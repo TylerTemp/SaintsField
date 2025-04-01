@@ -9,6 +9,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
     public static class EnumFlagsUtil
     {
+        public static bool HasFlag(Enum value, Enum flag) => (Convert.ToInt32(value) & Convert.ToInt32(flag)) != 0;
+        public static bool HasFlag(int value, int flag) => (value & flag) != 0;
+
         public struct EnumDisplayInfo
         {
             public string Name;

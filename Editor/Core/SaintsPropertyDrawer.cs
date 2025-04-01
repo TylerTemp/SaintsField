@@ -15,6 +15,8 @@ namespace SaintsField.Editor.Core
     // below-
     public partial class SaintsPropertyDrawer: PropertyDrawer, IDisposable
     {
+        public bool InHorizentalLayout;
+
         protected const int LabelLeftSpace = 4;
         protected const int LabelBaseWidth = 120;
         public const int IndentWidth = 15;

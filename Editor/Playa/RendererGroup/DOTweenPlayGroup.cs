@@ -8,7 +8,6 @@ using DG.Tweening;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -27,6 +26,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
     // ReSharper disable once InconsistentNaming
     public class DOTweenPlayGroup: ISaintsRendererGroup
     {
+        public bool InHorizontalLayout { get; set; }
+
         private readonly List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> _doTweenMethods = new List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)>();
         private readonly object _target;
 

@@ -18,5 +18,6 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
     [CustomPropertyDrawer(typeof(FullWidthRichLabelAttribute), true)]
     public partial class FullWidthRichLabelAttributeDrawer: SaintsPropertyDrawer
     {
+        // public bool IsSaintsPropertyDrawerOverrideLabel;
     }
 }

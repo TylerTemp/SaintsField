@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.FullWidthRichLabelDrawer;
 using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
@@ -28,6 +29,7 @@ namespace SaintsField.Editor.Core
         public static string ClassLabelFieldUIToolkit = "saints-field--label-field";
 
         public static string ClassNoRichLabelUpdate = "saints-field-no-rich-label-update";
+        private static string NameSaintsPropertyDrawerOverrideLabel = "saints-property-drawer-override-label";
 
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
 
@@ -41,7 +43,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual bool UseCreateFieldUIToolKit => false;
 
-        public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
+        // public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
 
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
@@ -90,28 +92,18 @@ namespace SaintsField.Editor.Core
                 })
                 .ToList();
 
-            if (AppendSaintsAttributeDrawer != null)
-            {
-                foreach ((ISaintsAttribute appendAttr, SaintsPropertyDrawer appendDrawer) in AppendSaintsAttributeDrawer)
-                {
-                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
-                    {
-                        Drawer = appendDrawer,
-                        Attribute = appendAttr,
-                        Index = saintsPropertyDrawers.Count,
-                    });
-                }
-            }
-
             // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
             if (string.IsNullOrEmpty(GetPreferredLabel(property)))
             {
+                saintsPropertyDrawers.RemoveAll(each => each.Attribute is RichLabelAttribute rl && string.IsNullOrEmpty(rl.RichTextXml));
+
                 NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
 
                 bool found = false;
                 for (int richLabelIndex = 0; richLabelIndex < saintsPropertyDrawers.Count; richLabelIndex++)
                 {
                     SaintsPropertyDrawer eachDrawer = saintsPropertyDrawers[richLabelIndex].Drawer;
+                    // ReSharper disable once InvertIf
                     if (eachDrawer is RichLabelAttributeDrawer)
                     {
                         found = true;
@@ -135,6 +127,88 @@ namespace SaintsField.Editor.Core
                     });
                 }
             }
+
+            // if in horizental layout,
+            // 1. we need to swap RichLabel to AboveRichLabel, if it has content
+            // 2. otherwise (NoLabel), we no longer added a `NoLabel` to it
+            if(InHorizentalLayout)
+            {
+                bool alreadyHasRichLabel = false;
+                bool alreadyHasNoLabel = false;
+                foreach ((SaintsPropertyInfo saintsPropertyInfo, int index) in saintsPropertyDrawers.WithIndex())
+                {
+                    if (saintsPropertyInfo.Attribute is RichLabelAttribute richLabel)
+                    {
+                        if (string.IsNullOrEmpty(richLabel.RichTextXml))
+                        {
+                            alreadyHasNoLabel = true;
+                        }
+                        else
+                        {
+                            alreadyHasRichLabel = true;
+                            AboveRichLabelAttribute aboveRichLabelAttribute =
+                                new AboveRichLabelAttribute(richLabel.RichTextXml, richLabel.IsCallback);
+
+                            FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
+                                (FullWidthRichLabelAttributeDrawer)
+                                GetOrCreateSaintsDrawerByAttr(aboveRichLabelAttribute);
+                            // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
+                            saintsPropertyDrawers[index] = new SaintsPropertyInfo
+                            {
+                                Drawer = fullWidthRichLabelAttributeDrawer,
+                                Attribute = aboveRichLabelAttribute,
+                                Index = saintsPropertyInfo.Index,
+                            };
+                        }
+                        break;
+                    }
+                }
+
+                if(!alreadyHasNoLabel)
+                {
+                    // Debug.Log($"add no label: {property.propertyPath}");
+                    NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
+                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    {
+                        Drawer = GetOrCreateSaintsDrawerByAttr(noLabelAttribute),
+                        Attribute = noLabelAttribute,
+                        Index = saintsPropertyDrawers.Count,
+                    });
+                }
+
+                if (!alreadyHasRichLabel)
+                {
+                    AboveRichLabelAttribute aboveRichLabelAttribute =
+                        // ReSharper disable once RedundantArgumentDefaultValue
+                        new AboveRichLabelAttribute("<label />");
+
+                    FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
+                        (FullWidthRichLabelAttributeDrawer)
+                        GetOrCreateSaintsDrawerByAttr(aboveRichLabelAttribute);
+                    // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
+                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    {
+                        Drawer = fullWidthRichLabelAttributeDrawer,
+                        Attribute = aboveRichLabelAttribute,
+                        Index = saintsPropertyDrawers.Count,
+                    });
+                }
+            }
+
+            // if (AppendSaintsAttributeDrawer != null)
+            // {
+            //     foreach ((ISaintsAttribute appendAttr, SaintsPropertyDrawer appendDrawer) in AppendSaintsAttributeDrawer)
+            //     {
+            //         saintsPropertyDrawers.Add(new SaintsPropertyInfo
+            //         {
+            //             Drawer = appendDrawer,
+            //             Attribute = appendAttr,
+            //             Index = saintsPropertyDrawers.Count,
+            //         });
+            //     }
+            // }
+
+
 
             // for type drawer that is in SaintsField, use this to draw with a fake property attribute
             SaintsPropertyInfo fieldAttributeWithIndex = saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field);
@@ -166,6 +240,13 @@ namespace SaintsField.Editor.Core
             }
 
             #region Above
+
+            // if (InHorizentalLayout)
+            // {
+            //     Label saintsPropertyDrawerOverrideLabel = new Label(GetPreferredLabel(property));
+            //     saintsPropertyDrawerOverrideLabel.AddToClassList(NameSaintsPropertyDrawerOverrideLabel);
+            //     containerElement.Add(saintsPropertyDrawerOverrideLabel);
+            // }
 
             Dictionary<string, List<SaintsPropertyInfo>> groupedAboveDrawers =
                 new Dictionary<string, List<SaintsPropertyInfo>>();
@@ -1094,10 +1175,17 @@ namespace SaintsField.Editor.Core
             return propertyField;
         }
 
-                protected static void OnLabelStateChangedUIToolkit(SerializedProperty property, VisualElement container,
+        protected static void OnLabelStateChangedUIToolkit(SerializedProperty property, VisualElement container,
             string toLabel, IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried,
             RichTextDrawer richTextDrawer)
         {
+            Label saintsPropertyDrawerOverrideLabel = container.Q<Label>(classes: NameSaintsPropertyDrawerOverrideLabel);
+            if (saintsPropertyDrawerOverrideLabel != null)
+            {
+                UIToolkitUtils.SetLabel(saintsPropertyDrawerOverrideLabel, richTextChunks, richTextDrawer);
+                return;
+            }
+
             VisualElement saintsLabelField = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
             object saintsLabelFieldDrawerData = saintsLabelField.userData;
 

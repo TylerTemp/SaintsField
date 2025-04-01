@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
@@ -381,7 +382,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                 Debug.Log($"add item@{groupPath}->{groupId}: {renderer}");
 #endif
+                renderer.InHorizontalLayout = InHorizontalLayout || EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
+
                 VisualElement fieldElement = renderer.CreateVisualElement();
+                // ReSharper disable once InvertIf
                 if(fieldElement != null)
                 {
                     if (!fieldToVisualElement.TryGetValue(groupId, out List<VisualElement> visualElements))

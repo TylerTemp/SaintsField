@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.FullWidthRichLabelDrawer;
+using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -67,6 +69,32 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
 
+            // List<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> appendSaintsAttributeDrawer = null;
+            //
+            // if (!isArray && InHorizentalLayout)
+            // {
+            //     appendSaintsAttributeDrawer = new List<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)>();
+            //     NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
+            //     RichLabelAttributeDrawer noLabelDrawer = (RichLabelAttributeDrawer)
+            //         SaintsPropertyDrawer.MakePropertyDrawer(typeof(RichLabelAttributeDrawer),
+            //             FieldWithInfo.FieldInfo, useAttribute, FieldWithInfo.SerializedProperty.displayName);
+            //
+            //     appendSaintsAttributeDrawer.Add((noLabelAttribute, noLabelDrawer));
+            //
+            //     // // ReSharper disable once RedundantArgumentDefaultValue
+            //     // AboveRichLabelAttribute aboveRichLabelAttribute = new AboveRichLabelAttribute("<label />");
+            //     // FullWidthRichLabelAttributeDrawer aboveRichLabelDrawer = (FullWidthRichLabelAttributeDrawer)
+            //     //     SaintsPropertyDrawer.MakePropertyDrawer(typeof(FullWidthRichLabelAttributeDrawer),
+            //     //         FieldWithInfo.FieldInfo, aboveRichLabelAttribute, FieldWithInfo.SerializedProperty.displayName);
+            //     //
+            //     // appendSaintsAttributeDrawer.Add((aboveRichLabelAttribute, aboveRichLabelDrawer));
+            // }
+
+            if (!isArray && useDrawerType == null && InHorizontalLayout)
+            {
+                useDrawerType = typeof(SaintsPropertyDrawer);
+            }
+
             // Debug.Log($"{useAttribute}/{useDrawerType}/isArray={isArray}/{FieldWithInfo.SerializedProperty.propertyPath}");
 
             if (useDrawerType == null)
@@ -99,6 +127,11 @@ namespace SaintsField.Editor.Playa.Renderer
 
             PropertyDrawer propertyDrawer = SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, FieldWithInfo.FieldInfo, useAttribute, FieldWithInfo.SerializedProperty.displayName);
             // Debug.Log(saintsPropertyDrawer);
+            if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
+            {
+                // saintsPropertyDrawer.AppendSaintsAttributeDrawer = appendSaintsAttributeDrawer;
+                saintsPropertyDrawer.InHorizentalLayout = InHorizontalLayout;
+            }
 
             MethodInfo uiToolkitMethod = useDrawerType.GetMethod("CreatePropertyGUI");
 

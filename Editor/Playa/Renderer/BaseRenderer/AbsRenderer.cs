@@ -15,6 +15,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
     public abstract partial class AbsRenderer: ISaintsRenderer
     {
+        public bool InHorizontalLayout { get; set; }
+
         // ReSharper disable InconsistentNaming
         public readonly SaintsFieldWithInfo FieldWithInfo;
         // protected readonly SerializedObject SerializedObject;
