@@ -1,7 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -9,12 +8,16 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.SceneDrawer
+namespace SaintsField.Editor.Drawers.SortingLayerDrawer
 {
-    public partial class SceneAttributeDrawer
+    public partial class SortingLayerAttributeDrawer
     {
-        private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__Scene_Button";
-        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Scene_HelpBox";
+
+        private static string NameButtonField(SerializedProperty property) =>
+            $"{property.propertyPath}__SortingLayer_Button";
+
+        private static string NameHelpBox(SerializedProperty property) =>
+            $"{property.propertyPath}__SortingLayer_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
@@ -35,7 +38,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
                 {
@@ -43,6 +46,8 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 },
                 name = NameHelpBox(property),
             };
+            helpBox.AddToClassList(ClassAllowDisable);
+            return helpBox;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -54,28 +59,34 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
             UIToolkitUtils.AddContextualMenuManipulator(buttonLabel.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
-            (int _, string displayName) = GetSelected(property, (SceneAttribute)saintsAttribute);
+            (string[] _, int _, string displayName) = GetSelected(property);
             buttonLabel.ButtonLabelElement.text = displayName;
 
             container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property)).ButtonElement.clicked += () =>
-                ShowDropdown(property, saintsAttribute, container, parent, onValueChangedCallback);
+                ShowDropdown(property, container, onValueChangedCallback);
         }
 
-        private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            VisualElement container, object parent, Action<object> onChange)
+        private static void ShowDropdown(SerializedProperty property,
+            VisualElement container, Action<object> onChange)
         {
-            string[] scenes = GetTrimedScenePath(((SceneAttribute)saintsAttribute).FullPath);
+            (string[] layers, int selectedIndex, string _) = GetSelected(property);
 
             GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-            UIToolkitUtils.DropdownButtonField buttonDropdown =
+            // if (layers.Length == 0)
+            // {
+            //     genericDropdownMenu.AddDisabledItem("No layers", false);
+            //     genericDropdownMenu.DropDown(button.worldBound, button, true);
+            //     return;
+            // }
+
+            UIToolkitUtils.DropdownButtonField buttonLabel =
                 container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
 
-            (int selectedIndex, string _) = GetSelected(property, (SceneAttribute)saintsAttribute);
-
-            for (var index = 0; index < scenes.Length; index++)
+            for (int index = 0; index < layers.Length; index++)
             {
                 int curIndex = index;
-                string curItem = scenes[index];
+                string curItem = layers[index];
+
                 string curName = $"{index}: {curItem}";
 
                 genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
@@ -93,41 +104,41 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                         onChange.Invoke(curIndex);
                     }
 
-                    buttonDropdown.ButtonLabelElement.text = curName;
+                    buttonLabel.ButtonLabelElement.text = curName;
                 });
             }
 
-            if (scenes.Length > 0)
+            if (layers.Length > 0)
             {
                 genericDropdownMenu.AddSeparator("");
             }
 
-            genericDropdownMenu.AddItem("Edit Scenes In Build...", false, OpenBuildSettings);
+            genericDropdownMenu.AddItem("Edit Sorting Layers...", false, OpenSortingLayerInspector);
 
-            genericDropdownMenu.DropDown(buttonDropdown.ButtonElement.worldBound, buttonDropdown, true);
+            genericDropdownMenu.DropDown(buttonLabel.ButtonElement.worldBound, buttonLabel, true);
         }
 
-        private static (int index, string displayName) GetSelected(SerializedProperty property, SceneAttribute sceneAttribute)
+        private static (string[] layers, int index, string display) GetSelected(SerializedProperty property)
         {
-            string[] scenes = GetTrimedScenePath(sceneAttribute.FullPath);
+            string[] layers = GetLayers();
             if (property.propertyType == SerializedPropertyType.String)
             {
-                string scene = property.stringValue;
-                int index = Array.IndexOf(scenes, scene);
-                return (index, index == -1 ? scene : $"{index}: {scene}");
+                string value = property.stringValue;
+                int index = Array.IndexOf(layers, value);
+                return (layers, index, index == -1 ? $"?: {value}" : $"{index}: {value}");
             }
             else
             {
                 int index = property.intValue;
-                if (index >= scenes.Length)
+                if (index < 0 || index >= layers.Length)
                 {
-                    return (-1, $"{index}: ?");
+                    return (layers, -1, $"{index}: ?");
                 }
 
-                string scene = scenes[index];
-                return (index, $"{index}: {scene}");
+                return (layers, index, $"{index}: {layers[index]}");
             }
         }
+
     }
 }
 #endif

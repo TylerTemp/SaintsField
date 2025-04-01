@@ -74,6 +74,41 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 SerializedProperty prop = property.GetArrayElementAtIndex(propIndex);
                 PropertyField propertyField = (PropertyField)propertyFieldRaw;
                 propertyField.BindProperty(prop);
+                // Debug.Log(prop.propertyPath);
+
+                // we can not clear the original context menu which will incorrectly copy the whole property, rather than an element
+                propertyField.AddManipulator(new ContextualMenuManipulator(evt =>
+                {
+                    evt.menu.AppendAction("Copy Element Property Path", _ => EditorGUIUtility.systemCopyBuffer = prop.propertyPath);
+
+                    // bool spearator = false;
+                    if (ClipboardHelper.CanCopySerializedProperty(prop.propertyType))
+                    {
+                        // spearator = true;
+                        // evt.menu.AppendSeparator();
+                        evt.menu.AppendAction("Copy Element", _ => ClipboardHelper.DoCopySerializedProperty(prop));
+                    }
+
+                    (bool hasReflectionPaste, bool hasValuePaste) = ClipboardHelper.CanPasteSerializedProperty(prop.propertyType);
+
+                    // ReSharper disable once InvertIf
+                    if (hasReflectionPaste)
+                    {
+                        evt.menu.AppendAction("Paste Element", _ =>
+                        {
+                            ClipboardHelper.DoPasteSerializedProperty(prop);
+                            property.serializedObject.ApplyModifiedProperties();
+                        }, hasValuePaste? DropdownMenuAction.Status.Normal: DropdownMenuAction.Status.Disabled);
+                    }
+
+                    evt.menu.AppendAction("Delete Element", _ =>
+                    {
+                        property.DeleteArrayElementAtIndex(propIndex);
+                        property.serializedObject.ApplyModifiedProperties();
+                    });
+
+                    evt.menu.AppendSeparator();
+                }));
             }
 
             ListView listView = new ListView(Enumerable.Range(0, property.arraySize).ToList())
@@ -495,6 +530,68 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 property.MoveArrayElement(fromPropIndex, toPropIndex);
                 property.serializedObject.ApplyModifiedProperties();
             };
+
+            listView.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                // ReSharper disable once MergeIntoLogicalPattern
+                bool ctrl = evt.modifiers == EventModifiers.Control ||
+                            evt.modifiers == EventModifiers.Command;
+
+                bool copyCommand = ctrl && evt.keyCode == KeyCode.C;
+                if (copyCommand)
+                {
+                    int selectedIndex = listView.selectedItems
+                        .Cast<int>()
+                        .DefaultIfEmpty(-1)
+                        .First();
+
+                    if (selectedIndex == -1)
+                    {
+                        return;
+                    }
+
+                    int propIndex = itemIndexToPropertyIndex[selectedIndex];
+                    if(propIndex >= property.arraySize)
+                    {
+                        return;
+                    }
+                    SerializedProperty prop = property.GetArrayElementAtIndex(propIndex);
+
+                    if (ClipboardHelper.CanCopySerializedProperty(prop.propertyType))
+                    {
+                        ClipboardHelper.DoCopySerializedProperty(prop);
+                    }
+                }
+
+                bool pasteCommand = ctrl && evt.keyCode == KeyCode.V;
+                if (pasteCommand)
+                {
+                    int selectedIndex = listView.selectedItems
+                        .Cast<int>()
+                        .DefaultIfEmpty(-1)
+                        .First();
+
+                    if (selectedIndex == -1)
+                    {
+                        return;
+                    }
+
+                    int propIndex = itemIndexToPropertyIndex[selectedIndex];
+                    if(propIndex >= property.arraySize)
+                    {
+                        return;
+                    }
+                    SerializedProperty prop = property.GetArrayElementAtIndex(propIndex);
+
+                    (bool pasteHasReflection, bool pasteHasValue) = ClipboardHelper.CanPasteSerializedProperty(prop.propertyType);
+                    // Debug.Log($"{pasteHasReflection}, {pasteHasValue}");
+                    if (pasteHasReflection && pasteHasValue)
+                    {
+                        ClipboardHelper.DoPasteSerializedProperty(prop);
+                        prop.serializedObject.ApplyModifiedProperties();
+                    }
+                }
+            });
 
             foldoutContent.Insert(0, preContent);
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
@@ -11,16 +12,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
     public class CopyPasteTest : SaintsMonoBehaviour
     {
-        // public bool boolV;
-        // [LeftToggle] public bool leftToggle;
-        //
-        // public sbyte sByteV;
-        // public byte byteV;
-        //
-        // public string s;
+        public bool boolV;
+        [LeftToggle] public bool leftToggle;
 
-        [ResizableTextArea]
-        public string res;
+        public sbyte sByteV;
+        public byte byteV;
+
+        public string s;
 
         [PropRange(0, 10)] public float propR;
 
@@ -51,16 +49,33 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
         [ListDrawerSettings]
         public GameObject[] goDrawer;
-        public MyClass[] goArray;
+        public GameObject[] goArray;
 
         [ListDrawerSettings]
         public MyClass[] classDrawer;
         public MyClass[] classArray;
 
         [Table]
-        public Scriptable[] scriptableArray;
+        public Scriptable[] scriptableTable;
         public Scriptable[] scriptables;
 
+        [Serializable]
+        public struct MyStruct
+        {
+            public int myInt;
+
+            [TableColumn("Value"), AboveRichLabel]
+            public string myString;
+            [TableColumn("Value"), AboveRichLabel]
+            public GameObject myObject;
+        }
+
+        [Table]
+        public List<MyStruct> myStructsTable;
+        public List<MyStruct> myStructsArray;
+
+        [ResizableTextArea]
+        public string res;
         [Button]
         private void Paste()
         {

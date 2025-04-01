@@ -22,6 +22,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public int MyInt { get; private set; }
         }
 
+        [ShowInInspector] private TestPrivateFieldDummy _testPrivateFieldDummy;
+
         [ShowInInspector]
         private readonly List<int> _readonlyList = new List<int>();
 

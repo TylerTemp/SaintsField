@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -26,6 +27,7 @@ namespace SaintsField.Editor.Utils
         {
             if (IsGeneralType(property.propertyType))
             {
+                // Debug.Log($"SetSerializedProperty {property.propertyPath}/{property.propertyType}");
                 SetSerializedProperty(property);
                 return;
             }
@@ -357,7 +359,10 @@ namespace SaintsField.Editor.Utils
         {
             if (EnsureSetSerializedPropertyMethod())
             {
+                // Debug.Log($"invoke {_setSerializedPropertyMethodInfo.Name} {string.Join(",", _setSerializedPropertyMethodInfo.GetParameters().Cast<object>())}");
+
                 _setSerializedPropertyMethodInfo.Invoke(null, new object[] { property });
+                // Debug.Log(EditorGUIUtility.systemCopyBuffer);
             }
         }
 

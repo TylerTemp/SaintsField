@@ -68,6 +68,8 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
         {
             Foldout foldOut = container.Q<Foldout>(NameFoldout(property));
 
+            UIToolkitUtils.AddContextualMenuManipulator(foldOut, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
             VisualElement nameProp = container.Q<VisualElement>(NameProps(property));
 
             foldOut.RegisterValueChangedCallback(v =>

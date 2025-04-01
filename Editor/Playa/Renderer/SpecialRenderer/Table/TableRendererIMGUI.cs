@@ -14,7 +14,12 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
             int arraySize = FieldWithInfo.SerializedProperty.arraySize;
             if (arraySize == 0)
             {
-                return SaintsPropertyDrawer.SingleLineHeight * 3 + 8;
+                if(FieldWithInfo.SerializedProperty.isExpanded)
+                {
+                    return SaintsPropertyDrawer.SingleLineHeight * 3 + 8;
+                }
+
+                return SaintsPropertyDrawer.SingleLineHeight;
             }
 
             return FieldWithInfo.SerializedProperty.isExpanded

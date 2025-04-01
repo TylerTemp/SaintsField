@@ -5,6 +5,8 @@ namespace SaintsField.Samples.Scripts.Interface
 {
     public class InterfaceExample: MonoBehaviour
     {
+        public SaintsObjInterface<IInterface1> i1;
+
         public SaintsInterface<Component, IInterface1> myInter1;
 
         // for old unity
@@ -23,12 +25,12 @@ namespace SaintsField.Samples.Scripts.Interface
         [RichLabel("<color=green><label/>")]
         public SaintsInterface<UnityEngine.Object, IInterface2> myAnyInter2;
 
-        // private void Awake()
-        // {
-        //     Debug.Log(myInter1.I);  // the actual interface object
-        //     Debug.Log(myInter1.V);  // the actual serialized object
-        //
-        //     myInter1.I.Method1();
-        // }
+        private void Awake()
+        {
+            Debug.Log(myInter1.I);  // the actual interface object
+            Debug.Log(myInter1.V);  // the actual serialized object
+
+            myInter1.I.Method1();
+        }
     }
 }

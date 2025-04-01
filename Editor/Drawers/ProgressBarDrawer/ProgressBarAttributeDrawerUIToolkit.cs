@@ -36,6 +36,8 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             }
         }
 
+        private static string NameProgressBarField(SerializedProperty property) =>
+            $"{property.propertyPath}__ProgressBarField";
         private static string NameProgressBar(SerializedProperty property) => $"{property.propertyPath}__ProgressBar";
 
         private static string NameHelpBox(SerializedProperty property) =>
@@ -97,7 +99,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
             ProgressBarField progressBarField = new ProgressBarField(GetPreferredLabel(property), progressBar)
             {
-                name = NameProgressBar(property),
+                name = NameProgressBarField(property),
             };
             progressBarField.AddToClassList(ProgressBarField.alignedFieldUssClassName);
 
@@ -126,6 +128,9 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            ProgressBarField progressBarField = container.Q<ProgressBarField>(name: NameProgressBarField(property));
+            UIToolkitUtils.AddContextualMenuManipulator(progressBarField.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
             ProgressBar progressBar = container.Q<ProgressBar>(NameProgressBar(property));
 
             progressBar.RegisterCallback<PointerDownEvent>(evt =>

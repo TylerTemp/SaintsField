@@ -17,8 +17,11 @@ namespace SaintsField
         public virtual bool EditorCustomPicker => true;
 #endif
 
-        public static implicit operator TInterface(SaintsInterface<TObject, TInterface> saintsInterface) => saintsInterface.I;
-        public static implicit operator TObject(SaintsInterface<TObject, TInterface> saintsInterface) => saintsInterface.V;
+        // public static implicit operator TInterface(SaintsInterface<TObject, TInterface> saintsInterface) => saintsInterface.I;
+        // public static implicit operator TObject(SaintsInterface<TObject, TInterface> saintsInterface) => saintsInterface.V;
+
+        public static explicit operator TInterface(SaintsInterface<TObject, TInterface> saintsInterface) => saintsInterface.I;
+        public static explicit operator TObject(SaintsInterface<TObject, TInterface> saintsInterface) => saintsInterface.V;
 
         public override string ToString() => $"<Interface I={I} V={V}/>";
 

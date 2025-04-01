@@ -11077,29 +11077,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a01f32b96f151b4d9c2a0136de5f05f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  res: GenericPropertyJSON:{"name":"classArray","type":-1,"arraySize":2,"arrayType":"MyClass","children":[{"name":"Array","type":-1,"arraySize":2,"arrayType":"MyClass","children":[{"name":"size","type":12,"val":2},{"name":"data","type":-1,"children":[{"name":"myString","type":3,"val":"13"}]},{"name":"data","type":-1,"children":[{"name":"myString","type":3,"val":"22"}]}]}]}
-  propR: 2.71
-  layerString: SortButton
-  layerInt: 2
+  boolV: 0
+  leftToggle: 0
+  sByteV: 0
+  byteV: 0
+  s: 
+  propR: 0
+  layerString: UIX
+  layerInt: -1
   myClass1:
-    myString: 74937
+    myString: 
   myClass2:
-    myString: 74937
-  v2I: {x: 0, y: -1}
-  v2: {x: 0, y: 0}
-  goDrawer:
-  - {fileID: 764521261}
+    myString: 
+  v2I: {x: -1, y: 0}
+  v2: {x: 1, y: 0}
+  goDrawer: []
   goArray: []
-  classDrawer:
-  - myString: 13
-  - myString: 22
-  classArray:
-  - myString: 13
-  - myString: 22
-  scriptableArray:
-  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
-  scriptables:
-  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+  classDrawer: []
+  classArray: []
+  scriptableTable:
+  - {fileID: 0}
+  scriptables: []
+  myStructsTable:
+  - myInt: 1321
+    myString: 32132
+    myObject: {fileID: 0}
+  - myInt: 111
+    myString: 222
+    myObject: {fileID: 0}
+  myStructsArray:
+  - myInt: 0
+    myString: 
+    myObject: {fileID: 0}
+  res: GenericPropertyJSON:{"name":"data","type":-1,"children":[{"name":"myInt","type":0,"val":1321},{"name":"myString","type":3,"val":"32132"},{"name":"myObject","type":5,"val":"UnityEditor.ObjectWrapperJSON:{\"guid\":\"\",\"localId\":0,\"type\":0,\"instanceID\":0}"}]}
 --- !u!1 &765557043
 GameObject:
   m_ObjectHideFlags: 0

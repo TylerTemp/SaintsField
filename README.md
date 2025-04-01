@@ -81,13 +81,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.0.3**
+**4.0.4**
 
-1.  UI Toolkit: `Layer` of string type should not give error when the layer name is an empty string
-2.  UI Toolkit: Add right click copy/paste ability to `AdvancedDropdown`, `Dropdown`, `ListDrawerSettings` & `Tabel`
-3.  UI Toolkit: Fix an error when using `PropRange` with int type
-4.  IMGUI: Change `EnumToggleButtons` selected one with green background color
-
+1.  UI Toolkit: Copy/Paste a row in `ListDrawerSettings`/`Table` using either ctrl+c/ctrl+v or RMB is now supported.
+2.  UI Toolkit: Add copy/paste ability to many fields, e.g. `Tag`, `Layer`, `Scene`
+3.  Fix `SaintsInterface` gave an error when working with auto getters.
+4.  Add `SaintsObjInterface<TInterface>` as a shortcut for `SaintsInterface<UnityEngine.Object, TInterface>`.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4886,7 +4885,7 @@ public ValueFillerDict decValueFillerDict;
 
 [![video](https://github.com/user-attachments/assets/ce2efb49-2723-4e43-a3a7-9969f229f591)](https://github.com/user-attachments/assets/38dcb22c-d30f-40d4-bd6b-420aa1b41588)
 
-### `SaintsInterface<,>` ###
+### `SaintsInterface<,>`/`SaintsObjInterface<>` ###
 
 `SaintsInterface` is a simple tool to serialize a `UnityEngine.Object` (usually your script component) with a required interface.
 
@@ -4901,10 +4900,12 @@ For `SaintsInterface<TObject, TInterface>`:
 *   `.I`: the interface value, which is the instance of `TInterface`
 *   `.V`: the actual object value, which is the instance of `TObject`
 
+`SaintsObjInterface<>` is a shortcut for `SaintsInterface<UnityEngine.Object, TInterface>`.
+
 ```csharp
 using SaintsField;
 
-public SaintsInterface<Component, IInterface1> myInter1;
+public SaintsObjInterface<IInterface1> myInter1;
 
 // for old unity
 [Serializable]
@@ -4922,19 +4923,6 @@ private void Awake()
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/e7ea662d-34d2-4d4b-88b9-0c4bbbbdee33)
-
-Special Note:
-
-Though you can inherit `SaintsInterface`, but don't inherit it with 2 steps of generic, for example:
-
-```csharp
-// Don't do this!
-class AnyObjectInterface<T>: SaintsInterface<UnityEngine.Object, T> {}
-class MyInterface: AnyObjectInterface<IInterface1> {}
-```
-
-The drawer will fail for `AnyObjectInterface` and `MyInterface` because in Unity's C# runtime, it can not report correctly generic arguments.
-For more information, see [the comment of the answer in this stackoverflow](https://stackoverflow.com/questions/78513347/getgenericarguments-recursively-on-inherited-class-type-in-c?noredirect=1#comment138415538_78513347).
 
 This component is inspired by [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/utilities/serialize-interfaces-187505), you may go there and support him!
 

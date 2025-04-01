@@ -153,11 +153,6 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 SerializedProperty arrayItemProp = ArrayProp.GetArrayElementAtIndex(item.id);
                 IReadOnlyList<string> propNames = _headerToPropNames[getColumn];
 
-                if (string.IsNullOrEmpty(arrayItemProp.propertyPath))
-                {
-                    return;
-                }
-
                 if(arrayItemProp.propertyType == SerializedPropertyType.ObjectReference)
                 {
                     Object obj = arrayItemProp.objectReferenceValue;
@@ -342,6 +337,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }
         }
 
+        private int _preArraySizeImGui = -1;
+
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, FieldInfo info,
             bool hasLabelWidth, object parent)
@@ -366,6 +363,12 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }
 
             (string error, SerializedProperty arrayProp) = SerializedUtils.GetArrayProperty(property);
+
+            if (_preArraySizeImGui == -1)
+            {
+                _preArraySizeImGui = arrayProp.arraySize;
+            }
+
             _error = error;
             if (_error != "")
             {
@@ -488,6 +491,12 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             // }
             // _saintsTable.Reload();
 
+            if (_preArraySizeImGui != arrayProp.arraySize)
+            {
+                _preArraySizeImGui = arrayProp.arraySize;
+                _saintsTable.Reload();
+            }
+
             // ReSharper disable once InvertIf
             if (_saintsTable.Changed)
             {
@@ -503,6 +512,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
+
+
             TableAttribute tableAttribute = (TableAttribute) saintsAttribute;
 
             int propertyIndex;

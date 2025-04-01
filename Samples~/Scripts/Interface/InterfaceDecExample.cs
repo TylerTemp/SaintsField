@@ -73,7 +73,7 @@ namespace SaintsField.Samples.Scripts.Interface
         [Expandable]
         public InterfaceSo interfaceSo;
 
-        [GetComponent, PostFieldButton(nameof(DebugInterface1), "D")] public Interface1 getComponent;
+        // [GetComponent, PostFieldButton(nameof(DebugInterface1), "D")] public Interface1 getComponent;
         [GetComponentByPath("."), PostFieldButton(nameof(DebugInterface1), "D")] public Interface1 getComponentByPath;
 
         private void DebugInterface1(Interface1 interface1)
@@ -81,21 +81,21 @@ namespace SaintsField.Samples.Scripts.Interface
             Debug.Log(interface1.I?.GetType().Name ?? "null");
             Debug.Log(interface1.V);
         }
-
-        [Serializable]
-        public class InterfaceAny1 : SaintsInterface<UnityEngine.Object, IInterface1>
-        {
-        }
-
-        [FindComponent("Sub")] public InterfaceAny1 findComponent;
-        [ShowImage]
-        [GetComponentInChildren] public InterfaceAny1 getComponentInChildren;
-        [GetComponentInParent] public InterfaceAny1 getComponentInParent;
-        [GetComponentInParents] public InterfaceAny1 getComponentInParents;
-        [GetComponentInScene] public InterfaceAny1 getComponentInScene;
-        [GetPrefabWithComponent] public InterfaceAny1 getPrefabWithComponent;
-        [GetScriptableObject] public InterfaceAny1 getScriptableObject;
-
-        [SpriteToggle(nameof(getComponentInChildren))] public Sprite sprite;
+        //
+        // [Serializable]
+        // public class InterfaceAny1 : SaintsInterface<UnityEngine.Object, IInterface1>
+        // {
+        // }
+        //
+        // [FindComponent("Sub")] public InterfaceAny1 findComponent;
+        // [ShowImage]
+        // [GetComponentInChildren] public InterfaceAny1 getComponentInChildren;
+        // [GetComponentInParent] public InterfaceAny1 getComponentInParent;
+        // [GetComponentInParents] public InterfaceAny1 getComponentInParents;
+        // [GetComponentInScene] public InterfaceAny1 getComponentInScene;
+        // [GetPrefabWithComponent] public InterfaceAny1 getPrefabWithComponent;
+        // [GetScriptableObject] public InterfaceAny1 getScriptableObject;
+        //
+        // [SpriteToggle(nameof(getComponentInChildren))] public Sprite sprite;
     }
 }

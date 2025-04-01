@@ -760,7 +760,7 @@ namespace SaintsField.Editor.Utils
                         {
                             return new[] { comp.gameObject };
                         }
-                        Component[] r = Array.Empty<Component>();
+                        Component[] r;
                         try
                         {
                             r = comp.GetComponents(fieldType);

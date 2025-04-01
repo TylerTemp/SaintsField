@@ -240,7 +240,24 @@ namespace SaintsField.Editor.Utils
             }
             else
             {
-                fieldOrProp.PropertyInfo.SetValue(wrapProp, value);
+                SetProperyValue(fieldOrProp.PropertyInfo, wrapProp, value);
+            }
+        }
+
+        private static void SetProperyValue(PropertyInfo prop, object instance, object value)
+        {
+            if(prop.CanWrite)
+            {
+                prop.SetValue(instance, value);
+            }
+            else
+            {
+                MethodInfo setter = prop.GetSetMethod(true);
+                if (setter != null)
+                {
+                    setter.Invoke(instance, new [] { value });
+                }
+
             }
         }
 

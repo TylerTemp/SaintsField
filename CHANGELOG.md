@@ -1,9 +1,16 @@
 # Changelog
 
+## 4.0.4 ##
+
+1.  UI Toolkit: Copy/Paste a row in `ListDrawerSettings`/`Table` using either ctrl+c/ctrl+v or RMB is now supported.
+2.  UI Toolkit: Add copy/paste ability to many fields, e.g. `Tag`, `Layer`, `Scene`
+3.  Fix `SaintsInterface` gave an error when working with auto getters.
+4.  Add `SaintsObjInterface<TInterface>` as a shortcut for `SaintsInterface<UnityEngine.Object, TInterface>`.
+
 ## 4.0.3 ##
 
 1.  UI Toolkit: `Layer` of string type should not give error when the layer name is an empty string
-2.  UI Toolkit: Add right click copy/paste ability to `AdvancedDropdown`, `Dropdown`, `ListDrawerSettings` & `Tabel`
+2.  UI Toolkit: Add right click copy/paste ability to `AdvancedDropdown`, `Dropdown`, `ListDrawerSettings` & `Table`
 3.  UI Toolkit: Fix an error when using `PropRange` with int type
 4.  IMGUI: Change `EnumToggleButtons` selected one with green background color
 
