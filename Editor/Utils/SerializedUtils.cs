@@ -286,6 +286,25 @@ namespace SaintsField.Editor.Utils
             return $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
         }
 
+        public static bool IsOk(SerializedProperty property)
+        {
+            try
+            {
+                int _ = property.serializedObject.targetObject.GetInstanceID();
+                string __ = property.propertyPath;
+            }
+            catch (NullReferenceException)
+            {
+                return false;
+            }
+            catch (ObjectDisposedException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static Object GetSerObject(SerializedProperty property, MemberInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.Generic)
