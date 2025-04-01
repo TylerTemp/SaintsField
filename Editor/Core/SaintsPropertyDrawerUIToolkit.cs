@@ -50,6 +50,11 @@ namespace SaintsField.Editor.Core
             Debug.Log($"Create property gui {property.propertyPath}/{property.displayName}/{this}");
 #endif
 
+            if (!SerializedUtils.IsOk(property))
+            {
+                return new VisualElement();
+            }
+
             // IMGUIContainer Fallback
             if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideDrawCount) &&
                 insideDrawCount > 0)
@@ -1048,18 +1053,22 @@ namespace SaintsField.Editor.Core
             FieldInfo info
         )
         {
-            try
-            {
-                string _ = property.propertyPath;
-            }
-            catch (ObjectDisposedException)
+            if (!SerializedUtils.IsOk(property))
             {
                 return;
             }
-            catch (NullReferenceException)
-            {
-                return;
-            }
+            // try
+            // {
+            //     string _ = property.propertyPath;
+            // }
+            // catch (ObjectDisposedException)
+            // {
+            //     return;
+            // }
+            // catch (NullReferenceException)
+            // {
+            //     return;
+            // }
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
