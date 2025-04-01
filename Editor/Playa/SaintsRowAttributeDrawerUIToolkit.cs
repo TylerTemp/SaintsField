@@ -1,8 +1,9 @@
-﻿#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+﻿#if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,6 +12,8 @@ namespace SaintsField.Editor.Playa
 {
     public partial class SaintsRowAttributeDrawer
     {
+        protected override bool UseCreateFieldUIToolKit => true;
+
         public const string SaintsRowClass = "saintsfield-saintsrow";
 
         public static VisualElement CreateElement(SerializedProperty property, string label, FieldInfo info, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
@@ -76,20 +79,12 @@ namespace SaintsField.Editor.Playa
             return root;
         }
 
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            // Debug.Log($"Render {property.propertyPath}");
-            // Debug.Log(property.isExpanded);
-
             SaintsRowAttribute saintsRowAttribute = attribute as SaintsRowAttribute;
 
-            return CreateElement(property,
-#if UNITY_2022_3_OR_NEWER
-                preferredLabel
-#else
-                property.displayName
-#endif
-            , fieldInfo, saintsRowAttribute, this, this);
+            return CreateElement(property, property.displayName, info, saintsRowAttribute, this, this);
         }
 
         private static void FillElement(VisualElement root, SerializedProperty property, FieldInfo info, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)

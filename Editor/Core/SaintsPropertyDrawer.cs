@@ -660,6 +660,7 @@ namespace SaintsField.Editor.Core
 
             Type drawerType = eachDrawer.First(each => each.IsSaints).DrawerType;
             SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
+            saintsPropertyDrawer.InHorizentalLayout = InHorizentalLayout;
 
 #if UNITY_2022_2_OR_NEWER  // don't bother with too old Unity
             FieldInfo preferredLabelField = typeof(PropertyDrawer).GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);

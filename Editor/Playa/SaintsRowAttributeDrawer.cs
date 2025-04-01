@@ -16,7 +16,7 @@ using SaintsField.Playa;
 namespace SaintsField.Editor.Playa
 {
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
-    public partial class SaintsRowAttributeDrawer: PropertyDrawer, IDOTweenPlayRecorder, IMakeRenderer
+    public partial class SaintsRowAttributeDrawer: SaintsPropertyDrawer, IMakeRenderer
     {
         private static (string error, int arrayIndex, object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
@@ -55,12 +55,12 @@ namespace SaintsField.Editor.Playa
 
         // private bool _testToggle;
 
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-#endif
+// #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+// #endif
 
-        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
-        {
-            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
-        }
+        // public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        // {
+        //     return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
+        // }
     }
 }

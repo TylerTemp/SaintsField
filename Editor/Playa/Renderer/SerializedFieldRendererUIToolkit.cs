@@ -66,6 +66,12 @@ namespace SaintsField.Editor.Playa.Renderer
                     // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
                     useAttribute = attrOrNull;
                     useDrawerType = drawerType;
+
+                    if (useDrawerType == null &&
+                        FieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic)
+                    {
+                        useDrawerType = typeof(SaintsRowAttributeDrawer);
+                    }
                 }
             }
 

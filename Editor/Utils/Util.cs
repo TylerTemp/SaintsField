@@ -1175,6 +1175,9 @@ namespace SaintsField.Editor.Utils
         {
             if (fieldInfo == null)
             {
+#if SAINTSFIELD_DEBUG
+                Debug.LogError($"MemberInfo is null");
+#endif
                 return ("No MemberInfo given", arrayIndex, null);
             }
 

@@ -88,12 +88,12 @@ namespace SaintsField.Editor.Core
             //     })
             //     .ToArray();
             List<SaintsPropertyInfo> saintsPropertyDrawers = iSaintsAttributes
-                .WithIndex()
-                .Select(each => new SaintsPropertyInfo
+                // .WithIndex()
+                .Select((value, index) => new SaintsPropertyInfo
                 {
-                    Drawer = GetOrCreateSaintsDrawerByAttr(each.value),
-                    Attribute = each.value,
-                    Index = each.index,
+                    Drawer = GetOrCreateSaintsDrawerByAttr(value),
+                    Attribute = value,
+                    Index = index,
                 })
                 .ToList();
 
@@ -133,10 +133,24 @@ namespace SaintsField.Editor.Core
                 }
             }
 
-            // if in horizental layout,
+            // if in horizental layout, and not SaintsRow
             // 1. we need to swap RichLabel to AboveRichLabel, if it has content
             // 2. otherwise (NoLabel), we no longer added a `NoLabel` to it
-            if(InHorizentalLayout)
+
+            bool needAboveProcesser = InHorizentalLayout;
+            if (needAboveProcesser)
+            {
+                if (GetType() == typeof(SaintsRowAttributeDrawer))
+                {
+                    needAboveProcesser = false;
+                }
+                else if (saintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer))
+                {
+                    needAboveProcesser = false;
+                }
+            }
+
+            if(needAboveProcesser)
             {
                 bool alreadyHasRichLabel = false;
                 bool alreadyHasNoLabel = false;

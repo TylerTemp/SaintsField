@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
 
@@ -55,7 +57,8 @@ namespace SaintsField.Editor.Playa
             return Array.Empty<ISaintsRenderer>();
         }
 
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute,
+            FieldInfo info, bool hasLabelWidth, object parent)
         {
 #if UNITY_2021_3_OR_NEWER
             if (property.propertyType == SerializedPropertyType.ManagedReference &&
@@ -69,8 +72,8 @@ namespace SaintsField.Editor.Playa
                 ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
                 : _filedWidthCache;
 
-            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)attribute;
-            float baseLineHeight = saintsRowAttribute.Inline ? 0 : SaintsPropertyDrawer.SingleLineHeight;
+            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)saintsAttribute;
+            float baseLineHeight = saintsRowAttribute.Inline ? 0 : SingleLineHeight;
             float fieldHeight = 0f;
             // ReSharper disable once InvertIf
             if (property.isExpanded || saintsRowAttribute.Inline)
@@ -85,60 +88,51 @@ namespace SaintsField.Editor.Playa
             return baseLineHeight + fieldHeight;
         }
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            if (position.width - 1 > Mathf.Epsilon)
+            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)saintsAttribute;
+
+            if (!saintsRowAttribute.Inline)
             {
-                _filedWidthCache = position.width;
+                // Debug.Log($"render foldout {position.x}, {position.y}");
+                property.isExpanded = EditorGUI.Foldout(new Rect(position)
+                {
+                    height = SaintsPropertyDrawer.SingleLineHeight,
+                }, property.isExpanded, label, true);
             }
 
-            // Debug.Log(property.propertyPath);
-            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)attribute;
-            using (new EditorGUI.PropertyScope(position, label, property))
+            if (!saintsRowAttribute.Inline && !property.isExpanded)
             {
-                if (!saintsRowAttribute.Inline)
+                return;
+            }
+
+            Rect leftRect = saintsRowAttribute.Inline
+                ? new Rect(position)
+                : new Rect(position)
                 {
-                    // Debug.Log($"render foldout {position.x}, {position.y}");
-                    property.isExpanded = EditorGUI.Foldout(new Rect(position)
-                    {
-                        height = SaintsPropertyDrawer.SingleLineHeight,
-                    }, property.isExpanded, label, true);
-                }
+                    x = position.x + SaintsPropertyDrawer.IndentWidth,
+                    y = position.y + SaintsPropertyDrawer.SingleLineHeight,
+                    height = position.height - SaintsPropertyDrawer.SingleLineHeight,
+                    width = position.width - SaintsPropertyDrawer.IndentWidth,
+                };
 
-                if (!saintsRowAttribute.Inline && !property.isExpanded)
-                {
-                    return;
-                }
+            float yAcc = leftRect.y;
 
-                Rect leftRect = saintsRowAttribute.Inline
-                    ? new Rect(position)
-                    : new Rect(position)
-                    {
-                        x = position.x + SaintsPropertyDrawer.IndentWidth,
-                        y = position.y + SaintsPropertyDrawer.SingleLineHeight,
-                        height = position.height - SaintsPropertyDrawer.SingleLineHeight,
-                        width = position.width - SaintsPropertyDrawer.IndentWidth,
-                    };
-
-                float yAcc = leftRect.y;
-
-                foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
-                {
+            foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
+            {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTSROW
                     Debug.Log($"saintsRow: {saintsRenderer}");
 #endif
-                    float height = saintsRenderer.GetHeightIMGUI(position.width);
-                    Rect rect = new Rect(leftRect)
-                    {
-                        y = yAcc,
-                        height = height,
-                    };
-                    saintsRenderer.RenderPositionIMGUI(rect);
-                    yAcc += height;
-                }
+                float height = saintsRenderer.GetHeightIMGUI(position.width);
+                Rect rect = new Rect(leftRect)
+                {
+                    y = yAcc,
+                    height = height,
+                };
+                saintsRenderer.RenderPositionIMGUI(rect);
+                yAcc += height;
             }
-
-            // Debug.Log($"Done {property.propertyPath}");
         }
     }
 }
