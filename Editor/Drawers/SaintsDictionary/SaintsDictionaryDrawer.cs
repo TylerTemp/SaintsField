@@ -18,33 +18,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
     {
         private static readonly Color WarningColor = new Color(0.8490566f, 0.3003738f, 0.3003738f);
 
-        // [InitializeOnLoadMethod]
-        // private static void AddSaintsPropertyInfoInjectAnimatorState()
-        // {
-        //     AddSaintsPropertyInfoInject((property, info, allAttributes) =>
-        //     {
-        //         if (allAttributes.Any(each => each is AnimatorStateAttribute))
-        //         {
-        //             return (null, null);
-        //         }
-        //
-        //         if (property.propertyType != SerializedPropertyType.Generic)
-        //         {
-        //             return (null, null);
-        //         }
-        //         Type infoType = ReflectUtils.GetElementType(info.FieldType);
-        //
-        //
-        //         if (!InterfaceTypes.All(interfaceType => interfaceType.IsAssignableFrom(infoType)))
-        //         {
-        //             return (null, null);
-        //         }
-        //
-        //         AnimatorStateAttribute fakeAttribute = new AnimatorStateAttribute();
-        //         return (fakeAttribute, typeof(AnimatorStateAttributeDrawer));
-        //     });
-        // }
-
         private static bool IncreaseArraySize(int newValue, SerializedProperty keyProp, SerializedProperty valueProp)
         {
             int keySize = keyProp.arraySize;

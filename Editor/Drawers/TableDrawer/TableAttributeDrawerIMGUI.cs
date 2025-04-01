@@ -377,6 +377,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             if (_saintsTable == null)
             {
+                float properFullWidth = Mathf.Max(20, width - IndentWidth - 20);
+
                 Dictionary<int, IReadOnlyList<string>> headerToPropNames = new Dictionary<int, IReadOnlyList<string>>();
 
                 _isObjectReference = arrayProp.GetArrayElementAtIndex(0).propertyType == SerializedPropertyType.ObjectReference;
@@ -409,6 +411,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             });
                         }
 
+                        float useWidth = properFullWidth / columnToProperties.Count;
+
                         // ReSharper disable once UseDeconstruction
                         foreach ((KeyValuePair<string, List<SerializedPropertyInfo>> columnKv, int index) in columnToProperties.WithIndex())
                         {
@@ -421,7 +425,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                                 headerTextAlignment = TextAlignment.Left,
                                 sortedAscending = true,
                                 sortingArrowAlignment = TextAlignment.Right,
-                                width = 100,
+                                width = useWidth,
                                 minWidth = 60,
                                 autoResize = true,
                                 allowToggleVisibility = true,
@@ -452,6 +456,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         });
                     }
 
+                    float useWidth = properFullWidth / columnToProperties.Count;
+
                     // ReSharper disable once UseDeconstruction
                     foreach ((KeyValuePair<string, List<SerializedPropertyInfo>> columnKv, int index) in columnToProperties.WithIndex())
                     {
@@ -466,7 +472,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             headerTextAlignment = TextAlignment.Left,
                             sortedAscending = true,
                             sortingArrowAlignment = TextAlignment.Right,
-                            width = 100,
+                            width = useWidth,
                             minWidth = 60,
                             autoResize = true,
                             allowToggleVisibility = true,

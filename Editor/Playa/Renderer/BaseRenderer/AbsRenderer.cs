@@ -9,7 +9,6 @@ using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 
 namespace SaintsField.Editor.Playa.Renderer.BaseRenderer

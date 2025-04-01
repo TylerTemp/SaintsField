@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Playa
             {
                 Foldout foldout = new Foldout
                 {
-                    text = property.displayName,
+                    text = label,
                     value = property.isExpanded,
                     style =
                     {

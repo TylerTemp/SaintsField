@@ -285,6 +285,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Foldout foldout = container.Q<Foldout>(name: NameFoldout(property));
+            UIToolkitUtils.AddContextualMenuManipulator(foldout, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             foldout.RegisterValueChangedCallback(newValue => property.isExpanded = newValue.newValue);
 
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -300,20 +301,28 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             SerializedProperty valuesProp = property.FindPropertyRelative(propValuesName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesName);
 
             FieldInfo keysField = null;
-            foreach (var each in ReflectUtils.GetSelfAndBaseTypesFromType(rawType))
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(rawType))
             {
-                var field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-                if (field == null) continue;
+                FieldInfo field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                if (field == null)
+                {
+                    continue;
+                }
                 keysField = field;
                 break;
             }
             Debug.Assert(keysField != null, $"Failed to get keys field from {property.propertyPath}");
             FieldInfo valuesField = null;
-            foreach (var each in ReflectUtils.GetSelfAndBaseTypesFromType(rawType))
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(rawType))
             {
-                var each1 = each.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-                if (each1 == null) continue;
-                valuesField = each1;
+                FieldInfo propValueFieldInfo = each.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                if (propValueFieldInfo == null)
+                {
+                    continue;
+                }
+                valuesField = propValueFieldInfo;
                 break;
             }
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
