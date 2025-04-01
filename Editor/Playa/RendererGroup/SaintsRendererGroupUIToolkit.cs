@@ -302,7 +302,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             foldoutLabel.style.borderBottomWidth = 1f;
                         }
                         foldoutLabel.style.borderBottomColor = EColor.EditorSeparator.GetColor();
-                        foldout.RegisterValueChangedCallback(e => foldoutLabel.style.borderBottomWidth = e.newValue? 1f : 0f);
+                        foldout.RegisterValueChangedCallback(e =>
+                        {
+                            foldoutLabel.style.borderBottomWidth = e.newValue ? 1f : 0f;
+                            if (e.newValue)
+                            {
+                                StartToCheckOutOfScoopFoldout(foldout);
+                            }
+                        });
                     }
 
                     root = foldout;
@@ -466,6 +473,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             if(NeedIndentCheck(_eLayout))
             {
+                // Debug.Log("Check indent");
                 root.RegisterCallback<AttachToPanelEvent>(_ => StartToCheckOutOfScoopFoldout(root));
             }
 
@@ -511,6 +519,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
             if (timeout >= 3000)
             {
+                // Debug.Log("Check indent stopped");
                 return;
             }
 
@@ -518,6 +527,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 // Debug.Log(actualFieldContainer);
                 List<Foldout> foldouts = actualFieldContainer.Query<Foldout>().ToList();
+                // Debug.Log($"foldouts {foldouts.Count}");
                 if (foldouts.Count == 0)
                 {
                     continue;
@@ -533,6 +543,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     if (toggle == null)
                     {
                         continue;
+                    }
+
+                    if(toggle.style.marginLeft != 0)
+                    {
+                        toggle.style.marginLeft = 0;
                     }
 
                     if (double.IsNaN(toggle.resolvedStyle.width))

@@ -84,7 +84,14 @@ namespace SaintsField.Editor.Playa
         {
             SaintsRowAttribute saintsRowAttribute = attribute as SaintsRowAttribute;
 
-            return CreateElement(property, property.displayName, info, saintsRowAttribute, this, this);
+            VisualElement ele = CreateElement(property, property.displayName, info, saintsRowAttribute, this, this);
+            //
+            // if (InHorizentalLayout)
+            // {
+            //     ele.style.marginLeft = IndentWidth;
+            // }
+
+            return ele;
         }
 
         private static void FillElement(VisualElement root, SerializedProperty property, FieldInfo info, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)

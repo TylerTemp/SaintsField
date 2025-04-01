@@ -96,10 +96,10 @@ namespace SaintsField.Editor.Playa.Renderer
             //     // appendSaintsAttributeDrawer.Add((aboveRichLabelAttribute, aboveRichLabelDrawer));
             // }
 
-            if (!isArray && useDrawerType == null && InHorizontalLayout)
-            {
-                useDrawerType = typeof(SaintsPropertyDrawer);
-            }
+            // if (!isArray && useDrawerType == null && InHorizontalLayout)
+            // {
+            //     useDrawerType = typeof(SaintsPropertyDrawer);
+            // }
 
             // Debug.Log($"{useAttribute}/{useDrawerType}/isArray={isArray}/{FieldWithInfo.SerializedProperty.propertyPath}");
 

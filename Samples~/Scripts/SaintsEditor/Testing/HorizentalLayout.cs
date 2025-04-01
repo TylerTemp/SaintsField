@@ -13,10 +13,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public int si;
         }
 
-        public MyStruct outStruct;
+        // public MyStruct outStruct;
+
+        [Layout("V", ELayout.TitleBox | ELayout.Vertical)]
+        public MyStruct inOneStruct;
 
         [LayoutStart("H", ELayout.TitleBox | ELayout.Horizontal)]
-
         [LayoutStart("./G1", ELayout.TitleBox)]
         public string g11;
         public string g12;
