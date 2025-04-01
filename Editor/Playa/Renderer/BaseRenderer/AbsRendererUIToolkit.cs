@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 style =
                 {
-                    flexGrow = 1,
+                    flexGrow = InHorizontalLayout? 0: 1,
                 },
                 name = ToString(),
             };

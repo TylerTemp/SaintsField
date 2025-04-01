@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.1.0 ##
+
+1.  UI Toolkit: Improve horizental layout label (still have some issue for struct/class. Will be fixed soon)
+2.  UI Toolkit: Fixes SerializedProperty disposed error [#192](https://github.com/TylerTemp/SaintsField/issues/192)
+
 ## 4.0.4 ##
 
 1.  UI Toolkit: Copy/Paste a row in `ListDrawerSettings`/`Table` using either ctrl+c/ctrl+v or RMB is now supported.

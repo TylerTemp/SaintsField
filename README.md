@@ -81,12 +81,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.0.4**
+**4.1.0**
 
-1.  UI Toolkit: Copy/Paste a row in `ListDrawerSettings`/`Table` using either ctrl+c/ctrl+v or RMB is now supported.
-2.  UI Toolkit: Add copy/paste ability to many fields, e.g. `Tag`, `Layer`, `Scene`
-3.  Fix `SaintsInterface` gave an error when working with auto getters.
-4.  Add `SaintsObjInterface<TInterface>` as a shortcut for `SaintsInterface<UnityEngine.Object, TInterface>`.
+1.  UI Toolkit: Improve horizental layout label (still have some issue for struct/class. Will be fixed soon)
+2.  UI Toolkit: Fixes SerializedProperty disposed error [#192](https://github.com/TylerTemp/SaintsField/issues/192)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2990,7 +2988,7 @@ Options are:
 `Horizental` style is buggy, for the following reasons:
 
 1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
-2.  On UI Toolkit we have the well-behaved layout system, but because Unity will try to align the first label, all the field except the first one will get the super-shrank label width which makes it unreadable.
+2.  On UI Toolkit the label will be put into a new line above. It'll have some issue for struct/class but I'm working on it.
 
 ![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
 

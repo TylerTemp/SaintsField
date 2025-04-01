@@ -2359,7 +2359,7 @@ MonoBehaviour:
   g12: 
   g21: 
   g22: 
-  g23: sssssssssssssssssssssssssssssss
+  g23: Content
 --- !u!1 &1152953110
 GameObject:
   m_ObjectHideFlags: 0

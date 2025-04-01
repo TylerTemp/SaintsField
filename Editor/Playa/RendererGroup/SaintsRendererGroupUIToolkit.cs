@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 style =
                 {
-                    flexGrow = 1,
+                    flexGrow =  InHorizontalLayout? 0: 1,
                 },
             };
 
