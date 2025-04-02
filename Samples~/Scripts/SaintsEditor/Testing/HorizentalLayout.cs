@@ -1,6 +1,5 @@
 using System;
 using SaintsField.Playa;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
@@ -31,5 +30,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public string g22;
         [RichLabel("$" + nameof(g23))]
         public string g23;
+
+        public bool toggle;
     }
 }

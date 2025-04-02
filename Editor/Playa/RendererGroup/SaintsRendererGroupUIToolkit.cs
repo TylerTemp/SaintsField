@@ -307,7 +307,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             foldoutLabel.style.borderBottomWidth = e.newValue ? 1f : 0f;
                             if (e.newValue)
                             {
-                                StartToCheckOutOfScoopFoldout(foldout);
+                                CheckOutOfScoopFoldout(foldout);
                             }
                         });
                     }
@@ -372,6 +372,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
 
             // tabs
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if((!hasFoldout && hasTitle && hasTab) || (hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
             {
                 // TODO: 2023_3+ these is a TabView can be used
@@ -479,13 +480,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             if(_toggleCheckInfos.Count > 0)
             {
-                root.schedule.Execute(() => LoopCheckTogglesUIToolkit(_toggleCheckInfos, root, body, _containerObject)).Every(150);
+                root.schedule.Execute(() => LoopCheckTogglesUIToolkit(_toggleCheckInfos, root, body)).Every(150);
             }
 
             return root;
         }
 
-        private static void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> notFilledtoggleCheckInfos, VisualElement root, VisualElement body, object target)
+        private static void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> notFilledtoggleCheckInfos, VisualElement root, VisualElement body)
         {
             List<ToggleCheckInfo> toggleCheckInfos = notFilledtoggleCheckInfos
                 .Select(SaintsEditorUtils.FillResult)
@@ -523,6 +524,16 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 return;
             }
 
+            CheckOutOfScoopFoldout(root);
+
+            root.schedule.Execute(() =>
+            {
+                LoopCheckOutOfScoopFoldout(root, timeout + 300);
+            }).StartingIn(300);
+        }
+
+        private void CheckOutOfScoopFoldout(VisualElement root)
+        {
             foreach (VisualElement actualFieldContainer in root.Query<VisualElement>(className: AbsRenderer.ClassSaintsFieldPlayaContainer).ToList())
             {
                 // Debug.Log(actualFieldContainer);
@@ -586,11 +597,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     }
                 }
             }
-
-            root.schedule.Execute(() =>
-            {
-                LoopCheckOutOfScoopFoldout(root, timeout + 300);
-            }).StartingIn(300);
         }
     }
 }

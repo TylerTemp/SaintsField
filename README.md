@@ -81,10 +81,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.1.0**
+**4.1.1**
 
-1.  UI Toolkit: Improve horizental layout label (still have some issue for struct/class. Will be fixed soon)
-2.  UI Toolkit: Fixes SerializedProperty disposed error [#192](https://github.com/TylerTemp/SaintsField/issues/192)
+1.  Fix a bug that the fallback drawer can not be created if the drawer is inherented from an abstruct class [#192](https://github.com/TylerTemp/SaintsField/issues/192)
+2.  If a bool field is under any horizental layout, an `LeftToggle` will be auto applied
+3.  If a struct/class/interface field is under any horizental layout, the label will not be put into a new line
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

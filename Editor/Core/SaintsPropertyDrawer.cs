@@ -243,10 +243,7 @@ namespace SaintsField.Editor.Core
                             Debug.Log($"Found dec drawer: {attr} -> {eachDecoratorDrawer}");
 #endif
 
-                        if(!attrList.Contains(eachDecoratorDrawer))
-                        {
-                            attrList.Add(eachDecoratorDrawer);
-                        }
+                        attrList.Add(eachDecoratorDrawer);
                     }
                 }
 
@@ -305,8 +302,7 @@ namespace SaintsField.Editor.Core
         public static bool PropertyIsDecoratorDrawer(PropertyAttribute propertyAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (!_propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
-                    out IReadOnlyList<PropertyDrawerInfo> eachDrawer))
+            if (!_propertyAttributeToDecoratorDrawers.ContainsKey(propertyAttribute.GetType()))
             {
                 // Debug.Log(propertyAttribute.GetType());
                 // foreach (Type key in PropertyAttributeToPropertyDrawers.Keys)

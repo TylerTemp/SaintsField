@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Drawers.FullWidthRichLabelDrawer;
 using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Linq;
@@ -147,6 +148,23 @@ namespace SaintsField.Editor.Core
                 else if (saintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer))
                 {
                     needAboveProcesser = false;
+                }
+                else if (property.propertyType == SerializedPropertyType.Boolean && saintsPropertyDrawers.All(each => each.Attribute.AttributeType != SaintsAttributeType.Field) && saintsPropertyDrawers.All(each => each.Drawer is not LeftToggleAttributeDrawer))
+                {
+                    needAboveProcesser = false;
+                    LeftToggleAttribute leftToggleAttribute =
+                        new LeftToggleAttribute();
+
+                    LeftToggleAttributeDrawer leftToggleAttributeDrawer =
+                        (LeftToggleAttributeDrawer)
+                        GetOrCreateSaintsDrawerByAttr(leftToggleAttribute);
+                    // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
+                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    {
+                        Drawer = leftToggleAttributeDrawer,
+                        Attribute = leftToggleAttribute,
+                        Index = saintsPropertyDrawers.Count,
+                    });
                 }
             }
 
