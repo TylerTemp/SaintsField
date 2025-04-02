@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Drawers.FullWidthRichLabelDrawer;
 using SaintsField.Editor.Drawers.RichLabelDrawer;
+using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
