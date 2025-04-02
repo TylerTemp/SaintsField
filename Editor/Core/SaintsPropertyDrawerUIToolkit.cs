@@ -137,7 +137,7 @@ namespace SaintsField.Editor.Core
             // 1. we need to swap RichLabel to AboveRichLabel, if it has content
             // 2. otherwise (NoLabel), we no longer added a `NoLabel` to it
 
-            bool needAboveProcesser = InHorizentalLayout;
+            bool needAboveProcesser = InHorizontalLayout;
             if (needAboveProcesser)
             {
                 if (GetType() == typeof(SaintsRowAttributeDrawer))
@@ -388,12 +388,13 @@ namespace SaintsField.Editor.Core
 
             if (fieldIsFallback)
             {
+                string fallbackClass = ClassFieldUIToolkit(property);
                 if (UseCreateFieldUIToolKit)
                 {
                     VisualElement fieldElement = CreateFieldUIToolKit(property,
                         null, allAttributes, containerElement, fieldInfo, parent);
                     fieldElement.style.flexGrow = 1;
-                    fieldElement.AddToClassList(ClassFieldUIToolkit(property));
+                    fieldElement.AddToClassList(fallbackClass);
                     fieldContainer.Add(fieldElement);
                     // fieldContainer.userData = null;
                 }
@@ -403,7 +404,7 @@ namespace SaintsField.Editor.Core
                     Debug.Log("fallback field drawer");
 #endif
                     VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, GetPreferredLabel(property), saintsPropertyDrawers);
-                    fallback.AddToClassList(ClassFieldUIToolkit(property));
+                    fallback.AddToClassList(fallbackClass);
                     fieldContainer.Add(fallback);
                     containerElement.visible = false;
                 }

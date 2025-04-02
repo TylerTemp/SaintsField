@@ -136,7 +136,7 @@ namespace SaintsField.Editor.Playa.Renderer
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
             {
                 // saintsPropertyDrawer.AppendSaintsAttributeDrawer = appendSaintsAttributeDrawer;
-                saintsPropertyDrawer.InHorizentalLayout = InHorizontalLayout;
+                saintsPropertyDrawer.InHorizontalLayout = InHorizontalLayout;
             }
 
             MethodInfo uiToolkitMethod = useDrawerType.GetMethod("CreatePropertyGUI");

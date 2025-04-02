@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -15,7 +14,7 @@ namespace SaintsField.Editor.Core
     // below-
     public partial class SaintsPropertyDrawer: PropertyDrawer, IDisposable
     {
-        public bool InHorizentalLayout;
+        public bool InHorizontalLayout;
 
         protected const int LabelLeftSpace = 4;
         protected const int LabelBaseWidth = 120;
@@ -198,6 +197,7 @@ namespace SaintsField.Editor.Core
                 List<Type> allSubPropertyDrawers = allTypes
                     // .Where(type => type.IsSubclassOf(typeof(SaintsPropertyDrawer)))
                     .Where(type => type.IsSubclassOf(typeof(PropertyDrawer)))
+                    .Where(type => !type.IsAbstract)
                     .ToList();
 
                 foreach (Type eachPropertyDrawer in allSubPropertyDrawers)
@@ -223,6 +223,7 @@ namespace SaintsField.Editor.Core
 
                 List<Type> allSubDecoratorDrawers = allTypes
                     .Where(type => type.IsSubclassOf(typeof(DecoratorDrawer)))
+                    .Where(type => !type.IsAbstract)
                     .ToList();
 
                 foreach (Type eachDecoratorDrawer in allSubDecoratorDrawers)
@@ -516,10 +517,15 @@ namespace SaintsField.Editor.Core
             PropertyDrawer propertyDrawer;
             try
             {
-                propertyDrawer = (PropertyDrawer)Activator.CreateInstance(foundDrawer);
+                propertyDrawer = (PropertyDrawer)Activator.CreateInstance(foundDrawer, true);
             }
-            catch (Exception)
+#pragma warning disable CS0168 // Variable is declared but never used
+            catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
             {
+#if SAINTSFIELD_DEBUG
+                Debug.LogError(e);
+#endif
                 return null;
             }
 
@@ -660,7 +666,7 @@ namespace SaintsField.Editor.Core
 
             Type drawerType = eachDrawer.First(each => each.IsSaints).DrawerType;
             SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
-            saintsPropertyDrawer.InHorizentalLayout = InHorizentalLayout;
+            saintsPropertyDrawer.InHorizontalLayout = InHorizontalLayout;
 
 #if UNITY_2022_2_OR_NEWER  // don't bother with too old Unity
             FieldInfo preferredLabelField = typeof(PropertyDrawer).GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance);
