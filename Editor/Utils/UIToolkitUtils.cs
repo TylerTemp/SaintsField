@@ -446,7 +446,7 @@ namespace SaintsField.Editor.Utils
 
                     if (property.type == "ulong")
                     {
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_3_OR_NEWER
                         if (originalField is UnsignedLongField unsignedLongField)
                         {
                             unsignedLongField.SetValueWithoutNotify(property.ulongValue);
@@ -511,7 +511,7 @@ namespace SaintsField.Editor.Utils
 
                     if (property.type == "uint")
                     {
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_3_OR_NEWER
                         if (originalField is UnsignedIntegerField unsignedIntegerField)
                         {
                             unsignedIntegerField.SetValueWithoutNotify(property.uintValue);

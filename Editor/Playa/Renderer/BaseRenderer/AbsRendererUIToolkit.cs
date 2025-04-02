@@ -669,7 +669,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(uint))
             {
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_3_OR_NEWER
                 if (oldElement is UnsignedIntegerField oldLongField)
                 {
                     oldLongField.SetValueWithoutNotify((uint)value);
@@ -768,7 +768,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(ulong))
             {
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_3_OR_NEWER
                 ulong ulongRawValue = (ulong)value;
                 if (oldElement is UnsignedLongField oldLongField)
                 {
