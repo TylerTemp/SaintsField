@@ -717,7 +717,6 @@ namespace SaintsField.Editor.Core
                         // // ReSharper disable once AccessToModifiedClosure
                         // imGuiContainer.style.height = position.height;
 
-                        using(new EditorGUI.IndentLevelScope(1))
                         using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
                         using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
                         {
