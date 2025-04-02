@@ -307,6 +307,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             foldoutLabel.style.borderBottomWidth = e.newValue ? 1f : 0f;
                             if (e.newValue)
                             {
+                                Debug.Log("CheckOutOfScoopFoldout");
                                 CheckOutOfScoopFoldout(foldout);
                             }
                         });
@@ -474,7 +475,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             if(NeedIndentCheck(_eLayout))
             {
-                // Debug.Log("Check indent");
+                // Debug.Log($"Check indent: {_eLayout}");
                 root.RegisterCallback<AttachToPanelEvent>(_ => StartToCheckOutOfScoopFoldout(root));
             }
 
@@ -550,18 +551,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     // this class name is not consistent in different UI Toolkit versions. So just remove it...
                     // Toggle toggle = actualFieldContainer.Q<Toggle>(className: "unity-foldout__toggle--inspector");
-                    Toggle toggle = actualFieldContainer.Q<Toggle>();
+                    Toggle toggle = foldout.Q<Toggle>();
                     if (toggle == null)
-                    {
-                        continue;
-                    }
-
-                    if(toggle.style.marginLeft != 0)
-                    {
-                        toggle.style.marginLeft = 0;
-                    }
-
-                    if (double.IsNaN(toggle.resolvedStyle.width))
                     {
                         continue;
                     }
@@ -571,30 +562,42 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         continue;
                     }
 
-                    float distance = toggle.worldBound.x - root.worldBound.x;
-                    if(distance < 0)
+                    if(toggle.style.marginLeft != 0)
                     {
-                        // Debug.Log($"process {toggle.worldBound.x} - {root.worldBound.x}: {distance}");
-                        float marginLeft = -distance + 4;
-                        // VisualElement saintsParent = UIToolkitUtils.FindParentClass(foldout, SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
-                        //     .FirstOrDefault();
-                        // if(saintsParent == null)
-                        // {
-                        //     Debug.Log(foldout);
-                        //     foldout.style.marginLeft = marginLeft;
-                        // }
-                        // else
-                        // {
-                        //     float ml = saintsParent.resolvedStyle.marginLeft;
-                        //     float useValue = double.IsNaN(ml) ? marginLeft : marginLeft + ml;
-                        //     saintsParent.style.marginLeft = useValue;
-                        // }
-                        VisualElement propertyParent = UIToolkitUtils.IterUpWithSelf(foldout).Skip(1).FirstOrDefault(each => each is PropertyField);
-                        if (propertyParent != null)
-                        {
-                            propertyParent.style.marginLeft = marginLeft;
-                        }
+                        toggle.style.marginLeft = 0;
                     }
+
+                    // Yeah... I no longer need this...
+                    // if (double.IsNaN(toggle.resolvedStyle.width))
+                    // {
+                    //     continue;
+                    // }
+                    //
+                    //
+                    // float distance = toggle.worldBound.x - root.worldBound.x;
+                    // if(distance < 0)
+                    // {
+                    //     // Debug.Log($"process {toggle.worldBound.x} - {root.worldBound.x}: {distance}");
+                    //     float marginLeft = -distance + 4;
+                    //     // VisualElement saintsParent = UIToolkitUtils.FindParentClass(foldout, SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
+                    //     //     .FirstOrDefault();
+                    //     // if(saintsParent == null)
+                    //     // {
+                    //     //     Debug.Log(foldout);
+                    //     //     foldout.style.marginLeft = marginLeft;
+                    //     // }
+                    //     // else
+                    //     // {
+                    //     //     float ml = saintsParent.resolvedStyle.marginLeft;
+                    //     //     float useValue = double.IsNaN(ml) ? marginLeft : marginLeft + ml;
+                    //     //     saintsParent.style.marginLeft = useValue;
+                    //     // }
+                    //     VisualElement propertyParent = UIToolkitUtils.IterUpWithSelf(foldout).Skip(1).FirstOrDefault(each => each is PropertyField);
+                    //     if (propertyParent != null)
+                    //     {
+                    //         propertyParent.style.marginLeft = marginLeft;
+                    //     }
+                    // }
                 }
             }
         }

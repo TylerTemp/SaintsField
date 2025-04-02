@@ -83,7 +83,8 @@ namespace: `SaintsField`
 
 **4.1.2**
 
-UI Toolkit: Fix fallback to IMGUI lead to multiple drawing [#193](https://github.com/TylerTemp/SaintsField/issues/193)
+1.  UI Toolkit: Fix fallback to IMGUI lead to multiple drawing [#193](https://github.com/TylerTemp/SaintsField/issues/193)
+2.  UI Toolkit: Fix logic of fixing out-area foldout icon
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
