@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Playa.Renderer;
+using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEngine;
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-using UnityEngine.UIElements;
-using SaintsField.Playa;
-#endif
 
-namespace SaintsField.Editor.Playa
+namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 {
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
     public partial class SaintsRowAttributeDrawer: SaintsPropertyDrawer, IMakeRenderer
@@ -62,5 +55,9 @@ namespace SaintsField.Editor.Playa
         // {
         //     return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         // }
+        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        {
+            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
+        }
     }
 }

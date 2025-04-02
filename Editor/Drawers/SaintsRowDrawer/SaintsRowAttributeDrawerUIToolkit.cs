@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Playa
+namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 {
     public partial class SaintsRowAttributeDrawer
     {
