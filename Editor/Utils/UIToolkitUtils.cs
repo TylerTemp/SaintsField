@@ -19,6 +19,17 @@ namespace SaintsField.Editor.Utils
     public static class UIToolkitUtils
     {
 
+        public const string NoDecoratorDrawerUssFile = "UIToolkit/NoDecoratorDrawer.uss";
+
+        public static void SetPropertyFieldDrawNestingLevel1(PropertyField prop)
+        {
+            FieldInfo fieldInfo = typeof(PropertyField).GetField("m_DrawNestingLevel", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (fieldInfo != null)
+            {
+                fieldInfo.SetValue(prop, 1);
+            }
+        }
+
         public static void FixLabelWidthLoopUIToolkit(Label label)
         {
             // FixLabelWidthUIToolkit(label);

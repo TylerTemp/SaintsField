@@ -10,7 +10,8 @@
         "NaughtyAttributes.Core",
         "today.comes.saintsfield.Runtime.Addressable",
         "Unity.Netcode.Runtime",
-        "Unity.Mathematics"
+        "Unity.Mathematics",
+        "Obvious.Soap"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -52,6 +53,11 @@
             "name": "com.unity.nuget.newtonsoft-json",
             "expression": "",
             "define": "SAINTSFIELD_JSON"
+        },
+        {
+            "name": "com.unity.nuget.newtonsoft-json",
+            "expression": "",
+            "define": "SAINTSFIELD_NEWTONSOFT_JSON"
         },
         {
             "name": "com.unity.nuget.newtonsoft-json",

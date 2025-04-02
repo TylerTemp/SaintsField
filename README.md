@@ -81,11 +81,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.1.1**
+**4.1.2**
 
-1.  Fix a bug that the fallback drawer can not be created if the drawer is inherented from an abstruct class [#192](https://github.com/TylerTemp/SaintsField/issues/192)
-2.  If a bool field is under any horizental layout, an `LeftToggle` will be auto applied
-3.  If a struct/class/interface field is under any horizental layout, the label will not be put into a new line
+UI Toolkit: Fix fallback to IMGUI lead to multiple drawing [#193](https://github.com/TylerTemp/SaintsField/issues/193)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
