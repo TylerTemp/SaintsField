@@ -633,29 +633,29 @@ namespace SaintsField.Editor.Core
 
                 // PropertyDrawer imGuiDrawer = drawerInstance;
 
-                using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                {
-                    // Debug.Log($"Fall {property.propertyPath}");
-                    // EditorGUILayout.PropertyField(property, label, true);
-                    // Debug.Log($"Fall Done {property.propertyPath}");
-                    // GUIContent label = new GUIContent(property.displayName);
-                    PropertyField prop = new PropertyField(property)
-                    {
-                        style =
-                        {
-                            flexGrow = 1,
-                        },
-                    };
-                    prop.styleSheets.Add(GetNoDecoratorUss());
-                    UIToolkitUtils.SetPropertyFieldDrawNestingLevel1(prop);
-                    // FieldInfo fieldInfo = typeof(PropertyField).GetField("m_DrawNestingLevel", BindingFlags.NonPublic | BindingFlags.Instance);
-                    // if (fieldInfo != null)
-                    // {
-                    //     fieldInfo.SetValue(prop, 1);
-                    // }
-                    return prop;
-                }
+                // using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                // using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                // {
+                //     // Debug.Log($"Fall {property.propertyPath}");
+                //     // EditorGUILayout.PropertyField(property, label, true);
+                //     // Debug.Log($"Fall Done {property.propertyPath}");
+                //     // GUIContent label = new GUIContent(property.displayName);
+                //     PropertyField prop = new PropertyField(property)
+                //     {
+                //         style =
+                //         {
+                //             flexGrow = 1,
+                //         },
+                //     };
+                //     prop.styleSheets.Add(GetNoDecoratorUss());
+                //     UIToolkitUtils.SetPropertyFieldDrawNestingLevel1(prop);
+                //     // FieldInfo fieldInfo = typeof(PropertyField).GetField("m_DrawNestingLevel", BindingFlags.NonPublic | BindingFlags.Instance);
+                //     // if (fieldInfo != null)
+                //     // {
+                //     //     fieldInfo.SetValue(prop, 1);
+                //     // }
+                //     return prop;
+                // }
 
                 // Action<object> onValueChangedCallback = null;
                 // onValueChangedCallback = value =>
@@ -714,11 +714,14 @@ namespace SaintsField.Editor.Core
                 //         // imGuiContainer.style.height = position.height;
                 //
                 //         using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                //         using (new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                //         using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
                 //         {
-                //             Debug.Log($"Fall {property.propertyPath}");
-                //             EditorGUILayout.PropertyField(property, label, true);
-                //             Debug.Log($"Fall Done {property.propertyPath}");
+                //             // Debug.Log($"Fall {property.propertyPath}");
+                //             // EditorGUILayout.PropertyField(property, label, true);
+                //             // Debug.Log($"Fall Done {property.propertyPath}");
+                //             float height = drawerInstance.GetPropertyHeight(property, label);
+                //             Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
+                //             drawerInstance.OnGUI(rect, property, label);
                 //         }
                 //
                 //         // using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
