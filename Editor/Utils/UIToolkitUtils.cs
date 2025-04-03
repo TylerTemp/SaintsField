@@ -362,6 +362,7 @@ namespace SaintsField.Editor.Utils
                                 reorderable = true,
                                 reorderMode = ListViewReorderMode.Animated,
                             };
+                            listView.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
 
                             // This won't work as itemsSourceSizeChanged is an internal event
                             // listView.itemsSourceSizeChanged += () =>
@@ -452,6 +453,7 @@ namespace SaintsField.Editor.Utils
                                 flexShrink = 1,
                             },
                         };
+                        longField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         longField.BindProperty(property);
                         longField.AddToClassList(LongField.alignedFieldUssClassName);
                         return longField;
@@ -475,6 +477,7 @@ namespace SaintsField.Editor.Utils
                                 flexShrink = 1,
                             },
                         };
+                        unsignedLongField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         unsignedLongField.BindProperty(property);
                         unsignedLongField.AddToClassList(UnsignedLongField.alignedFieldUssClassName);
                         return unsignedLongField;
@@ -494,6 +497,7 @@ namespace SaintsField.Editor.Utils
                                 flexShrink = 1,
                             },
                         };
+                        unsignedLongField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         unsignedLongField.BindProperty(property);
                         unsignedLongField.AddToClassList(LongField.alignedFieldUssClassName);
                         return unsignedLongField;
@@ -517,6 +521,7 @@ namespace SaintsField.Editor.Utils
                                 flexShrink = 1,
                             },
                         };
+                        integerField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         integerField.BindProperty(property);
                         integerField.AddToClassList(IntegerField.alignedFieldUssClassName);
                         return integerField;
@@ -542,6 +547,7 @@ namespace SaintsField.Editor.Utils
                         };
                         unsignedIntegerField.BindProperty(property);
                         unsignedIntegerField.AddToClassList(UnsignedIntegerField.alignedFieldUssClassName);
+                        unsignedIntegerField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         return unsignedIntegerField;
 #else
                         if (originalField is IntegerField unsignedIntegerField)
@@ -561,6 +567,7 @@ namespace SaintsField.Editor.Utils
                         };
                         unsignedIntegerField.BindProperty(property);
                         unsignedIntegerField.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        unsignedIntegerField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         return unsignedIntegerField;
 #endif
                     }
@@ -584,6 +591,7 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
 
                         return element;
                     }
@@ -606,6 +614,7 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         return element;
                     }
 
@@ -628,6 +637,7 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         return element;
                     }
                     if (property.type == "ushort")
@@ -649,6 +659,7 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                        element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         return element;
                     }
                     throw new ArgumentOutOfRangeException(nameof(property.type), property.type, null);
@@ -672,6 +683,7 @@ namespace SaintsField.Editor.Utils
                     };
                     toggle.BindProperty(property);
                     toggle.AddToClassList(Toggle.alignedFieldUssClassName);
+                    toggle.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return toggle;
                 }
                 case SerializedPropertyType.Float:
@@ -693,6 +705,7 @@ namespace SaintsField.Editor.Utils
                     };
                     doubleField.BindProperty(property);
                     doubleField.AddToClassList(DoubleField.alignedFieldUssClassName);
+                    doubleField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return doubleField;
                 }
                 case SerializedPropertyType.String:
@@ -714,6 +727,7 @@ namespace SaintsField.Editor.Utils
                     };
                     textField.BindProperty(property);
                     textField.AddToClassList(TextField.alignedFieldUssClassName);
+                    textField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return textField;
                 }
                 case SerializedPropertyType.Color:
@@ -735,6 +749,7 @@ namespace SaintsField.Editor.Utils
                     };
                     colorField.AddToClassList(ColorField.alignedFieldUssClassName);
                     colorField.BindProperty(property);
+                    colorField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return colorField;
                 }
                 case SerializedPropertyType.ObjectReference:
@@ -764,6 +779,7 @@ namespace SaintsField.Editor.Utils
                     };
                     objectField.BindProperty(property);
                     objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
+                    objectField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return objectField;
                 }
                 case SerializedPropertyType.LayerMask:
@@ -785,6 +801,7 @@ namespace SaintsField.Editor.Utils
                     };
                     layerMaskField.BindProperty(property);
                     layerMaskField.AddToClassList(LayerMaskField.alignedFieldUssClassName);
+                    layerMaskField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return layerMaskField;
                 }
                 case SerializedPropertyType.Enum:
@@ -811,6 +828,7 @@ namespace SaintsField.Editor.Utils
                         };
                         enumFlagsField.BindProperty(property);
                         enumFlagsField.AddToClassList(EnumFlagsField.alignedFieldUssClassName);
+                        enumFlagsField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                         return enumFlagsField;
                     }
 
@@ -876,6 +894,7 @@ namespace SaintsField.Editor.Utils
                     //     property.serializedObject.ApplyModifiedProperties();
                     // });
                     popupField.AddToClassList(PopupField<string>.alignedFieldUssClassName);
+                    popupField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
 
                     return popupField;
                 }
@@ -898,6 +917,7 @@ namespace SaintsField.Editor.Utils
                     };
                     vector2Field.BindProperty(property);
                     vector2Field.AddToClassList(Vector2Field.alignedFieldUssClassName);
+                    vector2Field.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return vector2Field;
                 }
                 case SerializedPropertyType.Vector3:
@@ -919,6 +939,7 @@ namespace SaintsField.Editor.Utils
                     };
                     vector3Field.BindProperty(property);
                     vector3Field.AddToClassList(Vector3Field.alignedFieldUssClassName);
+                    vector3Field.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return vector3Field;
                 }
                 case SerializedPropertyType.Vector4:
@@ -940,6 +961,7 @@ namespace SaintsField.Editor.Utils
                     };
                     vector4Field.BindProperty(property);
                     vector4Field.AddToClassList(Vector4Field.alignedFieldUssClassName);
+                    vector4Field.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return vector4Field;
                 }
                 case SerializedPropertyType.Rect:
@@ -961,6 +983,7 @@ namespace SaintsField.Editor.Utils
                     };
                     rectField.BindProperty(property);
                     rectField.AddToClassList(RectField.alignedFieldUssClassName);
+                    rectField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return rectField;
                 }
                 case SerializedPropertyType.ArraySize:
@@ -983,6 +1006,7 @@ namespace SaintsField.Editor.Utils
                     };
                     integerField.BindProperty(property);
                     integerField.AddToClassList(IntegerField.alignedFieldUssClassName);
+                    integerField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return integerField;
                 }
                 case SerializedPropertyType.Character:
@@ -1005,6 +1029,7 @@ namespace SaintsField.Editor.Utils
                     };
                     textField.BindProperty(property);
                     textField.AddToClassList(TextField.alignedFieldUssClassName);
+                    textField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return textField;
                 }
                 case SerializedPropertyType.AnimationCurve:
@@ -1026,6 +1051,7 @@ namespace SaintsField.Editor.Utils
                     };
                     curveField.BindProperty(property);
                     curveField.AddToClassList(CurveField.alignedFieldUssClassName);
+                    curveField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return curveField;
                 }
                 case SerializedPropertyType.Bounds:
@@ -1047,6 +1073,7 @@ namespace SaintsField.Editor.Utils
                     };
                     boundsField.BindProperty(property);
                     boundsField.AddToClassList(BoundsField.alignedFieldUssClassName);
+                    boundsField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return boundsField;
                 }
                 case SerializedPropertyType.Gradient:
@@ -1082,6 +1109,7 @@ namespace SaintsField.Editor.Utils
                     };
                     gradientField.BindProperty(property);
                     gradientField.AddToClassList(GradientField.alignedFieldUssClassName);
+                    gradientField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return gradientField;
                 }
                 case SerializedPropertyType.Quaternion:
@@ -1106,6 +1134,7 @@ namespace SaintsField.Editor.Utils
                     };
                     integerField.BindProperty(property);
                     integerField.AddToClassList(IntegerField.alignedFieldUssClassName);
+                    integerField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return integerField;
                 }
                 case SerializedPropertyType.Vector2Int:
@@ -1127,6 +1156,7 @@ namespace SaintsField.Editor.Utils
                     };
                     vector2IntField.BindProperty(property);
                     vector2IntField.AddToClassList(Vector2IntField.alignedFieldUssClassName);
+                    vector2IntField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return vector2IntField;
                 }
                 case SerializedPropertyType.Vector3Int:
@@ -1148,6 +1178,7 @@ namespace SaintsField.Editor.Utils
                     };
                     vector3IntField.BindProperty(property);
                     vector3IntField.AddToClassList(Vector3IntField.alignedFieldUssClassName);
+                    vector3IntField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return vector3IntField;
                 }
                 case SerializedPropertyType.RectInt:
@@ -1169,6 +1200,7 @@ namespace SaintsField.Editor.Utils
                     };
                     rectIntField.BindProperty(property);
                     rectIntField.AddToClassList(RectIntField.alignedFieldUssClassName);
+                    rectIntField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return rectIntField;
                 }
                 case SerializedPropertyType.BoundsInt:
@@ -1190,6 +1222,7 @@ namespace SaintsField.Editor.Utils
                     };
                     boundsIntField.BindProperty(property);
                     boundsIntField.AddToClassList(BoundsIntField.alignedFieldUssClassName);
+                    boundsIntField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return boundsIntField;
                 }
                 case SerializedPropertyType.Hash128:
@@ -1211,6 +1244,7 @@ namespace SaintsField.Editor.Utils
                     };
                     hash128Field.BindProperty(property);
                     hash128Field.AddToClassList(Hash128Field.alignedFieldUssClassName);
+                    hash128Field.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     return hash128Field;
                 }
                 default:

@@ -52,6 +52,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             }
 
             root.AddToClassList(SaintsRowClass);
+            root.AddToClassList(ClassAllowDisable);
 
             FillElement(root, property, info, makeRenderer, doTweenPlayRecorder);
 

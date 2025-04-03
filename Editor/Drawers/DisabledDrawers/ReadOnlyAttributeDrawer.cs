@@ -209,6 +209,8 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers
 
             // bool nowReadOnly = nowReadOnlyResult.Any(b => b);
 
+            // Debug.Log($"{curReadOnly}/{nowReadOnly}");
+
             if (curReadOnly != nowReadOnly)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_READ_ONLY
