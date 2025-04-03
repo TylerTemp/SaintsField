@@ -27,6 +27,11 @@ Unity: 2019.1 or higher
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
 
+> [!NOTE]  
+> Since [SaintsField 4.0](https://github.com/TylerTemp/SaintsField/discussions/183), the IMGUI is no longer a major maintaining codebase in this project.
+> 
+> IMGUI will only be focused on issues and small features. Big features like editing in `ShowInInspector` will not be supported in IMGUI.
+
 ### Installation ###
 
 *   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741)

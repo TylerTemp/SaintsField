@@ -629,11 +629,9 @@ namespace SaintsField.Editor.Core
 
             if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType == typeof(PropertyDrawer))  // null: old Unity || did not override
             {
+                return PropertyFieldFallbackUIToolkit(property);
+
                 // PropertyDrawer imGuiDrawer = drawerInstance;
-                // MethodInfo imGuiGetPropertyHeightMethod = drawerType.GetMethod("GetPropertyHeight");
-                // MethodInfo imGuiOnGUIMethodInfo = drawerType.GetMethod("OnGUI");
-                // Debug.Assert(imGuiGetPropertyHeightMethod != null);
-                // Debug.Assert(imGuiOnGUIMethodInfo != null);
 
                 using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
                 using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
@@ -972,6 +970,7 @@ namespace SaintsField.Editor.Core
                     });
                 }
 
+                // Debug.Log($"Ready for {property.propertyPath} in fallback style");
                 OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers, allAttributes);
             }
             else
@@ -1214,10 +1213,17 @@ namespace SaintsField.Editor.Core
             //     return;
             // }
 
+            if (container.parent == null)
+            {
+                return;
+            }
+
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
                 saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, info);
             }
+
+            // Debug.Log($"container={container}/parent={container.parent}");
 
             container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(SaintsFieldConfig.UpdateLoopDefaultMs);
         }
