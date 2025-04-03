@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.3 ##
+
+1.  UI Toolkit: Fix disable related function not working since 4.0, [#194](https://github.com/TylerTemp/SaintsField/issues/194)
+
 ## 4.1.2 ##
 
 1.  UI Toolkit: Fix fallback to IMGUI lead to multiple drawing [#193](https://github.com/TylerTemp/SaintsField/issues/193)
