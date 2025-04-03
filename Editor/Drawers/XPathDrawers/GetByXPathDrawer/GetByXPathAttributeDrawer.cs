@@ -497,8 +497,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     $"Auto sign {(propertyCache.TargetIsNull ? "null" : propertyCache.TargetValue)} to {propertyCache.SerializedProperty.displayName}");
             }
 
-            Debug.Log(propertyCache.SerializedProperty.propertyPath);
-            Debug.Log(propertyCache.TargetValue);
+            // Debug.Log(propertyCache.SerializedProperty.propertyPath);
+            // Debug.Log(propertyCache.TargetValue);
 
             ReflectUtils.SetValue(
                 propertyCache.SerializedProperty.propertyPath,
