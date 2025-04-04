@@ -1676,7 +1676,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         dictKey,
                         null,
                         null,
-                        false
+                        false,
+                        inHorizontalLayout
                     );
                     if (newKeyElement != null)
                     {
@@ -1694,7 +1695,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         dictValue,
                         null,
                         null,
-                        false
+                        false,
+                        inHorizontalLayout
                     );
                     if (newValueContainer != null)
                     {
