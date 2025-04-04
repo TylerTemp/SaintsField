@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -92,7 +91,17 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         }
 
         private static Texture2D _dropdownIconGray;
-        private static Texture2D DropdownIconGray => _dropdownIconGray ??= Util.LoadResource<Texture2D>("classic-dropdown-gray.png");
+        private static Texture2D DropdownIconGray {
+            get
+            {
+                if (_dropdownIconGray == null)
+                {
+                    _dropdownIconGray = Util.LoadResource<Texture2D>("classic-dropdown-gray.png");
+                }
+
+                return _dropdownIconGray;
+            }
+        }
 
         private static GUIStyle _buttonStyle;
 
