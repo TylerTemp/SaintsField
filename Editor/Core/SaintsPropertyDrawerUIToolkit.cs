@@ -41,7 +41,10 @@ namespace SaintsField.Editor.Core
             $"saints-field-tracker--{property.propertyPath}";
 
         private static string NameSaintsPropertyDrawerRoot(SerializedProperty property) =>
-            $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}__SaintsFieldRoot";
+            $"{SerializedUtils.GetUniqueId(property)}--saints-field--root";
+
+        private static string NameSaintsPropertyDrawerContainer(SerializedProperty property) =>
+            $"{SerializedUtils.GetUniqueId(property)}--saints-field--container";
 
         protected virtual bool UseCreateFieldUIToolKit => false;
 
@@ -60,13 +63,13 @@ namespace SaintsField.Editor.Core
             }
 
             // IMGUIContainer Fallback
-            if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideDrawCount) &&
-                insideDrawCount > 0)
-            {
-                // Debug.Log($"Sub Draw GetPropertyHeight/{this}");
-                // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
-                return new VisualElement();
-            }
+            // if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideDrawCount) &&
+            //     insideDrawCount > 0)
+            // {
+            //     // Debug.Log($"Sub Draw GetPropertyHeight/{this}");
+            //     // return EditorGUI.GetPropertyHeight(property, GUIContent.none, true);
+            //     return new VisualElement();
+            // }
 
             VisualElement containerElement = new VisualElement
             {
@@ -74,7 +77,7 @@ namespace SaintsField.Editor.Core
                 {
                     width = Length.Percent(100),
                 },
-                name = $"{property.propertyPath}__SaintsFieldContainer",
+                name = NameSaintsPropertyDrawerContainer(property),
             };
 
             (PropertyAttribute[] allAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
@@ -556,7 +559,7 @@ namespace SaintsField.Editor.Core
                 name = NameSaintsPropertyDrawerRoot(property),
                 // userData = this,
             };
-            rootElement.AddToClassList(NameSaintsPropertyDrawerRoot(property));
+            // rootElement.AddToClassList(NameSaintsPropertyDrawerRoot(property));
             rootElement.Add(containerElement);
 
             rootElement.schedule.Execute(() =>
@@ -607,7 +610,7 @@ namespace SaintsField.Editor.Core
                     ? ReflectUtils.GetElementType(info.FieldType)
                     : info.FieldType;
                 return UIToolkitUtils.CreateOrUpdateFieldFromProperty(property, rawType, passedPreferredLabel,
-                    info, this, this, null);
+                    info, InHorizontalLayout, this, this, null);
             }
 
             PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);
@@ -824,8 +827,10 @@ namespace SaintsField.Editor.Core
             if(fallbackField != null)
             {
                 // containerElement.visible = true;
+                string c = NameSaintsPropertyDrawerContainer(property);
+                VisualElement deepestContainer = containerElement.Query<VisualElement>(name: c).Last();
 
-                List<VisualElement> parentRoots = UIToolkitUtils.FindParentClass(containerElement, NameSaintsPropertyDrawerRoot(property)).ToList();
+                List<VisualElement> parentRoots = UIToolkitUtils.FindParentName(deepestContainer, NameSaintsPropertyDrawerRoot(property)).ToList();
                 // Debug.Log($"usingFallbackField {property.propertyPath}, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count} ({NameSaintsPropertyDrawerRoot(property)})");
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                 Debug.Log($"usingFallbackField {property.propertyPath}, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count} ({NameSaintsPropertyDrawerRoot(property)})");
@@ -867,12 +872,15 @@ namespace SaintsField.Editor.Core
 
                 // Debug.Log(parentRoots.Count);
 
-                if (saintsPropCount != 0 && parentRoots.Count != saintsPropCount)
-                // if (parentRoots.Count < saintsPropCount)
-                    // if (parentRoots.Count != saintsPropertyDrawers.Count)
-                {
-                    return;
-                }
+                // fallback will draw all (saintsPropCount), then this drawer itself will draw one.
+                int nestedCount = saintsPropCount + 1;
+
+                // if (saintsPropCount != 0 && parentRoots.Count != nestedCount)
+                // // if (parentRoots.Count < saintsPropCount)
+                //     // if (parentRoots.Count != saintsPropertyDrawers.Count)
+                // {
+                //     return;
+                // }
                 // Debug.Log(PropertyAttributeToPropertyDrawers[]);
 
                 // Debug.Log(fieldInfo.FieldType);
@@ -906,7 +914,7 @@ namespace SaintsField.Editor.Core
 //                 });
 
                 topRoot.Clear();
-                topRoot.Add(containerElement);
+                topRoot.Add(deepestContainer);
 
                 // thisPropField.Bind(property.serializedObject);
                 // fallbackField.Unbind();
@@ -974,7 +982,13 @@ namespace SaintsField.Editor.Core
                 }
 
                 // Debug.Log($"Ready for {property.propertyPath} in fallback style");
-                OnAwakeReady(property, containerElement, parent, onValueChangedCallback, saintsPropertyDrawers, allAttributes);
+                deepestContainer.schedule.Execute(() => {
+                    if(deepestContainer.parent != null)
+                    {
+                        OnAwakeReady(property, deepestContainer, parent, onValueChangedCallback, saintsPropertyDrawers,
+                            allAttributes);
+                    }
+                });
             }
             else
             {

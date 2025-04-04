@@ -107,6 +107,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     FieldWithInfo.FieldInfo.FieldType,
                     FieldWithInfo.SerializedProperty.displayName,
                     FieldWithInfo.FieldInfo,
+                    InHorizontalLayout,
                     this,
                     this,
                     null

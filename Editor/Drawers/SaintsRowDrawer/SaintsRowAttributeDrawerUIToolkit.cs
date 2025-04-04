@@ -17,10 +17,12 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
         public const string SaintsRowClass = "saintsfield-saintsrow";
 
-        public static VisualElement CreateElement(SerializedProperty property, string label, FieldInfo info, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        public static VisualElement CreateElement(SerializedProperty property, string label, FieldInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
             VisualElement root;
-            if (saintsRowAttribute?.Inline ?? false)
+            bool inline = saintsRowAttribute?.Inline ?? false;
+            // Debug.Log(inline);
+            if (inline)
             {
                 root = new VisualElement
                 {
@@ -54,7 +56,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             root.AddToClassList(SaintsRowClass);
             root.AddToClassList(ClassAllowDisable);
 
-            FillElement(root, property, info, makeRenderer, doTweenPlayRecorder);
+            FillElement(root, property, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder);
 
             if (property.propertyType == SerializedPropertyType.ManagedReference)
             {
@@ -72,7 +74,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
                             SerializedProperty newProp = property.serializedObject.FindProperty(propPath);
 
-                            FillElement(root, newProp, info, makeRenderer, doTweenPlayRecorder);
+                            FillElement(root, newProp, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder);
                         }
                         // Debug.Log(property.managedReferenceId);
                     })
@@ -84,9 +86,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            SaintsRowAttribute saintsRowAttribute = attribute as SaintsRowAttribute;
+            SaintsRowAttribute saintsRowAttribute = saintsAttribute as SaintsRowAttribute;
 
-            VisualElement ele = CreateElement(property, property.displayName, info, saintsRowAttribute, this, this);
+            VisualElement ele = CreateElement(property, property.displayName, info, InHorizontalLayout, saintsRowAttribute, this, this);
             //
             // if (InHorizentalLayout)
             // {
@@ -96,7 +98,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             return ele;
         }
 
-        private static void FillElement(VisualElement root, SerializedProperty property, FieldInfo info, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        private static void FillElement(VisualElement root, SerializedProperty property, FieldInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
             object value = null;
             if (property.propertyType == SerializedPropertyType.ManagedReference)
@@ -168,6 +170,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
              // this... fixed by adding Bind()... wtf...
              foreach (ISaintsRenderer saintsRenderer in renderer)
              {
+                 saintsRenderer.InHorizontalLayout = inHorizontalLayout;
                  VisualElement rendererElement = saintsRenderer.CreateVisualElement();
                  if (rendererElement != null)
                  {

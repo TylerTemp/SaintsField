@@ -1,9 +1,10 @@
 using System;
 using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
-    public class HorizentalLayout : SaintsMonoBehaviour
+    public class HorizontalLayout : SaintsMonoBehaviour
     {
         [Serializable]
         public struct MyStruct
@@ -17,7 +18,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [Layout("V", ELayout.TitleBox | ELayout.Vertical)]
         public MyStruct inOneStruct;
 
-        [LayoutStart("H", ELayout.TitleBox | ELayout.Horizontal)]
+        [LayoutStart("H", ELayout.FoldoutBox | ELayout.Horizontal)]
         [LayoutStart("./G1", ELayout.TitleBox)]
         public string g11;
         public string g12;
@@ -32,5 +33,19 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public string g23;
 
         public bool toggle;
+
+        [LayoutEnd]
+        [LayoutStart("Buttons", ELayout.Horizontal)]
+        [Button]
+        public void B1(string strV, bool bv, Vector2 v2)
+        {
+
+        }
+
+        [Button]
+        public void B2(MyStruct structV, Vector4 v4, Bounds bounds, Rect rectValue)
+        {
+
+        }
     }
 }

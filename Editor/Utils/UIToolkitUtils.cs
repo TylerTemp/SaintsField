@@ -268,9 +268,9 @@ namespace SaintsField.Editor.Utils
             return dropdownButtonField;
         }
 
-        public static IEnumerable<VisualElement> FindParentClass(VisualElement element, string className)
+        public static IEnumerable<VisualElement> FindParentName(VisualElement element, string className)
         {
-            return IterUpWithSelf(element).Where(each => each.ClassListContains(className));
+            return IterUpWithSelf(element).Where(each => each.name == className);
         }
 
         public static IEnumerable<VisualElement> IterUpWithSelf(VisualElement element)
@@ -334,6 +334,7 @@ namespace SaintsField.Editor.Utils
           Type rawType,
           string label,
           FieldInfo fieldInfo,
+          bool inHorizontalLayout,
           IMakeRenderer makeRenderer,
           IDOTweenPlayRecorder doTweenPlayRecorder,
           VisualElement originalField)
@@ -431,7 +432,7 @@ namespace SaintsField.Editor.Utils
                     {
                         return null;
                     }
-                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, null, makeRenderer, doTweenPlayRecorder);
+                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout, null, makeRenderer, doTweenPlayRecorder);
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:

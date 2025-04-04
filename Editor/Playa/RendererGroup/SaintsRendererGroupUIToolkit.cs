@@ -307,8 +307,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             foldoutLabel.style.borderBottomWidth = e.newValue ? 1f : 0f;
                             if (e.newValue)
                             {
-                                Debug.Log("CheckOutOfScoopFoldout");
-                                CheckOutOfScoopFoldout(foldout);
+                                // Debug.Log("CheckOutOfScoopFoldout");
+                                CheckOutOfScoopFoldout(foldout, new HashSet<Toggle>());
                             }
                         });
                     }
@@ -508,7 +508,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
         }
 
-        private readonly HashSet<Toggle> _processedToggles = new HashSet<Toggle>();
+        // private readonly HashSet<Toggle> _processedToggles = new HashSet<Toggle>();
 
         private void StartToCheckOutOfScoopFoldout(VisualElement root)
         {
@@ -525,7 +525,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 return;
             }
 
-            CheckOutOfScoopFoldout(root);
+            CheckOutOfScoopFoldout(root, new HashSet<Toggle>());
 
             root.schedule.Execute(() =>
             {
@@ -533,16 +533,16 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }).StartingIn(300);
         }
 
-        private void CheckOutOfScoopFoldout(VisualElement root)
+        public static void CheckOutOfScoopFoldout(VisualElement root, HashSet<Toggle> processedToggles)
         {
-            foreach (VisualElement actualFieldContainer in root.Query<VisualElement>(className: AbsRenderer.ClassSaintsFieldPlayaContainer).ToList())
+            // foreach (VisualElement actualFieldContainer in root.Query<VisualElement>(className: AbsRenderer.ClassSaintsFieldPlayaContainer).ToList())
             {
                 // Debug.Log(actualFieldContainer);
-                List<Foldout> foldouts = actualFieldContainer.Query<Foldout>().ToList();
+                List<Foldout> foldouts = root.Query<Foldout>().ToList();
                 // Debug.Log($"foldouts {foldouts.Count}");
                 if (foldouts.Count == 0)
                 {
-                    continue;
+                    return;
                 }
 
                 // Debug.Log(root.worldBound.x);
@@ -557,7 +557,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         continue;
                     }
 
-                    if (!_processedToggles.Add(toggle))  // already processed
+                    if (!processedToggles.Add(toggle))  // already processed
                     {
                         continue;
                     }

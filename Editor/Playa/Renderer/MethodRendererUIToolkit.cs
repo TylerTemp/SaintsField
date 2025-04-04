@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -35,6 +36,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
+            container.style.flexGrow = 1;
             object target = FieldWithInfo.Target;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
             // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
@@ -107,6 +109,13 @@ namespace SaintsField.Editor.Playa.Renderer
                 _ussClassSaintsFieldEditingDisabledHide ??= Util.LoadResource<StyleSheet>("UIToolkit/ClassSaintsFieldEditingDisabledHide.uss");
                 root.styleSheets.Add(_ussClassSaintsFieldEditingDisabledHide);
 
+                HashSet<Toggle> savedToggles = new HashSet<Toggle>();
+                root.schedule.Execute(() =>
+                {
+                    // Debug.Log("check");
+                    SaintsRendererGroup.CheckOutOfScoopFoldout(root, savedToggles);
+                }).Every(200);
+
                 foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
                 {
                     VisualElement paraContainer = new VisualElement();
@@ -143,7 +152,8 @@ namespace SaintsField.Editor.Playa.Renderer
                                 paraValue = parameterValues[index] = newValue;
                                 paraValueChanged = true;
                             },
-                            false
+                            false,
+                            InHorizontalLayout
                         );
                         // ReSharper disable once InvertIf
                         if (r != null)

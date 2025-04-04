@@ -3861,7 +3861,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b51a1ee91875cc449d8df769d0af777, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inputsEnabled: {fileID: 11400000, guid: 6c455a299abc5e348bd98f6344a7a512, type: 2}
+  inputsEnabled: {fileID: 11400000, guid: 6c455a299abc5e348bd98f6344a7a512, type: 2}
+  inputsEnabledG: {fileID: 11400000, guid: 6c455a299abc5e348bd98f6344a7a512, type: 2}
+  inputsEnabledI: {fileID: 11400000, guid: 6c455a299abc5e348bd98f6344a7a512, type: 2}
+  inputsEnabledBare: {fileID: 11400000, guid: 6c455a299abc5e348bd98f6344a7a512, type: 2}
 --- !u!1 &508450317
 GameObject:
   m_ObjectHideFlags: 0

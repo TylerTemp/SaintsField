@@ -32,6 +32,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 style =
                 {
+                    // flexGrow = 1,
                     flexGrow = InHorizontalLayout? 0: 1,
                 },
                 name = ToString(),
@@ -432,7 +433,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
         // before set: useful for struct editing that C# will messup and change the value of the reference you have
-        protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor)
+        protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
 
             // Debug.Log(valueType);
@@ -455,7 +456,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     value = (bool)value,
                 };
-                element.AddToClassList(Toggle.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    // element.style.flexDirection = FlexDirection.RowReverse;
+                    Label toggleLabel = element.Q<Label>();
+                    if(toggleLabel != null)
+                    {
+                        toggleLabel.style.minWidth = 0;
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(Toggle.alignedFieldUssClassName);
+                }
                 if (labelGrayColor)
                 {
                     element.labelElement.style.color = reColor;
@@ -492,7 +505,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -530,7 +550,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -568,7 +595,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -605,7 +639,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -647,7 +688,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 // element.labelElement.style.borderRightWidth = 1;
                 // element.labelElement.style.color = EColor.EditorEmphasized.GetColor();
                 element.labelElement.style.color = EColor.EditorSeparator.GetColor();
-                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -684,7 +732,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(UnsignedIntegerField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(UnsignedIntegerField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -714,7 +769,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(IntegerField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -749,7 +811,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(LongField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(LongField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -784,7 +853,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(UnsignedLongField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(UnsignedLongField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -815,7 +891,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(LongField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(LongField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -850,7 +933,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(FloatField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(FloatField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -883,7 +973,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(DoubleField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(DoubleField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -917,7 +1014,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.labelElement.style.color = reColor;
                 }
 
-                element.AddToClassList(TextField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(TextField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -953,7 +1057,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.labelElement.style.color = reColor;
                 }
 
-                element.AddToClassList(TextField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(TextField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1002,7 +1113,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(Vector2Field.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    // element.style.flexDirection = FlexDirection.Column;
+                    element.style.flexWrap = Wrap.Wrap;
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(Vector2Field.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1035,7 +1161,23 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(Vector3Field.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    // element.style.flexDirection = FlexDirection.Column;
+                    element.style.flexWrap = Wrap.Wrap;
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(Vector3Field.alignedFieldUssClassName);
+                }
+
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1068,7 +1210,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(Vector4Field.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    // element.style.flexDirection = FlexDirection.Column;
+                    element.style.flexWrap = Wrap.Wrap;
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(Vector4Field.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1101,7 +1258,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(Vector2IntField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    // element.style.flexDirection = FlexDirection.Column;
+                    element.style.flexWrap = Wrap.Wrap;
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(Vector2IntField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1134,7 +1306,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(Vector3IntField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    // element.style.flexDirection = FlexDirection.Column;
+                    element.style.flexWrap = Wrap.Wrap;
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(Vector3IntField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     beforeSet?.Invoke(value);
@@ -1171,7 +1358,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(ColorField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(ColorField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1207,7 +1401,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(BoundsField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    // element.style.flexDirection = FlexDirection.Column;
+                    // element.style.flexWrap = Wrap.Wrap;
+                    // Label elementLabel = element.Q<Label>();
+                    // if (elementLabel != null)
+                    // {
+                    //     elementLabel.style.minWidth = 0;
+                    //     elementLabel.style.borderRightWidth = 1;
+                    //     elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    // }
+                }
+                else
+                {
+                    element.AddToClassList(BoundsField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1240,7 +1449,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(RectField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    // element.style.flexDirection = FlexDirection.Column;
+                    element.style.flexWrap = Wrap.Wrap;
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(RectField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1273,7 +1497,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.labelElement.style.color = reColor;
                 }
-                element.AddToClassList(RectIntField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    // element.style.flexDirection = FlexDirection.Column;
+                    element.style.flexWrap = Wrap.Wrap;
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(RectIntField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1305,7 +1544,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 // ReSharper disable once PossibleNullReferenceException
                 typeof(EnumField).GetField("m_EnumType", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(element, valueType);
-                element.AddToClassList(EnumField.alignedFieldUssClassName);
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                    // element.style.flexWrap = Wrap.Wrap;
+                    // Label elementLabel = element.Q<Label>();
+                    // if (elementLabel != null)
+                    // {
+                    //     elementLabel.style.minWidth = 0;
+                    //     elementLabel.style.borderRightWidth = 1;
+                    //     elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    // }
+                }
+                else
+                {
+                    element.AddToClassList(EnumField.alignedFieldUssClassName);
+                }
                 if (setterOrNull == null)
                 {
                     element.SetEnabled(false);
@@ -1324,7 +1578,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
             {
-                return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor);
+                return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
             }
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
@@ -1376,7 +1630,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
                 bool isReadOnly = !isNormalDictionary;
                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
-                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor);
+                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
 #else  // WTF Unity, backport it!
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1465,7 +1719,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (value is IEnumerable enumerableValue)
             {
                 // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
-                return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor);
+                return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
             }
 
             // Debug.Log(valueType);
@@ -1597,12 +1851,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             if(canConvert)
                             {
                                 objFieldResult =
-                                    UIToolkitObjectFieldEdit(null, label, newType, (UnityEngine.Object) value, beforeSet, setterOrNull, labelGrayColor);
+                                    UIToolkitObjectFieldEdit(null, label, newType, (UnityEngine.Object) value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
                             }
                             else
                             {
                                 objFieldResult =
-                                    UIToolkitObjectFieldEdit(null, label, newType, null, beforeSet, setterOrNull, labelGrayColor);
+                                    UIToolkitObjectFieldEdit(null, label, newType, null, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
                                 beforeSet?.Invoke(value);
                                 setterOrNull?.Invoke(null);
                             }
@@ -1683,7 +1937,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // Debug.Log($"valueActualType={valueActualType}");
             if (valueActualType != null && typeof(UnityEngine.Object).IsAssignableFrom(valueActualType))
             {
-                ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor);
+                ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
                 // Debug.Log($"objFieldResult={objFieldResult}");
                 if (objFieldResult != null)
                 {
@@ -1746,7 +2000,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         fieldInfo.SetValue(value, newValue);
                         setterOrNull?.Invoke(value);
                     },
-                    labelGrayColor);
+                    labelGrayColor,
+                    inHorizontalLayout);
                 // Debug.Log($"{name}: {result}: {fieldInfo.FieldType}");
                 // ReSharper disable once InvertIf
                 if(result != null)
@@ -1782,7 +2037,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             setterOrNull?.Invoke(value);
                         }
                         : null,
-                    labelGrayColor);
+                    labelGrayColor,
+                    inHorizontalLayout);
                 // ReSharper disable once InvertIf
                 if(result != null)
                 {
@@ -1801,7 +2057,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return useOld? null: genFoldout;
         }
 
-        private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, UnityEngine.Object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor)
+        private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, UnityEngine.Object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
             if (oldElement is ObjectField oldUnityEngineObjectField)
             {
@@ -1819,7 +2075,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 element.labelElement.style.color = EColor.EditorSeparator.GetColor();
             }
-            element.AddToClassList(ObjectField.alignedFieldUssClassName);
+            if (inHorizontalLayout)
+            {
+                element.style.flexDirection = FlexDirection.Column;
+                // element.style.flexWrap = Wrap.Wrap;
+                // Label elementLabel = element.Q<Label>();
+                // if (elementLabel != null)
+                // {
+                //     elementLabel.style.minWidth = 0;
+                //     elementLabel.style.borderRightWidth = 1;
+                //     elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                // }
+            }
+            else
+            {
+                element.AddToClassList(ObjectField.alignedFieldUssClassName);
+            }
             if (setterOrNull == null)
             {
                 element.SetEnabled(false);
@@ -1938,7 +2209,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public object RawListValue;
         }
 
-        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor)
+        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
             Foldout foldout = oldElement;
             if (foldout != null && !foldout.ClassListContains("saintsfield-list"))
@@ -2102,7 +2373,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 payload.RawValues[actualIndex] = newItemValue;
                             }
                          : null,
-                        false);
+                        false,
+                        inHorizontalLayout);
                     if (item != null)
                     {
                         visualElement.Clear();
@@ -2249,7 +2521,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
-        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor)
+        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
             // Debug.Log(dictKeyType);
             // Debug.Log(dictValueType);
@@ -2441,7 +2713,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 // listView.itemsSource[sourceIndex] = newKey;
                                 key = newKey;
                                 keyChanged = true;
-                            }, false);
+                            }, false, true);
 
                             if (editing != null)
                             {
@@ -2501,7 +2773,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             object refreshedKey = listView.itemsSource[elementIndex];
                             payload.SetKeyValue(refreshedKey, newValue);
-                        }, false);
+                        }, false, true);
 
                         if (editing != null)
                         {
@@ -2629,7 +2901,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #endif
                             }
                         },
-                        false
+                        false,
+                        inHorizontalLayout
                     );
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -2663,7 +2936,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             addPairValue = newValue;
                             addPairValueChanged = true;
                         },
-                        false
+                        false,
+                        inHorizontalLayout
                     );
                     // ReSharper disable once InvertIf
                     if (r != null)

@@ -3,6 +3,10 @@
 ## 4.1.3 ##
 
 1.  UI Toolkit: Fix disable related function not working since 4.0, [#194](https://github.com/TylerTemp/SaintsField/issues/194)
+2.  UI Toolkit: Fix fallback to IMGUI gave empty space drawing [#193](https://github.com/TylerTemp/SaintsField/issues/193)
+3.  UI Toolkit: Fix Unity 6k changes that breaks `ResizableTextArea` 
+4.  UI Toolkit: Fix `SaintsRow(inline: true)` not using inline drawing
+5.  UI Toolkit: Improved Layout for `Button`
 
 ## 4.1.2 ##
 

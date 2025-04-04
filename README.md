@@ -89,6 +89,8 @@ namespace: `SaintsField`
 **4.1.3**
 
 1.  UI Toolkit: Fix disable related function not working since 4.0, [#194](https://github.com/TylerTemp/SaintsField/issues/194)
+2.  UI Toolkit: Fix fallback to IMGUI gave empty space drawing [#193](https://github.com/TylerTemp/SaintsField/issues/193)
+3.  UI Toolkit: Fix Unity 6k changes that breaks `ResizableTextArea`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

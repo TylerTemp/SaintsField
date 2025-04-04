@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Playa.Renderer
             // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
             Action<object> setter = GetSetterOrNull(FieldWithInfo);
             Type fieldType = GetFieldType(FieldWithInfo);
-            VisualElement result = UIToolkitValueEdit(null, GetNiceName(FieldWithInfo), fieldType, value, null, setter, true);
+            VisualElement result = UIToolkitValueEdit(null, GetNiceName(FieldWithInfo), fieldType, value, null, setter, true, InHorizontalLayout);
 
             bool isCollection = !typeof(UnityEngine.Object).IsAssignableFrom(fieldType) && (fieldType.IsArray || typeof(IEnumerable).IsAssignableFrom(fieldType));
             // Debug.Log(isCollection);
@@ -163,7 +163,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         userData.OldCollection = null;
                     }
                 }
-                VisualElement result = UIToolkitValueEdit(fieldElementOrNull, GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, true);
+                VisualElement result = UIToolkitValueEdit(fieldElementOrNull, GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, true, InHorizontalLayout);
                 // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {
