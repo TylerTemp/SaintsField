@@ -1,7 +1,9 @@
 using System;
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -17,7 +19,9 @@ namespace SaintsField.Samples.Scripts
         [Button]
         private void Button()
         {
+#if UNITY_EDITOR
             Debug.Log(EditorGUIUtility.systemCopyBuffer);
+#endif
         }
 
         [Serializable]
