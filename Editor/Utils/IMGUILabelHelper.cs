@@ -8,5 +8,10 @@ namespace SaintsField.Editor.Utils
         public string RichLabel;
 
         public IMGUILabelHelper(string defaultName) => RichLabel = defaultName;
+
+        public override string ToString()
+        {
+            return NoLabel ? "<IMGUILabelHelper />" : $"<IMGUILabelHelper={RichLabel} />";
+        }
     }
 }

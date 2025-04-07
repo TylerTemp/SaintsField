@@ -17,6 +17,9 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if SAINTSFIELD_OBVIOUS_SOAP
+using Obvious.Soap;
+#endif
 
 namespace SaintsField.Editor.Core
 {
@@ -428,7 +431,7 @@ namespace SaintsField.Editor.Core
                     VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, GetPreferredLabel(property), saintsPropertyDrawers);
                     fallback.AddToClassList(fallbackClass);
                     fieldContainer.Add(fallback);
-                    containerElement.visible = false;
+                    // containerElement.visible = false;
                 }
             }
             else
@@ -632,8 +635,92 @@ namespace SaintsField.Editor.Core
 
             if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType == typeof(PropertyDrawer))  // null: old Unity || did not override
             {
+#if UNITY_6000_0_OR_NEWER
                 return PropertyFieldFallbackUIToolkit(property);
+#else
 
+                Action<object> onValueChangedCallback = null;
+                onValueChangedCallback = value =>
+                {
+                    object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                    if (newFetchParent == null)
+                    {
+                        Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                        return;
+                    }
+
+                    foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
+                    {
+                        saintsPropertyInfo.Drawer.OnValueChanged(
+                            property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement,
+                            info, newFetchParent,
+                            onValueChangedCallback,
+                            value);
+                    }
+                };
+
+                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
+
+                return new IMGUIContainer(() =>
+                {
+                    using(new ImGuiFoldoutStyleRichTextScoop())
+                    using(new ImGuiLabelStyleRichTextScoop())
+                    using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                    using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                    {
+                        GUIContent label = imguiLabelHelper.NoLabel
+                            ? GUIContent.none
+                            : new GUIContent(imguiLabelHelper.RichLabel);
+#if SAINTSFIELD_OBVIOUS_SOAP
+                        {
+                            if(!imguiLabelHelper.NoLabel)
+                            {
+                                Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                                    ? ReflectUtils.GetElementType(info.FieldType)
+                                    : info.FieldType;
+                                if (rawType.IsSubclassOf(typeof(ScriptableVariableBase)))
+                                {
+                                    label = new GUIContent($"    {imguiLabelHelper.RichLabel}");
+                                }
+                            }
+                        }
+#endif
+                        // Debug.Log(imguiLabelHelper);
+
+                        using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                        {
+                            property.serializedObject.Update();
+                            EditorGUILayout.PropertyField(property, label);
+                            // ReSharper disable once InvertIf
+                            if (changed.changed)
+                            {
+                                // Debug.Log("changed");
+                                property.serializedObject.ApplyModifiedProperties();
+
+                                object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                                if (newFetchParent == null)
+                                {
+                                    Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                                    return;
+                                }
+
+                                (string error, int _, object value) = Util.GetValue(property, info, newFetchParent);
+                                if (error == "")
+                                {
+                                    onValueChangedCallback(value);
+                                }
+                            }
+                        }
+                    }
+                })
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                    userData = imguiLabelHelper,
+                };
+#endif
                 // PropertyDrawer imGuiDrawer = drawerInstance;
 
                 // using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
@@ -660,25 +747,7 @@ namespace SaintsField.Editor.Core
                 //     return prop;
                 // }
 
-                // Action<object> onValueChangedCallback = null;
-                // onValueChangedCallback = value =>
-                // {
-                //     object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                //     if (newFetchParent == null)
-                //     {
-                //         Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
-                //         return;
-                //     }
-                //
-                //     foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
-                //     {
-                //         saintsPropertyInfo.Drawer.OnValueChanged(
-                //             property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement,
-                //             info, newFetchParent,
-                //             onValueChangedCallback,
-                //             value);
-                //     }
-                // };
+
                 //
                 // IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
                 //
@@ -873,7 +942,7 @@ namespace SaintsField.Editor.Core
                 // Debug.Log(parentRoots.Count);
 
                 // fallback will draw all (saintsPropCount), then this drawer itself will draw one.
-                int nestedCount = saintsPropCount + 1;
+                // int nestedCount = saintsPropCount + 1;
 
                 // if (saintsPropCount != 0 && parentRoots.Count != nestedCount)
                 // // if (parentRoots.Count < saintsPropCount)
@@ -913,8 +982,8 @@ namespace SaintsField.Editor.Core
 //
 //                 });
 
-                topRoot.Clear();
-                topRoot.Add(deepestContainer);
+                // topRoot.Clear();
+                // topRoot.Add(deepestContainer);
 
                 // thisPropField.Bind(property.serializedObject);
                 // fallbackField.Unbind();
@@ -1279,6 +1348,20 @@ namespace SaintsField.Editor.Core
             string toLabel, IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried,
             RichTextDrawer richTextDrawer)
         {
+            VisualElement saintsLabelField = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
+
+            IMGUIContainer imGuiContainer = saintsLabelField.Q<IMGUIContainer>();
+
+            // ReSharper disable once MergeIntoPattern
+            // ReSharper disable once MergeSequentialChecks
+            if(imGuiContainer?.userData is IMGUILabelHelper imguiLabelHelper)
+            {
+                // Debug.Log($"imguiLabelHelper={imguiLabelHelper}");\
+                imguiLabelHelper.NoLabel = string.IsNullOrEmpty(toLabel);
+                imguiLabelHelper.RichLabel = toLabel;
+                return;
+            }
+
             Label saintsPropertyDrawerOverrideLabel = container.Q<Label>(classes: NameSaintsPropertyDrawerOverrideLabel);
             if (saintsPropertyDrawerOverrideLabel != null)
             {
@@ -1286,7 +1369,8 @@ namespace SaintsField.Editor.Core
                 return;
             }
 
-            VisualElement saintsLabelField = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
+
+
             object saintsLabelFieldDrawerData = saintsLabelField.userData;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RICH_LABEL
