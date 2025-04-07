@@ -1503,7 +1503,7 @@ namespace SaintsField.Editor.Core
 
         #endregion
 
-        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        public IEnumerable<AbsRenderer> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         }

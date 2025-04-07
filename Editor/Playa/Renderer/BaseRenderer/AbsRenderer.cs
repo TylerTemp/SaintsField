@@ -188,8 +188,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
         }
 
-
-        private static (string error, object rawResult) GetCallback(SaintsFieldWithInfo fieldWithInfo, string by)
+        protected static (string error, object rawResult) GetCallback(SaintsFieldWithInfo fieldWithInfo, string by)
         {
             object target = fieldWithInfo.Target;
 
