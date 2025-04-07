@@ -905,24 +905,24 @@ namespace SaintsField.Editor.Core
                 Debug.Log($"usingFallbackField {property.propertyPath}, parentRoots={parentRoots.Count}, {saintsPropertyDrawers.Count} ({NameSaintsPropertyDrawerRoot(property)})");
 #endif
 
-                int saintsPropCount = 0;
-                foreach (PropertyAttribute propertyAttribute in allAttributes)
-                {
-                    bool isSaintsProperty = propertyAttribute is ISaintsAttribute;
-                    // Debug.Log($"{propertyAttribute}: {propertyAttribute is ISaintsAttribute}");
-                    if (PropertyIsDecoratorDrawer(propertyAttribute))
-                    {
-                        continue;
-                    }
-                    if (isSaintsProperty)
-                    {
-                        saintsPropCount++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
+                // int saintsPropCount = 0;
+                // foreach (PropertyAttribute propertyAttribute in allAttributes)
+                // {
+                //     bool isSaintsProperty = propertyAttribute is ISaintsAttribute;
+                //     // Debug.Log($"{propertyAttribute}: {propertyAttribute is ISaintsAttribute}");
+                //     if (PropertyIsDecoratorDrawer(propertyAttribute))
+                //     {
+                //         continue;
+                //     }
+                //     if (isSaintsProperty)
+                //     {
+                //         saintsPropCount++;
+                //     }
+                //     else
+                //     {
+                //         break;
+                //     }
+                // }
 
                 // Debug.Log($"parentRoots.Count={parentRoots.Count}, saintsPropCount={saintsPropCount}");
 
@@ -982,8 +982,8 @@ namespace SaintsField.Editor.Core
 //
 //                 });
 
-                // topRoot.Clear();
-                // topRoot.Add(deepestContainer);
+                topRoot.Clear();
+                topRoot.Add(deepestContainer);
 
                 // thisPropField.Bind(property.serializedObject);
                 // fallbackField.Unbind();

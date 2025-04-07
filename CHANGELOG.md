@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.5 ##
+
+UI Toolkit: Fix IMGUI fallback in Unity 6k
+
 ## 4.1.4 ##
 
 UI Toolkit: Fix IMGUI fallback. The fallback flow in 4.1.3 works in Unity 6k, but not in lower version like Unity 2022. This release uses different fallback flow for it.
