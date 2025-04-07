@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.4 ##
+
+UI Toolkit: Fix IMGUI fallback. The fallback flow in 4.1.3 works in Unity 6k, but not in lower version like Unity 2022. This release uses different fallback flow for it.
+
 ## 4.1.3 ##
 
 1.  UI Toolkit: Fix disable related function not working since 4.0, [#194](https://github.com/TylerTemp/SaintsField/issues/194)
