@@ -9,7 +9,7 @@ using UnityEditor;
 namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 {
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
-    public partial class SaintsRowAttributeDrawer: SaintsPropertyDrawer
+    public partial class SaintsRowAttributeDrawer: SaintsPropertyDrawer, IMakeRenderer
     {
         private static (string error, int arrayIndex, object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {
@@ -55,9 +55,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         // {
         //     return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         // }
-        // public IEnumerable<AbsRenderer> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
-        // {
-        //     return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
-        // }
+        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        {
+            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
+        }
     }
 }
