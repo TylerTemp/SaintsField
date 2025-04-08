@@ -304,47 +304,47 @@ namespace SaintsField.Editor
                 .Select(each => each.value);
         }
 
-        private static IEnumerable<IPlayaAttribute> WrapPlayaAttributes(IPlayaAttribute[] getCustomAttributes)
-        {
-            foreach (IPlayaAttribute playaAttribute in getCustomAttributes)
-            {
-                switch (playaAttribute)
-                {
-                    case LayoutTerminateHereAttribute layoutTerminateHereAttribute:
-                        yield return new LayoutAttribute(".", layoutTerminateHereAttribute.Layout, false, layoutTerminateHereAttribute.MarginTop, layoutTerminateHereAttribute.MarginBottom);
-                        yield return new LayoutEndAttribute(null, layoutTerminateHereAttribute.MarginTop, layoutTerminateHereAttribute.MarginBottom);
-                        break;
-                    case LayoutCloseHereAttribute layoutCloseHereAttribute:
-                        yield return new LayoutAttribute(".", layoutCloseHereAttribute.Layout, false, layoutCloseHereAttribute.MarginTop, layoutCloseHereAttribute.MarginBottom);
-                        yield return new LayoutEndAttribute(".", layoutCloseHereAttribute.MarginTop, layoutCloseHereAttribute.MarginBottom);
-                        break;
-                    default:
-                        yield return playaAttribute;
-                        break;
-                }
-            }
-        }
+        // private static IEnumerable<IPlayaAttribute> WrapPlayaAttributes(IPlayaAttribute[] getCustomAttributes)
+        // {
+        //     foreach (IPlayaAttribute playaAttribute in getCustomAttributes)
+        //     {
+        //         switch (playaAttribute)
+        //         {
+        //             case LayoutTerminateHereAttribute layoutTerminateHereAttribute:
+        //                 yield return new LayoutAttribute(".", layoutTerminateHereAttribute.Layout, false, layoutTerminateHereAttribute.MarginTop, layoutTerminateHereAttribute.MarginBottom);
+        //                 yield return new LayoutEndAttribute(null, layoutTerminateHereAttribute.MarginTop, layoutTerminateHereAttribute.MarginBottom);
+        //                 break;
+        //             case LayoutCloseHereAttribute layoutCloseHereAttribute:
+        //                 yield return new LayoutAttribute(".", layoutCloseHereAttribute.Layout, false, layoutCloseHereAttribute.MarginTop, layoutCloseHereAttribute.MarginBottom);
+        //                 yield return new LayoutEndAttribute(".", layoutCloseHereAttribute.MarginTop, layoutCloseHereAttribute.MarginBottom);
+        //                 break;
+        //             default:
+        //                 yield return playaAttribute;
+        //                 break;
+        //         }
+        //     }
+        // }
 
-        private static IEnumerable<ISaintsLayoutBase> GetLayoutBases(IEnumerable<ISaintsLayoutBase> layoutBases)
-        {
-            foreach (ISaintsLayoutBase saintsLayoutBase in layoutBases)
-            {
-                switch (saintsLayoutBase)
-                {
-                    case LayoutTerminateHereAttribute layoutTerminateHereAttribute:
-                        yield return new LayoutAttribute(".", layoutTerminateHereAttribute.Layout, false, layoutTerminateHereAttribute.MarginTop, layoutTerminateHereAttribute.MarginBottom);
-                        yield return new LayoutEndAttribute(null, layoutTerminateHereAttribute.MarginTop, layoutTerminateHereAttribute.MarginBottom);
-                        break;
-                    case LayoutCloseHereAttribute layoutCloseHereAttribute:
-                        yield return new LayoutAttribute(".", layoutCloseHereAttribute.Layout, false, layoutCloseHereAttribute.MarginTop, layoutCloseHereAttribute.MarginBottom);
-                        yield return new LayoutEndAttribute(".", layoutCloseHereAttribute.MarginTop, layoutCloseHereAttribute.MarginBottom);
-                        break;
-                    default:
-                        yield return saintsLayoutBase;
-                        break;
-                }
-            }
-        }
+        // private static IEnumerable<ISaintsLayoutBase> GetLayoutBases(IEnumerable<ISaintsLayoutBase> layoutBases)
+        // {
+        //     foreach (ISaintsLayoutBase saintsLayoutBase in layoutBases)
+        //     {
+        //         switch (saintsLayoutBase)
+        //         {
+        //             case LayoutTerminateHereAttribute layoutTerminateHereAttribute:
+        //                 yield return new LayoutAttribute(".", layoutTerminateHereAttribute.Layout, false, layoutTerminateHereAttribute.MarginTop, layoutTerminateHereAttribute.MarginBottom);
+        //                 yield return new LayoutEndAttribute(null, layoutTerminateHereAttribute.MarginTop, layoutTerminateHereAttribute.MarginBottom);
+        //                 break;
+        //             case LayoutCloseHereAttribute layoutCloseHereAttribute:
+        //                 yield return new LayoutAttribute(".", layoutCloseHereAttribute.Layout, false, layoutCloseHereAttribute.MarginTop, layoutCloseHereAttribute.MarginBottom);
+        //                 yield return new LayoutEndAttribute(".", layoutCloseHereAttribute.MarginTop, layoutCloseHereAttribute.MarginBottom);
+        //                 break;
+        //             default:
+        //                 yield return saintsLayoutBase;
+        //                 break;
+        //         }
+        //     }
+        // }
 
         public static IReadOnlyList<ISaintsRenderer> HelperGetRenderers(
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict, SerializedObject serializedObject,
@@ -396,82 +396,82 @@ namespace SaintsField.Editor
             return group;
         }
 
-        private static IEnumerable<(string absGroupBy, ISaintsRenderer saintsRenderer)> HelperFlattenRendererGroupInfoIntoRenderers(IReadOnlyList<RendererGroupInfo> chainedGroups, SerializedObject serializedObject, IMakeRenderer makeRenderer, object target)
-        {
-            foreach (RendererGroupInfo rendererGroupInfo in chainedGroups)
-            {
-                Debug.Log($"Flatten processing `{rendererGroupInfo.AbsGroupBy}/{rendererGroupInfo.AbsGroupBy == null}`");
-
-                bool isEndNode = rendererGroupInfo.AbsGroupBy == null && rendererGroupInfo.Children.Count == 0;
-
-                if (isEndNode)
-                {
-                    foreach (RendererGroupInfo chainedGroup in chainedGroups)
-                    {
-                        if(chainedGroup.Renderer != null)
-                        {
-                            Debug.Log($"Flatten normal field {chainedGroup.Renderer}");
-                            yield return ("", chainedGroup.Renderer);
-                        }
-                    }
-
-//                     foreach (RendererGroupInfo result in chainedGroups)
+//         private static IEnumerable<(string absGroupBy, ISaintsRenderer saintsRenderer)> HelperFlattenRendererGroupInfoIntoRenderers(IReadOnlyList<RendererGroupInfo> chainedGroups, SerializedObject serializedObject, IMakeRenderer makeRenderer, object target)
+//         {
+//             foreach (RendererGroupInfo rendererGroupInfo in chainedGroups)
+//             {
+//                 Debug.Log($"Flatten processing `{rendererGroupInfo.AbsGroupBy}/{rendererGroupInfo.AbsGroupBy == null}`");
+//
+//                 bool isEndNode = rendererGroupInfo.AbsGroupBy == null && rendererGroupInfo.Children.Count == 0;
+//
+//                 if (isEndNode)
+//                 {
+//                     foreach (RendererGroupInfo chainedGroup in chainedGroups)
 //                     {
-//                         if(result != null)
+//                         if(chainedGroup.Renderer != null)
 //                         {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                             if(rendererGroupInfo.FieldWithInfo.MethodInfo == null)
-//                             {
-//                                 Debug.Log($"Flatten EndNode return {result}");
-//                             }
-// #endif
-//                             yield return ("", result);
+//                             Debug.Log($"Flatten normal field {chainedGroup.Renderer}");
+//                             yield return ("", chainedGroup.Renderer);
 //                         }
 //                     }
-
-                }
-                else
-                {
-                    (string absGroupBy, ISaintsRenderer saintsRenderer)[] children = HelperFlattenRendererGroupInfoIntoRenderers(rendererGroupInfo.Children, serializedObject, makeRenderer, target).ToArray();
-                    if (children.Length > 0)
-                    {
-                        string curGroupAbs = rendererGroupInfo.AbsGroupBy;
-
-                        ISaintsRendererGroup group =
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-                            rendererGroupInfo.Config.IsDoTween
-                                // ReSharper disable once RedundantCast
-                                ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
-                                : new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config, target)
-#else
-                            new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config, target)
-#endif
-                        ;
-
-                        foreach ((string eachChildGroupBy, ISaintsRenderer eachChild) in children)
-                        {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                            Debug.Log($"Flatten {group} add renderer {eachChild}");
-#endif
-
-                            group.Add(eachChildGroupBy, eachChild);
-                        }
-
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                        Debug.Log($"Flatten {group} return with {children.Length} children");
+//
+// //                     foreach (RendererGroupInfo result in chainedGroups)
+// //                     {
+// //                         if(result != null)
+// //                         {
+// // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
+// //                             if(rendererGroupInfo.FieldWithInfo.MethodInfo == null)
+// //                             {
+// //                                 Debug.Log($"Flatten EndNode return {result}");
+// //                             }
+// // #endif
+// //                             yield return ("", result);
+// //                         }
+// //                     }
+//
+//                 }
+//                 else
+//                 {
+//                     (string absGroupBy, ISaintsRenderer saintsRenderer)[] children = HelperFlattenRendererGroupInfoIntoRenderers(rendererGroupInfo.Children, serializedObject, makeRenderer, target).ToArray();
+//                     if (children.Length > 0)
+//                     {
+//                         string curGroupAbs = rendererGroupInfo.AbsGroupBy;
+//
+//                         ISaintsRendererGroup group =
+// #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+//                             rendererGroupInfo.Config.IsDoTween
+//                                 // ReSharper disable once RedundantCast
+//                                 ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
+//                                 : new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config, target)
+// #else
+//                             new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config, target)
 // #endif
-
-                        yield return (rendererGroupInfo.AbsGroupBy, group);
-                    }
+//                         ;
+//
+//                         foreach ((string eachChildGroupBy, ISaintsRenderer eachChild) in children)
+//                         {
 // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                    else
-                    {
-                        Debug.Log($"Flatten {rendererGroupInfo.AbsGroupBy} empty children, skip");
-                    }
+//                             Debug.Log($"Flatten {group} add renderer {eachChild}");
 // #endif
-                }
-            }
-        }
+//
+//                             group.Add(eachChildGroupBy, eachChild);
+//                         }
+//
+// // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
+//                         Debug.Log($"Flatten {group} return with {children.Length} children");
+// // #endif
+//
+//                         yield return (rendererGroupInfo.AbsGroupBy, group);
+//                     }
+// // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
+//                     else
+//                     {
+//                         Debug.Log($"Flatten {rendererGroupInfo.AbsGroupBy} empty children, skip");
+//                     }
+// // #endif
+//                 }
+//             }
+//         }
 
         private class RendererGroupInfo {
             public string AbsGroupBy;  // ""=normal fields, other=grouped fields
@@ -556,9 +556,9 @@ namespace SaintsField.Editor
                                         splitCloseGroup.RemoveAt(splitCloseGroup.Count - 1);
                                         string openGroupTo = string.Join("/", splitCloseGroup);
                                         if (!rootToRendererGroupInfo.TryGetValue(openGroupTo,
-                                                out RendererGroupInfo info))
+                                                out lastGroupInfo))
                                         {
-                                            rootToRendererGroupInfo[openGroupTo] = info = new RendererGroupInfo
+                                            rootToRendererGroupInfo[openGroupTo] = lastGroupInfo = new RendererGroupInfo
                                             {
                                                 AbsGroupBy = openGroupTo,
                                                 Children = new List<RendererGroupInfo>(),
@@ -567,7 +567,8 @@ namespace SaintsField.Editor
                                             };
                                         }
 
-                                        keepGroupingInfo = info.Config.KeepGrouping ? info : null;
+                                        keepGroupingInfo = lastGroupInfo.Config.KeepGrouping ? lastGroupInfo : null;
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                                         Debug.Log($"Layout close, {closeGroup}->{openGroupTo}: {keepGroupingInfo?.AbsGroupBy}");
 #endif
@@ -577,8 +578,11 @@ namespace SaintsField.Editor
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                                         Debug.Log($"Layout close, {closeGroup}: null");
 #endif
+                                        lastGroupInfo = null;
                                         keepGroupingInfo = null;
                                     }
+
+                                    Debug.Log($"closeGroup={closeGroup}; endGroupBy={endGroupBy}; cur={string.Join(",", rootToRendererGroupInfo.Keys)}");
                                 }
                                 else
                                 {
@@ -937,13 +941,11 @@ namespace SaintsField.Editor
 
         private readonly struct SaintsFieldWithRenderer
         {
-            public readonly SaintsFieldWithInfo SaintsFieldWithInfo;
             public readonly IPlayaAttribute Playa;
             public readonly AbsRenderer Renderer;
 
-            public SaintsFieldWithRenderer(SaintsFieldWithInfo saintsFieldWithInfo, IPlayaAttribute playa, AbsRenderer renderer)
+            public SaintsFieldWithRenderer(IPlayaAttribute playa, AbsRenderer renderer)
             {
-                SaintsFieldWithInfo = saintsFieldWithInfo;
                 Playa = playa;
                 Renderer = renderer;
             }
@@ -1023,7 +1025,7 @@ namespace SaintsField.Editor
                         PlayaInfoBoxRenderer infoBoxRenderer = new PlayaInfoBoxRenderer(serializedObject, fieldWithInfo, playaInfoBoxAttribute);
 
                         SaintsFieldWithRenderer playaInfoBoxRenderer =
-                            new SaintsFieldWithRenderer(fieldWithInfo, playaInfoBoxAttribute, infoBoxRenderer);
+                            new SaintsFieldWithRenderer(playaInfoBoxAttribute, infoBoxRenderer);
                         if (playaInfoBoxAttribute.Below)
                         {
                             postRenderer.Add(playaInfoBoxRenderer);
@@ -1036,24 +1038,24 @@ namespace SaintsField.Editor
                         break;
                     case LayoutTerminateHereAttribute _:
                     {
-                        postRenderer.Add(new SaintsFieldWithRenderer(fieldWithInfo, new LayoutEndAttribute(), null));
+                        postRenderer.Add(new SaintsFieldWithRenderer(new LayoutEndAttribute(), null));
                     }
                         break;
                     case LayoutCloseHereAttribute _:  // [Layout(".", keepGrouping: false), LayoutEnd(".")]
                     {
-                        yield return new SaintsFieldWithRenderer(fieldWithInfo, new LayoutAttribute(".", keepGrouping: false), null);
-                        postRenderer.Add(new SaintsFieldWithRenderer(fieldWithInfo, new LayoutEndAttribute("."), null));
+                        // yield return new SaintsFieldWithRenderer(fieldWithInfo, new LayoutAttribute(".", keepGrouping: false), null);
+                        postRenderer.Add(new SaintsFieldWithRenderer(new LayoutEndAttribute("."), null));
                     }
                         break;
                     default:
-                        yield return new SaintsFieldWithRenderer(fieldWithInfo, playaAttribute, null);
+                        yield return new SaintsFieldWithRenderer(playaAttribute, null);
                         break;
                 }
             }
 
             if(baseRenderer != null)
             {
-                yield return new SaintsFieldWithRenderer(fieldWithInfo, null, baseRenderer);
+                yield return new SaintsFieldWithRenderer(null, baseRenderer);
             }
             foreach (SaintsFieldWithRenderer posRenderer in postRenderer)
             {

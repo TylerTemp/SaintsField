@@ -15,20 +15,25 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         public string ot;
 
-        [LayoutStart("V", ELayout.TitleBox | ELayout.Vertical)]
+        [LayoutStart("装备", ELayout.TitleBox | ELayout.Vertical)]
+        [LayoutStart("./头部", ELayout.TitleBox)]
         public string st;
+        [LayoutCloseHere]
         public MyStruct inOneStruct;
 
-        [PlayaInfoBox("There!")]
+        [LayoutStart("./上身装备", ELayout.TitleBox)]
 
-        [LayoutStart("./H", ELayout.FoldoutBox | ELayout.Horizontal)]
-        [LayoutStart("./G1", ELayout.TitleBox)]
+        [PlayaInfoBox("注意：左手可以为空，右手不能为空", EMessageType.Warning)]
+
+        [LayoutStart("./Horizontal", ELayout.Horizontal)]
+
+        [LayoutStart("./左手", ELayout.TitleBox)]
         public string g11;
         public string g12;
         public MyStruct myStruct;
         public string g13;
 
-        [LayoutStart("../G2", ELayout.TitleBox)]
+        [LayoutStart("../右手", ELayout.TitleBox)]
         public string g21;
         [RichLabel("<color=lime><label/>")]
         public string g22;
@@ -37,20 +42,20 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         public bool toggle;
 
-        [LayoutEnd]
-        [PlayaInfoBox("Buttons!")]
-        [LayoutStart("Buttons", ELayout.Horizontal)]
-        [Button]
-        public void B1(string strV, bool bv, Vector2 v2)
-        {
-
-        }
-
-        [Button]
-        public void B2(MyStruct structV, Vector4 v4, Bounds bounds, Rect rectValue)
-        {
-
-        }
+        // [LayoutEnd]
+        // [PlayaInfoBox("Buttons!")]
+        // [LayoutStart("Buttons", ELayout.Horizontal)]
+        // [Button]
+        // public void B1(string strV, bool bv, Vector2 v2)
+        // {
+        //
+        // }
+        //
+        // [Button]
+        // public void B2(MyStruct structV, Vector4 v4, Bounds bounds, Rect rectValue)
+        // {
+        //
+        // }
 
 
         // [LayoutStart("Tab", ELayout.TitleBox)]
