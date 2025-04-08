@@ -28,14 +28,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             RenderPositionTargetIMGUI(rect, preCheckResult);
         }
 
-        private class FakeDisposable : IDisposable
-        {
-            public void Dispose()
-            {
-                // do nothing
-            }
-        }
-
         private static IReadOnlyList<(string, List<IPlayaAttribute>)> GroupAttributesIMGUI(IEnumerable<IPlayaAttribute> playaAttributes)
         {
             List<(string, List<IPlayaAttribute>)> groupWithAttributes = new List<(string, List<IPlayaAttribute>)>();
@@ -71,107 +63,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         protected virtual void RenderAboveIMGUI()
         {
-            foreach ((string, List<IPlayaAttribute>) groupWithAttribute in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
-            {
-                List<IPlayaAttribute> attributes = groupWithAttribute.Item2;
-
-                IDisposable layout = attributes.Count > 1
-                    // ReSharper disable once RedundantCast
-                    ? (IDisposable)new EditorGUILayout.HorizontalScope()
-                    : new FakeDisposable();
-                using (layout)
-                {
-                    foreach (IPlayaAttribute playaAttribute in attributes)
-                    {
-                        switch (playaAttribute)
-                        {
-                            case PlayaInfoBoxAttribute infoBoxAttribute:
-                            {
-                                if(!infoBoxAttribute.Below)
-                                {
-                                    RenderInfoBoxLayoutIMGUI(infoBoxAttribute);
-                                }
-                            }
-                                break;
-
-                        }
-                    }
-                }
-            }
-        }
-
-        private void RenderInfoBoxLayoutIMGUI(PlayaInfoBoxAttribute infoBoxAttribute)
-        {
-            (MessageType messageType, string content) = GetInfoBoxRawContent(FieldWithInfo, infoBoxAttribute);
-
-            if(!string.IsNullOrEmpty(content))
-            {
-                using(new ImGuiHelpBox.RichTextHelpBoxScoop())
-                {
-                    EditorGUILayout.HelpBox(content, messageType);
-                }
-            }
-        }
-
-        private static (MessageType messageType, string content) GetInfoBoxRawContent(SaintsFieldWithInfo fieldWithInfo, PlayaInfoBoxAttribute infoBoxAttribute)
-        {
-            string xmlContent = infoBoxAttribute.Content;
-            MessageType helpBoxType = infoBoxAttribute.MessageType.GetMessageType();
-
-            if (infoBoxAttribute.IsCallback)
-            {
-                (string error, object rawResult) = GetCallback(fieldWithInfo, infoBoxAttribute.Content);
-
-                if (error != "")
-                {
-                    return (MessageType.Error, error);
-                }
-
-                if (rawResult is ValueTuple<EMessageType, string> resultTuple)
-                {
-                    helpBoxType = resultTuple.Item1.GetMessageType();
-                    xmlContent = resultTuple.Item2;
-                }
-                else
-                {
-                    xmlContent = rawResult?.ToString() ?? "";
-                }
-            }
-
-            return (helpBoxType, xmlContent);
         }
 
         protected abstract void RenderTargetIMGUI(float width, PreCheckResult preCheckResult);
 
         protected virtual void RenderBelowIMGUI()
         {
-            foreach ((string, List<IPlayaAttribute>) groupWithAttribute in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
-            {
-                List<IPlayaAttribute> attributes = groupWithAttribute.Item2;
-
-                IDisposable layout = attributes.Count > 1
-                    // ReSharper disable once RedundantCast
-                    ? (IDisposable)new EditorGUILayout.HorizontalScope()
-                    : new FakeDisposable();
-                using (layout)
-                {
-                    foreach (IPlayaAttribute playaAttribute in attributes)
-                    {
-                        switch (playaAttribute)
-                        {
-                            case PlayaInfoBoxAttribute infoBoxAttribute:
-                            {
-                                if(infoBoxAttribute.Below)
-                                {
-                                    RenderInfoBoxLayoutIMGUI(infoBoxAttribute);
-                                }
-                            }
-                                break;
-
-                        }
-                    }
-                }
-            }
         }
 
         public virtual float GetHeightIMGUI(float width)
@@ -187,60 +84,58 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         protected virtual float GetAboveHeightIMGUI(float width)
         {
-            float totalHeight = 0f;
-            foreach ((string _, List<IPlayaAttribute> attributes) in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
-            {
-                float maxHeight = 0f;
-                float useWidth = attributes.Count == 1? width: width / attributes.Count;
-                foreach (IPlayaAttribute playaAttribute in attributes)
-                {
-                    switch (playaAttribute)
-                    {
-                        case PlayaInfoBoxAttribute infoBoxAttribute:
-                            if(!infoBoxAttribute.Below)
-                            {
-                                maxHeight = Mathf.Max(maxHeight, GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
-                            }
-                            break;
-                    }
-                }
-
-                totalHeight += maxHeight;
-            }
-            return totalHeight;
+            // float totalHeight = 0f;
+            // foreach ((string _, List<IPlayaAttribute> attributes) in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
+            // {
+            //     float maxHeight = 0f;
+            //     float useWidth = attributes.Count == 1? width: width / attributes.Count;
+            //     foreach (IPlayaAttribute playaAttribute in attributes)
+            //     {
+            //         switch (playaAttribute)
+            //         {
+            //             case PlayaInfoBoxAttribute infoBoxAttribute:
+            //                 if(!infoBoxAttribute.Below)
+            //                 {
+            //                     maxHeight = Mathf.Max(maxHeight, GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
+            //                 }
+            //                 break;
+            //         }
+            //     }
+            //
+            //     totalHeight += maxHeight;
+            // }
+            // return totalHeight;
+            return 0;
         }
 
-        private float GetInfoBoxHeightIMGUI(float width, PlayaInfoBoxAttribute infoBoxAttribute)
-        {
-            (MessageType messageType, string content) = GetInfoBoxRawContent(FieldWithInfo, infoBoxAttribute);
-            return ImGuiHelpBox.GetHeight(content, width, messageType);
-        }
+
 
         protected abstract float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult);
 
         protected virtual float GetBelowHeightIMGUI(float width)
         {
-            float totalHeight = 0f;
-            foreach ((string _, List<IPlayaAttribute> attributes) in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
-            {
-                List<float> accHeight = new List<float>();
-                float useWidth = attributes.Count == 1? width: width / attributes.Count;
-                foreach (IPlayaAttribute playaAttribute in attributes)
-                {
-                    switch (playaAttribute)
-                    {
-                        case PlayaInfoBoxAttribute infoBoxAttribute:
-                            if(infoBoxAttribute.Below)
-                            {
-                                accHeight.Add(GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
-                            }
-                            break;
-                    }
-                }
-
-                totalHeight += accHeight.DefaultIfEmpty(0).Max();
-            }
-            return totalHeight;
+            // float totalHeight = 0f;
+            // foreach ((string _, List<IPlayaAttribute> attributes) in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
+            // {
+            //     List<float> accHeight = new List<float>();
+            //     float useWidth = attributes.Count == 1? width: width / attributes.Count;
+            //     foreach (IPlayaAttribute playaAttribute in attributes)
+            //     {
+            //         switch (playaAttribute)
+            //         {
+            //             case PlayaInfoBoxAttribute infoBoxAttribute:
+            //                 if(infoBoxAttribute.Below)
+            //                 {
+            //                     accHeight.Add(GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
+            //                 }
+            //                 break;
+            //         }
+            //     }
+            //
+            //     totalHeight += accHeight.DefaultIfEmpty(0).Max();
+            // }
+            // return totalHeight;
+            return 0;
         }
 
         public void RenderPositionIMGUI(Rect position)
@@ -255,308 +150,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         protected virtual Rect RenderAbovePosition(Rect position)
         {
-            Rect result = position;
-
-            foreach ((string _, List<IPlayaAttribute> attributes) in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
-            {
-                float groupUseHeight = 0f;
-                float eachWidth = attributes.Count == 1? position.width: position.width / attributes.Count;
-                foreach ((IPlayaAttribute playaAttribute, int index) in attributes.WithIndex())
-                {
-                    switch (playaAttribute)
-                    {
-                        // case PlayaInfoBoxAttribute { Below: false } infoBoxAttribute:
-                        case PlayaInfoBoxAttribute infoBoxAttribute:
-                        {
-                            if(!infoBoxAttribute.Below)
-                            {
-                                (MessageType messageType, string content) =
-                                    GetInfoBoxRawContent(FieldWithInfo, infoBoxAttribute);
-
-                                float useHeight = ImGuiHelpBox.GetHeight(content, eachWidth, messageType);
-                                groupUseHeight = Mathf.Max(groupUseHeight, useHeight);
-                                Rect thisRect = new Rect(result)
-                                {
-                                    width = eachWidth,
-                                    x = result.x + eachWidth * index,
-                                    height = useHeight,
-                                };
-                                using (new ImGuiHelpBox.RichTextHelpBoxScoop())
-                                {
-                                    EditorGUI.HelpBox(thisRect, content, messageType);
-                                }
-                            }
-
-                        }
-                            break;
-                    }
-                }
-
-                result.y += groupUseHeight;
-                result.height -= groupUseHeight;
-            }
-            return result;
+            return position;
         }
 
         protected abstract void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult);
 
         protected virtual void RenderPositionBelow(Rect position)
         {
-            Rect result = position;
-
-            foreach ((string _, List<IPlayaAttribute> attributes) in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
-            {
-                float groupUseHeight = 0f;
-                float eachWidth = attributes.Count == 1? position.width: position.width / attributes.Count;
-                foreach ((IPlayaAttribute playaAttribute, int index) in attributes.WithIndex())
-                {
-                    switch (playaAttribute)
-                    {
-                        // case PlayaInfoBoxAttribute { Below: true } infoBoxAttribute:
-                        case PlayaInfoBoxAttribute infoBoxAttribute:
-                        {
-                            if(infoBoxAttribute.Below)
-                            {
-                                (MessageType messageType, string content) =
-                                    GetInfoBoxRawContent(FieldWithInfo, infoBoxAttribute);
-
-                                float useHeight = ImGuiHelpBox.GetHeight(content, eachWidth, messageType);
-                                groupUseHeight = Mathf.Max(groupUseHeight, useHeight);
-                                Rect thisRect = new Rect(result)
-                                {
-                                    width = eachWidth,
-                                    x = result.x + eachWidth * index,
-                                    height = useHeight,
-                                };
-                                using (new ImGuiHelpBox.RichTextHelpBoxScoop())
-                                {
-                                    EditorGUI.HelpBox(thisRect, content, messageType);
-                                }
-                            }
-
-                        }
-                            break;
-                    }
-                }
-
-                result.y += groupUseHeight;
-                result.height -= groupUseHeight;
-            }
         }
-
-
-        // // NA: NaughtyEditorGUI
-        // protected static object FieldLayout(object value, string label, Type type=null, bool disabled=true)
-        // {
-        //     using (new EditorGUI.DisabledScope(disabled))
-        //     {
-        //         if (value == null)
-        //         {
-        //             Rect rt = GUILayoutUtility.GetRect(new GUIContent(label), EditorStyles.label);
-        //             EditorGUI.DrawRect(new Rect(rt)
-        //             {
-        //                 x = rt.x + EditorGUIUtility.labelWidth,
-        //                 width = rt.width - EditorGUIUtility.labelWidth,
-        //             }, EColor.CharcoalGray.GetColor() * new Color(1, 1,1, 0.2f));
-        //             EditorGUI.LabelField(rt, label, "null", EditorStyles.label);
-        //             return null;
-        //         }
-        //
-        //         // bool isDrawn = true;
-        //         Type valueType = type ?? value.GetType();
-        //
-        //         if (valueType == typeof(bool))
-        //         {
-        //             return EditorGUILayout.Toggle(label, (bool)value);
-        //         }
-        //
-        //         if (valueType == typeof(short))
-        //         {
-        //             return EditorGUILayout.IntField(label, (short)value);
-        //         }
-        //         if (valueType == typeof(ushort))
-        //         {
-        //             return EditorGUILayout.IntField(label, (ushort)value);
-        //         }
-        //         if (valueType == typeof(int))
-        //         {
-        //             return EditorGUILayout.IntField(label, (int)value);
-        //         }
-        //         if (valueType == typeof(uint))
-        //         {
-        //             return EditorGUILayout.LongField(label, (uint)value);
-        //         }
-        //         if (valueType == typeof(long))
-        //         {
-        //             return EditorGUILayout.LongField(label, (long)value);
-        //         }
-        //         if (valueType == typeof(ulong))
-        //         {
-        //             return EditorGUILayout.TextField(label, ((ulong)value).ToString());
-        //         }
-        //         if (valueType == typeof(float))
-        //         {
-        //             return EditorGUILayout.FloatField(label, (float)value);
-        //         }
-        //         if (valueType == typeof(double))
-        //         {
-        //             return EditorGUILayout.DoubleField(label, (double)value);
-        //         }
-        //         if (valueType == typeof(string))
-        //         {
-        //             return EditorGUILayout.TextField(label, (string)value);
-        //         }
-        //         if (valueType == typeof(Vector2))
-        //         {
-        //             return EditorGUILayout.Vector2Field(label, (Vector2)value);
-        //         }
-        //         if (valueType == typeof(Vector3))
-        //         {
-        //             return EditorGUILayout.Vector3Field(label, (Vector3)value);
-        //         }
-        //         if (valueType == typeof(Vector4))
-        //         {
-        //             return EditorGUILayout.Vector4Field(label, (Vector4)value);
-        //         }
-        //         if (valueType == typeof(Vector2Int))
-        //         {
-        //             return EditorGUILayout.Vector2IntField(label, (Vector2Int)value);
-        //         }
-        //         if (valueType == typeof(Vector3Int))
-        //         {
-        //             return EditorGUILayout.Vector3IntField(label, (Vector3Int)value);
-        //         }
-        //         if (valueType == typeof(Color))
-        //         {
-        //             return EditorGUILayout.ColorField(label, (Color)value);
-        //         }
-        //         if (valueType == typeof(Bounds))
-        //         {
-        //             return EditorGUILayout.BoundsField(label, (Bounds)value);
-        //         }
-        //         if (valueType == typeof(Rect))
-        //         {
-        //             return EditorGUILayout.RectField(label, (Rect)value);
-        //         }
-        //         if (valueType == typeof(RectInt))
-        //         {
-        //             return EditorGUILayout.RectIntField(label, (RectInt)value);
-        //         }
-        //         if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
-        //         {
-        //             return EditorGUILayout.ObjectField(label, (UnityEngine.Object)value, valueType, true);
-        //         }
-        //         if (valueType.BaseType == typeof(Enum))
-        //         {
-        //             return EditorGUILayout.EnumPopup(label, (Enum)value);
-        //         }
-        //         if (valueType.BaseType == typeof(TypeInfo))
-        //         {
-        //             return EditorGUILayout.TextField(label, value.ToString());
-        //         }
-        //         if (ReflectUtils.GetDictionaryType(valueType) != null)
-        //         {
-        //             GUIStyle style = new GUIStyle(GUI.skin.label)
-        //             {
-        //                 richText = true,
-        //             };
-        //
-        //             // ReSharper disable once AssignNullToNotNullAttribute
-        //             object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
-        //
-        //             EditorGUILayout.LabelField($"{label} <i>(Dictionary x{kvPairs.Length})</i>", style);
-        //
-        //             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-        //                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
-        //
-        //             foreach ((object kvPair, int index) in kvPairs.WithIndex())
-        //             {
-        //                 Type kvPairType = kvPair.GetType();
-        //                 PropertyInfo keyProp = kvPairType.GetProperty("Key", bindAttr);
-        //                 if (keyProp == null)
-        //                 {
-        //                     EditorGUILayout.HelpBox($"Failed to obtain key on element {index}: {kvPair}", MessageType.Error);
-        //                     continue;
-        //                 }
-        //                 PropertyInfo valueProp = kvPairType.GetProperty("Value", bindAttr);
-        //                 if (valueProp == null)
-        //                 {
-        //                     EditorGUILayout.HelpBox($"Failed to obtain value on element {index}: {kvPair}", MessageType.Error);
-        //                     continue;
-        //                 }
-        //
-        //                 object dictKey = keyProp.GetValue(kvPair);
-        //                 using (new EditorGUI.IndentLevelScope())
-        //                 {
-        //                     FieldLayout(dictKey, $"{dictKey}");
-        //                     using (new EditorGUI.IndentLevelScope())
-        //                     {
-        //                         object dictValue = valueProp.GetValue(kvPair);
-        //                         FieldLayout(dictValue, $"{dictValue}");
-        //                     }
-        //                 }
-        //             }
-        //
-        //             return null;
-        //             // return new HelpBox($"IDictionary {valueType}", HelpBoxMessageType.Error);
-        //         }
-        //         if (value is IEnumerable enumerableValue)
-        //         {
-        //             (object value, int index)[] valueIndexed = enumerableValue.Cast<object>().WithIndex().ToArray();
-        //
-        //             // using(new EditorGUILayout.VerticalScope(GUI.skin.box))
-        //             // {
-        //             Rect labelRect = EditorGUILayout.GetControlRect();
-        //             EditorGUI.LabelField(labelRect, label);
-        //
-        //             float numWidth = Mathf.Max(30,
-        //                 EditorStyles.textField.CalcSize(new GUIContent($"{valueIndexed.Length}")).x);
-        //
-        //             Rect numRect = new Rect(labelRect)
-        //             {
-        //                 width = numWidth,
-        //                 x = labelRect.x + labelRect.width - numWidth,
-        //             };
-        //
-        //             EditorGUI.IntField(numRect, valueIndexed.Length);
-        //             using (new EditorGUI.IndentLevelScope())
-        //             {
-        //                 List<object> listResult = new List<object>();
-        //                 foreach ((object item, int index) in valueIndexed)
-        //                 {
-        //                     object itemValue = FieldLayout(item, $"Element {index}", item.GetType(), disabled);
-        //                     listResult.Add(itemValue);
-        //                 }
-        //
-        //                 return listResult;
-        //             }
-        //             // }
-        //         }
-        //
-        //         EditorGUILayout.LabelField(label);
-        //         using (new EditorGUI.IndentLevelScope())
-        //         {
-        //             const BindingFlags bindAttrNormal =
-        //                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
-        //
-        //             foreach (FieldInfo fieldInfo in valueType.GetFields(bindAttrNormal))
-        //             {
-        //                 object fieldValue = fieldInfo.GetValue(value);
-        //                 FieldLayout(fieldValue, fieldInfo.Name, fieldInfo.FieldType);
-        //             }
-        //
-        //             foreach (PropertyInfo propertyInfo in valueType.GetProperties(bindAttrNormal))
-        //             {
-        //                 object propertyValue = propertyInfo.GetValue(value);
-        //                 FieldLayout(propertyValue, propertyInfo.Name, propertyInfo.PropertyType);
-        //             }
-        //         }
-        //
-        //         return null;
-        //
-        //         // return isDrawn;
-        //     }
-        // }
 
         protected static float FieldHeight(object value, string label)
         {

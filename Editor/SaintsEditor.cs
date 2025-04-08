@@ -361,7 +361,7 @@ namespace SaintsField.Editor
                 .Select(MakeRendererForGroupIfNeed)
                 .ToArray();
 
-            Debug.Log($"Return renderers {r.Length}");
+            // Debug.Log($"Return renderers {r.Length}");
 
             return r;
         }
@@ -503,7 +503,7 @@ namespace SaintsField.Editor
                 if (isNewInherent)
                 {
                     keepGroupingInfo = null;
-                    Debug.Log($"set lastGroupInfo to null");
+                    // Debug.Log($"set lastGroupInfo to null");
                     lastGroupInfo = null;
                     preAbsGroupBy = null;
                 }
@@ -582,7 +582,7 @@ namespace SaintsField.Editor
                                         keepGroupingInfo = null;
                                     }
 
-                                    Debug.Log($"closeGroup={closeGroup}; endGroupBy={endGroupBy}; cur={string.Join(",", rootToRendererGroupInfo.Keys)}");
+                                    // Debug.Log($"closeGroup={closeGroup}; endGroupBy={endGroupBy}; cur={string.Join(",", rootToRendererGroupInfo.Keys)}");
                                 }
                                 else
                                 {
@@ -637,11 +637,11 @@ namespace SaintsField.Editor
                             (bool newRoot, RendererGroupInfo targetGroup) = GetOrCreateGroupInfo(rootToRendererGroupInfo, groupBy, saintsFieldWithInfo.Target);
                             if (newRoot)
                             {
-                                Debug.Log($"new root {saintsGroup}: {groupBy}({saintsGroup.LayoutBy})");
+                                // Debug.Log($"new root {saintsGroup}: {groupBy}({saintsGroup.LayoutBy})");
                                 rendererGroupInfos.Add(targetGroup);
                             }
                             lastGroupInfo = targetGroup;
-                            Debug.Log($"set lastGroupInfo to {targetGroup.AbsGroupBy}");
+                            // Debug.Log($"set lastGroupInfo to {targetGroup.AbsGroupBy}");
 
                             SaintsRendererGroup.Config newConfig = new SaintsRendererGroup.Config
                             {
@@ -687,7 +687,7 @@ namespace SaintsField.Editor
                                 bool shouldDraw = !(isMethod && hasNoPlaya);
                                 if(shouldDraw)
                                 {
-                                    Debug.Log($"default item {renderer}/{rendererInfo.Playa}");
+                                    // Debug.Log($"default item {renderer}/{rendererInfo.Playa}");
 
                                     RendererGroupInfo endNode = new RendererGroupInfo
                                     {
@@ -699,13 +699,13 @@ namespace SaintsField.Editor
 
                                     if (lastGroupInfo == null)
                                     {
-                                        Debug.Log($"Add normal field {saintsFieldWithInfo}/{rendererInfo.Playa}/{renderer}");
+                                        // Debug.Log($"Add normal field {saintsFieldWithInfo}/{rendererInfo.Playa}/{renderer}");
                                         rendererGroupInfos.Add(endNode);
                                     }
                                     else
                                     {
                                         lastGroupInfo.Children.Add(endNode);
-                                        Debug.Log($"Add group `{lastGroupInfo.AbsGroupBy}`: {saintsFieldWithInfo}/{rendererInfo.Playa}; total={lastGroupInfo.Children.Count}");
+                                        // Debug.Log($"Add group `{lastGroupInfo.AbsGroupBy}`: {saintsFieldWithInfo}/{rendererInfo.Playa}; total={lastGroupInfo.Children.Count}");
                                     }
                                 }
                             }
@@ -934,7 +934,7 @@ namespace SaintsField.Editor
 //                 }
             }
 
-            Debug.Log($"return rendererGroupInfos {rendererGroupInfos.Count}");
+            // Debug.Log($"return rendererGroupInfos {rendererGroupInfos.Count}");
 
             return rendererGroupInfos;
         }
