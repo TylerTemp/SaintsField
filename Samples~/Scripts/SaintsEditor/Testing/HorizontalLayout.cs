@@ -16,27 +16,25 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         // [PlayaSeparator("上身装备", EAlign.Center)]
         public string ot;
 
-        [LayoutStart("装备", ELayout.TitleBox | ELayout.Vertical)]
-        [LayoutStart("./头部", ELayout.TitleBox)]
+        [LayoutStart("Equipment", ELayout.TitleBox | ELayout.Vertical)]
+        [LayoutStart("./Head", ELayout.TitleBox)]
         public string st;
         [LayoutCloseHere]
         public MyStruct inOneStruct;
 
-        [LayoutStart("./上身装备")]
+        [LayoutStart("./Upper Body", ELayout.TitleBox)]
 
-        [PlayaSeparator("上身装备", EAlign.Center)]
-
-        [PlayaInfoBox("注意：左手可以为空，右手不能为空", EMessageType.Warning)]
+        [PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
 
         [LayoutStart("./Horizontal", ELayout.Horizontal)]
 
-        [LayoutStart("./左手", ELayout.TitleBox)]
+        [LayoutStart("./Left Hand", ELayout.TitleBox)]
         public string g11;
         public string g12;
         public MyStruct myStruct;
         public string g13;
 
-        [LayoutStart("../右手", ELayout.TitleBox)]
+        [LayoutStart("../Right Hand", ELayout.TitleBox)]
         public string g21;
         [RichLabel("<color=lime><label/>")]
         public string g22;

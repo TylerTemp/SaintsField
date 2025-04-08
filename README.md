@@ -86,10 +86,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.1.5**
+**4.2.0**
 
-1.  UI Toolkit: Fix IMGUI fallback in Unity 6k
-2.  The fallback flow in 4.1.3 works in Unity 6k, but not in lower version like Unity 2022. This release uses different fallback flow for it.
+1.  UI Toolkit: Add `PlayaSeparator`, similar to `Separator`, but it can be applied to list/array, and layout system
+2.  Improved `Playa*` with layout system. Now `PlayaInfoBox`, `PlayaSeparator` will be applied to the layout if there is one, otherwise to a field/property/method
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -566,6 +566,63 @@ public class SeparatorInherent : SeparatorParent
 ```
 
 ![image](https://github.com/user-attachments/assets/2f6e369d-1260-4379-9504-6036fb89e15b)
+
+#### `PlayaSeparator` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Draw text, separator, spaces for field/propery/button/layout on above / below with rich text & dynamic text support.
+
+Parameters:
+
+*   `string title=null` display a title. `null` for no title, only separator.
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
+*   `EColor color=EColor.Gray` color for the title and the separator
+*   `EAlign eAlign=EAlign.Start` how the title is positioned, options are:
+    *   `EAlign.Start`
+    *   `EAlign.Center`
+    *   `EAlign.End`
+*   `bool isCallback=false` when `true`, use `title` as a callback to get a dynamic title
+*   `int space=0` leave some space above or below the separator, like what `Space` does.
+*   `bool below=false` when `true`, draw the separator below the field.
+
+```csharp
+[LayoutStart("Equipment", ELayout.TitleBox)]
+
+[LayoutStart("./Head")]
+[PlayaSeparator("Head", EAlign.Center)]
+public string st;
+[LayoutCloseHere]
+public MyStruct inOneStruct;
+
+[LayoutStart("./Upper Body")]
+
+[PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
+
+[LayoutStart("./Horizontal", ELayout.Horizontal)]
+
+[LayoutStart("./Left Hand")]
+[PlayaSeparator("Left Hand", EAlign.Center)]
+public string g11;
+public string g12;
+public MyStruct myStruct;
+public string g13;
+
+[LayoutStart("../Right Hand")]
+[PlayaSeparator("Right Hand", EAlign.Center)]
+public string g21;
+[RichLabel("<color=lime><label/>")]
+public string g22;
+[RichLabel("$" + nameof(g23))]
+public string g23;
+
+public bool toggle;
+```
+
+![image](https://github.com/user-attachments/assets/792960eb-50eb-4a26-b563-37282c20a174)
 
 #### `SepTitle` ####
 
@@ -3153,6 +3210,41 @@ public string allTogetherG12, allTogetherG22;
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
+
+By combining `Layout` with `Playa*`, you can create some complex layout struct:
+
+```csharp
+[LayoutStart("Equipment", ELayout.TitleBox | ELayout.Vertical)]
+[LayoutStart("./Head", ELayout.TitleBox)]
+public string st;
+[LayoutCloseHere]
+public MyStruct inOneStruct;
+
+[LayoutStart("./Upper Body", ELayout.TitleBox)]
+
+[PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
+
+[LayoutStart("./Horizontal", ELayout.Horizontal)]
+
+[LayoutStart("./Left Hand", ELayout.TitleBox)]
+public string g11;
+public string g12;
+public MyStruct myStruct;
+public string g13;
+
+[LayoutStart("../Right Hand", ELayout.TitleBox)]
+public string g21;
+[RichLabel("<color=lime><label/>")]
+public string g22;
+[RichLabel("$" + nameof(g23))]
+public string g23;
+
+public bool toggle;
+```
+
+![image](https://github.com/user-attachments/assets/d2185e50-845a-47a5-abb4-fae0faac7ba4)
+
+If titled box is too heavy, you can use `PlayaSeparator` instead. See `PlayaSeparator` section for more information
 
 #### `LayoutStart` / `LayoutEnd` ####
 

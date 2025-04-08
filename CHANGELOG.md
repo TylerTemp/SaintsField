@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.2.0 ##
+
+1.  UI Toolkit: Add `PlayaSeparator`, similar to `Separator`, but it can be applied to list/array, and layout system
+2.  Improved `Playa*` with layout system. Now `PlayaInfoBox`, `PlayaSeparator` will be applied to the layout if there is one, otherwise to a field/property/method
+
 ## 4.1.5 ##
 
 UI Toolkit: Fix IMGUI fallback in Unity 6k
