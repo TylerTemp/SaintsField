@@ -17,5 +17,10 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         public override void OnDestroy()
         {
         }
+
+        public override string ToString()
+        {
+            return $"<InfoBox />";
+        }
     }
 }

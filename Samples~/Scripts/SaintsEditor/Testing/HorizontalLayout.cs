@@ -13,12 +13,15 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public int si;
         }
 
-        // public MyStruct outStruct;
+        public string ot;
 
-        [Layout("V", ELayout.TitleBox | ELayout.Vertical)]
+        [LayoutStart("V", ELayout.TitleBox | ELayout.Vertical)]
+        public string st;
         public MyStruct inOneStruct;
 
-        [LayoutStart("H", ELayout.FoldoutBox | ELayout.Horizontal)]
+        [PlayaInfoBox("There!")]
+
+        [LayoutStart("./H", ELayout.FoldoutBox | ELayout.Horizontal)]
         [LayoutStart("./G1", ELayout.TitleBox)]
         public string g11;
         public string g12;
@@ -35,6 +38,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public bool toggle;
 
         [LayoutEnd]
+        [PlayaInfoBox("Buttons!")]
         [LayoutStart("Buttons", ELayout.Horizontal)]
         [Button]
         public void B1(string strV, bool bv, Vector2 v2)
@@ -47,5 +51,20 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         {
 
         }
+
+
+        // [LayoutStart("Tab", ELayout.TitleBox)]
+        // // public string tab;
+        //
+        // // [LayoutStart("./1", ELayout.TitleBox)]
+        // // public string tab1Sub1;
+        // public string tab1Sub2;
+        // [LayoutTerminateHere]
+        // public string tab1Sub3;
+        //
+        // [Button]
+        // public void AFunction() {}
+        // [Button]
+        // public void BFunction() {}
     }
 }

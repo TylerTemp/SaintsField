@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -55,7 +57,7 @@ namespace SaintsField.Editor
             // Debug.Log($"renderers.Count={renderers.Count}");
             foreach (ISaintsRenderer saintsRenderer in renderers)
             {
-                // Debug.Log($"renderer={saintsRenderer}");
+                Debug.Log($"renderer={saintsRenderer}");
                 VisualElement ve = saintsRenderer.CreateVisualElement();
                 if(ve != null)
                 {
@@ -71,7 +73,6 @@ namespace SaintsField.Editor
 #endif
             return root;
         }
-
     }
 }
 #endif

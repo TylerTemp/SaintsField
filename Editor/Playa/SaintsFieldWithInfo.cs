@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Playa
         public int InherentDepth;
         public int Order;
 
-        public IReadOnlyList<ISaintsLayoutBase> LayoutBases;
+        // public IReadOnlyList<ISaintsLayoutBase> LayoutBases;
         public IReadOnlyList<IPlayaAttribute> PlayaAttributes;
         public object Target;
 
@@ -22,6 +22,8 @@ namespace SaintsField.Editor.Playa
         public FieldInfo FieldInfo;
         public MethodInfo MethodInfo;
         public PropertyInfo PropertyInfo;
+
+        // public List<IPlayaAttribute> PlayaAttributesQueue;
 
         public override string ToString()
         {
