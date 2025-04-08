@@ -620,6 +620,7 @@ namespace SaintsField.Editor.Core
         {
             foreach(RichTextChunk curChunk in payloads)
             {
+                // Debug.Log(curChunk);
                 if (!curChunk.IsIcon)
                 {
                     yield return new Label(curChunk.Content)

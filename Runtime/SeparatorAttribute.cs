@@ -9,18 +9,18 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class SeparatorAttribute : PropertyAttribute, ISaintsAttribute
+    public class SeparatorAttribute : PropertyAttribute, ISaintsAttribute, ISeparatorAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
 
-        public readonly string Title;
-        public readonly EColor Color;
-        public readonly EAlign EAlign;
-        public readonly bool IsCallback;
-        public readonly int Space;
+        public string Title { get; }
+        public EColor Color { get; }
+        public EAlign EAlign { get; }
+        public bool IsCallback { get; }
+        public int Space { get; }
 
-        public readonly bool Below;
+        public bool Below { get; }
 
         public SeparatorAttribute(): this(null) {}
 

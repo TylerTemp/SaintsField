@@ -1,10 +1,10 @@
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
-            (HelpBox helpBox, bool needUpdate) = CreateInfoBox(FieldWithInfo, PlayaInfoBoxAttribute);
+            (HelpBox helpBox, bool needUpdate) = CreateInfoBox(FieldWithInfo, _playaInfoBoxAttribute);
             helpBox.name = FieldWithInfo.MemberId;
             return (helpBox, needUpdate);
         }
@@ -185,3 +185,4 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         }
     }
 }
+#endif

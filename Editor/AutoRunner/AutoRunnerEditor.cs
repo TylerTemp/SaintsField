@@ -11,19 +11,15 @@ namespace SaintsField.Editor.AutoRunner
     [CustomEditor(typeof(AutoRunnerWindowBase), true)]
     public class AutoRunnerEditor: SaintsEditorWindowSpecialEditor
     {
-        public override IEnumerable<AbsRenderer> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        public override AbsRenderer MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
             if (fieldWithInfo.PlayaAttributes.Any(each => each is AutoRunnerWindowResultsAttribute))
             {
-                yield return new ResultsRenderer(so, fieldWithInfo);
-                yield break;
+                return new ResultsRenderer(so, fieldWithInfo);
             }
 
             // Debug.Log($"{fieldWithInfo.RenderType}/{fieldWithInfo.FieldInfo?.Name}/{string.Join(",", fieldWithInfo.PlayaAttributes)}");
-            foreach (AbsRenderer absRenderer in base.MakeRenderer(so, fieldWithInfo))
-            {
-                yield return absRenderer;
-            }
+            return base.MakeRenderer(so, fieldWithInfo);
         }
     }
 }

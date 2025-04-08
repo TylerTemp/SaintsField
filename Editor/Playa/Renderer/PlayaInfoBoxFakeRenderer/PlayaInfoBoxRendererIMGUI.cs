@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
                 return 0;
             }
 
-            return GetInfoBoxHeightIMGUI(width, PlayaInfoBoxAttribute);
+            return GetInfoBoxHeightIMGUI(width, _playaInfoBoxAttribute);
         }
 
         private float GetInfoBoxHeightIMGUI(float width, PlayaInfoBoxAttribute infoBoxAttribute)
@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
             (MessageType messageType, string content) =
-                GetInfoBoxRawContent(FieldWithInfo, PlayaInfoBoxAttribute);
+                GetInfoBoxRawContent(FieldWithInfo, _playaInfoBoxAttribute);
 
             using (new ImGuiHelpBox.RichTextHelpBoxScoop())
             {

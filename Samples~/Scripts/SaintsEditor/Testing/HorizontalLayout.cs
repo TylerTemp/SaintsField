@@ -13,6 +13,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public int si;
         }
 
+        // [PlayaSeparator("上身装备", EAlign.Center)]
         public string ot;
 
         [LayoutStart("装备", ELayout.TitleBox | ELayout.Vertical)]
@@ -21,7 +22,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [LayoutCloseHere]
         public MyStruct inOneStruct;
 
-        [LayoutStart("./上身装备", ELayout.TitleBox)]
+        [LayoutStart("./上身装备")]
+
+        [PlayaSeparator("上身装备", EAlign.Center)]
 
         [PlayaInfoBox("注意：左手可以为空，右手不能为空", EMessageType.Warning)]
 
@@ -42,20 +45,20 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         public bool toggle;
 
-        // [LayoutEnd]
-        // [PlayaInfoBox("Buttons!")]
-        // [LayoutStart("Buttons", ELayout.Horizontal)]
-        // [Button]
-        // public void B1(string strV, bool bv, Vector2 v2)
-        // {
-        //
-        // }
-        //
-        // [Button]
-        // public void B2(MyStruct structV, Vector4 v4, Bounds bounds, Rect rectValue)
-        // {
-        //
-        // }
+        [LayoutEnd]
+        [PlayaInfoBox("Buttons!")]
+        [LayoutStart("Buttons", ELayout.Horizontal)]
+        [Button]
+        public void B1(string strV, bool bv, Vector2 v2)
+        {
+
+        }
+
+        [Button]
+        public void B2(MyStruct structV, Vector4 v4, Bounds bounds, Rect rectValue)
+        {
+
+        }
 
 
         // [LayoutStart("Tab", ELayout.TitleBox)]

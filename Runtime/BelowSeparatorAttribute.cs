@@ -13,7 +13,7 @@ namespace SaintsField
         public BelowSeparatorAttribute(EColor color, int space): this(null, color, EAlign.Start, false, space) {}
         public BelowSeparatorAttribute(int space): this(null, EColor.Clear, EAlign.Start, false, space) {}
 
-        public BelowSeparatorAttribute(string title, EAlign eAlign, bool isCallback=false, int space=0, bool below=false): this(title, EColor.Gray, eAlign, isCallback, space) {}
+        public BelowSeparatorAttribute(string title, EAlign eAlign, bool isCallback=false, int space=0): this(title, EColor.Gray, eAlign, isCallback, space) {}
 
         public BelowSeparatorAttribute(string title, EColor color=EColor.Gray, EAlign eAlign=EAlign.Start, bool isCallback=false, int space=0): base(title, color, eAlign, isCallback, space, true) {}
     }

@@ -269,7 +269,28 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         public abstract void OnDestroy();
 
 
+        protected static string GetFriendlyName(SaintsFieldWithInfo fieldWithInfo)
+        {
+            if (fieldWithInfo.SerializedProperty != null)
+            {
+                return fieldWithInfo.SerializedProperty.displayName;
+            }
 
+            if (fieldWithInfo.MethodInfo != null)
+            {
+                return ObjectNames.NicifyVariableName(fieldWithInfo.MethodInfo.Name);
+            }
+            if (fieldWithInfo.FieldInfo != null)
+            {
+                return ObjectNames.NicifyVariableName(fieldWithInfo.FieldInfo.Name);
+            }
+            if (fieldWithInfo.PropertyInfo != null)
+            {
+                return ObjectNames.NicifyVariableName(fieldWithInfo.PropertyInfo.Name);
+            }
+
+            return "";
+        }
 
     }
 }

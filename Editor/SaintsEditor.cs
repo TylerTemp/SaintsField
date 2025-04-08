@@ -8,6 +8,7 @@ using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
@@ -352,7 +353,7 @@ namespace SaintsField.Editor
             object target)
         {
             IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedPropertyDict, target).ToArray();
-            IReadOnlyList<RendererGroupInfo> chainedGroups = ChainSaintsFieldWithInfo(fieldWithInfosSorted, serializedObject);
+            IReadOnlyList<RendererGroupInfo> chainedGroups = ChainSaintsFieldWithInfo(fieldWithInfosSorted, serializedObject, makeRenderer);
             // Debug.Log(chainedGroups.Count);
             // ISaintsRenderer[] r = HelperFlattenRendererGroupInfoIntoRenderers(chainedGroups, serializedObject, makeRenderer, target)
             //     .Select(each => each.saintsRenderer)
@@ -481,7 +482,7 @@ namespace SaintsField.Editor
             public object Target;
         }
 
-        private static IReadOnlyList<RendererGroupInfo> ChainSaintsFieldWithInfo(IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted, SerializedObject serializedObject)
+        private static IReadOnlyList<RendererGroupInfo> ChainSaintsFieldWithInfo(IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted, SerializedObject serializedObject, IMakeRenderer makeRenderer)
         {
             List<RendererGroupInfo> rendererGroupInfos = new List<RendererGroupInfo>();
             Dictionary<string, RendererGroupInfo> rootToRendererGroupInfo =
@@ -508,7 +509,7 @@ namespace SaintsField.Editor
                     preAbsGroupBy = null;
                 }
 
-                IEnumerable<SaintsFieldWithRenderer> playaAndRenderers = GetPlayaAndRenderer(saintsFieldWithInfo, serializedObject);
+                IEnumerable<SaintsFieldWithRenderer> playaAndRenderers = GetPlayaAndRenderer(saintsFieldWithInfo, serializedObject, makeRenderer);
 
                 foreach (SaintsFieldWithRenderer rendererInfo in playaAndRenderers)
                 {
@@ -951,65 +952,10 @@ namespace SaintsField.Editor
             }
         }
 
-        private static IEnumerable<SaintsFieldWithRenderer> GetPlayaAndRenderer(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject)
+        private static IEnumerable<SaintsFieldWithRenderer> GetPlayaAndRenderer(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject, IMakeRenderer makeRenderer)
         {
-            switch (fieldWithInfo.RenderType)
-            {
-                case SaintsRenderType.SerializedField:
-                {
-                    foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
-                    {
-                        switch (playaAttribute)
-                        {
-                            case TableAttribute _:
-                                foreach (SaintsFieldWithRenderer tableRenderer in WrapAroundSaintsRenderer(new TableRenderer(serializedObject, fieldWithInfo), fieldWithInfo, serializedObject))
-                                {
-                                    yield return tableRenderer;
-                                }
-                                // yield return new TableRenderer(serializedObject, fieldWithInfo);
-                                yield break;
-                            case ListDrawerSettingsAttribute _:
-                                // yield return new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo);
-                                foreach (SaintsFieldWithRenderer tableRenderer in WrapAroundSaintsRenderer(new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo), fieldWithInfo, serializedObject))
-                                {
-                                    yield return tableRenderer;
-                                }
-                                yield break;
-                        }
-                    }
-
-                    // yield return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
-                    foreach (SaintsFieldWithRenderer tableRenderer in WrapAroundSaintsRenderer(new SerializedFieldRenderer(serializedObject, fieldWithInfo), fieldWithInfo, serializedObject))
-                    {
-                        yield return tableRenderer;
-                    }
-                    yield break;
-                }
-                case SaintsRenderType.InjectedSerializedField:
-                    // yield return new SerializedFieldBareRenderer(serializedObject, fieldWithInfo);
-                    foreach (SaintsFieldWithRenderer tableRenderer in WrapAroundSaintsRenderer(new SerializedFieldBareRenderer(serializedObject, fieldWithInfo), fieldWithInfo, serializedObject))
-                    {
-                        yield return tableRenderer;
-                    }
-                    yield break;
-                case SaintsRenderType.NonSerializedField:
-                case SaintsRenderType.NativeProperty:
-                    // yield return new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo);
-                    foreach (SaintsFieldWithRenderer tableRenderer in WrapAroundSaintsRenderer(new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo), fieldWithInfo, serializedObject))
-                    {
-                        yield return tableRenderer;
-                    }
-                    yield break;
-                case SaintsRenderType.Method:
-                    // yield return new MethodRenderer(serializedObject, fieldWithInfo);
-                    foreach (SaintsFieldWithRenderer tableRenderer in WrapAroundSaintsRenderer(new MethodRenderer(serializedObject, fieldWithInfo), fieldWithInfo, serializedObject))
-                    {
-                        yield return tableRenderer;
-                    }
-                    yield break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
-            }
+            return WrapAroundSaintsRenderer(makeRenderer.MakeRenderer(serializedObject, fieldWithInfo), fieldWithInfo,
+                serializedObject);
         }
 
         private static IEnumerable<SaintsFieldWithRenderer> WrapAroundSaintsRenderer(AbsRenderer baseRenderer, SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject)
@@ -1033,6 +979,21 @@ namespace SaintsField.Editor
                         else
                         {
                             yield return playaInfoBoxRenderer;
+                        }
+                    }
+                        break;
+                    case PlayaSeparatorAttribute playaSeparatorAttribute:
+                    {
+                        PlayaSeparatorRenderer separatorRenderer = new PlayaSeparatorRenderer(serializedObject, fieldWithInfo, playaSeparatorAttribute);
+                        SaintsFieldWithRenderer separatorFieldWithRenderer =
+                            new SaintsFieldWithRenderer(playaSeparatorAttribute, separatorRenderer);
+                        if (playaSeparatorAttribute.Below)
+                        {
+                            postRenderer.Add(separatorFieldWithRenderer);
+                        }
+                        else
+                        {
+                            yield return separatorFieldWithRenderer;
                         }
                     }
                         break;
@@ -1222,7 +1183,7 @@ namespace SaintsField.Editor
         //     return new VerticalGroup(layoutInfo);
         // }
 
-        public static IEnumerable<AbsRenderer> HelperMakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        public static AbsRenderer HelperMakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             // Debug.Log($"field {fieldWithInfo.fieldInfo?.Name}/{fieldWithInfo.fieldInfo?.GetCustomAttribute<ExtShowHideConditionBase>()}");
             switch (fieldWithInfo.RenderType)
@@ -1234,94 +1195,30 @@ namespace SaintsField.Editor
                         switch (playaAttribute)
                         {
                             case TableAttribute _:
-                                foreach (AbsRenderer tableRenderer in WrapAroundRenderer(new TableRenderer(serializedObject, fieldWithInfo), serializedObject, fieldWithInfo))
-                                {
-                                    yield return tableRenderer;
-                                }
-                                // yield return new TableRenderer(serializedObject, fieldWithInfo);
-                                yield break;
+                                return new TableRenderer(serializedObject, fieldWithInfo);
+
                             case ListDrawerSettingsAttribute _:
-                                // yield return new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo);
-                                foreach (AbsRenderer tableRenderer in WrapAroundRenderer(new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo), serializedObject, fieldWithInfo))
-                                {
-                                    yield return tableRenderer;
-                                }
-                                yield break;
+                                return new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo);
                         }
                     }
 
-                    // yield return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
-                    foreach (AbsRenderer tableRenderer in WrapAroundRenderer(new SerializedFieldRenderer(serializedObject, fieldWithInfo), serializedObject, fieldWithInfo))
-                    {
-                        yield return tableRenderer;
-                    }
-                    yield break;
+                    return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
                 }
                 case SaintsRenderType.InjectedSerializedField:
-                    // yield return new SerializedFieldBareRenderer(serializedObject, fieldWithInfo);
-                    foreach (AbsRenderer tableRenderer in WrapAroundRenderer(new SerializedFieldBareRenderer(serializedObject, fieldWithInfo), serializedObject, fieldWithInfo))
-                    {
-                        yield return tableRenderer;
-                    }
-                    yield break;
+                    return new SerializedFieldBareRenderer(serializedObject, fieldWithInfo);
+
                 case SaintsRenderType.NonSerializedField:
                 case SaintsRenderType.NativeProperty:
-                    // yield return new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo);
-                    foreach (AbsRenderer tableRenderer in WrapAroundRenderer(new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo), serializedObject, fieldWithInfo))
-                    {
-                        yield return tableRenderer;
-                    }
-                    yield break;
+                    return new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo);
+
                 case SaintsRenderType.Method:
-                    // yield return new MethodRenderer(serializedObject, fieldWithInfo);
-                    foreach (AbsRenderer tableRenderer in WrapAroundRenderer(new MethodRenderer(serializedObject, fieldWithInfo), serializedObject, fieldWithInfo))
-                    {
-                        yield return tableRenderer;
-                    }
-                    yield break;
+                    return new MethodRenderer(serializedObject, fieldWithInfo);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
             }
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
-        public static IEnumerable<AbsRenderer> WrapAroundRenderer(AbsRenderer absRenderer,
-            SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
-        {
-            List<AbsRenderer> postRenderer = new List<AbsRenderer>();
-
-            foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
-            {
-                switch (playaAttribute)
-                {
-                    case PlayaInfoBoxAttribute playaInfoBoxAttribute:
-                    {
-                        PlayaInfoBoxRenderer infoBoxRenderer = new PlayaInfoBoxRenderer(serializedObject, fieldWithInfo, playaInfoBoxAttribute);
-
-                        if (playaInfoBoxAttribute.Below)
-                        {
-                            postRenderer.Add(infoBoxRenderer);
-                        }
-                        else
-                        {
-                            yield return infoBoxRenderer;
-                        }
-                        break;
-                    }
-                }
-            }
-
-            if(absRenderer != null)
-            {
-                yield return absRenderer;
-            }
-            foreach (AbsRenderer posRenderer in postRenderer)
-            {
-                yield return posRenderer;
-            }
-        }
-
-        public virtual IEnumerable<AbsRenderer> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        public virtual AbsRenderer MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
             return HelperMakeRenderer(so, fieldWithInfo);
         }
