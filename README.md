@@ -572,7 +572,9 @@ public class SeparatorInherent : SeparatorParent
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-Draw text, separator, spaces for field/propery/button/layout on above / below with rich text & dynamic text support.
+Draw text, separator, spaces for field/property/button/layout on above / below with rich text & dynamic text support.
+
+This is UI Toolkit only.
 
 Parameters:
 
@@ -588,6 +590,26 @@ Parameters:
 *   `bool isCallback=false` when `true`, use `title` as a callback to get a dynamic title
 *   `int space=0` leave some space above or below the separator, like what `Space` does.
 *   `bool below=false` when `true`, draw the separator below the field.
+
+```csharp
+[PlayaSeparator("Separator", EAlign.Center)]
+public string separator;
+
+[PlayaSeparator("Left", EAlign.Start)] public string left;
+
+[PlayaSeparator("$" + nameof(right), EAlign.End)]
+public string right;
+
+[PlayaSeparator(20)]
+[PlayaSeparator("Space 20")]
+public string[] arr;
+
+[PlayaSeparator("End", below: true)] public string end;
+```
+
+![image](https://github.com/user-attachments/assets/7aaee07a-d8f5-4b13-a166-157df57e9d3d)
+
+Using it with `Layout`, you can create some fancy appearance:
 
 ```csharp
 [LayoutStart("Equipment", ELayout.TitleBox)]

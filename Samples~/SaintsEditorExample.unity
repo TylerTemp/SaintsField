@@ -463,6 +463,55 @@ MonoBehaviour:
   hideOrElement: 
   showIfElement: 
   hideIfElement: 
+--- !u!1 &111474056
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 111474058}
+  - component: {fileID: 111474057}
+  m_Layer: 0
+  m_Name: PlayaSeparator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &111474057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111474056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e524b2d2a2b07747a0dfcb0d06ca3b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  separator: 
+  left: 
+  right: Right <color=lime>Dynamic</color>
+  arr: []
+  end: 
+--- !u!4 &111474058
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111474056}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &147024401
 GameObject:
   m_ObjectHideFlags: 0
@@ -2317,6 +2366,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1150580244}
   - component: {fileID: 1150580245}
+  - component: {fileID: 1150580246}
   m_Layer: 0
   m_Name: HorizontalLayout
   m_TagString: Untagged
@@ -2353,6 +2403,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ot: 
   st: 
+  inOneStruct:
+    ss: 
+    si: 0
   g11: 
   g12: 
   myStruct:
@@ -2361,7 +2414,34 @@ MonoBehaviour:
   g13: 
   g21: 
   g22: 
-  g23: 
+  g23: Dynamic <color=lime>label!
+  toggle: 0
+--- !u!114 &1150580246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150580243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e14ad8a1082da6c4f80f1b6a485690d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ot: 
+  st: 
+  inOneStruct:
+    ss: 
+    si: 0
+  g11: 
+  g12: 
+  myStruct:
+    ss: 
+    si: 0
+  g13: 
+  g21: 
+  g22: 
+  g23: Dynamic <color=lime>label!
   toggle: 0
 --- !u!1 &1152953110
 GameObject:
@@ -3919,3 +3999,4 @@ SceneRoots:
   - {fileID: 1500346666}
   - {fileID: 1987243850}
   - {fileID: 1175289511}
+  - {fileID: 111474058}
