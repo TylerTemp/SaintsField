@@ -900,7 +900,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (inHorizontalLayout)
                 {
                     // element.style.flexDirection = FlexDirection.Column;
-                    element.style.flexWrap = Wrap.Wrap;
+                    // element.style.flexWrap = Wrap.Wrap;
                     Label elementLabel = element.Q<Label>();
                     if (elementLabel != null)
                     {
@@ -948,7 +948,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (inHorizontalLayout)
                 {
                     // element.style.flexDirection = FlexDirection.Column;
-                    element.style.flexWrap = Wrap.Wrap;
+                    // element.style.flexWrap = Wrap.Wrap;
                     Label elementLabel = element.Q<Label>();
                     if (elementLabel != null)
                     {
@@ -997,7 +997,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (inHorizontalLayout)
                 {
                     // element.style.flexDirection = FlexDirection.Column;
-                    element.style.flexWrap = Wrap.Wrap;
+                    // element.style.flexWrap = Wrap.Wrap;
                     Label elementLabel = element.Q<Label>();
                     if (elementLabel != null)
                     {
@@ -1045,7 +1045,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (inHorizontalLayout)
                 {
                     // element.style.flexDirection = FlexDirection.Column;
-                    element.style.flexWrap = Wrap.Wrap;
+                    // element.style.flexWrap = Wrap.Wrap;
                     Label elementLabel = element.Q<Label>();
                     if (elementLabel != null)
                     {
@@ -1093,7 +1093,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (inHorizontalLayout)
                 {
                     // element.style.flexDirection = FlexDirection.Column;
-                    element.style.flexWrap = Wrap.Wrap;
+                    // element.style.flexWrap = Wrap.Wrap;
                     Label elementLabel = element.Q<Label>();
                     if (elementLabel != null)
                     {
@@ -1236,7 +1236,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (inHorizontalLayout)
                 {
                     // element.style.flexDirection = FlexDirection.Column;
-                    element.style.flexWrap = Wrap.Wrap;
+                    // element.style.flexWrap = Wrap.Wrap;
                     Label elementLabel = element.Q<Label>();
                     if (elementLabel != null)
                     {
@@ -1284,7 +1284,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (inHorizontalLayout)
                 {
                     // element.style.flexDirection = FlexDirection.Column;
-                    element.style.flexWrap = Wrap.Wrap;
+                    // element.style.flexWrap = Wrap.Wrap;
                     Label elementLabel = element.Q<Label>();
                     if (elementLabel != null)
                     {

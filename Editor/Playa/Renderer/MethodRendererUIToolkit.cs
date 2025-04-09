@@ -153,7 +153,7 @@ namespace SaintsField.Editor.Playa.Renderer
                                 paraValueChanged = true;
                             },
                             false,
-                            InAnyHorizontalLayout
+                            true
                         );
                         // ReSharper disable once InvertIf
                         if (r != null)
