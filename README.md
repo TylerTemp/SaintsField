@@ -27,9 +27,9 @@ Unity: 2019.1 or higher
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
 
-> [!NOTE]  
+> [!NOTE]
 > Since [SaintsField 4.0](https://github.com/TylerTemp/SaintsField/discussions/183), the IMGUI is no longer a major maintaining codebase in this project.
-> 
+>
 > IMGUI will only be focused on issues and small features. Big features like editing in `ShowInInspector` will not be supported in IMGUI.
 
 ### Installation ###
@@ -90,7 +90,7 @@ namespace: `SaintsField`
 
 1.  **Breaking Changes**: `SepTitle` arguments now aligned with `Separator`: `string title`, `EColor color`, `EAlign eAlign`, `int space`
 2.  UI Toolkit: `SepTitle` now supports rich text tags.
-3.  Fix single `Layout(keepGrouping: false)` still continuously grouping after version 4.2.0
+3.  Fix single `Layout(keepGrouping: false)` still continuously grouping, `LayoutToggle` not working after version 4.2.0
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

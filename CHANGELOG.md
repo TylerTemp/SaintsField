@@ -4,8 +4,8 @@
 
 1.  **Breaking Changes**: `SepTitle` arguments now aligned with `Separator`: `string title`, `EColor color`, `EAlign eAlign`, `int space`
 2.  UI Toolkit: `SepTitle` now supports rich text tags.
-3.  Fix single `Layout(keepGrouping: false)` still continuously grouping after version 4.2.0 
- 
+3.  Fix single `Layout(keepGrouping: false)` still continuously grouping, `LayoutToggle` not working after version 4.2.0
+
 ## 4.2.1 ##
 
 Fix DOTweenPlay... Holy \*\*\*\*...
