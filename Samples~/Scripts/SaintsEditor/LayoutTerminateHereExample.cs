@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class LayoutTernimateHereExample : SaintsMonoBehaviour
+    public class LayoutTerminateHereExample : SaintsMonoBehaviour
     {
         [LayoutStart("Tab", ELayout.TitleBox)] public string tab;
 

@@ -28,12 +28,23 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         public virtual VisualElement CreateVisualElement()
         {
+            int flexGrow;
+            if (InDirectHorizontalLayout)
+            {
+                flexGrow = 1;
+            }
+            else
+            {
+                flexGrow = InAnyHorizontalLayout ? 0 : 1;
+            }
+
             VisualElement root = new VisualElement
             {
                 style =
                 {
                     // flexGrow = 1,
-                    flexGrow = InHorizontalLayout? 0: 1,
+                    // flexGrow = InAnyHorizontalLayout? 0: 1,
+                    flexGrow = flexGrow,
                 },
                 name = ToString(),
             };

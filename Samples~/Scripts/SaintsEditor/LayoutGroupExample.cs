@@ -37,7 +37,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [LayoutEnd("break")]  // end, it will not be grouped
         public string breakAfter;
 
-        [SepTitle("Break By Last Group", EColor.Gray)]
+        [SepTitle("Break By Last Group")]
         public string beforeGroupLast;
 
         [LayoutStart("GroupLast")]

@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 style =
                 {
-                    flexGrow =  InHorizontalLayout? 0: 1,
+                    flexGrow =  InAnyHorizontalLayout? 0: 1,
                 },
             };
 
@@ -391,7 +391,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                 Debug.Log($"add item@{groupPath}->{groupId}: {renderer}");
 #endif
-                renderer.InHorizontalLayout = InHorizontalLayout || EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
+                renderer.InDirectHorizontalLayout = EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
+                renderer.InAnyHorizontalLayout = InAnyHorizontalLayout || renderer.InDirectHorizontalLayout;
 
                 VisualElement fieldElement = renderer.CreateVisualElement();
                 // ReSharper disable once InvertIf
@@ -449,7 +450,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     root.UnregisterCallback(switchOnAttach);
                     toolbarToggles[0].value = true;
-                    if (foldoutToggle != null) foldoutToggle.value = _foldout;
+                    if (foldoutToggle != null)
+                    {
+                        foldoutToggle.value = _foldout;
+                    }
                 };
                 root.RegisterCallback(switchOnAttach);
             }

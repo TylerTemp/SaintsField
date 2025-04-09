@@ -90,7 +90,7 @@ namespace: `SaintsField`
 
 1.  **Breaking Changes**: `SepTitle` arguments now aligned with `Separator`: `string title`, `EColor color`, `EAlign eAlign`, `int space`
 2.  UI Toolkit: `SepTitle` now supports rich text tags.
-3.  Fix single `Layout(keepGrouping: false)` still continuously grouping, `LayoutToggle` not working after version 4.2.0
+3.  Fix single `Layout(keepGrouping: false)` still continuously grouping, `LayoutToggle` not working, `LayoutEnd(name)` did not close layout in some cases after version 4.2.0
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

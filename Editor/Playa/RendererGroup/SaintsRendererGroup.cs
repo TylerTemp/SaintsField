@@ -8,7 +8,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
 {
     public partial class SaintsRendererGroup: ISaintsRendererGroup
     {
-        public bool InHorizontalLayout { get; set; }
+        public bool InDirectHorizontalLayout { get; set; }
+        public bool InAnyHorizontalLayout { get; set; }
 
         public class Config
         {

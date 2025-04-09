@@ -26,7 +26,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
     // ReSharper disable once InconsistentNaming
     public class DOTweenPlayGroup: ISaintsRendererGroup
     {
-        public bool InHorizontalLayout { get; set; }
+        public bool InDirectHorizontalLayout { get; set; }
+        public bool InAnyHorizontalLayout { get; set; }
 
         private readonly List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> _doTweenMethods = new List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)>();
         private readonly object _target;

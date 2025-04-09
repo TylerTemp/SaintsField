@@ -95,7 +95,7 @@ namespace SaintsField.Editor.Playa.Renderer
             //     // appendSaintsAttributeDrawer.Add((aboveRichLabelAttribute, aboveRichLabelDrawer));
             // }
 
-            if (!isArray && useDrawerType == null && InHorizontalLayout)
+            if (!isArray && useDrawerType == null && InAnyHorizontalLayout)
             {
                 useDrawerType = typeof(SaintsPropertyDrawer);
             }
@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     FieldWithInfo.FieldInfo.FieldType,
                     FieldWithInfo.SerializedProperty.displayName,
                     FieldWithInfo.FieldInfo,
-                    InHorizontalLayout,
+                    InAnyHorizontalLayout,
                     this,
                     this,
                     null
@@ -134,7 +134,7 @@ namespace SaintsField.Editor.Playa.Renderer
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
             {
                 // saintsPropertyDrawer.AppendSaintsAttributeDrawer = appendSaintsAttributeDrawer;
-                saintsPropertyDrawer.InHorizontalLayout = InHorizontalLayout;
+                saintsPropertyDrawer.InHorizontalLayout = InAnyHorizontalLayout;
             }
 
             MethodInfo uiToolkitMethod = useDrawerType.GetMethod("CreatePropertyGUI");

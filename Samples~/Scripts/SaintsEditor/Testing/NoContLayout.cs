@@ -13,5 +13,27 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [LayoutStart("Start", ELayout.TitleBox)]
         public string s1;
         public string s2;
+
+        [LayoutStart("Foldout", ELayout.FoldoutBox)]
+        public string foldoutItem1;
+
+        // tabs
+        [Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
+        [LayoutStart("./Tab1")]
+        public string tab1Item1;
+        public int tab1Item2;
+
+        [LayoutStart("../Tab2")]
+        public string tab2Item1;
+        public int tab2Item2;
+
+        [LayoutStart("../Tab3")]
+        public string tab3Item1;
+        public int tab3Item2;
+
+        // nested groups
+        [LayoutStart("Nested", ELayout.Background | ELayout.TitleOut)]
+        public int nestedOne;
+
     }
 }

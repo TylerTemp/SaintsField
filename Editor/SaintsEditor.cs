@@ -388,7 +388,7 @@ namespace SaintsField.Editor
             foreach (RendererGroupInfo c in rendererGroupInfo.Children)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                            Debug.Log($"Flatten {group} add renderer {eachChild}");
+                Debug.Log($"Flatten {group} add RendererGroupInfo {c.AbsGroupBy}");
 #endif
 
                 group.Add(c.AbsGroupBy, MakeRendererForGroupIfNeed(c));
@@ -604,6 +604,9 @@ namespace SaintsField.Editor
                                     {
                                         parentGroupBy = "";
                                     }
+
+                                    // Debug.Log($"parentGroupBy={parentGroupBy}/{endGroupBy}");
+
                                     if (parentGroupBy != "" && rootToRendererGroupInfo.TryGetValue(parentGroupBy,
                                             out RendererGroupInfo info))
                                     {
@@ -621,7 +624,8 @@ namespace SaintsField.Editor
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                                         Debug.Log($"Layout close, {endGroupBy}: null");
 #endif
-                                        keepGroupingInfo = null;
+                                        keepGroupingInfo = useGroupInfo = null;
+                                        stopGrouping = true;
                                     }
                                 }
                             }
@@ -674,19 +678,12 @@ namespace SaintsField.Editor
 
                             layoutToggles.Clear();
 
-                            if (targetGroup.Config.KeepGrouping)
-                            {
-                                useGroupInfo = keepGroupingInfo = targetGroup;
-                                stopGrouping = false;
-                            }
-                            else
-                            {
-                                useGroupInfo = targetGroup;
-                                stopGrouping = true;
-                            }
+                            stopGrouping = !targetGroup.Config.KeepGrouping;
+
+                            useGroupInfo = keepGroupingInfo = targetGroup;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                            Debug.Log($"Layout item {groupBy}, newRoot={newRoot}, eLayout={targetGroup.Config.ELayout}, keepGroupingInfo={keepGroupingInfo?.AbsGroupBy}");
+                            Debug.Log($"Layout item {groupBy}, newRoot={newRoot}, eLayout={targetGroup.Config.ELayout}, keepGroupingInfo={keepGroupingInfo?.AbsGroupBy}, useGroupInfo={useGroupInfo.AbsGroupBy}");
 #endif
                         }
                             break;

@@ -170,7 +170,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
              // this... fixed by adding Bind()... wtf...
              foreach (ISaintsRenderer saintsRenderer in renderer)
              {
-                 saintsRenderer.InHorizontalLayout = inHorizontalLayout;
+                 saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
                  VisualElement rendererElement = saintsRenderer.CreateVisualElement();
                  if (rendererElement != null)
                  {
