@@ -49,10 +49,10 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                 return !string.IsNullOrEmpty(xml);
             }
 
-            if (separatorAttribute.Color != EColor.Clear)
-            {
-                return true;
-            }
+            // if (separatorAttribute.Color != EColor.Clear)
+            // {
+            //     return true;
+            // }
 
             return false;
         }
@@ -117,10 +117,10 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                 return !string.IsNullOrEmpty(xml);
             }
 
-            if (separatorAttribute.Color != EColor.Clear)
-            {
-                return true;
-            }
+            // if (separatorAttribute.Color != EColor.Clear)
+            // {
+            //     return true;
+            // }
 
             return false;
         }
@@ -176,7 +176,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
 
                 // Debug.Log($"Draw bar {singleSepPosition}/{separatorAttribute.Color}");
 
-                EditorGUI.DrawRect(singleSepRect, separatorAttribute.Color.GetColor());
+                EditorGUI.DrawRect(singleSepRect, separatorAttribute.Color);
 
                 return singleLeftPosition;
             }
@@ -275,7 +275,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
 
             foreach (Rect sepRect in sepRects)
             {
-                EditorGUI.DrawRect(sepRect, separatorAttribute.Color.GetColor());
+                EditorGUI.DrawRect(sepRect, separatorAttribute.Color);
             }
 
             _richTextDrawer.DrawChunks(titleRect, label, chunks);

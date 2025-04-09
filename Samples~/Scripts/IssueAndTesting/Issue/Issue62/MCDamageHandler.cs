@@ -53,7 +53,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue62
 		public float normalizedHealth => _currentHealth/_initialHealth;
 		[HideIf(nameof(isRelay))]
 		public Transform targetOffset;
-		[SepTitle("DAMAGE",EColor.Brown,10,10)]
+		[SepTitle("DAMAGE",EColor.Brown)]
 		[HideIf(nameof(isRelay))]
 		public bool kickback = true;
 		// [GetComponent,ReadOnly,EnableIf(nameof(kickback)),HideIf(nameof(isRelay))]
@@ -67,7 +67,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue62
 		public List<Renderer> blinkRenderers;
 		// [HideIf(nameof(isRelay))]
 		// public UltEvent<float> onNormalizedHealthChange;
-		[SepTitle("DEATH",EColor.Black,10,10)]
+		[SepTitle("DEATH",EColor.Black)]
 		[HideIf(nameof(isRelay))]
 		public bool destroyOnDeath = true;
 		[EnableIf(nameof(destroyOnDeath)),HideIf(nameof(isRelay))]

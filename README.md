@@ -648,12 +648,20 @@ public bool toggle;
 
 #### `SepTitle` ####
 
-A separator with text. (Recommend to use `Separator` instead.)
+A separator with text. This is a decorator type attribute, which means it can be used on top of a list/array.
 
-*   `string title=null` title, `null` for no title at all. Does **NOT** support rich text
-*   `EColor color`, color for title and line separator
-*   `float gap = 2f`, space between title and line separator
-*   `float height = 2f`, height of this decorator
+*   `string title=null` display a title. `null` for no title, only separator.
+
+    UI Toolkit: support rich labels except `<field/>` & `<container/>` tag.
+
+    IMGUI: only support unity standard rich labels
+
+*   `EColor color=EColor.Gray` color for the title and the separator
+*   `EAlign eAlign=EAlign.Start` how the title is positioned, options are:
+    *   `EAlign.Start`
+    *   `EAlign.Center`
+    *   `EAlign.End`
+*   `int space=0` leave some space above or below the separator, like what `Space` does.
 
 ```csharp
 using SaintsField;

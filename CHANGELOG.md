@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.3.0 ##
+
+1.  **Breaking Changes**: `SepTitle` arguments now aligned with `Separator`: `string title`, `EColor color`, `EAlign eAlign`, `int space`
+2.  UI Toolkit: `SepTitle` now supports rich text tags.
+ 
 ## 4.2.1 ##
 
 Fix DOTweenPlay... Holy \*\*\*\*...

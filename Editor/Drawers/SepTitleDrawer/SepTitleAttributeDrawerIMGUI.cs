@@ -1,23 +1,10 @@
-﻿using UnityEditor;
+using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.Decorator
+namespace SaintsField.Editor.Drawers.SepTitleDrawer
 {
-#if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
-#endif
-    [CustomPropertyDrawer(typeof(SepTitleAttribute), true)]
-    public class SepTitleAttributeDrawer : DecoratorDrawer
+    public partial class SepTitleAttributeDrawer
     {
-        // public static int drawCounter = 0;
-        //
-        // // public override bool CanCacheInspectorGUI() => false;
-        //
-        // public SepTitleAttributeDrawer()
-        // {
-        //     Debug.Log($"Create {drawCounter}: {string.Join(",", SaintsPropertyDrawer.SubCounter.Select(each => $"{each.Key} {each.Value}"))}");
-        // }
-
         public override void OnGUI(Rect position)
         {
             // foreach ((InsideSaintsFieldScoop.PropertyKey propKey, int count)  in SaintsPropertyDrawer.SubCounter)
@@ -33,17 +20,17 @@ namespace SaintsField.Editor.Drawers.Decorator
             SepTitleAttribute lineAttr = (SepTitleAttribute)attribute;
             Rect indentedPosition = EditorGUI.IndentedRect(position);
 
-            string title = lineAttr.title;
+            string title = lineAttr.Title;
             // string title = drawCounter.ToString();
             // Debug.Log($"Draw {drawCounter} {Event.current}");
             // drawCounter++;
 
             float labelWidth;
-            if(title != null)
+            if (title != null)
             {
-                GUIStyle textColor = new GUIStyle { normal = { textColor = lineAttr.color.GetColor() } };
+                GUIStyle textColor = new GUIStyle { normal = { textColor = lineAttr.Color } };
                 GUI.Label(indentedPosition, title, textColor);
-                labelWidth = EditorStyles.label.CalcSize(new GUIContent(title)).x + lineAttr.gap;
+                labelWidth = EditorStyles.label.CalcSize(new GUIContent(title)).x + 2f;
             }
             else
             {
@@ -52,12 +39,12 @@ namespace SaintsField.Editor.Drawers.Decorator
 
             Rect rect = new Rect(indentedPosition);
             // position.yMin += EditorGUIUtility.singleLineHeight * 0.5f;
-            rect.y += EditorGUIUtility.singleLineHeight / 2f - lineAttr.height;
-            rect.height = lineAttr.height;
+            rect.y += EditorGUIUtility.singleLineHeight / 2f - 2f;
+            rect.height = 2f;
             rect.width -= labelWidth;
             rect.x += labelWidth;
 
-            EditorGUI.DrawRect(rect, lineAttr.color.GetColor());
+            EditorGUI.DrawRect(rect, lineAttr.Color);
             // EditorGUILayout.EndHorizontal();
             // NaughtyEditorGUI.HorizontalLine(rect, lineAttr.Height, lineAttr.Color.GetColor());
         }

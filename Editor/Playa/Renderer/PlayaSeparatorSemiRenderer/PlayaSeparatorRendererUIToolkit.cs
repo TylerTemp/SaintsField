@@ -1,6 +1,5 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SeparatorDrawer;
@@ -48,7 +47,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
 
                 if (rawResult is string rawString)
                 {
-                    newRichXml = $"<color=#{ColorUtility.ToHtmlStringRGBA(_playaSeparatorAttribute.Color.GetColor())}>{rawString}</color>";
+                    newRichXml = $"<color=#{ColorUtility.ToHtmlStringRGBA(_playaSeparatorAttribute.Color)}>{rawString}</color>";
                 }
                 else if (RuntimeUtil.IsNull(rawResult))
                 {
@@ -63,7 +62,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
 #endif
             }
 
-            if (newRichXml != _richXml)
+            if (newRichXml != _richXml || (newRichXml != null && newRichXml.Contains("<field")))
             {
                 // Debug.Log($"newRichXml={newRichXml}, _richXml={_richXml}");
                 _richXml = newRichXml;

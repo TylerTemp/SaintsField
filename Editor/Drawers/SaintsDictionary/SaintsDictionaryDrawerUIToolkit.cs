@@ -35,12 +35,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             $"{property.propertyPath}__SaintsDictinoary_PagePreButton";
 
         private static string NamePage(SerializedProperty property) =>
-            $"{property.propertyPath}__SaintsDictinoary_Page";
+            $"{property.propertyPath}__SaintsDictionary_Page";
 
         private static string NamePageLabel(SerializedProperty property) =>
-            $"{property.propertyPath}____SaintsDictionary_PageLabel";
+            $"{property.propertyPath}__SaintsDictionary_PageLabel";
         private static string NamePageNextButton(SerializedProperty property) =>
-            $"{property.propertyPath}__SaintsDictinoary_PageNextButton";
+            $"{property.propertyPath}__SaintsDictionary_PageNextButton";
 
         private static string NameAddButton(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_AddButton";
         private static string NameRemoveButton(SerializedProperty property) => $"{property.propertyPath}__SaintsDictionary_RemoveButton";
@@ -395,6 +395,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                 List<int> fullList = Enumerable.Range(0, nowArraySize).ToList();
                 // List<int> useIndexes = new List<int>(itemIndexToPropertyIndex);
+                // ReSharper disable once AccessToModifiedClosure
                 List<int> refreshedHitTargetIndexes = new List<int>(hitTargetIndexes);
                 // if (forceRebuild)
                 // {

@@ -15,7 +15,7 @@ namespace SaintsField
         public string GroupBy => "";
 
         public string Title { get; }
-        public EColor Color { get; }
+        public Color Color { get; }
         public EAlign EAlign { get; }
         public bool IsCallback { get; }
         public int Space { get; }
@@ -42,7 +42,7 @@ namespace SaintsField
 
             Title = titleParsed;
             IsCallback = titleIsCallback;
-            Color = color;
+            Color = color.GetColor();
             EAlign = eAlign;
             Space = space;
             Below = below;

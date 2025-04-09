@@ -8,11 +8,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [PlayaSeparator("Separator", EAlign.Center)]
         public string separator;
 
-        [PlayaSeparator("Left", EAlign.Start)] public string left;
+        [PlayaSeparator("Left", EAlign.Start)]
+        public string left;
 
         [PlayaSeparator("$" + nameof(right), EAlign.End)]
         public string right;
 
+        [PlayaSeparator(EColor.Aqua)]
         [PlayaSeparator(20)]
         [PlayaSeparator("Space 20")]
         public string[] arr;

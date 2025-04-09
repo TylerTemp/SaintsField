@@ -69,16 +69,16 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
         public static (VisualElement target, VisualElement title) CreateSeparatorUIToolkit(ISeparatorAttribute separatorAttribute, string nameTitleText)
         {
             string title = separatorAttribute.Title;
-            EColor eColor = separatorAttribute.Color;
+            Color color = separatorAttribute.Color;
             int space = separatorAttribute.Space;
             bool below = separatorAttribute.Below;
 
             VisualElement root = new VisualElement
             {
-                style =
-                {
-                    marginLeft = 4,
-                },
+                // style =
+                // {
+                //     marginLeft = 4,
+                // },
             };
 
             VisualElement titleElement = null;
@@ -94,7 +94,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                 });
             }
 
-            if (title != null || eColor != EColor.Clear)
+            if (title != null)
             {
                 VisualElement separator = new VisualElement
                 {
@@ -109,42 +109,42 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
 
                 EAlign eAlign = separatorAttribute.EAlign;
 
-                if (title != null)
+                // ReSharper disable once MergeIntoLogicalPattern
+                if (eAlign == EAlign.Center || eAlign == EAlign.End)
                 {
-                    if (eAlign == EAlign.Center || eAlign == EAlign.End)
-                    {
-                        VisualElement sep = MakeSeparator(eColor);
-                        sep.style.marginRight = 2;
-                        separator.Add(sep);
-                    }
-
-                    separator.Add(titleElement = new VisualElement
-                    {
-                        name = nameTitleText,
-                        style =
-                        {
-                            flexDirection = FlexDirection.Row,
-                            flexGrow = 0,
-                            flexShrink = 0,
-                            display = DisplayStyle.None,
-                            marginRight = 2,
-                        },
-                        userData = null,
-                    });
-
-                    if (eAlign == EAlign.Center || eAlign == EAlign.Start)
-                    {
-                        separator.Add(MakeSeparator(eColor));
-                    }
-                }
-                else if (eColor != EColor.Clear)
-                {
-                    VisualElement sep = MakeSeparator(eColor);
-                    sep.style.marginTop = sep.style.marginBottom = 3;
+                    VisualElement sep = MakeSeparator(color);
+                    sep.style.marginRight = 2;
                     separator.Add(sep);
                 }
 
+                separator.Add(titleElement = new VisualElement
+                {
+                    name = nameTitleText,
+                    style =
+                    {
+                        flexDirection = FlexDirection.Row,
+                        flexGrow = 0,
+                        flexShrink = 0,
+                        display = DisplayStyle.None,
+                        marginRight = 2,
+                    },
+                    userData = null,
+                });
+
+                // ReSharper disable once MergeIntoLogicalPattern
+                if (eAlign == EAlign.Center || eAlign == EAlign.Start)
+                {
+                    separator.Add(MakeSeparator(color));
+                }
+
                 root.Add(separator);
+            }
+            else if(space <= 0)
+            {
+                VisualElement sep = MakeSeparator(color);
+                sep.style.marginTop = 1;
+                sep.style.marginBottom = 1;
+                root.Add(sep);
             }
 
             if (space > 0 && below)
@@ -161,7 +161,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             return (root, titleElement);
         }
 
-        private static VisualElement MakeSeparator(EColor eColor)
+        private static VisualElement MakeSeparator(Color color)
         {
             return new VisualElement
             {
@@ -169,8 +169,8 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                 {
                     flexGrow = 1,
                     flexShrink = 1,
-                    height = 1,
-                    backgroundColor = eColor.GetColor(),
+                    height = 2,
+                    backgroundColor = color,
                 },
             };
         }
@@ -187,7 +187,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
 
             VisualElement titleElement = container.Q<VisualElement>(NameTitleText(property, index));
 
-            string error = UpdateSeparatorUIToolkit(property, separatorAttribute.Title, separatorAttribute.IsCallback, ColorUtility.ToHtmlStringRGBA(separatorAttribute.Color.GetColor()),
+            string error = UpdateSeparatorUIToolkit(property, separatorAttribute.Title, separatorAttribute.IsCallback, ColorUtility.ToHtmlStringRGBA(separatorAttribute.Color),
                 titleElement, info, _richTextDrawer);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));

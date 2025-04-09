@@ -2,6 +2,8 @@ using System;
 using System.Diagnostics;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
+using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 
 namespace SaintsField.Playa
 {
@@ -10,7 +12,7 @@ namespace SaintsField.Playa
     public class PlayaSeparatorAttribute: Attribute, IPlayaAttribute, ISeparatorAttribute
     {
         public string Title { get; }
-        public EColor Color { get; }
+        public Color Color { get; }
         public EAlign EAlign { get; }
         public bool IsCallback { get; }
         public int Space { get; }
@@ -36,7 +38,7 @@ namespace SaintsField.Playa
 
             Title = titleParsed;
             IsCallback = titleIsCallback;
-            Color = color;
+            Color = color.GetColor();
             EAlign = eAlign;
             Space = space;
             Below = below;
