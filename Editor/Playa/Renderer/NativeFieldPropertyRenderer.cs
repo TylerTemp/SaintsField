@@ -69,5 +69,10 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private static Type GetFieldType(SaintsFieldWithInfo fieldWithInfo) =>
             fieldWithInfo.FieldInfo?.FieldType ?? fieldWithInfo.PropertyInfo.PropertyType;
+
+        public override string ToString()
+        {
+            return $"<NativeFP {GetFriendlyName(FieldWithInfo)}/>";
+        }
     }
 }
