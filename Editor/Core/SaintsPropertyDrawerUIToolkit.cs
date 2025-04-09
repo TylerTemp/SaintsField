@@ -23,7 +23,7 @@ using Obvious.Soap;
 
 namespace SaintsField.Editor.Core
 {
-    public partial class SaintsPropertyDrawer: IMakeRenderer, IDOTweenPlayRecorder
+    public partial class SaintsPropertyDrawer: IDOTweenPlayRecorder
     {
         protected virtual void OnDisposeUIToolkit()
         {
@@ -1502,11 +1502,6 @@ namespace SaintsField.Editor.Core
         }
 
         #endregion
-
-        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
-        {
-            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
-        }
     }
 }
 #endif

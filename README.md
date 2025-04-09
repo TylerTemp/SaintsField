@@ -86,10 +86,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.2.1**
+**4.3.0**
 
-1.  UI Toolkit: Add `PlayaSeparator`, similar to `Separator`, but it can be applied to list/array, and layout system
-2.  Improved `Playa*` with layout system. Now `PlayaInfoBox`, `PlayaSeparator` will be applied to the layout if there is one, otherwise to a field/property/method
+1.  **Breaking Changes**: `SepTitle` arguments now aligned with `Separator`: `string title`, `EColor color`, `EAlign eAlign`, `int space`
+2.  UI Toolkit: `SepTitle` now supports rich text tags.
+3.  Fix single `Layout(keepGrouping: false)` still continuously grouping after version 4.2.0
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

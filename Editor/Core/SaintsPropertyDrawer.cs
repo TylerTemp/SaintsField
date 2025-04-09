@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -12,7 +14,7 @@ namespace SaintsField.Editor.Core
     // above
     // pre, label, field, post
     // below-
-    public partial class SaintsPropertyDrawer: PropertyDrawer, IDisposable
+    public partial class SaintsPropertyDrawer: PropertyDrawer, IMakeRenderer, IDisposable
     {
         public bool InHorizontalLayout;
 
@@ -692,6 +694,11 @@ namespace SaintsField.Editor.Core
 #else
             return sp.displayName;
 #endif
+        }
+
+        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        {
+            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         }
 
         public void Dispose()

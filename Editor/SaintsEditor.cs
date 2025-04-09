@@ -490,7 +490,7 @@ namespace SaintsField.Editor
 
             RendererGroupInfo keepGroupingInfo = null;
             string preAbsGroupBy = null;
-            RendererGroupInfo lastGroupInfo = null;
+            // RendererGroupInfo lastGroupInfo = null;
 
             int inherent = -1;
             foreach (SaintsFieldWithInfo saintsFieldWithInfo in fieldWithInfosSorted)
@@ -505,9 +505,13 @@ namespace SaintsField.Editor
                 {
                     keepGroupingInfo = null;
                     // Debug.Log($"set lastGroupInfo to null");
-                    lastGroupInfo = null;
+                    // lastGroupInfo = null;
                     preAbsGroupBy = null;
                 }
+
+                RendererGroupInfo useGroupInfo = keepGroupingInfo;
+
+                bool stopGrouping = false;
 
                 IEnumerable<SaintsFieldWithRenderer> playaAndRenderers = GetPlayaAndRenderer(saintsFieldWithInfo, serializedObject, makeRenderer);
 
@@ -531,9 +535,8 @@ namespace SaintsField.Editor
                             string endGroupBy = layoutEndAttribute.LayoutBy;
                             if (endGroupBy == null)
                             {
-                                keepGroupingInfo = null;
-                                lastGroupInfo = null;
-                                preAbsGroupBy = null;
+                                useGroupInfo = null;
+                                stopGrouping = true;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                                 Debug.Log($"Layout close null");
 #endif
@@ -541,7 +544,6 @@ namespace SaintsField.Editor
                             else if (keepGroupingInfo == null)
                             {
                                 // do nothing. End a layout when it's not in a layout is meaningless
-
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                                 Debug.Log($"Layout close with no scoop inside");
 #endif
@@ -557,9 +559,9 @@ namespace SaintsField.Editor
                                         splitCloseGroup.RemoveAt(splitCloseGroup.Count - 1);
                                         string openGroupTo = string.Join("/", splitCloseGroup);
                                         if (!rootToRendererGroupInfo.TryGetValue(openGroupTo,
-                                                out lastGroupInfo))
+                                                out keepGroupingInfo))
                                         {
-                                            rootToRendererGroupInfo[openGroupTo] = lastGroupInfo = new RendererGroupInfo
+                                            rootToRendererGroupInfo[openGroupTo] = keepGroupingInfo = new RendererGroupInfo
                                             {
                                                 AbsGroupBy = openGroupTo,
                                                 Children = new List<RendererGroupInfo>(),
@@ -568,7 +570,11 @@ namespace SaintsField.Editor
                                             };
                                         }
 
-                                        keepGroupingInfo = lastGroupInfo.Config.KeepGrouping ? lastGroupInfo : null;
+                                        useGroupInfo = keepGroupingInfo;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
+                                        Debug.Log($"keepGroupingInfo `{keepGroupingInfo.AbsGroupBy}`");
+#endif
+                                        stopGrouping = !useGroupInfo.Config.KeepGrouping;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                                         Debug.Log($"Layout close, {closeGroup}->{openGroupTo}: {keepGroupingInfo?.AbsGroupBy}");
@@ -579,8 +585,8 @@ namespace SaintsField.Editor
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                                         Debug.Log($"Layout close, {closeGroup}: null");
 #endif
-                                        lastGroupInfo = null;
-                                        keepGroupingInfo = null;
+                                        useGroupInfo = null;
+                                        stopGrouping = true;
                                     }
 
                                     // Debug.Log($"closeGroup={closeGroup}; endGroupBy={endGroupBy}; cur={string.Join(",", rootToRendererGroupInfo.Keys)}");
@@ -601,9 +607,11 @@ namespace SaintsField.Editor
                                     if (parentGroupBy != "" && rootToRendererGroupInfo.TryGetValue(parentGroupBy,
                                             out RendererGroupInfo info))
                                     {
-                                        keepGroupingInfo = info.Config.KeepGrouping
+                                        keepGroupingInfo = useGroupInfo = info.Config.KeepGrouping
                                             ? info
                                             : null;
+
+                                        stopGrouping = !info.Config.KeepGrouping;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
                                         Debug.Log($"Layout close, {endGroupBy}->{parentGroupBy}: {keepGroupingInfo?.AbsGroupBy}");
 #endif
@@ -641,7 +649,7 @@ namespace SaintsField.Editor
                                 // Debug.Log($"new root {saintsGroup}: {groupBy}({saintsGroup.LayoutBy})");
                                 rendererGroupInfos.Add(targetGroup);
                             }
-                            lastGroupInfo = targetGroup;
+                            // lastGroupInfo = targetGroup;
                             // Debug.Log($"set lastGroupInfo to {targetGroup.AbsGroupBy}");
 
                             SaintsRendererGroup.Config newConfig = new SaintsRendererGroup.Config
@@ -665,12 +673,13 @@ namespace SaintsField.Editor
 
                             if (targetGroup.Config.KeepGrouping)
                             {
-                                keepGroupingInfo = targetGroup;
+                                useGroupInfo = keepGroupingInfo = targetGroup;
+                                stopGrouping = false;
                             }
-                            else if (keepGroupingInfo != null &&
-                                     targetGroup.AbsGroupBy != keepGroupingInfo.AbsGroupBy)
+                            else
                             {
-                                keepGroupingInfo = null;
+                                useGroupInfo = targetGroup;
+                                stopGrouping = true;
                             }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
@@ -698,21 +707,31 @@ namespace SaintsField.Editor
                                         Renderer = renderer,
                                     };
 
-                                    if (lastGroupInfo == null)
+                                    if (useGroupInfo == null)
                                     {
-                                        // Debug.Log($"Add normal field {saintsFieldWithInfo}/{rendererInfo.Playa}/{renderer}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
+                                        Debug.Log($"Add normal field {saintsFieldWithInfo}/{rendererInfo.Playa}/{renderer}");
+#endif
                                         rendererGroupInfos.Add(endNode);
                                     }
                                     else
                                     {
-                                        lastGroupInfo.Children.Add(endNode);
-                                        // Debug.Log($"Add group `{lastGroupInfo.AbsGroupBy}`: {saintsFieldWithInfo}/{rendererInfo.Playa}; total={lastGroupInfo.Children.Count}");
+                                        useGroupInfo.Children.Add(endNode);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
+                                        Debug.Log($"Add to `{useGroupInfo.AbsGroupBy}` group: {saintsFieldWithInfo}/{rendererInfo.Playa}; total={useGroupInfo.Children.Count}");
+#endif
                                     }
                                 }
                             }
                         }
                             break;
                     }
+                }
+
+                if (stopGrouping)
+                {
+                    keepGroupingInfo = null;
+                    preAbsGroupBy = null;
                 }
 
 //                 if (lastGroupInfo == null && keepGroupingInfo != null)
