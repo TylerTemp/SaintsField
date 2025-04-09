@@ -494,7 +494,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   separator: 
   left: 
-  right: Right <color=lime>Dynamic</color>
+  right: Right <color=lime>Dynamic
   arr: []
   end: 
 --- !u!4 &111474058
