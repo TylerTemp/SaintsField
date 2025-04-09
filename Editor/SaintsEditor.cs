@@ -514,10 +514,10 @@ namespace SaintsField.Editor
                 bool stopGrouping = false;
 
                 IEnumerable<SaintsFieldWithRenderer> playaAndRenderers = GetPlayaAndRenderer(saintsFieldWithInfo, serializedObject, makeRenderer);
+                List<ISaintsLayoutToggle> layoutToggles = new List<ISaintsLayoutToggle>();
 
                 foreach (SaintsFieldWithRenderer rendererInfo in playaAndRenderers)
                 {
-                    List<ISaintsLayoutToggle> layoutToggles = new List<ISaintsLayoutToggle>();
                     switch (rendererInfo.Playa)
                     {
                         case ISaintsLayoutToggle layoutToggle:
@@ -669,6 +669,9 @@ namespace SaintsField.Editor
                                 KeepGrouping = saintsGroup.KeepGrouping,
                                 Toggles = (oldConfig?.Toggles ?? Array.Empty<ISaintsLayoutToggle>()).Concat(layoutToggles).ToArray(),
                             };
+
+                            // Debug.Log($"targetGroup={targetGroup.AbsGroupBy}/Conf.Toggle={targetGroup.Config.Toggles.Count}");
+
                             layoutToggles.Clear();
 
                             if (targetGroup.Config.KeepGrouping)

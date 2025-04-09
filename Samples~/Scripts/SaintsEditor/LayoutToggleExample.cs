@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class LayoutToggleExample : SaintsMonoBehaviour
     {
+        public string s;
         public bool editableMain;
         public bool visibleMain;
 
@@ -23,7 +24,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [LayoutStart("..", ELayout.FoldoutBox)]
         public bool editable2;
         public bool visible2;
-
 
         [LayoutEnableIf(nameof(editable2))]
         [LayoutShowIf(nameof(visible2))]

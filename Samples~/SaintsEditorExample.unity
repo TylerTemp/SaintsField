@@ -963,6 +963,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbd1cb6f61cf0134d998f8ed400ebdd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  l1: 
+  lOut: 
+  l2: 
+  s1: 
+  s2: 
 --- !u!1 &412778987
 GameObject:
   m_ObjectHideFlags: 0
@@ -1493,9 +1498,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7679c7ceb2f84949873cc184e7f3768, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  s: 
   editableMain: 1
-  visibleMain: 0
-  editable1: 1
+  visibleMain: 1
+  editable1: 0
   visible1: 1
   int1: 0
   string1: 
