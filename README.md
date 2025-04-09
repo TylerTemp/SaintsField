@@ -86,7 +86,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.2.0**
+**4.2.1**
 
 1.  UI Toolkit: Add `PlayaSeparator`, similar to `Separator`, but it can be applied to list/array, and layout system
 2.  Improved `Playa*` with layout system. Now `PlayaInfoBox`, `PlayaSeparator` will be applied to the layout if there is one, otherwise to a field/property/method
