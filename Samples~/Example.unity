@@ -11389,27 +11389,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e9c0e99cc43e434da64553e13666b59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eToState:
-    _keys: 
-    _values: []
-  eToV3:
-    _keys: 
-    _values: []
-  eToStateOld:
-    _keys: 00000000
+  myStructToGameObject:
+    _keys:
+    - 
     _values:
-    - <layerIndex>k__BackingField: 0
-      <stateNameHash>k__BackingField: 0
-      <stateName>k__BackingField: 
-      <stateSpeed>k__BackingField: 0
-      <stateTag>k__BackingField: 
-      <animationClip>k__BackingField: {fileID: 0}
-      <subStateMachineNameChain>k__BackingField: []
-  eToV3Old:
-    _keys: 0000000001000000
-    _values:
-    - {x: 0, y: 0, z: 0}
-    - {x: 0, y: 0, z: 0}
+    - ss: 
+      si: 0
 --- !u!1 &788337258
 GameObject:
   m_ObjectHideFlags: 0

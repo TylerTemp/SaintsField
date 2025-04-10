@@ -219,82 +219,30 @@ namespace SaintsField.Editor.Playa.Renderer
             return container;
         }
 
-        private static readonly Dictionary<Type, Type> PropertyTypeToDecoratorDrawerType = new Dictionary<Type, Type>();
 
         private static VisualElement DrawDecorator(IEnumerable<PropertyAttribute> allPropAttributes)
         {
             IReadOnlyDictionary<Type, IReadOnlyList<SaintsPropertyDrawer.PropertyDrawerInfo>> propertyAttributeToDecoratorDrawers = SaintsPropertyDrawer.EnsureAndGetTypeToDrawers().attrToDecoratorDrawers;
             // this can be multiple, should not be a dictionary
-            List<(PropertyAttribute propAttribute, Type drawerType)> decDrawers = new List<(PropertyAttribute, Type drawerType)>();
-
-            foreach (PropertyAttribute propAttribute in allPropAttributes)
-            {
-                Type propType = propAttribute.GetType();
-                Type decDrawer = null;
-
-                if (PropertyTypeToDecoratorDrawerType.TryGetValue(propType, out Type cachedDecoratorDrawerType))
-                {
-                    decDrawer = cachedDecoratorDrawerType;
-                }
-
-                if(decDrawer == null)
-                {
-                    if (propertyAttributeToDecoratorDrawers.TryGetValue(propType,
-                            out IReadOnlyList<SaintsPropertyDrawer.PropertyDrawerInfo> drawerInfos))
-                    {
-                        decDrawer = drawerInfos[0].DrawerType;
-                        // foreach (SaintsPropertyDrawer.PropertyDrawerInfo propertyDrawerInfo in drawerInfos)
-                        // {
-                        //     // Debug.Log($"{propType}: {propertyDrawerInfo.DrawerType}");
-                        //     // ReSharper disable once InvertIf
-                        //     if (propertyDrawerInfo.DrawerType.IsSubclassOf(decoratorDrawerType))
-                        //     {
-                        //
-                        //         break;
-                        //     }
-                        // }
-                    }
-                }
-                if (decDrawer == null)
-                {
-                    foreach (KeyValuePair<Type, IReadOnlyList<SaintsPropertyDrawer.PropertyDrawerInfo>> kv in propertyAttributeToDecoratorDrawers)
-                    {
-                        Type foundAttributeType = kv.Key;
-                        // ReSharper disable once InvertIf
-                        if (foundAttributeType.IsAssignableFrom(propAttribute.GetType()))
-                        {
-                            foreach (SaintsPropertyDrawer.PropertyDrawerInfo propertyDrawerInfo in kv.Value)
-                            {
-                                // ReSharper disable once InvertIf
-                                if (propertyDrawerInfo.UseForChildren)
-                                {
-                                    decDrawer = propertyDrawerInfo.DrawerType;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (decDrawer != null)
-                {
-                    decDrawers.Add((propAttribute, decDrawer));
-                    PropertyTypeToDecoratorDrawerType[propType] = decDrawer;
-                }
-            }
-
-            if (decDrawers.Count == 0)
-            {
-                return null;
-            }
+            IEnumerable<(PropertyAttribute propAttribute, Type)> decDrawers =
+                allPropAttributes
+                    .Select(propAttribute => (propAttribute, SaintsPropertyDrawer.PropertyGetDecoratorDrawer(propAttribute.GetType())))
+                    .Where(each => each.Item2 != null);
+            // new List<(PropertyAttribute, Type drawerType)>();
+            // if (decDrawers.Length == 0)
+            // {
+            //     return null;
+            // }
 
             VisualElement result = new VisualElement();
             result.AddToClassList("unity-decorator-drawers-container");
             // this.m_DecoratorDrawersContainer = new VisualElement();
             // this.m_DecoratorDrawersContainer.AddToClassList(PropertyField.decoratorDrawersContainerClassName);
 
+            bool hasAny = false;
             foreach ((PropertyAttribute propAttribute, Type drawerType) in decDrawers)
             {
+                hasAny = true;
                 DecoratorDrawer decorator = (DecoratorDrawer)Activator.CreateInstance(drawerType);
                 FieldInfo mAttributeField = drawerType.GetField("m_Attribute", BindingFlags.NonPublic | BindingFlags.Instance);
                 if (mAttributeField != null)
@@ -349,7 +297,7 @@ namespace SaintsField.Editor.Playa.Renderer
             //     this.m_DecoratorDrawersContainer.Add(ve);
             // }
 
-            return result;
+            return hasAny? result: null;
 
             // // PropertyHandler propertyHandle = UnityEditor.ScriptAttributeUtility.GetHandler(FieldWithInfo.SerializedProperty);
             // PropertyHandler propertyHandle = (PropertyHandler)typeof(UnityEditor.Editor).Assembly

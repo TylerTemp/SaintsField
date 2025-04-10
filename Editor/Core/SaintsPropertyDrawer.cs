@@ -300,11 +300,12 @@ namespace SaintsField.Editor.Core
             return (PropertyAttributeToPropertyDrawers, _propertyAttributeToDecoratorDrawers);
         }
 
-        // TODO: check useForChildren
-        public static bool PropertyIsDecoratorDrawer(PropertyAttribute propertyAttribute)
+        public static Type PropertyGetDecoratorDrawer(Type attributeType)
         {
+            EnsureAndGetTypeToDrawers();
+
             // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (!_propertyAttributeToDecoratorDrawers.ContainsKey(propertyAttribute.GetType()))
+            if (_propertyAttributeToDecoratorDrawers.TryGetValue(attributeType, out IReadOnlyList<PropertyDrawerInfo> info))
             {
                 // Debug.Log(propertyAttribute.GetType());
                 // foreach (Type key in PropertyAttributeToPropertyDrawers.Keys)
@@ -315,12 +316,43 @@ namespace SaintsField.Editor.Core
                 //     }
                 // }
                 // not found
-                return false;
+                return info[0].DrawerType;
             }
 
-            // return eachDrawer.Any(drawerType => drawerType.DrawerType.IsSubclassOf(typeof(DecoratorDrawer)));
-            return true;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (KeyValuePair<Type, IReadOnlyList<PropertyDrawerInfo>> kv in _propertyAttributeToDecoratorDrawers)
+            {
+                if (!kv.Key.IsAssignableFrom(attributeType))
+                {
+                    continue;
+                }
+                return kv.Value.FirstOrDefault(each => each.UseForChildren).DrawerType;
+            }
+
+            return null;
         }
+
+        // TODO: check useForChildren
+        // public static bool PropertyIsDecoratorDrawer(PropertyAttribute propertyAttribute)
+        // {
+        //     // ReSharper disable once ConvertIfStatementToReturnStatement
+        //     if (!_propertyAttributeToDecoratorDrawers.ContainsKey(propertyAttribute.GetType()))
+        //     {
+        //         // Debug.Log(propertyAttribute.GetType());
+        //         // foreach (Type key in PropertyAttributeToPropertyDrawers.Keys)
+        //         // {
+        //         //     if ($"{key}".Contains("SepTitle"))
+        //         //     {
+        //         //         Debug.Log(key);
+        //         //     }
+        //         // }
+        //         // not found
+        //         return false;
+        //     }
+        //
+        //     // return eachDrawer.Any(drawerType => drawerType.DrawerType.IsSubclassOf(typeof(DecoratorDrawer)));
+        //     return true;
+        // }
         // ~SaintsPropertyDrawer()
         // {
         //     Debug.Log($"[{this}] Stop listening changed");

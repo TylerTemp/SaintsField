@@ -382,7 +382,7 @@ namespace SaintsField.Editor.TroubleshootEditor
                 bool isSaintsProperty = propertyAttribute is ISaintsAttribute;
 
                 // Debug.Log($"{propertyAttribute}: {propertyAttribute is ISaintsAttribute}");
-                if (SaintsPropertyDrawer.PropertyIsDecoratorDrawer(propertyAttribute))
+                if (SaintsPropertyDrawer.PropertyGetDecoratorDrawer(propertyAttribute.GetType()) != null)
                 {
                     continue;
                 }
