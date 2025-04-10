@@ -4,6 +4,7 @@
 
 1.  Fix `SaintsEditor` can not find a correct typed drawer on first drawing after a domain reload
 2.  `SaintsDictionary` now can use the new fallback system, which means if you have a struct/class typed key/value, you can use `Layout`, `Button` etc. in it without add a `SaintsRow` decorator
+3.  Fix `AnimatorParam` didn't work on an `AnimatorOverrideController` animator.
 
 ## 4.3.0 ##
 

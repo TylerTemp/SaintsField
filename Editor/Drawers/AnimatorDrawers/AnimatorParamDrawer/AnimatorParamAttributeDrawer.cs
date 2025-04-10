@@ -118,8 +118,37 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
                 };
             }
 
-            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(AssetDatabase.GetAssetPath(runtimeController));
+            string loadPath;
+            if(runtimeController is AnimatorOverrideController aoc)
+            {
+                loadPath = AssetDatabase.GetAssetPath(aoc.runtimeAnimatorController);
+            }
+            else
+            {
+                loadPath = AssetDatabase.GetAssetPath(runtimeController);
+            }
+
+            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(loadPath);
+            // AnimatorOverrideController oc = (AnimatorOverrideController);
+            // if (runtimeController is AnimatorOverrideController aoc)
+            // {
+            //     Debug.Log(aoc.runtimeAnimatorController);
+            //     Debug.Log(AssetDatabase.GetAssetPath(aoc.runtimeAnimatorController));
+            // }
             // AnimatorController controller = (AnimatorController)runtimeController;
+            // Debug.Log($"runtimeController={runtimeController}/controller={controller}/{AssetDatabase.GetAssetPath(runtimeController)}");
+            // for override controller, this hack won't work.
+            // TODO: if the target is inside a prefab which is not loaded yet, does it works?
+            if (controller == null)
+            {
+                // Debug.Log(runtimeController.GetType());
+                // controller = (AnimatorController)runtimeController;
+                return new MetaInfo
+                {
+                    Error = $"Can not obtain AnimatorController from {animator.name}: {runtimeController.GetType()}",
+                    AnimatorParameters = Array.Empty<AnimatorControllerParameter>(),
+                };
+            }
 
             List<AnimatorControllerParameter> animatorParameters = new List<AnimatorControllerParameter>();
 
