@@ -69,9 +69,8 @@ namespace SaintsField.Editor.Utils
             FieldOrProp fieldOrProp = default;
 
             bool preNameIsArray = false;
-            for (int propIndex = 0; propIndex < propPaths.Length; propIndex++)
+            foreach (string propSegName in propPaths)
             {
-                string propSegName = propPaths[propIndex];
                 // Debug.Log($"check key {propSegName}");
                 if(propSegName == "Array")
                 {
@@ -133,9 +132,6 @@ namespace SaintsField.Editor.Utils
                 }
 
                 fieldOrProp = GetFileOrProp(sourceObj, propSegName);
-                // Debug.Log($"get key {propSegName} => {(fieldOrProp.IsField ? fieldOrProp.FieldInfo.Name : fieldOrProp.PropertyInfo.Name)}");
-                // targetFieldName = propSegName;
-                // Debug.Log($"[{propSegName}]={targetObj}");
             }
 
             return (fieldOrProp, sourceObj);

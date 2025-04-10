@@ -617,8 +617,10 @@ namespace SaintsField.Editor.Core
             return _cachedDrawer[saintsAttributeWithIndex] = GetOrCreateSaintsDrawerByAttr(saintsAttributeWithIndex.SaintsAttribute);
         }
 
-        public static (Attribute attrOrNull, Type drawerType) GetFallbackDrawerType(FieldInfo info, SerializedProperty property)
+        public static (Attribute attrOrNull, Type drawerType) GetFallbackDrawerType(MemberInfo info, SerializedProperty property)
         {
+            EnsureAndGetTypeToDrawers();
+
             // check if any property has drawer. If so, just use PropertyField
             // if not, check if it has custom drawer. if it exists, then try use that custom drawer
             (Attribute attr, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
@@ -627,9 +629,15 @@ namespace SaintsField.Editor.Core
                 return (attr, attributeDrawerType);
             }
 
+            Type fieldType = info.MemberType == MemberTypes.Property
+                ? ((PropertyInfo)info).PropertyType
+                : ((FieldInfo)info).FieldType;
+
+            Debug.Assert(fieldType != null, info);
+
             Type fieldElementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
-                ? ReflectUtils.GetElementType(info.FieldType)
-                : info.FieldType;
+                ? ReflectUtils.GetElementType(fieldType)
+                : fieldType;
 
             Type foundDrawer = FindTypeDrawerAny(fieldElementType);
 

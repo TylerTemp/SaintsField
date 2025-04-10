@@ -86,11 +86,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.3.0**
+**4.3.1**
 
-1.  **Breaking Changes**: `SepTitle` arguments now aligned with `Separator`: `string title`, `EColor color`, `EAlign eAlign`, `int space`
-2.  UI Toolkit: `SepTitle` now supports rich text tags.
-3.  Fix single `Layout(keepGrouping: false)` still continuously grouping, `LayoutToggle` not working, `LayoutEnd(name)` did not close layout in some cases after version 4.2.0
+1.  Fix `SaintsEditor` can not find a correct typed drawer on first drawing after a domain reload
+2.  `SaintsDictionary` now can use the new fallback system, which means if you have a struct/class typed key/value, you can use `Layout`, `Button` etc. in it without add a `SaintsRow` decorator
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

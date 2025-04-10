@@ -40,8 +40,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private bool _foldout;
 
-        private readonly object _containerObject;
-
         private readonly List<ToggleCheckInfo> _toggleCheckInfos;
 
         public SaintsRendererGroup(string groupPath, Config config, object containerObject)
@@ -50,7 +48,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
             _config = config;
             _eLayout = config.ELayout;
             _foldout = !config.ELayout.HasFlagFast(ELayout.Collapse);
-            _containerObject = containerObject;
 
             List<ToggleCheckInfo> toggleCheckInfos = new List<ToggleCheckInfo>(_config.Toggles.Count);
 
@@ -65,7 +62,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         (
                             ToggleType.Enable,
                             layoutEnableIfAttribute.ConditionInfos,
-                            _containerObject
+                            containerObject
                         ));
                         break;
                     case LayoutReadOnlyAttribute layoutReadOnlyAttribute:
@@ -73,7 +70,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         (
                             ToggleType.Disable,
                             layoutReadOnlyAttribute.ConditionInfos,
-                            _containerObject
+                            containerObject
                         ));
                         break;
 
@@ -82,7 +79,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         (
                             ToggleType.Hide,
                             layoutHideIfAttribute.ConditionInfos,
-                            _containerObject
+                            containerObject
                         ));
                         break;
                     case LayoutShowIfAttribute layoutShowIfAttribute:
@@ -90,7 +87,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         (
                             ToggleType.Show,
                             layoutShowIfAttribute.ConditionInfos,
-                            _containerObject
+                            containerObject
                         ));
                         break;
 

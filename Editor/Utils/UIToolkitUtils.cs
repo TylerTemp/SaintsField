@@ -333,7 +333,7 @@ namespace SaintsField.Editor.Utils
           SerializedProperty property,
           Type rawType,
           string label,
-          FieldInfo fieldInfo,
+          MemberInfo fieldInfo,
           bool inHorizontalLayout,
           IMakeRenderer makeRenderer,
           IDOTweenPlayRecorder doTweenPlayRecorder,

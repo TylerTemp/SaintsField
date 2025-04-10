@@ -48,6 +48,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     flexGrow =  InAnyHorizontalLayout? 0: 1,
                 },
+                name = $"saints-field-group--title--{_groupPath}",
             };
 
             bool hasFoldout = _eLayout.HasFlagFast(ELayout.Foldout) || _eLayout.HasFlagFast(ELayout.Collapse);
@@ -120,7 +121,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             VisualElement body = new VisualElement
             {
-                name = $"saints-editor-layout-{_groupPath}",
+                name = $"saints-field-group--body--{_groupPath}",
                 style =
                 {
                     flexGrow = 1,
@@ -172,6 +173,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         borderTopRightRadius = radius,
                     },
                 };
+                title.RemoveFromClassList("unity-label");
                 if (_eLayout.HasFlagFast(ELayout.TitleOut))
                 {
                     if(_eLayout.HasFlagFast(ELayout.Background))
@@ -488,6 +490,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 root.schedule.Execute(() => LoopCheckTogglesUIToolkit(_toggleCheckInfos, root, body)).Every(150);
             }
 
+            root.name = $"saints-field-group--{_groupPath}";
+
             return root;
         }
 
@@ -514,14 +518,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         // private readonly HashSet<Toggle> _processedToggles = new HashSet<Toggle>();
 
-        private void StartToCheckOutOfScoopFoldout(VisualElement root)
+        private static void StartToCheckOutOfScoopFoldout(VisualElement root)
         {
             root.schedule
                 .Execute(() => LoopCheckOutOfScoopFoldout(root, 0))
                 .StartingIn(100);
         }
 
-        private void LoopCheckOutOfScoopFoldout(VisualElement root, int timeout)
+        private static void LoopCheckOutOfScoopFoldout(VisualElement root, int timeout)
         {
             if (timeout >= 3000)
             {

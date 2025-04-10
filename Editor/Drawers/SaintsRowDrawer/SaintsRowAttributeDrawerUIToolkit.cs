@@ -15,13 +15,12 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
     {
         protected override bool UseCreateFieldUIToolKit => true;
 
-        public const string SaintsRowClass = "saintsfield-saintsrow";
+        public const string SaintsRowClass = "saints-field--saintsrow";
 
-        public static VisualElement CreateElement(SerializedProperty property, string label, FieldInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
             VisualElement root;
             bool inline = saintsRowAttribute?.Inline ?? false;
-            // Debug.Log(inline);
             if (inline)
             {
                 root = new VisualElement
@@ -98,7 +97,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             return ele;
         }
 
-        private static void FillElement(VisualElement root, SerializedProperty property, FieldInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        private static void FillElement(VisualElement root, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
             object value = null;
             if (property.propertyType == SerializedPropertyType.ManagedReference)
@@ -113,6 +112,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             {
                 string error = "";
                 object parentValue = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                // Debug.Log($"parentValue={parentValue}/{property.propertyPath}");
                 if (parentValue == null)
                 {
                     error = $"Parent of {property.propertyPath} not found";
@@ -146,8 +146,8 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             // SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)attribute;
 
-             IReadOnlyList<ISaintsRenderer> renderer =
-                 SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, value);
+            IReadOnlyList<ISaintsRenderer> renderer =
+                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, value);
 
 //             // Debug.Log($"{renderer.Count}");
 //
@@ -174,7 +174,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                  VisualElement rendererElement = saintsRenderer.CreateVisualElement();
                  if (rendererElement != null)
                  {
-                     // Debug.Log($"add {saintsRenderer}: {rendererElement}");
+                     // Debug.Log($"add: {saintsRenderer}");
                      bodyElement.Add(rendererElement);
                  }
              }

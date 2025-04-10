@@ -4,7 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -298,6 +301,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             // Debug.Log(propKeysName);
 
             SerializedProperty keysProp = property.FindPropertyRelative(propKeysName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propKeysName);
+            Debug.Assert(keysProp != null, $"Failed to get keys prop from {propKeysName}");
             SerializedProperty valuesProp = property.FindPropertyRelative(propValuesName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesName);
 
             FieldInfo keysField = null;
@@ -313,6 +317,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 break;
             }
             Debug.Assert(keysField != null, $"Failed to get keys field from {property.propertyPath}");
+            Type keyType = ReflectUtils.GetElementType(keysField.FieldType);
+
             FieldInfo valuesField = null;
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
             foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(rawType))
@@ -326,6 +332,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 break;
             }
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
+            Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);
 
             IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
             totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
@@ -539,11 +546,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     int propIndex = itemIndexToPropertyIndex[elementIndex];
                     SerializedProperty elementProp = keysProp.GetArrayElementAtIndex(propIndex);
 
-                    if (!keyStructChecked)
-                    {
-                        keyStructChecked = true;
-                        keyStructNeedFlatten = GetNeedFlatten(elementProp, ReflectUtils.GetElementType(keysField.FieldType));
-                    }
+                    // if (!keyStructChecked)
+                    // {
+                    //     keyStructChecked = true;
+                    //     keyStructNeedFlatten = GetNeedFlatten(elementProp, ReflectUtils.GetElementType(keysField.FieldType));
+                    // }
 
                     elementProp.isExpanded = true;
                     element.Clear();
@@ -556,25 +563,28 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         },
                     };
                     element.Add(keyContainer);
-                    if (keyStructNeedFlatten)
-                    {
-                        foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
-                        {
-                            keyContainer.Add(new Label(childProp.displayName));
-                            PropertyField propertyField = new PropertyField(childProp, "");
-                            propertyField.Bind(property.serializedObject);
-                            keyContainer.Add(propertyField);
-                        }
-                    }
-                    else
-                    {
-                        PropertyField propertyField = new PropertyField(elementProp)
-                        {
-                            label = "",
-                        };
-                        propertyField.Bind(property.serializedObject);
-                        keyContainer.Add(propertyField);
-                    }
+
+                    VisualElement resultElement = CreateCellElement(keysField, keyType, elementProp, this, this);
+                    keyContainer.Add(resultElement);
+                    // if (keyStructNeedFlatten)
+                    // {
+                    //     foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
+                    //     {
+                    //         keyContainer.Add(new Label(childProp.displayName));
+                    //         PropertyField propertyField = new PropertyField(childProp, "");
+                    //         propertyField.Bind(property.serializedObject);
+                    //         keyContainer.Add(propertyField);
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     PropertyField propertyField = new PropertyField(elementProp)
+                    //     {
+                    //         label = "",
+                    //     };
+                    //     propertyField.Bind(property.serializedObject);
+                    //     keyContainer.Add(propertyField);
+                    // }
 
                     // propertyField.BindProperty(elementProp);
 
@@ -585,8 +595,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             return;
                         }
 
-                        (string curFieldError, int _, object curFieldVaue) = Util.GetValue(property, info, parent);
-                        // Debug.Log(curFieldVaue);
+                        (string curFieldError, int _, object curFieldValue) = Util.GetValue(property, info, parent);
+                        // Debug.Log(curFieldValue);
                         if (curFieldError != "")
                         {
 #if SAINTSFIELD_DEBUG
@@ -595,7 +605,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             return;
                         }
 
-                        IEnumerable allKeyList = keysField.GetValue(curFieldVaue) as IEnumerable;
+                        IEnumerable allKeyList = keysField.GetValue(curFieldValue) as IEnumerable;
                         Debug.Assert(allKeyList != null, $"key list {keysField.Name} is null");
                         (object value, int index)[] indexedValue = allKeyList.Cast<object>().WithIndex().ToArray();
                         object thisKey = indexedValue[propIndex].value;
@@ -678,39 +688,43 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     SerializedProperty elementProp = valuesProp.GetArrayElementAtIndex(itemIndexToPropertyIndex[elementIndex]);
                     elementProp.isExpanded = true;
 
-                    if (!valueStructChecked)
-                    {
-                        valueStructChecked = true;
-                        valueStructNeedFlatten = GetNeedFlatten(elementProp, ReflectUtils.GetElementType(valuesField.FieldType));
-                    }
+                    VisualElement resultElement = CreateCellElement(valuesField, valueType, elementProp, this, this);
 
-                    VisualElement valueContainer = new VisualElement
-                    {
-                        style =
-                        {
-                            marginRight = 3,
-                        },
-                    };
-                    element.Add(valueContainer);
-                    if (valueStructNeedFlatten)
-                    {
-                        foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
-                        {
-                            valueContainer.Add(new Label(childProp.displayName));
-                            PropertyField propertyField = new PropertyField(childProp)
-                            {
-                                label = "",
-                            };
-                            propertyField.Bind(property.serializedObject);
-                            valueContainer.Add(propertyField);
-                        }
-                    }
-                    else
-                    {
-                        PropertyField propertyField = new PropertyField(elementProp, "");
-                        propertyField.Bind(property.serializedObject);
-                        valueContainer.Add(propertyField);
-                    }
+                    element.Add(resultElement);
+
+                    // if (!valueStructChecked)
+                    // {
+                    //     valueStructChecked = true;
+                    //     valueStructNeedFlatten = GetNeedFlatten(elementProp, ReflectUtils.GetElementType(valuesField.FieldType));
+                    // }
+                    //
+                    // VisualElement valueContainer = new VisualElement
+                    // {
+                    //     style =
+                    //     {
+                    //         marginRight = 3,
+                    //     },
+                    // };
+                    // element.Add(valueContainer);
+                    // if (valueStructNeedFlatten)
+                    // {
+                    //     foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
+                    //     {
+                    //         valueContainer.Add(new Label(childProp.displayName));
+                    //         PropertyField propertyField = new PropertyField(childProp)
+                    //         {
+                    //             label = "",
+                    //         };
+                    //         propertyField.Bind(property.serializedObject);
+                    //         valueContainer.Add(propertyField);
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     PropertyField propertyField = new PropertyField(elementProp, "");
+                    //     propertyField.Bind(property.serializedObject);
+                    //     valueContainer.Add(propertyField);
+                    // }
                 },
             });
 
@@ -810,6 +824,126 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         // {
         //     return Enumerable.Range(0, property.arraySize).ToList();
         // }
+
+        private static VisualElement CreateCellElement(FieldInfo info, Type rawType, SerializedProperty serializedProperty, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        {
+            PropertyAttribute[] allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(info);
+
+            Type useDrawerType = null;
+            Attribute useAttribute = null;
+            IReadOnlyList<PropertyAttribute> appendPropertyAttributes = null;
+            bool isArray = serializedProperty.propertyType == SerializedPropertyType.Generic
+                && serializedProperty.isArray;
+            if(!isArray)
+            {
+                ISaintsAttribute saintsAttr = allAttributes
+                    .OfType<ISaintsAttribute>()
+                    .FirstOrDefault();
+
+                // Debug.Log(saintsAttr);
+
+                useAttribute = saintsAttr as Attribute;
+                if (saintsAttr != null)
+                {
+                    useDrawerType = GetFirstSaintsDrawerType(saintsAttr.GetType());
+                }
+                else
+                {
+                    (Attribute attrOrNull, Type drawerType) =
+                        GetFallbackDrawerType(info, serializedProperty);
+                    // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
+                    useAttribute = attrOrNull;
+                    useDrawerType = drawerType;
+
+                    if (useDrawerType == null &&
+                        serializedProperty.propertyType == SerializedPropertyType.Generic)
+                    {
+                        PropertyAttribute prop = new SaintsRowAttribute(inline: true);
+                        useAttribute = prop;
+                        useDrawerType = typeof(SaintsRowAttributeDrawer);
+                        appendPropertyAttributes = new[] { prop };
+                    }
+                }
+            }
+
+            // if (!isArray && useDrawerType == null)
+            // {
+            //     PropertyAttribute prop = new SaintsRowAttribute(inline: true);
+            //     useAttribute = prop;
+            //     useDrawerType = typeof(SaintsRowAttributeDrawer);
+            //     appendPropertyAttributes = new[] { prop };
+            // }
+
+            // Debug.Log($"{serializedProperty.propertyPath}/{useDrawerType}");
+
+            if (useDrawerType == null)
+            {
+                VisualElement r = UIToolkitUtils.CreateOrUpdateFieldFromProperty(
+                    serializedProperty,
+                    rawType,
+                    null,
+                    info,
+                    true,
+                    makeRenderer,
+                    doTweenPlayRecorder,
+                    null
+                );
+                return UIToolkitCache.MergeWithDec(r, allAttributes);
+            }
+
+            // Nah... This didn't handle for mis-ordered case
+            // // Above situation will handle all including SaintsRow for general class/struct/interface.
+            // // At this point we only need to let Unity handle it
+            // PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
+            // {
+            //     style =
+            //     {
+            //         flexGrow = 1,
+            //     },
+            //     name = FieldWithInfo.SerializedProperty.propertyPath,
+            // };
+            // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
+            // return (result, false);
+
+            // Debug.Log($"{useAttribute}/{useDrawerType}");
+
+            PropertyDrawer propertyDrawer = MakePropertyDrawer(useDrawerType, info, useAttribute, null);
+            // Debug.Log(saintsPropertyDrawer);
+            if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
+            {
+                saintsPropertyDrawer.InHorizontalLayout = true;
+                saintsPropertyDrawer.AppendPropertyAttributes = appendPropertyAttributes;
+            }
+
+            MethodInfo uiToolkitMethod = useDrawerType.GetMethod("CreatePropertyGUI");
+
+            // bool isSaintsDrawer = useDrawerType.IsSubclassOf(typeof(SaintsPropertyDrawer)) || useDrawerType == typeof(SaintsPropertyDrawer);
+
+            bool useImGui = uiToolkitMethod == null ||
+                            uiToolkitMethod.DeclaringType == typeof(PropertyDrawer);  // null: old Unity || did not override
+
+            // Debug.Log($"{useDrawerType}/{uiToolkitMethod.DeclaringType}/{FieldWithInfo.SerializedProperty.propertyPath}");
+
+            if (!useImGui)
+            {
+                // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}");
+                VisualElement r = propertyDrawer.CreatePropertyGUI(serializedProperty);
+                return UIToolkitCache.MergeWithDec(r, allAttributes);
+            }
+
+            // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
+            // We don't need to handle decorators either
+            PropertyField result = new PropertyField(serializedProperty)
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            result.Bind(serializedProperty.serializedObject);
+            return result;
+        }
+
         private static void ListSwapValue(IList<int> lis, int a, int b)
         {
             int aIndex = lis.IndexOf(a);

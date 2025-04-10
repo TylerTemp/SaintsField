@@ -52,6 +52,7 @@ namespace SaintsField.Editor.Core
         protected virtual bool UseCreateFieldUIToolKit => false;
 
         // public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
+        public IReadOnlyList<PropertyAttribute> AppendPropertyAttributes = null;
 
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
@@ -83,7 +84,10 @@ namespace SaintsField.Editor.Core
                 name = NameSaintsPropertyDrawerContainer(property),
             };
 
-            (PropertyAttribute[] allAttributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+            (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+            PropertyAttribute[] allAttributes = AppendPropertyAttributes == null
+                ? allAttributesRaw
+                : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
 
             ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
             // Debug.Assert(iSaintsAttributes.Length > 0, property.propertyPath);

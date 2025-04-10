@@ -19,5 +19,10 @@ namespace SaintsField.Editor.Playa.Renderer
         {
 
         }
+
+        public override string ToString()
+        {
+            return $"<SerializedBare {FieldWithInfo.SerializedProperty.propertyPath}/>";
+        }
     }
 }
