@@ -54,6 +54,8 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
         private static string NameMaskField(SerializedProperty property) => $"{property.propertyPath}__NavMeshAreaMask";
 
+        private IReadOnlyList<AiNavigationUtils.NavMeshArea> _oldData = new List<AiNavigationUtils.NavMeshArea>();
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
@@ -61,7 +63,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
         {
             MaskField maskField = new MaskField(GetPreferredLabel(property))
             {
-                userData = new List<AiNavigationUtils.NavMeshArea>(),
+                // userData = new List<AiNavigationUtils.NavMeshArea>(),
                 name = NameMaskField(property),
                 style =
                 {
@@ -69,7 +71,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 },
             };
             maskField.BindProperty(property);
-            maskField.AddToClassList("unity-base-field__aligned");
+            maskField.AddToClassList(MaskField.alignedFieldUssClassName);
             maskField.AddToClassList(ClassAllowDisable);
             return maskField;
         }
@@ -78,9 +80,11 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            container.Q<MaskField>(NameMaskField(property)).RegisterValueChangedCallback(evt =>
+            MaskField maskField = container.Q<MaskField>(NameMaskField(property));
+            maskField.RegisterValueChangedCallback(evt =>
             {
                 int value = evt.newValue;
+                property.serializedObject.ApplyModifiedProperties();
                 onValueChangedCallback.Invoke(value);
             });
         }
@@ -90,17 +94,19 @@ namespace SaintsField.Editor.Drawers.AiNavigation
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             MaskField maskField = container.Q<MaskField>(NameMaskField(property));
-            List<AiNavigationUtils.NavMeshArea> oldData = (List<AiNavigationUtils.NavMeshArea>)maskField.userData;
+            // List<AiNavigationUtils.NavMeshArea> oldData = (List<AiNavigationUtils.NavMeshArea>)maskField.userData;
 
             List<AiNavigationUtils.NavMeshArea> newData = AiNavigationUtils.GetNavMeshAreas().ToList();
-            if(newData.SequenceEqual(oldData) && maskField.value == property.intValue)
+            if(newData.SequenceEqual(_oldData) && maskField.value == property.intValue)
             {
                 return;
             }
 
+            _oldData = newData.ToArray();
+
             // Debug.Log("Reset");
 
-            maskField.userData = newData;
+            // maskField.userData = newData;
             maskField.choices = newData.Select(each => each.Name).ToList();
             // maskField.formatSelectedValueCallback = listItem => $"[{listItem}]";
             maskField.formatSelectedValueCallback =  maskField.formatListItemCallback = selected =>
@@ -109,7 +115,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
                 return $"{newData[i].Mask}: {newData[i].Name}";
             };
             // maskField.value = property.intValue;
-            maskField.SetValueWithoutNotify(property.intValue);
+            // maskField.SetValueWithoutNotify(property.intValue);
         }
 
         #endregion
