@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -39,6 +41,67 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             private string _error = "";
             protected override string Error => _error;
 
+            protected override IEnumerable<ItemInfo> FetchAllAssets()
+            {
+                IEnumerable<ItemInfo> r = base.FetchAllAssets();
+                return SplitEachTarget(r, _interfaceType);
+            }
+
+            protected override IEnumerable<ItemInfo> FetchAllSceneObject()
+            {
+                IEnumerable<ItemInfo> r = base.FetchAllSceneObject();
+                return SplitEachTarget(r, _interfaceType);
+            }
+
+            private IEnumerable<ItemInfo> SplitEachTarget(IEnumerable<ItemInfo> itemInfos, Type interfaceType)
+            {
+                foreach (ItemInfo itemInfo in itemInfos)
+                {
+                    if (itemInfo.Object is GameObject go)
+                    {
+                        Component[] comps = go.GetComponents<Component>();
+
+                        Dictionary<Type, List<Component>> typeToComponents = new Dictionary<Type, List<Component>>();
+
+                        foreach (Component component in comps.Where(each => each != null))
+                        {
+                            Type compType = component.GetType();
+                            if(interfaceType.IsInstanceOfType(component))
+                            {
+                                if (!typeToComponents.TryGetValue(compType, out List<Component> components))
+                                {
+                                    typeToComponents[compType] = components = new List<Component>();
+                                }
+
+                                components.Add(component);
+                            }
+                        }
+
+                        foreach (List<Component> components in typeToComponents.Values)
+                        {
+                            foreach ((Component component, int index) in components.WithIndex())
+                            {
+                                yield return new ItemInfo
+                                {
+                                    failedCount = itemInfo.failedCount,
+                                    GuiLabel = itemInfo.GuiLabel,
+                                    Icon = itemInfo.Icon,
+                                    InstanceID = component.GetInstanceID(),
+                                    Label = comps.Length == 1 ? component.name : $"{component.name} [{index}]",
+                                    Object = component,
+                                    preview = itemInfo.preview,
+                                };
+                            }
+                        }
+                    }
+                    else
+                    {
+                        yield return itemInfo;
+                    }
+                }
+            }
+
+
             protected override bool IsEqual(ItemInfo itemInfo, Object target)
             {
                 Object itemObject = itemInfo.Object;
@@ -62,7 +125,9 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
                 if(!FetchFilter(itemInfo))
                 {
-                    // Debug.LogError($"Selected object {obj} has no component {expectedType}");
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError($"Selected object {obj} has no component {expectedType}");
+#endif
                     _error = $"{itemInfo.Label} is invalid";
                     return;
                 }
