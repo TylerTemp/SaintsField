@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.3.2 ##
+
+1.  Fix `SaintsInterface` can not pick a component when there are multiple component matches [#199](https://github.com/TylerTemp/SaintsField/issues/199)
+2.  `ReferencePicker` now gives a more friendly error if it's been used on a wrong type
+
 ## 4.3.1 ##
 
 1.  Fix `SaintsEditor` can not find a correct typed drawer on first drawing after a domain reload

@@ -19,6 +19,8 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__Reference_Button";
         private static string NameLabel(SerializedProperty property) => $"{property.propertyPath}__Reference_Label";
 
+        private string _initError;
+
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
@@ -61,7 +63,16 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 },
             };
 
-            object curValue = property.managedReferenceValue;
+            object curValue;
+            try
+            {
+                curValue = property.managedReferenceValue;
+            }
+            catch (InvalidOperationException e)
+            {
+                _initError = e.Message;
+                return null;
+            }
             string labelName = curValue == null
                 ? ""
                 : curValue.GetType().Name;
@@ -100,10 +111,31 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             return button;
         }
 
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, FieldInfo info, object parent)
+        {
+            if (_initError is not null)
+            {
+                return new HelpBox(_initError, HelpBoxMessageType.Error)
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                };
+            }
+
+            return null;
+        }
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            if (_initError is not null)
+            {
+                return;
+            }
             Button button = container.Q<Button>(NameButton(property));
             VisualElement root = container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property));
             button.clicked += () =>
@@ -197,6 +229,11 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             int index,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
+            if (_initError is not null)
+            {
+                return;
+            }
+
             // Debug.Log(property.propertyPath);
             // var s = property.propertyPath;
 

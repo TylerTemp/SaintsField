@@ -1,4 +1,5 @@
 ﻿using System;
+using SaintsField.Samples.Scripts.Interface;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.ReferenceExamples
@@ -103,6 +104,8 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
         [ReadOnly]
         [SerializeReference, ReferencePicker]
         public IRefInterface myInterfaceDisabled = new ClassSub2();
+
+        [ReferencePicker] public SaintsObjInterface<InterfaceExample.Interface1> wrongType;
 #else
         [InfoBox("This feature is only available in Unity 2021.3 or newer.")]
         public string info;

@@ -1,7 +1,6 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -157,21 +156,27 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             {
                 FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
                 {
-                    if (fieldResult == null)
+                    // // Debug.Log(fieldResult);
+                    // if (fieldResult == null)
+                    // {
+                    //     valueProp.objectReferenceValue = null;
+                    //     valueProp.serializedObject.ApplyModifiedProperties();
+                    // }
+                    // else
+                    // {
+                    //     (bool match, Object result) =
+                    //         GetSerializedObject(fieldResult, valueType, interfaceType);
+                    //     // ReSharper disable once InvertIf
+                    //     if (match)
+                    //     {
+                    //         valueProp.objectReferenceValue = result;
+                    //         valueProp.serializedObject.ApplyModifiedProperties();
+                    //     }
+                    // }
+                    if(valueProp.objectReferenceValue != fieldResult)
                     {
-                        valueProp.objectReferenceValue = null;
+                        valueProp.objectReferenceValue = fieldResult;
                         valueProp.serializedObject.ApplyModifiedProperties();
-                    }
-                    else
-                    {
-                        (bool match, Object result) =
-                            GetSerializedObject(fieldResult, valueType, interfaceType);
-                        // ReSharper disable once InvertIf
-                        if (match)
-                        {
-                            valueProp.objectReferenceValue = result;
-                            valueProp.serializedObject.ApplyModifiedProperties();
-                        }
                     }
                 });
             };
@@ -184,18 +189,26 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                     return;
                 }
 
-                (bool match, Object result) =
-                    GetSerializedObject(v.changedProperty.objectReferenceValue, valueType, interfaceType);
-                if (match)
-                {
-                    propertyField.userData = v.changedProperty.objectReferenceValue = result;
-                }
-                else
-                {
-                    v.changedProperty.objectReferenceValue = (Object)propertyField.userData;
-                }
+                bool match = interfaceType.IsInstanceOfType(v.changedProperty.objectReferenceValue);
 
-                v.changedProperty.serializedObject.ApplyModifiedProperties();
+                // (bool match, Object result) =
+                //     GetSerializedObject(v.changedProperty.objectReferenceValue, valueType, interfaceType);
+                // ReSharper disable once InvertIf
+                if (!match)
+                {
+                    (bool findMatch, Object findResult) = GetSerializedObject(v.changedProperty.objectReferenceValue,
+                        valueType, interfaceType);
+                    if (findMatch)
+                    {
+                        v.changedProperty.objectReferenceValue = findResult;
+                    }
+                    else
+                    {
+                        v.changedProperty.objectReferenceValue = (Object)propertyField.userData;
+                    }
+
+                    v.changedProperty.serializedObject.ApplyModifiedProperties();
+                }
             });
 
             return saintsInterfaceField;

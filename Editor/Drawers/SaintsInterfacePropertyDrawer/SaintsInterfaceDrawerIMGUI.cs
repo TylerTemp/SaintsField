@@ -62,22 +62,10 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                     FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType,
                         fieldResult =>
                         {
-                            if (fieldResult == null)
+                            if(valueProp.objectReferenceValue != fieldResult)
                             {
-                                valueProp.objectReferenceValue = null;
+                                valueProp.objectReferenceValue = fieldResult;
                                 valueProp.serializedObject.ApplyModifiedProperties();
-                            }
-                            else
-                            {
-                                (bool match, Object result) =
-                                    GetSerializedObject(fieldResult, valueType, interfaceType);
-                                // Debug.Log($"match={match}, result={result}");
-                                // ReSharper disable once InvertIf
-                                if (match)
-                                {
-                                    valueProp.objectReferenceValue = result;
-                                    valueProp.serializedObject.ApplyModifiedProperties();
-                                }
                             }
                         });
                 }
@@ -91,13 +79,26 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                     if (changed.changed)
                     {
                         Object newValue = valueProp.objectReferenceValue;
-                        if (newValue != null)
+                        // if (newValue != null)
+                        // {
+                        //     (bool match, Object result) = GetSerializedObject(newValue, valueType, interfaceType);
+                        //     // Debug.Log($"newValue={newValue}, match={match}, result={result}");
+                        //     valueProp.objectReferenceValue = match
+                        //         ? result
+                        //         : oldValue;
+                        // }
+
+                        bool match = interfaceType.IsInstanceOfType(newValue);
+
+                        if (!match)
                         {
-                            (bool match, Object result) = GetSerializedObject(newValue, valueType, interfaceType);
-                            // Debug.Log($"newValue={newValue}, match={match}, result={result}");
-                            valueProp.objectReferenceValue = match
-                                ? result
+                            (bool findMatch, Object findResult) = GetSerializedObject(newValue,
+                                valueType, interfaceType);
+                            valueProp.objectReferenceValue = findMatch
+                                ? findResult
                                 : oldValue;
+
+                            valueProp.serializedObject.ApplyModifiedProperties();
                         }
                     }
                 }
