@@ -90,6 +90,7 @@ namespace: `SaintsField`
 
 1.  Fix `SaintsInterface` can not pick a component when there are multiple component matches [#199](https://github.com/TylerTemp/SaintsField/issues/199)
 2.  `ReferencePicker` now gives a more friendly error if it's been used on a wrong type
+3.  UI Toolkit: fix `ResizableTextArea` did not save the changes
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
