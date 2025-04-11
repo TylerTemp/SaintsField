@@ -88,8 +88,8 @@ namespace: `SaintsField`
 
 **4.3.1**
 
-1.  Fix `SaintsEditor` can not find a correct typed drawer on first drawing after a domain reload
-2.  `SaintsDictionary` now can use the new fallback system, which means if you have a struct/class typed key/value, you can use `Layout`, `Button` etc. in it without add a `SaintsRow` decorator
+1.  Fix `SaintsInterface` can not pick a component when there are multiple component matches [#199](https://github.com/TylerTemp/SaintsField/issues/199)
+2.  `ReferencePicker` now gives a more friendly error if it's been used on a wrong type
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

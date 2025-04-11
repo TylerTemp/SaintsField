@@ -12563,7 +12563,6 @@ Transform:
   - {fileID: 910818277}
   - {fileID: 1178603147}
   - {fileID: 1191493419}
-  - {fileID: 1490458621}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &867320294
@@ -19046,6 +19045,7 @@ Transform:
   - {fileID: 58910633}
   - {fileID: 1073998274}
   - {fileID: 499746668}
+  - {fileID: 1490458621}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1490458620
@@ -19061,7 +19061,7 @@ GameObject:
   - component: {fileID: 1490458623}
   - component: {fileID: 1490458622}
   m_Layer: 0
-  m_Name: InterfaceMultiple
+  m_Name: Issue199
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19075,12 +19075,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1490458620}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 867320293}
+  m_Father: {fileID: 1486592967}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1490458622
 MonoBehaviour:
@@ -20624,13 +20624,15 @@ MonoBehaviour:
     rid: -2
   myInterfaces: []
   myInterfaceDisabled:
-    rid: 650996164911169536
+    rid: 2194327499221762050
+  wrongType:
+    <V>k__BackingField: {fileID: 0}
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 650996164911169536
+    - rid: 2194327499221762050
       type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples,
         asm: today.comes.saintsfield.Samples}
       data:
