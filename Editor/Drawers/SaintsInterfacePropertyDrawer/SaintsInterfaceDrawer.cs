@@ -87,7 +87,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                                     GuiLabel = itemInfo.GuiLabel,
                                     Icon = itemInfo.Icon,
                                     InstanceID = component.GetInstanceID(),
-                                    Label = comps.Length == 1 ? component.name : $"{component.name} [{index}]",
+                                    Label = components.Count == 1 ? component.name : $"{component.name} [{index}]",
                                     Object = component,
                                     preview = itemInfo.preview,
                                 };
@@ -107,15 +107,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 Object itemObject = itemInfo.Object;
                 Debug.Assert(itemObject, itemObject);
 
-                int targetInstanceId = target.GetInstanceID();
-                if (itemInfo.InstanceID == targetInstanceId)
-                {
-                    return true;
-                }
-
-                Object itemToOriginTypeValue = Util.GetTypeFromObj(itemObject, _fieldType);
-
-                return itemToOriginTypeValue.GetInstanceID() == targetInstanceId;
+                return itemObject == target;
             }
 
             protected override void OnSelect(ItemInfo itemInfo)
@@ -126,7 +118,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 if(!FetchFilter(itemInfo))
                 {
 #if SAINTSFIELD_DEBUG
-                    Debug.LogError($"Selected object {obj} has no component {expectedType}");
+                    Debug.LogError($"Selected object {obj} has no component {_fieldType}/{_interfaceType}");
 #endif
                     _error = $"{itemInfo.Label} is invalid";
                     return;
@@ -144,7 +136,11 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 {
                     return true;
                 }
-                return GetSerializedObject(itemInfo.Object, _fieldType, _interfaceType).isMatch;
+
+                Type itemType = itemInfo.Object.GetType();
+
+                return _fieldType.IsAssignableFrom(itemType) && _interfaceType.IsAssignableFrom(itemType);
+                // return GetSerializedObject(itemInfo.Object, _fieldType, _interfaceType).isMatch;
             }
         }
 
