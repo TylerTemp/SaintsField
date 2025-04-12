@@ -432,7 +432,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                     Debug.Log("fallback field drawer");
 #endif
-                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, GetPreferredLabel(property), saintsPropertyDrawers);
+                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, GetPreferredLabel(property), saintsPropertyDrawers, parent);
                     fallback.AddToClassList(fallbackClass);
                     fieldContainer.Add(fallback);
                     // containerElement.visible = false;
@@ -607,7 +607,7 @@ namespace SaintsField.Editor.Core
         // }
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
+        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
 
@@ -617,7 +617,7 @@ namespace SaintsField.Editor.Core
                     ? ReflectUtils.GetElementType(info.FieldType)
                     : info.FieldType;
                 return UIToolkitUtils.CreateOrUpdateFieldFromProperty(property, rawType, passedPreferredLabel,
-                    info, InHorizontalLayout, this, this, null);
+                    info, InHorizontalLayout, this, this, null, parent);
             }
 
             PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);

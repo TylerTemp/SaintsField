@@ -337,7 +337,8 @@ namespace SaintsField.Editor.Utils
           bool inHorizontalLayout,
           IMakeRenderer makeRenderer,
           IDOTweenPlayRecorder doTweenPlayRecorder,
-          VisualElement originalField)
+          VisualElement originalField,
+          object parent)
         {
             SerializedPropertyType propertyType = property.propertyType;
             switch (propertyType)
@@ -432,7 +433,7 @@ namespace SaintsField.Editor.Utils
                     {
                         return null;
                     }
-                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout, null, makeRenderer, doTweenPlayRecorder);
+                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout, null, makeRenderer, doTweenPlayRecorder, parent);
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:

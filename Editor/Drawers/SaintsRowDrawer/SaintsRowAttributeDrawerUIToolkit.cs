@@ -1,11 +1,14 @@
 ﻿#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,10 +20,51 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
         public const string SaintsRowClass = "saints-field--saintsrow";
 
-        public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
-            VisualElement root;
+            // foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
+            // {
+            //     Debug.Log(subProp.propertyPath);
+            // }
+
             bool inline = saintsRowAttribute?.Inline ?? false;
+            if (!inline && property.propertyType == SerializedPropertyType.Generic)
+            {
+//                 bool hasSaintsProperty = false;
+//                 foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
+//                 {
+//                     (PropertyAttribute[] allAttributesRaw, object _) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(subProp);
+//                     // ReSharper disable once MergeIntoLogicalPattern
+//                     hasSaintsProperty = allAttributesRaw.Any(a => a is ISaintsAttribute || a is IPlayaAttribute);
+//                     if (hasSaintsProperty)
+//                     {
+//                         Debug.Log($"find saints property {subProp.propertyPath}: {string.Join<PropertyAttribute>(",", allAttributesRaw)}");
+//                     }
+//                 }
+//
+//                 if (!hasSaintsProperty)
+//                 {
+// #if SAINTSFIELD_DEBUG
+//                     Debug.LogWarning($"No saints for {property.propertyPath}, use fallback instead. See: https://github.com/TylerTemp/SaintsField/issues/200");
+// #endif
+// //                     // return new PropertyField(property);
+//                      return PropertyFieldFallbackUIToolkit(property);
+//                 }
+
+                (string getValueError, int _, object getValue) = Util.GetValue(property, info, parent);
+                if (getValueError == "" && getValue == null)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning($"Can not process this kind of data for {property.propertyPath}, use fallback instead. See: https://github.com/TylerTemp/SaintsField/issues/200");
+#endif
+                    // return new PropertyField(property);
+                    return PropertyFieldFallbackUIToolkit(property);
+
+                }
+            }
+
+            VisualElement root;
+
             if (inline)
             {
                 root = new VisualElement
@@ -67,7 +111,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         // ReSharper disable once InvertIf
                         if (curId != property.managedReferenceId)
                         {
-                            // Debug.Log($"Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
+                            Debug.Log($"{property.propertyPath} Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
                             root.userData = property.managedReferenceId;
                             root.Clear();
 
@@ -87,7 +131,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         {
             SaintsRowAttribute saintsRowAttribute = saintsAttribute as SaintsRowAttribute;
 
-            VisualElement ele = CreateElement(property, property.displayName, info, InHorizontalLayout, saintsRowAttribute, this, this);
+            VisualElement ele = CreateElement(property, property.displayName, info, InHorizontalLayout, saintsRowAttribute, this, this, parent);
             //
             // if (InHorizentalLayout)
             // {
@@ -96,6 +140,13 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             return ele;
         }
+
+        // private static Type GetMemberType(MemberInfo member)
+        // {
+        //     return member.MemberType == MemberTypes.Property
+        //         ? ((PropertyInfo) member).PropertyType
+        //         : ((FieldInfo) member).FieldType;
+        // }
 
         private static void FillElement(VisualElement root, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
@@ -127,6 +178,48 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     else
                     {
                         value = getValue;
+
+                        // Debug.Log(value);
+                        if (value == null)
+                        {
+                            // foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
+                            // {
+                            //     // switch (subProp.)
+                            //     // {
+                            //     //
+                            //     // }
+                            // }
+
+                            // var p = new PropertyField(property);
+                            // root.Add(p);
+                            // return;
+
+                            // Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                            //     ? ReflectUtils.GetElementType(GetMemberType(info))
+                            //     : GetMemberType(info);
+                            //
+                            // // Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
+                            // // value = Activator.CreateInstance(rawType, true);
+                            // // Util.SignPropertyValue(property, info, parent, value);
+                            //
+                            // property.boxedValue = value = Activator.CreateInstance(rawType, true);
+                            // property.serializedObject.ApplyModifiedProperties();
+
+                            // return;
+                        }
+
+
+
+                        // if (value == null)
+                        // {
+                        //     Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                        //         ? ReflectUtils.GetElementType(GetMemberType(info))
+                        //         : GetMemberType(info);
+                        //
+                        //     Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
+                        //     value = Activator.CreateInstance(rawType, true);
+                        //     Util.SignPropertyValue(property, info, parent, value);
+                        // }
                     }
                 }
 

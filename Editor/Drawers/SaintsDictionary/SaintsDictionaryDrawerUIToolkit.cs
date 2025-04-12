@@ -564,7 +564,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     };
                     element.Add(keyContainer);
 
-                    VisualElement resultElement = CreateCellElement(keysField, keyType, elementProp, this, this);
+                    VisualElement resultElement = CreateCellElement(keysField, keyType, elementProp, this, this, parent);
                     keyContainer.Add(resultElement);
                     // if (keyStructNeedFlatten)
                     // {
@@ -688,7 +688,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     SerializedProperty elementProp = valuesProp.GetArrayElementAtIndex(itemIndexToPropertyIndex[elementIndex]);
                     elementProp.isExpanded = true;
 
-                    VisualElement resultElement = CreateCellElement(valuesField, valueType, elementProp, this, this);
+                    VisualElement resultElement = CreateCellElement(valuesField, valueType, elementProp, this, this, parent);
 
                     element.Add(resultElement);
 
@@ -825,7 +825,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         //     return Enumerable.Range(0, property.arraySize).ToList();
         // }
 
-        private static VisualElement CreateCellElement(FieldInfo info, Type rawType, SerializedProperty serializedProperty, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        private static VisualElement CreateCellElement(FieldInfo info, Type rawType, SerializedProperty serializedProperty, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
             PropertyAttribute[] allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(info);
 
@@ -886,7 +886,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     true,
                     makeRenderer,
                     doTweenPlayRecorder,
-                    null
+                    null,
+                    parent
                 );
                 return UIToolkitCache.MergeWithDec(r, allAttributes);
             }

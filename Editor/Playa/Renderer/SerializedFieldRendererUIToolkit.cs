@@ -110,7 +110,8 @@ namespace SaintsField.Editor.Playa.Renderer
                     InAnyHorizontalLayout,
                     this,
                     this,
-                    null
+                    null,
+                    FieldWithInfo.Target
                 );
                 return (UIToolkitCache.MergeWithDec(r, allAttributes), false);
             }
