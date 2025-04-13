@@ -92,6 +92,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
 
-        public override string ToString() => $"Ser<{FieldWithInfo.FieldInfo?.Name ?? FieldWithInfo.SerializedProperty.displayName}>";
+        public override string ToString()
+        {
+            string propPath;
+            try
+            {
+                propPath = FieldWithInfo.SerializedProperty.propertyPath;
+            }
+            catch (NullReferenceException)
+            {
+                propPath = FieldWithInfo.FieldInfo?.Name ?? "?";
+            }
+            catch (ObjectDisposedException)
+            {
+                propPath = FieldWithInfo.FieldInfo?.Name ?? "?";
+            }
+            return $"Ser<{propPath}>";
+        }
     }
 }

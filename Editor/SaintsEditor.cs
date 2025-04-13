@@ -419,83 +419,6 @@ namespace SaintsField.Editor
             return group;
         }
 
-//         private static IEnumerable<(string absGroupBy, ISaintsRenderer saintsRenderer)> HelperFlattenRendererGroupInfoIntoRenderers(IReadOnlyList<RendererGroupInfo> chainedGroups, SerializedObject serializedObject, IMakeRenderer makeRenderer, object target)
-//         {
-//             foreach (RendererGroupInfo rendererGroupInfo in chainedGroups)
-//             {
-//                 Debug.Log($"Flatten processing `{rendererGroupInfo.AbsGroupBy}/{rendererGroupInfo.AbsGroupBy == null}`");
-//
-//                 bool isEndNode = rendererGroupInfo.AbsGroupBy == null && rendererGroupInfo.Children.Count == 0;
-//
-//                 if (isEndNode)
-//                 {
-//                     foreach (RendererGroupInfo chainedGroup in chainedGroups)
-//                     {
-//                         if(chainedGroup.Renderer != null)
-//                         {
-//                             Debug.Log($"Flatten normal field {chainedGroup.Renderer}");
-//                             yield return ("", chainedGroup.Renderer);
-//                         }
-//                     }
-//
-// //                     foreach (RendererGroupInfo result in chainedGroups)
-// //                     {
-// //                         if(result != null)
-// //                         {
-// // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-// //                             if(rendererGroupInfo.FieldWithInfo.MethodInfo == null)
-// //                             {
-// //                                 Debug.Log($"Flatten EndNode return {result}");
-// //                             }
-// // #endif
-// //                             yield return ("", result);
-// //                         }
-// //                     }
-//
-//                 }
-//                 else
-//                 {
-//                     (string absGroupBy, ISaintsRenderer saintsRenderer)[] children = HelperFlattenRendererGroupInfoIntoRenderers(rendererGroupInfo.Children, serializedObject, makeRenderer, target).ToArray();
-//                     if (children.Length > 0)
-//                     {
-//                         string curGroupAbs = rendererGroupInfo.AbsGroupBy;
-//
-//                         ISaintsRendererGroup group =
-// #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-//                             rendererGroupInfo.Config.IsDoTween
-//                                 // ReSharper disable once RedundantCast
-//                                 ? (ISaintsRendererGroup)new DOTweenPlayGroup(target)
-//                                 : new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config, target)
-// #else
-//                             new SaintsRendererGroup(curGroupAbs, rendererGroupInfo.Config, target)
-// #endif
-//                         ;
-//
-//                         foreach ((string eachChildGroupBy, ISaintsRenderer eachChild) in children)
-//                         {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                             Debug.Log($"Flatten {group} add renderer {eachChild}");
-// #endif
-//
-//                             group.Add(eachChildGroupBy, eachChild);
-//                         }
-//
-// // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                         Debug.Log($"Flatten {group} return with {children.Length} children");
-// // #endif
-//
-//                         yield return (rendererGroupInfo.AbsGroupBy, group);
-//                     }
-// // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                     else
-//                     {
-//                         Debug.Log($"Flatten {rendererGroupInfo.AbsGroupBy} empty children, skip");
-//                     }
-// // #endif
-//                 }
-//             }
-//         }
-
         private class RendererGroupInfo {
             public string AbsGroupBy;  // ""=normal fields, other=grouped fields
             public List<RendererGroupInfo> Children;
@@ -714,9 +637,9 @@ namespace SaintsField.Editor
                             AbsRenderer renderer = rendererInfo.Renderer;
                             if (renderer != null)
                             {
-                                bool isMethod = saintsFieldWithInfo.MethodInfo != null;
-                                bool hasNoPlaya = saintsFieldWithInfo.PlayaAttributes.Count == 0;
-                                bool shouldDraw = !(isMethod && hasNoPlaya);
+                                // bool isMethod = saintsFieldWithInfo.MethodInfo != null;
+                                // bool hasNoPlaya = saintsFieldWithInfo.PlayaAttributes.Count == 0;
+                                bool shouldDraw = SaintsFieldInfoShouldDraw(saintsFieldWithInfo);
                                 if(shouldDraw)
                                 {
                                     // Debug.Log($"default item {renderer}/{rendererInfo.Playa}");
@@ -755,230 +678,19 @@ namespace SaintsField.Editor
                     keepGroupingInfo = null;
                     preAbsGroupBy = null;
                 }
-
-//                 if (lastGroupInfo == null && keepGroupingInfo != null)
-//                 {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                     Debug.Log($"Layout lastGroupInfo set to keepGrouping: {keepGroupingInfo.AbsGroupBy}");
-// #endif
-//                     lastGroupInfo = keepGroupingInfo;
-//                 }
-//
-//                 if (lastGroupInfo != null)
-//                 {
-//                     Debug.Log($"Add `{lastGroupInfo.AbsGroupBy}` to final list");
-//                     rendererGroupInfos.Add(lastGroupInfo);
-//                 }
-
-
-//                 if (layouts.Count > 0)
-//                 {
-//                     string preAbsGroupBy = null;
-//                     List<ISaintsLayoutToggle> layoutToggles = new List<ISaintsLayoutToggle>();
-//
-//                     foreach (ISaintsLayoutBase layoutBase in layoutBases)
-//                     {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                         Debug.Log($"Layout processing {layoutBase}");
-// #endif
-//
-//                         switch (layoutBase)
-//                         {
-//                             case ISaintsLayoutToggle layoutToggle:
-//                                 layoutToggles.Add(layoutToggle);
-//                                 break;
-//                             case LayoutEndAttribute layoutEndAttribute:
-//                             {
-//                                 // does not work with toggles, just clear it
-//                                 if(layoutToggles.Count > 0)
-//                                 {
-//                                     Debug.LogWarning($"layout toggles does not work with LayoutEnd. Please adjust the order of the attributes. ({string.Join(", ", layoutToggles)})");
-//                                     layoutToggles.Clear();
-//                                 }
-//
-//                                 string endGroupBy = layoutEndAttribute.LayoutBy;
-//                                 if (endGroupBy == null)
-//                                 {
-//                                     keepGroupingInfo = null;
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                                     Debug.Log($"Layout close null");
-// #endif
-//                                 }
-//                                 else if (keepGroupingInfo == null)
-//                                 {
-//                                     // do nothing. End a layout when it's not in a layout is meaningless
-//
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                                     Debug.Log($"Layout close with no scoop inside");
-// #endif
-//                                 }
-//                                 else
-//                                 {
-//                                     if (endGroupBy.StartsWith("."))
-//                                     {
-//                                         string closeGroup = JoinGroupBy(keepGroupingInfo.AbsGroupBy, endGroupBy);
-//                                         if(closeGroup.Contains('/'))
-//                                         {
-//                                             List<string> splitCloseGroup = closeGroup.Split('/').ToList();
-//                                             splitCloseGroup.RemoveAt(splitCloseGroup.Count - 1);
-//                                             string openGroupTo = string.Join("/", splitCloseGroup);
-//                                             if (!rootToRendererGroupInfo.TryGetValue(openGroupTo,
-//                                                     out RendererGroupInfo info))
-//                                             {
-//                                                 rootToRendererGroupInfo[openGroupTo] = info = new RendererGroupInfo
-//                                                 {
-//                                                     AbsGroupBy = openGroupTo,
-//                                                     Children = new List<RendererGroupInfo>(),
-//                                                     Config = new SaintsRendererGroup.Config(),
-//                                                 };
-//                                             }
-//
-//                                             keepGroupingInfo = info.Config.KeepGrouping ? info : null;
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                                             Debug.Log($"Layout close, {closeGroup}->{openGroupTo}: {keepGroupingInfo?.AbsGroupBy}");
-// #endif
-//                                         }
-//                                         else
-//                                         {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                                             Debug.Log($"Layout close, {closeGroup}: null");
-// #endif
-//                                             keepGroupingInfo = null;
-//                                         }
-//                                     }
-//                                     else
-//                                     {
-//                                         string parentGroupBy;
-//                                         if (endGroupBy.Contains('/'))
-//                                         {
-//                                             List<string> endGroupBySplit = endGroupBy.Split('/').ToList();
-//                                             endGroupBySplit.RemoveAt(endGroupBySplit.Count - 1);
-//                                             parentGroupBy = string.Join("/", endGroupBySplit);
-//                                         }
-//                                         else
-//                                         {
-//                                             parentGroupBy = "";
-//                                         }
-//                                         if (parentGroupBy != "" && rootToRendererGroupInfo.TryGetValue(parentGroupBy,
-//                                                 out RendererGroupInfo info))
-//                                         {
-//                                             keepGroupingInfo = info.Config.KeepGrouping
-//                                                 ? info
-//                                                 : null;
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                                             Debug.Log($"Layout close, {endGroupBy}->{parentGroupBy}: {keepGroupingInfo?.AbsGroupBy}");
-// #endif
-//                                         }
-//                                         else
-//                                         {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                                             Debug.Log($"Layout close, {endGroupBy}: null");
-// #endif
-//                                             keepGroupingInfo = null;
-//                                         }
-//                                     }
-//                                 }
-//                             }
-//                                 break;
-//
-//                             case ISaintsLayout saintsGroup:
-//                             {
-//                                 string groupBy = saintsGroup.LayoutBy;
-//                                 if (groupBy.StartsWith("."))
-//                                 {
-//                                     string preGroupBy = keepGroupingInfo?.AbsGroupBy ?? preAbsGroupBy;
-//                                     if(preGroupBy != null)
-//                                     {
-//                                         groupBy = JoinGroupBy(preGroupBy, groupBy);
-//                                     }
-//                                 }
-//                                 preAbsGroupBy = groupBy;
-//                                 // Debug.Log($"{saintsGroup}: {groupBy}({saintsGroup.LayoutBy})");
-//
-//                                 (bool newRoot, RendererGroupInfo targetGroup) = GetOrCreateGroupInfo(rootToRendererGroupInfo, groupBy);
-//                                 if (newRoot)
-//                                 {
-//                                     rendererGroupInfos.Add(targetGroup);
-//                                 }
-//                                 lastGroupInfo = targetGroup;
-//
-//                                 SaintsRendererGroup.Config newConfig = new SaintsRendererGroup.Config
-//                                 {
-//                                     ELayout = saintsGroup.Layout,
-//                                     IsDoTween = saintsGroup is DOTweenPlayAttribute,
-//                                     MarginTop = saintsGroup.MarginTop,
-//                                     MarginBottom = saintsGroup.MarginBottom,
-//                                 };
-//                                 SaintsRendererGroup.Config oldConfig = targetGroup.Config;
-//                                 targetGroup.Config = new SaintsRendererGroup.Config
-//                                 {
-//                                     ELayout = newConfig.ELayout == 0? oldConfig.ELayout: newConfig.ELayout,
-//                                     IsDoTween = oldConfig.IsDoTween || newConfig.IsDoTween,
-//                                     MarginTop = newConfig.MarginTop >= 0? newConfig.MarginTop: oldConfig.MarginTop,
-//                                     MarginBottom = newConfig.MarginBottom >= 0? newConfig.MarginBottom: oldConfig.MarginBottom,
-//                                     KeepGrouping = saintsGroup.KeepGrouping,
-//                                     Toggles = (oldConfig?.Toggles ?? Array.Empty<ISaintsLayoutToggle>()).Concat(layoutToggles).ToArray(),
-//                                 };
-//                                 layoutToggles.Clear();
-//
-//                                 if (targetGroup.Config.KeepGrouping)
-//                                 {
-//                                     keepGroupingInfo = targetGroup;
-//                                 }
-//                                 else if (keepGroupingInfo != null &&
-//                                          targetGroup.AbsGroupBy != keepGroupingInfo.AbsGroupBy)
-//                                 {
-//                                     keepGroupingInfo = null;
-//                                 }
-//
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                                 Debug.Log($"Layout item {groupBy}, newRoot={newRoot}, eLayout={targetGroup.Config.ELayout}, keepGroupingInfo={keepGroupingInfo?.AbsGroupBy}");
-// #endif
-//                             }
-//                                 break;
-//                         }
-//                     }
-//                 }
-//
-//                 RendererGroupInfo endNode = new RendererGroupInfo
-//                 {
-//                     AbsGroupBy = "",
-//                     Children = new List<RendererGroupInfo>(),
-//                     Config = new SaintsRendererGroup.Config(),
-//                     FieldWithInfo = saintsFieldWithInfo,
-//                 };
-//
-//                 if (lastGroupInfo == null && keepGroupingInfo != null)
-//                 {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                     Debug.Log($"Layout lastGroupInfo set to keepGrouping: {keepGroupingInfo.AbsGroupBy}");
-// #endif
-//                     lastGroupInfo = keepGroupingInfo;
-//                 }
-//
-//                 if (lastGroupInfo == null)
-//                 {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                     Debug.Log($"Layout add direct: {saintsFieldWithInfo.FieldInfo?.Name ?? saintsFieldWithInfo.PropertyInfo?.Name ?? saintsFieldWithInfo.MethodInfo?.Name}");
-// #endif
-//                     rendererGroupInfos.Add(endNode);
-//                 }
-//                 else
-//                 {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-//                     Debug.Log($"Layout add field under {lastGroupInfo.AbsGroupBy}: {saintsFieldWithInfo.FieldInfo?.Name ?? saintsFieldWithInfo.PropertyInfo?.Name ?? saintsFieldWithInfo.MethodInfo?.Name}");
-// #endif
-//                     lastGroupInfo.Children.Add(endNode);
-//                     // if (!lastGroupInfo.AbsGroupBy.Contains('/') && !rendererGroupInfos.Contains(lastGroupInfo))
-//                     // {
-//                     //     rendererGroupInfos.Add(lastGroupInfo);
-//                     // }
-//                 }
             }
 
             // Debug.Log($"return rendererGroupInfos {rendererGroupInfos.Count}");
 
             return rendererGroupInfos;
+        }
+
+        public static bool SaintsFieldInfoShouldDraw(SaintsFieldWithInfo saintsFieldWithInfo)
+        {
+            bool isMethod = saintsFieldWithInfo.MethodInfo != null;
+            bool hasNoPlaya = saintsFieldWithInfo.PlayaAttributes.Count == 0;
+            bool shouldDraw = !(isMethod && hasNoPlaya);
+            return shouldDraw;
         }
 
         private readonly struct SaintsFieldWithRenderer

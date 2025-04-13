@@ -4,9 +4,9 @@ using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.TableExampleS
 {
-    public class TableExampleGeneric : SaintsMonoBehaviour
+    public class TableExampleGeneral : SaintsMonoBehaviour
     {
         [Serializable]
         public struct MyStruct

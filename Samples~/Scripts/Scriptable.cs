@@ -1,4 +1,5 @@
 using System;
+using SaintsField.Playa;
 using SaintsField.Samples.Scripts.Interface;
 using UnityEngine;
 
@@ -37,5 +38,11 @@ namespace SaintsField.Samples.Scripts
 
         [field: SerializeField]
         public int MyInt { get; set; }
+
+        [TableColumn("Buttons")]
+        [Button] private void B1() { }
+
+        [TableColumn("Buttons")]
+        [Button] private void B2() { }
     }
 }

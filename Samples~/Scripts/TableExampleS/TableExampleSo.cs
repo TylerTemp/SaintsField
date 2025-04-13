@@ -1,12 +1,12 @@
 using System;
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 using UnityEngine;
+#if UNITY_EDITOR
+#endif
 
-namespace SaintsField.Samples.Scripts
+namespace SaintsField.Samples.Scripts.TableExampleS
 {
     public class TableExampleSo : SaintsMonoBehaviour
     {

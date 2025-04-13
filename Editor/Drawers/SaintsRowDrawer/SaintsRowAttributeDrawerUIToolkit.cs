@@ -20,9 +20,29 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
         public const string SaintsRowClass = "saints-field--saintsrow";
 
+        public class ForceInlineScoop : IDisposable
+        {
+            public static bool Inline;
+
+            public ForceInlineScoop(bool inline)
+            {
+                Inline = inline;
+            }
+
+            public void Dispose()
+            {
+                Inline = false;
+            }
+        }
+
         public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
             bool inline = saintsRowAttribute?.Inline ?? false;
+
+            if (!inline)
+            {
+                inline = ForceInlineScoop.Inline;
+            }
 
             VisualElement root;
 

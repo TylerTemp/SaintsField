@@ -7,8 +7,8 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class TableColumnAttribute: PropertyAttribute, ISaintsAttribute
+    // [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+    public class TableColumnAttribute: Attribute, ISaintsAttribute, IPlayaAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "__LABEL_FIELD__";
