@@ -149,20 +149,23 @@ namespace SaintsField.Editor.Core
             // 1. we need to swap RichLabel to AboveRichLabel, if it has content
             // 2. otherwise (NoLabel), we no longer added a `NoLabel` to it
 
-            bool needAboveProcesser = InHorizontalLayout;
-            if (needAboveProcesser)
+            bool needAboveProcessor = InHorizontalLayout;
+            if (needAboveProcessor)
             {
                 if (GetType() == typeof(SaintsRowAttributeDrawer))
                 {
-                    needAboveProcesser = false;
+                    needAboveProcessor = false;
                 }
-                else if (saintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer))
+                else if (saintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer
+                                                           || each.Attribute is NoLabelAttribute
+                                                           || (each.Attribute is RichLabelAttribute rl &&
+                                                               string.IsNullOrEmpty(rl.RichTextXml))))
                 {
-                    needAboveProcesser = false;
+                    needAboveProcessor = false;
                 }
                 else if (property.propertyType == SerializedPropertyType.Boolean && saintsPropertyDrawers.All(each => each.Attribute.AttributeType != SaintsAttributeType.Field) && saintsPropertyDrawers.All(each => each.Drawer is not LeftToggleAttributeDrawer))
                 {
-                    needAboveProcesser = false;
+                    needAboveProcessor = false;
                     LeftToggleAttribute leftToggleAttribute =
                         new LeftToggleAttribute();
 
@@ -179,7 +182,7 @@ namespace SaintsField.Editor.Core
                 }
             }
 
-            if(needAboveProcesser)
+            if(needAboveProcessor)
             {
                 bool alreadyHasRichLabel = false;
                 bool alreadyHasNoLabel = false;

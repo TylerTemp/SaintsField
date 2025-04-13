@@ -45,6 +45,8 @@ namespace SaintsField.Samples.Scripts.TableExampleS
             [TableColumn("Buttons")]
             [Button("Cancel")]
             public void BtnCancel() {}
+
+            [ShowInInspector] private int _showI;
         }
 
         [Table, DefaultExpand]

@@ -15,11 +15,11 @@ namespace SaintsField.Samples.Scripts
 
         [Range(0, 100)] public int normalRange;
 
-        [TableColumn("Basic!"), AboveRichLabel]
+        [TableColumn("Basic!")]
         public int publicValue;
 
-        [NoLabel]
         [TableColumn("Basic!")]
+        [NoLabel]
         public string noLabel;
 
         [Serializable]
@@ -44,5 +44,7 @@ namespace SaintsField.Samples.Scripts
 
         [TableColumn("Buttons")]
         [Button] private void B2() { }
+
+        [ShowInInspector] private int _showI;
     }
 }

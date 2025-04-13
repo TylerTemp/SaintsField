@@ -86,9 +86,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.3.3**
+**4.4.0**
 
-UI Toolkit: Some unity built-in class type has some very weird behavior. Fallback to default drawing flow instead [#200](https://github.com/TylerTemp/SaintsField/issues/200)
+1.  UI Toolkit: `Table` now support showing `Button` & `ShowInInspector`. (Note: Any kind of `Layout` will be ignored)
+2.  UI Toolkit: Fix `NoLabel` didn't work when inside a horizontal layout
+3.  UI Toolkit: Fix `Table` foldout out of area. If a struct is a field, that field will remove the `foldout`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1416,6 +1418,8 @@ Show a list/array of class/struct/`ScriptableObject`(or `MonoBehavior` if you li
 
 It allows to resize the rows, hide rows.
 
+UI Toolkit: `Button`, `ShowInInspector` & `Playa*` will work as expected, and `Layout` will be ignored. 
+
 Note:
 1.  It's highly recommended to enable `SaintsEditor`, otherwise the outside `list` will always be visible with some empty rows.
 2.  for UI Toolkit user: it requires Unity 2022.2+, otherwise it'll fall back to IMGUI.
@@ -1468,6 +1472,34 @@ public List<MyStruct> myStructs;
 ```
 
 ![image](https://github.com/user-attachments/assets/53a20670-c281-49e1-a034-c11d96d270bc)
+
+For UI Toolkit, You can also use `Button`, `ShowInInspector` etc.:
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+
+[Serializable]
+public struct MyValueStruct
+{
+    // ...
+
+    [TableColumn("Buttons")]
+    [Button("Ok")]
+    public void BtnOk() {}
+
+    [TableColumn("Buttons")]
+    [Button("Cancel")]
+    public void BtnCancel() {}
+
+    [ShowInInspector] private int _showI;
+}
+
+[Table, DefaultExpand]
+public MyValueStruct[] myStructs;
+```
+
+![image](https://github.com/user-attachments/assets/01190ea1-97b7-4654-84ea-1ca4388739a9)
 
 #### `ShowInInspector` ####
 
