@@ -1217,7 +1217,18 @@ namespace SaintsField.Editor.Core
         {
             // Wait... it works now?
             (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
-            if (attributeDrawerType == null)  // not attribute drawer, use type drawer
+
+            if(attributeDrawerType != null)
+            {
+                PropertyDrawer propertyDrawerInstance =
+                    MakePropertyDrawer(attributeDrawerType, fieldInfo, attributeInstance, preferredLabel);
+                if (propertyDrawerInstance != null)
+                {
+                    propertyDrawerInstance.OnGUI(position, property, label);
+                    return;
+                }
+            }
+            else  // not attribute drawer, use type drawer
             {
                 Type drawerType = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(fieldInfo.FieldType) : fieldInfo.FieldType);
                 if (drawerType != null)
@@ -1231,14 +1242,6 @@ namespace SaintsField.Editor.Core
                         return;
                     }
                 }
-            }
-
-
-            PropertyDrawer propertyDrawerInstance = MakePropertyDrawer(attributeDrawerType, fieldInfo, attributeInstance, preferredLabel);
-            if (propertyDrawerInstance != null)
-            {
-                propertyDrawerInstance.OnGUI(position, property, label);
-                return;
             }
 
             InsideSaintsFieldScoop.PropertyKey key = InsideSaintsFieldScoop.MakeKey(property);

@@ -554,7 +554,8 @@ namespace SaintsField.Editor.Core
 #pragma warning restore CS0168 // Variable is declared but never used
             {
 #if SAINTSFIELD_DEBUG
-                Debug.LogError(e);
+                Debug.LogWarning(foundDrawer);
+                Debug.LogException(e);
 #endif
                 return null;
             }
