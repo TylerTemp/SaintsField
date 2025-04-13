@@ -1,5 +1,8 @@
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue200
 {
@@ -21,7 +24,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue200
             public Sub1 sub1;
         }
 
-        [BelowInfoBox("$" + nameof(D))] public string debugHolder;
+        [BelowInfoBox("$" + nameof(D)), PostFieldButton(nameof(R))] public string debugHolder;
 
         // [SaintsRow]
         public MainC mainC;
@@ -38,6 +41,15 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue200
             $"ro2 is null? {roUnity == null}\n" +
             $"ro2S is null? {ro2SaintsFieldDraw == null}\n" +
             $"ro2F is null? {ro2SaintsFallback == null}";
+        }
+
+        private void R()
+        {
+#if UNITY_EDITOR
+            GameObject go = gameObject;
+            Undo.DestroyObjectImmediate(this);
+            Undo.AddComponent<Issue200Se>(go);
+#endif
         }
 
     }

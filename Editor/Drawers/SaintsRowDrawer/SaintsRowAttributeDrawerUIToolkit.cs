@@ -22,46 +22,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
         public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
-            // foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
-            // {
-            //     Debug.Log(subProp.propertyPath);
-            // }
-
             bool inline = saintsRowAttribute?.Inline ?? false;
-            if (!inline && property.propertyType == SerializedPropertyType.Generic)
-            {
-//                 bool hasSaintsProperty = false;
-//                 foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
-//                 {
-//                     (PropertyAttribute[] allAttributesRaw, object _) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(subProp);
-//                     // ReSharper disable once MergeIntoLogicalPattern
-//                     hasSaintsProperty = allAttributesRaw.Any(a => a is ISaintsAttribute || a is IPlayaAttribute);
-//                     if (hasSaintsProperty)
-//                     {
-//                         Debug.Log($"find saints property {subProp.propertyPath}: {string.Join<PropertyAttribute>(",", allAttributesRaw)}");
-//                     }
-//                 }
-//
-//                 if (!hasSaintsProperty)
-//                 {
-// #if SAINTSFIELD_DEBUG
-//                     Debug.LogWarning($"No saints for {property.propertyPath}, use fallback instead. See: https://github.com/TylerTemp/SaintsField/issues/200");
-// #endif
-// //                     // return new PropertyField(property);
-//                      return PropertyFieldFallbackUIToolkit(property);
-//                 }
-
-                (string getValueError, int _, object getValue) = Util.GetValue(property, info, parent);
-                if (getValueError == "" && getValue == null)
-                {
-#if SAINTSFIELD_DEBUG
-                    Debug.LogWarning($"Can not process this kind of data for {property.propertyPath}, use fallback instead. See: https://github.com/TylerTemp/SaintsField/issues/200");
-#endif
-                    // return new PropertyField(property);
-                    return PropertyFieldFallbackUIToolkit(property);
-
-                }
-            }
 
             VisualElement root;
 
@@ -232,7 +193,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 // value = getValue;
             }
 
-            Debug.Assert(value != null);
+            // Debug.Assert(value != null);
 
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
                 .ToDictionary(each => each.name, each => each.property);

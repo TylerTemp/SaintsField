@@ -93,185 +93,207 @@ namespace SaintsField.Editor
             object target)
         {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
-            List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            types.Reverse();
+
 
             // Dictionary<string, SerializedProperty> pendingSerializedProperties = new Dictionary<string, SerializedProperty>(serializedPropertyDict);
             Dictionary<string, SerializedProperty> pendingSerializedProperties = serializedPropertyDict.ToDictionary(each => each.Key, each => each.Value);
             pendingSerializedProperties.Remove("m_Script");
 
-            // base type -> this type
-            // a later field should override current in different depth
-            // but, if the field is not in the same depth, it should be added (method override)
-            // Yep, C# is a crap
-            for (int inherentDepth = 0; inherentDepth < types.Count; inherentDepth++)
+            List<Type> types = new List<Type>();
+            if (target == null)
             {
-                Type systemType = types[inherentDepth];
-
-                // as we can not get the correct order, we'll make it order as: field(serialized+nonSerialized), property, method
-                List<SaintsFieldWithInfo> thisDepthInfos = new List<SaintsFieldWithInfo>();
-                List<string> memberDepthIds = new List<string>();
-
-                foreach (MemberInfo memberInfo in systemType
-                             .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                         BindingFlags.Public | BindingFlags.DeclaredOnly)
-                             .OrderBy(memberInfo => memberInfo.MetadataToken))  // this is still not the correct order, but... a bit better
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning($"Target is null, use fallback workaround, #200");
+#endif
+                // do nothing
+            }
+            else
+            {
+                types = ReflectUtils.GetSelfAndBaseTypes(target);
+                types.Reverse();
+                // base type -> this type
+                // a later field should override current in different depth
+                // but, if the field is not in the same depth, it should be added (method override)
+                // Yep, C# is a crap
+                for (int inherentDepth = 0; inherentDepth < types.Count; inherentDepth++)
                 {
-                    // Debug.Log(memberInfo.Name);
-                    IReadOnlyList<IPlayaAttribute> playaAttributes =
-                        ReflectCache.GetCustomAttributes<IPlayaAttribute>(memberInfo);
+                    Type systemType = types[inherentDepth];
 
-                    // ISaintsLayoutBase[] layoutBases = GetLayoutBases(playaAttributes.OfType<ISaintsLayoutBase>()).ToArray();
+                    // as we can not get the correct order, we'll make it order as: field(serialized+nonSerialized), property, method
+                    List<SaintsFieldWithInfo> thisDepthInfos = new List<SaintsFieldWithInfo>();
+                    List<string> memberDepthIds = new List<string>();
 
-                    switch (memberInfo)
+                    foreach (MemberInfo memberInfo in systemType
+                                 .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                             BindingFlags.Public | BindingFlags.DeclaredOnly)
+                                 .OrderBy(memberInfo =>
+                                     memberInfo
+                                         .MetadataToken)) // this is still not the correct order, but... a bit better
                     {
-                        case FieldInfo fieldInfo:
-                        {
-                            #region SerializedField
+                        // Debug.Log(memberInfo.Name);
+                        IReadOnlyList<IPlayaAttribute> playaAttributes =
+                            ReflectCache.GetCustomAttributes<IPlayaAttribute>(memberInfo);
 
-                            if (serializedPropertyDict.ContainsKey(fieldInfo.Name))
+                        // ISaintsLayoutBase[] layoutBases = GetLayoutBases(playaAttributes.OfType<ISaintsLayoutBase>()).ToArray();
+
+                        switch (memberInfo)
+                        {
+                            case FieldInfo fieldInfo:
                             {
-                                // Debug.Log($"Name            : {fieldInfo.Name}");
-                                // Debug.Log($"Declaring Type  : {fieldInfo.DeclaringType}");
-                                // Debug.Log($"IsPublic        : {fieldInfo.IsPublic}");
-                                // Debug.Log($"MemberType      : {fieldInfo.MemberType}");
-                                // Debug.Log($"FieldType       : {fieldInfo.FieldType}");
-                                // Debug.Log($"IsFamily        : {fieldInfo.IsFamily}");
+                                #region SerializedField
+
+                                if (serializedPropertyDict.ContainsKey(fieldInfo.Name))
+                                {
+                                    // Debug.Log($"Name            : {fieldInfo.Name}");
+                                    // Debug.Log($"Declaring Type  : {fieldInfo.DeclaringType}");
+                                    // Debug.Log($"IsPublic        : {fieldInfo.IsPublic}");
+                                    // Debug.Log($"MemberType      : {fieldInfo.MemberType}");
+                                    // Debug.Log($"FieldType       : {fieldInfo.FieldType}");
+                                    // Debug.Log($"IsFamily        : {fieldInfo.IsFamily}");
+
+                                    OrderedAttribute orderProp =
+                                        playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
+                                    int order = orderProp?.Order ?? int.MinValue;
+
+                                    // Debug.Log($"{fieldInfo.Name}/{string.Join(",", pendingSerializedProperties.Keys)}");
+                                    thisDepthInfos.Add(new SaintsFieldWithInfo
+                                    {
+                                        PlayaAttributes = playaAttributes,
+                                        // PlayaAttributesQueue = playaAttributes,
+                                        // LayoutBases = layoutBases,
+                                        Target = target,
+
+                                        RenderType = SaintsRenderType.SerializedField,
+                                        SerializedProperty = serializedPropertyDict[fieldInfo.Name],
+                                        MemberId = fieldInfo.Name,
+                                        FieldInfo = fieldInfo,
+                                        InherentDepth = inherentDepth,
+                                        Order = order,
+                                        // serializable = true,
+                                    });
+                                    memberDepthIds.Add(fieldInfo.Name);
+                                    // Debug.Log($"remove key {fieldInfo.Name}");
+                                    pendingSerializedProperties.Remove(fieldInfo.Name);
+                                }
+
+                                #endregion
+
+                                #region nonSerFieldInfo
+
+                                else if (playaAttributes.Count > 0)
+                                {
+                                    OrderedAttribute orderProp =
+                                        playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
+                                    int order = orderProp?.Order ?? int.MinValue;
+                                    thisDepthInfos.Add(new SaintsFieldWithInfo
+                                    {
+                                        PlayaAttributes = playaAttributes,
+                                        // PlayaAttributesQueue = playaAttributes,
+                                        // LayoutBases = layoutBases,
+                                        Target = target,
+
+                                        RenderType = SaintsRenderType.NonSerializedField,
+                                        // memberType = nonSerFieldInfo.MemberType,
+                                        MemberId = fieldInfo.Name,
+                                        FieldInfo = fieldInfo,
+                                        InherentDepth = inherentDepth,
+                                        Order = order,
+                                        // serializable = false,
+                                    });
+                                    memberDepthIds.Add(fieldInfo.Name);
+                                }
+
+                                #endregion
+                            }
+                                break;
+                            case PropertyInfo propertyInfo:
+                            {
+                                #region NativeProperty
+
+                                if (playaAttributes.Count > 0)
+                                {
+                                    OrderedAttribute orderProp =
+                                        playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
+                                    int order = orderProp?.Order ?? int.MinValue;
+                                    thisDepthInfos.Add(new SaintsFieldWithInfo
+                                    {
+                                        PlayaAttributes = playaAttributes,
+                                        // PlayaAttributesQueue = playaAttributes,
+                                        // LayoutBases = layoutBases,
+                                        Target = target,
+
+                                        RenderType = SaintsRenderType.NativeProperty,
+                                        MemberId = propertyInfo.Name,
+                                        PropertyInfo = propertyInfo,
+                                        InherentDepth = inherentDepth,
+                                        Order = order,
+                                    });
+                                    memberDepthIds.Add(propertyInfo.Name);
+                                }
+
+                                #endregion
+                            }
+                                break;
+                            case MethodInfo methodInfo:
+                            {
+                                #region Method
+
+                                // method attributes will be collected no matter what, because DOTweenPlayGroup depending on it even
+                                // it has no attribute at all
+
+                                // Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
 
                                 OrderedAttribute orderProp =
-                                    playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
+                                    playaAttributes.FirstOrDefault(each =>
+                                        each is OrderedAttribute) as OrderedAttribute;
                                 int order = orderProp?.Order ?? int.MinValue;
 
-                                // Debug.Log($"{fieldInfo.Name}/{string.Join(",", pendingSerializedProperties.Keys)}");
-                                thisDepthInfos.Add(new SaintsFieldWithInfo
-                                {
-                                    PlayaAttributes = playaAttributes,
-                                    // PlayaAttributesQueue = playaAttributes,
-                                    // LayoutBases = layoutBases,
-                                    Target = target,
-
-                                    RenderType = SaintsRenderType.SerializedField,
-                                    SerializedProperty = serializedPropertyDict[fieldInfo.Name],
-                                    MemberId = fieldInfo.Name,
-                                    FieldInfo = fieldInfo,
-                                    InherentDepth = inherentDepth,
-                                    Order = order,
-                                    // serializable = true,
-                                });
-                                memberDepthIds.Add(fieldInfo.Name);
-                                // Debug.Log($"remove key {fieldInfo.Name}");
-                                pendingSerializedProperties.Remove(fieldInfo.Name);
-                            }
-                            #endregion
-
-                            #region nonSerFieldInfo
-
-                            else if (playaAttributes.Count > 0)
-                            {
-                                OrderedAttribute orderProp = playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
-                                int order = orderProp?.Order ?? int.MinValue;
-                                thisDepthInfos.Add(new SaintsFieldWithInfo
-                                {
-                                    PlayaAttributes = playaAttributes,
-                                    // PlayaAttributesQueue = playaAttributes,
-                                    // LayoutBases = layoutBases,
-                                    Target = target,
-
-                                    RenderType = SaintsRenderType.NonSerializedField,
-                                    // memberType = nonSerFieldInfo.MemberType,
-                                    MemberId = fieldInfo.Name,
-                                    FieldInfo = fieldInfo,
-                                    InherentDepth = inherentDepth,
-                                    Order = order,
-                                    // serializable = false,
-                                });
-                                memberDepthIds.Add(fieldInfo.Name);
-                            }
-                            #endregion
-                        }
-                            break;
-                        case PropertyInfo propertyInfo:
-                        {
-                            #region NativeProperty
-                            if(playaAttributes.Count > 0)
-                            {
-                                OrderedAttribute orderProp =
-                                    playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
-                                int order = orderProp?.Order ?? int.MinValue;
-                                thisDepthInfos.Add(new SaintsFieldWithInfo
-                                {
-                                    PlayaAttributes = playaAttributes,
-                                    // PlayaAttributesQueue = playaAttributes,
-                                    // LayoutBases = layoutBases,
-                                    Target = target,
-
-                                    RenderType = SaintsRenderType.NativeProperty,
-                                    MemberId = propertyInfo.Name,
-                                    PropertyInfo = propertyInfo,
-                                    InherentDepth = inherentDepth,
-                                    Order = order,
-                                });
-                                memberDepthIds.Add(propertyInfo.Name);
-                            }
-                            #endregion
-                        }
-                            break;
-                        case MethodInfo methodInfo:
-                        {
-                            #region Method
-                            // method attributes will be collected no matter what, because DOTweenPlayGroup depending on it even
-                            // it has no attribute at all
-
-                            // Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
-
-                            OrderedAttribute orderProp =
-                                playaAttributes.FirstOrDefault(each => each is OrderedAttribute) as OrderedAttribute;
-                            int order = orderProp?.Order ?? int.MinValue;
-
-                            // wrong: inspector does not care about inherited/new method. It just needs to use the last one
-                            // right: we support method override now
-                            // fieldWithInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
-                            // methodInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
+                                // wrong: inspector does not care about inherited/new method. It just needs to use the last one
+                                // right: we support method override now
+                                // fieldWithInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
+                                // methodInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD
                             Debug.Log($"[{systemType}] method: {methodInfo.Name}");
 #endif
 
-                            string buttonExtraId = string.Join(":", methodInfo.GetParameters()
+                                string buttonExtraId = string.Join(":", methodInfo.GetParameters()
                                     .Select(each => each.ParameterType)
                                     .Append(methodInfo.ReturnType)
                                     .Select(each => each.FullName));
 
-                            string buttonId = $"{methodInfo.Name}.{buttonExtraId}";
+                                string buttonId = $"{methodInfo.Name}.{buttonExtraId}";
 
-                            thisDepthInfos.Add(new SaintsFieldWithInfo
-                            {
-                                PlayaAttributes = playaAttributes,
-                                // PlayaAttributesQueue = playaAttributes,
-                                // LayoutBases = layoutBases,
-                                Target = target,
+                                thisDepthInfos.Add(new SaintsFieldWithInfo
+                                {
+                                    PlayaAttributes = playaAttributes,
+                                    // PlayaAttributesQueue = playaAttributes,
+                                    // LayoutBases = layoutBases,
+                                    Target = target,
 
-                                // memberType = MemberTypes.Method,
-                                RenderType = SaintsRenderType.Method,
-                                MemberId = buttonId,
-                                MethodInfo = methodInfo,
-                                InherentDepth = inherentDepth,
-                                Order = order,
-                            });
-                            memberDepthIds.Add(buttonId);
-                            #endregion
+                                    // memberType = MemberTypes.Method,
+                                    RenderType = SaintsRenderType.Method,
+                                    MemberId = buttonId,
+                                    MethodInfo = methodInfo,
+                                    InherentDepth = inherentDepth,
+                                    Order = order,
+                                });
+                                memberDepthIds.Add(buttonId);
+
+                                #endregion
+                            }
+                                break;
                         }
-                            break;
                     }
+
+                    // now handle overrides
+                    fieldWithInfos.RemoveAll(each => memberDepthIds.Contains(each.MemberId));
+
+                    fieldWithInfos.AddRange(thisDepthInfos);
+                    // fieldWithInfos.AddRange(fieldInfos);
+                    // fieldWithInfos.AddRange(propertyInfos);
+                    // fieldWithInfos.AddRange(methodInfos);
                 }
-
-                // now handle overrides
-                fieldWithInfos.RemoveAll(each => memberDepthIds.Contains(each.MemberId));
-
-                fieldWithInfos.AddRange(thisDepthInfos);
-                // fieldWithInfos.AddRange(fieldInfos);
-                // fieldWithInfos.AddRange(propertyInfos);
-                // fieldWithInfos.AddRange(methodInfos);
             }
 
             if (pendingSerializedProperties.Count > 0)
@@ -290,7 +312,7 @@ namespace SaintsField.Editor
                         RenderType = SaintsRenderType.InjectedSerializedField,
                         SerializedProperty = pendingSer.Value,
                         FieldInfo = null,
-                        InherentDepth = types.Count - 1,
+                        InherentDepth = types.Count == 0? 0: types.Count - 1,
                         Order = int.MinValue,
                         // serializable = true,
                     });
