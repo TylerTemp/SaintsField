@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         // ReSharper disable once InvertIf
                         if (curId != property.managedReferenceId)
                         {
-                            Debug.Log($"{property.propertyPath} Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
+                            // Debug.Log($"{property.propertyPath} Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
                             root.userData = property.managedReferenceId;
                             root.Clear();
 

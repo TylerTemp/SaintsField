@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Playa;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 #endif
@@ -362,6 +363,8 @@ namespace SaintsField.Editor.Utils
             Attribute useAttribute = null;
             bool isArray = property.propertyType == SerializedPropertyType.Generic
                            && property.isArray;
+            // bool useFallbackSaintsRow = false;
+            // Debug.Log($"rendering {property.propertyPath}/{property.propertyType}/isArray={isArray}");
             if(!isArray)
             {
                 ISaintsAttribute saintsAttr = allAttributes
@@ -382,11 +385,12 @@ namespace SaintsField.Editor.Utils
                     useAttribute = attrOrNull;
                     useDrawerType = drawerType;
 
-                    if (useDrawerType == null &&
-                        property.propertyType == SerializedPropertyType.Generic)
-                    {
-                        useDrawerType = typeof(SaintsRowAttributeDrawer);
-                    }
+                    // if (useDrawerType == null &&
+                    //     property.propertyType == SerializedPropertyType.Generic)
+                    // {
+                    //     // useFallbackSaintsRow = true;
+                    //     // useDrawerType = typeof(SaintsRowAttributeDrawer);
+                    // }
                 }
             }
 
@@ -411,10 +415,24 @@ namespace SaintsField.Editor.Utils
             //     // appendSaintsAttributeDrawer.Add((aboveRichLabelAttribute, aboveRichLabelDrawer));
             // }
 
-            if (!isArray && useDrawerType == null && inHorizontalLayout)
-            {
-                useDrawerType = typeof(SaintsPropertyDrawer);
-            }
+
+
+            // if (!isArray && useDrawerType == null && inHorizontalLayout)
+            // {
+            //     useFallbackSaintsRow = true;
+            //     useDrawerType = typeof(SaintsPropertyDrawer);
+            // }
+
+            // Debug.Log($"rendering {property.propertyPath}/useAttribute={useAttribute}/useDrawerType={useDrawerType}");
+
+            // fallback to SaintsRow cuz: not custom drawer (attr drawer or type drawer), is generic, and is not array
+            // if (useDrawerType != null && property.propertyType == SerializedPropertyType.Generic
+            //                           && !property.isArray)
+            // {
+            //     SaintsRowAttributeDrawer saintsRowDrawer = (SaintsRowAttributeDrawer)SaintsPropertyDrawer.MakePropertyDrawer(typeof(SaintsRowAttributeDrawer), fieldInfo, useAttribute, label);
+            //     saintsRowDrawer.InHorizontalLayout = inHorizontalLayout;
+            //     return saintsRowDrawer.CreatePropertyGUI(property);
+            // }
 
             if (useDrawerType == null)
             {
@@ -447,7 +465,7 @@ namespace SaintsField.Editor.Utils
             // };
             // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
             // return (result, false);
-
+            // Debug.Log($"use {useDrawerType} for {property.propertyPath}");
             PropertyDrawer propertyDrawer = SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, fieldInfo, useAttribute, label);
             // Debug.Log(saintsPropertyDrawer);
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
@@ -455,6 +473,7 @@ namespace SaintsField.Editor.Utils
                 // saintsPropertyDrawer.AppendSaintsAttributeDrawer = appendSaintsAttributeDrawer;
                 saintsPropertyDrawer.InHorizontalLayout = inHorizontalLayout;
             }
+
 
             MethodInfo uiToolkitMethod = useDrawerType.GetMethod("CreatePropertyGUI");
 
@@ -470,6 +489,7 @@ namespace SaintsField.Editor.Utils
                 VisualElement r = propertyDrawer.CreatePropertyGUI(property);
                 if (r != null)
                 {
+                    PropertyDrawerElementDirtyFix(property, propertyDrawer, r);
                     return UIToolkitCache.MergeWithDec(r, allAttributes);
                 }
             }
@@ -527,6 +547,27 @@ namespace SaintsField.Editor.Utils
             // return (imGuiContainer, false);
         }
 
+        public static void PropertyDrawerElementDirtyFix(SerializedProperty property, PropertyDrawer propertyDrawer, VisualElement element)
+        {
+            // ReSharper disable once InvertIf
+            if (propertyDrawer is UnityEventDrawer)  // I have zero idea why...
+            {
+                ListView lv = element.Q<ListView>();
+                // ReSharper disable once InvertIf
+                if(lv != null)
+                {
+                    SerializedProperty propertyRelative = property.FindPropertyRelative("m_PersistentCalls.m_Calls");
+                    // lv.bindingPath = propertyRelative.propertyPath;
+                    if(propertyRelative != null)
+                    {
+                        lv.BindProperty(propertyRelative);
+                    }
+                }
+                // Debug.Log(lv.itemsSource);
+                // return ele;
+            }
+        }
+
         // Basically the same idea from PropertyField
         // Note: do NOT pass SerializedPropertyType.Generic type: process it externally.
         public static VisualElement CreateOrUpdateFieldRawFallback(
@@ -578,11 +619,17 @@ namespace SaintsField.Editor.Utils
                                         rawType,
                                         $"Element {index}",
                                         fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null, parent);
+                                    // Debug.Log($"done rendering {index}/{itemProp.propertyPath}/{result == null}/{property.arraySize}");
                                     if (result != null)
                                     {
                                         element.Add(result);
                                     }
                                 },
+                                // onAdd = thisListView =>
+                                // {
+                                //     property.arraySize += 1;
+                                //     property.serializedObject.ApplyModifiedProperties();
+                                // },
                             };
                             Toggle listViewToggle = listView.Q<Toggle>();
                             if (listViewToggle != null && listViewToggle.style.marginLeft != -12)
@@ -635,7 +682,7 @@ namespace SaintsField.Editor.Utils
 
                         SerializedProperty serializedProperty = property.Copy();
                         // string str = PropertyField.listViewNamePrefix + property.propertyPath;
-                        string str = "unity-list-" + property.propertyPath;
+                        string str = "saints-field--list-view--" + property.propertyPath;
                         listView.headerTitle = label;
                         listView.userData = serializedProperty;
                         listView.bindingPath = property.propertyPath;

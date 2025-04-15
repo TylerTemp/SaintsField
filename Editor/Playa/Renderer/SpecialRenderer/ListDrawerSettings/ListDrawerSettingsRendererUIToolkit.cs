@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 return new VisualElement();
             }
 
-            var allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo);
+            PropertyAttribute[] allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo);
 
             void BindItem(VisualElement element, int index)
             {
@@ -156,6 +156,11 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             Foldout foldoutElement = listView.Q<Foldout>();
 
             UIToolkitUtils.AddContextualMenuManipulator(foldoutElement, property, () => {});
+            Toggle toggle = foldoutElement.Q<Toggle>();
+            if (toggle != null && toggle.style.marginLeft != -12)
+            {
+                toggle.style.marginLeft = -12;
+            }
 
             VisualElement foldoutContent = foldoutElement.Q<VisualElement>(className: "unity-foldout__content");
 

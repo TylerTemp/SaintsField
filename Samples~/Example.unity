@@ -1908,10 +1908,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 263f1a55fa481ed42bcb481f5ac0fe83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestData: []
+  TestData:
+  - rid: 2194327588755472451
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 2194327588755472451
+      type: {class: TestData, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        InternalTestData: []
+        TestMinMax: {x: 0, y: 2}
 --- !u!1 &246861350
 GameObject:
   m_ObjectHideFlags: 0
@@ -15914,7 +15920,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2063932b1065fe4499cb9ed4b6200109, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  intValue: 0
+  intValue: 69
   intValue2: 0
   intValue3: 0
 --- !u!1 &1138076587
@@ -18285,85 +18291,117 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rCValues:
-  - key: 
-    valueType: 2
-    intValue:
-      Value: 0
-      defaultValue: 0
-    onIntValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-    floatValue:
-      Value: 0
-      defaultValue: 0
-    onFloatValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-    boolValue:
-      Value: 0
-      defaultValue: 0
+  - valueType: 0
     onBoolValueFetched:
       m_PersistentCalls:
-        m_Calls: []
-    stringValue:
-      Value: 
-      defaultValue: 
-    onStringValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-    longValue:
-      Value: 0
-      defaultValue: 0
-    onLongValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-    jsonValue:
-      Value: 
-      defaultValue: 
-    onJsonValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 
-    valueType: 2
-    intValue:
-      Value: 0
-      defaultValue: 0
-    onIntValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-    floatValue:
-      Value: 0
-      defaultValue: 0
-    onFloatValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-    boolValue:
-      Value: 0
-      defaultValue: 0
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1416062037}
+          m_TargetAssemblyTypeName: UnityEngine.Transform, UnityEngine
+          m_MethodName: set_hierarchyCapacity
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1416062037}
+          m_TargetAssemblyTypeName: UnityEngine.Transform, UnityEngine
+          m_MethodName: set_hierarchyCapacity
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1416062037}
+          m_TargetAssemblyTypeName: UnityEngine.Transform, UnityEngine
+          m_MethodName: set_hierarchyCapacity
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  rCValue:
+    valueType: 0
     onBoolValueFetched:
       m_PersistentCalls:
-        m_Calls: []
-    stringValue:
-      Value: 
-      defaultValue: 
-    onStringValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-    longValue:
-      Value: 0
-      defaultValue: 0
-    onLongValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-    jsonValue:
-      Value: 
-      defaultValue: 
-    onJsonValueFetched:
-      m_PersistentCalls:
-        m_Calls: []
-  onBoolValueFetched:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  onBoolValueFetchedArr:
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onBoolValueFetched:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1423887155
 GameObject:
   m_ObjectHideFlags: 0

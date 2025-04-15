@@ -15,6 +15,7 @@ using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 #if SAINTSFIELD_OBVIOUS_SOAP
@@ -39,7 +40,7 @@ namespace SaintsField.Editor.Core
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
 
         public const string ClassAllowDisable = "saints-field-allow-disable";
-        protected static string UIToolkitFallbackName(SerializedProperty property) => $"saints-field--fallback-{property.propertyPath}";
+        public static string UIToolkitFallbackName(SerializedProperty property) => $"saints-field--fallback-{property.propertyPath}";
         private static string UIToolkitOnChangedTrackerName(SerializedProperty property) =>
             $"saints-field-tracker--{property.propertyPath}";
 
@@ -622,9 +623,18 @@ namespace SaintsField.Editor.Core
                     info, InHorizontalLayout, this, this, null, parent);
             }
 
+            // return PropertyFieldFallbackUIToolkit(property);
+
             PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);
+
             VisualElement element = DrawUsingDrawerInstance(drawerType, typeDrawer, property, info,
                 saintsPropertyDrawers, containerElement);
+            // ReSharper disable once InvertIf
+            if (element != null)
+            {
+                UIToolkitUtils.PropertyDrawerElementDirtyFix(property, typeDrawer, element);
+            }
+
             return element;
         }
 #endif
