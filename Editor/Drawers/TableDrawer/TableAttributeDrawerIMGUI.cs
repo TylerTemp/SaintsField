@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
@@ -377,7 +378,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             if (_saintsTable == null)
             {
-                float properFullWidth = Mathf.Max(20, width - IndentWidth - 20);
+                float properFullWidth = Mathf.Max(20, width - IndentWidth * 2 - 20);
 
                 Dictionary<int, IReadOnlyList<string>> headerToPropNames = new Dictionary<int, IReadOnlyList<string>>();
 
@@ -510,6 +511,9 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 _saintsTable.Reload();
             }
 
+            // Debug.Log($"tableHeight={_saintsTable.totalHeight}, minHeight={EditorGUIUtility.singleLineHeight * (arrayProp.arraySize + 1)}, SingleLineHeight={SingleLineHeight}");
+
+
             return Mathf.Max(_saintsTable.totalHeight, EditorGUIUtility.singleLineHeight * (arrayProp.arraySize + 1)) + SingleLineHeight;
         }
 
@@ -518,8 +522,6 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-
-
             TableAttribute tableAttribute = (TableAttribute) saintsAttribute;
 
             int propertyIndex;
