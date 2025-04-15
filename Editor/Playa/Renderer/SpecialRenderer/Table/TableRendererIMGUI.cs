@@ -1,4 +1,3 @@
-using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
