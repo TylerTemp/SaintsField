@@ -878,8 +878,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             if (useDrawerType == null)
             {
-                VisualElement r = UIToolkitUtils.CreateOrUpdateFieldFromProperty(
+                VisualElement r = UIToolkitUtils.CreateOrUpdateFieldRawFallback(
                     serializedProperty,
+                    allAttributes,
                     rawType,
                     null,
                     info,

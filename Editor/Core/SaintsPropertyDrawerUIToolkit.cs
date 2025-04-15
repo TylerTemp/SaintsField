@@ -432,7 +432,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                     Debug.Log("fallback field drawer");
 #endif
-                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, containerElement, GetPreferredLabel(property), saintsPropertyDrawers);
+                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, allAttributes, containerElement, GetPreferredLabel(property), saintsPropertyDrawers);
                     fallback.AddToClassList(fallbackClass);
                     fieldContainer.Add(fallback);
                     // containerElement.visible = false;
@@ -607,7 +607,7 @@ namespace SaintsField.Editor.Core
         // }
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
+        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
 
@@ -616,7 +616,7 @@ namespace SaintsField.Editor.Core
                 Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
                     ? ReflectUtils.GetElementType(info.FieldType)
                     : info.FieldType;
-                return UIToolkitUtils.CreateOrUpdateFieldFromProperty(property, rawType, passedPreferredLabel,
+                return UIToolkitUtils.CreateOrUpdateFieldRawFallback(property, allAttributes, rawType, passedPreferredLabel,
                     info, InHorizontalLayout, this, this, null);
             }
 

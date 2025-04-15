@@ -120,5 +120,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [Range(0, 1), InfoBox("Order no longer matters with SaintsEditor")]
         public float f3;
+
+        public int[] intArr;
     }
 }
