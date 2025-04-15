@@ -338,7 +338,8 @@ namespace SaintsField.Editor.Utils
             bool inHorizontalLayout,
             IMakeRenderer makeRenderer,
             IDOTweenPlayRecorder doTweenPlayRecorder,
-            VisualElement originalField)
+            VisualElement originalField,
+            object parent)
         {
             // PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
             // {
@@ -426,7 +427,8 @@ namespace SaintsField.Editor.Utils
                     inHorizontalLayout,
                     makeRenderer,
                     doTweenPlayRecorder,
-                    originalField
+                    originalField,
+                    parent
                 );
                 if (r == null)
                 {
@@ -539,7 +541,8 @@ namespace SaintsField.Editor.Utils
           bool inHorizontalLayout,
           IMakeRenderer makeRenderer,
           IDOTweenPlayRecorder doTweenPlayRecorder,
-          VisualElement originalField)
+          VisualElement originalField,
+          object parent)
         {
             SerializedPropertyType propertyType = property.propertyType;
             switch (propertyType)
@@ -575,7 +578,7 @@ namespace SaintsField.Editor.Utils
                                         itemProp,
                                         allAttributes,
                                         rawType, $"Element {index}",
-                                        fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null);
+                                        fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null, parent);
                                     if (result != null)
                                     {
                                         element.Add(result);
@@ -651,7 +654,7 @@ namespace SaintsField.Editor.Utils
                     {
                         return null;
                     }
-                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout, null, makeRenderer, doTweenPlayRecorder);
+                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout, null, makeRenderer, doTweenPlayRecorder, parent);
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:

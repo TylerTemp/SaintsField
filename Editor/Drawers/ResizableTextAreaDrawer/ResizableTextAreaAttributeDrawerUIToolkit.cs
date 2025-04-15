@@ -59,6 +59,8 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                 textInput.style.minHeight = minHeight;
             }
 
+            textField.BindProperty(property);
+
             return new ResizableTextArea(GetPreferredLabel(property), textField)
             {
                 style =

@@ -149,20 +149,23 @@ namespace SaintsField.Editor.Core
             // 1. we need to swap RichLabel to AboveRichLabel, if it has content
             // 2. otherwise (NoLabel), we no longer added a `NoLabel` to it
 
-            bool needAboveProcesser = InHorizontalLayout;
-            if (needAboveProcesser)
+            bool needAboveProcessor = InHorizontalLayout;
+            if (needAboveProcessor)
             {
                 if (GetType() == typeof(SaintsRowAttributeDrawer))
                 {
-                    needAboveProcesser = false;
+                    needAboveProcessor = false;
                 }
-                else if (saintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer))
+                else if (saintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer
+                                                           || each.Attribute is NoLabelAttribute
+                                                           || (each.Attribute is RichLabelAttribute rl &&
+                                                               string.IsNullOrEmpty(rl.RichTextXml))))
                 {
-                    needAboveProcesser = false;
+                    needAboveProcessor = false;
                 }
                 else if (property.propertyType == SerializedPropertyType.Boolean && saintsPropertyDrawers.All(each => each.Attribute.AttributeType != SaintsAttributeType.Field) && saintsPropertyDrawers.All(each => each.Drawer is not LeftToggleAttributeDrawer))
                 {
-                    needAboveProcesser = false;
+                    needAboveProcessor = false;
                     LeftToggleAttribute leftToggleAttribute =
                         new LeftToggleAttribute();
 
@@ -179,7 +182,7 @@ namespace SaintsField.Editor.Core
                 }
             }
 
-            if(needAboveProcesser)
+            if(needAboveProcessor)
             {
                 bool alreadyHasRichLabel = false;
                 bool alreadyHasNoLabel = false;
@@ -432,7 +435,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                     Debug.Log("fallback field drawer");
 #endif
-                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, allAttributes, containerElement, GetPreferredLabel(property), saintsPropertyDrawers);
+                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, allAttributes, containerElement, GetPreferredLabel(property), saintsPropertyDrawers, parent);
                     fallback.AddToClassList(fallbackClass);
                     fieldContainer.Add(fallback);
                     // containerElement.visible = false;
@@ -607,7 +610,7 @@ namespace SaintsField.Editor.Core
         // }
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers)
+        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
 
@@ -617,7 +620,7 @@ namespace SaintsField.Editor.Core
                     ? ReflectUtils.GetElementType(info.FieldType)
                     : info.FieldType;
                 return UIToolkitUtils.CreateOrUpdateFieldRawFallback(property, allAttributes, rawType, passedPreferredLabel,
-                    info, InHorizontalLayout, this, this, null);
+                    info, InHorizontalLayout, this, this, null, parent);
             }
 
             PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);

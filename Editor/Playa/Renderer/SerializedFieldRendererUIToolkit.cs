@@ -31,7 +31,8 @@ namespace SaintsField.Editor.Playa.Renderer
                 InAnyHorizontalLayout,
                 this,
                 this,
-                null
+                null,
+                FieldWithInfo.Target
             );
             return (r, false);
 

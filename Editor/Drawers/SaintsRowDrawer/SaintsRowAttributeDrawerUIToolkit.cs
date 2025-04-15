@@ -1,11 +1,14 @@
 ﻿#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,10 +20,32 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
         public const string SaintsRowClass = "saints-field--saintsrow";
 
-        public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        public class ForceInlineScoop : IDisposable
         {
-            VisualElement root;
+            public static bool Inline;
+
+            public ForceInlineScoop(bool inline)
+            {
+                Inline = inline;
+            }
+
+            public void Dispose()
+            {
+                Inline = false;
+            }
+        }
+
+        public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
+        {
             bool inline = saintsRowAttribute?.Inline ?? false;
+
+            if (!inline)
+            {
+                inline = ForceInlineScoop.Inline;
+            }
+
+            VisualElement root;
+
             if (inline)
             {
                 root = new VisualElement
@@ -67,7 +92,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         // ReSharper disable once InvertIf
                         if (curId != property.managedReferenceId)
                         {
-                            // Debug.Log($"Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
+                            Debug.Log($"{property.propertyPath} Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
                             root.userData = property.managedReferenceId;
                             root.Clear();
 
@@ -87,7 +112,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         {
             SaintsRowAttribute saintsRowAttribute = saintsAttribute as SaintsRowAttribute;
 
-            VisualElement ele = CreateElement(property, property.displayName, info, InHorizontalLayout, saintsRowAttribute, this, this);
+            VisualElement ele = CreateElement(property, property.displayName, info, InHorizontalLayout, saintsRowAttribute, this, this, parent);
             //
             // if (InHorizentalLayout)
             // {
@@ -96,6 +121,13 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             return ele;
         }
+
+        // private static Type GetMemberType(MemberInfo member)
+        // {
+        //     return member.MemberType == MemberTypes.Property
+        //         ? ((PropertyInfo) member).PropertyType
+        //         : ((FieldInfo) member).FieldType;
+        // }
 
         private static void FillElement(VisualElement root, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
@@ -127,6 +159,48 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     else
                     {
                         value = getValue;
+
+                        // Debug.Log(value);
+                        if (value == null)
+                        {
+                            // foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
+                            // {
+                            //     // switch (subProp.)
+                            //     // {
+                            //     //
+                            //     // }
+                            // }
+
+                            // var p = new PropertyField(property);
+                            // root.Add(p);
+                            // return;
+
+                            // Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                            //     ? ReflectUtils.GetElementType(GetMemberType(info))
+                            //     : GetMemberType(info);
+                            //
+                            // // Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
+                            // // value = Activator.CreateInstance(rawType, true);
+                            // // Util.SignPropertyValue(property, info, parent, value);
+                            //
+                            // property.boxedValue = value = Activator.CreateInstance(rawType, true);
+                            // property.serializedObject.ApplyModifiedProperties();
+
+                            // return;
+                        }
+
+
+
+                        // if (value == null)
+                        // {
+                        //     Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                        //         ? ReflectUtils.GetElementType(GetMemberType(info))
+                        //         : GetMemberType(info);
+                        //
+                        //     Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
+                        //     value = Activator.CreateInstance(rawType, true);
+                        //     Util.SignPropertyValue(property, info, parent, value);
+                        // }
                     }
                 }
 
@@ -139,7 +213,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 // value = getValue;
             }
 
-            Debug.Assert(value != null);
+            // Debug.Assert(value != null);
 
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
                 .ToDictionary(each => each.name, each => each.property);

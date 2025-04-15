@@ -4,9 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
+using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -189,61 +195,81 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             if (itemIsObject)
             {
-                Object obj0 = multiColumnListView.itemsSource.Cast<SerializedProperty>().Select(each => each.objectReferenceValue).FirstOrDefault(each => each != null);
-                SerializedObject serializedObject = new SerializedObject(obj0);
+                Object obj0 = multiColumnListView.itemsSource.Cast<SerializedProperty>()
+                    .Select(each => each.objectReferenceValue)
+                    .FirstOrDefault(each => each != null);
 
-                Dictionary<string, List<SerializedPropertyInfo>> columnToProperties = new Dictionary<string, List<SerializedPropertyInfo>>();
+                Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
 
-                foreach (SerializedProperty serializedProperty in SerializedUtils.GetAllField(serializedObject))
+                using(SerializedObject serializedObject = new SerializedObject(obj0))
                 {
-                    (TableColumnAttribute[] tableColumnAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<TableColumnAttribute>(serializedProperty);
-                    string columnName = tableColumnAttributes.Length > 0? tableColumnAttributes[0].Title: serializedProperty.displayName;
-                    if(!columnToProperties.TryGetValue(columnName, out List<SerializedPropertyInfo> list))
+                    Dictionary<string, SerializedProperty> serializedPropertyDict = SerializedUtils
+                        .GetAllField(serializedObject)
+                        .Where(each => each != null)
+                        .ToDictionary(each => each.name, each => each.Copy());
+                    IEnumerable<SaintsFieldInfoName> saintsFieldWithInfos = SaintsEditor
+                        .HelperGetSaintsFieldWithInfo(serializedPropertyDict, obj0)
+                        .Where(SaintsEditor.SaintsFieldInfoShouldDraw)
+                        .Select(each => new SaintsFieldInfoName(each, AbsRenderer.GetFriendlyName(each)));
+
+                    foreach (SaintsFieldInfoName saintsFieldInfoName in saintsFieldWithInfos)
                     {
-                        columnToProperties[columnName] = list = new List<SerializedPropertyInfo>();
+                        string columnName = saintsFieldInfoName.FriendlyName;
+                        foreach (IPlayaAttribute playaAttribute in saintsFieldInfoName.SaintsFieldWithInfo.PlayaAttributes)
+                        {
+                            // ReSharper disable once InvertIf
+                            if (playaAttribute is TableColumnAttribute tc)
+                            {
+                                columnName = tc.Title;
+                                break;
+                            }
+                        }
+
+                        if(!columnToMemberIds.TryGetValue(columnName, out List<string> list))
+                        {
+                            columnToMemberIds[columnName] = list = new List<string>();
+                        }
+                        // Debug.Log($"{columnName}: {saintsFieldWithInfo}");
+                        list.Add(saintsFieldInfoName.SaintsFieldWithInfo.MemberId);
                     }
-                    list.Add(new SerializedPropertyInfo
-                    {
-                        Name = serializedProperty.name,
-                        PropertyPath = serializedProperty.propertyPath,
-                    });
                 }
 
                 // ReSharper disable once UseDeconstruction
-                foreach (KeyValuePair<string, List<SerializedPropertyInfo>> columnKv in columnToProperties)
+                foreach (KeyValuePair<string, List<string>> columnKv in columnToMemberIds)
                 {
                     string columnName = columnKv.Key;
-                    List<SerializedPropertyInfo> properties = columnKv.Value;
-                    IReadOnlyList<string> propNames = properties.Select(each => each.Name).ToArray();
+                    List<string> memberIds = columnKv.Value;
 
-                    string id = string.Join(";", properties.Select(each => each.PropertyPath));
+                    string id = string.Join(";", memberIds);
 
                     multiColumnListView.columns.Add(new Column
                     {
                         name = id,
                         title = columnName,
                         stretchable = true,
-                        // comparison = (a, b) => CompareProp((SerializedProperty) multiColumnListView.itemsSource[a], (SerializedProperty) multiColumnListView.itemsSource[(int)b]),
                     });
 
                     multiColumnListView.columns[id].makeCell = () =>
                     {
                         VisualElement itemContainer = new VisualElement();
-                        // PropertyField propField = new PropertyField();
-                        // itemContainer.Add(propField);
-                        for (int i = 0; i < properties.Count; i++)
-                        {
-                            itemContainer.Add(new PropertyField());
-                        }
+
+                        HashSet<Toggle> toggles = new HashSet<Toggle>();
+
+                        itemContainer.schedule
+                            .Execute(() => SaintsRendererGroup.CheckOutOfScoopFoldout(itemContainer, toggles))
+                            .Every(250);
+
                         return itemContainer;
                     };
 
                     multiColumnListView.columns[id].bindCell = (element, index) =>
                     {
+                        SerializedProperty targetProp = ((SerializedProperty)multiColumnListView.itemsSource[index]).Copy();
+                        targetProp.isExpanded = true;
 
-                        SerializedProperty sp = (SerializedProperty)multiColumnListView.itemsSource[index];
-                        Object obj = sp.objectReferenceValue;
-                        if (obj == null)
+                        Object targetPropValue = targetProp.objectReferenceValue;
+
+                        if (RuntimeUtil.IsNull(targetPropValue))
                         {
                             ObjectField arrayItemProp = new ObjectField("")
                             {
@@ -255,72 +281,179 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
                             arrayItemProp.RegisterValueChangedCallback(evt =>
                             {
-                                sp.objectReferenceValue = evt.newValue;
-                                sp.serializedObject.ApplyModifiedProperties();
+                                targetProp.objectReferenceValue = evt.newValue;
+                                targetProp.serializedObject.ApplyModifiedProperties();
                                 multiColumnListView.Rebuild();
                             });
                             return;
                         }
-                        SerializedObject itemObject = new SerializedObject(obj);
 
-                        foreach ((PropertyField propField, int propIndex) in element.Query<PropertyField>().ToList().WithIndex())
+                        SerializedObject targetSerializedObject = new SerializedObject(targetPropValue);
+
+                        Dictionary<string, SerializedProperty> targetPropertyDict = SerializedUtils
+                            .GetAllField(targetSerializedObject)
+                            .Where(each => each != null)
+                            .ToDictionary(each => each.name, each => each.Copy());
+
+                        IEnumerable<SaintsFieldWithInfo> allSaintsFieldWithInfos = SaintsEditor
+                            .HelperGetSaintsFieldWithInfo(targetPropertyDict, targetPropValue)
+                            .Where(each => memberIds.Contains(each.MemberId));
+
+                        element.Clear();
+
+                        bool saintsRowInline = memberIds.Count == 1;
+
+                        using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline))
                         {
-                            if (propIndex >= propNames.Count)
+                            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                            foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                             {
-                                break;
-                            }
-
-                            string propName = propNames[propIndex];
-                            SerializedProperty itemProp = itemObject.FindProperty(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(itemObject, propName);
-                            propField.BindProperty(itemProp);
-                            propField.Bind(itemObject);
-                            propField.label = "";
-                            Label firstLabel = propField.Query<Label>().First();
-                            if(firstLabel != null)
-                            {
-                                if (!firstLabel.ClassListContains(ClassNoRichLabelUpdate))
+                                AbsRenderer renderer =
+                                    SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo);
+                                // Debug.Log(renderer);
+                                // ReSharper disable once InvertIf
+                                if (renderer != null)
                                 {
-                                    firstLabel.AddToClassList(ClassNoRichLabelUpdate);
-                                }
-                                if(itemProp.propertyType != SerializedPropertyType.Generic && firstLabel.style.display != DisplayStyle.None)
-                                {
-                                    firstLabel.style.display = DisplayStyle.None;
+                                    renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
+                                    VisualElement fieldElement = renderer.CreateVisualElement();
+                                    if (fieldElement != null)
+                                    {
+                                        element.Add(fieldElement);
+                                    }
                                 }
                             }
                         }
                     };
                 }
+
+                // // ReSharper disable once UseDeconstruction
+                // foreach (KeyValuePair<string, List<SerializedPropertyInfo>> columnKv in columnToProperties)
+                // {
+                //     string columnName = columnKv.Key;
+                //     List<SerializedPropertyInfo> properties = columnKv.Value;
+                //     IReadOnlyList<string> propNames = properties.Select(each => each.Name).ToArray();
+                //
+                //     string id = string.Join(";", properties.Select(each => each.PropertyPath));
+                //
+                //     multiColumnListView.columns.Add(new Column
+                //     {
+                //         name = id,
+                //         title = columnName,
+                //         stretchable = true,
+                //         // comparison = (a, b) => CompareProp((SerializedProperty) multiColumnListView.itemsSource[a], (SerializedProperty) multiColumnListView.itemsSource[(int)b]),
+                //     });
+                //
+                //     multiColumnListView.columns[id].makeCell = () =>
+                //     {
+                //         VisualElement itemContainer = new VisualElement();
+                //         // PropertyField propField = new PropertyField();
+                //         // itemContainer.Add(propField);
+                //         for (int i = 0; i < properties.Count; i++)
+                //         {
+                //             itemContainer.Add(new PropertyField());
+                //         }
+                //         return itemContainer;
+                //     };
+                //
+                //     multiColumnListView.columns[id].bindCell = (element, index) =>
+                //     {
+                //
+                //         SerializedProperty sp = (SerializedProperty)multiColumnListView.itemsSource[index];
+                //         Object obj = sp.objectReferenceValue;
+                //         if (obj == null)
+                //         {
+                //             ObjectField arrayItemProp = new ObjectField("")
+                //             {
+                //                 objectType = ReflectUtils.GetElementType(info.FieldType),
+                //             };
+                //
+                //             element.Clear();
+                //             element.Add(arrayItemProp);
+                //
+                //             arrayItemProp.RegisterValueChangedCallback(evt =>
+                //             {
+                //                 sp.objectReferenceValue = evt.newValue;
+                //                 sp.serializedObject.ApplyModifiedProperties();
+                //                 multiColumnListView.Rebuild();
+                //             });
+                //             return;
+                //         }
+                //         SerializedObject itemObject = new SerializedObject(obj);
+                //
+                //         foreach ((PropertyField propField, int propIndex) in element.Query<PropertyField>().ToList().WithIndex())
+                //         {
+                //             if (propIndex >= propNames.Count)
+                //             {
+                //                 break;
+                //             }
+                //
+                //             string propName = propNames[propIndex];
+                //             SerializedProperty itemProp = itemObject.FindProperty(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(itemObject, propName);
+                //             propField.BindProperty(itemProp);
+                //             propField.Bind(itemObject);
+                //             propField.label = "";
+                //             Label firstLabel = propField.Query<Label>().First();
+                //             if(firstLabel != null)
+                //             {
+                //                 if (!firstLabel.ClassListContains(ClassNoRichLabelUpdate))
+                //                 {
+                //                     firstLabel.AddToClassList(ClassNoRichLabelUpdate);
+                //                 }
+                //                 if(itemProp.propertyType != SerializedPropertyType.Generic && firstLabel.style.display != DisplayStyle.None)
+                //                 {
+                //                     firstLabel.style.display = DisplayStyle.None;
+                //                 }
+                //             }
+                //         }
+                //     };
+                // }
             }
             else  // item is general
             {
                 SerializedProperty firstProp = arrayProp.GetArrayElementAtIndex(0);
                 // Debug.Log($"rendering generic {firstProp.propertyPath}");
-                Dictionary<string, List<SerializedPropertyInfo>> columnToProperties = new Dictionary<string, List<SerializedPropertyInfo>>();
+                Dictionary<string, SerializedProperty> firstSerializedPropertyDict = SerializedUtils.GetPropertyChildren(firstProp)
+                    .Where(each => each != null)
+                    .ToDictionary(each => each.name);
 
-                foreach (SerializedProperty serializedProperty in SerializedUtils.GetPropertyChildren(firstProp)
-                             .Where(each => each != null))
+                (PropertyAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(firstProp);
+
+                (string error, int index, object value) firstPropValue = Util.GetValue(firstProp, info, parent);
+
+                IEnumerable<SaintsFieldWithInfo> firstSaintsFieldWithInfos = SaintsEditor
+                    .HelperGetSaintsFieldWithInfo(firstSerializedPropertyDict, firstPropValue.value)
+                    .Where(SaintsEditor.SaintsFieldInfoShouldDraw);
+
+                Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
+
+                foreach (SaintsFieldWithInfo saintsFieldWithInfo in firstSaintsFieldWithInfos)
                 {
-                    (TableColumnAttribute[] tableColumnAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<TableColumnAttribute>(serializedProperty);
-                    string columnName = tableColumnAttributes.Length > 0? tableColumnAttributes[0].Title: serializedProperty.displayName;
-                    if(!columnToProperties.TryGetValue(columnName, out List<SerializedPropertyInfo> list))
+                    string columnName = AbsRenderer.GetFriendlyName(saintsFieldWithInfo);
+                    foreach (IPlayaAttribute playaAttribute in saintsFieldWithInfo.PlayaAttributes)
                     {
-                        columnToProperties[columnName] = list = new List<SerializedPropertyInfo>();
+                        // ReSharper disable once InvertIf
+                        if (playaAttribute is TableColumnAttribute tc)
+                        {
+                            columnName = tc.Title;
+                            break;
+                        }
                     }
-                    list.Add(new SerializedPropertyInfo
+
+                    if(!columnToMemberIds.TryGetValue(columnName, out List<string> list))
                     {
-                        Name = serializedProperty.name,
-                        PropertyPath = serializedProperty.propertyPath,
-                    });
+                        columnToMemberIds[columnName] = list = new List<string>();
+                    }
+                    // Debug.Log($"{columnName}: {saintsFieldWithInfo}");
+                    list.Add(saintsFieldWithInfo.MemberId);
                 }
 
                 // ReSharper disable once UseDeconstruction
-                foreach (KeyValuePair<string, List<SerializedPropertyInfo>> columnKv in columnToProperties)
+                foreach (KeyValuePair<string, List<string>> columnKv in columnToMemberIds)
                 {
                     string columnName = columnKv.Key;
-                    List<SerializedPropertyInfo> properties = columnKv.Value;
-                    IReadOnlyList<string> propNames = properties.Select(each => each.Name).ToArray();
+                    List<string> memberIds = columnKv.Value;
 
-                    string id = string.Join(";", properties.Select(each => each.PropertyPath));
+                    string id = string.Join(";", memberIds);
 
                     multiColumnListView.columns.Add(new Column
                     {
@@ -332,46 +465,116 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     multiColumnListView.columns[id].makeCell = () =>
                     {
                         VisualElement itemContainer = new VisualElement();
-                        // PropertyField propField = new PropertyField();
-                        // itemContainer.Add(propField);
-                        // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                        for (int i = 0; i < properties.Count; i++)
-                        {
-                            itemContainer.Add(new PropertyField());
-                        }
+
+                        HashSet<Toggle> toggles = new HashSet<Toggle>();
+
+                        itemContainer.schedule
+                            .Execute(() => SaintsRendererGroup.CheckOutOfScoopFoldout(itemContainer, toggles))
+                            .Every(250);
+
                         return itemContainer;
                     };
 
                     multiColumnListView.columns[id].bindCell = (element, index) =>
                     {
-                        SerializedProperty sp = (SerializedProperty)multiColumnListView.itemsSource[index];
+                        // Debug.Log($"id={id}/index={index}");
+                        SerializedProperty targetProp = (SerializedProperty)multiColumnListView.itemsSource[index];
+                        targetProp.isExpanded = true;
 
-                        foreach ((PropertyField propField, int propIndex) in element.Query<PropertyField>().ToList().WithIndex())
+                        (string error, int index, object value) targetPropValue = Util.GetValue(targetProp, info, parent);
+                        Dictionary<string, SerializedProperty> targetSerializedPropertyDict = SerializedUtils.GetPropertyChildren(targetProp)
+                            .Where(each => each != null)
+                            .ToDictionary(each => each.name);
+                        IEnumerable<SaintsFieldWithInfo> allSaintsFieldWithInfos = SaintsEditor
+                            .HelperGetSaintsFieldWithInfo(targetSerializedPropertyDict, targetPropValue.value)
+                            .Where(each => memberIds.Contains(each.MemberId));
+
+                        element.Clear();
+
+                        bool saintsRowInline = memberIds.Count == 1;
+
+                        using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline))
                         {
-                            if (propIndex >= propNames.Count)
+                            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                            foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                             {
-                                break;
-                            }
-                            string propName = propNames[propIndex];
-                            SerializedProperty itemProp = sp.FindPropertyRelative(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(sp, propName);
-                            propField.BindProperty(itemProp);
-                            propField.Bind(itemProp.serializedObject);
-                            propField.label = "";
-                            Label firstLabel = propField.Query<Label>().First();
-                            if(firstLabel != null)
-                            {
-                                if (!firstLabel.ClassListContains(ClassNoRichLabelUpdate))
+                                AbsRenderer renderer =
+                                    SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo);
+                                // Debug.Log(renderer);
+                                // ReSharper disable once InvertIf
+                                if (renderer != null)
                                 {
-                                    firstLabel.AddToClassList(ClassNoRichLabelUpdate);
-                                }
-                                if(itemProp.propertyType != SerializedPropertyType.Generic && firstLabel.style.display != DisplayStyle.None)
-                                {
-                                    firstLabel.style.display = DisplayStyle.None;
+                                    renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
+                                    VisualElement fieldElement = renderer.CreateVisualElement();
+                                    if (fieldElement != null)
+                                    {
+                                        element.Add(fieldElement);
+                                    }
                                 }
                             }
                         }
                     };
                 }
+
+                // // ReSharper disable once UseDeconstruction
+                // foreach (KeyValuePair<string, List<SerializedPropertyInfo>> columnKv in columnToProperties)
+                // {
+                //     string columnName = columnKv.Key;
+                //     List<SerializedPropertyInfo> properties = columnKv.Value;
+                //     IReadOnlyList<string> propNames = properties.Select(each => each.Name).ToArray();
+                //
+                //     string id = string.Join(";", properties.Select(each => each.PropertyPath));
+                //
+                //     multiColumnListView.columns.Add(new Column
+                //     {
+                //         name = id,
+                //         title = columnName,
+                //         stretchable = true,
+                //     });
+                //
+                //     multiColumnListView.columns[id].makeCell = () =>
+                //     {
+                //         VisualElement itemContainer = new VisualElement();
+                //         // PropertyField propField = new PropertyField();
+                //         // itemContainer.Add(propField);
+                //         // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                //         for (int i = 0; i < properties.Count; i++)
+                //         {
+                //             itemContainer.Add(new PropertyField());
+                //         }
+                //         return itemContainer;
+                //     };
+                //
+                //     multiColumnListView.columns[id].bindCell = (element, index) =>
+                //     {
+                //         SerializedProperty sp = (SerializedProperty)multiColumnListView.itemsSource[index];
+                //
+                //         foreach ((PropertyField propField, int propIndex) in element.Query<PropertyField>().ToList().WithIndex())
+                //         {
+                //             if (propIndex >= propNames.Count)
+                //             {
+                //                 break;
+                //             }
+                //             string propName = propNames[propIndex];
+                //             SerializedProperty itemProp = sp.FindPropertyRelative(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(sp, propName);
+                //             propField.BindProperty(itemProp);
+                //             propField.Bind(itemProp.serializedObject);
+                //             propField.label = "";
+                //             Label firstLabel = propField.Query<Label>().First();
+                //             if(firstLabel != null)
+                //             {
+                //                 if (!firstLabel.ClassListContains(ClassNoRichLabelUpdate))
+                //                 {
+                //                     firstLabel.AddToClassList(ClassNoRichLabelUpdate);
+                //                 }
+                //                 if(itemProp.propertyType != SerializedPropertyType.Generic && firstLabel.style.display != DisplayStyle.None)
+                //                 {
+                //                     firstLabel.style.display = DisplayStyle.None;
+                //                 }
+                //             }
+                //         }
+                //     };
+                // }
             }
             root.Add(multiColumnListView);
 
@@ -441,6 +644,18 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 // #endif
 
             // return root;
+        }
+
+        private readonly struct SaintsFieldInfoName
+        {
+            public readonly SaintsFieldWithInfo SaintsFieldWithInfo;
+            public readonly string FriendlyName;
+
+            public SaintsFieldInfoName(SaintsFieldWithInfo saintsFieldWithInfo, string friendlyName)
+            {
+                SaintsFieldWithInfo = saintsFieldWithInfo;
+                FriendlyName = friendlyName;
+            }
         }
 
         private ArraySizeAttribute _arraySizeAttribute;

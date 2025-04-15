@@ -561,6 +561,8 @@ MonoBehaviour:
     i: 0
   - s: 22
     i: 0
+  floatArr:
+  - 0.076
 --- !u!1 &147024401
 GameObject:
   m_ObjectHideFlags: 0

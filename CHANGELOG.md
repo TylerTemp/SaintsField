@@ -1,9 +1,20 @@
 # Changelog
 
+## 4.4.0 ##
+
+1.  UI Toolkit: `Table` now support showing `Button` & `ShowInInspector`. (Note: Any kind of `Layout` will be ignored)
+2.  UI Toolkit: Fix `NoLabel` didn't work when inside a horizontal layout
+3.  UI Toolkit: Fix `Table` foldout out of area. If a struct is a field, that field will remove the `foldout`
+
+## 4.3.3 ##
+
+UI Toolkit: Some unity built-in class type has some very weird behavior. Fallback to default drawing flow instead [#200](https://github.com/TylerTemp/SaintsField/issues/200)
+
 ## 4.3.2 ##
 
 1.  Fix `SaintsInterface` can not pick a component when there are multiple component matches [#199](https://github.com/TylerTemp/SaintsField/issues/199)
 2.  `ReferencePicker` now gives a more friendly error if it's been used on a wrong type
+3.  UI Toolkit: fix `ResizableTextArea` did not save the changes
 
 ## 4.3.1 ##
 

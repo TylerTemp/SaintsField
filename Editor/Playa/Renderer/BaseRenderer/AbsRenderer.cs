@@ -270,7 +270,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         public abstract void OnDestroy();
 
 
-        protected static string GetFriendlyName(SaintsFieldWithInfo fieldWithInfo)
+        public static string GetFriendlyName(SaintsFieldWithInfo fieldWithInfo)
         {
             if (fieldWithInfo.SerializedProperty != null)
             {
