@@ -37,6 +37,11 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 name = NameFoldout(property),
                 value = property.isExpanded,
             };
+            Toggle toggle = foldOut.Q<Toggle>();
+            if (toggle != null)
+            {
+                toggle.userData = container;
+            }
 
             return foldOut;
         }

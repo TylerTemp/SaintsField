@@ -6,7 +6,8 @@
 2.  UI Toolkit: `ListDrawerSettings`, same as above
 3.  UI Toolkit: fix an issue that `PropRange` gave an error when working with list/array
 4.  IMGUI: fix height issue in `Table`, [#201](https://github.com/TylerTemp/SaintsField/issues/201)
-5.  UI Toolkit: fix width changes in Horizontal Layout 
+5.  UI Toolkit: fix width changes in horizontal `Layout` 
+6.  UI Toolkit: fix `Expandable`, `AnimatorState` foldout out of space when using inside `Layout`
 
 ## 4.4.0 ##
 

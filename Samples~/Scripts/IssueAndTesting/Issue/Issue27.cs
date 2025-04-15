@@ -44,5 +44,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 
         [SerializeField] RCValue[] rCValues;
 
+        public UnityEvent<bool>[] onBoolValueFetched;
     }
 }

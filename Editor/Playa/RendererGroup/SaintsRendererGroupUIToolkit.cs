@@ -573,7 +573,17 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                     if(toggle.style.marginLeft != 0)
                     {
-                        toggle.style.marginLeft = 0;
+                        if (toggle.userData is VisualElement moverTarget)
+                        {
+                            if (moverTarget.style.paddingLeft != 12)
+                            {
+                                moverTarget.style.paddingLeft = 12;
+                            }
+                        }
+                        else
+                        {
+                            toggle.style.marginLeft = 0;
+                        }
                     }
 
                     // Yeah... I no longer need this...

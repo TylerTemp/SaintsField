@@ -58,7 +58,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         }
 
+        [LayoutStart("V", ELayout.TitleBox)]
+        [Expandable] public Scriptable soV;
+        [AnimatorState] public AnimatorStateBase animBaseV;
 
+        [LayoutStart("Horizontal", ELayout.TitleBox | ELayout.Horizontal)]
+        [Expandable] public Scriptable so;
+        [AnimatorState] public AnimatorStateBase animBase;
         // [LayoutStart("Tab", ELayout.TitleBox)]
         // // public string tab;
         //

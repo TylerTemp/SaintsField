@@ -584,6 +584,11 @@ namespace SaintsField.Editor.Utils
                                     }
                                 },
                             };
+                            Toggle listViewToggle = listView.Q<Toggle>();
+                            if (listViewToggle != null && listViewToggle.style.marginLeft != -12)
+                            {
+                                listViewToggle.style.marginLeft = -12;
+                            }
                             listView.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
 
                             // This won't work as itemsSourceSizeChanged is an internal event

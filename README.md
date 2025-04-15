@@ -88,10 +88,12 @@ namespace: `SaintsField`
 
 **4.5.0**
 
-1.  UI Toolkit: When `SaintsEditor` enabled, list/array can automatically add `SaintsRow` if necessary
+1.  UI Toolkit: when `SaintsEditor` enabled, list/array can automatically add `SaintsRow` if necessary
 2.  UI Toolkit: `ListDrawerSettings`, same as above
 3.  UI Toolkit: fix an issue that `PropRange` gave an error when working with list/array
 4.  IMGUI: fix height issue in `Table`, [#201](https://github.com/TylerTemp/SaintsField/issues/201)
+5.  UI Toolkit: fix width changes in horizontal `Layout`
+6.  UI Toolkit: fix `Expandable`, `AnimatorState` foldout out of space when using inside `Layout`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

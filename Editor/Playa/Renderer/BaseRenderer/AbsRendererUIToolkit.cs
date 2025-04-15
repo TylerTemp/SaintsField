@@ -231,7 +231,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             Color reColor = EColor.EditorSeparator.GetColor();
 
-            if (valueType == typeof(bool))
+            if (valueType == typeof(bool) || value is bool)
             {
                 if (oldElement is Toggle oldToggle)
                 {
@@ -276,7 +276,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(sbyte))
+            if (valueType == typeof(sbyte) || value is sbyte)
             {
                 if (oldElement is IntegerField integerField)
                 {
@@ -321,7 +321,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(byte))
+            if (valueType == typeof(byte) || value is byte)
             {
                 if (oldElement is IntegerField oldIntegerField)
                 {
@@ -366,7 +366,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(short))
+            if (valueType == typeof(short) || value is short)
             {
                 if (oldElement is IntegerField oldIntegerField)
                 {
@@ -410,7 +410,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return element;
             }
-            if (valueType == typeof(ushort))
+            if (valueType == typeof(ushort) || value is ushort)
             {
                 if (oldElement is IntegerField oldIntegerField)
                 {
@@ -455,7 +455,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(int))
+            if (valueType == typeof(int) || value is int)
             {
                 if (oldElement is IntegerField oldIntegerField)
                 {
@@ -502,7 +502,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(uint))
+            if (valueType == typeof(uint) || value is uint)
             {
 #if UNITY_2022_3_OR_NEWER
                 if (oldElement is UnsignedIntegerField oldLongField)
@@ -582,7 +582,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(long))
+            if (valueType == typeof(long) || value is long)
             {
                 if (oldElement is LongField oldLongField)
                 {
@@ -622,7 +622,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(ulong))
+            if (valueType == typeof(ulong) || value is ulong)
             {
 #if UNITY_2022_3_OR_NEWER
                 ulong ulongRawValue = (ulong)value;
@@ -704,7 +704,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(float))
+            if (valueType == typeof(float) || value is float)
             {
                 if (oldElement is FloatField oldFloatField)
                 {
@@ -744,7 +744,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(double))
+            if (valueType == typeof(double) || value is double)
             {
                 if (oldElement is DoubleField oldDoubleField)
                 {
@@ -784,7 +784,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(string))
+            if (valueType == typeof(string) || value is string)
             {
                 if (oldElement is TextField oldTextField)
                 {
@@ -825,7 +825,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(char))
+            if (valueType == typeof(char) || value is char)
             {
                 if (oldElement is TextField oldTextField)
                 {
@@ -891,7 +891,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(Vector2))
+            if (valueType == typeof(Vector2) || value is Vector2)
             {
                 if (oldElement is Vector2Field oldVector2Field)
                 {
@@ -939,7 +939,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(Vector3))
+            if (valueType == typeof(Vector3) || value is Vector3)
             {
                 if (oldElement is Vector3Field oldVector3Field)
                 {
@@ -988,7 +988,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(Vector4))
+            if (valueType == typeof(Vector4) || value is Vector4)
             {
                 if (oldElement is Vector4Field oldVector4Field)
                 {
@@ -1036,7 +1036,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(Vector2Int))
+            if (valueType == typeof(Vector2Int) || value is Vector2Int)
             {
                 if (oldElement is Vector2IntField oldVector2IntField)
                 {
@@ -1084,7 +1084,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(Vector3Int))
+            if (valueType == typeof(Vector3Int) || value is Vector3Int)
             {
                 if (oldElement is Vector3IntField oldVector3IntField)
                 {
@@ -1132,7 +1132,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(Color))
+            if (valueType == typeof(Color) || value is Color)
             {
                 if (oldElement is ColorField oldColorField)
                 {
@@ -1179,7 +1179,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(Bounds))
+            if (valueType == typeof(Bounds) || value is Bounds)
             {
                 if (oldElement is BoundsField oldBoundsField)
                 {
@@ -1227,7 +1227,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(Rect))
+            if (valueType == typeof(Rect) || value is Rect)
             {
                 if (oldElement is RectField oldRectField)
                 {
@@ -1275,7 +1275,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType == typeof(RectInt))
+            if (valueType == typeof(RectInt) || value is RectInt)
             {
                 if (oldElement is RectIntField oldRectIntField)
                 {
@@ -1323,7 +1323,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (valueType.BaseType == typeof(Enum))
+            if (valueType.BaseType == typeof(Enum) || value is Enum)
             {
                 if (oldElement is EnumField oldEnumField)
                 {
@@ -1370,7 +1370,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return element;
             }
-            if (typeof(UnityEngine.Object).IsAssignableFrom(valueType))
+            if (typeof(UnityEngine.Object).IsAssignableFrom(valueType) || value is UnityEngine.Object)
             {
                 return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
             }

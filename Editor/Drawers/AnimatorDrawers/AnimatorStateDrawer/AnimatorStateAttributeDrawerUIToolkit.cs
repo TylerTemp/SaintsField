@@ -91,6 +91,11 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
                 name = NameFoldout(property),
                 value = false,
             };
+            Toggle toggle = foldOut.Q<Toggle>();
+            if (toggle != null)
+            {
+                toggle.userData = container;
+            }
 
             foldOut.RegisterValueChangedCallback(v =>
             {
