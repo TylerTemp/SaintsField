@@ -430,11 +430,8 @@ namespace SaintsField.Editor.Utils
                     originalField,
                     parent
                 );
-                if (r == null)
-                {
-                    return null;
-                }
-                return UIToolkitCache.MergeWithDec(r, allAttributes);
+                // we don't need decorator here
+                return r;
             }
 
             // Nah... This didn't handle for mis-ordered case
@@ -556,6 +553,7 @@ namespace SaintsField.Editor.Utils
                         bool listViewNotExist = listView == null;
                         if (listViewNotExist)
                         {
+                            // Debug.Log($"listView {property.propertyPath}");
                             listView = new ListView
                             {
                                 showBorder = true,
@@ -577,7 +575,8 @@ namespace SaintsField.Editor.Utils
                                     VisualElement result = CreateOrUpdateFieldProperty(
                                         itemProp,
                                         allAttributes,
-                                        rawType, $"Element {index}",
+                                        rawType,
+                                        $"Element {index}",
                                         fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null, parent);
                                     if (result != null)
                                     {

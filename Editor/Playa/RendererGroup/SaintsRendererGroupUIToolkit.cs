@@ -37,6 +37,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     borderTopRightRadius = radius,
                     borderBottomLeftRadius = radius,
                     borderBottomRightRadius = radius,
+                    width = new StyleLength(Length.Percent(100)),
                 },
             };
 

@@ -556,13 +556,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb402a79b8bd85646b18070685f729b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  structArr:
-  - s: 11
-    i: 0
-  - s: 22
-    i: 0
+  structArr: []
+  structArrLis: []
   floatArr:
-  - 0.076
+  - 0
+  g23:
+  - 112233
+  - sfdsfds
 --- !u!1 &147024401
 GameObject:
   m_ObjectHideFlags: 0
@@ -1858,7 +1858,7 @@ MonoBehaviour:
     i1: 0
     go: {fileID: 0}
   f3: 0
-  intArr: 000000000000000000000000
+  intArr: 
 --- !u!1 &861579776
 GameObject:
   m_ObjectHideFlags: 0
@@ -2524,7 +2524,9 @@ MonoBehaviour:
   g13: 
   g21: 1321321321
   g22: 
-  g23: Dynamic <color=lime>label!
+  g23:
+  - 1
+  - 2
   toggle: 0
 --- !u!114 &1150580246
 MonoBehaviour:

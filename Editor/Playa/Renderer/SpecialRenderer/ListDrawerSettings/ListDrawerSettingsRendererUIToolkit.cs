@@ -52,11 +52,13 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             VisualElement MakeItem()
             {
-                PropertyField propertyField = new PropertyField();
-                return propertyField;
+                // PropertyField propertyField = new PropertyField();
+                return new VisualElement();
             }
 
-            void BindItem(VisualElement propertyFieldRaw, int index)
+            var allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo);
+
+            void BindItem(VisualElement element, int index)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log(($"bind: {index}, propIndex: {itemIndexToPropertyIndex[index]}, itemIndexes={string.Join(", ", itemIndexToPropertyIndex)}"));
@@ -71,44 +73,64 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 {
                     return;
                 }
+
                 SerializedProperty prop = property.GetArrayElementAtIndex(propIndex);
-                PropertyField propertyField = (PropertyField)propertyFieldRaw;
-                propertyField.BindProperty(prop);
+                VisualElement resultField = UIToolkitUtils.CreateOrUpdateFieldRawFallback(
+                    property,
+                    allAttributes,
+                    FieldWithInfo.FieldInfo.FieldType,
+                    $"Element {index}",
+                    FieldWithInfo.FieldInfo,
+                    InAnyHorizontalLayout,
+                    this,
+                    this,
+                    null,
+                    FieldWithInfo.Target
+                );
+                // PropertyField propertyField = (PropertyField)propertyFieldRaw;
+                // propertyField.BindProperty(prop);
                 // Debug.Log(prop.propertyPath);
-
-                // we can not clear the original context menu which will incorrectly copy the whole property, rather than an element
-                propertyField.AddManipulator(new ContextualMenuManipulator(evt =>
+                element.Clear();
+                // ReSharper disable once InvertIf
+                if(resultField != null)
                 {
-                    evt.menu.AppendAction("Copy Element Property Path", _ => EditorGUIUtility.systemCopyBuffer = prop.propertyPath);
-
-                    // bool spearator = false;
-                    if (ClipboardHelper.CanCopySerializedProperty(prop.propertyType))
+                    element.Add(resultField);
+                    // we can not clear the original context menu which will incorrectly copy the whole property, rather than an element
+                    resultField.AddManipulator(new ContextualMenuManipulator(evt =>
                     {
-                        // spearator = true;
-                        // evt.menu.AppendSeparator();
-                        evt.menu.AppendAction("Copy Element", _ => ClipboardHelper.DoCopySerializedProperty(prop));
-                    }
+                        evt.menu.AppendAction("Copy Element Property Path",
+                            _ => EditorGUIUtility.systemCopyBuffer = prop.propertyPath);
 
-                    (bool hasReflectionPaste, bool hasValuePaste) = ClipboardHelper.CanPasteSerializedProperty(prop.propertyType);
-
-                    // ReSharper disable once InvertIf
-                    if (hasReflectionPaste)
-                    {
-                        evt.menu.AppendAction("Paste Element", _ =>
+                        // bool spearator = false;
+                        if (ClipboardHelper.CanCopySerializedProperty(prop.propertyType))
                         {
-                            ClipboardHelper.DoPasteSerializedProperty(prop);
+                            // spearator = true;
+                            // evt.menu.AppendSeparator();
+                            evt.menu.AppendAction("Copy Element", _ => ClipboardHelper.DoCopySerializedProperty(prop));
+                        }
+
+                        (bool hasReflectionPaste, bool hasValuePaste) =
+                            ClipboardHelper.CanPasteSerializedProperty(prop.propertyType);
+
+                        // ReSharper disable once InvertIf
+                        if (hasReflectionPaste)
+                        {
+                            evt.menu.AppendAction("Paste Element", _ =>
+                            {
+                                ClipboardHelper.DoPasteSerializedProperty(prop);
+                                property.serializedObject.ApplyModifiedProperties();
+                            }, hasValuePaste ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
+                        }
+
+                        evt.menu.AppendAction("Delete Element", _ =>
+                        {
+                            property.DeleteArrayElementAtIndex(propIndex);
                             property.serializedObject.ApplyModifiedProperties();
-                        }, hasValuePaste? DropdownMenuAction.Status.Normal: DropdownMenuAction.Status.Disabled);
-                    }
+                        });
 
-                    evt.menu.AppendAction("Delete Element", _ =>
-                    {
-                        property.DeleteArrayElementAtIndex(propIndex);
-                        property.serializedObject.ApplyModifiedProperties();
-                    });
-
-                    evt.menu.AppendSeparator();
-                }));
+                        evt.menu.AppendSeparator();
+                    }));
+                }
             }
 
             ListView listView = new ListView(Enumerable.Range(0, property.arraySize).ToList())

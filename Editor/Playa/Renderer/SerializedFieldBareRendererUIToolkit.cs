@@ -13,6 +13,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 style =
                 {
                     flexGrow = 1,
+                    width = new StyleLength(Length.Percent(100)),
                 },
                 name = FieldWithInfo.SerializedProperty.propertyPath,
             };

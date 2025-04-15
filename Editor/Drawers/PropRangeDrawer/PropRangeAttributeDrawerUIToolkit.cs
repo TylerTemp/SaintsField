@@ -127,6 +127,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+
             AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
 
             PropRangeField propRangeField = container.Q<PropRangeField>(name: NamePropRange(property));
@@ -316,7 +317,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
                     floatField.SetValueWithoutNotify((float)preValueInfo.value);
                     slider.SetValueWithoutNotify((float)preValueInfo.value);
-                    info.SetValue(parent, parsedValue);
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, parsedValue);
                     onValueChangedCallback.Invoke(parsedValue);
                 }
                 else
@@ -328,7 +329,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
                     integerField.SetValueWithoutNotify((int) preValueInfo.value);
                     slider.SetValueWithoutNotify((int) preValueInfo.value);
-                    info.SetValue(parent, intValue);
+                    // info.SetValue(parent, intValue);
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, intValue);
                     onValueChangedCallback.Invoke(intValue);
                 }
 

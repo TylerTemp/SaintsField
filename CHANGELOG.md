@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.5.0 ##
+
+1.  UI Toolkit: when `SaintsEditor` enabled, list/array can automatically add `SaintsRow` if necessary
+2.  UI Toolkit: `ListDrawerSettings`, same as above
+3.  UI Toolkit: fix an issue that `PropRange` gave an error when working with list/array
+4.  IMGUI: fix height issue in `Table`, [#201](https://github.com/TylerTemp/SaintsField/issues/201)
+5.  UI Toolkit: fix width changes in Horizontal Layout 
+
 ## 4.4.0 ##
 
 1.  UI Toolkit: `Table` now support showing `Button` & `ShowInInspector`. (Note: Any kind of `Layout` will be ignored)

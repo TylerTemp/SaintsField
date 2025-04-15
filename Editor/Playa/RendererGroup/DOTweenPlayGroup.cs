@@ -443,7 +443,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public VisualElement CreateVisualElement()
         {
-            VisualElement root = new VisualElement();
+            VisualElement root = new VisualElement
+            {
+                style =
+                {
+                    width = new StyleLength(Length.Percent(100)),
+                },
+            };
 
             List<DOTweenToolkit> doTweenToolkits = new List<DOTweenToolkit>();
 

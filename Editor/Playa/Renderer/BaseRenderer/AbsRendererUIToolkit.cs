@@ -45,6 +45,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // flexGrow = 1,
                     // flexGrow = InAnyHorizontalLayout? 0: 1,
                     flexGrow = flexGrow,
+                    width = new StyleLength(Length.Percent(100)),
                 },
                 name = ToString(),
             };
@@ -66,6 +67,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         flexGrow = 1,
                         flexShrink = 0,
+
+                        width = new StyleLength(Length.Percent(100)),
                     },
                 };
                 targetContainer.AddToClassList(ClassSaintsFieldPlayaContainer);
@@ -844,6 +847,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (inHorizontalLayout)
                 {
                     element.style.flexDirection = FlexDirection.Column;
+                    // a bug in Unity 6000.0.41f1
+                    // TextInput but not such element, at all...
+                    TextElement te = element.Q<VisualElement>("unity-text-input")?.Q<TextElement>();
+                    if (te != null)
+                    {
+                        te.style.minHeight = 15;
+                    }
                 }
                 else
                 {

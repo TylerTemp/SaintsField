@@ -128,25 +128,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
         }
 
-        private static float GetValue(MetaInfo metaInfo, float newValue)
-        {
-            // property.floatValue = newValue;
-            float step = metaInfo.Step;
-            bool isFloat = metaInfo.IsFloat;
-            // Debug.Log(step);
-            if (step <= 0)
-            {
-                // return newValue;
-                return Mathf.Clamp(newValue, metaInfo.MinValue, metaInfo.MaxValue);
-            }
 
-            if (isFloat)
-            {
-                return Util.BoundFloatStep(newValue, metaInfo.MinValue, metaInfo.MaxValue, step);
-            }
-
-            return Util.BoundIntStep(newValue, metaInfo.MinValue, metaInfo.MaxValue, (int)step);
-        }
 
         protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,

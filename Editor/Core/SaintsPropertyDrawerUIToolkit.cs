@@ -60,7 +60,6 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"Create property gui {property.propertyPath}/{property.displayName}/{this}");
 #endif
-
             if (!SerializedUtils.IsOk(property))
             {
                 return new VisualElement();

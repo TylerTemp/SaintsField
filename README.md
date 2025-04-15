@@ -86,11 +86,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.4.0**
+**4.5.0**
 
-1.  UI Toolkit: `Table` now support showing `Button` & `ShowInInspector`. (Note: Any kind of `Layout` will be ignored)
-2.  UI Toolkit: Fix `NoLabel` didn't work when inside a horizontal layout
-3.  UI Toolkit: Fix `Table` foldout out of area. If a struct is a field, that field will remove the `foldout`
+1.  UI Toolkit: When `SaintsEditor` enabled, list/array can automatically add `SaintsRow` if necessary
+2.  UI Toolkit: `ListDrawerSettings`, same as above
+3.  UI Toolkit: fix an issue that `PropRange` gave an error when working with list/array
+4.  IMGUI: fix height issue in `Table`, [#201](https://github.com/TylerTemp/SaintsField/issues/201)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

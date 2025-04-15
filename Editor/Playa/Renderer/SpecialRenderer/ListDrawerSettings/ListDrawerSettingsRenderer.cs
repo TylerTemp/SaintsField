@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 {
-    public partial class ListDrawerSettingsRenderer: SerializedFieldBaseRenderer
+    public partial class ListDrawerSettingsRenderer: SerializedFieldBaseRenderer, IMakeRenderer, IDOTweenPlayRecorder
     {
         private bool _arraySizeCondition;
         private bool _richLabelCondition;
@@ -16,6 +16,11 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
         public ListDrawerSettingsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
+        }
+
+        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        {
+            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         }
     }
 }
