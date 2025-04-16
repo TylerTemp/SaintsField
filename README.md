@@ -86,16 +86,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.5.0**
+**4.5.1**
 
-1.  UI Toolkit: when `SaintsEditor` enabled, list/array can automatically add `SaintsRow` if necessary
-2.  UI Toolkit: `ListDrawerSettings`, same as above. Fix incorrect indent for the foldout
-3.  UI Toolkit: fix an issue that `PropRange` gave an error when working with list/array
-4.  IMGUI: fix height issue in `Table`, [#201](https://github.com/TylerTemp/SaintsField/issues/201)
-5.  UI Toolkit: fix width changes in horizontal `Layout`
-6.  UI Toolkit: fix `Expandable`, `AnimatorState` foldout out of space when using inside `Layout`
-7.  UI Toolkit: fix `UnityEvent` can not be drawn correctly under some circumstances
-8.  UI Toolkit: fix `ShowInInspector` can not correctly draw a field when using a parent class type
+UI Toolkit: fix `OnValueChanged` broken
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1423,7 +1416,7 @@ Show a list/array of class/struct/`ScriptableObject`(or `MonoBehavior` if you li
 
 It allows to resize the rows, hide rows.
 
-UI Toolkit: `Button`, `ShowInInspector` & `Playa*` will work as expected, and `Layout` will be ignored. 
+UI Toolkit: `Button`, `ShowInInspector` & `Playa*` will work as expected, and `Layout` will be ignored.
 
 Note:
 1.  It's highly recommended to enable `SaintsEditor`, otherwise the outside `list` will always be visible with some empty rows.

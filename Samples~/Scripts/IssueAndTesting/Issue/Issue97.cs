@@ -56,8 +56,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             public override string ToString() => $"MyClass3: {int2}";
         }
         [SerializeReference,
-         ReferencePicker,
-         OnArraySizeChanged(nameof(InterfaceSizeChanged)),
+         // ReferencePicker,
+         // OnArraySizeChanged(nameof(InterfaceSizeChanged)),
          OnValueChanged(nameof(InterfacesValueChanged)),
         ]
         public IMyInterface[] myInterfaces;

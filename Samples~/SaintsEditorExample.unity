@@ -2099,8 +2099,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myClasses:
-  - unique: 31321
-  - unique: 333
+  - unique: 1122
+  - unique: 3232
   myInterfaces:
   - rid: 650996098112159754
   references:
@@ -2109,7 +2109,7 @@ MonoBehaviour:
     - rid: 650996098112159754
       type: {class: Issue97/MyClass3, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
-        int2: 0
+        int2: 19
 --- !u!1 &943755158
 GameObject:
   m_ObjectHideFlags: 0
@@ -2528,6 +2528,22 @@ MonoBehaviour:
   - 1
   - 2
   toggle: 0
+  soV: {fileID: 0}
+  animBaseV:
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: 0
+    <stateName>k__BackingField: 
+    <stateSpeed>k__BackingField: 0
+    <stateTag>k__BackingField: 
+    <subStateMachineNameChain>k__BackingField: []
+  so: {fileID: 0}
+  animBase:
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: 0
+    <stateName>k__BackingField: 
+    <stateSpeed>k__BackingField: 0
+    <stateTag>k__BackingField: 
+    <subStateMachineNameChain>k__BackingField: []
 --- !u!114 &1150580246
 MonoBehaviour:
   m_ObjectHideFlags: 0
