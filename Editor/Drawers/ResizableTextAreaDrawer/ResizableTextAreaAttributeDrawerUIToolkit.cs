@@ -52,6 +52,8 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                 },
             };
 
+            textField.AddToClassList(ClassAllowDisable);
+
             // TextInput inputField = textField.Q<TextInput>();
             VisualElement textInput = textField.Q(name: "unity-text-input");
             if (textInput != null)
