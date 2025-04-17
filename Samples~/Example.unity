@@ -17618,7 +17618,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7b6222d0422146439d9ab267f239344, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objDefaultPicker: {fileID: 0}
+  objDefaultPicker: {fileID: 8204014741858920423, guid: 318b7d046ab1ba94b961338a2f064a6a, type: 3}
   objectPicker: 
 --- !u!1 &1318514130
 GameObject:

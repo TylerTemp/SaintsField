@@ -1,14 +1,25 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <ui:VisualElement style="flex-grow: 1; flex-shrink: initial; width: 100%;">
-        <uie:ToolbarSearchField focusable="true" placeholder-text="Search" style="width: initial;" />
-        <ui:VisualElement name="saint-field-object-picker-tabl-row" style="flex-grow: initial; height: 20px; flex-direction: row; width: 100%; justify-content: space-between;">
+    <uie:ToolbarSearchField focusable="true" placeholder-text="Search" style="width: initial;" />
+    <ui:VisualElement style="flex-grow: initial; height: 20px; flex-direction: row; width: 100%; justify-content: space-between;">
+        <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
             <uie:Toolbar>
                 <uie:ToolbarToggle label="Assets" style="width: 65px;" />
                 <uie:ToolbarToggle label="Scene" style="width: 65px;" />
             </uie:Toolbar>
-            <ui:Slider value="42" high-value="100" name="Slider" enabled="true" style="min-width: 60px;" />
+            <ui:Image name="saints-field-object-picker-loading" style="width: 16px; height: 16px; align-self: center;" />
         </ui:VisualElement>
-        <ui:ListView name="saints-field-object-picker-list" style="background-color: rgb(80, 80, 80); flex-grow: 1;" />
+        <ui:Slider value="42" high-value="100" name="Slider" style="min-width: 60px;" />
     </ui:VisualElement>
-    <ui:VisualElement style="flex-grow: 1;" />
+    <ui:VisualElement name="saints-field-object-picker-body" style="flex-grow: 1;">
+        <ui:ListView name="saints-field-object-picker-list" style="background-color: rgb(80, 80, 80); flex-grow: 1;" />
+        <ui:ScrollView name="saints-field-object-picker-block" horizontal-scroller-visibility="Hidden" style="flex-grow: 1;" />
+    </ui:VisualElement>
+    <ui:VisualElement style="flex-grow: 0; flex-direction: row; flex-shrink: 0; height: 80px; padding-top: 5px; padding-right: 5px; padding-left: 5px;">
+        <ui:Image name="saints-field-object-picker-preview-image" style="width: 70px; height: 70px; margin-right: 5px;" />
+        <ui:VisualElement style="flex-grow: 1;">
+            <ui:Label text="Name" name="saints-field-object-picker-preview-label-name" style="text-overflow: ellipsis; margin-left: 0; margin-right: 0; margin-top: 1px; margin-bottom: 1px; padding-left: 0; padding-bottom: 0; padding-right: 0; padding-top: 0; text-shadow: 2px 2px 1.6px rgb(43, 43, 43);" />
+            <ui:Label text="Object Type" name="saints-field-object-picker-preview-label-type" style="text-overflow: ellipsis; margin-left: 0; margin-right: 0; margin-top: 1px; margin-bottom: 1px; padding-left: 0; padding-bottom: 0; padding-right: 0; padding-top: 0; text-shadow: 2px 2px 1.6px rgb(43, 43, 43);" />
+            <ui:Label text="Assets/Path/To/This/Assets/With/Relative/Path.prefab" name="saints-field-object-picker-preview-label-path" style="text-overflow: ellipsis; margin-left: 0; margin-right: 0; margin-top: 1px; margin-bottom: 1px; padding-left: 0; padding-bottom: 0; padding-right: 0; padding-top: 0; text-shadow: 2px 2px 1.6px rgb(43, 43, 43);" />
+        </ui:VisualElement>
+    </ui:VisualElement>
 </ui:UXML>

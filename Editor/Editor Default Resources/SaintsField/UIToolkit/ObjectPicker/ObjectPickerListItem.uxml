@@ -1,0 +1,6 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <engine:Button name="saints-field-object-picker-list-item-button" style="height: 22px; flex-direction: row; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; align-items: center; margin-top: 0; margin-bottom: 0; flex-grow: 1; margin-right: 0; margin-left: 0; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-bottom-left-radius: 0;">
+        <engine:Image name="saints-field-object-picker-list-item-image" style="height: 16px; width: 16px;" />
+        <engine:Label text="Item Name" name="saints-field-object-picker-list-item-label" style="height: 16px;" />
+    </engine:Button>
+</engine:UXML>
