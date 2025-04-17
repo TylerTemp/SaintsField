@@ -1,9 +1,11 @@
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,18 +13,77 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 {
 
 
-    public class PopupContentExample : EditorWindow
+    public class SaintsObjectPickerUIToolkit : EditorWindow
     {
+        public readonly struct ObjectBaseInfo
+        {
+            public readonly Object Target;
+            public readonly Texture2D Icon;
+            public readonly string Name;
+            public readonly string TypeName;
+            public readonly string Path;
+
+            public ObjectBaseInfo(Object target, Texture2D icon, string name, string typeName, string path)
+            {
+                Target = target;
+                Icon = icon;
+                Name = name;
+                TypeName = typeName;
+                Path = path;
+            }
+        }
+
+        public class ObjectInfo
+        {
+            public ObjectBaseInfo BaseInfo;
+            public Texture2D Preview;
+        }
+
+        private bool _currentOnAssets = true;
+
+        private ToolbarToggle _assetsToggle;
+        private ToolbarToggle _sceneToggle;
+
         private VisualElement _pickerBody;
         private ListView _listView;
         private ScrollView _blockView;
 
         private Image _loadingImage;
 
+        // private List<ObjectInfo> _scene
+
         public void CreateGUI()
         {
             VisualTreeAsset visualTreeAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerPanel.uxml");
             visualTreeAsset.CloneTree(rootVisualElement);
+
+            _assetsToggle = rootVisualElement.Q<ToolbarToggle>(name: "saints-field-object-picker-toggle-assets");
+            _sceneToggle = rootVisualElement.Q<ToolbarToggle>(name: "saints-field-object-picker-toggle-scene");
+
+            _assetsToggle.RegisterValueChangedCallback(e =>
+            {
+                if (e.newValue)
+                {
+                    _currentOnAssets = true;
+                    _sceneToggle.SetValueWithoutNotify(false);
+                }
+                else
+                {
+                    _assetsToggle.SetValueWithoutNotify(true);
+                }
+            });
+            _sceneToggle.RegisterValueChangedCallback(e =>
+            {
+                if (e.newValue)
+                {
+                    _currentOnAssets = false;
+                    _assetsToggle.SetValueWithoutNotify(false);
+                }
+                else
+                {
+                    _sceneToggle.SetValueWithoutNotify(true);
+                }
+            });
 
             _loadingImage = rootVisualElement.Q<Image>(name: "saints-field-object-picker-loading");
             _loadingImage.image = Util.LoadResource<Texture2D>("refresh.png");
@@ -72,6 +133,45 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                 blockViewContainer.Add(blockItem);
                 blockItem.Q<Label>(name: "saints-field-object-picker-block-item-name").text = $"Item {i}";
             }
+
+            // rootVisualElement.schedule.Execute(() =>
+            // {
+            //     DisableAssets();
+            // }).StartingIn(1000);
+            //
+            // rootVisualElement.schedule.Execute(() =>
+            // {
+            //     DisableScene();
+            // }).StartingIn(2000);
+        }
+
+        public void DisableAssets()
+        {
+            InternalDisableAssets(true);
+        }
+
+        public void DisableScene()
+        {
+            InternalDisableAssets(false);
+        }
+
+        private void InternalDisableAssets(bool disable)
+        {
+            _assetsToggle.SetEnabled(!disable);
+            _sceneToggle.SetEnabled(disable);
+
+            if (_currentOnAssets && disable)
+            {
+                _assetsToggle.SetValueWithoutNotify(false);
+                _sceneToggle.SetValueWithoutNotify(true);
+                _currentOnAssets = false;
+            }
+            else
+            {
+                _assetsToggle.SetValueWithoutNotify(true);
+                _sceneToggle.SetValueWithoutNotify(false);
+                _currentOnAssets = true;
+            }
         }
     }
 
@@ -99,9 +199,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                 // PopupWindow.Show(container.worldBound, new PopupContentExample());
 
                 // PopupWindow.Show(container.worldBound, new PopupContentExample());
-                var pop = EditorWindow.GetWindow<PopupContentExample>();
+                var pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
                 pop.Close();
-                pop = EditorWindow.GetWindow<PopupContentExample>();
+                pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
                 pop.Show();
 
                 // UnityEngine.UIElements.PopupWindow popup = new UnityEngine.UIElements.PopupWindow();
@@ -116,9 +216,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             };
 
             // var pop = ScriptableObject.CreateInstance<PopupContentExample>();
-            var pop = EditorWindow.GetWindow<PopupContentExample>();
+            var pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
             pop.Close();
-            pop = EditorWindow.GetWindow<PopupContentExample>();
+            pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
             pop.Show();
 
             VisualElement root = new VisualElement();

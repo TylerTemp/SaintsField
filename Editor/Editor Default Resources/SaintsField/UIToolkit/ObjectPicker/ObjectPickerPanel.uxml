@@ -3,8 +3,8 @@
     <ui:VisualElement style="flex-grow: initial; height: 20px; flex-direction: row; width: 100%; justify-content: space-between;">
         <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
             <uie:Toolbar>
-                <uie:ToolbarToggle label="Assets" style="width: 65px;" />
-                <uie:ToolbarToggle label="Scene" style="width: 65px;" />
+                <uie:ToolbarToggle label="Assets" name="saints-field-object-picker-toggle-assets" value="true" style="width: 65px;" />
+                <uie:ToolbarToggle label="Scene" name="saints-field-object-picker-toggle-scene" style="width: 65px;" />
             </uie:Toolbar>
             <ui:Image name="saints-field-object-picker-loading" style="width: 16px; height: 16px; align-self: center;" />
         </ui:VisualElement>

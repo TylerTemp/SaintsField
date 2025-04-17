@@ -11,7 +11,8 @@
         "today.comes.saintsfield.Runtime.Addressable",
         "Unity.Netcode.Runtime",
         "Unity.Mathematics",
-        "Obvious.Soap"
+        "Obvious.Soap",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
