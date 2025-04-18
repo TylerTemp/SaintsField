@@ -42,10 +42,12 @@ namespace SaintsField.Editor.Utils
             Method,
         }
 
+        public const BindingFlags FindTargetBindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                      BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
         public static (GetPropType getPropType, object fieldOrMethodInfo) GetProp(Type targetType, string fieldName)
         {
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+            const BindingFlags bindAttr = FindTargetBindAttr;
 
             FieldInfo fieldInfo = targetType.GetField(fieldName, bindAttr);
             // Debug.Log($"init get fieldInfo {fieldInfo}");

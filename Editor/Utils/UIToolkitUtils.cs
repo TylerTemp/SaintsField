@@ -393,6 +393,8 @@ namespace SaintsField.Editor.Utils
                     //     // useDrawerType = typeof(SaintsRowAttributeDrawer);
                     // }
                 }
+
+                // Debug.Log($"{property.propertyPath}: drawer={useDrawerType}");
             }
 
             // List<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> appendSaintsAttributeDrawer = null;
@@ -437,6 +439,7 @@ namespace SaintsField.Editor.Utils
 
             if (useDrawerType == null)
             {
+                // Debug.Log($"fallback {property.propertyPath}");
                 VisualElement r = CreateOrUpdateFieldRawFallback(
                     property,
                     allAttributes,
@@ -589,6 +592,7 @@ namespace SaintsField.Editor.Utils
                 case SerializedPropertyType.Generic:
                 case SerializedPropertyType.ManagedReference:
                 {
+                    // Debug.Log($"generic/managed process {property.propertyPath}/{property.isArray}");
                     if (property.isArray)
                     {
                         ListView listView = originalField as ListView;
@@ -613,6 +617,8 @@ namespace SaintsField.Editor.Utils
                                 {
                                     SerializedProperty itemProp = property.GetArrayElementAtIndex(index);
                                     element.Clear();
+
+                                    // Debug.Log($"draw item {itemProp.propertyPath}/rawType={rawType}/itemType={ReflectUtils.GetElementType(rawType)}");
 
                                     VisualElement result = CreateOrUpdateFieldProperty(
                                         itemProp,

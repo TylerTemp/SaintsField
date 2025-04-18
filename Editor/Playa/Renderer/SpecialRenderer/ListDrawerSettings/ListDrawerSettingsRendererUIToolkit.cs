@@ -1,7 +1,9 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -34,8 +36,193 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             return (root, false);
         }
 
+        private enum ParamType
+        {
+            TargetAndIndex,
+            Target,
+            Index,
+        }
+
+        private (MethodInfo, ParamType) GetSearchMethodInfo(Type targetType, Type elementType, string methodName)
+        {
+            foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypesFromType(targetType))
+            {
+                foreach (MethodInfo methodInfo in eachType.GetMethods(ReflectUtils.FindTargetBindAttr))
+                {
+                    if (methodInfo.Name != methodName)
+                    {
+                        continue;
+                    }
+
+                    if (methodInfo.ReturnParameter?.ParameterType != typeof(bool))
+                    {
+                        continue;
+                    }
+
+                    ParameterInfo[] methodParams = methodInfo.GetParameters();
+
+                    // ReSharper disable once UseIndexFromEndExpression
+                    bool lastMatch = typeof(IEnumerable<ListSearchToken>).IsAssignableFrom(methodParams[methodParams.Length - 1].ParameterType);
+                    if (!lastMatch)
+                    {
+                        continue;
+                    }
+
+                    // ReSharper disable once ConvertIfStatementToSwitchStatement
+                    if (methodParams.Length == 3
+                        && elementType.IsAssignableFrom(methodParams[0].ParameterType)
+                        && typeof(int).IsAssignableFrom(methodParams[1].ParameterType))
+                    {
+                        return (methodInfo, ParamType.TargetAndIndex);
+                    }
+
+                    if (methodParams.Length == 2 && elementType.IsAssignableFrom(methodParams[0].ParameterType))
+                    {
+                        return (methodInfo, ParamType.Target);
+                    }
+
+                    if (methodParams.Length == 2 && typeof(int).IsAssignableFrom(methodParams[0].ParameterType))
+                    {
+                        return (methodInfo, ParamType.Index);
+                    }
+                }
+            }
+
+            return (null, default);
+        }
+
         private (VisualElement root, Button addButton, Button removeButton) MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, ArraySizeAttribute arraySizeAttribute)
         {
+            Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
+                                                           FieldWithInfo.PropertyInfo.PropertyType);
+
+            // search functions
+            string extraSearchCallback = listDrawerSettingsAttribute.ExtraSearch;
+            string overrideSearchCallback = listDrawerSettingsAttribute.OverrideSearch;
+
+            (MethodInfo methodInfo, ParamType paramType) extraSearchMethod = default;
+            (MethodInfo methodInfo, ParamType paramType) overrideSearchMethod = default;
+
+            if (!string.IsNullOrEmpty(extraSearchCallback))
+            {
+                extraSearchMethod = GetSearchMethodInfo(FieldWithInfo.Target.GetType(), elementType, extraSearchCallback);
+            }
+
+            if (!string.IsNullOrEmpty(overrideSearchCallback))
+            {
+                overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Target.GetType(), elementType, overrideSearchCallback);
+            }
+
+            IEnumerable<int> SearchCallback (SerializedProperty arrayProperty, string search)
+            {
+                if (string.IsNullOrEmpty(search))
+                {
+                    foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
+                    {
+                        yield return fullIndex;
+                    }
+
+                    yield break;
+                }
+
+                IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(search).ToList();
+
+                if (overrideSearchMethod.methodInfo != null)
+                {
+                    foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
+                    {
+                        if (overrideSearchMethod.paramType == ParamType.Index)
+                        {
+                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Target,
+                                    new object[] { fullIndex, searchTokens }))
+                            {
+                                yield return fullIndex;
+                            }
+                            continue;
+                        }
+
+                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
+
+                        int curIndex = 0;
+
+                        foreach (object rawValue in rawValueList)
+                        {
+                            object[] methodParams = overrideSearchMethod.paramType == ParamType.Target
+                                ? new object[] { rawValue, searchTokens }
+                                : new object[] { rawValue, curIndex, searchTokens };
+
+                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
+                            {
+                                yield return fullIndex;
+                            }
+
+                            curIndex++;
+                        }
+
+                    }
+                    yield break;
+                }
+
+                if (extraSearchMethod.methodInfo != null)
+                {
+
+                    foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
+                    {
+                        if (extraSearchMethod.paramType == ParamType.Index)
+                        {
+                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Target,
+                                    new object[] { fullIndex, searchTokens }))
+                            {
+                                yield return fullIndex;
+                            }
+                            else
+                            {
+                                SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(fullIndex);
+                                if(searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
+                                {
+                                    yield return fullIndex;
+                                }
+                            }
+                            continue;
+                        }
+
+                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
+
+                        int curIndex = 0;
+
+                        foreach (object rawValue in rawValueList)
+                        {
+                            object[] methodParams = extraSearchMethod.paramType == ParamType.Target
+                                ? new[] { rawValue, searchTokens }
+                                : new[] { rawValue, curIndex, searchTokens };
+
+                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
+                            {
+                                yield return fullIndex;
+                            }
+                            else
+                            {
+                                SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(fullIndex);
+                                if(searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
+                                {
+                                    yield return fullIndex;
+                                }
+                            }
+
+                            curIndex++;
+                        }
+
+                    }
+
+                    yield break;
+                }
+
+                foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search))
+                {
+                    yield return i;
+                }
+            }
+
             VisualElement root = new VisualElement
             {
                 style =
@@ -312,7 +499,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             void UpdatePage(int newPageIndex, int numberOfItemsPerPage)
             {
-                PagingInfo pagingInfo = GetPagingInfo(property, newPageIndex, searchField.value, numberOfItemsPerPage);
+                List<int> resultIndexes = SearchCallback(property, searchField.value).ToList();
+                PagingInfo pagingInfo = GetPagingInfo(newPageIndex, resultIndexes, numberOfItemsPerPage);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"index search={searchField.value} result: {string.Join(",", pagingInfo.IndexesAfterSearch)}; numberOfItemsPerPage={numberOfItemsPerPage}");
@@ -516,9 +704,9 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             #region Drag
             VisualElement foldoutInput = foldoutElement.Q<VisualElement>(classes: "unity-foldout__input");
 
-            Type elementType =
-                ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
-                                            FieldWithInfo.PropertyInfo.PropertyType);
+            // Type elementType =
+            //     ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
+            //                                 FieldWithInfo.PropertyInfo.PropertyType);
             foldoutInput.RegisterCallback<DragEnterEvent>(_ =>
             {
                 // Debug.Log($"Drag Enter {evt}");

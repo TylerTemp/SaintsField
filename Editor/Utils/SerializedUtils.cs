@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -332,12 +333,19 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static IEnumerable<int> SearchArrayProperty(SerializedProperty property, string search)
+        public static IEnumerable<ListSearchToken> ParseSearch(string search)
         {
+            // TODO: support web search,including "search whole", -exclude, -"exclude whole"
+            return search.Split(' ').Select(segment => new ListSearchToken(ListSearchType.Include, segment));
+        }
+
+        public static IEnumerable<int> SearchArrayProperty(SerializedProperty property, string searchFull)
+        {
+            IReadOnlyList<ListSearchToken> searchTokens = ParseSearch(searchFull).ToArray();
             for (int i = 0; i < property.arraySize; i++)
             {
                 SerializedProperty childProperty = property.GetArrayElementAtIndex(i);
-                if(SearchProp(childProperty, search))
+                if (searchTokens.All(search => SearchProp(childProperty, search.Token)))
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"found: {childProperty.propertyPath}");
@@ -347,7 +355,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private static bool SearchProp(SerializedProperty property, string search)
+        public static bool SearchProp(SerializedProperty property, string token)
         {
             SerializedPropertyType propertyType;
             try
@@ -368,73 +376,73 @@ namespace SaintsField.Editor.Utils
             switch (propertyType)
             {
                 case SerializedPropertyType.Integer:
-                    return property.intValue.ToString().Contains(search);
+                    return property.intValue.ToString().Contains(token);
                 case SerializedPropertyType.Boolean:
-                    return property.boolValue.ToString().Contains(search);
+                    return property.boolValue.ToString().Contains(token);
                 case SerializedPropertyType.Float:
                     // ReSharper disable once SpecifyACultureInStringConversionExplicitly
-                    return property.floatValue.ToString().Contains(search);
+                    return property.floatValue.ToString().Contains(token);
                 case SerializedPropertyType.String:
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"{property.propertyPath}={property.stringValue} contains {search}={property.stringValue?.Contains(search)}");
 #endif
-                    return property.stringValue?.Contains(search) ?? false;
+                    return property.stringValue?.Contains(token) ?? false;
                 case SerializedPropertyType.Color:
-                    return property.colorValue.ToString().Contains(search);
+                    return property.colorValue.ToString().Contains(token);
                 case SerializedPropertyType.ObjectReference:
                     // ReSharper disable once Unity.NoNullPropagation
                     if (property.objectReferenceValue is ScriptableObject so)
                     {
-                        return SearchSoProp(so, search);
+                        return SearchSoProp(so, token);
                     }
-                    return property.objectReferenceValue?.name.Contains(search) ?? false;
+                    return property.objectReferenceValue?.name.Contains(token) ?? false;
                 case SerializedPropertyType.LayerMask:
-                    return property.intValue.ToString().Contains(search);
+                    return property.intValue.ToString().Contains(token);
                 case SerializedPropertyType.Enum:
                     // ReSharper disable once ConvertIfStatementToReturnStatement
                     if(property.enumNames.Length <= property.enumValueIndex || property.enumValueIndex < 0)
                     {
                         return false;
                     }
-                    return property.enumNames[property.enumValueIndex].Contains(search);
+                    return property.enumNames[property.enumValueIndex].Contains(token);
                 case SerializedPropertyType.Vector2:
-                    return property.vector2Value.ToString().Contains(search);
+                    return property.vector2Value.ToString().Contains(token);
                 case SerializedPropertyType.Vector3:
-                    return property.vector3Value.ToString().Contains(search);
+                    return property.vector3Value.ToString().Contains(token);
                 case SerializedPropertyType.Vector4:
-                    return property.vector4Value.ToString().Contains(search);
+                    return property.vector4Value.ToString().Contains(token);
                 case SerializedPropertyType.Rect:
-                    return property.rectValue.ToString().Contains(search);
+                    return property.rectValue.ToString().Contains(token);
                 case SerializedPropertyType.ArraySize:
                     if (property.isArray)
                     {
-                        return property.arraySize.ToString().Contains(search);
+                        return property.arraySize.ToString().Contains(token);
                     }
                     goto default;
                 case SerializedPropertyType.Character:
-                    return property.intValue.ToString().Contains(search);
+                    return property.intValue.ToString().Contains(token);
                 case SerializedPropertyType.AnimationCurve:
-                    return property.animationCurveValue.ToString().Contains(search);
+                    return property.animationCurveValue.ToString().Contains(token);
                 case SerializedPropertyType.Bounds:
-                    return property.boundsValue.ToString().Contains(search);
+                    return property.boundsValue.ToString().Contains(token);
                 case SerializedPropertyType.Quaternion:
-                    return property.quaternionValue.ToString().Contains(search);
+                    return property.quaternionValue.ToString().Contains(token);
                 case SerializedPropertyType.ExposedReference:
                     // ReSharper disable once Unity.NoNullPropagation
-                    return property.exposedReferenceValue?.name.Contains(search) ?? false;
+                    return property.exposedReferenceValue?.name.Contains(token) ?? false;
                 case SerializedPropertyType.FixedBufferSize:
-                    return property.fixedBufferSize.ToString().Contains(search);
+                    return property.fixedBufferSize.ToString().Contains(token);
                 case SerializedPropertyType.Vector2Int:
-                    return property.vector2IntValue.ToString().Contains(search);
+                    return property.vector2IntValue.ToString().Contains(token);
                 case SerializedPropertyType.Vector3Int:
-                    return property.vector3IntValue.ToString().Contains(search);
+                    return property.vector3IntValue.ToString().Contains(token);
                 case SerializedPropertyType.RectInt:
-                    return property.rectIntValue.ToString().Contains(search);
+                    return property.rectIntValue.ToString().Contains(token);
                 case SerializedPropertyType.BoundsInt:
-                    return property.boundsIntValue.ToString().Contains(search);
+                    return property.boundsIntValue.ToString().Contains(token);
 #if UNITY_2019_3_OR_NEWER
                 case SerializedPropertyType.ManagedReference:
-                    return property.managedReferenceFullTypename.Contains(search);
+                    return property.managedReferenceFullTypename.Contains(token);
 #endif
                 case SerializedPropertyType.Generic:
                 {
@@ -445,7 +453,7 @@ namespace SaintsField.Editor.Utils
 #endif
                         for (int i = 0; i < property.arraySize; i++)
                         {
-                            if (SearchProp(property.GetArrayElementAtIndex(i), search))
+                            if (SearchProp(property.GetArrayElementAtIndex(i), token))
                                 return true;
                         }
                         return false;
@@ -454,7 +462,7 @@ namespace SaintsField.Editor.Utils
                     // ReSharper disable once LoopCanBeConvertedToQuery
                     foreach (SerializedProperty child in SerializedUtils.GetPropertyChildren(property))
                     {
-                        if(SearchProp(child, search))
+                        if(SearchProp(child, token))
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                             Debug.Log($"found child: {child.propertyPath}");

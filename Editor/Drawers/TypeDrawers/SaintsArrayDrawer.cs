@@ -70,7 +70,13 @@ namespace SaintsField.Editor.Drawers.TypeDrawers
             }
             SerializedProperty arrProperty = property.FindPropertyRelative(propRawName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propRawName);
             // return new PropertyField(arrProperty);
-            return new PropertyField(arrProperty, curInArrayIndex == -1? property.displayName : $"Element {curInArrayIndex}");
+
+            // Debug.Log($"saints array draw {arrProperty.propertyPath}");
+
+            PropertyField prop = new PropertyField(arrProperty, curInArrayIndex == -1? property.displayName : $"Element {curInArrayIndex}");
+            prop.BindProperty(arrProperty);
+            prop.Bind(arrProperty.serializedObject);
+            return prop;
         }
 #endif
     }

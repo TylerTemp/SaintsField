@@ -38,6 +38,9 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 r.style.width = new StyleLength(Length.Percent(100));
             }
+
+            // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}/{r}");
+
             return (r, false);
 
             // // PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
