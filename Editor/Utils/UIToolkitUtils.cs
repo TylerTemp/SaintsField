@@ -363,6 +363,7 @@ namespace SaintsField.Editor.Utils
             Attribute useAttribute = null;
             bool isArray = property.propertyType == SerializedPropertyType.Generic
                            && property.isArray;
+
             // bool useFallbackSaintsRow = false;
             // Debug.Log($"rendering {property.propertyPath}/{property.propertyType}/isArray={isArray}");
             if(!isArray)
@@ -616,7 +617,7 @@ namespace SaintsField.Editor.Utils
                                     VisualElement result = CreateOrUpdateFieldProperty(
                                         itemProp,
                                         allAttributes,
-                                        rawType,
+                                        ReflectUtils.GetElementType(rawType),
                                         $"Element {index}",
                                         fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null, parent);
                                     // Debug.Log($"done rendering {index}/{itemProp.propertyPath}/{result == null}/{property.arraySize}");

@@ -1,5 +1,4 @@
 using System;
-using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEngine;
 
@@ -48,7 +47,11 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
 
             public override int GetHashCode()
             {
-                return Util.CombineHashCode(key, ks);
+                // the fuck...
+                int hashCode = 17;
+                hashCode *= 31 + key?.GetHashCode() ?? 0;
+                hashCode *= 31 + ks?.GetHashCode() ?? 0;
+                return hashCode;
             }
 
             private static bool KsEqual(string[] ks1, string[] ks2)
@@ -87,6 +90,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
             public string ss;
 
             public int si;
+
 
             [LayoutEnd]
 

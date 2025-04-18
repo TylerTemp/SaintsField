@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.5.2 ##
+
+1.  UI Toolkit: fix `ListDrawerSettings` can not render items correctly in the new fallback flow
+2.  UI Toolkit: fix `ResizableTextArea` did not get disabled with `ReadOnly`, `DisableIf`
+3.  Fix demo code blocked the build process [#208](https://github.com/TylerTemp/SaintsField/issues/208)
+
 ## 4.5.1 ##
 
 UI Toolkit: fix `OnValueChanged` broken

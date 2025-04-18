@@ -76,9 +76,9 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
                 SerializedProperty prop = property.GetArrayElementAtIndex(propIndex);
                 VisualElement resultField = UIToolkitUtils.CreateOrUpdateFieldRawFallback(
-                    property,
+                    prop,
                     allAttributes,
-                    FieldWithInfo.FieldInfo.FieldType,
+                    ReflectUtils.GetElementType(FieldWithInfo.FieldInfo.FieldType),
                     $"Element {index}",
                     FieldWithInfo.FieldInfo,
                     InAnyHorizontalLayout,
@@ -340,13 +340,9 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             }
 
             int arraySize = property.arraySize;
-            // don't use TrackPropertyValue because if you remove anything from list, it gives error
-            // this is Unity's fault
-            // result.TrackPropertyValue(property, p =>
-            // listView.RegisterCallback<SerializedPropertyChangeEvent>(_ =>
-            listView.TrackPropertyValue(property, _ =>
+
+            void CheckArraySizeChange()
             {
-                // Debug.Log($"property changed: {arraySize} -> {property.arraySize}");
                 int newSize;
                 try
                 {
@@ -371,7 +367,16 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 arraySize = newSize;
                 numberOfItemsTotalField.SetValueWithoutNotify(arraySize);
                 UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+            }
+
+            // result.TrackPropertyValue(property, p =>
+            // listView.RegisterCallback<SerializedPropertyChangeEvent>(_ =>
+            listView.TrackPropertyValue(property, _ =>
+            {
+                CheckArraySizeChange();
             });
+
+            listView.schedule.Execute(CheckArraySizeChange).StartingIn(500);
 
             searchField.RegisterValueChangedCallback(_ =>
             {
