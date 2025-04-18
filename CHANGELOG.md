@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.5.2 ##
+## 4.5.3 ##
 
 1.  UI Toolkit: fix `ListDrawerSettings` can not render items correctly in the new fallback flow
 2.  UI Toolkit: fix `ResizableTextArea` did not get disabled with `ReadOnly`, `DisableIf`

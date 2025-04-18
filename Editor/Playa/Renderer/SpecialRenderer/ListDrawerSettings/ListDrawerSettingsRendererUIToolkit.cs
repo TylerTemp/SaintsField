@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 }
 
                 SerializedProperty prop = property.GetArrayElementAtIndex(propIndex);
-                VisualElement resultField = UIToolkitUtils.CreateOrUpdateFieldRawFallback(
+                VisualElement resultField = UIToolkitUtils.CreateOrUpdateFieldProperty(
                     prop,
                     allAttributes,
                     ReflectUtils.GetElementType(FieldWithInfo.FieldInfo.FieldType),
@@ -87,6 +87,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     null,
                     FieldWithInfo.Target
                 );
+                // Debug.Log($"draw list item {prop.propertyPath}: {resultField}");
                 // PropertyField propertyField = (PropertyField)propertyFieldRaw;
                 // propertyField.BindProperty(prop);
                 // Debug.Log(prop.propertyPath);
