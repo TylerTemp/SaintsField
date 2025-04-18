@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.6.0 ##
+
+UI Toolkit: `ListDrawerSettings` add `string extraSearch`, `string overrideSearch` to allow custom search.
+
 ## 4.5.3 ##
 
 1.  UI Toolkit: fix `ListDrawerSettings` can not render items correctly in the new fallback flow

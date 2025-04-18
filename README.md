@@ -86,12 +86,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.5.3**
+**4.6.0**
 
-1.  UI Toolkit: fix `ListDrawerSettings` can not render items correctly in the new fallback flow
-2.  UI Toolkit: fix `ResizableTextArea` did not get disabled with `ReadOnly`, `DisableIf`
-3.  Fix demo code blocked the build process [#208](https://github.com/TylerTemp/SaintsField/issues/208)
-4.  UI Toolkit: fix `ListDrawerSettings` didn't refresh size when changed by auto getters
+UI Toolkit: `ListDrawerSettings` add `string extraSearch`, `string overrideSearch` to allow custom search.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1391,6 +1388,8 @@ Parameters:
 *   `bool searchable = false`: allow search in the list/array
 *   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
 *   `bool delayedSearch = false`: when `true`, delay the search until you hit enter or blur the search field
+*   `string extraSearch = null`: set a callback function to use your custom search. If not match, use the default search.
+*   `string overrideSearch = null`: set a callback function as a custom search. When present, ignore `extraSearch` and default search.
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -1412,6 +1411,75 @@ public MyData[] myDataArr;
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/08c6da9a-e613-4e94-8933-3d7a92f7cb33)
 
 The first input is where you can search. The next input can adjust how many items per page. The last part is the paging.
+
+**Custom Search**
+
+`extraSearch` & `overrideSearch` uses the following signiture:
+
+*   `bool CustomSearch(T item, int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> seachToken)`
+*   `bool CustomSearch(T item, IReadOnlyList<SaintsField.Playa.ListSearchToken> seachToken)`
+*   `bool CustomSearch(int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> seachToken)`
+
+`ListSearchToken` is a struct of:
+
+```csharp
+public readonly struct ListSearchToken
+{
+    public readonly ListSearchType Type;  // filter type: Include, Exclude
+    public readonly string Token;  // search string
+}
+```
+
+example:
+
+```csharp
+[Serializable]
+public enum WeaponType
+{
+    Sword,
+    Arch,
+    Hammer,
+}
+
+[Serializable]
+public struct Weapon
+{
+    public WeaponType weaponType;
+    public string description;
+}
+
+private bool ExtraSearch(Weapon weapon, int _, IReadOnlyList<ListSearchToken> tokens)
+{
+    string searchName = new Dictionary<WeaponType, string>
+    {
+        { WeaponType.Arch , "弓箭 双手" },
+        { WeaponType.Sword , "刀剑 单手" },
+        { WeaponType.Hammer, "大锤 双手" },
+    }[weapon.weaponType];
+
+    foreach (ListSearchToken token in tokens)
+    {
+        if (token.Type == ListSearchType.Exclude && searchName.Contains(token.Token))
+        {
+            return false;
+        }
+
+        if (token.Type == ListSearchType.Include && !searchName.Contains(token.Token))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+[ListDrawerSettings(extraSearch: nameof(ExtraSearch))]
+public Weapon[] weapons;
+```
+
+You can now search as you want, both your custom search & serialized property search:
+
+[![video](https://github.com/user-attachments/assets/a32b3592-68f6-4207-8142-3d895c926de1)](https://github.com/user-attachments/assets/d7fd4e08-355f-460b-88fb-2e874f58cb01)
 
 #### `Table` ####
 

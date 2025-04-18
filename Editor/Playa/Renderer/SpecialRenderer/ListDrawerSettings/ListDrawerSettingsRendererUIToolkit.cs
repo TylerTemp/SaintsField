@@ -129,46 +129,45 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
                 if (overrideSearchMethod.methodInfo != null)
                 {
-                    foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
+                    if (overrideSearchMethod.paramType == ParamType.Index)
                     {
-                        if (overrideSearchMethod.paramType == ParamType.Index)
+                        foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
                         {
                             if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Target,
                                     new object[] { fullIndex, searchTokens }))
                             {
                                 yield return fullIndex;
                             }
-                            continue;
                         }
 
-                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
+                        yield break;
+                    }
 
-                        int curIndex = 0;
+                    IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
 
-                        foreach (object rawValue in rawValueList)
+                    int curIndex = 0;
+
+                    foreach (object rawValue in rawValueList)
+                    {
+                        object[] methodParams = overrideSearchMethod.paramType == ParamType.Target
+                            ? new[] { rawValue, searchTokens }
+                            : new[] { rawValue, curIndex, searchTokens };
+
+                        if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
                         {
-                            object[] methodParams = overrideSearchMethod.paramType == ParamType.Target
-                                ? new object[] { rawValue, searchTokens }
-                                : new object[] { rawValue, curIndex, searchTokens };
-
-                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
-                            {
-                                yield return fullIndex;
-                            }
-
-                            curIndex++;
+                            yield return curIndex;
                         }
 
+                        curIndex++;
                     }
                     yield break;
                 }
 
                 if (extraSearchMethod.methodInfo != null)
                 {
-
-                    foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
+                    if (extraSearchMethod.paramType == ParamType.Index)
                     {
-                        if (extraSearchMethod.paramType == ParamType.Index)
+                        foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
                         {
                             if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Target,
                                     new object[] { fullIndex, searchTokens }))
@@ -178,40 +177,42 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                             else
                             {
                                 SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(fullIndex);
-                                if(searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
+                                if (searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
                                 {
                                     yield return fullIndex;
                                 }
                             }
-                            continue;
                         }
 
-                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
+                        yield break;
+                    }
 
-                        int curIndex = 0;
+                    IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
 
-                        foreach (object rawValue in rawValueList)
+                    int curIndex = 0;
+
+                    foreach (object rawValue in rawValueList)
+                    {
+                        // Debug.Log($"pass rawValue {rawValue}/{curIndex}");
+                        object[] methodParams = extraSearchMethod.paramType == ParamType.Target
+                            ? new[] { rawValue, searchTokens }
+                            : new[] { rawValue, curIndex, searchTokens };
+
+                        if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
                         {
-                            object[] methodParams = extraSearchMethod.paramType == ParamType.Target
-                                ? new[] { rawValue, searchTokens }
-                                : new[] { rawValue, curIndex, searchTokens };
-
-                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
+                            // Debug.Log($"yield {curIndex}/{rawValue} in extra search");
+                            yield return curIndex;
+                        }
+                        else
+                        {
+                            SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(curIndex);
+                            if(searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
                             {
-                                yield return fullIndex;
+                                yield return curIndex;
                             }
-                            else
-                            {
-                                SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(fullIndex);
-                                if(searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
-                                {
-                                    yield return fullIndex;
-                                }
-                            }
-
-                            curIndex++;
                         }
 
+                        curIndex++;
                     }
 
                     yield break;
@@ -500,6 +501,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             void UpdatePage(int newPageIndex, int numberOfItemsPerPage)
             {
                 List<int> resultIndexes = SearchCallback(property, searchField.value).ToList();
+                // Debug.Log($"get indexes {string.Join(", ", resultIndexes)}");
                 PagingInfo pagingInfo = GetPagingInfo(newPageIndex, resultIndexes, numberOfItemsPerPage);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
