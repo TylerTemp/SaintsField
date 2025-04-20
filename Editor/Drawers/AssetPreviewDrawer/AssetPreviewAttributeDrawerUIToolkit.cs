@@ -13,7 +13,6 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
 {
     public partial class AssetPreviewAttributeDrawer
     {
-        #region UIToolkit
 
         public class AssetPreviewField : BaseField<string>
         {
@@ -270,8 +269,6 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
             image.style.width = Mathf.Max(width, 0);
             image.style.height = Mathf.Max(height, 0);
         }
-
-        #endregion
     }
 }
 #endif

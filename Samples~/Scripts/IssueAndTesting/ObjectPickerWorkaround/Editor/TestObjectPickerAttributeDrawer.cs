@@ -1,5 +1,6 @@
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -37,6 +38,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
         {
             public ObjectBaseInfo BaseInfo;
             public Texture2D Preview;
+            public int PreviewLoadCount;
+
+            public VisualElement ListItem;
+            public VisualElement BlockItem;
+            public Image BlockItemIcon;
+            public Image BlockItemPreview;
         }
 
         private bool _currentOnAssets = true;
@@ -46,11 +53,20 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
         private VisualElement _pickerBody;
         private ListView _listView;
+        private VisualElement _listViewContent;
         private ScrollView _blockView;
+        private VisualElement _blockViewContent;
 
         private Image _loadingImage;
 
-        // private List<ObjectInfo> _scene
+        private readonly List<ObjectInfo> _sceneObjects = new List<ObjectInfo>();
+        private readonly List<ObjectInfo> _assetsObjects = new List<ObjectInfo>();
+
+        private VisualTreeAsset _listItemAsset;
+        private VisualTreeAsset _blockItemAsset;
+
+        private Slider _slider;
+        private bool _isBlockView;
 
         public void CreateGUI()
         {
@@ -60,12 +76,41 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             _assetsToggle = rootVisualElement.Q<ToolbarToggle>(name: "saints-field-object-picker-toggle-assets");
             _sceneToggle = rootVisualElement.Q<ToolbarToggle>(name: "saints-field-object-picker-toggle-scene");
 
+            _slider = rootVisualElement.Q<Slider>("saints-field-object-picker-slider");
+            _slider.RegisterValueChangedCallback(e =>
+            {
+                if (!_currentOnAssets)  // scene view only has list type
+                {
+                    return;
+                }
+
+                var scaleValue = e.newValue;
+                if (scaleValue > 0.1f)
+                {
+                    if (!_isBlockView)
+                    {
+                        _isBlockView = true;
+                        _listView.RemoveFromHierarchy();
+                        _pickerBody.Add(_blockView);
+                    }
+                }
+                else
+                {
+                    if (_isBlockView)
+                    {
+                        _isBlockView = false;
+                        _blockView.RemoveFromHierarchy();
+                        _pickerBody.Add(_listView);
+                    }
+                }
+            });
+
             _assetsToggle.RegisterValueChangedCallback(e =>
             {
                 if (e.newValue)
                 {
-                    _currentOnAssets = true;
                     _sceneToggle.SetValueWithoutNotify(false);
+                    SwitchToAssets(true);
                 }
                 else
                 {
@@ -76,8 +121,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             {
                 if (e.newValue)
                 {
-                    _currentOnAssets = false;
+                    // _currentOnAssets = false;
                     _assetsToggle.SetValueWithoutNotify(false);
+                    SwitchToAssets(false);
                 }
                 else
                 {
@@ -87,7 +133,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
             _loadingImage = rootVisualElement.Q<Image>(name: "saints-field-object-picker-loading");
             _loadingImage.image = Util.LoadResource<Texture2D>("refresh.png");
-            Debug.Log(_loadingImage.image);
+            // Debug.Log(_loadingImage.image);
             UIToolkitUtils.KeepRotate(_loadingImage);
             // _loadingImage.RegisterCallback<AttachToPanelEvent>(_ =>  UIToolkitUtils.TriggerRotate(_loadingImage));
             _loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(_loadingImage)).StartingIn(300);
@@ -96,43 +142,43 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
             _pickerBody = rootVisualElement.Q<VisualElement>("saints-field-object-picker-body");
 
-            VisualTreeAsset listItemAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerListItem.uxml");
-            Debug.Assert(listItemAsset != null);
+            _listItemAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerListItem.uxml");
+            Debug.Assert(_listItemAsset != null);
             _listView = _pickerBody.Q<ListView>(name: "saints-field-object-picker-list");
             Debug.Assert(_listView != null);
-            VisualElement listViewContainer = _listView.Q<VisualElement>(name: "unity-content-container");
-            Debug.Assert(listViewContainer != null);
+            _listViewContent = _listView.Q<VisualElement>(name: "unity-content-container");
+            Debug.Assert(_listViewContent != null);
 
-            for (int i = 0; i < 15; i++)
-            {
-                VisualElement listItem = listItemAsset.CloneTree();
-                listViewContainer.Add(listItem);
-                // listItem.style.width = new StyleLength(Length.Percent(50));
-                listItem.Q<Label>(name: "saints-field-object-picker-list-item-label").text = $"Item {i}";
-            }
+            // for (int i = 0; i < 15; i++)
+            // {
+            //     VisualElement listItem = _listItemAsset.CloneTree();
+            //     _listViewContent.Add(listItem);
+            //     // listItem.style.width = new StyleLength(Length.Percent(50));
+            //     listItem.Q<Label>(name: "saints-field-object-picker-list-item-label").text = $"Item {i}";
+            // }
 
             // _listView.RemoveFromHierarchy();
 
-            VisualTreeAsset blockItemAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerBlockItem.uxml");
-            Debug.Assert(blockItemAsset != null);
+            _blockItemAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerBlockItem.uxml");
+            Debug.Assert(_blockItemAsset != null);
             _blockView = _pickerBody.Q<ScrollView>(name: "saints-field-object-picker-block");
             Debug.Assert(_blockView != null);
-            VisualElement blockViewContainer = _blockView.Q<VisualElement>(name: "unity-content-container");
-            Debug.Assert(blockViewContainer != null);
+            _blockViewContent = _blockView.Q<VisualElement>(name: "unity-content-container");
+            Debug.Assert(_blockViewContent != null);
 
-            blockViewContainer.style.flexDirection = FlexDirection.Row;
-            blockViewContainer.style.flexWrap = Wrap.Wrap;
+            _blockViewContent.style.flexDirection = FlexDirection.Row;
+            _blockViewContent.style.flexWrap = Wrap.Wrap;
 
             _blockView.RemoveFromHierarchy();
 
-            for (int i = 0; i < 15; i++)
-            {
-                VisualElement blockItem = blockItemAsset.CloneTree();
-                // blockItem.style.width = 60;
-                // blockItem.style.height = 60;
-                blockViewContainer.Add(blockItem);
-                blockItem.Q<Label>(name: "saints-field-object-picker-block-item-name").text = $"Item {i}";
-            }
+            // for (int i = 0; i < 15; i++)
+            // {
+            //     VisualElement blockItem = _blockItemAsset.CloneTree();
+            //     // blockItem.style.width = 60;
+            //     // blockItem.style.height = 60;
+            //     _blockViewContent.Add(blockItem);
+            //     blockItem.Q<Label>(name: "saints-field-object-picker-block-item-name").text = $"Item {i}";
+            // }
 
             // rootVisualElement.schedule.Execute(() =>
             // {
@@ -143,6 +189,54 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             // {
             //     DisableScene();
             // }).StartingIn(2000);
+
+            rootVisualElement.schedule.Execute(() => _slider.value = _slider.value);
+            rootVisualElement.schedule.Execute(UpdatePreview).Every(500);
+        }
+
+        private void UpdatePreview()
+        {
+            foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).Where(each => each.PreviewLoadCount < 10).ToArray())
+            {
+                Object target = objectInfo.BaseInfo.Target;
+                if (target is Component comp)
+                {
+                    target = comp.gameObject;
+                }
+                Texture2D preview = AssetPreview.GetAssetPreview(target);
+                if (preview != null && preview.width > 1)
+                {
+                    objectInfo.Preview = preview;
+                    objectInfo.PreviewLoadCount = int.MaxValue;
+
+                    objectInfo.BlockItemIcon.RemoveFromHierarchy();
+                    objectInfo.BlockItemPreview.image = preview;
+                }
+                else
+                {
+                    objectInfo.PreviewLoadCount++;
+                }
+            }
+        }
+
+        private void SwitchToAssets(bool on)
+        {
+            if (on == _currentOnAssets)
+            {
+                return;
+            }
+
+            _currentOnAssets = on;
+
+            List<ObjectInfo> objInfoTargets = _currentOnAssets? _assetsObjects : _sceneObjects;
+            _listViewContent.Clear();
+            _blockViewContent.Clear();
+
+            foreach (ObjectInfo objInfoTarget in objInfoTargets)
+            {
+                _listViewContent.Add(objInfoTarget.ListItem);
+                _blockViewContent.Add(objInfoTarget.BlockItem);
+            }
         }
 
         public void DisableAssets()
@@ -162,15 +256,70 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
             if (_currentOnAssets && disable)
             {
-                _assetsToggle.SetValueWithoutNotify(false);
-                _sceneToggle.SetValueWithoutNotify(true);
-                _currentOnAssets = false;
+                // _assetsToggle.SetValueWithoutNotify(false);
+                _sceneToggle.value = true;
+                // _currentOnAssets = false;
             }
             else
             {
-                _assetsToggle.SetValueWithoutNotify(true);
-                _sceneToggle.SetValueWithoutNotify(false);
+                // _sceneToggle.SetValueWithoutNotify(false);
+                _assetsToggle.value = true;
                 _currentOnAssets = true;
+            }
+        }
+
+        public void EnqueueSceneObjects(IEnumerable<ObjectBaseInfo> objectBaseInfos)
+        {
+            EnqueueToAssetsObjects(false, objectBaseInfos);
+        }
+
+        public void EnqueueAssetsObjects(IEnumerable<ObjectBaseInfo> objectBaseInfos)
+        {
+            EnqueueToAssetsObjects(true, objectBaseInfos);
+        }
+
+        private void EnqueueToAssetsObjects(bool isAssets, IEnumerable<ObjectBaseInfo> objectBaseInfos)
+        {
+            foreach (ObjectBaseInfo objectBaseInfo in objectBaseInfos)
+            {
+                VisualElement listItem = _listItemAsset.CloneTree();
+                VisualElement blockItem = _blockItemAsset.CloneTree();
+                ObjectInfo objectInfo = new ObjectInfo
+                {
+                    BaseInfo = objectBaseInfo,
+                    Preview = null,
+                    PreviewLoadCount = 0,
+
+                    ListItem = listItem,
+                    BlockItem = blockItem,
+                    BlockItemIcon = blockItem.Q<Image>(name: "saints-field-object-picker-block-item-icon"),
+                    BlockItemPreview = blockItem.Q<Image>(name: "saints-field-object-picker-block-item-preview"),
+                };
+
+                InitItem(objectInfo, listItem, blockItem);
+
+                if (isAssets == _currentOnAssets)
+                {
+                    _listViewContent.Add(objectInfo.ListItem);
+                    _blockViewContent.Add(objectInfo.BlockItem);
+                }
+            }
+        }
+
+        private static void InitItem(ObjectInfo objectInfo, VisualElement listItem, VisualElement blockItem)
+        {
+            // Debug.Log(objectInfo.BaseInfo.Icon);
+
+            listItem.Q<Label>(name: "saints-field-object-picker-list-item-label").text = objectInfo.BaseInfo.Name;
+            if(objectInfo.BaseInfo.Icon != null)
+            {
+                listItem.Q<Image>(name: "saints-field-object-picker-list-item-image").image = objectInfo.BaseInfo.Icon;
+            }
+
+            blockItem.Q<Label>(name: "saints-field-object-picker-block-item-name").text = objectInfo.BaseInfo.Name;
+            if (objectInfo.BaseInfo.Icon != null)
+            {
+                objectInfo.BlockItemIcon.image = objectInfo.BaseInfo.Icon;
             }
         }
     }
@@ -179,17 +328,24 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
     public class TestObjectPickerAttributeDrawer : SaintsPropertyDrawer
     {
 
+        private void DebugOpenWindow()
+        {
+            var pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
+            pop.Close();
+            pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
+            pop.Show();
+
+            var resources = Resources.LoadAll("");
+            // Debug.Log(resources.Length);
+            pop.EnqueueAssetsObjects(resources.Select(each => new SaintsObjectPickerUIToolkit.ObjectBaseInfo(
+                each, AssetPreview.GetMiniThumbnail(each), each.name, each.GetType().Name, AssetDatabase.GetAssetPath(each)
+            )));
+        }
+
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement popContainer = new VisualElement
-            {
-                style =
-                {
-                    position = Position.Absolute,
-                },
-            };
 
             Button button = new Button(() =>
             {
@@ -199,10 +355,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                 // PopupWindow.Show(container.worldBound, new PopupContentExample());
 
                 // PopupWindow.Show(container.worldBound, new PopupContentExample());
-                var pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
-                pop.Close();
-                pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
-                pop.Show();
+                DebugOpenWindow();
 
                 // UnityEngine.UIElements.PopupWindow popup = new UnityEngine.UIElements.PopupWindow();
                 // visualTreeAsset.CloneTree(popup);
@@ -216,15 +369,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             };
 
             // var pop = ScriptableObject.CreateInstance<PopupContentExample>();
-            var pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
-            pop.Close();
-            pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
-            pop.Show();
+            DebugOpenWindow();
 
-            VisualElement root = new VisualElement();
-            root.Add(popContainer);
-            root.Add(button);
-            return root;
+            return button;
         }
     }
 }

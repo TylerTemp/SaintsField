@@ -3204,26 +3204,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
-  scriptable: {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
-  scriptables:
-  - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
-  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
-  myStruct:
-    vector2: {x: 0, y: 0}
-    vector2Int: {x: 0, y: 0}
-    vector3: {x: 0, y: 0, z: 0}
-    vector3Int: {x: 0, y: 0, z: 0}
-    color: {r: 0, g: 0, b: 0, a: 0}
-    gameObject: {fileID: 0}
-    so: {fileID: 0}
-    sprite: {fileID: 0}
-    animator: {fileID: 0}
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
 --- !u!1 &414579718
 GameObject:
   m_ObjectHideFlags: 0
@@ -12344,26 +12324,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
-  scriptable: {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
-  scriptables:
-  - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
-  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
-  myStruct:
-    vector2: {x: 0, y: 0}
-    vector2Int: {x: 0, y: 0}
-    vector3: {x: 0, y: 0, z: 0}
-    vector3Int: {x: 0, y: 0, z: 0}
-    color: {r: 0, g: 0, b: 0, a: 0}
-    gameObject: {fileID: 0}
-    so: {fileID: 0}
-    sprite: {fileID: 0}
-    animator: {fileID: 0}
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
 --- !u!1 &836531683
 GameObject:
   m_ObjectHideFlags: 0
