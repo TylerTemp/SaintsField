@@ -12,6 +12,11 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class ShowInInspectorEditing : SaintsMonoBehaviour
     {
+        [ShowInInspector] private Gradient _gradient = new Gradient();
+        [ShowInInspector] private AnimationCurve _curve = new AnimationCurve();
+
+        [ShowInInspector] private Hash128 _hash128Value = new Hash128(1, 2, 3, 4);
+
         private class TestPrivateFieldDummy
             : IDummy
         {

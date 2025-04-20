@@ -15,6 +15,10 @@ namespace SaintsField.Samples.Scripts
 
         [Range(0, 100)] public int normalRange;
 
+        public AnimationCurve animationCurve;
+        public Gradient gradient;
+        public Hash128 hash128Value;
+
         [TableColumn("Basic!")]
         public int publicValue;
 
@@ -31,13 +35,6 @@ namespace SaintsField.Samples.Scripts
         public MyStruct myStruct;
 
         public MyStruct[] myStructs;
-        public string GetComment()
-        {
-            return "";
-        }
-
-        [field: SerializeField]
-        public int MyInt { get; set; }
 
         [TableColumn("Buttons")]
         [Button] private void B1() { }
@@ -46,5 +43,13 @@ namespace SaintsField.Samples.Scripts
         [Button] private void B2() { }
 
         [ShowInInspector] private int _showI;
+
+        public string GetComment()
+        {
+            return "";
+        }
+
+        [field: SerializeField]
+        public int MyInt { get; set; }
     }
 }

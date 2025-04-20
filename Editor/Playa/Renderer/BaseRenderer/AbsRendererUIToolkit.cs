@@ -228,6 +228,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // {
             //     return null;
             // }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+            Debug.Log($"render start {label}/{valueType}/{value}");
+#endif
 
             Color reColor = EColor.EditorSeparator.GetColor();
 
@@ -505,9 +508,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (valueType == typeof(uint) || value is uint)
             {
 #if UNITY_2022_3_OR_NEWER
-                if (oldElement is UnsignedIntegerField oldLongField)
+                if (oldElement is UnsignedIntegerField oldUnsignedIntegerField)
                 {
-                    oldLongField.SetValueWithoutNotify((uint)value);
+                    oldUnsignedIntegerField.SetValueWithoutNotify((uint)value);
                     return null;
                 }
 
@@ -1375,6 +1378,115 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
             }
 
+            if (typeof(AnimationCurve).IsAssignableFrom(valueType) || value is AnimationCurve)
+            {
+
+                CurveField element = new CurveField(label)
+                {
+                    value = value as AnimationCurve,
+                };
+
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(CurveField.alignedFieldUssClassName);
+                }
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        setterOrNull(evt.newValue);
+                    });
+                }
+                return element;
+            }
+
+            if (typeof(Hash128).IsAssignableFrom(valueType) || value is Hash128)
+            {
+                Hash128Field element = new Hash128Field(label)
+                {
+                    value = (Hash128)value,
+                };
+
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(Hash128Field.alignedFieldUssClassName);
+                }
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        setterOrNull(evt.newValue);
+                    });
+                }
+                return element;
+            }
+
+            if (typeof(Gradient).IsAssignableFrom(valueType) || value is Gradient)
+            {
+                GradientField element = new GradientField(label)
+                {
+                    value = value as Gradient,
+                };
+
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = reColor;
+                }
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(GradientField.alignedFieldUssClassName);
+                }
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        setterOrNull(evt.newValue);
+                    });
+                }
+                return element;
+            }
+
             bool valueIsNull = RuntimeUtil.IsNull(value);
 
             IEnumerable<Type> genTypes = valueType.GetInterfaces()
@@ -1515,6 +1627,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (value is IEnumerable enumerableValue)
             {
                 // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
+
                 return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
             }
 
@@ -1772,14 +1885,50 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
+            // Debug.Log($"fieldTargets={string.Join(",", fieldTargets.Select(each => each.Name))}");
+            // Debug.Log($"propertyTargets={string.Join(",", propertyTargets.Select(each => each.Name))}");
+            //
             // Debug.Log("Init generic type");
             foreach (FieldInfo fieldInfo in fieldTargets)
             {
                 string name = fieldInfo.Name;
+
+
+                // if (fieldInfo.FieldType.IsAssignableFrom(typeof(System.IntPtr))
+                //         // fieldInfo.FieldType.Name == "System.IntPtr" || fieldInfo.FieldType.Name == "System.UIntPtr"
+                //     )
+                // {
+                //     continue;
+                // }
+                if (SkipTypeDrawing(fieldInfo.FieldType))
+                {
+                    continue;
+                }
+
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-                Debug.Log($"render general field {name}");
+                Debug.Log($"render general field {name}/{fieldInfo.FieldType}/{fieldInfo.FieldType.Namespace}/{fieldInfo.FieldType.Name}");
 #endif
-                object fieldValue = fieldInfo.GetValue(value);
+
+                // if (name == "m_Ptr" || name == "_ptr")
+                // {
+                //     continue;
+                // }
+                object fieldValue;
+                try
+                {
+                    fieldValue = fieldInfo.GetValue(value);
+                }
+#pragma warning disable CS0168 // Variable is declared but never used
+                catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning($"property {name}/{fieldInfo.FieldType} inside {value} gives error: {e}");
+#endif
+                    // throw;
+                    return null;
+                }
+
                 VisualElement result = UIToolkitValueEdit(
                     oldElement?.Q<VisualElement>(name: name),
                     ObjectNames.NicifyVariableName(name),
@@ -1814,11 +1963,31 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     continue;
                 }
 
+                if (SkipTypeDrawing(propertyInfo.PropertyType))
+                {
+                    continue;
+                }
+
                 string name = propertyInfo.Name;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-                Debug.Log($"render general property {name}");
+                Debug.Log(
+                    $"render general property {name}/{propertyInfo.PropertyType} inside {value}");
 #endif
-                object propertyValue = propertyInfo.GetValue(value);
+                object propertyValue;
+                try
+                {
+                    propertyValue = propertyInfo.GetValue(value);
+                }
+#pragma warning disable CS0168 // Variable is declared but never used
+                catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning($"property {name}/{propertyInfo.PropertyType} inside {value} gives error: {e}");
+#endif
+                    // throw;
+                    return null;
+                }
 
                 VisualElement result = UIToolkitValueEdit(
                     oldElement?.Q<VisualElement>(name: name),
@@ -1851,6 +2020,21 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             return useOld? null: genFoldout;
+        }
+
+        private static readonly Type[] SkipTypes = { typeof(IntPtr), typeof(UIntPtr), typeof(void) };
+
+        private static bool SkipTypeDrawing(Type checkType)
+        {
+            foreach (Type disallowType in SkipTypes)
+            {
+                if (disallowType.IsAssignableFrom(checkType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, UnityEngine.Object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
@@ -2007,6 +2191,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+            Debug.Log($"render list start {listValue.Length}/{label}/{valueType}");
+#endif
             Foldout foldout = oldElement;
             if (foldout != null && !foldout.ClassListContains("saintsfield-list"))
             {
@@ -2145,13 +2332,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // Debug.Log($"index={index}, ItemIndexToOriginIndex={string.Join(",", payload.ItemIndexToOriginIndex)}");
 
                     VisualElement firstChild = visualElement.Children().FirstOrDefault();
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
-                    Debug.Log($"bind {index} with old child: {firstChild}");
-#endif
 
                     int actualIndex = payload.ItemIndexToOriginIndex[index];
                     object actualValue = payload.RawValues[actualIndex];
-                    // Debug.Log($"elementType={elementType}, actualValue={actualValue}, rawValues={string.Join(",", payload.RawValues)}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+                    Debug.Log($"list index={index}, elementType={elementType}, actualValue={actualValue}, rawValues={string.Join(",", payload.RawValues)}");
+#endif
                     VisualElement item = UIToolkitValueEdit(
                         firstChild,
                         $"Element {actualIndex}",
@@ -2161,7 +2347,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         showAddRemoveFooter
                          ? newItemValue =>
                             {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
                                 Debug.Log($"List {actualIndex} set newValue {newItemValue}");
 #endif
                                 IList rawListValueArray = (IList) payload.RawListValue;

@@ -86,9 +86,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.6.0**
+**4.6.1**
 
-UI Toolkit: `ListDrawerSettings` add `string extraSearch`, `string overrideSearch` to allow custom search.
+1.  UI Toolkit: Fix `ShowInInspector` can not correctly draw `Gradient`, `Curve` & `Hash128`
+2.  UI Toolkit: Improve the label layout in horizontal layout for Unity's native types (`Vector2` etc.)
+3.  UI Toolkit: Fix `ShowInInspector` might fail to draw some properties, give errors and block the rest drawing process
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

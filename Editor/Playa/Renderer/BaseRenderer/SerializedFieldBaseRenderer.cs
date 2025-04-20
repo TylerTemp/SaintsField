@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 propPath = FieldWithInfo.FieldInfo?.Name ?? "?";
             }
-            return $"Ser<{propPath}>";
+            return $"{GetType().Name}<{propPath}>";
         }
     }
 }
