@@ -37,55 +37,88 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
             GameObject sGo = targetComp.gameObject;
-            if(!sGo.scene.IsValid())
+            UnityEngine.SceneManagement.Scene sScene = sGo.scene;
+
+            switch (each)
             {
-                switch (each)
-                {
-                    case GameObject targetValueGo:
-                        if (targetValueGo.scene.IsValid()) // don't sign a scene object to non-scene target
-                        {
-                            return false;
-                        }
+                case GameObject targetValueGo:
+                    if (!SceneCompare(sScene, targetValueGo.scene))
+                    {
+                        return false;
+                    }
 
-                        break;
-                    case Component targetValueComp:
-                        if (targetValueComp.gameObject.scene.IsValid())
-                        {
-                            return false;
-                        }
+                    break;
+                case Component targetValueComp:
+                    if (!SceneCompare(sScene, targetValueComp.gameObject.scene))
+                    {
+                        return false;
+                    }
 
-                        break;
-                }
+                    break;
             }
 
-#if UNITY_2021_2_OR_NEWER
-            PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
-            // Debug.Log(prefabStage?.mode);
-            // if (prefabStage?.mode == PrefabStage.Mode.InIsolation)
-            // ReSharper disable once InvertIf
-            if (prefabStage != null)
-            {
-                switch (each)
-                {
-                    case GameObject targetValueGo:
-                        if (targetValueGo.scene.IsValid())  // don't sign a scene object to non-scene target
-                        {
-                            return false;
-                        }
+            // if(!sGo.scene.IsValid())
+            // {
+            //     switch (each)
+            //     {
+            //         case GameObject targetValueGo:
+            //             if (targetValueGo.scene.IsValid()) // don't sign a scene object to non-scene target
+            //             {
+            //                 return false;
+            //             }
+            //
+            //             break;
+            //         case Component targetValueComp:
+            //             if (targetValueComp.gameObject.scene.IsValid())
+            //             {
+            //                 return false;
+            //             }
+            //
+            //             break;
+            //     }
+            // }
 
-                        break;
-                    case Component taragetValueComp:
-                        if (taragetValueComp.gameObject.scene.IsValid())
-                        {
-                            return false;
-                        }
-
-                        break;
-                }
-            }
-#endif
+// #if UNITY_2021_2_OR_NEWER
+//             PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
+//             // Debug.Log(prefabStage?.mode);
+//             // if (prefabStage?.mode == PrefabStage.Mode.InIsolation)
+//             // ReSharper disable once InvertIf
+//             // Debug.Log(prefabStage.mode);
+//             if (prefabStage != null)
+//             {
+//                 switch (each)
+//                 {
+//                     case GameObject targetValueGo:
+//                         if (targetValueGo.scene.IsValid())  // don't sign a scene object to non-scene target
+//                         {
+//                             // Debug.Log(targetValueGo.scene);
+//                             return (sGo.scene.IsValid() && targetValueGo.scene == sGo.scene);
+//                         }
+//
+//                         break;
+//                     case Component taragetValueComp:
+//                         if (taragetValueComp.gameObject.scene.IsValid())
+//                         {
+//                             // Debug.Log(taragetValueComp.gameObject.scene.name);
+//                             return (sGo.scene.IsValid() && taragetValueComp.gameObject.scene == sGo.scene);
+//                         }
+//
+//                         break;
+//                 }
+//             }
+// #endif
 
             return true;
+        }
+
+        private static bool SceneCompare(UnityEngine.SceneManagement.Scene scene1, UnityEngine.SceneManagement.Scene scene2)
+        {
+            if (!scene1.IsValid())
+            {
+                return !scene2.IsValid();
+            }
+
+            return scene1 == scene2;
         }
 
         private static (bool valid, object value) ValidateXPathResult(Object fieldContainingObject, object each, Type expectType, Type expectInterface)
