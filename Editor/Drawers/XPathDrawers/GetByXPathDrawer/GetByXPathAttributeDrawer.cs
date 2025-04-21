@@ -48,8 +48,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         }
 
                         break;
-                    case Component taragetValueComp:
-                        if (taragetValueComp.gameObject.scene.IsValid())
+                    case Component targetValueComp:
+                        if (targetValueComp.gameObject.scene.IsValid())
                         {
                             return false;
                         }
@@ -58,6 +58,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
             }
 
+#if UNITY_2021_2_OR_NEWER
             PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
             // Debug.Log(prefabStage?.mode);
             // if (prefabStage?.mode == PrefabStage.Mode.InIsolation)
@@ -82,6 +83,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         break;
                 }
             }
+#endif
 
             return true;
         }
