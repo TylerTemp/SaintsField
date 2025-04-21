@@ -163,9 +163,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                                 {
                                     return AssetDatabase.LoadAssetAtPath<Object>(assetPath);
                                 }
-#pragma warning disable CS0168 
+#pragma warning disable CS0168
                                 catch (Exception e)
-#pragma warning restore CS0168 
+#pragma warning restore CS0168
                                 {
 #if SAINTSFIELD_DEBUG
                                     Debug.LogException(e);
@@ -177,7 +177,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                             return each.Resource;
                         })
                         .Where(each => !RuntimeUtil.IsNull(each))
-                        .Select(each => ValidateXPathResult(each, expectedType, expectedInterface))
+                        .Select(each => ValidateXPathResult(property.serializedObject.targetObject, each, expectedType, expectedInterface))
                         .Where(each => each.valid)
                         .Select(each => each.value);
 

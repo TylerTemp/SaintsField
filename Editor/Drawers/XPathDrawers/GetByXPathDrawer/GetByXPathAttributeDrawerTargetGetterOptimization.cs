@@ -151,7 +151,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     components = components.Where(interfaceType.IsInstanceOfType).ToArray();
                 }
 
-                results.AddRange(components.SelectMany(each => SceneFilterComponent(each, type, fieldType)));
+                results.AddRange(components
+                    .Where(each => PrefabCanSignCheck(property.serializedObject.targetObject, each))
+                    .SelectMany(each => SceneFilterComponent(each, type, fieldType))
+                );
             }
 
             // Debug.Log($"#GetByXPath# GetComponentInSceneOptimized: {results.Count} valid values found for {type}({interfaceType}), includeInactive={includeInactive}");
@@ -476,7 +479,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             // UnityEngine.Object result = componentInParent;
             // Debug.Log($"fieldType={fieldType}, type={type}, propPath={targetProperty.propertyPath}");
-            foreach (Component componentInParent in componentsInParents)
+            foreach (Component componentInParent in componentsInParents.Where(each => PrefabCanSignCheck(property.serializedObject.targetObject, each)))
             {
                 if (fieldType != type)
                 {

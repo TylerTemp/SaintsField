@@ -28,9 +28,99 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     [CustomPropertyDrawer(typeof(FindComponentAttribute))]
     public partial class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
-
-        private static (bool valid, object value) ValidateXPathResult(object each, Type expectType, Type expectInterface)
+        private static bool PrefabCanSignCheck(Object fieldContainingObject, object each)
         {
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(fieldContainingObject is Component targetComp))
+            {
+                return true;
+            }
+
+            GameObject sGo = targetComp.gameObject;
+            if(!sGo.scene.IsValid())
+            {
+                switch (each)
+                {
+                    case GameObject targetValueGo:
+                        if (targetValueGo.scene.IsValid()) // don't sign a scene object to non-scene target
+                        {
+                            return false;
+                        }
+
+                        break;
+                    case Component taragetValueComp:
+                        if (taragetValueComp.gameObject.scene.IsValid())
+                        {
+                            return false;
+                        }
+
+                        break;
+                }
+            }
+
+            PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
+            // Debug.Log(prefabStage?.mode);
+            // if (prefabStage?.mode == PrefabStage.Mode.InIsolation)
+            // ReSharper disable once InvertIf
+            if (prefabStage != null)
+            {
+                switch (each)
+                {
+                    case GameObject targetValueGo:
+                        if (targetValueGo.scene.IsValid())  // don't sign a scene object to non-scene target
+                        {
+                            return false;
+                        }
+
+                        break;
+                    case Component taragetValueComp:
+                        if (taragetValueComp.gameObject.scene.IsValid())
+                        {
+                            return false;
+                        }
+
+                        break;
+                }
+            }
+
+            return true;
+        }
+
+        private static (bool valid, object value) ValidateXPathResult(Object fieldContainingObject, object each, Type expectType, Type expectInterface)
+        {
+            if(!PrefabCanSignCheck(fieldContainingObject, each))
+            {
+                return (false, null);
+            }
+
+            if (fieldContainingObject is Component sComp)
+            {
+                GameObject sGo = sComp.gameObject;
+                PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
+                Debug.Log(prefabStage?.mode);
+                // if (prefabStage?.mode == PrefabStage.Mode.InIsolation)
+                if (prefabStage != null)
+                {
+                    switch (each)
+                    {
+                        case GameObject targetValueGo:
+                            if (targetValueGo.scene.IsValid())  // don't sign a scene object to non-scene target
+                            {
+                                return (false, null);
+                            }
+
+                            break;
+                        case Component taragetValueComp:
+                            if (taragetValueComp.gameObject.scene.IsValid())
+                            {
+                                return (false, null);
+                            }
+
+                            break;
+                    }
+                }
+            }
+
             object result;
             // Debug.Log($"{each}");
             if (expectType.IsInstanceOfType(each))
@@ -490,57 +580,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
             Debug.Log($"#GetByXPath# Sign {propertyCache.SerializedProperty.propertyPath} from {propertyCache.OriginalValue} to {propertyCache.TargetValue}");
 #endif
-
-            if (propertyCache.SerializedProperty.serializedObject.targetObject is Component targetComp &&
-                !targetComp.gameObject.scene.IsValid())
-            {
-                switch (propertyCache.TargetValue)
-                {
-                    case GameObject targetValueGo:
-                        if (targetValueGo.scene.IsValid())  // don't sign a scene object to non-scene target
-                        {
-                            return false;
-                        }
-
-                        break;
-                    case Component taragetValueComp:
-                        if (taragetValueComp.gameObject.scene.IsValid())
-                        {
-                            return false;
-                        }
-
-                        break;
-                }
-            }
-
-            if (propertyCache.SerializedProperty.serializedObject.targetObject is Component sComp)
-            {
-                GameObject sGo = sComp.gameObject;
-                PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
-                // Debug.Log(prefabStage?.mode);
-                // if (prefabStage?.mode == PrefabStage.Mode.InIsolation)
-                if (prefabStage != null)
-                {
-                    switch (propertyCache.TargetValue)
-                    {
-                        case GameObject targetValueGo:
-                            if (targetValueGo.scene.IsValid())  // don't sign a scene object to non-scene target
-                            {
-                                return false;
-                            }
-
-                            break;
-                        case Component taragetValueComp:
-                            if (taragetValueComp.gameObject.scene.IsValid())
-                            {
-                                return false;
-                            }
-
-                            break;
-                    }
-                }
-            }
-
             propertyCache.MisMatch = false;
 
             if(notice)
