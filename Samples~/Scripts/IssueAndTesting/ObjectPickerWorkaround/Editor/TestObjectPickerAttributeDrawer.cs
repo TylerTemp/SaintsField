@@ -159,7 +159,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             _listScrollView = _listView.Q<ScrollView>();
 
 // #if UNITY_2021_3 || UNITY_2022_3 || UNITY_6000_OR_NEWER
-#if UNITY_2022_3 || UNITY_6000_OR_NEWER
+#if UNITY_2022_2_OR_NEWER
             _listScrollViewScrollSize = _listScrollView.mouseWheelScrollSize;
 #endif
 
@@ -181,7 +181,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             _blockScrollView = _blockView.Q<ScrollView>();
             _blockScrollView.RegisterCallback<WheelEvent>(WheelEvent);
 
-#if UNITY_2022_3 || UNITY_6000_OR_NEWER
+#if UNITY_2022_2_OR_NEWER
             _blockScrollViewScrollSize = _blockScrollView.mouseWheelScrollSize;
 #endif
 
@@ -193,7 +193,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                 if (ctrl)
                 {
                     _ctrlDown = true;
-#if UNITY_2022_3 || UNITY_6000_OR_NEWER
+#if UNITY_2022_2_OR_NEWER
                     _listScrollView.mouseWheelScrollSize = 0;
                     _blockScrollView.mouseWheelScrollSize = 0;
 #endif
@@ -206,7 +206,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                 if (ctrl)
                 {
                     _ctrlDown = false;
-#if UNITY_2022_3 || UNITY_6000_OR_NEWER
+#if UNITY_2022_2_OR_NEWER
                     _listScrollView.mouseWheelScrollSize = _listScrollViewScrollSize;
                     _blockScrollView.mouseWheelScrollSize = _blockScrollViewScrollSize;
 #endif
@@ -225,7 +225,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             }
 
             _ctrlDown = down;
-#if UNITY_2022_3 || UNITY_6000_OR_NEWER
+#if UNITY_2022_2_OR_NEWER
             if (down)
             {
                 _listScrollView.mouseWheelScrollSize = 0;
