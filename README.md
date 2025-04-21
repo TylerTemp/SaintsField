@@ -86,11 +86,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.6.1**
+**4.6.2**
 
-1.  UI Toolkit: Fix `ShowInInspector` can not correctly draw `Gradient`, `Curve` & `Hash128`
-2.  UI Toolkit: Improve the label layout in horizontal layout for Unity's native types (`Vector2` etc.)
-3.  UI Toolkit: Fix `ShowInInspector` might fail to draw some properties, give errors and block the rest drawing process
+Fix auto getters sign in-scene objects to not-in-scene object fields (e.g. `GetComponentInScene` used on a prefab, the prefab sould not reference to a scene-object. But if you put the target in the scene, then the field should be signed)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

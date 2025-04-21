@@ -139,11 +139,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return;
             }
 
-            string propertyPath;
+            string arrayRemovedKey;
             try
             {
-                // ReSharper disable once RedundantAssignment
-                propertyPath = property.propertyPath;
+                arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
             }
             catch (ObjectDisposedException)
             {
@@ -153,8 +152,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 return;
             }
-
-            string arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
 
             // watch selection
             Object curInspectingTarget = property.serializedObject.targetObject;
@@ -257,6 +254,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // Debug.Log(property.propertyPath);
 
             // ActualUpdateUIToolkit(property, index, container, onValueChangedCallback, info);
+            string propertyPath;
             try
             {
                 propertyPath = property.propertyPath;

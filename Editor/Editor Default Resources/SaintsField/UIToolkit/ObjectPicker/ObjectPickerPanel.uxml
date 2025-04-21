@@ -8,11 +8,11 @@
             </uie:Toolbar>
             <ui:Image name="saints-field-object-picker-loading" style="width: 16px; height: 16px; align-self: center;" />
         </ui:VisualElement>
-        <ui:Slider value="0" high-value="100" name="saints-field-object-picker-slider" style="min-width: 60px;" />
+        <ui:Slider value="0" high-value="1" name="saints-field-object-picker-slider" style="min-width: 60px;" />
     </ui:VisualElement>
     <ui:VisualElement name="saints-field-object-picker-body" style="flex-grow: 1;">
         <ui:ListView name="saints-field-object-picker-list" style="background-color: rgb(80, 80, 80); flex-grow: 1;" />
-        <ui:ScrollView name="saints-field-object-picker-block" horizontal-scroller-visibility="Hidden" style="flex-grow: 1;" />
+        <ui:ScrollView name="saints-field-object-picker-block" horizontal-scroller-visibility="Hidden" style="flex-grow: 1; background-color: rgb(80, 80, 80);" />
     </ui:VisualElement>
     <ui:VisualElement style="flex-grow: 0; flex-direction: row; flex-shrink: 0; height: 80px; padding-top: 5px; padding-right: 5px; padding-left: 5px;">
         <ui:Image name="saints-field-object-picker-preview-image" style="width: 70px; height: 70px; margin-right: 5px;" />

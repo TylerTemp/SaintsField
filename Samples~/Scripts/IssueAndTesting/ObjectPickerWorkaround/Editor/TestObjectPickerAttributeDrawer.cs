@@ -68,6 +68,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
         private Slider _slider;
         private bool _isBlockView;
 
+        private bool _ctrlDown;
+
+        private ScrollView _listScrollView;
+        private float _listScrollViewScrollSize;
+        private ScrollView _blockScrollView;
+        private float _blockScrollViewScrollSize;
+
         public void CreateGUI()
         {
             VisualTreeAsset visualTreeAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerPanel.uxml");
@@ -84,7 +91,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                     return;
                 }
 
-                var scaleValue = e.newValue;
+                float scaleValue = e.newValue;
                 if (scaleValue > 0.1f)
                 {
                     if (!_isBlockView)
@@ -93,6 +100,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                         _listView.RemoveFromHierarchy();
                         _pickerBody.Add(_blockView);
                     }
+
+                    UpdateBlockItemScale();
                 }
                 else
                 {
@@ -104,6 +113,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                     }
                 }
             });
+
+            // so key event can be captured
+            rootVisualElement.focusable = true;
 
             _assetsToggle.RegisterValueChangedCallback(e =>
             {
@@ -133,12 +145,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
             _loadingImage = rootVisualElement.Q<Image>(name: "saints-field-object-picker-loading");
             _loadingImage.image = Util.LoadResource<Texture2D>("refresh.png");
-            // Debug.Log(_loadingImage.image);
             UIToolkitUtils.KeepRotate(_loadingImage);
-            // _loadingImage.RegisterCallback<AttachToPanelEvent>(_ =>  UIToolkitUtils.TriggerRotate(_loadingImage));
             _loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(_loadingImage)).StartingIn(300);
-            // UIToolkitUtils.TriggerRotate(_loadingImage);
-            // buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator));
 
             _pickerBody = rootVisualElement.Q<VisualElement>("saints-field-object-picker-body");
 
@@ -148,16 +156,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             Debug.Assert(_listView != null);
             _listViewContent = _listView.Q<VisualElement>(name: "unity-content-container");
             Debug.Assert(_listViewContent != null);
+            _listScrollView = _listView.Q<ScrollView>();
 
-            // for (int i = 0; i < 15; i++)
-            // {
-            //     VisualElement listItem = _listItemAsset.CloneTree();
-            //     _listViewContent.Add(listItem);
-            //     // listItem.style.width = new StyleLength(Length.Percent(50));
-            //     listItem.Q<Label>(name: "saints-field-object-picker-list-item-label").text = $"Item {i}";
-            // }
+            _listScrollViewScrollSize = _listScrollView.mouseWheelScrollSize;
 
-            // _listView.RemoveFromHierarchy();
+            rootVisualElement.RegisterCallback<WheelEvent>(WheelEvent);
+            _listScrollView.RegisterCallback<WheelEvent>(WheelEvent);
 
             _blockItemAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerBlockItem.uxml");
             Debug.Assert(_blockItemAsset != null);
@@ -171,27 +175,73 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
             _blockView.RemoveFromHierarchy();
 
-            // for (int i = 0; i < 15; i++)
-            // {
-            //     VisualElement blockItem = _blockItemAsset.CloneTree();
-            //     // blockItem.style.width = 60;
-            //     // blockItem.style.height = 60;
-            //     _blockViewContent.Add(blockItem);
-            //     blockItem.Q<Label>(name: "saints-field-object-picker-block-item-name").text = $"Item {i}";
-            // }
+            _blockScrollView = _blockView.Q<ScrollView>();
+            _blockScrollView.RegisterCallback<WheelEvent>(WheelEvent);
 
-            // rootVisualElement.schedule.Execute(() =>
-            // {
-            //     DisableAssets();
-            // }).StartingIn(1000);
-            //
-            // rootVisualElement.schedule.Execute(() =>
-            // {
-            //     DisableScene();
-            // }).StartingIn(2000);
+            _blockScrollViewScrollSize = _blockScrollView.mouseWheelScrollSize;
+
+            rootVisualElement.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                bool ctrl = evt.keyCode is KeyCode.LeftControl or KeyCode.RightControl or KeyCode.LeftCommand or KeyCode.RightCommand;
+                // Debug.Log($"ctrl={ctrl}");
+                // ReSharper disable once InvertIf
+                if (ctrl)
+                {
+                    _ctrlDown = true;
+                    _listScrollView.mouseWheelScrollSize = 0;
+                    _blockScrollView.mouseWheelScrollSize = 0;
+                }
+            });
+            rootVisualElement.RegisterCallback<KeyUpEvent>(evt =>
+            {
+                bool ctrl = evt.keyCode is KeyCode.LeftControl or KeyCode.RightControl or KeyCode.LeftCommand or KeyCode.RightCommand;
+                // ReSharper disable once InvertIf
+                if (ctrl)
+                {
+                    _ctrlDown = false;
+                    _listScrollView.mouseWheelScrollSize = _listScrollViewScrollSize;
+                    _blockScrollView.mouseWheelScrollSize = _blockScrollViewScrollSize;
+                }
+            });
 
             rootVisualElement.schedule.Execute(() => _slider.value = _slider.value);
             rootVisualElement.schedule.Execute(UpdatePreview).Every(500);
+        }
+
+        private void SetCtrl(bool down)
+        {
+            if (_ctrlDown == down)
+            {
+                return;
+            }
+
+            _ctrlDown = down;
+            if (down)
+            {
+                _listScrollView.mouseWheelScrollSize = 0;
+                _blockScrollView.mouseWheelScrollSize = 0;
+            }
+            else
+            {
+                _listScrollView.mouseWheelScrollSize = _listScrollViewScrollSize;
+                _blockScrollView.mouseWheelScrollSize = _blockScrollViewScrollSize;
+            }
+        }
+
+        private void WheelEvent(WheelEvent evt)
+        {
+            bool nowCtrlDown = evt.modifiers == EventModifiers.Control || evt.modifiers == EventModifiers.Command;
+
+            SetCtrl(nowCtrlDown);
+
+            if (!_ctrlDown)
+            {
+                return;
+            }
+
+            Vector3 delta = evt.delta;
+            float deltaY = -delta.y / 30f;
+            _slider.value = Mathf.Clamp(_slider.value + deltaY, 0, 1);
         }
 
         private void UpdatePreview()
@@ -229,6 +279,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             _currentOnAssets = on;
 
             List<ObjectInfo> objInfoTargets = _currentOnAssets? _assetsObjects : _sceneObjects;
+            // Debug.Log($"switch to assets {_currentOnAssets}: {objInfoTargets.Count}");
             _listViewContent.Clear();
             _blockViewContent.Clear();
 
@@ -303,6 +354,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                     _listViewContent.Add(objectInfo.ListItem);
                     _blockViewContent.Add(objectInfo.BlockItem);
                 }
+
+                List<ObjectInfo> objInfoTargets = _currentOnAssets? _assetsObjects : _sceneObjects;
+                objInfoTargets.Add(objectInfo);
             }
         }
 
@@ -320,6 +374,21 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             if (objectInfo.BaseInfo.Icon != null)
             {
                 objectInfo.BlockItemIcon.image = objectInfo.BaseInfo.Icon;
+                objectInfo.BlockItemPreview.image = objectInfo.BaseInfo.Icon;
+            }
+        }
+
+        private void UpdateBlockItemScale()
+        {
+            // float curValue = (_slider.value - 0.1f) / 0.9f;
+            float curValue = Mathf.InverseLerp(0.1f, 0.9f, _slider.value);
+            // Debug.Log(curValue);
+            foreach (ObjectInfo objectInfo in _assetsObjects)
+            {
+                Button button = objectInfo.BlockItem.Q<Button>();
+                button.style.width = 60 * (1 + curValue);
+                button.style.height = 80 * (1 + curValue);
+
             }
         }
     }
@@ -330,12 +399,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
         private void DebugOpenWindow()
         {
-            var pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
+            SaintsObjectPickerUIToolkit pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
             pop.Close();
             pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
             pop.Show();
 
-            var resources = Resources.LoadAll("");
+            Object[] resources = Resources.LoadAll("");
             // Debug.Log(resources.Length);
             pop.EnqueueAssetsObjects(resources.Select(each => new SaintsObjectPickerUIToolkit.ObjectBaseInfo(
                 each, AssetPreview.GetMiniThumbnail(each), each.name, each.GetType().Name, AssetDatabase.GetAssetPath(each)
