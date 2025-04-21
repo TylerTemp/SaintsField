@@ -93,34 +93,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return (false, null);
             }
 
-            if (fieldContainingObject is Component sComp)
-            {
-                GameObject sGo = sComp.gameObject;
-                PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
-                Debug.Log(prefabStage?.mode);
-                // if (prefabStage?.mode == PrefabStage.Mode.InIsolation)
-                if (prefabStage != null)
-                {
-                    switch (each)
-                    {
-                        case GameObject targetValueGo:
-                            if (targetValueGo.scene.IsValid())  // don't sign a scene object to non-scene target
-                            {
-                                return (false, null);
-                            }
-
-                            break;
-                        case Component taragetValueComp:
-                            if (taragetValueComp.gameObject.scene.IsValid())
-                            {
-                                return (false, null);
-                            }
-
-                            break;
-                    }
-                }
-            }
-
             object result;
             // Debug.Log($"{each}");
             if (expectType.IsInstanceOfType(each))
