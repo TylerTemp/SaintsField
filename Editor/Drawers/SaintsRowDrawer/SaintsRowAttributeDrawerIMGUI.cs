@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
         private float _filedWidthCache = -1;
 
-        private IEnumerable<ISaintsRenderer> ImGuiEnsureRenderers(SerializedProperty property)
+        private IEnumerable<ISaintsRenderer> ImGuiEnsureRenderers(FieldInfo info, SerializedProperty property)
         {
 #if UNITY_2021_3_OR_NEWER
             if (property.propertyType == SerializedPropertyType.ManagedReference &&
@@ -45,7 +45,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             }
 
             // Debug.Log($"create new for {property.propertyPath}");
-            (string error, int index, object _, object current) = GetTargets(fieldInfo, property);
+            (string error, int index, object _, object current) = GetTargets(info, property);
             if (error == "")
             {
                 Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
@@ -80,7 +80,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             if (property.isExpanded || saintsRowAttribute.Inline)
             {
                 // ReSharper disable once LoopCanBeConvertedToQuery
-                foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
+                foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(info, property))
                 {
                     fieldHeight += saintsRenderer.GetHeightIMGUI(fullWidth);
                 }
@@ -120,7 +120,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             float yAcc = leftRect.y;
 
-            foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(property))
+            foreach (ISaintsRenderer saintsRenderer in ImGuiEnsureRenderers(info, property))
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTSROW
                     Debug.Log($"saintsRow: {saintsRenderer}");
