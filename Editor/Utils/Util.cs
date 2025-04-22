@@ -324,13 +324,24 @@ namespace SaintsField.Editor.Utils
             Debug.Log($"check equal using .Equals on {itemValue} -> {curValue}");
 #endif
             // ReSharper disable once InvertIf
-            if (itemValue.Equals(curValue))
+
+            bool equalCalledResult;
+
+            try
             {
-                // Debug.Log($"GetSelected equal {curValue}");
-                return true;
+                equalCalledResult = itemValue.Equals(curValue);   // WTF microsoft
+            }
+#pragma warning disable CS0168 // Variable is declared but never used
+            catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogException(e);
+#endif
+                equalCalledResult = itemValue == curValue;
             }
 
-            return false;
+            return equalCalledResult;
         }
 
         public static (string error, T value) GetOfNoParams<T>(object target, string by, T defaultValue)
