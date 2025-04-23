@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.SaintsXPathParser.Optimization;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -98,6 +99,30 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private static (string error, bool hasElement, IEnumerable<object> results) GetComponentInSceneOptimized(Type compType, bool includeInactive, SerializedProperty property, MemberInfo info)
         {
+#if UNITY_2021_2_OR_NEWER
+            {
+                GameObject sGo = null;
+                if (property.serializedObject.targetObject is Component propComp)
+                {
+                    sGo = propComp.gameObject;
+                }
+                else if (property.serializedObject.targetObject is GameObject propGo)
+                {
+                    sGo = propGo;
+                }
+
+                // ReSharper disable once UseNegatedPatternInIsExpression
+                if(!(sGo is null))
+                {
+                    PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
+                    if (prefabStage != null)  // isolated/context prefab should not sign a scene object
+                    {
+                        return ("", false, Array.Empty<object>());
+                    }
+                }
+            }
+#endif
+
             (string error, Type fieldType, Type interfaceType) = GetExpectedTypeOfProp(property, info);
             if (error != "")
             {
