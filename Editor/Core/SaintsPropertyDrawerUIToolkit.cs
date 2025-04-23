@@ -680,70 +680,58 @@ namespace SaintsField.Editor.Core
                     }
                 };
 
-                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
-
-                return new IMGUIContainer(() =>
-                {
-                    using(new ImGuiFoldoutStyleRichTextScoop())
-                    using(new ImGuiLabelStyleRichTextScoop())
-                    using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                    using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                    {
-                        GUIContent label = imguiLabelHelper.NoLabel
-                            ? GUIContent.none
-                            : new GUIContent(imguiLabelHelper.RichLabel);
-#if SAINTSFIELD_OBVIOUS_SOAP
-                        {
-                            if(!imguiLabelHelper.NoLabel)
-                            {
-                                Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
-                                    ? ReflectUtils.GetElementType(info.FieldType)
-                                    : info.FieldType;
-                                if (rawType.IsSubclassOf(typeof(ScriptableVariableBase)))
-                                {
-                                    label = new GUIContent($"    {imguiLabelHelper.RichLabel}");
-                                }
-                            }
-                        }
-#endif
-                        // Debug.Log(imguiLabelHelper);
-
-                        using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                        {
-                            property.serializedObject.Update();
-                            EditorGUILayout.PropertyField(property, label);
-                            // ReSharper disable once InvertIf
-                            if (changed.changed)
-                            {
-                                // Debug.Log("changed");
-                                property.serializedObject.ApplyModifiedProperties();
-
-                                object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                                if (newFetchParent == null)
-                                {
-                                    Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
-                                    return;
-                                }
-
-                                (string error, int _, object value) = Util.GetValue(property, info, newFetchParent);
-                                if (error == "")
-                                {
-                                    onValueChangedCallback(value);
-                                }
-                            }
-                        }
-                    }
-                })
-                {
-                    style =
-                    {
-                        flexGrow = 1,
-                    },
-                    userData = imguiLabelHelper,
-                };
-#endif
+                // This breaks: AYellowPaper SerializedDictionary
+//
+//                 IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
+//
+//                 return new IMGUIContainer(() =>
+//                 {
+//                     using(new ImGuiFoldoutStyleRichTextScoop())
+//                     using(new ImGuiLabelStyleRichTextScoop())
+//                     using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
+//                     using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+//                     {
+//                         GUIContent label = imguiLabelHelper.NoLabel
+//                             ? GUIContent.none
+//                             : new GUIContent(imguiLabelHelper.RichLabel);
+//                         // Debug.Log(imguiLabelHelper);
+//
+//                         using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+//                         {
+//                             property.serializedObject.Update();
+//                             EditorGUILayout.PropertyField(property, label);
+//                             // ReSharper disable once InvertIf
+//                             if (changed.changed)
+//                             {
+//                                 // Debug.Log("changed");
+//                                 property.serializedObject.ApplyModifiedProperties();
+//
+//                                 object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+//                                 if (newFetchParent == null)
+//                                 {
+//                                     Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+//                                     return;
+//                                 }
+//
+//                                 (string error, int _, object value) = Util.GetValue(property, info, newFetchParent);
+//                                 if (error == "")
+//                                 {
+//                                     onValueChangedCallback(value);
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 })
+//                 {
+//                     style =
+//                     {
+//                         flexGrow = 1,
+//                     },
+//                     userData = imguiLabelHelper,
+//                 };
+// #endif
                 // PropertyDrawer imGuiDrawer = drawerInstance;
-
+                //
                 // using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
                 // using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
                 // {
@@ -769,96 +757,97 @@ namespace SaintsField.Editor.Core
                 // }
 
 
-                //
-                // IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
-                //
-                // IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
-                // {
-                //     property.serializedObject.Update();
-                //
-                //     GUIContent label = imguiLabelHelper.NoLabel
-                //         ? GUIContent.none
-                //         : new GUIContent(imguiLabelHelper.RichLabel);
-                //
-                //     using(new ImGuiFoldoutStyleRichTextScoop())
-                //     using(new ImGuiLabelStyleRichTextScoop())
-                //     using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                //     {
-                //         // // This weird way is from Unity's PropertyDrawer
-                //         // // The other ways which commented below does not work:
-                //         // // they either not work for I2Language, or Wwise.Event
-                //         // Rect position;
-                //         // using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                //         // {
-                //         //     Debug.Log($"== Get Height from {imGuiDrawer}");
-                //         //     position = new Rect
-                //         //     {
-                //         //         height = imGuiDrawer.GetPropertyHeight(property, label),
-                //         //         width = imGuiContainer.resolvedStyle.width,
-                //         //     };
-                //         // }
-                //         // Debug.Log($"== Done Height from {imGuiDrawer}: {position.height}");
-                //         // using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                //         // {
-                //         //     imGuiDrawer.OnGUI(position, property, label);
-                //         // }
-                //         // // ReSharper disable once PossibleNullReferenceException
-                //         // // ReSharper disable once AccessToModifiedClosure
-                //         // imGuiContainer.style.height = position.height;
-                //
-                //         using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                //         using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                //         {
-                //             // Debug.Log($"Fall {property.propertyPath}");
-                //             // EditorGUILayout.PropertyField(property, label, true);
-                //             // Debug.Log($"Fall Done {property.propertyPath}");
-                //             float height = drawerInstance.GetPropertyHeight(property, label);
-                //             Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
-                //             drawerInstance.OnGUI(rect, property, label);
-                //         }
-                //
-                //         // using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                //         // using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
-                //         // {
-                //         //     float height = drawerInstance.GetPropertyHeight(property, label);
-                //         //     // Debug.Log($"container height={height}");
-                //         //     Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
-                //         //     drawerInstance.OnGUI(rect, property, label);
-                //         // }
-                //         //
-                //         // // Debug.Log(changed.changed);
-                //         //
-                //         // ReSharper disable once InvertIf
-                //         if (changed.changed)
-                //         {
-                //             property.serializedObject.ApplyModifiedProperties();
-                //
-                //             object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                //             if (newFetchParent == null)
-                //             {
-                //                 Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
-                //                 return;
-                //             }
-                //
-                //             (string error, int _, object value) = Util.GetValue(property, info, newFetchParent);
-                //             if (error == "")
-                //             {
-                //                 onValueChangedCallback(value);
-                //             }
-                //         }
-                //     }
-                // })
-                // {
-                //     style =
-                //     {
-                //         flexGrow = 1,
-                //         flexShrink = 0,
-                //     },
-                //     userData = imguiLabelHelper,
-                // };
-                // imGuiContainer.AddToClassList(IMGUILabelHelper.ClassName);
-                //
-                // return imGuiContainer;
+                // This works fine with: AYellowPaper.SerializedDictionary, Wwise.Event, I2Language.LocalizedString
+                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
+
+                IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
+                {
+                    property.serializedObject.Update();
+
+                    GUIContent label = imguiLabelHelper.NoLabel
+                        ? GUIContent.none
+                        : new GUIContent(imguiLabelHelper.RichLabel);
+
+                    using(new ImGuiFoldoutStyleRichTextScoop())
+                    using(new ImGuiLabelStyleRichTextScoop())
+                    using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                    {
+                        // // This weird way is from Unity's PropertyDrawer
+                        // // The other ways which commented below does not work:
+                        // // they either not work for I2Language, or Wwise.Event
+                        // Rect position;
+                        // using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        // {
+                        //     Debug.Log($"== Get Height from {imGuiDrawer}");
+                        //     position = new Rect
+                        //     {
+                        //         height = imGuiDrawer.GetPropertyHeight(property, label),
+                        //         width = imGuiContainer.resolvedStyle.width,
+                        //     };
+                        // }
+                        // Debug.Log($"== Done Height from {imGuiDrawer}: {position.height}");
+                        // using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        // {
+                        //     imGuiDrawer.OnGUI(position, property, label);
+                        // }
+                        // // ReSharper disable once PossibleNullReferenceException
+                        // // ReSharper disable once AccessToModifiedClosure
+                        // imGuiContainer.style.height = position.height;
+
+                        using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        {
+                            // Debug.Log($"Fall {property.propertyPath}");
+                            // EditorGUILayout.PropertyField(property, label, true);
+                            // Debug.Log($"Fall Done {property.propertyPath}");
+                            float height = drawerInstance.GetPropertyHeight(property, label);
+                            Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
+                            drawerInstance.OnGUI(rect, property, label);
+                        }
+
+                        // using(new InsideSaintsFieldScoop(SubDrawCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        // using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
+                        // {
+                        //     float height = drawerInstance.GetPropertyHeight(property, label);
+                        //     // Debug.Log($"container height={height}");
+                        //     Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
+                        //     drawerInstance.OnGUI(rect, property, label);
+                        // }
+                        //
+                        // // Debug.Log(changed.changed);
+                        //
+                        // ReSharper disable once InvertIf
+                        if (changed.changed)
+                        {
+                            property.serializedObject.ApplyModifiedProperties();
+
+                            object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                            if (newFetchParent == null)
+                            {
+                                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                                return;
+                            }
+
+                            (string error, int _, object value) = Util.GetValue(property, info, newFetchParent);
+                            if (error == "")
+                            {
+                                onValueChangedCallback(value);
+                            }
+                        }
+                    }
+                })
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 0,
+                    },
+                    userData = imguiLabelHelper,
+                };
+                imGuiContainer.AddToClassList(IMGUILabelHelper.ClassName);
+
+                return imGuiContainer;
+#endif
             }
 
             VisualElement attrCreateReturnElement = drawerInstance.CreatePropertyGUI(property);
