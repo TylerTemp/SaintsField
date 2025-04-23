@@ -86,9 +86,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.6.3**
+**4.6.4**
 
-Fix broken auto getters since 4.6.2... (sad face)
+1.  UI Toolkit: Fix `double` & `float` editing round [#215](https://github.com/TylerTemp/SaintsField/issues/215)
+2.  Fix error should be dismissed when user override the `Equal` method which raises an error
+3.  UI Toolkit: Fix `ShowInInspector` an error when add element to a list/array
+4.  UI Toolkit: `ShowInInspector` now only show `public` `instance` field to avoid loop calling
+5.  UI Toolkit: Fix fallback drawer breaks `AYellowpaper.SerializedDictionary`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
