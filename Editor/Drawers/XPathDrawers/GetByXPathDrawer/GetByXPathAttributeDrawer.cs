@@ -28,28 +28,28 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     [CustomPropertyDrawer(typeof(FindComponentAttribute))]
     public partial class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
-        private static bool PrefabCanSignCheck(Object fieldContainingObject, object each)
+        private static bool PrefabCanSignCheck(Object signToObj, object signFrom)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression
-            if (!(fieldContainingObject is Component targetComp))
+            if (!(signToObj is Component signToComp))
             {
                 return true;
             }
 
-            GameObject sGo = targetComp.gameObject;
-            UnityEngine.SceneManagement.Scene sScene = sGo.scene;
+            GameObject signToGo = signToComp.gameObject;
+            UnityEngine.SceneManagement.Scene signToScene = signToGo.scene;
 
-            switch (each)
+            switch (signFrom)
             {
-                case GameObject targetValueGo:
-                    if (!SceneCompare(sScene, targetValueGo.scene))
+                case GameObject singFromGo:
+                    if (!SceneCompare(singFromGo.scene, signToScene))
                     {
                         return false;
                     }
 
                     break;
-                case Component targetValueComp:
-                    if (!SceneCompare(sScene, targetValueComp.gameObject.scene))
+                case Component signFromComp:
+                    if (!SceneCompare(signFromComp.gameObject.scene, signToScene))
                     {
                         return false;
                     }
@@ -111,14 +111,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return true;
         }
 
-        private static bool SceneCompare(UnityEngine.SceneManagement.Scene scene1, UnityEngine.SceneManagement.Scene scene2)
+        private static bool SceneCompare(UnityEngine.SceneManagement.Scene signFrom, UnityEngine.SceneManagement.Scene signTo)
         {
-            if (!scene1.IsValid())
+            if (signFrom.IsValid())   // `from` is a scene object
             {
-                return !scene2.IsValid();
+                return signFrom == signTo;  // `to` must also be a scene object
             }
 
-            return scene1 == scene2;
+            // `from` is an asset
+            return true;  // `to` can be anything
         }
 
         private static (bool valid, object value) ValidateXPathResult(Object fieldContainingObject, object each, Type expectType, Type expectInterface)

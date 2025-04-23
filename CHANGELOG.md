@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.6.3 ##
+
+Fix broken auto getters since 4.6.2... (sad face)
+
 ## 4.6.2 ##
 
 Fix auto getters sign in-scene objects to not-in-scene object fields (e.g. `GetComponentInScene` used on a prefab, the prefab sould not reference to a scene-object. But if you put the target in the scene, then the field should be signed)
