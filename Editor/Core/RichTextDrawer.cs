@@ -177,7 +177,7 @@ namespace SaintsField.Editor.Core
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(RawContent, IsIcon, Content, IconColor);
+                return Util.CombineHashCode(RawContent, IsIcon, Content, IconColor);
             }
         }
 
