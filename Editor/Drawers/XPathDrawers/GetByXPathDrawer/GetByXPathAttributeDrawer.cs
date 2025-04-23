@@ -28,62 +28,98 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     [CustomPropertyDrawer(typeof(FindComponentAttribute))]
     public partial class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
-        private static bool PrefabCanSignCheck(Object fieldContainingObject, object each)
+        private static bool PrefabCanSignCheck(Object signToObj, object signFrom)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression
-            if (!(fieldContainingObject is Component targetComp))
+            if (!(signToObj is Component signToComp))
             {
                 return true;
             }
 
-            GameObject sGo = targetComp.gameObject;
-            if(!sGo.scene.IsValid())
+            GameObject signToGo = signToComp.gameObject;
+            UnityEngine.SceneManagement.Scene signToScene = signToGo.scene;
+
+            switch (signFrom)
             {
-                switch (each)
-                {
-                    case GameObject targetValueGo:
-                        if (targetValueGo.scene.IsValid()) // don't sign a scene object to non-scene target
-                        {
-                            return false;
-                        }
+                case GameObject singFromGo:
+                    if (!SceneCompare(singFromGo.scene, signToScene))
+                    {
+                        return false;
+                    }
 
-                        break;
-                    case Component taragetValueComp:
-                        if (taragetValueComp.gameObject.scene.IsValid())
-                        {
-                            return false;
-                        }
+                    break;
+                case Component signFromComp:
+                    if (!SceneCompare(signFromComp.gameObject.scene, signToScene))
+                    {
+                        return false;
+                    }
 
-                        break;
-                }
+                    break;
             }
 
-            PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
-            // Debug.Log(prefabStage?.mode);
-            // if (prefabStage?.mode == PrefabStage.Mode.InIsolation)
-            // ReSharper disable once InvertIf
-            if (prefabStage != null)
-            {
-                switch (each)
-                {
-                    case GameObject targetValueGo:
-                        if (targetValueGo.scene.IsValid())  // don't sign a scene object to non-scene target
-                        {
-                            return false;
-                        }
+            // if(!sGo.scene.IsValid())
+            // {
+            //     switch (each)
+            //     {
+            //         case GameObject targetValueGo:
+            //             if (targetValueGo.scene.IsValid()) // don't sign a scene object to non-scene target
+            //             {
+            //                 return false;
+            //             }
+            //
+            //             break;
+            //         case Component targetValueComp:
+            //             if (targetValueComp.gameObject.scene.IsValid())
+            //             {
+            //                 return false;
+            //             }
+            //
+            //             break;
+            //     }
+            // }
 
-                        break;
-                    case Component taragetValueComp:
-                        if (taragetValueComp.gameObject.scene.IsValid())
-                        {
-                            return false;
-                        }
-
-                        break;
-                }
-            }
+// #if UNITY_2021_2_OR_NEWER
+//             PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(sGo);
+//             // Debug.Log(prefabStage?.mode);
+//             // if (prefabStage?.mode == PrefabStage.Mode.InIsolation)
+//             // ReSharper disable once InvertIf
+//             // Debug.Log(prefabStage.mode);
+//             if (prefabStage != null)
+//             {
+//                 switch (each)
+//                 {
+//                     case GameObject targetValueGo:
+//                         if (targetValueGo.scene.IsValid())  // don't sign a scene object to non-scene target
+//                         {
+//                             // Debug.Log(targetValueGo.scene);
+//                             return (sGo.scene.IsValid() && targetValueGo.scene == sGo.scene);
+//                         }
+//
+//                         break;
+//                     case Component taragetValueComp:
+//                         if (taragetValueComp.gameObject.scene.IsValid())
+//                         {
+//                             // Debug.Log(taragetValueComp.gameObject.scene.name);
+//                             return (sGo.scene.IsValid() && taragetValueComp.gameObject.scene == sGo.scene);
+//                         }
+//
+//                         break;
+//                 }
+//             }
+// #endif
 
             return true;
+        }
+
+        private static bool SceneCompare(UnityEngine.SceneManagement.Scene signFrom, UnityEngine.SceneManagement.Scene signTo)
+        {
+            if (signFrom.IsValid())   // `from` is a scene object
+            {
+                return signFrom == signTo;  // `to` must also be a scene object
+            }
+
+            // `from` is an asset
+            return true;  // `to` can be anything
         }
 
         private static (bool valid, object value) ValidateXPathResult(Object fieldContainingObject, object each, Type expectType, Type expectInterface)
