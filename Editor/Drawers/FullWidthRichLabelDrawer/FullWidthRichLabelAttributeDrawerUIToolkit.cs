@@ -1,5 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -16,6 +18,18 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
 
         private static string NameHelpBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__FullWidthRichLabel_HelpBox";
+
+        public readonly struct RichXmlUserData
+        {
+            public readonly string Xml;
+            public readonly IReadOnlyList<RichTextDrawer.RichTextChunk> Chunks;
+
+            public RichXmlUserData(string xml, IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
+            {
+                Xml = xml;
+                Chunks = chunks;
+            }
+        }
 
         private static VisualElement DrawUIToolKit(SerializedProperty property, int index)
         {
@@ -43,7 +57,7 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
                 },
                 pickingMode = PickingMode.Ignore,
                 name = NameFullWidthLabelContainer(property, index),
-                userData = null,
+                userData = new RichXmlUserData("", Array.Empty<RichTextDrawer.RichTextChunk>()),
             };
             visualElement.AddToClassList(ClassAllowDisable);
             return visualElement;
@@ -104,21 +118,36 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
 
             VisualElement fullWidthLabelContainer =
                 container.Q<VisualElement>(NameFullWidthLabelContainer(property, index));
-            if ((string)fullWidthLabelContainer.userData != xml || (xml?.Contains("<field") ?? false))
+
+            RichXmlUserData richXmlUserData = (RichXmlUserData)fullWidthLabelContainer.userData;
+
+            if (richXmlUserData.Xml != xml || (xml?.Contains("<field") ?? false))
             {
-                fullWidthLabelContainer.userData = xml;
+                // fullWidthLabelContainer.userData = xml;
                 if (string.IsNullOrEmpty(xml))
                 {
-                    fullWidthLabelContainer.style.display = DisplayStyle.None;
+                    if (fullWidthLabelContainer.style.display != DisplayStyle.None)
+                    {
+                        fullWidthLabelContainer.style.display = DisplayStyle.None;
+                    }
+
+                    fullWidthLabelContainer.userData = new RichXmlUserData("", Array.Empty<RichTextDrawer.RichTextChunk>());
                 }
                 else
                 {
-                    fullWidthLabelContainer.Clear();
-                    fullWidthLabelContainer.style.display = DisplayStyle.Flex;
-                    foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(
-                                 RichTextDrawer.ParseRichXml(xml, property.displayName, property, info, parent)))
+                    RichTextDrawer.RichTextChunk[] newChunks = RichTextDrawer.ParseRichXml(xml, property.displayName, property, info, parent).ToArray();
+
+                    // ReSharper disable once InvertIf
+                    if(!newChunks.SequenceEqual(richXmlUserData.Chunks))
                     {
-                        fullWidthLabelContainer.Add(rich);
+                        fullWidthLabelContainer.userData = new RichXmlUserData(xml, newChunks);
+                        fullWidthLabelContainer.Clear();
+                        fullWidthLabelContainer.style.display = DisplayStyle.Flex;
+
+                        foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(newChunks))
+                        {
+                            fullWidthLabelContainer.Add(rich);
+                        }
                     }
                 }
             }
