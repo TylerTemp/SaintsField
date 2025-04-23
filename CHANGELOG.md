@@ -6,6 +6,7 @@
 2.  Fix error should be dismissed when user override the `Equal` method which raises an error
 3.  UI Toolkit: Fix `ShowInInspector` an error when add element to a list/array
 4.  UI Toolkit: `ShowInInspector` now only show `public` `instance` field to avoid loop calling
+5.  UI Toolkit: Fix fallback drawer breaks `AYellowpaper.SerializedDictionary`
 
 ## 4.6.3 ##
 

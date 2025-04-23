@@ -14,17 +14,41 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
-            _value = GetValue();
+            // _value = GetValue();
 
             // SaintsEditorWindowSpecialEditor editor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(value);
             // editor.EditorShowMonoScript = false;
             _container = new VisualElement();
-            if(!RuntimeUtil.IsNull(_value))
+            // if(!RuntimeUtil.IsNull(_value))
+            // {
+            //     ReCreateEditor();
+            // }
+
+            // _container.schedule.Execute(WatchChanges).Every(100);
+            _container.RegisterCallback<AttachToPanelEvent>(_ => _container.schedule.Execute(WatchChanges).Every(100));
+            WatchChanges();
+
+            // Debug.Log($"created for {element}");
+            return (_container, true);
+        }
+
+        private void WatchChanges()
+        {
+            Object newValue = GetValue();
+            if (Util.GetIsEqual(_value, newValue))
+            {
+                return;
+            }
+
+            _value = newValue;
+            if (RuntimeUtil.IsNull(_value))
+            {
+                _container.Clear();
+            }
+            else
             {
                 ReCreateEditor();
             }
-            // Debug.Log($"created for {element}");
-            return (_container, true);
         }
 
         private void ReCreateEditor()
