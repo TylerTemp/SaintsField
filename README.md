@@ -93,6 +93,8 @@ namespace: `SaintsField`
 3.  UI Toolkit: Fix `ShowInInspector` an error when add element to a list/array
 4.  UI Toolkit: `ShowInInspector` now only show `public` `instance` field to avoid loop calling
 5.  UI Toolkit: Fix fallback drawer breaks `AYellowpaper.SerializedDictionary`
+6.  UI Toolkit: Fix `WindowInlineEditor` not re-paint when target changed [#214](https://github.com/TylerTemp/SaintsField/issues/214)
+7.  Fix broken auto getters since 4.6.2... (sad face)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

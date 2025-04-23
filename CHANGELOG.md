@@ -7,6 +7,7 @@
 3.  UI Toolkit: Fix `ShowInInspector` an error when add element to a list/array
 4.  UI Toolkit: `ShowInInspector` now only show `public` `instance` field to avoid loop calling
 5.  UI Toolkit: Fix fallback drawer breaks `AYellowpaper.SerializedDictionary`
+6.  UI Toolkit: Fix `WindowInlineEditor` not re-paint when target changed [#214](https://github.com/TylerTemp/SaintsField/issues/214)
 
 ## 4.6.3 ##
 
