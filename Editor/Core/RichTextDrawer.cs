@@ -153,7 +153,7 @@ namespace SaintsField.Editor.Core
             // return ($"not found `{richTextXml}` on `{target}`", property.displayName);
         }
 
-        public struct RichTextChunk
+        public struct RichTextChunk: IEquatable<RichTextChunk>
         {
             public string RawContent;
 
@@ -164,6 +164,21 @@ namespace SaintsField.Editor.Core
             public override string ToString() => IsIcon
                 ? $"<ICON={Content} COLOR={IconColor}/>"
                 : Content.Replace("<", "[").Replace(">", "]");
+
+            public bool Equals(RichTextChunk other)
+            {
+                return RawContent == other.RawContent && IsIcon == other.IsIcon && Content == other.Content && IconColor == other.IconColor;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is RichTextChunk other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(RawContent, IsIcon, Content, IconColor);
+            }
         }
 
         // e.g. prefix<icon=iconPath/>some <color=red>rich</color> <color=green><label /></color>suffix

@@ -1047,34 +1047,71 @@ namespace SaintsField.Editor.Utils
                 }
                 case SerializedPropertyType.Float:
                 {
-                    if (originalField is DoubleField doubleField)
+                    // Debug.Log(rawType);
+                    if(rawType == typeof(double))
                     {
-                        doubleField.SetValueWithoutNotify(property.doubleValue);
-                        return null;
-                    }
-
-                    doubleField = new DoubleField(label)
-                    {
-                        value = property.doubleValue,
-                        style =
+                        if (originalField is DoubleField doubleField)
                         {
-                            flexGrow = 1,
-                            flexShrink = 1,
-                        },
-                    };
-                    doubleField.BindProperty(property);
+                            doubleField.SetValueWithoutNotify(property.doubleValue);
+                            return null;
+                        }
 
-                    doubleField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                        doubleField = new DoubleField(label)
+                        {
+                            value = property.doubleValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                                flexShrink = 1,
+                            },
+                        };
+                        doubleField.BindProperty(property);
 
-                    if (inHorizontalLayout)
-                    {
-                        doubleField.style.flexDirection = FlexDirection.Column;
+                        doubleField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+
+                        if (inHorizontalLayout)
+                        {
+                            doubleField.style.flexDirection = FlexDirection.Column;
+                        }
+                        else
+                        {
+                            doubleField.AddToClassList(DoubleField.alignedFieldUssClassName);
+                        }
+
+                        return doubleField;
                     }
                     else
                     {
-                        doubleField.AddToClassList(DoubleField.alignedFieldUssClassName);
+                        if (originalField is FloatField doubleField)
+                        {
+                            doubleField.SetValueWithoutNotify(property.floatValue);
+                            return null;
+                        }
+
+                        doubleField = new FloatField(label)
+                        {
+                            value = property.floatValue,
+                            style =
+                            {
+                                flexGrow = 1,
+                                flexShrink = 1,
+                            },
+                        };
+                        doubleField.BindProperty(property);
+
+                        doubleField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+
+                        if (inHorizontalLayout)
+                        {
+                            doubleField.style.flexDirection = FlexDirection.Column;
+                        }
+                        else
+                        {
+                            doubleField.AddToClassList(DoubleField.alignedFieldUssClassName);
+                        }
+
+                        return doubleField;
                     }
-                    return doubleField;
                 }
                 case SerializedPropertyType.String:
                 {
