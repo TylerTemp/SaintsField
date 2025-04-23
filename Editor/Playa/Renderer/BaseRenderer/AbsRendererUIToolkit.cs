@@ -1704,7 +1704,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             const string objFieldName = "saintsfield-objectfield";
 
             // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
-            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
             Foldout genFoldout = oldElement as Foldout;
             if (genFoldout != null && !genFoldout.ClassListContains("saintsfield-general"))
             {
@@ -1928,6 +1928,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // throw;
                     return null;
                 }
+
+                // Debug.Log($"try render field {name}/{fieldInfo.FieldType} under {value}/{value?.GetType()}");
 
                 VisualElement result = UIToolkitValueEdit(
                     oldElement?.Q<VisualElement>(name: name),
@@ -2379,7 +2381,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                         if (valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
                         {
-                            beforeSet.Invoke(rawListValue);
+                            beforeSet?.Invoke(rawListValue);
                             Array newArray = Array.CreateInstance(elementType, newSize);
                             payload.RawValues.Add(addItem);
                             Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
@@ -2406,8 +2408,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                     if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
                     {
-                        beforeSet.Invoke(rawListValue);
-                        Array newArray = Array.CreateInstance(elementType, payload.RawValues.Count - removeIndexInRaw.Count());
+                        beforeSet?.Invoke(rawListValue);
+                        Array newArray = Array.CreateInstance(elementType, payload.RawValues.Count - removeIndexInRaw.Count);
                         Array rawArray = (Array) payload.RawListValue;
                         int copyIndex = 0;
                         foreach ((object rawValue, int rawIndex) in rawArray.Cast<object>().WithIndex())
