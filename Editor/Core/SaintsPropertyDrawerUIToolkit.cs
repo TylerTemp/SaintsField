@@ -1384,6 +1384,8 @@ namespace SaintsField.Editor.Core
             // propertyField.AddToClassList(SaintsFieldFallbackClass);
             propertyField.AddToClassList(ClassAllowDisable);
             propertyField.styleSheets.Add(GetNoDecoratorUss());
+            propertyField.BindProperty(property);
+            propertyField.Bind(property.serializedObject);
             // propertyField.AddToClassList("unity-base-field__aligned");
             // propertyField.RegisterValueChangeCallback(Debug.Log);
             return propertyField;

@@ -284,6 +284,50 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             return root;
         }
 
+        private static (FieldInfo targetInfo, object targetParent) GetTargetInfo(string propNameCompact, FieldInfo info, Type type, object parent)
+        {
+            object keysIterTarget = info.GetValue(parent);
+            List<object> keysParents = new List<object>(3)
+            {
+                keysIterTarget,
+            };
+            Type keysParentType = type;
+            FieldInfo keysField = null;
+            // Debug.Log($"propKeysNameCompact={propNameCompact}");
+            foreach (string propKeysName in propNameCompact.Split('.'))
+            {
+                // Debug.Log($"propKeysName={propKeysName}");
+
+                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(keysParentType))
+                {
+                    FieldInfo field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                    if (field == null)
+                    {
+                        continue;
+                    }
+
+                    // Debug.Log($"field={field}; keysField={keysField}");
+
+                    keysField = field;
+                    keysParentType = keysField.FieldType;
+                    keysIterTarget = keysField.GetValue(keysIterTarget);
+                    keysParents.Add(keysIterTarget);
+                    // Debug.Log($"Prop {propKeysName} Add parents = {keysIterTarget}/{keysIterTarget.GetType()}");
+                    // Debug.Log($"set keysField={keysField}/keysParentType={keysParentType}/keysIterTarget={keysIterTarget}");
+                    break;
+                }
+
+                Debug.Assert(keysField != null, $"Failed to get key {propKeysName} from {keysIterTarget}");
+            }
+
+            int keysParentsCount = keysParents.Count;
+
+            object keysParent = keysParentsCount >= 2? keysParents[keysParentsCount - 2]: keysParents[0];
+
+            return (keysField, keysParent);
+        }
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
@@ -296,41 +340,98 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             Type rawType = arrayIndex == -1 ? info.FieldType : ReflectUtils.GetElementType(info.FieldType);
             Debug.Assert(rawType != null, $"Failed to get element type from {property.propertyPath}");
             // Debug.Log(info.FieldType);
-            (string propKeysName, string propValuesName) = GetKeysValuesPropName(rawType);
+            (string propKeysNameCompact, string propValuesNameCompact) = GetKeysValuesPropName(rawType);
 
             // Debug.Log(propKeysName);
 
-            SerializedProperty keysProp = property.FindPropertyRelative(propKeysName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propKeysName);
-            Debug.Assert(keysProp != null, $"Failed to get keys prop from {propKeysName}");
-            SerializedProperty valuesProp = property.FindPropertyRelative(propValuesName) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesName);
+            // Debug.Log($"propKeysNameCompact={propKeysNameCompact}");
+            SerializedProperty keysProp = FindPropertyCompact(property, propKeysNameCompact);
+            // property.FindPropertyRelative(propKeysNameCompact) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propKeysNameCompact);
+            Debug.Assert(keysProp != null, $"Failed to get keys prop from {propKeysNameCompact}");
+            // Debug.Log($"keysProp={keysProp.propertyPath}");
+            SerializedProperty valuesProp = FindPropertyCompact(property, propValuesNameCompact);
+            // property.FindPropertyRelative(propValuesNameCompact) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesNameCompact);
+            Debug.Assert(valuesProp != null, $"Failed to get values prop from {propValuesNameCompact}");
 
-            FieldInfo keysField = null;
-            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-            foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(rawType))
-            {
-                FieldInfo field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-                if (field == null)
-                {
-                    continue;
-                }
-                keysField = field;
-                break;
-            }
-            Debug.Assert(keysField != null, $"Failed to get keys field from {property.propertyPath}");
+            // object keysIterTarget = info.GetValue(parent);
+            // List<object> keysParents = new List<object>(2);
+            // Type keysParentType = rawType;
+            // FieldInfo keysField = null;
+            // Debug.Log($"propKeysNameCompact={propKeysNameCompact}");
+            // foreach (string propKeysName in propKeysNameCompact.Split('.'))
+            // {
+            //     Debug.Log($"propKeysName={propKeysName}");
+            //
+            //     // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            //     foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(keysParentType))
+            //     {
+            //         FieldInfo field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            //         if (field == null)
+            //         {
+            //             continue;
+            //         }
+            //
+            //         // Debug.Log($"field={field}; keysField={keysField}");
+            //
+            //         keysField = field;
+            //         keysParentType = keysField.FieldType;
+            //         keysIterTarget = keysField.GetValue(keysIterTarget);
+            //         keysParents.Add(keysIterTarget);
+            //         Debug.Log($"set keysField={keysField}/keysParentType={keysParentType}/keysIterTarget={keysIterTarget}");
+            //         break;
+            //     }
+            //
+            //     Debug.Assert(keysField != null, $"Failed to get key {propKeysName} from {property.propertyPath}");
+            // }
+            //
+            // int keysParentsCount = keysParents.Count;
+            //
+            // object keysParent = keysParentsCount >= 2? keysParents[keysParentsCount - 2]: keysParents[0];
+            //
+            // Debug.Log($"keysParent={keysParent}; keysField={keysField}");
+
+            (FieldInfo keysField, object keysParent) = GetTargetInfo(propKeysNameCompact, info, rawType, parent);
+
+            // Debug.Log($"!!!!!!!! keysField={keysField}, keysParent={keysParent}/{keysParent.GetType()}");
+
+            // return;
+
+            Debug.Assert(keysField != null, $"Failed to get keys field {propKeysNameCompact} from {property.propertyPath}");
             Type keyType = ReflectUtils.GetElementType(keysField.FieldType);
 
-            FieldInfo valuesField = null;
-            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-            foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(rawType))
-            {
-                FieldInfo propValueFieldInfo = each.GetField(propValuesName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-                if (propValueFieldInfo == null)
-                {
-                    continue;
-                }
-                valuesField = propValueFieldInfo;
-                break;
-            }
+            // object valuesParent = info.GetValue(parent);
+            // Type valuesParentType = rawType;
+            // FieldInfo valuesField = null;
+            // Debug.Log($"propKeysNameCompact={propKeysNameCompact}");
+            // foreach (string propKeysName in propKeysNameCompact.Split('.'))
+            // {
+            //     Debug.Log($"propKeysName={propKeysName}");
+            //
+            //     // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            //     foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(valuesParentType))
+            //     {
+            //         FieldInfo field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            //         if (field == null)
+            //         {
+            //             continue;
+            //         }
+            //
+            //         // Debug.Log($"field={field}; keysField={keysField}");
+            //
+            //         valuesField = field;
+            //         valuesParentType = valuesField.FieldType;
+            //         valuesParent = valuesField.GetValue(valuesParent);
+            //         Debug.Log($"set valuesField={valuesField}/valuesParentType={valuesParentType}/valuesParent={valuesParent}");
+            //         break;
+            //     }
+            //
+            //     Debug.Assert(valuesField != null, $"Failed to get value {propKeysName} from {property.propertyPath}");
+            // }
+
+            (FieldInfo valuesField, object valuesParent) = GetTargetInfo(propValuesNameCompact, info, rawType, parent);
+
+            // Debug.Log($"valuesField={valuesField}; valuesParent={valuesParent}/{valuesParent.GetType()}");
+
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
             Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);
 
@@ -493,12 +594,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 RefreshList(preKeySearch, preValueSearch, prePageIndex, evt.newValue);
             });
 
-            bool keyStructChecked = false;
-            bool keyStructNeedFlatten = false;
-
-            bool valueStructChecked = false;
-            bool valueStructNeedFlatten = false;
-
             multiColumnListView.columns.Add(new Column
             {
                 name = "Keys",
@@ -546,12 +641,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     int propIndex = itemIndexToPropertyIndex[elementIndex];
                     SerializedProperty elementProp = keysProp.GetArrayElementAtIndex(propIndex);
 
-                    // if (!keyStructChecked)
-                    // {
-                    //     keyStructChecked = true;
-                    //     keyStructNeedFlatten = GetNeedFlatten(elementProp, ReflectUtils.GetElementType(keysField.FieldType));
-                    // }
-
                     elementProp.isExpanded = true;
                     element.Clear();
 
@@ -564,29 +653,16 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     };
                     element.Add(keyContainer);
 
-                    VisualElement resultElement = CreateCellElement(keysField, keyType, elementProp, this, this, parent);
+                    VisualElement resultElement = CreateCellElement(keysField, keyType, elementProp, this, this, keysParent);
                     keyContainer.Add(resultElement);
-                    // if (keyStructNeedFlatten)
-                    // {
-                    //     foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
-                    //     {
-                    //         keyContainer.Add(new Label(childProp.displayName));
-                    //         PropertyField propertyField = new PropertyField(childProp, "");
-                    //         propertyField.Bind(property.serializedObject);
-                    //         keyContainer.Add(propertyField);
-                    //     }
-                    // }
-                    // else
-                    // {
-                    //     PropertyField propertyField = new PropertyField(elementProp)
-                    //     {
-                    //         label = "",
-                    //     };
-                    //     propertyField.Bind(property.serializedObject);
-                    //     keyContainer.Add(propertyField);
-                    // }
 
-                    // propertyField.BindProperty(elementProp);
+                    keyContainer.TrackPropertyValue(keysProp, _ =>
+                    {
+                        RefreshConflict();
+                    });
+
+                    RefreshConflict();
+                    return;
 
                     void RefreshConflict()
                     {
@@ -594,18 +670,18 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         {
                             return;
                         }
+//
+//                         (string curFieldError, int _, object curFieldValue) = Util.GetValue(property, info, parent);
+//                         // Debug.Log(curFieldValue);
+//                         if (curFieldError != "")
+//                         {
+// #if SAINTSFIELD_DEBUG
+//                             Debug.LogError(curFieldError);
+// #endif
+//                             return;
+//                         }
 
-                        (string curFieldError, int _, object curFieldValue) = Util.GetValue(property, info, parent);
-                        // Debug.Log(curFieldValue);
-                        if (curFieldError != "")
-                        {
-#if SAINTSFIELD_DEBUG
-                            Debug.LogError(curFieldError);
-#endif
-                            return;
-                        }
-
-                        IEnumerable allKeyList = keysField.GetValue(curFieldValue) as IEnumerable;
+                        IEnumerable allKeyList = keysField.GetValue(keysParent) as IEnumerable;
                         Debug.Assert(allKeyList != null, $"key list {keysField.Name} is null");
                         (object value, int index)[] indexedValue = allKeyList.Cast<object>().WithIndex().ToArray();
                         object thisKey = indexedValue[propIndex].value;
@@ -623,17 +699,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                         keyContainer.style.backgroundColor = Color.clear;
                     }
-
-                    // propertyField.RegisterCallback<SerializedPropertyChangeEvent>(_ =>
-                    // {
-                    //     RefreshConflict();
-                    // });
-                    keyContainer.TrackPropertyValue(keysProp, _ =>
-                    {
-                        RefreshConflict();
-                    });
-                    // Debug.Log($"RefreshConflict {elementIndex}");
-                    RefreshConflict();
                 },
             });
 
@@ -685,10 +750,15 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 makeCell = () => new VisualElement(),
                 bindCell = (element, elementIndex) =>
                 {
-                    SerializedProperty elementProp = valuesProp.GetArrayElementAtIndex(itemIndexToPropertyIndex[elementIndex]);
+                    int propIndex = itemIndexToPropertyIndex[elementIndex];
+                    SerializedProperty elementProp = valuesProp.GetArrayElementAtIndex(propIndex);
+                    // IEnumerable valuesResult = valuesField.GetValue(valuesParent) as IEnumerable;
+                    // object valueResult = GetIndexAt(valuesResult, propIndex);
                     elementProp.isExpanded = true;
 
-                    VisualElement resultElement = CreateCellElement(valuesField, valueType, elementProp, this, this, parent);
+                    // Debug.Log($"elementProp={elementProp.propertyPath}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
+
+                    VisualElement resultElement = CreateCellElement(valuesField, valueType, elementProp, this, this, valuesParent);
 
                     element.Add(resultElement);
 

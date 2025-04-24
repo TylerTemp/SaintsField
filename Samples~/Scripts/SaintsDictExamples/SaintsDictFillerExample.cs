@@ -16,17 +16,17 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
         {
             [SerializeField, NoLabel]
-            private List<int> _intKeys = new List<int>();
+            private List<Wrap<int>> _intKeys = new List<Wrap<int>>();
 
             [SerializeField, NoLabel, GetComponentInChildren, ReadOnly]
-            private List<GameObject> _objValues = new List<GameObject>();
+            private List<Wrap<GameObject>> _objValues = new List<Wrap<GameObject>>();
 
 #if UNITY_EDITOR
             private static string EditorPropKeys => nameof(_intKeys);
             private static string EditorPropValues => nameof(_objValues);
 #endif
-            protected override List<int> SerializedKeys => _intKeys;
-            protected override List<GameObject> SerializedValues => _objValues;
+            protected override List<Wrap<int>> SerializedKeys => _intKeys;
+            protected override List<Wrap<GameObject>> SerializedValues => _objValues;
         }
 
         // public ValueFillerDict valueFillerDict;
@@ -73,18 +73,18 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         public class MyConfig: SaintsDictionaryBase<int, MyStruct>
         {
             [SerializeField]
-            private List<int> _keys = new List<int>();
+            private List<Wrap<int>> _keys = new List<Wrap<int>>();
 
             [SerializeField, SaintsRow(inline: true)]
             // [GetComponentInChildren]
-            private List<MyStruct> _values = new List<MyStruct>();
+            private List<Wrap<MyStruct>> _values = new List<Wrap<MyStruct>>();
 
 #if UNITY_EDITOR
             private static string EditorPropKeys => nameof(_keys);
             private static string EditorPropValues => nameof(_values);
 #endif
-            protected override List<int> SerializedKeys => _keys;
-            protected override List<MyStruct> SerializedValues => _values;
+            protected override List<Wrap<int>> SerializedKeys => _keys;
+            protected override List<Wrap<MyStruct>> SerializedValues => _values;
         }
 
         // public SaintsDictionary<int, MyStruct> basicType;

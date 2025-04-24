@@ -2,6 +2,9 @@ using System;
 using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
@@ -10,6 +13,7 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
     {
         private readonly SaintsFieldWithInfo _fieldWithInfo;
         private readonly Type _editorType;
+
         public WindowInlineEditorRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, Type editorType): base(serializedObject, fieldWithInfo)
         {
             _fieldWithInfo = fieldWithInfo;
@@ -19,6 +23,24 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
         public override void OnDestroy()
         {
 
+        }
+
+        public override VisualElement CreateVisualElement()
+        {
+            VisualElement root = new VisualElement();
+            // _rootElement = CreateRootElement();
+            VisualElement result = base.CreateVisualElement();
+            if (result != null)
+            {
+                root.Add(result);
+            }
+
+            root.TrackPropertyValue(FieldWithInfo.SerializedProperty, changedProp =>
+            {
+                Debug.Log(changedProp.objectReferenceValue);
+            });
+
+            return root;
         }
 
         private Object GetValue()

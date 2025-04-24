@@ -6,10 +6,10 @@ using UnityEngine;
 namespace SaintsField
 {
     [Serializable]
-    public struct SaintsList<T>: IWrapProp, IList<T>
+    public class SaintsList<T>: IWrapProp, IList<T>
     {
         [SerializeField]
-        public List<T> value;
+        public List<T> value = new List<T>();
 
 #if UNITY_EDITOR
         // ReSharper disable once StaticMemberInGenericType

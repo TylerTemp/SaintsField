@@ -1,11 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsDictionary
 {
@@ -128,6 +128,52 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             return true;
+        }
+
+        private static SerializedProperty FindPropertyCompact(SerializedProperty property, string propValuesNameCompact)
+        {
+            SerializedProperty prop = property.FindPropertyRelative(propValuesNameCompact);
+            if (prop != null)
+            {
+                return prop;
+            }
+
+            SerializedProperty accProp = property;
+            foreach (string propSegName in propValuesNameCompact.Split('.'))
+            {
+                SerializedProperty findProp = accProp.FindPropertyRelative(propSegName) ?? SerializedUtils.FindPropertyByAutoPropertyName(accProp, propSegName);
+                Debug.Assert(findProp != null, $"Failed to find prop {propSegName} in {accProp.propertyPath}");
+                accProp = findProp;
+            }
+
+            return accProp;
+        }
+
+        private static object GetIndexAt(IEnumerable keysResult, int index)
+        {
+            if (keysResult is Array array)
+            {
+                return array.GetValue(index);
+            }
+
+            if (keysResult is IList iList)
+            {
+                return iList[index];
+            }
+
+
+            int curIndex = 0;
+            foreach (object item in keysResult)
+            {
+                if (curIndex == index)
+                {
+                    return item;
+                }
+
+                curIndex++;
+            }
+
+            throw new IndexOutOfRangeException($"Failed to get index {index} from {keysResult}");
         }
     }
 }
