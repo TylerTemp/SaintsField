@@ -675,17 +675,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   decValueFillerDict:
-    _intKeys: 0000000001000000
+    _intKeys:
+    - value: 0
     _objValues:
-    - {fileID: 0}
-    - {fileID: 0}
+    - value: {fileID: 0}
   basicType:
-    _keys: 0000000001000000
+    _keys:
+    - value: 0
     _values:
-    - myStringField: First
-      myIntField: 0
-    - myStringField: Second
-      myIntField: 0
+    - value:
+        myStringField: 
+        myIntField: 0
 --- !u!1 &61780217
 GameObject:
   m_ObjectHideFlags: 0
@@ -11789,48 +11789,69 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eToState:
-    _keys: 0000000001000000
-    _values:
-    - <layerIndex>k__BackingField: 0
-      <stateNameHash>k__BackingField: 0
-      <stateName>k__BackingField: 
-      <stateSpeed>k__BackingField: 0
-      <stateTag>k__BackingField: 
-      <animationClip>k__BackingField: {fileID: 0}
-      <subStateMachineNameChain>k__BackingField: []
-    - <layerIndex>k__BackingField: 0
-      <stateNameHash>k__BackingField: 0
-      <stateName>k__BackingField: 
-      <stateSpeed>k__BackingField: 0
-      <stateTag>k__BackingField: 
-      <animationClip>k__BackingField: {fileID: 0}
-      <subStateMachineNameChain>k__BackingField: []
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 0
+    - value: 1
+    _saintsValues:
+    - value:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
+    - value:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
   eToV3:
-    _keys: 0000000001000000
-    _values:
-    - {x: 0, y: 0, z: 0}
-    - {x: 0, y: 0, z: 0}
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 0
+    - value: 1
+    _saintsValues:
+    - value: {x: 0, y: 0, z: 0}
+    - value: {x: 0, y: 0, z: 0}
   eToStateOld:
-    _keys: 00000000
-    _values:
-    - <layerIndex>k__BackingField: 0
-      <stateNameHash>k__BackingField: 0
-      <stateName>k__BackingField: 
-      <stateSpeed>k__BackingField: 0
-      <stateTag>k__BackingField: 
-      <animationClip>k__BackingField: {fileID: 0}
-      <subStateMachineNameChain>k__BackingField: []
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 0
+    _saintsValues:
+    - value:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
   eToV3Old:
-    _keys: 01000000
-    _values:
-    - {x: 0, y: 0, z: 0}
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 1
+    _saintsValues:
+    - value: {x: 0, y: 0, z: 0}
   myStructToGameObject:
-    _keys:
-    - key: 432
-      ks: []
-    _values:
-    - ss: 
-      si: 0
+    _keys: []
+    _values: []
+    _saintsKeys:
+    - value:
+        key: 432
+        ks: []
+    _saintsValues:
+    - value:
+        ss: 
+        si: 0
 --- !u!1 &788337258
 GameObject:
   m_ObjectHideFlags: 0
@@ -29781,16 +29802,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36e5c620db1deb141bc544e0bbc22a73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  genDict:
-    _keys:
-    - 1
-    _values:
-    - {fileID: 2009324526}
-  dict:
-    _keys: 00000000
-    _values:
-    - myStringField: 1
-      myIntField: 2
+  genDictValueList:
+    _keys: []
+    _saintsKeys:
+    - value: key1
+    _saintsValues:
+    - value:
+      - {fileID: 2009324526}
+      - {fileID: 787857617}
 --- !u!1 &2009356786
 GameObject:
   m_ObjectHideFlags: 0
