@@ -257,6 +257,25 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
         private void UpdatePreview()
         {
+            // Debug.Log(_blockScrollView.scrollOffset);
+            Debug.Log($"{_blockScrollView.verticalScroller.value}/{_blockScrollView.verticalScroller.lowValue}/{_blockScrollView.verticalScroller.highValue}");
+            Debug.Log(_blockScrollView.contentViewport.resolvedStyle.height);
+
+            var viewHeight = _blockScrollView.contentViewport.resolvedStyle.height;
+            var scrollValue = _blockScrollView.verticalScroller.value;
+            var scrollLow = _blockScrollView.verticalScroller.lowValue;
+            var scrollHigh = _blockScrollView.verticalScroller.highValue;
+
+            if (double.IsNaN(viewHeight) || double.IsNaN(scrollHigh))
+            {
+                return;
+            }
+
+            var scrollPercent = Mathf.InverseLerp(scrollLow, scrollHigh, scrollValue);
+            //
+
+
+
             foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).Where(each => each.PreviewLoadCount < 10).ToArray())
             {
                 Object target = objectInfo.BaseInfo.Target;
@@ -389,6 +408,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             }
         }
 
+        private float _blockHeight = 80f;
+
         private void UpdateBlockItemScale()
         {
             // float curValue = (_slider.value - 0.1f) / 0.9f;
@@ -398,8 +419,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             {
                 Button button = objectInfo.BlockItem.Q<Button>();
                 button.style.width = 60 * (1 + curValue);
-                button.style.height = 80 * (1 + curValue);
-
+                button.style.height = _blockHeight = 80 * (1 + curValue);
             }
         }
     }

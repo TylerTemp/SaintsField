@@ -243,6 +243,8 @@ GameObject:
   - component: {fileID: 29054847}
   - component: {fileID: 29054846}
   - component: {fileID: 29054848}
+  - component: {fileID: 29054850}
+  - component: {fileID: 29054849}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -360,6 +362,46 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &29054849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29054844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce92818c712eaf2479662905942921d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDefaultListener: 1
+  bOverrideScalingFactor: 0
+  scalingFactor: -1
+  listenerId: 0
+--- !u!114 &29054850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29054844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd7b7c660c25b641834b45bf20d9279, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 0
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!1 &30182316
 GameObject:
   m_ObjectHideFlags: 0
@@ -633,15 +675,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   decValueFillerDict:
-    _intKeys: 
-    _objValues: []
+    _intKeys:
+    - value: 0
+    _objValues:
+    - value: {fileID: 0}
   basicType:
-    _keys: 0000000001000000
+    _keys:
+    - value: 0
     _values:
-    - myStringField: First
-      myIntField: 0
-    - myStringField: Second
-      myIntField: 0
+    - value:
+        myStringField: 
+        myIntField: 0
 --- !u!1 &61780217
 GameObject:
   m_ObjectHideFlags: 0
@@ -10872,6 +10916,37 @@ MonoBehaviour:
   searchParent: {fileID: 579857408}
   searchParentDifferentType: {fileID: 579857407}
   searchNoSuch: {fileID: 0}
+--- !u!1 &682622973
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 682622975}
+  m_Layer: 0
+  m_Name: WwiseGlobal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &682622975
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682622973}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &682673172
 GameObject:
   m_ObjectHideFlags: 0
@@ -11714,48 +11789,69 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eToState:
-    _keys: 0000000001000000
-    _values:
-    - <layerIndex>k__BackingField: 0
-      <stateNameHash>k__BackingField: 0
-      <stateName>k__BackingField: 
-      <stateSpeed>k__BackingField: 0
-      <stateTag>k__BackingField: 
-      <animationClip>k__BackingField: {fileID: 0}
-      <subStateMachineNameChain>k__BackingField: []
-    - <layerIndex>k__BackingField: 0
-      <stateNameHash>k__BackingField: 0
-      <stateName>k__BackingField: 
-      <stateSpeed>k__BackingField: 0
-      <stateTag>k__BackingField: 
-      <animationClip>k__BackingField: {fileID: 0}
-      <subStateMachineNameChain>k__BackingField: []
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 0
+    - value: 1
+    _saintsValues:
+    - value:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
+    - value:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
   eToV3:
-    _keys: 0000000001000000
-    _values:
-    - {x: 0, y: 0, z: 0}
-    - {x: 0, y: 0, z: 0}
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 0
+    - value: 1
+    _saintsValues:
+    - value: {x: 0, y: 0, z: 0}
+    - value: {x: 0, y: 0, z: 0}
   eToStateOld:
-    _keys: 00000000
-    _values:
-    - <layerIndex>k__BackingField: 0
-      <stateNameHash>k__BackingField: 0
-      <stateName>k__BackingField: 
-      <stateSpeed>k__BackingField: 0
-      <stateTag>k__BackingField: 
-      <animationClip>k__BackingField: {fileID: 0}
-      <subStateMachineNameChain>k__BackingField: []
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 0
+    _saintsValues:
+    - value:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
   eToV3Old:
-    _keys: 01000000
-    _values:
-    - {x: 0, y: 0, z: 0}
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 1
+    _saintsValues:
+    - value: {x: 0, y: 0, z: 0}
   myStructToGameObject:
-    _keys:
-    - key: 
-      ks: []
-    _values:
-    - ss: 
-      si: 0
+    _keys: []
+    _values: []
+    _saintsKeys:
+    - value:
+        key: 432
+        ks: []
+    _saintsValues:
+    - value:
+        ss: 
+        si: 0
 --- !u!1 &788337258
 GameObject:
   m_ObjectHideFlags: 0
@@ -16339,6 +16435,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1165005530
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1165005531}
+  - component: {fileID: 1165005532}
+  m_Layer: 0
+  m_Name: IssueEA31
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1165005531
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1165005530}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1165005532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1165005530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 257d3fbefdeb4324585f36e9578240a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  steps:
+  - stepType: 1
+    dialog: 
+  - stepType: 1
+    dialog: 
 --- !u!1 &1171136839
 GameObject:
   m_ObjectHideFlags: 0
@@ -19638,6 +19783,7 @@ Transform:
   - {fileID: 1315195532}
   - {fileID: 647374442}
   - {fileID: 1285081337}
+  - {fileID: 1165005531}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1490458620
@@ -29656,12 +29802,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36e5c620db1deb141bc544e0bbc22a73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  genDict:
+  genDictValueList:
     _keys: []
-    _values: []
-  dict:
-    _keys: 
-    _values: []
+    _saintsKeys:
+    - value: key1
+    _saintsValues:
+    - value:
+      - {fileID: 2009324526}
+      - {fileID: 787857617}
 --- !u!1 &2009356786
 GameObject:
   m_ObjectHideFlags: 0
@@ -31420,3 +31568,4 @@ SceneRoots:
   - {fileID: 272774834}
   - {fileID: 2138214539}
   - {fileID: 834960804}
+  - {fileID: 682622975}

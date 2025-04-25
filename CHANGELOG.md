@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.7.0 ##
+
+**Breaking Changes**: inherent from `SaintsDictionaryBase` has been changed. Read the document in the `SaintsDictionary` section for more information
+
+1.  `SaintsDictionary` now support list/array as value
+2.  Change `SaintsList`, `SaintsArray` to `class` type so it can be null, just like `List<T>` and `Array`
+
 ## 4.6.4 ##
 
 1.  UI Toolkit: Fix `double` & `float` editing round [#215](https://github.com/TylerTemp/SaintsField/issues/215)

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Serializable]
-    public struct SaintsArray<T>: IWrapProp
+    public class SaintsArray<T>: IWrapProp
         , IReadOnlyList<T>
         , ICollection
         , ICloneable
@@ -15,7 +15,7 @@ namespace SaintsField
         , IStructuralComparable
     {
         [SerializeField]
-        public T[] value;
+        public T[] value = {};
 
 #if UNITY_EDITOR
         // ReSharper disable once StaticMemberInGenericType
