@@ -13,7 +13,7 @@ using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 using FontStyle = UnityEngine.FontStyle;
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 #endif
 
@@ -429,7 +429,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
         #endregion
 
         #region UI Toolkit
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
         // ReSharper disable InconsistentNaming
         private struct DOTweenToolkit

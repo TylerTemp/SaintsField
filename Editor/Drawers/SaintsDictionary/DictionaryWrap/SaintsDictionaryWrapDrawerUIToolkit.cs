@@ -16,12 +16,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            // string label = GetPreferredLabel(property);
-            //
-            SerializedProperty realProp = property.FindPropertyRelative("value") ?? SerializedUtils.FindPropertyByAutoPropertyName(property, "value");
-            Debug.Assert(realProp != null, property.propertyPath);
-
-            FieldInfo realInfo = ReflectUtils.GetElementType(info.FieldType).GetField("value", BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            (SerializedProperty realProp, FieldInfo realInfo) = GetBasicInfo(property, info);
 
             InHorizontalLayout = true;
 

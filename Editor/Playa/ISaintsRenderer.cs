@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 #endif
 
@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Playa
         bool InDirectHorizontalLayout { get; set; }
         bool InAnyHorizontalLayout { get; set; }
 
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public VisualElement CreateVisualElement();
 #endif
         void RenderIMGUI(float width);

@@ -1,4 +1,4 @@
-﻿#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+﻿#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +16,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 {
     public partial class SaintsRowAttributeDrawer
     {
-        protected override bool UseCreateFieldUIToolKit => true;
-
-        public const string SaintsRowClass = "saints-field--saintsrow";
-
         public class ForceInlineScoop : IDisposable
         {
+            // ReSharper disable once NotAccessedField.Global
             public static bool Inline;
 
             public ForceInlineScoop(bool inline)
@@ -34,6 +31,11 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 Inline = false;
             }
         }
+
+        protected override bool UseCreateFieldUIToolKit => true;
+
+        public const string SaintsRowClass = "saints-field--saintsrow";
+
 
         public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {

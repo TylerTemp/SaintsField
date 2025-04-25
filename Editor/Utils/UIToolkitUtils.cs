@@ -329,7 +329,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public static VisualElement CreateOrUpdateFieldProperty(
             SerializedProperty property,
             IReadOnlyList<PropertyAttribute> allAttributes,
