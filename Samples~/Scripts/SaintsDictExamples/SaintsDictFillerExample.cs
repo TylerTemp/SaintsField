@@ -75,7 +75,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
             [SerializeField]
             private List<Wrap<int>> _keys = new List<Wrap<int>>();
 
-            [SerializeField, SaintsRow(inline: true)]
+            [SerializeField]
             // [GetComponentInChildren]
             private List<Wrap<MyStruct>> _values = new List<Wrap<MyStruct>>();
 
