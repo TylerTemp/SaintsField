@@ -394,7 +394,7 @@ namespace SaintsField.Editor.Utils
                     // }
                 }
 
-                // Debug.Log($"{property.propertyPath}: drawer={useDrawerType}");
+                // Debug.Log($"{property.propertyPath}: drawer={useDrawerType}; label={label}");
             }
 
             // List<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> appendSaintsAttributeDrawer = null;
@@ -439,7 +439,7 @@ namespace SaintsField.Editor.Utils
 
             if (useDrawerType == null)
             {
-                // Debug.Log($"fallback {property.propertyPath}/hor={inHorizontalLayout}");
+                // Debug.Log($"fallback {property.propertyPath}/hor={inHorizontalLayout};prop={string.Join(",", allAttributes)}; label={label}");
                 VisualElement r = CreateOrUpdateFieldRawFallback(
                     property,
                     allAttributes,

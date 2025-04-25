@@ -597,9 +597,19 @@ namespace SaintsField.Editor.Core
             if (!PropertyAttributeToPropertyDrawers.TryGetValue(attributeType,
                     out IReadOnlyList<PropertyDrawerInfo> eachDrawer))
             {
-                return null;
+                foreach (KeyValuePair<Type, IReadOnlyList<PropertyDrawerInfo>> kv in PropertyAttributeToPropertyDrawers)
+                {
+                    if(attributeType.IsSubclassOf(kv.Key))
+                    {
+                        eachDrawer = kv.Value.Where(each => each.UseForChildren).ToArray();
+                        break;
+                    }
+                }
+                if(eachDrawer == null || eachDrawer.Count == 0)
+                {
+                    return null;
+                }
             }
-            // Debug.Log($"{attributeType}/{eachDrawer.Count}");
 
             PropertyDrawerInfo drawerInfo = eachDrawer.FirstOrDefault(each => each.IsSaints);
 
@@ -686,24 +696,31 @@ namespace SaintsField.Editor.Core
         private SaintsPropertyDrawer GetOrCreateSaintsDrawerByAttr(ISaintsAttribute saintsAttribute)
         {
             Type attributeType = saintsAttribute.GetType();
-            if (!PropertyAttributeToPropertyDrawers.TryGetValue(attributeType,
-                out IReadOnlyList<PropertyDrawerInfo> eachDrawer))
+            // if (!PropertyAttributeToPropertyDrawers.TryGetValue(attributeType,
+            //     out IReadOnlyList<PropertyDrawerInfo> eachDrawer))
+            // {
+            //     foreach (KeyValuePair<Type, IReadOnlyList<PropertyDrawerInfo>> kv in PropertyAttributeToPropertyDrawers)
+            //     {
+            //         if(attributeType.IsSubclassOf(kv.Key))
+            //         {
+            //             eachDrawer = kv.Value.Where(each => each.UseForChildren).ToArray();
+            //             break;
+            //         }
+            //     }
+            //     if(eachDrawer == null || eachDrawer.Count == 0)
+            //     {
+            //         throw new Exception($"No drawer found for {saintsAttribute}");
+            //     }
+            // }
+            //
+            // Type drawerType = eachDrawer.First(each => each.IsSaints).DrawerType;
+            Type drawerType = GetFirstSaintsDrawerType(attributeType);
+
+            if (drawerType == null)
             {
-                foreach (KeyValuePair<Type, IReadOnlyList<PropertyDrawerInfo>> kv in PropertyAttributeToPropertyDrawers)
-                {
-                    if(attributeType.IsSubclassOf(kv.Key))
-                    {
-                        eachDrawer = kv.Value.Where(each => each.UseForChildren).ToArray();
-                        break;
-                    }
-                }
-                if(eachDrawer == null || eachDrawer.Count == 0)
-                {
-                    throw new Exception($"No drawer found for {saintsAttribute}");
-                }
+                throw new Exception($"No drawer found for {saintsAttribute}");
             }
 
-            Type drawerType = eachDrawer.First(each => each.IsSaints).DrawerType;
             SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
             saintsPropertyDrawer.InHorizontalLayout = InHorizontalLayout;
 

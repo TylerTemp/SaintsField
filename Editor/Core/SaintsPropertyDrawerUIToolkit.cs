@@ -55,6 +55,8 @@ namespace SaintsField.Editor.Core
         // public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
         public IReadOnlyList<PropertyAttribute> AppendPropertyAttributes = null;
 
+        protected List<SaintsPropertyInfo> SaintsPropertyDrawers;
+
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -99,7 +101,7 @@ namespace SaintsField.Editor.Core
             //         Index = index,
             //     })
             //     .ToArray();
-            List<SaintsPropertyInfo> saintsPropertyDrawers = iSaintsAttributes
+            SaintsPropertyDrawers = iSaintsAttributes
                 // .WithIndex()
                 .Select((value, index) => new SaintsPropertyInfo
                 {
@@ -112,19 +114,19 @@ namespace SaintsField.Editor.Core
             // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
             if (string.IsNullOrEmpty(GetPreferredLabel(property)))
             {
-                saintsPropertyDrawers.RemoveAll(each => each.Attribute is RichLabelAttribute rl && string.IsNullOrEmpty(rl.RichTextXml));
+                SaintsPropertyDrawers.RemoveAll(each => each.Attribute is RichLabelAttribute rl && string.IsNullOrEmpty(rl.RichTextXml));
 
                 NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
 
                 bool found = false;
-                for (int richLabelIndex = 0; richLabelIndex < saintsPropertyDrawers.Count; richLabelIndex++)
+                for (int richLabelIndex = 0; richLabelIndex < SaintsPropertyDrawers.Count; richLabelIndex++)
                 {
-                    SaintsPropertyDrawer eachDrawer = saintsPropertyDrawers[richLabelIndex].Drawer;
+                    SaintsPropertyDrawer eachDrawer = SaintsPropertyDrawers[richLabelIndex].Drawer;
                     // ReSharper disable once InvertIf
                     if (eachDrawer is RichLabelAttributeDrawer)
                     {
                         found = true;
-                        saintsPropertyDrawers[richLabelIndex] = new SaintsPropertyInfo
+                        SaintsPropertyDrawers[richLabelIndex] = new SaintsPropertyInfo
                         {
                             Drawer = GetOrCreateSaintsDrawerByAttr(noLabelAttribute),
                             Attribute = noLabelAttribute,
@@ -136,11 +138,11 @@ namespace SaintsField.Editor.Core
 
                 if (!found)
                 {
-                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
                         Drawer = GetOrCreateSaintsDrawerByAttr(noLabelAttribute),
                         Attribute = noLabelAttribute,
-                        Index = saintsPropertyDrawers.Count,
+                        Index = SaintsPropertyDrawers.Count,
                     });
                 }
             }
@@ -156,14 +158,14 @@ namespace SaintsField.Editor.Core
                 {
                     needAboveProcessor = false;
                 }
-                else if (saintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer
+                else if (SaintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer
                                                            || each.Attribute is NoLabelAttribute
                                                            || (each.Attribute is RichLabelAttribute rl &&
                                                                string.IsNullOrEmpty(rl.RichTextXml))))
                 {
                     needAboveProcessor = false;
                 }
-                else if (property.propertyType == SerializedPropertyType.Boolean && saintsPropertyDrawers.All(each => each.Attribute.AttributeType != SaintsAttributeType.Field) && saintsPropertyDrawers.All(each => each.Drawer is not LeftToggleAttributeDrawer))
+                else if (property.propertyType == SerializedPropertyType.Boolean && SaintsPropertyDrawers.All(each => each.Attribute.AttributeType != SaintsAttributeType.Field) && SaintsPropertyDrawers.All(each => each.Drawer is not LeftToggleAttributeDrawer))
                 {
                     needAboveProcessor = false;
                     LeftToggleAttribute leftToggleAttribute =
@@ -173,20 +175,22 @@ namespace SaintsField.Editor.Core
                         (LeftToggleAttributeDrawer)
                         GetOrCreateSaintsDrawerByAttr(leftToggleAttribute);
                     // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
-                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
                         Drawer = leftToggleAttributeDrawer,
                         Attribute = leftToggleAttribute,
-                        Index = saintsPropertyDrawers.Count,
+                        Index = SaintsPropertyDrawers.Count,
                     });
                 }
             }
+
+            // Debug.Log($"needAboveProcessor={needAboveProcessor}; prop={property.propertyPath}; attrs={string.Join<PropertyAttribute>(",", allAttributes)}");
 
             if(needAboveProcessor)
             {
                 bool alreadyHasRichLabel = false;
                 bool alreadyHasNoLabel = false;
-                foreach ((SaintsPropertyInfo saintsPropertyInfo, int index) in saintsPropertyDrawers.WithIndex())
+                foreach ((SaintsPropertyInfo saintsPropertyInfo, int index) in SaintsPropertyDrawers.WithIndex())
                 {
                     if (saintsPropertyInfo.Attribute is RichLabelAttribute richLabel)
                     {
@@ -204,7 +208,7 @@ namespace SaintsField.Editor.Core
                                 (FullWidthRichLabelAttributeDrawer)
                                 GetOrCreateSaintsDrawerByAttr(aboveRichLabelAttribute);
                             // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
-                            saintsPropertyDrawers[index] = new SaintsPropertyInfo
+                            SaintsPropertyDrawers[index] = new SaintsPropertyInfo
                             {
                                 Drawer = fullWidthRichLabelAttributeDrawer,
                                 Attribute = aboveRichLabelAttribute,
@@ -219,11 +223,11 @@ namespace SaintsField.Editor.Core
                 {
                     // Debug.Log($"add no label: {property.propertyPath}");
                     NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
-                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
                         Drawer = GetOrCreateSaintsDrawerByAttr(noLabelAttribute),
                         Attribute = noLabelAttribute,
-                        Index = saintsPropertyDrawers.Count,
+                        Index = SaintsPropertyDrawers.Count,
                     });
                 }
 
@@ -237,11 +241,11 @@ namespace SaintsField.Editor.Core
                         (FullWidthRichLabelAttributeDrawer)
                         GetOrCreateSaintsDrawerByAttr(aboveRichLabelAttribute);
                     // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
-                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
                         Drawer = fullWidthRichLabelAttributeDrawer,
                         Attribute = aboveRichLabelAttribute,
-                        Index = saintsPropertyDrawers.Count,
+                        Index = SaintsPropertyDrawers.Count,
                     });
                 }
             }
@@ -262,7 +266,7 @@ namespace SaintsField.Editor.Core
 
 
             // for type drawer that is in SaintsField, use this to draw with a fake property attribute
-            SaintsPropertyInfo fieldAttributeWithIndex = saintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field);
+            SaintsPropertyInfo fieldAttributeWithIndex = SaintsPropertyDrawers.FirstOrDefault(each => each.Attribute.AttributeType == SaintsAttributeType.Field);
             if(fieldAttributeWithIndex.Attribute == null)
             {
                 // fieldAttributeWithIndex = CheckSaintsPropertyInfoInject(property, allAttributes, fieldInfo, saintsPropertyDrawers.Count);
@@ -281,7 +285,7 @@ namespace SaintsField.Editor.Core
                 // }
                 if(UseCreateFieldUIToolKit)
                 {
-                    saintsPropertyDrawers.Add(new SaintsPropertyInfo
+                    SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
                         Drawer = this,
                         Attribute = null,
@@ -301,7 +305,7 @@ namespace SaintsField.Editor.Core
 
             Dictionary<string, List<SaintsPropertyInfo>> groupedAboveDrawers =
                 new Dictionary<string, List<SaintsPropertyInfo>>();
-            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in SaintsPropertyDrawers)
             {
                 string groupBy = eachAttributeWithIndex.Attribute?.GroupBy ?? "";
                 if (!groupedAboveDrawers.TryGetValue(groupBy,
@@ -401,7 +405,7 @@ namespace SaintsField.Editor.Core
 
             #region Pre Overlay
 
-            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in SaintsPropertyDrawers)
             {
                 SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.Drawer;
 
@@ -437,7 +441,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
                     Debug.Log("fallback field drawer");
 #endif
-                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, allAttributes, containerElement, GetPreferredLabel(property), saintsPropertyDrawers, parent);
+                    VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, allAttributes, containerElement, GetPreferredLabel(property), SaintsPropertyDrawers, parent);
                     fallback.AddToClassList(fallbackClass);
                     fieldContainer.Add(fallback);
                     // containerElement.visible = false;
@@ -468,7 +472,7 @@ namespace SaintsField.Editor.Core
 
             #region post field
 
-            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in SaintsPropertyDrawers)
             {
                 VisualElement postFieldElement = eachAttributeWithIndex.Drawer.CreatePostFieldUIToolkit(property, eachAttributeWithIndex.Attribute, eachAttributeWithIndex.Index, containerElement, fieldInfo, parent);
                 if (postFieldElement != null)
@@ -482,7 +486,7 @@ namespace SaintsField.Editor.Core
 
             #region Post Overlay
 
-            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in SaintsPropertyDrawers)
             {
                 SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.Drawer;
 
@@ -503,7 +507,7 @@ namespace SaintsField.Editor.Core
 
             Dictionary<string, List<SaintsPropertyInfo>> groupedDrawers =
                 new Dictionary<string, List<SaintsPropertyInfo>>();
-            foreach (SaintsPropertyInfo eachAttributeWithIndex in saintsPropertyDrawers)
+            foreach (SaintsPropertyInfo eachAttributeWithIndex in SaintsPropertyDrawers)
             {
                 string groupBy = eachAttributeWithIndex.Attribute?.GroupBy ?? "";
                 if(!groupedDrawers.TryGetValue(groupBy, out List<SaintsPropertyInfo> currentGroup))
@@ -578,7 +582,7 @@ namespace SaintsField.Editor.Core
             rootElement.Add(containerElement);
 
             rootElement.schedule.Execute(() =>
-                OnAwakeUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers, allAttributes, onChangeManuallyWatch));
+                OnAwakeUiToolKitInternal(property, containerElement, parent, SaintsPropertyDrawers, allAttributes, onChangeManuallyWatch));
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"Done property gui {property.propertyPath}/{this}");
@@ -615,7 +619,7 @@ namespace SaintsField.Editor.Core
         // }
 
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        private VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
+        protected VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
 

@@ -86,11 +86,17 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.6.3**
+**4.7.0**
 
-Fix broken auto getters since 4.6.2... (sad face)
+1.  `SaintsDictionary` now support list/array as value
+2.  Change `SaintsList`, `SaintsArray` to `class` type so it can be null, just like `List<T>` and `Array`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
+
+> [!CAUTION]
+> **Breaking Changes**: inherent from `SaintsDictionaryBase` has been changed.
+>
+> Custom `SaintsDictionary` is still under some test and need some API changes. Please avoid inherent a custom dictionary, but use `SaintsDictionary` directly.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -5085,6 +5091,9 @@ At last, use auto getters so it can auto-fetch some values:
 
 (Note: ATM you still need to click the plus button once to make the array filling)
 
+> [!WARNING]
+> Custom Dictionary is still under some test and need some API changes. Please avoid inherent a custom dictionary, but use `SaintsDictionary` directly.
+
 ```csharp
 suing SaintsField;
 
@@ -5101,8 +5110,8 @@ public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
     private static string EditorPropKeys => nameof(_intKeys);
     private static string EditorPropValues => nameof(_objValues);
 #endif
-    protected override List<int> SerializedKeys => _intKeys;
-    protected override List<GameObject> SerializedValues => _objValues;
+    protected override List<Wrap<int>> SerializedKeys => _intKeys;  // NOTE: need this `Wrap`
+    protected override List<Wrap<GameObject>> SerializedValues => _objValues;
 }
 
 public ValueFillerDict decValueFillerDict;
