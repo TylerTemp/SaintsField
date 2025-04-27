@@ -14,6 +14,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
     public class SaintsObjectPickerWindowUIToolkit : EditorWindow
     {
         public readonly UnityEvent<ObjectInfo> OnSelectedEvent = new UnityEvent<ObjectInfo>();
+        public readonly UnityEvent OnDestroyEvent = new UnityEvent();
 
         private static float Scale
         {
@@ -103,8 +104,8 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         public static readonly ObjectBaseInfo NoneObjectInfo = new ObjectBaseInfo(null, "None", "", "");
 
-        private readonly List<ObjectInfo> _sceneObjects = new List<ObjectInfo>();
-        private readonly List<ObjectInfo> _assetsObjects = new List<ObjectInfo>();
+        public List<ObjectInfo> SceneObjects = new List<ObjectInfo>();
+        public List<ObjectInfo> AssetsObjects = new List<ObjectInfo>();
 
         private VisualTreeAsset _listItemAsset;
         private VisualTreeAsset _blockItemAsset;
@@ -129,7 +130,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             VisualTreeAsset visualTreeAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerPanel.uxml");
             visualTreeAsset.CloneTree(rootVisualElement);
 
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_2023_2_OR_NEWER
             // don't lose focus
             rootVisualElement.RegisterCallback<PointerDownEvent>(evt =>
             {
@@ -333,7 +334,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
                 bool changed = false;
 
-                foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).ToArray())
+                foreach (ObjectInfo objectInfo in SceneObjects.Concat(AssetsObjects).ToArray())
                 {
                     bool match = string.IsNullOrEmpty(searchTarget) || searchFragments.All(fragment =>
                         objectInfo.BaseInfo.Name.Contains(fragment, StringComparison.OrdinalIgnoreCase));
@@ -365,7 +366,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         private void OnUpListView(bool isUp)
         {
-            List<ObjectInfo> targetInfos = _currentOnAssets ? _assetsObjects : _sceneObjects;
+            List<ObjectInfo> targetInfos = _currentOnAssets ? AssetsObjects : SceneObjects;
             List<int> accIndexes = new List<int>();
             int foundIndex = -1;
 
@@ -491,7 +492,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
             // Debug.Log($"{currentBound} -> {shrinkBound}");
 
-            List<ObjectInfo> checkingTargets = _currentOnAssets ? _assetsObjects : _sceneObjects;
+            List<ObjectInfo> checkingTargets = _currentOnAssets ? AssetsObjects : SceneObjects;
             foreach (ObjectInfo objectInfo in checkingTargets)
             {
                 VisualElement checkingBlockItem = objectInfo.BlockItem;
@@ -579,7 +580,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 return;
             }
 
-            foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).ToArray())
+            foreach (ObjectInfo objectInfo in SceneObjects.Concat(AssetsObjects).ToArray())
             {
                 if (objectInfo.BaseInfo.Target is null)
                 {
@@ -633,7 +634,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 return;
             }
 
-            foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).ToArray())
+            foreach (ObjectInfo objectInfo in SceneObjects.Concat(AssetsObjects).ToArray())
             {
                 if (objectInfo.BaseInfo.Target is null)
                 {
@@ -682,7 +683,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             }
         }
 
-        private void RefreshDisplay()
+        public void RefreshDisplay()
         {
             DisplayStyle sliderDisplay = _currentOnAssets
                 ? DisplayStyle.Flex
@@ -693,7 +694,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 _slider.style.display = sliderDisplay;
             }
 
-            List<ObjectInfo> objInfoTargets = _currentOnAssets? _assetsObjects : _sceneObjects;
+            List<ObjectInfo> objInfoTargets = _currentOnAssets? AssetsObjects : SceneObjects;
             // Debug.Log($"switch to assets {_currentOnAssets}: {objInfoTargets.Count}");
             _listViewContent.Clear();
             _blockViewContent.Clear();
@@ -770,7 +771,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         public void SetItemActive(ObjectBaseInfo objectBaseInfo)
         {
-            foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).ToArray())
+            foreach (ObjectInfo objectInfo in SceneObjects.Concat(AssetsObjects).ToArray())
             {
                 bool equal = objectInfo.BaseInfo.Equals(objectBaseInfo);
                 SetObjectInfoActive(objectInfo, equal);
@@ -853,7 +854,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                     _blockViewContent.Add(objectInfo.BlockItem);
                 }
 
-                List<ObjectInfo> objInfoTargets = isAssets? _assetsObjects : _sceneObjects;
+                List<ObjectInfo> objInfoTargets = isAssets? AssetsObjects : SceneObjects;
                 objInfoTargets.Add(objectInfo);
             }
         }
@@ -882,7 +883,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                     return;
                 }
 
-#if !UNITY_2022_3_OR_NEWER
+#if !UNITY_2023_2_OR_NEWER
                 _toolbarSearchField.Focus();
 #endif
                 SetItemActive(objectInfo.BaseInfo);
@@ -930,13 +931,18 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             // float curValue = Mathf.InverseLerp(0.1f, 0.9f, _slider.value);
             // Debug.Log(curValue);
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            foreach (ObjectInfo objectInfo in _assetsObjects)
+            foreach (ObjectInfo objectInfo in AssetsObjects)
             {
                 ApplyBlockItemScale(_slider.value, objectInfo.BlockItemButton);
                 // Button button = objectInfo.BlockItem.Q<Button>();
                 // button.style.width = 60 * (1 + curValue);
                 // button.style.height = 80 * (1 + curValue);
             }
+        }
+
+        public void OnDestroy()
+        {
+            OnDestroyEvent.Invoke();
         }
     }
 

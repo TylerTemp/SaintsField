@@ -1,9 +1,14 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -66,6 +71,10 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 lastType = baseType;
             }
         }
+
+        private SaintsObjectPickerWindowUIToolkit _objectPickerWindowUIToolkit;
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -137,14 +146,40 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             selectButton.clicked += () =>
             {
-                FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
+                _objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
+                _objectPickerWindowUIToolkit.AssetsObjects = _assetsObjectInfos;
+                _objectPickerWindowUIToolkit.SceneObjects = _sceneObjectInfos;
+                _objectPickerWindowUIToolkit.EnqueueAssetsObjects(_assetsObjectBaseInfos);
+                _assetsObjectBaseInfos.Clear();
+                _objectPickerWindowUIToolkit.EnqueueSceneObjects(_sceneObjectBaseInfos);
+                _sceneObjectBaseInfos.Clear();
+
+                _objectPickerWindowUIToolkit.ShowAuxWindow();
+                _objectPickerWindowUIToolkit.RefreshDisplay();
+                _objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() => _objectPickerWindowUIToolkit = null);
+                CheckResourceLoad(valueType, interfaceType);
+
+                if (RuntimeUtil.IsNull(valueProp.objectReferenceValue))
                 {
-                    if(valueProp.objectReferenceValue != fieldResult)
-                    {
-                        valueProp.objectReferenceValue = fieldResult;
-                        valueProp.serializedObject.ApplyModifiedProperties();
-                    }
-                });
+                    _objectPickerWindowUIToolkit.SetItemActive(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+                }
+                else
+                {
+                    _objectPickerWindowUIToolkit.SetItemActive(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                        valueProp.objectReferenceValue,
+                        valueProp.objectReferenceValue.name,
+                        valueProp.objectReferenceValue.GetType().Name,
+                        AssetDatabase.GetAssetPath(valueProp.objectReferenceValue)
+                    ));
+                }
+                // FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
+                // {
+                //     if(valueProp.objectReferenceValue != fieldResult)
+                //     {
+                //         valueProp.objectReferenceValue = fieldResult;
+                //         valueProp.serializedObject.ApplyModifiedProperties();
+                //     }
+                // });
             };
 
             propertyField.RegisterValueChangeCallback(v =>
@@ -177,7 +212,112 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 }
             });
 
+            saintsInterfaceField.schedule.Execute(() =>
+            {
+                if (_enumeratorAssets != null)
+                {
+                    if (!_enumeratorAssets.MoveNext())
+                    {
+                        _enumeratorAssets = null;
+                    }
+                }
+
+                if(_enumeratorScene != null)
+                {
+                    if (!_enumeratorScene.MoveNext())
+                    {
+                        _enumeratorScene = null;
+                    }
+                }
+            }).Every(1);
+
             return saintsInterfaceField;
+        }
+
+        private bool _resourcesLoadStarted = false;
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _assetsObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _sceneObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+        private IEnumerator _enumeratorAssets;
+        private IEnumerator _enumeratorScene;
+
+        private void CheckResourceLoad(Type fieldType, Type interfaceType)
+        {
+            if (_resourcesLoadStarted)
+            {
+                return;
+            }
+
+            _resourcesLoadStarted = true;
+            _objectPickerWindowUIToolkit.EnqueueSceneObjects(new[]{SaintsObjectPickerWindowUIToolkit.NoneObjectInfo});
+            _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[]{SaintsObjectPickerWindowUIToolkit.NoneObjectInfo});
+            _enumeratorAssets = StartEnumeratorAssets(fieldType, interfaceType);
+        }
+
+        private IEnumerator StartEnumeratorAssets(Type fieldType, Type interfaceType)
+        {
+            int batchCount = 0;
+
+            foreach (string prefabGuid in AssetDatabase.FindAssets("t:prefab"))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(prefabGuid);
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+
+                Component[] comps = prefab.GetComponents<Component>();
+
+                Dictionary<Type, List<Component>> typeToComponents = new Dictionary<Type, List<Component>>();
+
+                foreach (Component component in comps)
+                {
+                    if (component == null)
+                    {
+                        continue;
+                    }
+                    Type compType = component.GetType();
+
+                    // Debug.Log($"{component}/{fieldType}/{interfaceType}");
+
+                    if(fieldType.IsAssignableFrom(compType) && interfaceType.IsInstanceOfType(component))
+                    {
+                        if (!typeToComponents.TryGetValue(compType, out List<Component> components))
+                        {
+                            typeToComponents[compType] = components = new List<Component>();
+                        }
+
+                        Debug.Log($"add {component}");
+                        components.Add(component);
+                    }
+                }
+
+                foreach (KeyValuePair<Type, List<Component>> kv in typeToComponents)
+                {
+                    List<Component> components = kv.Value;
+                    for (int compIndex = 0; compIndex < components.Count; compIndex++)
+                    {
+                        Component prefabComp = components[compIndex];
+                        SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                            prefabComp,
+                            prefab.name,
+                            kv.Key.Name,
+                            $"{prefab.name}:{kv.Key.Name}{(components.Count > 1? $"[{compIndex}]": "")}"
+                        );
+                        if (_objectPickerWindowUIToolkit)
+                        {
+                            _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[]{baseInfo});
+                        }
+                        else
+                        {
+                            _assetsObjectBaseInfos.Add(baseInfo);
+                        }
+                    }
+                }
+
+                batchCount++;
+                if (batchCount / 1000 > 0)
+                {
+                    batchCount = 0;
+                    yield return null;
+                }
+            }
         }
     }
 }
