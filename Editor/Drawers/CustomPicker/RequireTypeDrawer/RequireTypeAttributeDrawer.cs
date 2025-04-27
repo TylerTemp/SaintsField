@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
     [CustomPropertyDrawer(typeof(RequireTypeAttribute), true)]
     public partial class RequireTypeAttributeDrawer: SaintsPropertyDrawer
     {
-        private class FieldInterfaceSelectWindow : ObjectSelectWindow
+        private class FieldInterfaceSelectWindow : SaintsObjectPickerWindowIMGUI
         {
             private Type _fieldType;
             private IReadOnlyList<Type> _requiredTypes;

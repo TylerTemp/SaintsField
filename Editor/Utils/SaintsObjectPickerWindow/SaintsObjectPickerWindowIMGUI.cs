@@ -7,9 +7,9 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Utils
+namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 {
-    public abstract class ObjectSelectWindow: EditorWindow
+    public abstract class SaintsObjectPickerWindowIMGUI: EditorWindow
     {
         protected abstract bool AllowScene { get; }
         protected abstract bool AllowAssets { get; }
@@ -670,9 +670,9 @@ namespace SaintsField.Editor.Utils
                 {
                     go = property.pptrValue;
                 }
-#pragma warning disable CS0168 
+#pragma warning disable CS0168
                 catch (Exception e)
-#pragma warning restore CS0168 
+#pragma warning restore CS0168
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e);

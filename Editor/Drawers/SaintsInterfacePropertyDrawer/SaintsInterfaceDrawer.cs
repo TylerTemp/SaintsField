@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -17,7 +18,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
     [CustomPropertyDrawer(typeof(SaintsInterface<,>), true)]
     public partial class SaintsInterfaceDrawer: PropertyDrawer
     {
-        private class FieldInterfaceSelectWindow : ObjectSelectWindow
+        private class FieldInterfaceSelectWindow : SaintsObjectPickerWindowIMGUI
         {
             private Type _fieldType;
             private Type _interfaceType;
