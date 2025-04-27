@@ -132,47 +132,13 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             saintsInterfaceField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
             saintsInterfaceField.AddToClassList(SaintsInterfaceField.alignedFieldUssClassName);
             saintsInterfaceField.SetValueWithoutNotify(valueProp.objectReferenceValue);
-            // saintsInterfaceField.BindProperty(valueProp);
-//
-//             Type interfaceContainer = ReflectUtils.GetElementType(fieldInfo.FieldType);
-//             // Debug.Log(interfaceContainer.IsGenericType);
-//             // Debug.Log(interfaceContainer.BaseType);
-//             // Debug.Log(interfaceContainer.GetGenericArguments());
-//             // Debug.Log(interfaceContainer);
-//             Type mostBaseType = ReflectUtils.GetMostBaseType(interfaceContainer);
-//             Debug.Assert(mostBaseType != null, interfaceContainer);
-//             Debug.Assert(mostBaseType.IsGenericType, $"{interfaceContainer}->{mostBaseType} is not generic type");
-//             IReadOnlyList<Type> genericArguments = mostBaseType.GetGenericArguments();
-// // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_INTERFACE
-// //             Debug.Log($"from {interfaceContainer} get types: {string.Join(",", genericArguments)}");
-// // #endif
 
             (Type valueType, Type interfaceType) = GetTypes(property, fieldInfo);
-
-            // Type valueType = genericArguments[0];
-            // Type interfaceType = genericArguments[1];
 
             selectButton.clicked += () =>
             {
                 FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
                 {
-                    // // Debug.Log(fieldResult);
-                    // if (fieldResult == null)
-                    // {
-                    //     valueProp.objectReferenceValue = null;
-                    //     valueProp.serializedObject.ApplyModifiedProperties();
-                    // }
-                    // else
-                    // {
-                    //     (bool match, Object result) =
-                    //         GetSerializedObject(fieldResult, valueType, interfaceType);
-                    //     // ReSharper disable once InvertIf
-                    //     if (match)
-                    //     {
-                    //         valueProp.objectReferenceValue = result;
-                    //         valueProp.serializedObject.ApplyModifiedProperties();
-                    //     }
-                    // }
                     if(valueProp.objectReferenceValue != fieldResult)
                     {
                         valueProp.objectReferenceValue = fieldResult;
