@@ -1,4 +1,5 @@
 #if UNITY_EDITOR && UNITY_2021_3_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,7 +9,9 @@ using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Editor
 {
@@ -16,21 +19,49 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
     public class SaintsObjectPickerUIToolkit : EditorWindow
     {
-        public readonly struct ObjectBaseInfo
+        public readonly UnityEvent<ObjectInfo> OnSelectedEvent = new UnityEvent<ObjectInfo>();
+        private static float _scale;
+
+        public readonly struct ObjectBaseInfo: IEquatable<ObjectBaseInfo>
         {
             public readonly Object Target;
-            public readonly Texture2D Icon;
+            // public readonly Texture2D Icon;
             public readonly string Name;
             public readonly string TypeName;
             public readonly string Path;
 
-            public ObjectBaseInfo(Object target, Texture2D icon, string name, string typeName, string path)
+            public ObjectBaseInfo(Object target, string name, string typeName, string path)
             {
                 Target = target;
-                Icon = icon;
+                // Icon = icon;
                 Name = name;
                 TypeName = typeName;
                 Path = path;
+            }
+
+            public bool Equals(ObjectBaseInfo other)
+            {
+                // ReSharper disable once Unity.BurstAccessingManagedMethod
+                return ReferenceEquals(
+                    // ReSharper disable once Unity.BurstLoadingManagedType
+                    Target,
+                    // ReSharper disable once Unity.BurstLoadingManagedType
+                    other.Target);
+            }
+
+            public override bool Equals(object obj)
+            {
+                // ReSharper disable once Unity.BurstLoadingManagedType
+                return obj is ObjectBaseInfo other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                // ReSharper disable once Unity.BurstLoadingManagedType
+                return Target != null
+                    // ReSharper disable once Unity.BurstLoadingManagedType
+                    ? Target.GetHashCode()
+                    : 0;
             }
         }
 
@@ -38,12 +69,22 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
         {
             public ObjectBaseInfo BaseInfo;
             public Texture2D Preview;
+            public Texture2D Icon;
             public int PreviewLoadCount;
+            public bool IconLoaded;
 
             public VisualElement ListItem;
             public VisualElement BlockItem;
-            public Image BlockItemIcon;
+
+            public Button BlockItemButton;
             public Image BlockItemPreview;
+            public VisualElement BlockItemLabelContainer;
+            public Image BlockItemIcon;
+
+            public Button ListItemButton;
+            public Image ListItemIcon;
+
+            public bool Display;
         }
 
         private bool _currentOnAssets = true;
@@ -58,6 +99,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
         private VisualElement _blockViewContent;
 
         private Image _loadingImage;
+
+        public static readonly ObjectBaseInfo NoneObjectInfo = new ObjectBaseInfo(null, "None", "", "");
 
         private readonly List<ObjectInfo> _sceneObjects = new List<ObjectInfo>();
         private readonly List<ObjectInfo> _assetsObjects = new List<ObjectInfo>();
@@ -75,10 +118,17 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
         private ScrollView _blockScrollView;
         private float _blockScrollViewScrollSize;
 
+        private Image _selectedPreviewImage;
+        private Label _selectedPreviewName;
+        private Label _selectedPreviewType;
+        private Label _selectedPreviewPath;
+
         public void CreateGUI()
         {
             VisualTreeAsset visualTreeAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerPanel.uxml");
             visualTreeAsset.CloneTree(rootVisualElement);
+
+            ToolbarSearchField toolbarSearchField = rootVisualElement.Q<ToolbarSearchField>(name: "saints-field-object-picker-search");
 
             _assetsToggle = rootVisualElement.Q<ToolbarToggle>(name: "saints-field-object-picker-toggle-assets");
             _sceneToggle = rootVisualElement.Q<ToolbarToggle>(name: "saints-field-object-picker-toggle-scene");
@@ -168,6 +218,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
             _blockItemAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/ObjectPicker/ObjectPickerBlockItem.uxml");
             Debug.Assert(_blockItemAsset != null);
+            // StyleSheet blockItemStyle = Util.LoadResource<StyleSheet>("UIToolkit/ObjectPicker/ObjectPickerBlockItemStyle.uss");
+            // _blockItemAsset.styleSheets.Add(blockItemStyle);
             _blockView = _pickerBody.Q<ScrollView>(name: "saints-field-object-picker-block");
             Debug.Assert(_blockView != null);
             _blockViewContent = _blockView.Q<VisualElement>(name: "unity-content-container");
@@ -213,8 +265,30 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                 }
             });
 
-            rootVisualElement.schedule.Execute(() => _slider.value = _slider.value);
-            rootVisualElement.schedule.Execute(UpdatePreview).Every(500);
+            _selectedPreviewImage = rootVisualElement.Q<Image>(name: "saints-field-object-picker-preview-image");
+            _selectedPreviewName = rootVisualElement.Q<Label>(name: "saints-field-object-picker-preview-label-name");
+            _selectedPreviewType = rootVisualElement.Q<Label>(name: "saints-field-object-picker-preview-label-type");
+            _selectedPreviewPath = rootVisualElement.Q<Label>(name: "saints-field-object-picker-preview-label-path");
+
+            rootVisualElement.schedule.Execute(() =>
+            {
+                _slider.value = _scale;
+                toolbarSearchField.Focus();
+            });
+            rootVisualElement.schedule.Execute(() =>
+            {
+                UpdateIcon();
+                UpdatePreview();
+            }).Every(500);
+        }
+
+        public void SetLoadingImage(bool on)
+        {
+            Visibility visibleType = on ? Visibility.Visible : Visibility.Hidden;
+            if (_loadingImage.style.visibility != visibleType)
+            {
+                _loadingImage.style.visibility = visibleType;
+            }
         }
 
         private void SetCtrl(bool down)
@@ -241,9 +315,14 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
         private void WheelEvent(WheelEvent evt)
         {
-            bool nowCtrlDown = evt.modifiers == EventModifiers.Control || evt.modifiers == EventModifiers.Command;
+            bool nowCtrlDown = evt.modifiers is EventModifiers.Control or EventModifiers.Command;
 
             SetCtrl(nowCtrlDown);
+
+            if (!_currentOnAssets)
+            {
+                return;
+            }
 
             if (!_ctrlDown)
             {
@@ -252,50 +331,153 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
             Vector3 delta = evt.delta;
             float deltaY = -delta.y / 30f;
-            _slider.value = Mathf.Clamp(_slider.value + deltaY, 0, 1);
+            _scale = _slider.value = Mathf.Clamp(_slider.value + deltaY, 0, 1);
         }
 
-        private void UpdatePreview()
+        private void UpdateIcon()
         {
-            // Debug.Log(_blockScrollView.scrollOffset);
-            Debug.Log($"{_blockScrollView.verticalScroller.value}/{_blockScrollView.verticalScroller.lowValue}/{_blockScrollView.verticalScroller.highValue}");
-            Debug.Log(_blockScrollView.contentViewport.resolvedStyle.height);
-
-            var viewHeight = _blockScrollView.contentViewport.resolvedStyle.height;
-            var scrollValue = _blockScrollView.verticalScroller.value;
-            var scrollLow = _blockScrollView.verticalScroller.lowValue;
-            var scrollHigh = _blockScrollView.verticalScroller.highValue;
-
-            if (double.IsNaN(viewHeight) || double.IsNaN(scrollHigh))
+            // AssetPreview.GetMiniThumbnail(each);
+            Rect viewBound = _listScrollView.contentViewport.worldBound;
+            if (double.IsNaN(viewBound.width) || double.IsNaN(viewBound.height))
             {
                 return;
             }
 
-            var scrollPercent = Mathf.InverseLerp(scrollLow, scrollHigh, scrollValue);
-            //
-
-
-
-            foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).Where(each => each.PreviewLoadCount < 10).ToArray())
+            foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).ToArray())
             {
-                Object target = objectInfo.BaseInfo.Target;
-                if (target is Component comp)
+                if (objectInfo.BaseInfo.Target is null)
                 {
-                    target = comp.gameObject;
+                    continue;
                 }
-                Texture2D preview = AssetPreview.GetAssetPreview(target);
-                if (preview != null && preview.width > 1)
+                Rect listBound = objectInfo.ListItem.worldBound;
+                // Debug.Log($"{viewBound}/{blockBound}");
+                if (double.IsNaN(listBound.width) || double.IsNaN(listBound.height))
                 {
-                    objectInfo.Preview = preview;
-                    objectInfo.PreviewLoadCount = int.MaxValue;
+                    continue;
+                }
 
-                    objectInfo.BlockItemIcon.RemoveFromHierarchy();
-                    objectInfo.BlockItemPreview.image = preview;
-                }
-                else
+                // ReSharper disable once InvertIf
+                if (viewBound.Overlaps(listBound))
                 {
-                    objectInfo.PreviewLoadCount++;
+                    // Debug.Log(objectInfo.BaseInfo.Name);
+                    UpdateObjectIcon(objectInfo);
                 }
+
+            }
+        }
+
+        private static void UpdateObjectIcon(ObjectInfo objectInfo)
+        {
+            if (objectInfo.IconLoaded)
+            {
+                return;
+            }
+
+            objectInfo.IconLoaded = true;
+            Texture icon
+                = objectInfo.ListItemIcon.image
+                = objectInfo.BlockItemIcon.image
+                = objectInfo.Icon
+                = AssetPreview.GetMiniThumbnail(objectInfo.BaseInfo.Target);
+
+            if(objectInfo.PreviewLoadCount < PreviewLoadMaxCount)
+            {
+                objectInfo.BlockItemPreview.image = icon;
+            }
+        }
+
+        private const int PreviewLoadMaxCount = 10;
+
+        private void UpdatePreview()
+        {
+            Rect viewBound = _blockScrollView.contentViewport.worldBound;
+
+            if (double.IsNaN(viewBound.width) || double.IsNaN(viewBound.height))
+            {
+                return;
+            }
+
+            foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).ToArray())
+            {
+                if (objectInfo.BaseInfo.Target is null)
+                {
+                    continue;
+                }
+
+                Rect blockBound = objectInfo.BlockItem.worldBound;
+                // Debug.Log($"{viewBound}/{blockBound}");
+                if (double.IsNaN(blockBound.width) || double.IsNaN(blockBound.height))
+                {
+                    continue;
+                }
+
+                // ReSharper disable once InvertIf
+                if (viewBound.Overlaps(blockBound))
+                {
+                    // Debug.Log(objectInfo.BaseInfo.Name);
+
+                    UpdateObjectIcon(objectInfo);
+
+                    if(objectInfo.PreviewLoadCount < PreviewLoadMaxCount)
+                    {
+                        Object target = objectInfo.BaseInfo.Target;
+
+                        if (target is Component comp)
+                        {
+                            target = comp.gameObject;
+                        }
+
+                        Texture2D preview = AssetPreview.GetAssetPreview(target);
+                        if (preview != null && preview.width > 1)
+                        {
+                            objectInfo.Preview = preview;
+                            objectInfo.PreviewLoadCount = int.MaxValue;
+
+                            objectInfo.BlockItemIcon.style.display = DisplayStyle.Flex;
+                            objectInfo.BlockItemPreview.image = preview;
+                        }
+                        else
+                        {
+                            objectInfo.PreviewLoadCount++;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        private void RefreshDisplay()
+        {
+            DisplayStyle sliderDisplay = _currentOnAssets
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+
+            if (_slider.style.display != sliderDisplay)
+            {
+                _slider.style.display = sliderDisplay;
+            }
+
+            _currentOnAssets = _currentOnAssets;
+
+            List<ObjectInfo> objInfoTargets = _currentOnAssets? _assetsObjects : _sceneObjects;
+            // Debug.Log($"switch to assets {_currentOnAssets}: {objInfoTargets.Count}");
+            _listViewContent.Clear();
+            _blockViewContent.Clear();
+
+            foreach (ObjectInfo objInfoTarget in objInfoTargets)
+            {
+                if(objInfoTarget.Display)
+                {
+                    _listViewContent.Add(objInfoTarget.ListItem);
+                    _blockViewContent.Add(objInfoTarget.BlockItem);
+                }
+            }
+
+            if (!_currentOnAssets && _isBlockView)
+            {
+                _isBlockView = false;
+                _blockView.RemoveFromHierarchy();
+                _pickerBody.Add(_listView);
             }
         }
 
@@ -308,16 +490,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
             _currentOnAssets = on;
 
-            List<ObjectInfo> objInfoTargets = _currentOnAssets? _assetsObjects : _sceneObjects;
-            // Debug.Log($"switch to assets {_currentOnAssets}: {objInfoTargets.Count}");
-            _listViewContent.Clear();
-            _blockViewContent.Clear();
-
-            foreach (ObjectInfo objInfoTarget in objInfoTargets)
-            {
-                _listViewContent.Add(objInfoTarget.ListItem);
-                _blockViewContent.Add(objInfoTarget.BlockItem);
-            }
+            RefreshDisplay();
         }
 
         public void DisableAssets()
@@ -359,6 +532,60 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             EnqueueToAssetsObjects(true, objectBaseInfos);
         }
 
+        public void SetItemActive(ObjectBaseInfo objectBaseInfo)
+        {
+            foreach (ObjectInfo objectInfo in _sceneObjects.Concat(_assetsObjects).ToArray())
+            {
+                bool equal = objectInfo.BaseInfo.Equals(objectBaseInfo);
+                SetObjectInfoActive(objectInfo, equal);
+
+                if (equal)
+                {
+                    SetDetailPanel(objectInfo);
+                }
+            }
+        }
+
+        private void SetDetailPanel(ObjectInfo objectInfo)
+        {
+            _selectedPreviewImage.image = objectInfo.Preview ?? objectInfo.Icon;
+            _selectedPreviewName.text = objectInfo.BaseInfo.Name;
+            _selectedPreviewType.text = objectInfo.BaseInfo.TypeName;
+            _selectedPreviewPath.text = objectInfo.BaseInfo.Path;
+        }
+
+        private static void SetObjectInfoActive(ObjectInfo objectInfo, bool active)
+        {
+            const string activeClass = "pressed";
+
+            VisualElement blockItemLabelContainer = objectInfo.BlockItemLabelContainer;
+            Button listItemButton = objectInfo.ListItemButton;
+
+            if (active)
+            {
+                if (!blockItemLabelContainer.ClassListContains(activeClass))
+                {
+                    blockItemLabelContainer.AddToClassList(activeClass);
+                }
+
+                if (!listItemButton.ClassListContains(activeClass))
+                {
+                    listItemButton.AddToClassList(activeClass);
+                }
+            }
+            else
+            {
+                if (blockItemLabelContainer.ClassListContains(activeClass))
+                {
+                    blockItemLabelContainer.RemoveFromClassList(activeClass);
+                }
+                if (listItemButton.ClassListContains(activeClass))
+                {
+                    listItemButton.RemoveFromClassList(activeClass);
+                }
+            }
+        }
+
         private void EnqueueToAssetsObjects(bool isAssets, IEnumerable<ObjectBaseInfo> objectBaseInfos)
         {
             foreach (ObjectBaseInfo objectBaseInfo in objectBaseInfos)
@@ -373,11 +600,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
 
                     ListItem = listItem,
                     BlockItem = blockItem,
+                    BlockItemButton = blockItem.Q<Button>(),
                     BlockItemIcon = blockItem.Q<Image>(name: "saints-field-object-picker-block-item-icon"),
                     BlockItemPreview = blockItem.Q<Image>(name: "saints-field-object-picker-block-item-preview"),
+                    Display = true,
                 };
 
-                InitItem(objectInfo, listItem, blockItem);
+                InitItem(_slider.value, objectInfo, listItem, blockItem);
 
                 if (isAssets == _currentOnAssets)
                 {
@@ -385,41 +614,56 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
                     _blockViewContent.Add(objectInfo.BlockItem);
                 }
 
-                List<ObjectInfo> objInfoTargets = _currentOnAssets? _assetsObjects : _sceneObjects;
+                List<ObjectInfo> objInfoTargets = isAssets? _assetsObjects : _sceneObjects;
                 objInfoTargets.Add(objectInfo);
             }
         }
 
-        private static void InitItem(ObjectInfo objectInfo, VisualElement listItem, VisualElement blockItem)
+        private void InitItem(float sliderValue, ObjectInfo objectInfo, VisualElement listItem, VisualElement blockItem)
         {
             // Debug.Log(objectInfo.BaseInfo.Icon);
 
             listItem.Q<Label>(name: "saints-field-object-picker-list-item-label").text = objectInfo.BaseInfo.Name;
-            if(objectInfo.BaseInfo.Icon != null)
-            {
-                listItem.Q<Image>(name: "saints-field-object-picker-list-item-image").image = objectInfo.BaseInfo.Icon;
-            }
+            objectInfo.ListItemButton = listItem.Q<Button>(name: "saints-field-object-picker-list-item-button");
+            objectInfo.ListItemIcon = listItem.Q<Image>(name: "saints-field-object-picker-list-item-image");
 
+            objectInfo.BlockItemLabelContainer =
+                blockItem.Q<VisualElement>(name: "saints-field-object-picker-block-item-label-container");
             blockItem.Q<Label>(name: "saints-field-object-picker-block-item-name").text = objectInfo.BaseInfo.Name;
-            if (objectInfo.BaseInfo.Icon != null)
+
+            ApplyBlockItemScale(sliderValue, objectInfo.BlockItemButton);
+
+            objectInfo.ListItemButton.clicked += OnClick;
+            objectInfo.BlockItemButton.clicked += OnClick;
+            return;
+
+            void OnClick()
             {
-                objectInfo.BlockItemIcon.image = objectInfo.BaseInfo.Icon;
-                objectInfo.BlockItemPreview.image = objectInfo.BaseInfo.Icon;
+                SetItemActive(objectInfo.BaseInfo);
+                OnSelectedEvent.Invoke(objectInfo);
             }
         }
 
-        private float _blockHeight = 80f;
+        private static void ApplyBlockItemScale(float sliderValue, Button button)
+        {
+            // float curValue = (_slider.value - 0.1f) / 0.9f;
+            float curValue = Mathf.InverseLerp(0.1f, 0.9f, sliderValue);
+            button.style.width = 60 * (1 + curValue);
+            button.style.height = 80 * (1 + curValue);
+        }
 
         private void UpdateBlockItemScale()
         {
             // float curValue = (_slider.value - 0.1f) / 0.9f;
-            float curValue = Mathf.InverseLerp(0.1f, 0.9f, _slider.value);
+            // float curValue = Mathf.InverseLerp(0.1f, 0.9f, _slider.value);
             // Debug.Log(curValue);
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
             foreach (ObjectInfo objectInfo in _assetsObjects)
             {
-                Button button = objectInfo.BlockItem.Q<Button>();
-                button.style.width = 60 * (1 + curValue);
-                button.style.height = _blockHeight = 80 * (1 + curValue);
+                ApplyBlockItemScale(_slider.value, objectInfo.BlockItemButton);
+                // Button button = objectInfo.BlockItem.Q<Button>();
+                // button.style.width = 60 * (1 + curValue);
+                // button.style.height = 80 * (1 + curValue);
             }
         }
     }
@@ -435,11 +679,19 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.ObjectPickerWorkaround.Edi
             pop = EditorWindow.GetWindow<SaintsObjectPickerUIToolkit>();
             pop.Show();
 
+            pop.EnqueueSceneObjects(new[]{SaintsObjectPickerUIToolkit.NoneObjectInfo});
+
             Object[] resources = Resources.LoadAll("");
             // Debug.Log(resources.Length);
+
+            pop.EnqueueAssetsObjects(new[]{SaintsObjectPickerUIToolkit.NoneObjectInfo});
             pop.EnqueueAssetsObjects(resources.Select(each => new SaintsObjectPickerUIToolkit.ObjectBaseInfo(
-                each, AssetPreview.GetMiniThumbnail(each), each.name, each.GetType().Name, AssetDatabase.GetAssetPath(each)
+                each, each.name, each.GetType().Name, AssetDatabase.GetAssetPath(each)
             )));
+
+            pop.SetItemActive(SaintsObjectPickerUIToolkit.NoneObjectInfo);
+
+            // pop.SetLoadingImage(false);
         }
 
 

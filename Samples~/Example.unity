@@ -17836,7 +17836,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7b6222d0422146439d9ab267f239344, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objDefaultPicker: {fileID: 11400000, guid: d7402221b8c3af9489cc1ca1962f4f5c, type: 2}
+  objDefaultPicker: {fileID: 0}
   objectPicker: 
 --- !u!1 &1318514130
 GameObject:
