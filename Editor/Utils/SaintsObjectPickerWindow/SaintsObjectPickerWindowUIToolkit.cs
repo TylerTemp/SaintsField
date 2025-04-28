@@ -244,6 +244,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
             _blockViewContent.style.flexDirection = FlexDirection.Row;
             _blockViewContent.style.flexWrap = Wrap.Wrap;
+            _blockViewContent.style.overflow = Overflow.Visible;
 
             _blockView.RemoveFromHierarchy();
 

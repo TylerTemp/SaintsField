@@ -376,6 +376,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     });
 
                     objectPickerWindowUIToolkit.ShowAuxWindow();
+                    // objectPickerWindowUIToolkit.Show();
                     // objectPickerWindowUIToolkit.SetLoadingImage(true);
 
                     objectPickerWindowUIToolkit.SetItemActive(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
