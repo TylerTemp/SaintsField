@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
     [CustomPropertyDrawer(typeof(SaintsDictionaryBase<,>.Wrap<>), true)]
     public partial class SaintsDictionaryWrapDrawer: SaintsPropertyDrawer
     {
-        private static (SerializedProperty realProp, FieldInfo realInfo) GetBasicInfo(SerializedProperty property, FieldInfo info)
+        public static (SerializedProperty realProp, FieldInfo realInfo) GetBasicInfo(SerializedProperty property, FieldInfo info)
         {
             // string label = GetPreferredLabel(property);
             //

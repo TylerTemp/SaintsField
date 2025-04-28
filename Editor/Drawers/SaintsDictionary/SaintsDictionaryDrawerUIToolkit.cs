@@ -755,6 +755,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     // IEnumerable valuesResult = valuesField.GetValue(valuesParent) as IEnumerable;
                     // object valueResult = GetIndexAt(valuesResult, propIndex);
                     elementProp.isExpanded = true;
+                    element.Clear();
 
                     // Debug.Log($"elementProp={elementProp.propertyPath}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
 

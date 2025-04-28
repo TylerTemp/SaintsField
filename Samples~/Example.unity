@@ -771,6 +771,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
   m_AgentTypeID: 0
   m_CollectObjects: 0
   m_Size: {x: 10, y: 10, z: 10}
@@ -17339,8 +17340,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 142339351076478d999c809bf8f02511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneKey: 
-  sceneKeySep: 
 --- !u!1 &1244097642
 GameObject:
   m_ObjectHideFlags: 0
@@ -17796,10 +17795,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2ca16b3131ec84b80578c42b1cc1dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entrance: {fileID: 0}
-  worldPos: []
-  centerPoint: {x: 0, y: 0, z: 0}
-  exit: {fileID: 0}
 --- !u!1 &1315195531
 GameObject:
   m_ObjectHideFlags: 0
@@ -22673,7 +22668,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 125c5d081d7e68649b7796eaf9740e79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 1265279476356126933, guid: ff15727a6fdf24cb48a62af6b6210d9d, type: 3}
+  prefab: {fileID: 724537243}
 --- !u!1 &1755597643
 GameObject:
   m_ObjectHideFlags: 0
@@ -29804,10 +29799,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36e5c620db1deb141bc544e0bbc22a73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  genDict:
+    _keys: []
+    _values: []
+    _saintsKeys:
+    - value: 1
+    - value: 2
+    _saintsValues:
+    - value: {fileID: 787857617}
+    - value: {fileID: 2137894679}
+  dict:
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 0
+    - value: 1
+    _saintsValues:
+    - value:
+        myStringField: 0
+        myIntField: 
+    - value:
+        myStringField: 1
+        myIntField: 
+  genDictValueArray:
+    _keys: []
+    _saintsKeys:
+    - value: 
+    _saintsValues:
+    - value:
+      - {fileID: 2009324526}
+      - {fileID: 787857617}
   genDictValueList:
     _keys: []
     _saintsKeys:
-    - value: key1
+    - value: 
     _saintsValues:
     - value:
       - {fileID: 2009324526}

@@ -1189,7 +1189,7 @@ namespace SaintsField.Editor.Utils
                         return null;
                     }
 
-                    objectField = new ObjectField(label)
+                    objectField = new ObjectField(property.displayName)
                     {
                         objectType = rawType,
                         value = property.objectReferenceValue,
@@ -1210,6 +1210,7 @@ namespace SaintsField.Editor.Utils
                     {
                         objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
                     }
+
                     return objectField;
                 }
                 case SerializedPropertyType.LayerMask:
