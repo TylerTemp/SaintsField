@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
@@ -23,7 +24,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
     [CustomPropertyDrawer(typeof(ResourcePathAttribute), true)]
     public class ResourcePathAttributeDrawer: RequireTypeAttributeDrawer
     {
-        private class FieldResourcesSelectWindow : ObjectSelectWindow
+        private class FieldResourcesSelectWindow : SaintsObjectPickerWindowIMGUI
         {
             private IReadOnlyList<Type> _requiredTypes;
             // private Type _interfaceType;

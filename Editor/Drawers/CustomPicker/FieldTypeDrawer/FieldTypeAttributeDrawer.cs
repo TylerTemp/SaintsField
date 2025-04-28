@@ -2,6 +2,7 @@
 using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -14,7 +15,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
     [CustomPropertyDrawer(typeof(FieldTypeAttribute), true)]
     public partial class FieldTypeAttributeDrawer: SaintsPropertyDrawer
     {
-        private class FieldTypeSelectWindow : ObjectSelectWindow
+        private class FieldTypeSelectWindow : SaintsObjectPickerWindowIMGUI
         {
             // private Type[] _expectedTypes;
             private Type _originType;

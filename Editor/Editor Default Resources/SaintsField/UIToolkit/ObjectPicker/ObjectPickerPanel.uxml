@@ -1,12 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <uie:ToolbarSearchField focusable="true" placeholder-text="Search" style="width: initial;" />
+    <uie:ToolbarSearchField focusable="true" placeholder-text="Search" name="saints-field-object-picker-search" style="width: initial;" />
     <ui:VisualElement style="flex-grow: initial; height: 20px; flex-direction: row; width: 100%; justify-content: space-between;">
         <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
             <uie:Toolbar>
                 <uie:ToolbarToggle label="Assets" name="saints-field-object-picker-toggle-assets" value="true" style="width: 65px;" />
                 <uie:ToolbarToggle label="Scene" name="saints-field-object-picker-toggle-scene" style="width: 65px;" />
             </uie:Toolbar>
-            <ui:Image name="saints-field-object-picker-loading" style="width: 16px; height: 16px; align-self: center;" />
+            <ui:Image name="saints-field-object-picker-loading" style="width: 16px; height: 16px; align-self: center; visibility: hidden;" />
         </ui:VisualElement>
         <ui:Slider value="0" high-value="1" name="saints-field-object-picker-slider" style="min-width: 60px;" />
     </ui:VisualElement>

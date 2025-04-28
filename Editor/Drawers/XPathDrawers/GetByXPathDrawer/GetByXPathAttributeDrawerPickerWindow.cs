@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -12,7 +13,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 {
     public partial class GetByXPathAttributeDrawer
     {
-        private class GetByPickerWindow : ObjectSelectWindow
+        private class GetByPickerWindow : SaintsObjectPickerWindowIMGUI
         {
             private Action<Object> _onSelected;
             private EPick _editorPick;
