@@ -238,7 +238,8 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             // _blockItemAsset.styleSheets.Add(blockItemStyle);
             _blockView = _pickerBody.Q<ScrollView>(name: "saints-field-object-picker-block");
             Debug.Assert(_blockView != null);
-            _blockViewContent = _blockView.Q<VisualElement>(name: "unity-content-container");
+            // _blockViewContent = _blockView.Q<VisualElement>(name: "unity-content-container");
+            _blockViewContent = _blockView.contentContainer;
             Debug.Assert(_blockViewContent != null);
 
             _blockViewContent.style.flexDirection = FlexDirection.Row;
@@ -722,6 +723,12 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 _isBlockView = false;
                 _blockView.RemoveFromHierarchy();
                 _pickerBody.Add(_listView);
+            }
+            else if (_currentOnAssets && !_isBlockView && _slider.value >= 0.1f)
+            {
+                _isBlockView = true;
+                _listView.RemoveFromHierarchy();
+                _pickerBody.Add(_blockView);
             }
         }
 

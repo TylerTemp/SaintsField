@@ -1,10 +1,12 @@
 ﻿#if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
@@ -27,6 +29,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         private static string NameSelectorButton(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__GetByXPath_SelectorButton";
 
         // private const string ClassGetByXPath = "saints-field-get-by-xpath-attribute-drawer";
+
+        private SaintsObjectPickerWindowUIToolkit _saintsObjectPickerWindowUIToolkit;
+        private IEnumerator _enumeratorResources;
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
@@ -320,21 +325,78 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         return;
                     }
 
-                    OpenPicker(property, info, genericCache.GetByXPathAttributes, genericCache.ExpectedType, genericCache.ExpectedInterface,
-                        newValue =>
+                    (string getValueError, int _, object curValue) = Util.GetValue(property, info, updatedParent);
+
+                    // ReSharper disable once UseNegatedPatternInIsExpression
+                    if (!(curValue is Object) && curValue != null)
+                    {
+                        Debug.LogError($"targetValue is not Object: {curValue}");
+                        return;
+                    }
+                    Object curValueObj = (Object)curValue;
+
+                    if (getValueError != "")
+                    {
+                        Debug.LogError(getValueError);
+                        return;
+                    }
+
+                    GetXPathValuesResult r = GetXPathValues(genericCache.GetByXPathAttributes
+                            .Select(xPathAttribute => new XPathResourceInfo
+                            {
+                                OptimizationPayload = xPathAttribute.OptimizationPayload,
+                                OrXPathInfoList = xPathAttribute.XPathInfoAndList.SelectMany(each => each).ToArray(),
+                            })
+                            .ToArray(),
+                        genericCache.ExpectedType, genericCache.ExpectedInterface, property, info, updatedParent);
+                    if (r.XPathError != "")
+                    {
+                        Debug.LogError(r.XPathError);
+                        return;
+                    }
+
+                    SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
+                    objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {genericCache.ExpectedType}" + (genericCache.ExpectedInterface == null? "": $"({genericCache.ExpectedInterface})"));
+
+                    objectPickerWindowUIToolkit.OnSelectedEvent.AddListener(objInfo =>
+                    {
+                        object oldValue = propertyCache.TargetValue;
+                        Object newValue = objInfo.BaseInfo.Target;
+
+                        propertyCache.TargetValue = newValue;
+                        if(DoSignPropertyCache(propertyCache, false))
                         {
-                            object oldValue = propertyCache.TargetValue;
-                            propertyCache.TargetValue = newValue;
-                            if(DoSignPropertyCache(propertyCache, false))
-                            {
-                                property.serializedObject.ApplyModifiedProperties();
-                                onValueChangedCallback.Invoke(newValue);
-                            }
-                            else
-                            {
-                                propertyCache.TargetValue = oldValue;
-                            }
-                        }, updatedParent);
+                            property.serializedObject.ApplyModifiedProperties();
+                            onValueChangedCallback.Invoke(newValue);
+                        }
+                        else
+                        {
+                            propertyCache.TargetValue = oldValue;
+                        }
+                    });
+
+                    objectPickerWindowUIToolkit.ShowAuxWindow();
+                    // objectPickerWindowUIToolkit.SetLoadingImage(true);
+
+                    objectPickerWindowUIToolkit.SetItemActive(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+
+                    _enumeratorResources = LoadResourcesFromResult(r, objectPickerWindowUIToolkit, curValueObj);
+
+                    // OpenPicker(property, info, genericCache.GetByXPathAttributes, genericCache.ExpectedType, genericCache.ExpectedInterface,
+                    //     newValue =>
+                    //     {
+                    //         object oldValue = propertyCache.TargetValue;
+                    //         propertyCache.TargetValue = newValue;
+                    //         if(DoSignPropertyCache(propertyCache, false))
+                    //         {
+                    //             property.serializedObject.ApplyModifiedProperties();
+                    //             onValueChangedCallback.Invoke(newValue);
+                    //         }
+                    //         else
+                    //         {
+                    //             propertyCache.TargetValue = oldValue;
+                    //         }
+                    //     }, updatedParent);
                 };
 
                 if (!getByXPathAttribute.KeepOriginalPicker)
@@ -345,6 +407,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
             }
 
+            container.schedule.Execute(() =>
+            {
+                // ReSharper disable once InvertIf
+                if (_enumeratorResources != null)
+                {
+                    if (!_enumeratorResources.MoveNext())
+                    {
+                        _enumeratorResources = null;
+                    }
+                }
+            }).Every(1);
             // int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
             // if (loop > 0)
             // {
@@ -352,6 +425,45 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             //         ActualUpdateUIToolkit(property, index, container, onValueChangedCallback,
             //             info)).Every(loop);
             // }
+        }
+
+        private static IEnumerator LoadResourcesFromResult(GetXPathValuesResult getXPathValuesResult, SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit, Object curValue)
+        {
+            objectPickerWindowUIToolkit.SetLoadingImage(true);
+
+            foreach (object o in getXPathValuesResult.Results)
+            {
+                if (o is not Object objResult)
+                {
+                    continue;
+                }
+                string assetPath = AssetDatabase.GetAssetPath(objResult);
+
+                SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                    objResult,
+                    objResult.name,
+                    objResult.GetType().Name,
+                    assetPath
+                );
+
+                if (assetPath != "")
+                {
+                    objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[]{baseInfo});
+                }
+                else
+                {
+                    objectPickerWindowUIToolkit.EnqueueSceneObjects(new[]{baseInfo});
+                }
+
+                if (Util.GetIsEqual(curValue, objResult))
+                {
+                    objectPickerWindowUIToolkit.SetItemActive(baseInfo);
+                }
+
+                yield return null;
+            }
+
+            objectPickerWindowUIToolkit.SetLoadingImage(false);
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
