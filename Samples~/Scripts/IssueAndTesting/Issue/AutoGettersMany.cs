@@ -4,8 +4,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 {
     public class AutoGettersMany : MonoBehaviour
     {
-        [GetByXPath("assets:://*.prefab")]
+        [GetByXPath(EXP.JustPicker, "assets:://*")]
         [GetByXPath("scene:://*")]
-        public Transform prefab;
+        public GameObject anyObj;
     }
 }

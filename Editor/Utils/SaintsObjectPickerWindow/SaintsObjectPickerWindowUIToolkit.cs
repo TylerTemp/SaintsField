@@ -265,6 +265,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 if (evt.keyCode == KeyCode.Return)
                 {
                     evt.StopPropagation();
+                    // DoClose();
                     Close();
                 }
 
@@ -320,6 +321,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 if (evt.keyCode == KeyCode.Return)
                 {
                     evt.StopPropagation();
+                    // DoClose();
                     Close();
                 }
             }, TrickleDown.TrickleDown);
@@ -926,7 +928,6 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             {
                 if (ShouldCloseOnDoubleClick(objectInfo))
                 {
-                    // Debug.Log("Close");
                     Close();
                     return;
                 }
@@ -934,6 +935,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 #if !UNITY_2023_2_OR_NEWER
                 _toolbarSearchField.Focus();
 #endif
+                // Debug.Log($"pick {objectInfo.BaseInfo.Name}");
                 SetItemActive(objectInfo.BaseInfo);
                 OnSelectedEvent.Invoke(objectInfo);
             };
@@ -949,6 +951,12 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 OnSelectedEvent.Invoke(objectInfo);
             };
         }
+
+        // private void DoClose()
+        // {
+        //     Debug.Log("close this window");
+        //     Close();
+        // }
 
         private bool ShouldCloseOnDoubleClick(ObjectInfo objectInfo)
         {

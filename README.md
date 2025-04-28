@@ -86,14 +86,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.7.1**
+**4.7.2**
 
-1.  UI Toolkit: `SaintsInterface` now will limit the scene object to current ones when in prefab:
-    *   For prefab context/isolated editing, or prefab project inspecting, the scene object will only list the prefab itself or its children objects
-    *   For prefab already instantiated in the scene hierarchy, the scene object will only list the scene objects that the instance in
-2.  UI Toolkit: Optimize `SaintsInterface` drawer to allow async object loading & cached results. It no longer searches unnecessary resources. [#199](https://github.com/TylerTemp/SaintsField/issues/199)
-3.  UI Toolkit: `SaintsInterface` will now display a loaing icon if there are resources fetching
-4.  UI Toolkit: `SaintsInterface` now allows keyboard arrow up/down key in list view, and keyboard arrow up/down/left/right key in block view to select objects
+1.  UI Toolkit: auto getters now can use async resource loading instead of blocking the Unity Editor thread. The picker view will continuously add resources with a loading icon.
+    It'll also cache the results instead of loading them again every time you open the picker.
+2.  UI Toolkit: fix `SaintsInterface` cache refresh when project changed.
+3.  UI Toolkit: fix `SaintsDictionary` object type can not display a correct label. [#220](https://github.com/TylerTemp/SaintsField/issues/220)
+4.  UI Toolkit: fix `SaintsDictionary` value get drawn multiple times after dragging.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

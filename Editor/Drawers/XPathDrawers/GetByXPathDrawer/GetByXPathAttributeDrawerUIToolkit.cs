@@ -359,7 +359,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         return;
                     }
 
-                    SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
+                    SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = EditorWindow.GetWindow<SaintsObjectPickerWindowUIToolkit>();
                     objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {genericCache.ExpectedType}" + (genericCache.ExpectedInterface == null? "": $"({genericCache.ExpectedInterface})"));
 
                     if(_useCache)
@@ -377,15 +377,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         object oldValue = propertyCache.TargetValue;
                         Object newValue = objInfo.BaseInfo.Target;
 
-                        propertyCache.TargetValue = newValue;
-                        if(DoSignPropertyCache(propertyCache, false))
+                        if(!Util.GetIsEqual(newValue, oldValue))
                         {
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback.Invoke(newValue);
-                        }
-                        else
-                        {
-                            propertyCache.TargetValue = oldValue;
+                            propertyCache.TargetValue = newValue;
+                            if (DoSignPropertyCache(propertyCache, false))
+                            {
+                                // Debug.Log($"sign {property.propertyPath} to {propertyCache.TargetValue}");
+                                property.serializedObject.ApplyModifiedProperties();
+                                onValueChangedCallback.Invoke(newValue);
+                            }
+                            else
+                            {
+                                propertyCache.TargetValue = oldValue;
+                            }
                         }
                     });
                     objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() =>
@@ -407,7 +411,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     // objectPickerWindowUIToolkit.Show();
                     // objectPickerWindowUIToolkit.SetLoadingImage(true);
 
-                    objectPickerWindowUIToolkit.SetItemActive(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+                    if (_useCache)
+                    {
+                        objectPickerWindowUIToolkit.SetItemActive(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                            curValueObj,
+                            curValueObj?.name ?? "",
+                            curValueObj?.GetType().Name ?? "",
+                            ""
+                        ));
+                    }
+                    else
+                    {
+                        objectPickerWindowUIToolkit.SetItemActive(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+                    }
 
                     _objectPickerWindowUIToolkit = objectPickerWindowUIToolkit;
 
@@ -432,6 +448,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     //             propertyCache.TargetValue = oldValue;
                     //         }
                     //     }, updatedParent);
+
+                    // container.schedule.Execute(() => _objectPickerWindowUIToolkit.Close()).StartingIn(1000);
                 };
 
                 if (!getByXPathAttribute.KeepOriginalPicker)
