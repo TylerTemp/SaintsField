@@ -252,6 +252,15 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             }).Every(1);
 
+            saintsInterfaceField.RegisterCallback<AttachToPanelEvent>(e =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshResults);
+            });
+            saintsInterfaceField.RegisterCallback<DetachFromPanelEvent>(e =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults);
+            });
+
             return saintsInterfaceField;
         }
 
@@ -453,7 +462,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
         }
 
-        private IEnumerable<(string path, GameObject go)> GetSubGo(GameObject root, string prefix)
+        private static IEnumerable<(string path, GameObject go)> GetSubGo(GameObject root, string prefix)
         {
             foreach (Transform directChild in root.transform)
             {
@@ -469,7 +478,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
         }
 
-        private IEnumerable<(Component, Type, int)> RevertComponents(GameObject go, Type fieldType, Type interfaceType)
+        private static IEnumerable<(Component, Type, int)> RevertComponents(GameObject go, Type fieldType, Type interfaceType)
         {
             Component[] comps = go.GetComponents<Component>();
 
@@ -503,6 +512,17 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                     yield return (prefabComp, kv.Key, components.Count > 1 ? compIndex : -1);
                 }
             }
+        }
+
+        private void RefreshResults()
+        {
+            _resourcesLoadStarted = false;
+            _enumeratorAssets = null;
+            _enumeratorScene = null;
+            _assetsObjectBaseInfos.Clear();
+            _sceneObjectBaseInfos.Clear();
+            _assetsObjectInfos.Clear();
+            _sceneObjectInfos.Clear();
         }
     }
 }
