@@ -74,8 +74,8 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
         }
 
         private SaintsObjectPickerWindowUIToolkit _objectPickerWindowUIToolkit;
-        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
-        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -149,12 +149,15 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             {
                 SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
                 objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {interfaceType.Name} of {valueType.Name}");
-                objectPickerWindowUIToolkit.AssetsObjects = _assetsObjectInfos;
-                objectPickerWindowUIToolkit.SceneObjects = _sceneObjectInfos;
-                objectPickerWindowUIToolkit.EnqueueAssetsObjects(_assetsObjectBaseInfos);
-                _assetsObjectBaseInfos.Clear();
-                objectPickerWindowUIToolkit.EnqueueSceneObjects(_sceneObjectBaseInfos);
-                _sceneObjectBaseInfos.Clear();
+                if(_useCache)
+                {
+                    objectPickerWindowUIToolkit.AssetsObjects =
+                        new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(_assetsObjectInfos);
+                    objectPickerWindowUIToolkit.SceneObjects =
+                        new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(_sceneObjectInfos);
+                }
+                _assetsObjectInfos.Clear();
+                _sceneObjectInfos.Clear();
 
                 objectPickerWindowUIToolkit.OnSelectedEvent.AddListener(objInfo =>
                 {
@@ -164,27 +167,32 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                         valueProp.serializedObject.ApplyModifiedProperties();
                     }
                 });
+                objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() =>
+                {
+                    _objectPickerWindowUIToolkit = null;
+                    _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.AssetsObjects);
+                    _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.SceneObjects);
+                });
 
                 objectPickerWindowUIToolkit.ShowAuxWindow();
                 objectPickerWindowUIToolkit.RefreshDisplay();
+                if(_useCache)
+                {
+                    objectPickerWindowUIToolkit.EnqueueAssetsObjects(_assetsObjectBaseInfos);
+                    objectPickerWindowUIToolkit.EnqueueSceneObjects(_sceneObjectBaseInfos);
+                }
+                _assetsObjectBaseInfos.Clear();
+                _sceneObjectBaseInfos.Clear();
+
                 objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() => _objectPickerWindowUIToolkit = null);
 
-                if (RuntimeUtil.IsNull(valueProp.objectReferenceValue))
-                {
-                    objectPickerWindowUIToolkit.SetItemActive(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
-                }
-                else
-                {
-                    objectPickerWindowUIToolkit.SetItemActive(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
-                        valueProp.objectReferenceValue,
-                        valueProp.objectReferenceValue.name,
-                        valueProp.objectReferenceValue.GetType().Name,
-                        AssetDatabase.GetAssetPath(valueProp.objectReferenceValue)
-                    ));
-                }
-
                 _objectPickerWindowUIToolkit = objectPickerWindowUIToolkit;
-                CheckResourceLoad(valueProp, valueType, interfaceType);
+
+                if(!_useCache)
+                {
+                    _useCache = true;
+                    CheckResourceLoad(valueProp, valueType, interfaceType);
+                }
                 // FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
                 // {
                 //     if(valueProp.objectReferenceValue != fieldResult)
@@ -264,7 +272,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             return saintsInterfaceField;
         }
 
-        private bool _resourcesLoadStarted;
+        private bool _useCache;
         private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _assetsObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
         private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _sceneObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
         private IEnumerator _enumeratorAssets;
@@ -272,12 +280,6 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
         private void CheckResourceLoad(SerializedProperty valueProp, Type fieldType, Type interfaceType)
         {
-            if (_resourcesLoadStarted)
-            {
-                return;
-            }
-
-            _resourcesLoadStarted = true;
             _objectPickerWindowUIToolkit.SetLoadingImage(true);
 
             _objectPickerWindowUIToolkit.EnqueueSceneObjects(new[]{SaintsObjectPickerWindowUIToolkit.NoneObjectInfo});
@@ -503,6 +505,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 }
             }
 
+            // ReSharper disable once UseDeconstruction
             foreach (KeyValuePair<Type, List<Component>> kv in typeToComponents)
             {
                 List<Component> components = kv.Value;
@@ -516,13 +519,13 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
         private void RefreshResults()
         {
-            _resourcesLoadStarted = false;
-            _enumeratorAssets = null;
-            _enumeratorScene = null;
-            _assetsObjectBaseInfos.Clear();
-            _sceneObjectBaseInfos.Clear();
-            _assetsObjectInfos.Clear();
-            _sceneObjectInfos.Clear();
+            _useCache = false;
+            // ReSharper disable once InvertIf
+            if (!_objectPickerWindowUIToolkit)
+            {
+                _enumeratorAssets = null;
+                _enumeratorScene = null;
+            }
         }
     }
 }

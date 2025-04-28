@@ -134,6 +134,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return helpBox;
         }
 
+        private SaintsObjectPickerWindowUIToolkit _objectPickerWindowUIToolkit;
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -358,6 +362,16 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
                     objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {genericCache.ExpectedType}" + (genericCache.ExpectedInterface == null? "": $"({genericCache.ExpectedInterface})"));
 
+                    if(_useCache)
+                    {
+                        objectPickerWindowUIToolkit.AssetsObjects =
+                            new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(_assetsObjectInfos);
+                        objectPickerWindowUIToolkit.SceneObjects =
+                            new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(_sceneObjectInfos);
+                    }
+                    _assetsObjectInfos.Clear();
+                    _sceneObjectInfos.Clear();
+
                     objectPickerWindowUIToolkit.OnSelectedEvent.AddListener(objInfo =>
                     {
                         object oldValue = propertyCache.TargetValue;
@@ -374,14 +388,34 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                             propertyCache.TargetValue = oldValue;
                         }
                     });
+                    objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() =>
+                    {
+                        _objectPickerWindowUIToolkit = null;
+                        _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.AssetsObjects);
+                        _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.SceneObjects);
+                    });
 
                     objectPickerWindowUIToolkit.ShowAuxWindow();
+                    objectPickerWindowUIToolkit.RefreshDisplay();
+                    if(_useCache)
+                    {
+                        objectPickerWindowUIToolkit.EnqueueAssetsObjects(_assetsObjectBaseInfos);
+                        objectPickerWindowUIToolkit.EnqueueSceneObjects(_sceneObjectBaseInfos);
+                    }
+                    _assetsObjectBaseInfos.Clear();
+                    _sceneObjectBaseInfos.Clear();
                     // objectPickerWindowUIToolkit.Show();
                     // objectPickerWindowUIToolkit.SetLoadingImage(true);
 
                     objectPickerWindowUIToolkit.SetItemActive(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
 
-                    _enumeratorResources = LoadResourcesFromResult(r, objectPickerWindowUIToolkit, curValueObj);
+                    _objectPickerWindowUIToolkit = objectPickerWindowUIToolkit;
+
+                    if(!_useCache)
+                    {
+                        _useCache = true;
+                        _enumeratorResources = LoadResourcesFromResult(r, curValueObj);
+                    }
 
                     // OpenPicker(property, info, genericCache.GetByXPathAttributes, genericCache.ExpectedType, genericCache.ExpectedInterface,
                     //     newValue =>
@@ -419,6 +453,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     }
                 }
             }).Every(1);
+
+            container.RegisterCallback<AttachToPanelEvent>(e =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshResults);
+            });
+            container.RegisterCallback<DetachFromPanelEvent>(e =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults);
+            });
             // int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
             // if (loop > 0)
             // {
@@ -428,9 +471,26 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // }
         }
 
-        private static IEnumerator LoadResourcesFromResult(GetXPathValuesResult getXPathValuesResult, SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit, Object curValue)
+        private void RefreshResults()
         {
-            objectPickerWindowUIToolkit.SetLoadingImage(true);
+            _useCache = false;
+            if (!_objectPickerWindowUIToolkit)
+            {
+                _enumeratorResources = null;
+            }
+        }
+
+        private bool _useCache;
+
+        // private bool _resourcesLoadStarted;
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _assetsObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _sceneObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+
+        private IEnumerator LoadResourcesFromResult(GetXPathValuesResult getXPathValuesResult, Object curValue)
+        {
+            _objectPickerWindowUIToolkit.SetLoadingImage(true);
+            _objectPickerWindowUIToolkit.EnqueueSceneObjects(new[]{SaintsObjectPickerWindowUIToolkit.NoneObjectInfo});
+            _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[]{SaintsObjectPickerWindowUIToolkit.NoneObjectInfo});
 
             foreach (object o in getXPathValuesResult.Results)
             {
@@ -449,22 +509,39 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 if (assetPath != "")
                 {
-                    objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[]{baseInfo});
+                    if(_objectPickerWindowUIToolkit)
+                    {
+                        _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[] { baseInfo });
+                    }
+                    else
+                    {
+                        _assetsObjectBaseInfos.Add(baseInfo);
+                    }
                 }
                 else
                 {
-                    objectPickerWindowUIToolkit.EnqueueSceneObjects(new[]{baseInfo});
+                    if(_objectPickerWindowUIToolkit)
+                    {
+                        _objectPickerWindowUIToolkit.EnqueueSceneObjects(new[] { baseInfo });
+                    }
+                    else
+                    {
+                        _sceneObjectBaseInfos.Add(baseInfo);
+                    }
                 }
 
-                if (Util.GetIsEqual(curValue, objResult))
+                if (_objectPickerWindowUIToolkit && Util.GetIsEqual(curValue, objResult))
                 {
-                    objectPickerWindowUIToolkit.SetItemActive(baseInfo);
+                    _objectPickerWindowUIToolkit.SetItemActive(baseInfo);
                 }
 
                 yield return null;
             }
 
-            objectPickerWindowUIToolkit.SetLoadingImage(false);
+            if(_objectPickerWindowUIToolkit)
+            {
+                _objectPickerWindowUIToolkit.SetLoadingImage(false);
+            }
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
