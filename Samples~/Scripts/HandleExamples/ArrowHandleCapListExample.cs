@@ -21,11 +21,11 @@ namespace SaintsField.Samples.Scripts.HandleExamples
         public Vector3[] worldPos;
 
         [DrawLabel("Center"),
-         // PositionHandle(space: Space.Self)
+         PositionHandle
         ] public Vector3 centerPoint;
 
         [DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true),
-         // PositionHandle,
+         PositionHandle,
          // connect worldPos[0] to this
          ArrowHandleCap(start: nameof(worldPos), startIndex: -1),
         ] public Transform exit;

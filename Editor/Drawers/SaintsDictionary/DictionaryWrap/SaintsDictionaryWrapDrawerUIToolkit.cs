@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
@@ -36,3 +37,4 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
         }
     }
 }
+#endif

@@ -3713,18 +3713,18 @@ Draw and use a position handle in the scene. If The decorated field is a `GameOb
 
 Parameters:
 
-*   `Space space=Space.World`: the space of the handle. Default is world space. Only works for `Vector3`/`Vector2` type.
+*   `string space="this"`:the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value. Only works for `Vector3`/`Vector2` type.
 
 Example of using it with vector types + `DrawLabel`:
 
 ```csharp
 using SaintsField;
 
-[PositionHandle, DrawLabel(nameof(worldPos3))] public Vector3 worldPos3;
-[PositionHandle, DrawLabel(nameof(worldPos2))] public Vector2 worldPos2;
+[PositionHandle(space: null), DrawLabel(nameof(worldPos3), space: null)] public Vector3 worldPos3;
+[PositionHandle(space: null), DrawLabel(nameof(worldPos2), space: null)] public Vector2 worldPos2;
 
-[PositionHandle(space: Space.Self), DrawLabel(nameof(localPos3), space: Space.Self)] public Vector3 localPos3;
-[PositionHandle(space: Space.Self), DrawLabel(nameof(localPos2), space: Space.Self)] public Vector2 localPos2;
+[PositionHandle, DrawLabel(nameof(localPos3))] public Vector3 localPos3;
+[PositionHandle, DrawLabel(nameof(localPos2))] public Vector2 localPos2;
 ```
 
 [![video](https://github.com/user-attachments/assets/16a85513-ad65-4da7-9fec-a3388af9ff43)](https://github.com/user-attachments/assets/b74cf98d-c83d-4eb3-ba8d-4baeb8f49e1d)
@@ -3776,15 +3776,15 @@ using SaintsField;
 
 [
     // connect every element in the list
-    DrawLine(color: EColor.Green, startSpace: Space.Self, endSpace: Space.Self),
+    DrawLine(color: EColor.Green, endSpace: Space.Self),
     // connect every element to the `centerPoint`
-    DrawLineTo(space: Space.Self, target: nameof(centerPoint), targetSpace: Space.Self, color: EColor.Red, colorAlpha: 0.4f),
+    DrawLineTo(target: nameof(centerPoint), color: EColor.Red, colorAlpha: 0.4f),
 
-    DrawLabel("$" + nameof(PosIndexLabel), space: Space.Self),
+    DrawLabel("$" + nameof(PosIndexLabel)),
 ]
 public Vector3[] localPos;
 
-[DrawLabel("Center", space: Space.Self)] public Vector3 centerPoint;
+[DrawLabel("Center")] public Vector3 centerPoint;
 
 [DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true),
  // connect worldPos[0] to this
@@ -3835,12 +3835,12 @@ using SaintsField;
     // connect every element to the `centerPoint`
     SaintsArrow(start: nameof(centerPoint), color: EColor.Red, startSpace: Space.Self, endSpace: Space.Self, headLength: 0.1f, colorAlpha: 0.4f),
 
-    PositionHandle(space: Space.Self),
-    DrawLabel("$" + nameof(PosIndexLabel), space: Space.Self),
+    PositionHandle,
+    DrawLabel("$" + nameof(PosIndexLabel)),
 ]
 public Vector3[] worldPos;
 
-[DrawLabel("Center", space: Space.Self), PositionHandle(space: Space.Self)] public Vector3 centerPoint;
+[DrawLabel("Center"), PositionHandle] public Vector3 centerPoint;
 
 [DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true), PositionHandle,
  // connect worldPos[0] to this
@@ -3882,24 +3882,28 @@ using SaintsField;
 
 [SerializeField, GetComponent, DrawLabel("Entrance"),
  // connect this to worldPos[0]
- ArrowHandleCap(end: nameof(worldPos), endIndex: 0, endSpace: Space.Self),
+ ArrowHandleCap(end: nameof(worldPos), endIndex: 0),
 ] private GameObject entrance;
 
 [
     // connect every element in the list
-    ArrowHandleCap(color: EColor.Green, startSpace: Space.Self),
+    ArrowHandleCap(eColor: EColor.Green),
     // connect every element to the `centerPoint`
-    ArrowHandleCap(end: nameof(centerPoint), color: EColor.Red, startSpace: Space.Self, endSpace: Space.Self, colorAlpha: 0.4f),
+    ArrowHandleCap(end: nameof(centerPoint), eColor: EColor.Red),
 
-    DrawLabel("$" + nameof(PosIndexLabel), space: Space.Self),
+    PositionHandle,
+    DrawLabel("$" + nameof(PosIndexLabel)),
 ]
 public Vector3[] worldPos;
 
-[DrawLabel("Center", space: Space.Self)] public Vector3 centerPoint;
+[DrawLabel("Center"),
+ PositionHandle
+] public Vector3 centerPoint;
 
 [DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true),
+ PositionHandle,
  // connect worldPos[0] to this
- ArrowHandleCap(start: nameof(worldPos), startIndex: -1, startSpace: Space.Self),
+ ArrowHandleCap(start: nameof(worldPos), startIndex: -1),
 ] public Transform exit;
 
 private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
@@ -5098,11 +5102,12 @@ suing SaintsField;
 [Serializable]
 public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
 {
-    [SerializeField, NoLabel]
-    private List<int> _intKeys = new List<int>();
+    [SerializeField]
+    private List<Wrap<int>> _keys = new List<Wrap<int>>();
 
-    [SerializeField, NoLabel, GetComponentInChildren, ReadOnly]
-    private List<GameObject> _objValues = new List<GameObject>();
+    [SerializeField]
+    // [GetComponentInChildren]
+    private List<Wrap<MyStruct>> _values = new List<Wrap<MyStruct>>();
 
 #if UNITY_EDITOR
     private static string EditorPropKeys => nameof(_intKeys);
