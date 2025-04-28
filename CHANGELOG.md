@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.7.1 ##
+
+1.  UI Toolkit: `SaintsInterface` now will limit the scene object to current ones when in prefab:
+    *   For prefab context/isolated editing, or prefab project inspecting, the scene object will only list the prefab itself or its children objects
+    *   For prefab already instantiated in the scene hierarchy, the scene object will only list the scene objects that the instance in
+2.  UI Toolkit: Optimize `SaintsInterface` drawer to allow async object loading & cached results. It no longer searches unnecessary resources. [#199](https://github.com/TylerTemp/SaintsField/issues/199)
+3.  UI Toolkit: `SaintsInterface` now allows keyboard arrow up/down key in list view, and keyboard arrow up/down/left/right key in block view to select objects
+
 ## 4.7.0 ##
 
 **Breaking Changes**: inherent from `SaintsDictionaryBase` has been changed. Read the document in the `SaintsDictionary` section for more information

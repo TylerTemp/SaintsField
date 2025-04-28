@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -73,8 +74,8 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
         }
 
         private SaintsObjectPickerWindowUIToolkit _objectPickerWindowUIToolkit;
-        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
-        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -136,7 +137,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 {
                     flexGrow = 1,
                     flexShrink = 1,
-                }
+                },
             };
             saintsInterfaceField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
             saintsInterfaceField.AddToClassList(SaintsInterfaceField.alignedFieldUssClassName);
@@ -146,32 +147,44 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             selectButton.clicked += () =>
             {
-                _objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
-                _objectPickerWindowUIToolkit.AssetsObjects = _assetsObjectInfos;
-                _objectPickerWindowUIToolkit.SceneObjects = _sceneObjectInfos;
-                _objectPickerWindowUIToolkit.EnqueueAssetsObjects(_assetsObjectBaseInfos);
+                SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
+                objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {interfaceType.Name} of {valueType.Name}");
+                objectPickerWindowUIToolkit.AssetsObjects = _assetsObjectInfos;
+                objectPickerWindowUIToolkit.SceneObjects = _sceneObjectInfos;
+                objectPickerWindowUIToolkit.EnqueueAssetsObjects(_assetsObjectBaseInfos);
                 _assetsObjectBaseInfos.Clear();
-                _objectPickerWindowUIToolkit.EnqueueSceneObjects(_sceneObjectBaseInfos);
+                objectPickerWindowUIToolkit.EnqueueSceneObjects(_sceneObjectBaseInfos);
                 _sceneObjectBaseInfos.Clear();
 
-                _objectPickerWindowUIToolkit.ShowAuxWindow();
-                _objectPickerWindowUIToolkit.RefreshDisplay();
-                _objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() => _objectPickerWindowUIToolkit = null);
-                CheckResourceLoad(valueType, interfaceType);
+                objectPickerWindowUIToolkit.OnSelectedEvent.AddListener(objInfo =>
+                {
+                    if(valueProp.objectReferenceValue != objInfo.BaseInfo.Target)
+                    {
+                        valueProp.objectReferenceValue = objInfo.BaseInfo.Target;
+                        valueProp.serializedObject.ApplyModifiedProperties();
+                    }
+                });
+
+                objectPickerWindowUIToolkit.ShowAuxWindow();
+                objectPickerWindowUIToolkit.RefreshDisplay();
+                objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() => _objectPickerWindowUIToolkit = null);
 
                 if (RuntimeUtil.IsNull(valueProp.objectReferenceValue))
                 {
-                    _objectPickerWindowUIToolkit.SetItemActive(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+                    objectPickerWindowUIToolkit.SetItemActive(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
                 }
                 else
                 {
-                    _objectPickerWindowUIToolkit.SetItemActive(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                    objectPickerWindowUIToolkit.SetItemActive(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
                         valueProp.objectReferenceValue,
                         valueProp.objectReferenceValue.name,
                         valueProp.objectReferenceValue.GetType().Name,
                         AssetDatabase.GetAssetPath(valueProp.objectReferenceValue)
                     ));
                 }
+
+                _objectPickerWindowUIToolkit = objectPickerWindowUIToolkit;
+                CheckResourceLoad(valueProp, valueType, interfaceType);
                 // FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
                 // {
                 //     if(valueProp.objectReferenceValue != fieldResult)
@@ -229,18 +242,26 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                         _enumeratorScene = null;
                     }
                 }
+
+                // ReSharper disable once InvertIf
+                if(_objectPickerWindowUIToolkit)
+                {
+                    bool loading = _enumeratorAssets != null || _enumeratorScene != null;
+                    _objectPickerWindowUIToolkit.SetLoadingImage(loading);
+                }
+
             }).Every(1);
 
             return saintsInterfaceField;
         }
 
-        private bool _resourcesLoadStarted = false;
-        private List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _assetsObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
-        private List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _sceneObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+        private bool _resourcesLoadStarted;
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _assetsObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _sceneObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
         private IEnumerator _enumeratorAssets;
         private IEnumerator _enumeratorScene;
 
-        private void CheckResourceLoad(Type fieldType, Type interfaceType)
+        private void CheckResourceLoad(SerializedProperty valueProp, Type fieldType, Type interfaceType)
         {
             if (_resourcesLoadStarted)
             {
@@ -248,74 +269,238 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
 
             _resourcesLoadStarted = true;
+            _objectPickerWindowUIToolkit.SetLoadingImage(true);
+
             _objectPickerWindowUIToolkit.EnqueueSceneObjects(new[]{SaintsObjectPickerWindowUIToolkit.NoneObjectInfo});
             _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[]{SaintsObjectPickerWindowUIToolkit.NoneObjectInfo});
-            _enumeratorAssets = StartEnumeratorAssets(fieldType, interfaceType);
+            _enumeratorAssets = StartEnumeratorAssets(valueProp, fieldType, interfaceType);
+
+            Object target = valueProp.serializedObject.targetObject;
+            // Scene targetScene;
+            IEnumerable<GameObject> rootGameObjects = null;
+            // bool sceneFound = false;
+            if(target is Component comp)
+            {
+                Scene scene = comp.gameObject.scene;
+                if (scene.IsValid())
+                {
+                    rootGameObjects = scene.GetRootGameObjects();
+                }
+                else
+                {
+#if UNITY_2021_2_OR_NEWER
+
+                    PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(comp.gameObject);
+                    if (prefabStage != null)  // isolated/context prefab should use its child
+                    {
+                        rootGameObjects = comp.transform.Cast<Transform>().Select(each => each.gameObject);
+                    }
+#endif
+                    if(rootGameObjects is null)
+                    {
+                        string assetPath = AssetDatabase.GetAssetPath(comp.gameObject);
+                        if (!string.IsNullOrEmpty(assetPath))  // asset in project
+                        {
+                            rootGameObjects = comp.transform.Cast<Transform>().Select(each => each.gameObject);
+                        }
+                    }
+                }
+            }
+
+            if (rootGameObjects is null)
+            {
+                _objectPickerWindowUIToolkit.DisableScene();
+            }
+            else
+            {
+                _enumeratorScene = StartEnumeratorScene(rootGameObjects, valueProp, fieldType, interfaceType);
+            }
         }
 
-        private IEnumerator StartEnumeratorAssets(Type fieldType, Type interfaceType)
+        private const int BatchLimit = 100;
+
+        private IEnumerator StartEnumeratorAssets(SerializedProperty valueProp, Type fieldType, Type interfaceType)
         {
             int batchCount = 0;
 
-            foreach (string prefabGuid in AssetDatabase.FindAssets("t:prefab"))
+            if(fieldType.IsAssignableFrom(typeof(Component)))
             {
-                string path = AssetDatabase.GUIDToAssetPath(prefabGuid);
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-
-                Component[] comps = prefab.GetComponents<Component>();
-
-                Dictionary<Type, List<Component>> typeToComponents = new Dictionary<Type, List<Component>>();
-
-                foreach (Component component in comps)
+                foreach (string prefabGuid in AssetDatabase.FindAssets("t:prefab"))
                 {
-                    if (component == null)
+                    string path = AssetDatabase.GUIDToAssetPath(prefabGuid);
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+
+                    foreach ((Component prefabComp, Type prefabType, int prefabIndex)  in RevertComponents(prefab, fieldType, interfaceType))
                     {
-                        continue;
-                    }
-                    Type compType = component.GetType();
-
-                    // Debug.Log($"{component}/{fieldType}/{interfaceType}");
-
-                    if(fieldType.IsAssignableFrom(compType) && interfaceType.IsInstanceOfType(component))
-                    {
-                        if (!typeToComponents.TryGetValue(compType, out List<Component> components))
-                        {
-                            typeToComponents[compType] = components = new List<Component>();
-                        }
-
-                        Debug.Log($"add {component}");
-                        components.Add(component);
-                    }
-                }
-
-                foreach (KeyValuePair<Type, List<Component>> kv in typeToComponents)
-                {
-                    List<Component> components = kv.Value;
-                    for (int compIndex = 0; compIndex < components.Count; compIndex++)
-                    {
-                        Component prefabComp = components[compIndex];
-                        SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
-                            prefabComp,
-                            prefab.name,
-                            kv.Key.Name,
-                            $"{prefab.name}:{kv.Key.Name}{(components.Count > 1? $"[{compIndex}]": "")}"
-                        );
+                        SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo =
+                            new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                                prefabComp,
+                                prefab.name,
+                                prefabType.Name,
+                                $"{path}{(prefabIndex > 1 ? $"[{prefabIndex}]" : "")}"
+                            );
                         if (_objectPickerWindowUIToolkit)
                         {
-                            _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[]{baseInfo});
+                            _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[] { baseInfo });
+                            if (ReferenceEquals(prefabComp, valueProp.objectReferenceValue))
+                            {
+                                _objectPickerWindowUIToolkit.SetItemActive(baseInfo);
+                            }
+                            yield return null;
                         }
                         else
                         {
                             _assetsObjectBaseInfos.Add(baseInfo);
                         }
                     }
-                }
 
-                batchCount++;
-                if (batchCount / 1000 > 0)
+                    if(batchCount / BatchLimit > 1)
+                    {
+                        batchCount = 0;
+                        yield return null;
+                    }
+
+                    batchCount++;
+                }
+            }
+
+            if(fieldType.IsAssignableFrom(typeof(ScriptableObject)))
+            {
+                foreach (string soGuid in AssetDatabase.FindAssets("t:ScriptableObject"))
                 {
-                    batchCount = 0;
-                    yield return null;
+                    string path = AssetDatabase.GUIDToAssetPath(soGuid);
+                    ScriptableObject so = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
+                    if (so == null)
+                    {
+                        continue;
+                    }
+
+                    Type soType = so.GetType();
+                    if (fieldType.IsAssignableFrom(soType) && interfaceType.IsInstanceOfType(so))
+                    {
+                        SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo =
+                            new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                                so,
+                                so.name,
+                                soType.Name,
+                                path
+                            );
+                        if (_objectPickerWindowUIToolkit)
+                        {
+                            _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[] { baseInfo });
+                            if (ReferenceEquals(so, valueProp.objectReferenceValue))
+                            {
+                                _objectPickerWindowUIToolkit.SetItemActive(baseInfo);
+                            }
+                            yield return null;
+                        }
+                        else
+                        {
+                            _assetsObjectBaseInfos.Add(baseInfo);
+                        }
+                    }
+
+                    if(batchCount / BatchLimit > 1)
+                    {
+                        batchCount = 0;
+                        yield return null;
+                    }
+
+                    batchCount++;
+                }
+            }
+        }
+
+        private IEnumerator StartEnumeratorScene(IEnumerable<GameObject> rootGameObjects, SerializedProperty valueProp, Type fieldType, Type interfaceType)
+        {
+            int batchCount = 0;
+            foreach (GameObject rootGameObject in rootGameObjects)
+            {
+                IEnumerable<(string, GameObject)> allGo = GetSubGo(rootGameObject, null).Prepend((rootGameObject.name, rootGameObject));
+                foreach ((string eachSubPath, GameObject eachSubGo) in allGo)
+                {
+                    foreach ((Component fitComp, Type fitType, int fitIndex)  in RevertComponents(eachSubGo, fieldType, interfaceType))
+                    {
+                        SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                            fitComp,
+                            fitComp.gameObject.name,
+                            fitType.Name,
+                            $"{eachSubPath}{(fitIndex > 1? $"[{fitIndex}]": "")}"
+                        );
+                        if (_objectPickerWindowUIToolkit)
+                        {
+                            _objectPickerWindowUIToolkit.EnqueueSceneObjects(new[]{baseInfo});
+                            if (ReferenceEquals(fitComp, valueProp.objectReferenceValue))
+                            {
+                                _objectPickerWindowUIToolkit.SetItemActive(baseInfo);
+                            }
+                            yield return null;
+                        }
+                        else
+                        {
+                            _sceneObjectBaseInfos.Add(baseInfo);
+                        }
+                    }
+
+                    if(batchCount / BatchLimit > 1)
+                    {
+                        batchCount = 0;
+                        yield return null;
+                    }
+
+                    batchCount++;
+                }
+            }
+        }
+
+        private IEnumerable<(string path, GameObject go)> GetSubGo(GameObject root, string prefix)
+        {
+            foreach (Transform directChild in root.transform)
+            {
+                GameObject directGo = directChild.gameObject;
+                string dir = prefix is null? "": $"{prefix}/";
+                string path = $"{dir}{directGo.name}";
+                yield return (path, directGo);
+
+                foreach ((string path, GameObject go) r in GetSubGo(directGo, path))
+                {
+                    yield return r;
+                }
+            }
+        }
+
+        private IEnumerable<(Component, Type, int)> RevertComponents(GameObject go, Type fieldType, Type interfaceType)
+        {
+            Component[] comps = go.GetComponents<Component>();
+
+            Dictionary<Type, List<Component>> typeToComponents = new Dictionary<Type, List<Component>>();
+
+            foreach (Component component in comps)
+            {
+                if (component == null)
+                {
+                    continue;
+                }
+                Type compType = component.GetType();
+
+                if(fieldType.IsAssignableFrom(compType) && interfaceType.IsInstanceOfType(component))
+                {
+                    if (!typeToComponents.TryGetValue(compType, out List<Component> components))
+                    {
+                        typeToComponents[compType] = components = new List<Component>();
+                    }
+
+                    components.Add(component);
+                }
+            }
+
+            foreach (KeyValuePair<Type, List<Component>> kv in typeToComponents)
+            {
+                List<Component> components = kv.Value;
+                for (int compIndex = 0; compIndex < components.Count; compIndex++)
+                {
+                    Component prefabComp = components[compIndex];
+                    yield return (prefabComp, kv.Key, components.Count > 1 ? compIndex : -1);
                 }
             }
         }

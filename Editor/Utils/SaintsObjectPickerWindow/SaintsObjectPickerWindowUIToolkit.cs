@@ -361,6 +361,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             {
                 UpdateIcon();
                 UpdatePreview();
+                UpdateDetailPreview();
             }).Every(500);
         }
 
@@ -381,7 +382,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
                 accIndexes.Add(index);
                 // ReSharper disable once InvertIf
-                if (curInfo.BaseInfo.Equals(_currentActive.BaseInfo))
+                if (curInfo.BaseInfo.Equals(_currentActive?.BaseInfo))
                 {
                     foundIndex = index;
                     break;
@@ -451,7 +452,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             NavigationMoveEvent.Direction direction = evt.direction;
 
             // Debug.Log(direction);
-            VisualElement currentBlockItem = _currentActive.BlockItem;
+            VisualElement currentBlockItem = _currentActive?.BlockItem;
             if (currentBlockItem == null)
             {
                 return;
@@ -597,13 +598,13 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 if (viewBound.Overlaps(listBound))
                 {
                     // Debug.Log(objectInfo.BaseInfo.Name);
-                    UpdateObjectIcon(objectInfo);
+                    UpdateObjectIconOne(objectInfo);
                 }
 
             }
         }
 
-        private static void UpdateObjectIcon(ObjectInfo objectInfo)
+        private static void UpdateObjectIconOne(ObjectInfo objectInfo)
         {
             if (objectInfo.IconLoaded)
             {
@@ -651,35 +652,43 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 // ReSharper disable once InvertIf
                 if (viewBound.Overlaps(blockBound))
                 {
-                    // Debug.Log(objectInfo.BaseInfo.Name);
+                    UpdatePreviewOne(objectInfo);
+                }
+            }
+        }
 
-                    UpdateObjectIcon(objectInfo);
+        private static void UpdatePreviewOne(ObjectInfo objectInfo)
+        {
+            if (objectInfo.BaseInfo.Target is null)
+            {
+                return;
+            }
 
-                    if(objectInfo.PreviewLoadCount < PreviewLoadMaxCount)
-                    {
-                        Object target = objectInfo.BaseInfo.Target;
+            UpdateObjectIconOne(objectInfo);
 
-                        if (target is Component comp)
-                        {
-                            target = comp.gameObject;
-                        }
+            if(objectInfo.PreviewLoadCount < PreviewLoadMaxCount)
+            {
+                Object target = objectInfo.BaseInfo.Target;
 
-                        Texture2D preview = AssetPreview.GetAssetPreview(target);
-                        if (preview != null && preview.width > 1)
-                        {
-                            objectInfo.Preview = preview;
-                            objectInfo.PreviewLoadCount = int.MaxValue;
-
-                            objectInfo.BlockItemIcon.style.display = DisplayStyle.Flex;
-                            objectInfo.BlockItemPreview.image = preview;
-                        }
-                        else
-                        {
-                            objectInfo.PreviewLoadCount++;
-                        }
-                    }
+                if (target is Component comp)
+                {
+                    target = comp.gameObject;
                 }
 
+                Texture2D preview = AssetPreview.GetAssetPreview(target);
+                if (preview != null && preview.width > 1)
+                {
+                    // Debug.Log($"{objectInfo.BaseInfo.Name}: {preview}");
+                    objectInfo.Preview = preview;
+                    objectInfo.PreviewLoadCount = int.MaxValue;
+
+                    objectInfo.BlockItemIcon.style.display = DisplayStyle.Flex;
+                    objectInfo.BlockItemPreview.image = preview;
+                }
+                else
+                {
+                    objectInfo.PreviewLoadCount++;
+                }
             }
         }
 
@@ -794,6 +803,36 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             _selectedPreviewPath.text = objectInfo.BaseInfo.Path;
         }
 
+        private void UpdateDetailPreview()
+        {
+            if (_currentActive == null)
+            {
+                return;
+            }
+
+            if((_currentActive.Preview == null && _currentActive.PreviewLoadCount < PreviewLoadMaxCount) || !_currentActive.IconLoaded)
+            {
+                UpdatePreviewOne(_currentActive);
+            }
+
+            // Debug.Log($"{_currentActive.BaseInfo.Name}:{_currentActive.Preview}/{_currentActive.PreviewLoadCount}");
+
+            if (_currentActive.Preview != null)
+            {
+                if(_selectedPreviewImage.image != _currentActive.Preview)
+                {
+                    _selectedPreviewImage.image = _currentActive.Preview;
+                }
+            }
+            else if(_currentActive.IconLoaded)
+            {
+                if(_selectedPreviewImage.image != _currentActive.Icon)
+                {
+                    _selectedPreviewImage.image = _currentActive.Icon;
+                }
+            }
+        }
+
         private static void SetObjectInfoActive(ObjectInfo objectInfo, bool active)
         {
             const string activeClass = "pressed";
@@ -879,6 +918,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             {
                 if (ShouldCloseOnDoubleClick(objectInfo))
                 {
+                    // Debug.Log("Close");
                     Close();
                     return;
                 }
@@ -893,6 +933,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             {
                 if (ShouldCloseOnDoubleClick(objectInfo))
                 {
+                    // Debug.Log("Close");
                     Close();
                     return;
                 }
@@ -905,10 +946,12 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
         {
             double curTime = EditorApplication.timeSinceStartup;
 
-            if (_lastClickTime > 0 && curTime - _lastClickTime < 0.15d && _currentActive.BaseInfo.Equals(objectInfo.BaseInfo))
+            // Debug.Log($"{curTime - _lastClickTime}/{_currentActive?.BaseInfo.Equals(objectInfo.BaseInfo)}");
+
+            if (_lastClickTime > 0 && curTime - _lastClickTime < 0.2d && (_currentActive?.BaseInfo.Equals(objectInfo.BaseInfo) ?? false))
             {
                 // double click to close
-                _lastClickTime = double.MinValue;
+                // _lastClickTime = double.MinValue;
                 return true;
             }
 
