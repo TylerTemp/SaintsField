@@ -17,6 +17,10 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
         public readonly UnityEvent<ObjectInfo> OnSelectedEvent = new UnityEvent<ObjectInfo>();
         public readonly UnityEvent OnDestroyEvent = new UnityEvent();
 
+        public abstract class ObjectBasePayload
+        {
+        }
+
         private static float Scale
         {
             get => EditorPrefs.GetFloat("saintsField:objectPicker:scale", 0);
@@ -31,13 +35,16 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             public readonly string TypeName;
             public readonly string Path;
 
-            public ObjectBaseInfo(Object target, string name, string typeName, string path)
+            public readonly ObjectBasePayload Payload;
+
+            public ObjectBaseInfo(Object target, string name, string typeName, string path, ObjectBasePayload payload = null)
             {
                 Target = target;
                 // Icon = icon;
                 Name = name;
                 TypeName = typeName;
                 Path = path;
+                Payload = payload;
             }
 
             public bool Equals(ObjectBaseInfo other)
@@ -963,15 +970,29 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             };
         }
 
-        public readonly UnityEvent PleaseCloseMe = new UnityEvent();
+        public readonly UnityEvent PleaseCloseMeEvent = new UnityEvent();
 
+        // private bool _closed;
         private void DoClose()
         {
+            // if (_closed)
+            // {
+            //     // Debug.Log("already closed");
+            //     return;
+            // }
+
+            // Debug.Log("close!");
+            // _closed = true;
             // Debug.Log("close this window");
             // UI Toolkit has this weird issue that can not be close, but can be close from outside...
             // Close();
-            PleaseCloseMe.Invoke();
+            PleaseCloseMeEvent.Invoke();
         }
+
+        // public void ResetClose()
+        // {
+        //     // _closed = false;
+        // }
 
         private bool ShouldCloseOnDoubleClick(ObjectInfo objectInfo)
         {

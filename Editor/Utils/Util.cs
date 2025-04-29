@@ -7,8 +7,10 @@ using SaintsField.Condition;
 using SaintsField.Editor.Linq;
 using UnityEditor;
 using UnityEditor.Events;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Events;
+using Scene = UnityEngine.SceneManagement.Scene;
 
 namespace SaintsField.Editor.Utils
 {
@@ -1587,6 +1589,46 @@ namespace SaintsField.Editor.Utils
                     return ("", comp.transform);
                 default:
                     return ($"Target is not GameObject or Component", null);
+            }
+        }
+
+        public static IReadOnlyList<GameObject> SceneRootGameObjectsOf(GameObject gameObject)
+        {
+            Scene scene = gameObject.scene;
+            if (scene.IsValid())
+            {
+                return scene.GetRootGameObjects();
+            }
+#if UNITY_2021_2_OR_NEWER
+
+            PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(gameObject);
+            if (prefabStage != null)  // isolated/context prefab should use its child
+            {
+                return new[]{gameObject};
+            }
+#endif
+            string assetPath = AssetDatabase.GetAssetPath(gameObject);
+            if (!string.IsNullOrEmpty(assetPath))  // asset in project
+            {
+                return new[]{gameObject};
+            }
+
+            return null;
+        }
+
+        public static IEnumerable<(GameObject go, string path)> GetSubGoWithPath(GameObject root, string prefix)
+        {
+            foreach (Transform directChild in root.transform)
+            {
+                GameObject directGo = directChild.gameObject;
+                string dir = prefix is null? "": $"{prefix}/";
+                string path = $"{dir}{directGo.name}";
+                yield return (directGo, path);
+
+                foreach ((GameObject go, string path) r in GetSubGoWithPath(directGo, path))
+                {
+                    yield return r;
+                }
             }
         }
 

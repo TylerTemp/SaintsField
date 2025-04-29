@@ -1,21 +1,29 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 {
     public partial class FieldTypeAttributeDrawer
     {
+        public class ObjectPayload : SaintsObjectPickerWindowUIToolkit.ObjectBasePayload
+        {
+            public readonly Object WrapValue;
 
-
-        #region UIToolkit
+            public ObjectPayload(Object wrapValue) => WrapValue = wrapValue;
+        }
 
         private static string NameObjectField(SerializedProperty property) => $"{property.propertyPath}__FieldType_ObjectField";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__FieldType_HelpBox";
@@ -30,7 +38,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             bool customPicker = fieldTypeAttribute.CustomPicker;
             Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
-            UnityEngine.Object requiredValue;
+            Object requiredValue;
 
             // Debug.Log($"property.Object={property.objectReferenceValue}");
 
@@ -64,7 +72,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             };
 
             objectField.Bind(property.serializedObject);
-            objectField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
+            objectField.AddToClassList(BaseField<Object>.alignedFieldUssClassName);
 
             if (customPicker)
             {
@@ -108,6 +116,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             return helpBox;
         }
 
+        private SaintsObjectPickerWindowUIToolkit _objectPickerWindowUIToolkit;
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -121,7 +133,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 
             objectField.RegisterValueChangedCallback(v =>
             {
-                UnityEngine.Object result = GetNewValue(v.newValue, fieldType, requiredComp);
+                Object result = GetNewValue(v.newValue, fieldType, requiredComp);
                 property.objectReferenceValue = result;
                 property.serializedObject.ApplyModifiedProperties();
                 onValueChangedCallback.Invoke(result);
@@ -143,22 +155,125 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             {
                 selectorButton.clicked += () =>
                 {
-                    FieldTypeSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredComp, fieldResult =>
+                    SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
+                    // objectPickerWindowUIToolkit.ResetClose();
+                    objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {requiredComp} for {fieldType}");
+                    if(_useCache)
                     {
-                        UnityEngine.Object result = OnSelectWindowSelected(fieldResult, fieldType);
-                        // Debug.Log($"fieldType={fieldType} fieldResult={fieldResult}, result={result}");
-                        property.objectReferenceValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
-                        objectField.SetValueWithoutNotify(result);
-                        // objectField.Unbind();
-                        // objectField.BindProperty(property);
-                        onValueChangedCallback.Invoke(result);
+                        objectPickerWindowUIToolkit.AssetsObjects =
+                            new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(_assetsObjectInfos);
+                        objectPickerWindowUIToolkit.SceneObjects =
+                            new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(_sceneObjectInfos);
+                    }
+                    _assetsObjectInfos.Clear();
+                    _sceneObjectInfos.Clear();
 
-                        // Debug.Log($"property new value = {property.objectReferenceValue}, objectField={objectField.value}");
+                    objectPickerWindowUIToolkit.OnSelectedEvent.AddListener(objInfo =>
+                    {
+                        if(property.objectReferenceValue != objInfo.BaseInfo.Target)
+                        {
+                            property.objectReferenceValue = objInfo.BaseInfo.Target;
+                            property.serializedObject.ApplyModifiedProperties();
+
+                            Object wrapFieldValue = (objInfo.BaseInfo.Payload as ObjectPayload)?.WrapValue;
+                            objectField.SetValueWithoutNotify(wrapFieldValue);
+
+                            onValueChangedCallback.Invoke(objInfo.BaseInfo.Target);
+                        }
                     });
+                    objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() =>
+                    {
+                        _objectPickerWindowUIToolkit = null;
+                        _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.AssetsObjects);
+                        _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.SceneObjects);
+                    });
+                    objectPickerWindowUIToolkit.PleaseCloseMeEvent.AddListener(() =>
+                    {
+                        if (_objectPickerWindowUIToolkit)
+                        {
+                            _objectPickerWindowUIToolkit.Close();
+                        }
+                        else
+                        {
+                            objectPickerWindowUIToolkit.Close();
+                        }
+                    });
+
+                    objectPickerWindowUIToolkit.ShowAuxWindow();
+                    objectPickerWindowUIToolkit.RefreshDisplay();
+                    if(_useCache)
+                    {
+                        objectPickerWindowUIToolkit.EnqueueAssetsObjects(_assetsObjectBaseInfos);
+                        objectPickerWindowUIToolkit.EnqueueSceneObjects(_sceneObjectBaseInfos);
+                    }
+                    _assetsObjectBaseInfos.Clear();
+                    _sceneObjectBaseInfos.Clear();
+
+                    objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() => _objectPickerWindowUIToolkit = null);
+
+                    bool hasAssetsObjs = EnumFlagsUtil.HasFlag(editorPick, EPick.Assets);
+                    if (!hasAssetsObjs)
+                    {
+                        objectPickerWindowUIToolkit.DisableAssets();
+                    }
+                    bool hasSceneObjs = EnumFlagsUtil.HasFlag(editorPick, EPick.Scene);
+                    if (!hasSceneObjs)
+                    {
+                        objectPickerWindowUIToolkit.DisableScene();
+                    }
+
+                    _objectPickerWindowUIToolkit = objectPickerWindowUIToolkit;
+
+                    if(!_useCache)
+                    {
+                        _useCache = true;
+                        CheckResourceLoad(property, editorPick, fieldType, requiredComp);
+                    }
+                    // FieldTypeSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredComp, fieldResult =>
+                    // {
+                    //     UnityEngine.Object result = OnSelectWindowSelected(fieldResult, fieldType);
+                    //     // Debug.Log($"fieldType={fieldType} fieldResult={fieldResult}, result={result}");
+                    //     property.objectReferenceValue = result;
+                    //     property.serializedObject.ApplyModifiedProperties();
+                    //     objectField.SetValueWithoutNotify(result);
+                    //     // objectField.Unbind();
+                    //     // objectField.BindProperty(property);
+                    //     onValueChangedCallback.Invoke(result);
+                    //
+                    //     // Debug.Log($"property new value = {property.objectReferenceValue}, objectField={objectField.value}");
+                    // });
                 };
             }
+
+            container.schedule.Execute(() =>
+            {
+                if (_enumeratorAssets != null)
+                {
+                    if (!_enumeratorAssets.MoveNext())
+                    {
+                        _enumeratorAssets = null;
+                    }
+                }
+
+                if(_enumeratorScene != null)
+                {
+                    if (!_enumeratorScene.MoveNext())
+                    {
+                        _enumeratorScene = null;
+                    }
+                }
+
+                // ReSharper disable once InvertIf
+                if(_objectPickerWindowUIToolkit)
+                {
+                    bool loading = _enumeratorAssets != null || _enumeratorScene != null;
+                    _objectPickerWindowUIToolkit.SetLoadingImage(loading);
+                }
+
+            }).Every(1);
         }
+
+
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
@@ -169,15 +284,15 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
 
             // ReSharper disable once UseNegatedPatternInIsExpression
-            if (!(newValue is UnityEngine.Object) && newValue != null)
+            if (!(newValue is Object) && newValue != null)
             {
                 helpBox.style.display = DisplayStyle.Flex;
                 helpBox.text = $"Value `{newValue}` is not a UnityEngine.Object";
                 return;
             }
 
-            UnityEngine.Object uObjectValue = (UnityEngine.Object) newValue;
-            UnityEngine.Object result = GetNewValue(uObjectValue, info.FieldType, requiredComp);
+            Object uObjectValue = (Object) newValue;
+            Object result = GetNewValue(uObjectValue, info.FieldType, requiredComp);
 
             ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
             if(objectField.value != result)
@@ -196,16 +311,162 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             }
         }
 
+        private bool _useCache;
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _assetsObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _sceneObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+        private IEnumerator _enumeratorAssets;
+        private IEnumerator _enumeratorScene;
 
-        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
-        //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
-        // {
-        //     ObjectField target = container.Q<ObjectField>(NameObjectField(property));
-        //     target.label = labelOrNull;
-        // }
+        private void CheckResourceLoad(SerializedProperty property, EPick editorPick, Type fieldType, Type requiredComp)
+        {
 
-        #endregion
+            if (EnumFlagsUtil.HasFlag(editorPick, EPick.Scene))
+            {
+                Object target = property.serializedObject.targetObject;
+                // Scene targetScene;
+                IEnumerable<GameObject> rootGameObjects = null;
+                // bool sceneFound = false;
+                if(target is Component comp)
+                {
+                    rootGameObjects = Util.SceneRootGameObjectsOf(comp.gameObject);
+                }
+                if (rootGameObjects is not null)
+                {
+                    _enumeratorScene = StartEnumeratorScene(rootGameObjects, property, fieldType, requiredComp);
+                }
+            }
+
+            if (EnumFlagsUtil.HasFlag(editorPick, EPick.Assets))
+            {
+                _enumeratorAssets = StartEnumeratorAssets(property, fieldType, requiredComp);
+            }
+        }
+
+        private const int BatchLimit = 100;
+
+        private IEnumerator StartEnumeratorScene(IEnumerable<GameObject> rootGameObjects, SerializedProperty valueProp, Type fieldType, Type requiredComp)
+        {
+            int batchCount = 0;
+            foreach (GameObject rootGameObject in rootGameObjects)
+            {
+                IEnumerable<(GameObject, string)> allGo = Util.GetSubGoWithPath(rootGameObject, null).Prepend((rootGameObject, rootGameObject.name));
+                foreach ((GameObject eachSubGo, string eachSubPath) in allGo)
+                {
+                    Component displayComp = eachSubGo.GetComponent(requiredComp);
+                    if (displayComp != null)
+                    {
+                        IReadOnlyList<Object> targets;
+                        if (typeof(Component).IsAssignableFrom(fieldType))
+                        {
+                            targets = eachSubGo.GetComponents(fieldType);
+                        }
+                        else
+                        {
+                            targets = new[] { eachSubGo };
+                        }
+
+                        int index = 0;
+                        foreach (Object fieldTarget in targets)
+                        {
+                            SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                                fieldTarget,
+                                fieldTarget.name,
+                                fieldTarget.GetType().Name,
+                                $"{eachSubPath}{(targets.Count > 1? $"[{index}]": "")}",
+                                new ObjectPayload(displayComp)
+                            );
+                            index++;
+
+                            if (_objectPickerWindowUIToolkit)
+                            {
+                                _objectPickerWindowUIToolkit.EnqueueSceneObjects(new[]{baseInfo});
+                                if (ReferenceEquals(fieldTarget, valueProp.objectReferenceValue))
+                                {
+                                    _objectPickerWindowUIToolkit.SetItemActive(baseInfo);
+                                }
+                                yield return null;
+                            }
+                            else
+                            {
+                                _sceneObjectBaseInfos.Add(baseInfo);
+                            }
+                        }
+                    }
+
+                    if(batchCount / BatchLimit > 1)
+                    {
+                        batchCount = 0;
+                        yield return null;
+                    }
+
+                    batchCount++;
+                }
+            }
+        }
+
+        private IEnumerator StartEnumeratorAssets(SerializedProperty valueProp, Type fieldType, Type requiredComp)
+        {
+            int batchCount = 0;
+
+            if(typeof(Component).IsAssignableFrom(requiredComp))
+            {
+                // We only to care about prefab;
+                // ScriptableObject can have superclass/subclass, but... WHATS THE POINT??? So we don't support that.
+                foreach (string prefabGuid in AssetDatabase.FindAssets("t:prefab"))
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(prefabGuid);
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+
+                    Component displayComp = prefab.GetComponent(requiredComp);
+                    if (displayComp != null)
+                    {
+                        // Debug.Log(displayComp);
+                        IReadOnlyList<Object> targets;
+                        if (typeof(Component).IsAssignableFrom(fieldType))
+                        {
+                            targets = prefab.GetComponents(fieldType);
+                        }
+                        else
+                        {
+                            targets = new[] { prefab };
+                        }
+
+                        foreach (Object fieldTarget in targets)
+                        {
+                            SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                                fieldTarget,
+                                fieldTarget.name,
+                                fieldTarget.GetType().Name,
+                                path,
+                                new ObjectPayload(displayComp)
+                            );
+
+                            if (_objectPickerWindowUIToolkit)
+                            {
+                                _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[] { baseInfo });
+                                if (ReferenceEquals(fieldTarget, valueProp.objectReferenceValue))
+                                {
+                                    _objectPickerWindowUIToolkit.SetItemActive(baseInfo);
+                                }
+                                yield return null;
+                            }
+                            else
+                            {
+                                _assetsObjectBaseInfos.Add(baseInfo);
+                            }
+                        }
+                    }
+
+                    if(batchCount / BatchLimit > 1)
+                    {
+                        batchCount = 0;
+                        yield return null;
+                    }
+
+                    batchCount++;
+                }
+            }
+        }
     }
 }
 #endif

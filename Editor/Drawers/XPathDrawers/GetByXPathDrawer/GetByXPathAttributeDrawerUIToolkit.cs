@@ -360,6 +360,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     }
 
                     SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = EditorWindow.GetWindow<SaintsObjectPickerWindowUIToolkit>();
+                    // objectPickerWindowUIToolkit.ResetClose();
                     objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {genericCache.ExpectedType}" + (genericCache.ExpectedInterface == null? "": $"({genericCache.ExpectedInterface})"));
 
                     if(_useCache)
@@ -398,7 +399,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.AssetsObjects);
                         _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.SceneObjects);
                     });
-                    objectPickerWindowUIToolkit.PleaseCloseMe.AddListener(() =>
+                    objectPickerWindowUIToolkit.PleaseCloseMeEvent.AddListener(() =>
                     {
                         if (_objectPickerWindowUIToolkit)
                         {

@@ -148,6 +148,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             selectButton.clicked += () =>
             {
                 SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
+                // objectPickerWindowUIToolkit.ResetClose();
                 objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {interfaceType.Name} of {valueType.Name}");
                 if(_useCache)
                 {
@@ -173,7 +174,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                     _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.AssetsObjects);
                     _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.SceneObjects);
                 });
-                objectPickerWindowUIToolkit.PleaseCloseMe.AddListener(() =>
+                objectPickerWindowUIToolkit.PleaseCloseMeEvent.AddListener(() =>
                 {
                     if (_objectPickerWindowUIToolkit)
                     {
@@ -303,30 +304,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             // bool sceneFound = false;
             if(target is Component comp)
             {
-                Scene scene = comp.gameObject.scene;
-                if (scene.IsValid())
-                {
-                    rootGameObjects = scene.GetRootGameObjects();
-                }
-                else
-                {
-#if UNITY_2021_2_OR_NEWER
-
-                    PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(comp.gameObject);
-                    if (prefabStage != null)  // isolated/context prefab should use its child
-                    {
-                        rootGameObjects = comp.transform.Cast<Transform>().Select(each => each.gameObject);
-                    }
-#endif
-                    if(rootGameObjects is null)
-                    {
-                        string assetPath = AssetDatabase.GetAssetPath(comp.gameObject);
-                        if (!string.IsNullOrEmpty(assetPath))  // asset in project
-                        {
-                            rootGameObjects = comp.transform.Cast<Transform>().Select(each => each.gameObject);
-                        }
-                    }
-                }
+                rootGameObjects = Util.SceneRootGameObjectsOf(comp.gameObject);
             }
 
             if (rootGameObjects is null)
@@ -438,8 +416,8 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             int batchCount = 0;
             foreach (GameObject rootGameObject in rootGameObjects)
             {
-                IEnumerable<(string, GameObject)> allGo = GetSubGo(rootGameObject, null).Prepend((rootGameObject.name, rootGameObject));
-                foreach ((string eachSubPath, GameObject eachSubGo) in allGo)
+                IEnumerable<(GameObject, string)> allGo = Util.GetSubGoWithPath(rootGameObject, null).Prepend((rootGameObject, rootGameObject.name));
+                foreach ((GameObject eachSubGo, string eachSubPath) in allGo)
                 {
                     foreach ((Component fitComp, Type fitType, int fitIndex)  in RevertComponents(eachSubGo, fieldType, interfaceType))
                     {
@@ -475,21 +453,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
         }
 
-        private static IEnumerable<(string path, GameObject go)> GetSubGo(GameObject root, string prefix)
-        {
-            foreach (Transform directChild in root.transform)
-            {
-                GameObject directGo = directChild.gameObject;
-                string dir = prefix is null? "": $"{prefix}/";
-                string path = $"{dir}{directGo.name}";
-                yield return (path, directGo);
 
-                foreach ((string path, GameObject go) r in GetSubGo(directGo, path))
-                {
-                    yield return r;
-                }
-            }
-        }
 
         private static IEnumerable<(Component, Type, int)> RevertComponents(GameObject go, Type fieldType, Type interfaceType)
         {
