@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.7.3 ##
+
+UI Toolkit: `FieldType` now use the new object picker for an async and fast experience
+
 ## 4.7.2 ##
 
 1.  UI Toolkit: auto getters now can use async resource loading instead of blocking the Unity Editor thread. The picker view will continuously add resources with a loading icon.

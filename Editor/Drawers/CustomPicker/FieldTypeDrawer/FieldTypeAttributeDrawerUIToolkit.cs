@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
@@ -271,9 +272,16 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                 }
 
             }).Every(1);
+
+            container.RegisterCallback<AttachToPanelEvent>(e =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshResults);
+            });
+            container.RegisterCallback<DetachFromPanelEvent>(e =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults);
+            });
         }
-
-
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
@@ -465,6 +473,17 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 
                     batchCount++;
                 }
+            }
+        }
+
+        private void RefreshResults()
+        {
+            _useCache = false;
+            // ReSharper disable once InvertIf
+            if (!_objectPickerWindowUIToolkit)
+            {
+                _enumeratorAssets = null;
+                _enumeratorScene = null;
             }
         }
     }

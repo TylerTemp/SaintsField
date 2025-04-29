@@ -11,7 +11,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 {
     public partial class RequireTypeAttributeDrawer
     {
-        #region UIToolkit
         protected static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__RequireType_HelpBox";
         protected static string NameSelectorButton(SerializedProperty property) => $"{property.propertyPath}__RequireType_SelectorButton";
 
@@ -148,8 +147,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             }
 
         }
-
-        #endregion
     }
 }
 #endif

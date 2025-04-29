@@ -86,14 +86,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.7.2**
+**4.7.3**
 
-1.  UI Toolkit: auto getters now can use async resource loading instead of blocking the Unity Editor thread. The picker view will continuously add resources with a loading icon.
-    It'll also cache the results instead of loading them again every time you open the picker.
-2.  UI Toolkit: fix `SaintsInterface` cache refresh when project changed.
-3.  UI Toolkit: fix `SaintsDictionary` object type can not display a correct label. [#220](https://github.com/TylerTemp/SaintsField/issues/220)
-4.  UI Toolkit: fix `SaintsDictionary` value get drawn multiple times after dragging.
-5.  UI Toolkit: workaround for a Unity bug that `AuxWindow` can not be properly closed (affected: `SaintsInterface` drawer, auto getter drawer)
+UI Toolkit: `FieldType` now use the new object picker for an async and fast experience
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
