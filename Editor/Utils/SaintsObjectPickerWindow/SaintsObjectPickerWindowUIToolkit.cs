@@ -7,6 +7,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
+using UnityEngine.Windows;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
@@ -614,16 +615,16 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             }
 
             objectInfo.IconLoaded = true;
-            Texture icon
-                = objectInfo.ListItemIcon.image
+            // Texture icon
+            objectInfo.ListItemIcon.image
                 = objectInfo.BlockItemIcon.image
                 = objectInfo.Icon
                 = AssetPreview.GetMiniThumbnail(objectInfo.BaseInfo.Target);
 
-            if(objectInfo.PreviewLoadCount < PreviewLoadMaxCount)
-            {
-                objectInfo.BlockItemPreview.image = icon;
-            }
+            // if(objectInfo.PreviewLoadCount < PreviewLoadMaxCount)
+            // {
+            //     objectInfo.BlockItemPreview.image = icon;
+            // }
         }
 
         private const int PreviewLoadMaxCount = 10;
@@ -659,6 +660,9 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             }
         }
 
+        private static Texture2D _prefabIcon;
+        private static Texture2D _gameObjectIcon;
+
         private static void UpdatePreviewOne(ObjectInfo objectInfo)
         {
             if (objectInfo.BaseInfo.Target is null)
@@ -672,9 +676,14 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             {
                 Object target = objectInfo.BaseInfo.Target;
 
+                bool isComp = false;
+                GameObject targetGo = null;
+
                 if (target is Component comp)
                 {
-                    target = comp.gameObject;
+                    target = targetGo = comp.gameObject;
+                    isComp = true;
+
                 }
 
                 Texture2D preview = AssetPreview.GetAssetPreview(target);
@@ -690,6 +699,11 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 else
                 {
                     objectInfo.PreviewLoadCount++;
+                    if (objectInfo.BlockItemPreview.image == null && isComp)
+                    {
+                        Texture2D previewIcon = AssetPreview.GetMiniThumbnail(targetGo);
+                        objectInfo.BlockItemPreview.image = previewIcon;
+                    }
                 }
             }
         }
