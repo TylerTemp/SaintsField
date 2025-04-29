@@ -265,8 +265,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 if (evt.keyCode == KeyCode.Return)
                 {
                     evt.StopPropagation();
-                    // DoClose();
-                    Close();
+                    DoClose();
                 }
 
                 bool ctrl = evt.keyCode is KeyCode.LeftControl or KeyCode.RightControl or KeyCode.LeftCommand or KeyCode.RightCommand;
@@ -321,8 +320,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 if (evt.keyCode == KeyCode.Return)
                 {
                     evt.StopPropagation();
-                    // DoClose();
-                    Close();
+                    DoClose();
                 }
             }, TrickleDown.TrickleDown);
 
@@ -928,7 +926,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             {
                 if (ShouldCloseOnDoubleClick(objectInfo))
                 {
-                    Close();
+                    DoClose();
                     return;
                 }
 
@@ -943,8 +941,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             {
                 if (ShouldCloseOnDoubleClick(objectInfo))
                 {
-                    // Debug.Log("Close");
-                    Close();
+                    DoClose();
                     return;
                 }
                 SetItemActive(objectInfo.BaseInfo);
@@ -952,11 +949,15 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             };
         }
 
-        // private void DoClose()
-        // {
-        //     Debug.Log("close this window");
-        //     Close();
-        // }
+        public readonly UnityEvent PleaseCloseMe = new UnityEvent();
+
+        private void DoClose()
+        {
+            // Debug.Log("close this window");
+            // UI Toolkit has this weird issue that can not be close, but can be close from outside...
+            // Close();
+            PleaseCloseMe.Invoke();
+        }
 
         private bool ShouldCloseOnDoubleClick(ObjectInfo objectInfo)
         {
@@ -1002,6 +1003,11 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
         public void OnDestroy()
         {
             OnDestroyEvent.Invoke();
+        }
+
+        public void OnLostFocus()
+        {
+            DoClose();
         }
     }
 

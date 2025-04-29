@@ -93,6 +93,7 @@ namespace: `SaintsField`
 2.  UI Toolkit: fix `SaintsInterface` cache refresh when project changed.
 3.  UI Toolkit: fix `SaintsDictionary` object type can not display a correct label. [#220](https://github.com/TylerTemp/SaintsField/issues/220)
 4.  UI Toolkit: fix `SaintsDictionary` value get drawn multiple times after dragging.
+5.  UI Toolkit: workaround for a Unity bug that `AuxWindow` can not be properly closed (affected: `SaintsInterface` drawer, auto getter drawer)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

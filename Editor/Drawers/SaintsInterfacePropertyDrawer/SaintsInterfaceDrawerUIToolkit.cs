@@ -173,6 +173,17 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                     _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.AssetsObjects);
                     _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.SceneObjects);
                 });
+                objectPickerWindowUIToolkit.PleaseCloseMe.AddListener(() =>
+                {
+                    if (_objectPickerWindowUIToolkit)
+                    {
+                        _objectPickerWindowUIToolkit.Close();
+                    }
+                    else
+                    {
+                        objectPickerWindowUIToolkit.Close();
+                    }
+                });
 
                 objectPickerWindowUIToolkit.ShowAuxWindow();
                 objectPickerWindowUIToolkit.RefreshDisplay();

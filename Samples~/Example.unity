@@ -17340,6 +17340,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 142339351076478d999c809bf8f02511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneKey: 
+  sceneKeySep: 
 --- !u!1 &1244097642
 GameObject:
   m_ObjectHideFlags: 0
@@ -22668,7 +22670,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 125c5d081d7e68649b7796eaf9740e79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anyObj: {fileID: 11500000, guid: 866df5fe7eef4592a6413dd02619ba53, type: 3}
+  go: {fileID: 0}
+  anyObj: {fileID: 11500000, guid: 30f42e8a12eb842acbe9a63057fb00e4, type: 3}
 --- !u!1 &1755597643
 GameObject:
   m_ObjectHideFlags: 0
