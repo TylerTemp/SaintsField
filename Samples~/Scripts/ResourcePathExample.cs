@@ -8,30 +8,30 @@ namespace SaintsField.Samples.Scripts
     {
         // resource: display as a MonoScript, requires a BoxCollider
         [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
-        [InfoBox(nameof(myResource), true)]
         [RichLabel("<icon=star.png /><label />")]
+        [BelowRichLabel("<color=gray>resource: <field />")]
         public string myResource;
 
         // AssetDatabase path
         [Space]
         [ResourcePath(EStr.AssetDatabase, typeof(Dummy), typeof(BoxCollider))]
-        [InfoBox(nameof(myAssetPath), true)]
+        [BelowRichLabel("<color=gray>assets: <field />")]
         public string myAssetPath;
 
         // GUID
         [Space]
         [ResourcePath(EStr.Guid, typeof(Dummy), typeof(BoxCollider))]
-        [InfoBox(nameof(myGuid), true)]
+        [BelowRichLabel("<color=gray>guid: <field />")]
         public string myGuid;
 
         // prefab resource
         [ResourcePath(typeof(GameObject))]
-        [InfoBox(nameof(resourceNoRequire), true)]
+        [BelowRichLabel("<color=gray>resource: <field />")]
         public string resourceNoRequire;
 
         // requires to have a Dummy script attached, and has interface IMyInterface
         [ResourcePath(typeof(Dummy), typeof(IMyInterface))]
-        [InfoBox(nameof(myInterface), true)]
+        [BelowRichLabel("<color=gray>interface: <field />")]
         public string myInterface;
 
         [Serializable]

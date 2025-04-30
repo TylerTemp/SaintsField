@@ -272,6 +272,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                     }
                     foreach (Component component in go.GetComponents<Component>())
                     {
+                        // Debug.Log($"{obj}: {fieldType} -> {component}: {fieldType.IsInstanceOfType(component)}");
                         if (fieldType.IsInstanceOfType(component))
                         {
                             yield return component;
@@ -328,13 +329,13 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                     List<Type> checkCompIsTypes = new List<Type>();
                     foreach (Type requiredType in requiredTypes)
                     {
-                        if (requiredType.IsAssignableFrom(typeof(GameObject)) || requiredType.IsInstanceOfType(go))
+                        if (typeof(GameObject).IsAssignableFrom(requiredType) || requiredType.IsInstanceOfType(go))
                         {
                             continue;
                         }
 
                         // ReSharper disable once InvertIf
-                        if (requiredType.IsAssignableFrom(typeof(Component)) || requiredType.IsInterface)
+                        if (typeof(Component).IsAssignableFrom(requiredType) || requiredType.IsInterface)
                         {
                             checkCompIsTypes.Add(requiredType);
                             continue;

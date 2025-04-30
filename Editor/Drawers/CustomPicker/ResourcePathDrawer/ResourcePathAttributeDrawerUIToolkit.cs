@@ -209,7 +209,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
 
             SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
 
-            objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {(resourcePathAttribute.EStr == EStr.Resource? "resources": "assets")} {fieldType} with {string.Join<Type>(", ", requiredTypes)}");
+            objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {(resourcePathAttribute.EStr == EStr.Resource? "resources": "assets")} {fieldType.Name} with {string.Join(", ", requiredTypes.Select(each => each.Name))}");
             if(_useCache)
             {
                 objectPickerWindowUIToolkit.AssetsObjects =
@@ -287,6 +287,8 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
                 {
                     continue;
                 }
+
+                // Debug.Log($"{asset} -> {fieldType}");
 
                 foreach (Object fieldTarget in GetSignableObject(asset, fieldType))
                 {
