@@ -119,7 +119,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                 .ToArray();
         }
 
-        protected virtual void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
+        protected virtual void OpenSelectorWindowIMGUI(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
         {
             Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             FieldInterfaceSelectWindow.Open(property.objectReferenceValue, requireTypeAttribute.EditorPick,
@@ -137,7 +137,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                     onChangeCallback(result);
                 });
         }
-
 
         private static Object OnSelectWindowSelected(Object fieldResult, Type fieldType, IReadOnlyList<Type> requiredTypes)
         {

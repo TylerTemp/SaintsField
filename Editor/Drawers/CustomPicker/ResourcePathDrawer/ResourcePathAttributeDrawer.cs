@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEngine;
-using Object = UnityEngine.Object;
-#if UNITY_2021_3_OR_NEWER
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
-#endif
+using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Drawers.CustomPicker
+namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
 {
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(ResourcePathAttribute), true)]
-    public class ResourcePathAttributeDrawer: RequireTypeAttributeDrawer
+    public partial class ResourcePathAttributeDrawer: RequireTypeAttributeDrawer
     {
         private class FieldResourcesSelectWindow : SaintsObjectPickerWindowIMGUI
         {
@@ -228,7 +225,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             return GetObjFromStr(property.stringValue, resourcePathAttribute.CompType, resourcePathAttribute.EStr);
         }
 
-        protected override void OpenSelectorWindow(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
+        protected override void OpenSelectorWindowIMGUI(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onChangeCallback, object parent)
         {
             ResourcePathAttribute resourcePathAttribute = (ResourcePathAttribute)requireTypeAttribute;
 
@@ -320,151 +317,5 @@ namespace SaintsField.Editor.Drawers.CustomPicker
             return obj == null ? null : Util.GetTypeFromObj(obj, requiredType);
         }
 
-#if UNITY_2021_3_OR_NEWER
-
-        #region UIToolkit
-
-        private static string NameObjectField(SerializedProperty property) => $"{property.propertyPath}__ResourcePath_ObjectField";
-
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, FieldInfo info, object parent)
-        {
-            ResourcePathAttribute fieldTypeAttribute = (ResourcePathAttribute)saintsAttribute;
-            bool customPicker = fieldTypeAttribute.CustomPicker;
-            Type requiredComp = fieldTypeAttribute.CompType;
-            Object requiredValue = GetObjFromStr(property.stringValue, requiredComp, fieldTypeAttribute.EStr);
-
-            ObjectField objectField = new ObjectField(GetPreferredLabel(property))
-            {
-                name = NameObjectField(property),
-                objectType = requiredComp,
-                allowSceneObjects = true,
-                value = requiredValue,
-                style =
-                {
-                    flexShrink = 1,
-                },
-            };
-
-            objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
-
-            objectField.Bind(property.serializedObject);
-
-            if (customPicker)
-            {
-                StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
-                objectField.styleSheets.Add(hideStyle);
-            }
-
-            objectField.AddToClassList(ClassAllowDisable);
-
-            return objectField;
-        }
-
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
-            Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            ResourcePathAttribute resourcePathAttribute = (ResourcePathAttribute)saintsAttribute;
-            IReadOnlyList<Type> requiredTypes = resourcePathAttribute.RequiredTypes;
-            ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
-
-            if(resourcePathAttribute.CustomPicker)
-            {
-                container.Q<Button>(NameSelectorButton(property)).clicked += () =>
-                {
-                    OpenSelectorWindow(property, resourcePathAttribute, info, newValue =>
-                    {
-                        // Debug.Log(newValue.GetType());
-                        string newStringValue = (string)newValue;
-                        objectField.SetValueWithoutNotify(GetObjFromStr(newStringValue, resourcePathAttribute.CompType, resourcePathAttribute.EStr));
-                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newStringValue);
-                        onValueChangedCallback(newValue);
-                    }, parent);
-                };
-            }
-
-            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-            Payload payload = (Payload)helpBox.userData;
-            Object newObjectValue = GetObjFromStr(property.stringValue, resourcePathAttribute.CompType, resourcePathAttribute.EStr);
-            string errorMessage = FieldResourcesSelectWindow.ValidateObject(newObjectValue, resourcePathAttribute.EStr, requiredTypes);
-            if (errorMessage != "")
-            {
-                helpBox.text = errorMessage;
-                helpBox.style.display = DisplayStyle.Flex;
-            }
-            else
-            {
-                payload.HasCorrectValue = true;
-                payload.CorrectValue = newObjectValue;
-            }
-
-            objectField.RegisterValueChangedCallback(evt =>
-            {
-                // onValueChangedCallback(GetNewValue(evt.newValue, resourcePathAttribute.EStr));
-                OnValueChangeObjectField(property, info, evt.newValue, resourcePathAttribute, helpBox, objectField, onValueChangedCallback, parent);
-            });
-        }
-
-        private static void OnValueChangeObjectField(SerializedProperty property, FieldInfo info, Object newValue, ResourcePathAttribute resourcePathAttribute, HelpBox helpBox, ObjectField objectField, Action<object> onValueChangedCallback, object parent)
-        {
-            IReadOnlyList<Type> requiredTypes = resourcePathAttribute.RequiredTypes;
-            // HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-            Payload payload = (Payload)helpBox.userData;
-
-            string errorMessage = FieldResourcesSelectWindow.ValidateObject(newValue, resourcePathAttribute.EStr, requiredTypes);
-
-            if (errorMessage == "")
-            {
-                helpBox.style.display = DisplayStyle.None;
-                payload.HasCorrectValue = true;
-                payload.CorrectValue = newValue;
-
-                // ObjectField target = container.Q<ObjectField>(NameObjectField(property));
-                string newStringValue = property.stringValue = GetNewValue(newValue, resourcePathAttribute.EStr);
-                property.serializedObject.ApplyModifiedProperties();
-                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newStringValue);
-                // info.SetValue(parent, newStringValue);
-                // object fieldValue = info.GetValue(parent);
-                // if (fieldValue is Array array)
-                // {
-                //     array.SetValue(newStringValue, 1);
-                // }
-
-                onValueChangedCallback(newStringValue);
-            }
-            else
-            {
-                if(resourcePathAttribute.FreeSign || !payload.HasCorrectValue)
-                {
-                    helpBox.text = errorMessage;
-                    helpBox.style.display = DisplayStyle.Flex;
-                }
-                else
-                {
-                    Debug.Assert(!resourcePathAttribute.FreeSign && payload.HasCorrectValue,
-                        "Code should not be here. This is a BUG.");
-                    // string correctValue = property.stringValue = GetNewValue(payload.correctValue, resourcePathAttribute.EStr);
-                    // property.serializedObject.ApplyModifiedProperties();
-                    Debug.LogWarning($"{errorMessage} Change reverted to {(payload.CorrectValue == null ? "null" : payload.CorrectValue.ToString())}.");
-                    // careful for infinite loop!
-                    // onValueChangedCallback(correctValue);
-                    objectField.SetValueWithoutNotify(payload.CorrectValue);
-                }
-            }
-        }
-
-        // do nothing because valueChanged is controlled by this drawer itself
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container,
-            FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
-        {
-        }
-
-        #endregion
-
-#endif
     }
 }

@@ -1,11 +1,19 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers;
+using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 {
@@ -17,7 +25,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
         protected class Payload
         {
             public bool HasCorrectValue;
-            public UnityEngine.Object CorrectValue;
+            public Object CorrectValue;
         }
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
@@ -81,13 +89,13 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             {
                 container.Q<Button>(NameSelectorButton(property)).clicked += () =>
                 {
-                    OpenSelectorWindow(property, requireTypeAttribute, info, onValueChangedCallback, parent);
+                    OpenSelectorWindowUIToolkit(property, requireTypeAttribute, info, onValueChangedCallback, parent);
                 };
             }
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
             Payload payload = (Payload)helpBox.userData;
-            UnityEngine.Object curValue = property.objectReferenceValue;
+            Object curValue = property.objectReferenceValue;
             IReadOnlyList<string> missingTypeNames = curValue == null
                 ? Array.Empty<string>()
                 : GetMissingTypeNames(curValue, requiredTypes);
@@ -102,14 +110,378 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                 payload.CorrectValue = curValue;
             }
 
+            container.schedule.Execute(() =>
+            {
+                if (_enumeratorAssets != null)
+                {
+                    if (!_enumeratorAssets.MoveNext())
+                    {
+                        _enumeratorAssets = null;
+                    }
+                }
 
+                if(_enumeratorScene != null)
+                {
+                    if (!_enumeratorScene.MoveNext())
+                    {
+                        _enumeratorScene = null;
+                    }
+                }
+
+                // ReSharper disable once InvertIf
+                if(_objectPickerWindowUIToolkit)
+                {
+                    bool loading = _enumeratorAssets != null || _enumeratorScene != null;
+                    _objectPickerWindowUIToolkit.SetLoadingImage(loading);
+                }
+
+            }).Every(1);
+
+            container.RegisterCallback<AttachToPanelEvent>(e =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshResults);
+            });
+            container.RegisterCallback<DetachFromPanelEvent>(e =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults);
+            });
+        }
+
+        private SaintsObjectPickerWindowUIToolkit _objectPickerWindowUIToolkit;
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+        private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
+
+        private void OpenSelectorWindowUIToolkit(SerializedProperty property, RequireTypeAttribute requireTypeAttribute, FieldInfo info, Action<object> onValueChangedCallback, object parent)
+        {
+            Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
+
+
+            EPick editorPick = requireTypeAttribute.EditorPick;
+
+            SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
+            // objectPickerWindowUIToolkit.ResetClose();
+            objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {fieldType} with {string.Join(", ", requireTypeAttribute.RequiredTypes)}");
+            if(_useCache)
+            {
+                objectPickerWindowUIToolkit.AssetsObjects =
+                    new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(_assetsObjectInfos);
+                objectPickerWindowUIToolkit.SceneObjects =
+                    new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(_sceneObjectInfos);
+            }
+            _assetsObjectInfos.Clear();
+            _sceneObjectInfos.Clear();
+
+            objectPickerWindowUIToolkit.OnSelectedEvent.AddListener(objInfo =>
+            {
+                if(property.objectReferenceValue != objInfo.BaseInfo.Target)
+                {
+                    property.objectReferenceValue = objInfo.BaseInfo.Target;
+                    property.serializedObject.ApplyModifiedProperties();
+                    onValueChangedCallback.Invoke(objInfo.BaseInfo.Target);
+                }
+            });
+            objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() =>
+            {
+                _objectPickerWindowUIToolkit = null;
+                _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.AssetsObjects);
+                _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>(objectPickerWindowUIToolkit.SceneObjects);
+            });
+            objectPickerWindowUIToolkit.PleaseCloseMeEvent.AddListener(() =>
+            {
+                if (_objectPickerWindowUIToolkit)
+                {
+                    _objectPickerWindowUIToolkit.Close();
+                }
+                else
+                {
+                    objectPickerWindowUIToolkit.Close();
+                }
+            });
+
+            objectPickerWindowUIToolkit.ShowAuxWindow();
+            objectPickerWindowUIToolkit.RefreshDisplay();
+            if(_useCache)
+            {
+                objectPickerWindowUIToolkit.EnqueueAssetsObjects(_assetsObjectBaseInfos);
+                objectPickerWindowUIToolkit.EnqueueSceneObjects(_sceneObjectBaseInfos);
+            }
+            _assetsObjectBaseInfos.Clear();
+            _sceneObjectBaseInfos.Clear();
+
+            objectPickerWindowUIToolkit.OnDestroyEvent.AddListener(() => _objectPickerWindowUIToolkit = null);
+
+            bool hasAssetsObjs = EnumFlagsUtil.HasFlag(editorPick, EPick.Assets);
+            if (!hasAssetsObjs)
+            {
+                objectPickerWindowUIToolkit.DisableAssets();
+            }
+            bool hasSceneObjs = EnumFlagsUtil.HasFlag(editorPick, EPick.Scene);
+            if (!hasSceneObjs)
+            {
+                objectPickerWindowUIToolkit.DisableScene();
+            }
+
+            _objectPickerWindowUIToolkit = objectPickerWindowUIToolkit;
+
+            if(!_useCache)
+            {
+                _useCache = true;
+                CheckResourceLoad(property, editorPick, fieldType, requireTypeAttribute.RequiredTypes);
+            }
+        }
+
+        private bool _useCache;
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _assetsObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+        private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _sceneObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
+        private IEnumerator _enumeratorAssets;
+        private IEnumerator _enumeratorScene;
+
+        private void CheckResourceLoad(SerializedProperty property, EPick editorPick, Type fieldType, IReadOnlyList<Type> requiredTypes)
+        {
+            if (EnumFlagsUtil.HasFlag(editorPick, EPick.Scene))
+            {
+                Object target = property.serializedObject.targetObject;
+                // Scene targetScene;
+                IEnumerable<GameObject> rootGameObjects = null;
+                // bool sceneFound = false;
+                if(target is Component comp)
+                {
+                    rootGameObjects = Util.SceneRootGameObjectsOf(comp.gameObject);
+                }
+                if (rootGameObjects is not null)
+                {
+                    _enumeratorScene = StartEnumeratorScene(rootGameObjects, property, fieldType, requiredTypes);
+                }
+            }
+
+            if (EnumFlagsUtil.HasFlag(editorPick, EPick.Assets))
+            {
+                _enumeratorAssets = StartEnumeratorAssets(property, fieldType, requiredTypes);
+            }
+        }
+
+        protected static IEnumerable<Object> GetSignableObject(Object obj, Type fieldType)
+        {
+            switch (obj)
+            {
+                case GameObject go:
+                {
+                    if (fieldType.IsInstanceOfType(go))
+                    {
+                        yield return go;
+                    }
+                    foreach (Component component in go.GetComponents<Component>())
+                    {
+                        if (fieldType.IsInstanceOfType(component))
+                        {
+                            yield return component;
+                        }
+                    }
+                }
+                    yield break;
+                case ScriptableObject so:
+                    if(fieldType.IsInstanceOfType(so))
+                    {
+                        yield return so;
+                    }
+                    yield break;
+                case Component comp:
+                    foreach (Object result in GetSignableObject(comp.gameObject, fieldType))
+                    {
+                        yield return result;
+                    }
+                    yield break;
+
+                case Texture2D _:
+                {
+                    if (fieldType.IsAssignableFrom(typeof(Sprite)))
+                    {
+                        string assetPath = AssetDatabase.GetAssetPath(obj);
+                        Sprite result = null;
+                        if(assetPath != "")
+                        {
+                            result = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                        }
+
+                        if (result != null)
+                        {
+                            yield return result;
+                        }
+                    }
+                }
+                    goto default;
+                default:
+                    if (fieldType.IsInstanceOfType(obj))
+                    {
+                        yield return obj;
+                    }
+                    yield break;
+            }
+        }
+
+        protected static bool IsMatchedObject(Object obj, IReadOnlyList<Type> requiredTypes)
+        {
+            switch (obj)
+            {
+                case GameObject go:  // For gameObject: check component matches the requiredTypes
+                {
+                    List<Type> checkCompIsTypes = new List<Type>();
+                    foreach (Type requiredType in requiredTypes)
+                    {
+                        if (requiredType.IsAssignableFrom(typeof(GameObject)) || requiredType.IsInstanceOfType(go))
+                        {
+                            continue;
+                        }
+
+                        // ReSharper disable once InvertIf
+                        if (requiredType.IsAssignableFrom(typeof(Component)) || requiredType.IsInterface)
+                        {
+                            checkCompIsTypes.Add(requiredType);
+                            continue;
+                        }
+
+                        return false;
+                    }
+
+                    if (checkCompIsTypes.Count == 0)
+                    {
+                        return true;
+                    }
+
+                    Component[] allComp = go.GetComponents<Component>();
+
+                    return checkCompIsTypes.All(
+                        isType => allComp.Any(isType.IsInstanceOfType)
+                    );
+                }
+                case Component comp:
+                    // ReSharper disable once TailRecursiveCall
+                    return IsMatchedObject(comp.gameObject, requiredTypes);
+                default:
+                    return requiredTypes.All(checkType => checkType.IsInstanceOfType(obj));
+            }
+        }
+
+        private const int BatchLimit = 100;
+
+        private IEnumerator StartEnumeratorScene(IEnumerable<GameObject> rootGameObjects, SerializedProperty valueProp, Type fieldType, IReadOnlyList<Type> requiredTypes)
+        {
+            int batchCount = 0;
+            foreach (GameObject rootGameObject in rootGameObjects)
+            {
+                IEnumerable<(GameObject, string)> allGo = Util.GetSubGoWithPath(rootGameObject, null).Prepend((rootGameObject, rootGameObject.name));
+                foreach ((GameObject eachSubGo, string eachSubPath) in allGo)
+                {
+                    foreach (Object fieldTarget in GetSignableObject(eachSubGo, fieldType))
+                    {
+                        if (!IsMatchedObject(fieldTarget, requiredTypes))
+                        {
+                            continue;
+                        }
+
+                        SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                            fieldTarget,
+                            fieldTarget.name,
+                            fieldTarget.GetType().Name,
+                            eachSubPath
+                        );
+
+                        if (_objectPickerWindowUIToolkit)
+                        {
+                            _objectPickerWindowUIToolkit.EnqueueSceneObjects(new[]{baseInfo});
+                            if (ReferenceEquals(fieldTarget, valueProp.objectReferenceValue))
+                            {
+                                _objectPickerWindowUIToolkit.SetItemActive(baseInfo);
+                            }
+                            yield return null;
+                        }
+                        else
+                        {
+                            _sceneObjectBaseInfos.Add(baseInfo);
+                        }
+                    }
+
+                    if(batchCount / BatchLimit > 1)
+                    {
+                        batchCount = 0;
+                        yield return null;
+                    }
+
+                    batchCount++;
+                }
+            }
+        }
+
+        private IEnumerator StartEnumeratorAssets(SerializedProperty valueProp, Type fieldType, IReadOnlyList<Type> requiredTypes)
+        {
+            int batchCount = 0;
+
+            // foreach (string prefabGuid in AssetDatabase.FindAssets($"t:{fieldType.Name}"))
+            foreach (string prefabGuid in AssetDatabase.FindAssets(""))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(prefabGuid);
+                Object asset = AssetDatabase.LoadAssetAtPath(path, fieldType);
+
+                if (RuntimeUtil.IsNull(asset))
+                {
+                    continue;
+                }
+
+                foreach (Object fieldTarget in GetSignableObject(asset, fieldType))
+                {
+                    if (!IsMatchedObject(fieldTarget, requiredTypes))
+                    {
+                        continue;
+                    }
+
+                    SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                        fieldTarget,
+                        fieldTarget.name,
+                        fieldTarget.GetType().Name,
+                        path
+                    );
+
+                    if (_objectPickerWindowUIToolkit)
+                    {
+                        _objectPickerWindowUIToolkit.EnqueueAssetsObjects(new[] { baseInfo });
+                        if (ReferenceEquals(fieldTarget, valueProp.objectReferenceValue))
+                        {
+                            _objectPickerWindowUIToolkit.SetItemActive(baseInfo);
+                        }
+                        yield return null;
+                    }
+                    else
+                    {
+                        _assetsObjectBaseInfos.Add(baseInfo);
+                    }
+                }
+
+                if(batchCount / BatchLimit > 1)
+                {
+                    batchCount = 0;
+                    yield return null;
+                }
+
+                batchCount++;
+            }
+        }
+
+        private void RefreshResults()
+        {
+            _useCache = false;
+            // ReSharper disable once InvertIf
+            if (!_objectPickerWindowUIToolkit)
+            {
+                _enumeratorAssets = null;
+                _enumeratorScene = null;
+            }
         }
 
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container,
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
         {
-            UnityEngine.Object newObjectValue = (UnityEngine.Object)newValue;
+            Object newObjectValue = (Object)newValue;
             RequireTypeAttribute requireTypeAttribute = (RequireTypeAttribute)saintsAttribute;
             IReadOnlyList<Type> requiredTypes = requireTypeAttribute.RequiredTypes;
 

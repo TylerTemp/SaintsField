@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
                 if (GUI.Button(position, "●", _imGuiButtonStyle))
                 {
-                    OpenSelectorWindow(property, requireTypeAttribute, info, onGUIPayload.SetValue, parent);
+                    OpenSelectorWindowIMGUI(property, requireTypeAttribute, info, onGUIPayload.SetValue, parent);
                 }
             }
 
