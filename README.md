@@ -88,7 +88,8 @@ namespace: `SaintsField`
 
 **4.7.3**
 
-UI Toolkit: `FieldType` now use the new object picker for an async and fast experience
+1.  UI Toolkit: `FieldType`, `ResourcePath`, `RequireType` now use the new object picker for an async and fast experience
+2.  UI Toolkit: fix native decorator header with no other attributes does not draw [#223](https://github.com/TylerTemp/SaintsField/issues/223)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
