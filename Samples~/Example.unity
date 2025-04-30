@@ -771,6 +771,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
   m_AgentTypeID: 0
   m_CollectObjects: 0
   m_Size: {x: 10, y: 10, z: 10}
@@ -17339,8 +17340,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 142339351076478d999c809bf8f02511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneKey: 
-  sceneKeySep: 
 --- !u!1 &1244097642
 GameObject:
   m_ObjectHideFlags: 0
@@ -17796,10 +17795,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2ca16b3131ec84b80578c42b1cc1dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entrance: {fileID: 0}
-  worldPos: []
-  centerPoint: {x: 0, y: 0, z: 0}
-  exit: {fileID: 0}
 --- !u!1 &1315195531
 GameObject:
   m_ObjectHideFlags: 0

@@ -452,8 +452,7 @@ namespace SaintsField.Editor.Utils
                     originalField,
                     parent
                 );
-                // we don't need decorator here
-                return r;
+                return r == null ? null : UIToolkitCache.MergeWithDec(r, allAttributes);
             }
 
             // Nah... This didn't handle for mis-ordered case
