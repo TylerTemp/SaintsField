@@ -1629,6 +1629,7 @@ Transform:
   - {fileID: 1668091817}
   - {fileID: 75259801}
   - {fileID: 786619285}
+  - {fileID: 1594187018}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &786619284
@@ -1676,7 +1677,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   value1: 0
+  value2: 0
   value3: 0
+  value4: 0
 --- !u!1 &790202822
 GameObject:
   m_ObjectHideFlags: 0
@@ -3258,6 +3261,72 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1594187017
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1594187018}
+  - component: {fileID: 1594187019}
+  m_Layer: 0
+  m_Name: Issue224TableReadOnly
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1594187018
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1594187017}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 785898368}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1594187019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1594187017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a06a1e96f823f74288ed4805562c55d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loots:
+  - DisplayName: 
+    Loot:
+      ratio: -0.36
+    Chance: 
+    Weight: 0
+    MinQuantity: 18
+    MaxQuantity: 0
+  - DisplayName: 
+    Loot:
+      ratio: 0.57
+    Chance: 
+    Weight: 28
+    MinQuantity: 0
+    MaxQuantity: 0
+  - DisplayName: 
+    Loot:
+      ratio: 0.61
+    Chance: 
+    Weight: 7
+    MinQuantity: 0
+    MaxQuantity: 0
 --- !u!1 &1668091816
 GameObject:
   m_ObjectHideFlags: 0
