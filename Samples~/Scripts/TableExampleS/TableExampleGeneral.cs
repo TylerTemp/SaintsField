@@ -13,14 +13,13 @@ namespace SaintsField.Samples.Scripts.TableExampleS
         {
             public int myInt;
 
-            [TableColumn("Value"), AboveRichLabel]
-            public string myString;
-            [TableColumn("Value"), AboveRichLabel]
-            public GameObject myObject;
+            // [TableColumn("Value"), AboveRichLabel]
+            // public string myString;
+            // [TableColumn("Value"), AboveRichLabel]
+            public ScriptableObject myObject;
         }
 
         [Table]
-        [OnArraySizeChanged(nameof(SizeChanged))]
         public List<MyStruct> myStructs;
 
         [Button]

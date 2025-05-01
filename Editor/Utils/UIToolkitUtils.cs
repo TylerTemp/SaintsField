@@ -571,6 +571,8 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        private static StyleSheet _unityObjectFieldLabelDisplayNone;
+
         // Basically the same idea from PropertyField
         // Note: do NOT pass SerializedPropertyType.Generic type: process it externally.
         public static VisualElement CreateOrUpdateFieldRawFallback(
@@ -1200,6 +1202,13 @@ namespace SaintsField.Editor.Utils
                     };
                     objectField.BindProperty(property);
                     objectField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+
+                    if (string.IsNullOrEmpty(label))  // ObjectField.label has issue in SaintsDictionary. This is a workaround
+                    {
+                        _unityObjectFieldLabelDisplayNone ??=
+                            Util.LoadResource<StyleSheet>("UIToolkit/UnityObjectFieldLabelDisplayNone.uss");
+                        objectField.styleSheets.Add(_unityObjectFieldLabelDisplayNone);
+                    }
 
                     if (inHorizontalLayout)
                     {

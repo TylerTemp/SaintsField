@@ -1762,27 +1762,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myStructs:
   - myInt: 12
-    myString: 
-    myObject: {fileID: 833747048}
+    myObject: {fileID: 11400000, guid: a1531069d26bcec459484c6bc0dd9cbe, type: 2}
   - myInt: 1
-    myString: 
-    myObject: {fileID: 2138214537}
+    myObject: {fileID: 11400000, guid: aef5010cd48df3848851357eb5f31ae8, type: 2}
   - myInt: 2
-    myString: 
-    myObject: {fileID: 272774832}
+    myObject: {fileID: 11400000, guid: d68a85fa51eca994b9c3400927090e99, type: 2}
   - myInt: 49
-    myString: 
-    myObject: {fileID: 0}
+    myObject: {fileID: 11400000, guid: 11b61b95052fba44788a2dd17d2bde74, type: 2}
   defaultExpanded2: []
   hideButtons:
   - myInt: 132
-    myString: 
     myObject: {fileID: 0}
   - myInt: 0
-    myString: 
     myObject: {fileID: 0}
   - myInt: 0
-    myString: 
     myObject: {fileID: 0}
 --- !u!1 &215164999
 GameObject:

@@ -937,14 +937,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 }
             }
 
-            // if (!isArray && useDrawerType == null)
-            // {
-            //     PropertyAttribute prop = new SaintsRowAttribute(inline: true);
-            //     useAttribute = prop;
-            //     useDrawerType = typeof(SaintsRowAttributeDrawer);
-            //     appendPropertyAttributes = new[] { prop };
-            // }
-
             // Debug.Log($"{serializedProperty.propertyPath}/{useDrawerType}");
 
             if (useDrawerType == null)
