@@ -12,7 +12,8 @@
         "Unity.Netcode.Runtime",
         "Unity.Mathematics",
         "Obvious.Soap",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Kybernetik.UltEvents"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
