@@ -443,6 +443,7 @@ namespace SaintsField.Editor.Core
 #endif
                     VisualElement fallback = UnityFallbackUIToolkit(fieldInfo, property, allAttributes, containerElement, GetPreferredLabel(property), SaintsPropertyDrawers, parent);
                     fallback.AddToClassList(fallbackClass);
+                    fallback.AddToClassList(ClassAllowDisable);
                     fieldContainer.Add(fallback);
                     // containerElement.visible = false;
                     onChangeManuallyWatch = true;

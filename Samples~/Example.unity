@@ -15736,12 +15736,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fruit:
-    rid: -2
+    rid: 5034320753130995712
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 5034320753130995712
+      type: {class: ReferencePickerBase/Base2Fruit, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8, asm: today.comes.saintsfield.Samples}
+      data:
+        base1: {fileID: 0}
+        base2: 0
 --- !u!114 &1098124222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16054,7 +16057,7 @@ GameObject:
   - component: {fileID: 1134193989}
   - component: {fileID: 1134193990}
   m_Layer: 0
-  m_Name: Issue49
+  m_Name: Issue49AdvancedDropdownOutOfScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17924,6 +17927,68 @@ MonoBehaviour:
   e1: 
   e1And2: 
   e1Or2: 
+--- !u!1 &1328970752
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1328970753}
+  - component: {fileID: 1328970755}
+  - component: {fileID: 1328970756}
+  m_Layer: 0
+  m_Name: Issue227
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1328970753
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328970752}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1328970755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328970752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ab1293d4989e6141a1e85c52bdfcdcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delay: 0
+  randomizeOffset: 1
+  delay2: 0.285
+--- !u!114 &1328970756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328970752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2288c39cfae26744a8849fbc5124074f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delay: 0
+  randomizeOffset: 1
 --- !u!1 &1328998356
 GameObject:
   m_ObjectHideFlags: 0
@@ -19782,6 +19847,7 @@ Transform:
   - {fileID: 1165005531}
   - {fileID: 1743365212}
   - {fileID: 1951413951}
+  - {fileID: 1328970753}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1490458620
@@ -21362,12 +21428,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item:
-    rid: -2
+    rid: 5034320753130995713
   structImpl:
-    rid: -2
+    rid: 5034320753130995714
   myInterface:
-    rid: -2
-  myInterfaces: []
+    rid: 5034320753130995715
+  myInterfaces:
+  - rid: 5034320753130995814
   myInterfaceDisabled:
     rid: 2194327499221762050
   wrongType:
@@ -21375,13 +21442,33 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
     - rid: 2194327499221762050
       type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
       data:
         <TheInt>k__BackingField: 0
         sub2: 
+    - rid: 5034320753130995713
+      type: {class: ReferenceExample/Apple, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        base1: {fileID: 0}
+        base2: 0
+        apple: 
+        applePrefab: {fileID: 0}
+    - rid: 5034320753130995714
+      type: {class: ReferenceExample/ClassSub1, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        sub1: 
+    - rid: 5034320753130995715
+      type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        sub2: 
+    - rid: 5034320753130995814
+      type: {class: ReferenceExample/StructImpl, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
+        myStruct: 
 --- !u!1 &1639647309
 GameObject:
   m_ObjectHideFlags: 0
@@ -29922,9 +30009,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   omniscient: 0
-  detectionRange: 0
-  f: 0
-  fieldOfView: 0
+  detectionRange: 1
+  f: 1
+  fieldOfView: 1
 --- !u!1 &2013150704
 GameObject:
   m_ObjectHideFlags: 0

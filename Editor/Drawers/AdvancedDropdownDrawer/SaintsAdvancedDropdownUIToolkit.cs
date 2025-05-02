@@ -28,6 +28,25 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         private readonly float _maxHeight;
         private readonly bool _allowUnSelect;
 
+        public static (Rect worldBound, float maxHeight) GetProperPos(Rect rootWorldBound)
+        {
+            int screenHeight = Screen.currentResolution.height;
+
+            float maxHeight = Screen.currentResolution.height - rootWorldBound.y - rootWorldBound.height - 100;
+            Rect worldBound = new Rect(rootWorldBound);
+            // Debug.Log(worldBound);
+            // ReSharper disable once InvertIf
+            if (maxHeight < 100)
+            {
+                // worldBound.x -= 400;
+                worldBound.y -= 100 + worldBound.height;
+                // Debug.Log(worldBound);
+                maxHeight = Mathf.Max(100, screenHeight - 100);
+            }
+
+            return (worldBound, maxHeight);
+        }
+
         public SaintsAdvancedDropdownUIToolkit(AdvancedDropdownMetaInfo metaInfo, float width, float maxHeight, bool allowUnSelect, Action<string, object> setValue)
         {
             _width = width;

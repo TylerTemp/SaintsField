@@ -167,14 +167,15 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 //
                 // genericDropdownMenu.DropDown(fakePos, container, true);
 
-                Rect worldBound = root.worldBound;
-                float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
-                if (maxHeight < 100)
-                {
-                    // Debug.LogError($"near out of screen: {maxHeight}");
-                    worldBound.y -= 300 + worldBound.height;
-                    maxHeight = 300;
-                }
+                // Rect worldBound = root.worldBound;
+                // float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
+                // if (maxHeight < 100)
+                // {
+                //     // Debug.LogError($"near out of screen: {maxHeight}");
+                //     // worldBound.y -= 300 + worldBound.height;
+                //     maxHeight = 300;
+                // }
+                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
                 worldBound.height = SingleLineHeight;
 
                 object managedReferenceValue = property.managedReferenceValue;

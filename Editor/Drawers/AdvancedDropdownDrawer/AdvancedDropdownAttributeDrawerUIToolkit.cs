@@ -69,16 +69,18 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 // float maxHeight = Mathf.Max(400, Screen.height - root.worldBound.y - root.worldBound.height - 200);
 
                 // float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
-                float maxHeight = Screen.currentResolution.height - root.worldBound.y - root.worldBound.height - 100;
-                Rect worldBound = root.worldBound;
-                // Debug.Log(worldBound);
-                if (maxHeight < 100)
-                {
-                    // worldBound.x -= 400;
-                    worldBound.y -= 100 + worldBound.height;
-                    // Debug.Log(worldBound);
-                    maxHeight = 100;
-                }
+                // float maxHeight = Screen.currentResolution.height - root.worldBound.y - root.worldBound.height - 100;
+                // Rect worldBound = root.worldBound;
+                // // Debug.Log(worldBound);
+                // if (maxHeight < 100)
+                // {
+                //     // worldBound.x -= 400;
+                //     worldBound.y -= 100 + worldBound.height;
+                //     // Debug.Log(worldBound);
+                //     maxHeight = 100;
+                // }
+
+                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 
                 UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
                     metaInfo,
