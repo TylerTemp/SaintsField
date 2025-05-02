@@ -10,6 +10,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
     {
         public bool InDirectHorizontalLayout { get; set; }
         public bool InAnyHorizontalLayout { get; set; }
+        public bool NoLabel { get; set; }
 
         public class Config
         {

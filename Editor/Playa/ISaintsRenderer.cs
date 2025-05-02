@@ -10,6 +10,8 @@ namespace SaintsField.Editor.Playa
         bool InDirectHorizontalLayout { get; set; }
         bool InAnyHorizontalLayout { get; set; }
 
+        bool NoLabel { get; set; }
+
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public VisualElement CreateVisualElement();
 #endif

@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 FieldWithInfo.SerializedProperty,
                 ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo),
                 FieldWithInfo.FieldInfo.FieldType,
-                FieldWithInfo.SerializedProperty.displayName,
+                NoLabel? null: FieldWithInfo.SerializedProperty.displayName,
                 FieldWithInfo.FieldInfo,
                 InAnyHorizontalLayout,
                 this,

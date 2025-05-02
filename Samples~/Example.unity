@@ -1769,7 +1769,9 @@ MonoBehaviour:
     myObject: {fileID: 11400000, guid: d68a85fa51eca994b9c3400927090e99, type: 2}
   - myInt: 49
     myObject: {fileID: 11400000, guid: 11b61b95052fba44788a2dd17d2bde74, type: 2}
-  defaultExpanded2: []
+  defaultExpanded2:
+  - myInt: 0
+    myObject: {fileID: 0}
   hideButtons:
   - myInt: 132
     myObject: {fileID: 0}

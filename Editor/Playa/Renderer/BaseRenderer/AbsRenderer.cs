@@ -17,6 +17,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
     {
         public bool InAnyHorizontalLayout { get; set; }
         public bool InDirectHorizontalLayout { get; set; }
+        public bool NoLabel { get; set; }
 
         // ReSharper disable InconsistentNaming
         public readonly SaintsFieldWithInfo FieldWithInfo;
