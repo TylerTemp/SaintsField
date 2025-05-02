@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.4 ##
+
+1.  UI Toolkit: Fix ReadOnly does not work with 3rd party & Unity default drawer [#227](https://github.com/TylerTemp/SaintsField/issues/227)
+2.  UI Toolkit: Fix ReferencePicker dropdown appears in the wrong place [#226](https://github.com/TylerTemp/SaintsField/issues/226)
+3.  UI Toolkit: Fix duplicated label shown in Table on every column [#224](https://github.com/TylerTemp/SaintsField/issues/224)
+
 ## 4.7.3 ##
 
 1.  UI Toolkit: `FieldType`, `ResourcePath`, `RequireType` now use the new object picker for an async and fast experience

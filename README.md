@@ -86,10 +86,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.7.3**
+**4.7.4**
 
-1.  UI Toolkit: `FieldType`, `ResourcePath`, `RequireType` now use the new object picker for an async and fast experience
-2.  UI Toolkit: fix native decorator header with no other attributes does not draw [#223](https://github.com/TylerTemp/SaintsField/issues/223)
+1.  UI Toolkit: Fix ReadOnly does not work with 3rd party & Unity default drawer [#227](https://github.com/TylerTemp/SaintsField/issues/227)
+2.  UI Toolkit: Fix ReferencePicker dropdown appears in the wrong place [#226](https://github.com/TylerTemp/SaintsField/issues/226)
+3.  UI Toolkit: Fix duplicated label shown in Table on every column [#224](https://github.com/TylerTemp/SaintsField/issues/224)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
