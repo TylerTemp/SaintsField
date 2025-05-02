@@ -692,7 +692,9 @@ namespace SaintsField.Editor.Utils
                         SerializedProperty serializedProperty = property.Copy();
                         // string str = PropertyField.listViewNamePrefix + property.propertyPath;
                         string str = "saints-field--list-view--" + property.propertyPath;
-                        listView.headerTitle = label;
+                        listView.headerTitle = string.IsNullOrEmpty(label)
+                            ? property.displayName
+                            : label;
                         listView.userData = serializedProperty;
                         listView.bindingPath = property.propertyPath;
                         listView.viewDataKey = str;
