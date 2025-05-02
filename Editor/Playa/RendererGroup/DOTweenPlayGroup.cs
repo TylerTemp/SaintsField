@@ -28,6 +28,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
     {
         public bool InDirectHorizontalLayout { get; set; }
         public bool InAnyHorizontalLayout { get; set; }
+        public bool NoLabel { get; set; }
 
         private readonly List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> _doTweenMethods = new List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)>();
         private readonly object _target;
