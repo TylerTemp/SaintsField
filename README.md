@@ -88,9 +88,8 @@ namespace: `SaintsField`
 
 **4.7.4**
 
-1.  UI Toolkit: Fix ReadOnly does not work with 3rd party & Unity default drawer [#227](https://github.com/TylerTemp/SaintsField/issues/227)
-2.  UI Toolkit: Fix ReferencePicker dropdown appears in the wrong place [#226](https://github.com/TylerTemp/SaintsField/issues/226)
-3.  UI Toolkit: Fix duplicated label shown in Table on every column [#224](https://github.com/TylerTemp/SaintsField/issues/224)
+1.  UI Toolkit: `ListDrawerSettings` now allow async search to avoid blocking the editor thread.
+2.  Add constructor and Editor setter for `SaintsInterface` [#228](https://github.com/TylerTemp/SaintsField/issues/228)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1389,9 +1388,14 @@ Parameters:
 
 *   `bool searchable = false`: allow search in the list/array
 *   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
-*   `bool delayedSearch = false`: when `true`, delay the search until you hit enter or blur the search field
+*   [IMGUI] `bool delayedSearch = false`: when `true`, delay the search until you hit enter or blur the search field
 *   `string extraSearch = null`: set a callback function to use your custom search. If not match, use the default search.
 *   `string overrideSearch = null`: set a callback function as a custom search. When present, ignore `extraSearch` and default search.
+
+`delayedSearch` only works for IMGUI. For UI Toolkit, it already has a debounced search, which means:
+
+*   When input anything, it'll wait for 0.6 seconds for next input, then perform the actual searching
+*   You can always use `Enter` to search immediately
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -1413,6 +1417,12 @@ public MyData[] myDataArr;
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/08c6da9a-e613-4e94-8933-3d7a92f7cb33)
 
 The first input is where you can search. The next input can adjust how many items per page. The last part is the paging.
+
+**Async Search**
+
+In UI Toolkit you can also see the async searching which does not block the editor when searching in a BIG list:
+
+[![video](https://github.com/user-attachments/assets/f76a68c5-fc27-4ecd-ab4b-eebec37f882d)](https://github.com/user-attachments/assets/3b4a1fd7-c5fb-4ed5-98ed-66645abb5512)
 
 **Custom Search**
 

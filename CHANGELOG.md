@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.7.5 ##
+
+1.  UI Toolkit: `ListDrawerSettings` now allow async search to avoid blocking the editor thread.
+2.  Add constructor and Editor setter for `SaintsInterface` [#228](https://github.com/TylerTemp/SaintsField/issues/228)
+
 ## 4.7.4 ##
 
 1.  UI Toolkit: Fix ReadOnly does not work with 3rd party & Unity default drawer [#227](https://github.com/TylerTemp/SaintsField/issues/227)

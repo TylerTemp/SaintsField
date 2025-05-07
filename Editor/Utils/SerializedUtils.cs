@@ -339,6 +339,7 @@ namespace SaintsField.Editor.Utils
             return search.Split(' ').Select(segment => new ListSearchToken(ListSearchType.Include, segment));
         }
 
+        // Note: This WILL contain -1 for the sake of async searching...
         public static IEnumerable<int> SearchArrayProperty(SerializedProperty property, string searchFull)
         {
             IReadOnlyList<ListSearchToken> searchTokens = ParseSearch(searchFull).ToArray();
@@ -351,6 +352,10 @@ namespace SaintsField.Editor.Utils
                     Debug.Log($"found: {childProperty.propertyPath}");
 #endif
                     yield return i;
+                }
+                else
+                {
+                    yield return -1;
                 }
             }
         }
@@ -383,9 +388,6 @@ namespace SaintsField.Editor.Utils
                     // ReSharper disable once SpecifyACultureInStringConversionExplicitly
                     return property.floatValue.ToString().Contains(token);
                 case SerializedPropertyType.String:
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
-                    Debug.Log($"{property.propertyPath}={property.stringValue} contains {search}={property.stringValue?.Contains(search)}");
-#endif
                     return property.stringValue?.Contains(token) ?? false;
                 case SerializedPropertyType.Color:
                     return property.colorValue.ToString().Contains(token);

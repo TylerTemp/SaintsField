@@ -74,14 +74,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             List<int> results = string.IsNullOrEmpty(keySearch)
                 ? Enumerable.Range(0, size).ToList()
-                : SerializedUtils.SearchArrayProperty(keysProp, keySearch).ToList();
+                : SerializedUtils.SearchArrayProperty(keysProp, keySearch).Where(each => each != -1).ToList();
             // int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
             if (string.IsNullOrEmpty(valueSearch))
             {
                 return results;
             }
 
-            int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
+            int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).Where(each => each != -1).ToArray();
             return results.Where(each => valueResults.Contains(each)).ToList();
         }
 

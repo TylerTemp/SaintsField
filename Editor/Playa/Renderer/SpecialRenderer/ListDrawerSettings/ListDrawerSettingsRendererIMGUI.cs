@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(_imGuiListInfo.SearchText)
                 ? Enumerable.Range(0, property.arraySize).ToList()
-                : SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText).ToList();
+                : SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText).Where(each => each != -1).ToList();
             PagingInfo newPagingInfo = GetPagingInfo(_imGuiListInfo.PageIndex, fullIndexResults, _imGuiListInfo.NumberOfItemsPrePage);
             if (!newPagingInfo.IndexesCurPage.SequenceEqual(_imGuiListInfo.PagingInfo.IndexesCurPage))
             {
@@ -288,7 +288,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                             _imGuiListInfo.Property.serializedObject.ApplyModifiedProperties();
                             IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(_imGuiListInfo.SearchText)
                                 ? Enumerable.Range(0, property.arraySize).ToList()
-                                : SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText).ToList();
+                                : SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText).Where(each => each != -1).ToList();
                             _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.PageIndex,
                                 fullIndexResults, _imGuiListInfo.NumberOfItemsPrePage);
                             return;
@@ -413,7 +413,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                         _imGuiListInfo.Property.serializedObject.ApplyModifiedProperties();
                         IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(_imGuiListInfo.SearchText)
                             ? Enumerable.Range(0, property.arraySize).ToList()
-                            : SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText).ToList();
+                            : SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText).Where(each => each != -1).ToList();
                         _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.PageIndex,
                             fullIndexResults, _imGuiListInfo.NumberOfItemsPrePage);
                         return;
@@ -527,9 +527,9 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             //     ? Enumerable.Range(0, property.arraySize).ToList()
             //     : SerializedUtils.SearchArrayProperty(property, search).ToList();
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
-            Debug.Log($"index search={search} result: {string.Join(",", fullIndexResults)}; numberOfItemsPerPage={numberOfItemsPerPage}");
-#endif
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+//             Debug.Log($"index search={search} result: {string.Join(",", fullIndexResults)}; numberOfItemsPerPage={numberOfItemsPerPage}");
+// #endif
 
             // List<int> itemIndexToPropertyIndex = fullIndexResults.ToList();
             int curPageIndex;
@@ -594,7 +594,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             {
                 IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(_imGuiListInfo.SearchText)
                     ? Enumerable.Range(0, FieldWithInfo.SerializedProperty.arraySize).ToList()
-                    : SerializedUtils.SearchArrayProperty(FieldWithInfo.SerializedProperty, _imGuiListInfo.SearchText).ToList();
+                    : SerializedUtils.SearchArrayProperty(FieldWithInfo.SerializedProperty, _imGuiListInfo.SearchText).Where(each => each != -1).ToList();
                 _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.PageIndex,
                     fullIndexResults, _imGuiListInfo.NumberOfItemsPrePage);
             }
