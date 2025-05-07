@@ -13,6 +13,9 @@ namespace SaintsField.Samples.Scripts.Interface
         [Serializable]
         public class Interface1 : SaintsInterface<Component, IInterface1>
         {
+            public Interface1(Component obj) : base(obj)
+            {
+            }
         }
 
         public Interface1 myInherentInterface1;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
@@ -14,7 +15,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
         }
 
         [Serializable]
-        public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
+        public class GeneralInterface : SaintsInterface<Object, IDummy>
+        {
+            public GeneralInterface(Object obj) : base(obj)
+            {
+            }
+        }
 
         // saintsInterface is broken atm
         // TODO: fix this
@@ -31,7 +37,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
             return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
         }
 
-        private string DummyNumberG(SaintsInterface<UnityEngine.Object, IDummy> dummyInter)
+        private string DummyNumberG(SaintsInterface<Object, IDummy> dummyInter)
         {
             return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
         }

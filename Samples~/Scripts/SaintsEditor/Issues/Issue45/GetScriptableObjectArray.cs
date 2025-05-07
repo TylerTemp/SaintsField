@@ -1,4 +1,5 @@
 using System;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
@@ -8,7 +9,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
         // [GetScriptableObject] public List<ScriptableInter12> dummyGos;
 
         [Serializable]
-        public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
+        public class GeneralInterface : SaintsInterface<Object, IDummy>
+        {
+            public GeneralInterface(Object obj) : base(obj)
+            {
+            }
+        }
 
         [GetScriptableObject, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
         public GeneralInterface[] getSoIArray;
@@ -21,7 +27,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
             return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
         }
 
-        private string DummyNumberG(SaintsInterface<UnityEngine.Object, IDummy> dummyInter)
+        private string DummyNumberG(SaintsInterface<Object, IDummy> dummyInter)
         {
             return dummyInter == null? "":  $"{dummyInter.I.GetComment()}";
         }

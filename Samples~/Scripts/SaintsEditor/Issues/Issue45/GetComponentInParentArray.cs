@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
@@ -14,7 +15,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
         }
 
         [Serializable]
-        public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy> { }
+        public class GeneralInterface : SaintsInterface<Object, IDummy>
+        {
+            public GeneralInterface(Object obj) : base(obj)
+            {
+            }
+        }
 
         [GetComponentInParent, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
         public GeneralInterface[] getComponentIArray;
