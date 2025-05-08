@@ -2,8 +2,9 @@
 
 ## 4.8.0 ##
 
-1.  Fix the error check in SpineAnimationPickerAttributeDrawerUIToolkit:UpdateDisplay for SkeletonData being null is backwards [#229](https://github.com/TylerTemp/SaintsField/issues/229)
-2.  Fix (SpineAnimationPicker) skeletonTarget callbacks do not check for null prefabs or null instances [#230](https://github.com/TylerTemp/SaintsField/issues/230)
+1.  UI Toolkit: Add `TableHide` to exclude a field/column from `Table` [#225](https://github.com/TylerTemp/SaintsField/issues/225)
+2.  Fix the error check in SpineAnimationPickerAttributeDrawerUIToolkit:UpdateDisplay for SkeletonData being null is backwards [#229](https://github.com/TylerTemp/SaintsField/issues/229)
+3.  Fix (SpineAnimationPicker) skeletonTarget callbacks do not check for null prefabs or null instances [#230](https://github.com/TylerTemp/SaintsField/issues/230)
 
 ## 4.7.5 ##
 

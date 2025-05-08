@@ -32,6 +32,10 @@ Unity: 2019.1 or higher
 >
 > IMGUI will only be focused on issues and small features. Big features like editing in `ShowInInspector` will not be supported in IMGUI.
 
+> [!NOTE]
+> If you want some specific feature been backport from UI Toolkit to IMGUI, open [an issue](https://github.com/TylerTemp/SaintsField/issues) or [discussion](https://github.com/TylerTemp/SaintsField/discussions) to request for it (not guaranteed tho)
+
+
 ### Installation ###
 
 *   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741)
@@ -86,10 +90,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.7.5**
+**4.8.0**
 
-1.  UI Toolkit: `ListDrawerSettings` now allow async search to avoid blocking the editor thread.
-2.  Add constructor and Editor setter for `SaintsInterface` [#228](https://github.com/TylerTemp/SaintsField/issues/228)
+1.  UI Toolkit: Add `TableHide` to exclude a field/column from `Table` [#225](https://github.com/TylerTemp/SaintsField/issues/225)
+2.  Fix the error check in SpineAnimationPickerAttributeDrawerUIToolkit:UpdateDisplay for SkeletonData being null is backwards [#229](https://github.com/TylerTemp/SaintsField/issues/229)
+3.  Fix (SpineAnimationPicker) skeletonTarget callbacks do not check for null prefabs or null instances [#230](https://github.com/TylerTemp/SaintsField/issues/230)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1581,6 +1586,35 @@ public MyValueStruct[] myStructs;
 ```
 
 ![image](https://github.com/user-attachments/assets/01190ea1-97b7-4654-84ea-1ca4388739a9)
+
+**`TableHide`**
+
+> [!NOTE]
+> This feature is UI Toolkit only
+
+You can use `TableHide` attribute to exclude some column from the table. It'll hide the column by default, and you can still toggle it in header - right click menu
+
+```csharp
+[Serializable]
+public struct MyStruct
+{
+    // Hide a single row
+    [TableHide] public int hideMeInTable;
+
+    // Hide a grouped column
+    [TableColumn("HideGroup"), TableHide]
+    public int hideMeGroup1;
+
+    [TableColumn("HideGroup")]
+    [ShowInInspector] private const int HideMeGroup2 = 2;
+
+}
+
+[Table]
+public List<MyStruct> myStructs;
+```
+
+[![video](https://github.com/user-attachments/assets/2bf6480a-65f7-4dfc-bf96-bfee9497428e)](https://github.com/user-attachments/assets/66fa7d10-427c-4f8c-b23f-f4bb29faa9f6)
 
 #### `ShowInInspector` ####
 
