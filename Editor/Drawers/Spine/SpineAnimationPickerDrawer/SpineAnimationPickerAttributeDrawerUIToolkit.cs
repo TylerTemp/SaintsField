@@ -170,7 +170,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             if (error == "")
             {
                 SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
-                if (skeletonData != null)
+                if (skeletonData == null)
                 {
                     error = $"SkeletonData of {skeletonDataAsset} is null";
                 }
