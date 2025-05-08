@@ -200,6 +200,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     .FirstOrDefault(each => each != null);
 
                 Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
+                Dictionary<string, bool> columnToDefaultHide = new Dictionary<string, bool>();
 
                 using(SerializedObject serializedObject = new SerializedObject(obj0))
                 {
@@ -225,6 +226,16 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             }
                         }
 
+                        foreach (IPlayaAttribute playaAttribute in saintsFieldInfoName.SaintsFieldWithInfo.PlayaAttributes)
+                        {
+                            // ReSharper disable once InvertIf
+                            if (playaAttribute is TableHideAttribute)
+                            {
+                                columnToDefaultHide[columnName] = true;
+                                break;
+                            }
+                        }
+
                         if(!columnToMemberIds.TryGetValue(columnName, out List<string> list))
                         {
                             columnToMemberIds[columnName] = list = new List<string>();
@@ -242,11 +253,18 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
                     string id = string.Join(";", memberIds);
 
+                    bool visible = true;
+                    if (columnToDefaultHide.TryGetValue(columnName, out bool hide))
+                    {
+                        visible = !hide;
+                    }
+
                     multiColumnListView.columns.Add(new Column
                     {
                         name = id,
                         title = columnName,
                         stretchable = true,
+                        visible = visible,
                     });
 
                     multiColumnListView.columns[id].makeCell = () =>
@@ -338,88 +356,6 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         }
                     };
                 }
-
-                // // ReSharper disable once UseDeconstruction
-                // foreach (KeyValuePair<string, List<SerializedPropertyInfo>> columnKv in columnToProperties)
-                // {
-                //     string columnName = columnKv.Key;
-                //     List<SerializedPropertyInfo> properties = columnKv.Value;
-                //     IReadOnlyList<string> propNames = properties.Select(each => each.Name).ToArray();
-                //
-                //     string id = string.Join(";", properties.Select(each => each.PropertyPath));
-                //
-                //     multiColumnListView.columns.Add(new Column
-                //     {
-                //         name = id,
-                //         title = columnName,
-                //         stretchable = true,
-                //         // comparison = (a, b) => CompareProp((SerializedProperty) multiColumnListView.itemsSource[a], (SerializedProperty) multiColumnListView.itemsSource[(int)b]),
-                //     });
-                //
-                //     multiColumnListView.columns[id].makeCell = () =>
-                //     {
-                //         VisualElement itemContainer = new VisualElement();
-                //         // PropertyField propField = new PropertyField();
-                //         // itemContainer.Add(propField);
-                //         for (int i = 0; i < properties.Count; i++)
-                //         {
-                //             itemContainer.Add(new PropertyField());
-                //         }
-                //         return itemContainer;
-                //     };
-                //
-                //     multiColumnListView.columns[id].bindCell = (element, index) =>
-                //     {
-                //
-                //         SerializedProperty sp = (SerializedProperty)multiColumnListView.itemsSource[index];
-                //         Object obj = sp.objectReferenceValue;
-                //         if (obj == null)
-                //         {
-                //             ObjectField arrayItemProp = new ObjectField("")
-                //             {
-                //                 objectType = ReflectUtils.GetElementType(info.FieldType),
-                //             };
-                //
-                //             element.Clear();
-                //             element.Add(arrayItemProp);
-                //
-                //             arrayItemProp.RegisterValueChangedCallback(evt =>
-                //             {
-                //                 sp.objectReferenceValue = evt.newValue;
-                //                 sp.serializedObject.ApplyModifiedProperties();
-                //                 multiColumnListView.Rebuild();
-                //             });
-                //             return;
-                //         }
-                //         SerializedObject itemObject = new SerializedObject(obj);
-                //
-                //         foreach ((PropertyField propField, int propIndex) in element.Query<PropertyField>().ToList().WithIndex())
-                //         {
-                //             if (propIndex >= propNames.Count)
-                //             {
-                //                 break;
-                //             }
-                //
-                //             string propName = propNames[propIndex];
-                //             SerializedProperty itemProp = itemObject.FindProperty(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(itemObject, propName);
-                //             propField.BindProperty(itemProp);
-                //             propField.Bind(itemObject);
-                //             propField.label = "";
-                //             Label firstLabel = propField.Query<Label>().First();
-                //             if(firstLabel != null)
-                //             {
-                //                 if (!firstLabel.ClassListContains(ClassNoRichLabelUpdate))
-                //                 {
-                //                     firstLabel.AddToClassList(ClassNoRichLabelUpdate);
-                //                 }
-                //                 if(itemProp.propertyType != SerializedPropertyType.Generic && firstLabel.style.display != DisplayStyle.None)
-                //                 {
-                //                     firstLabel.style.display = DisplayStyle.None;
-                //                 }
-                //             }
-                //         }
-                //     };
-                // }
             }
             else  // item is general
             {
@@ -438,6 +374,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     .Where(SaintsEditor.SaintsFieldInfoShouldDraw);
 
                 Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
+                Dictionary<string, bool> columnToDefaultHide = new Dictionary<string, bool>();
 
                 foreach (SaintsFieldWithInfo saintsFieldWithInfo in firstSaintsFieldWithInfos)
                 {
@@ -448,6 +385,16 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         if (playaAttribute is TableColumnAttribute tc)
                         {
                             columnName = tc.Title;
+                            break;
+                        }
+                    }
+
+                    foreach (IPlayaAttribute playaAttribute in saintsFieldWithInfo.PlayaAttributes)
+                    {
+                        // ReSharper disable once InvertIf
+                        if (playaAttribute is TableHideAttribute)
+                        {
+                            columnToDefaultHide[columnName] = true;
                             break;
                         }
                     }
@@ -468,14 +415,22 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
                     string id = string.Join(";", memberIds);
 
-                    multiColumnListView.columns.Add(new Column
+                    bool visible = true;
+                    if (columnToDefaultHide.TryGetValue(columnName, out bool hide))
+                    {
+                        visible = !hide;
+                    }
+
+                    Column curColumn = new Column
                     {
                         name = id,
                         title = columnName,
                         stretchable = true,
-                    });
+                        visible = visible,
+                    };
+                    multiColumnListView.columns.Add(curColumn);
 
-                    multiColumnListView.columns[id].makeCell = () =>
+                    curColumn.makeCell = () =>
                     {
                         VisualElement itemContainer = new VisualElement();
 
@@ -488,7 +443,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         return itemContainer;
                     };
 
-                    multiColumnListView.columns[id].bindCell = (element, index) =>
+                    curColumn.bindCell = (element, index) =>
                     {
                         // Debug.Log($"id={id}/index={index}");
                         SerializedProperty targetProp = (SerializedProperty)multiColumnListView.itemsSource[index];
@@ -541,66 +496,6 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         }
                     };
                 }
-
-                // // ReSharper disable once UseDeconstruction
-                // foreach (KeyValuePair<string, List<SerializedPropertyInfo>> columnKv in columnToProperties)
-                // {
-                //     string columnName = columnKv.Key;
-                //     List<SerializedPropertyInfo> properties = columnKv.Value;
-                //     IReadOnlyList<string> propNames = properties.Select(each => each.Name).ToArray();
-                //
-                //     string id = string.Join(";", properties.Select(each => each.PropertyPath));
-                //
-                //     multiColumnListView.columns.Add(new Column
-                //     {
-                //         name = id,
-                //         title = columnName,
-                //         stretchable = true,
-                //     });
-                //
-                //     multiColumnListView.columns[id].makeCell = () =>
-                //     {
-                //         VisualElement itemContainer = new VisualElement();
-                //         // PropertyField propField = new PropertyField();
-                //         // itemContainer.Add(propField);
-                //         // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                //         for (int i = 0; i < properties.Count; i++)
-                //         {
-                //             itemContainer.Add(new PropertyField());
-                //         }
-                //         return itemContainer;
-                //     };
-                //
-                //     multiColumnListView.columns[id].bindCell = (element, index) =>
-                //     {
-                //         SerializedProperty sp = (SerializedProperty)multiColumnListView.itemsSource[index];
-                //
-                //         foreach ((PropertyField propField, int propIndex) in element.Query<PropertyField>().ToList().WithIndex())
-                //         {
-                //             if (propIndex >= propNames.Count)
-                //             {
-                //                 break;
-                //             }
-                //             string propName = propNames[propIndex];
-                //             SerializedProperty itemProp = sp.FindPropertyRelative(propName) ?? SerializedUtils.FindPropertyByAutoPropertyName(sp, propName);
-                //             propField.BindProperty(itemProp);
-                //             propField.Bind(itemProp.serializedObject);
-                //             propField.label = "";
-                //             Label firstLabel = propField.Query<Label>().First();
-                //             if(firstLabel != null)
-                //             {
-                //                 if (!firstLabel.ClassListContains(ClassNoRichLabelUpdate))
-                //                 {
-                //                     firstLabel.AddToClassList(ClassNoRichLabelUpdate);
-                //                 }
-                //                 if(itemProp.propertyType != SerializedPropertyType.Generic && firstLabel.style.display != DisplayStyle.None)
-                //                 {
-                //                     firstLabel.style.display = DisplayStyle.None;
-                //                 }
-                //             }
-                //         }
-                //     };
-                // }
             }
             root.Add(multiColumnListView);
 
@@ -780,31 +675,6 @@ namespace SaintsField.Editor.Drawers.TableDrawer
         //         StyleSheet uss = Util.LoadResource<StyleSheet>("UIToolkit/ListViewSkipRest.uss");
         //         Debug.Log($"uss={uss}");
         //         listView.styleSheets.Add(uss);
-        //     }
-        // }
-
-        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-        //     VisualElement container, Action<object> onValueChanged, FieldInfo info)
-        // {
-        //     int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-        //     if (propertyIndex != 0)
-        //     {
-        //         return;
-        //     }
-        //
-        //     (string error, SerializedProperty arrayProp) = SerializedUtils.GetArrayProperty(property);
-        //     if (error != "")
-        //     {
-        //         return;
-        //     }
-        //
-        //     if (_preArraySize != arrayProp.arraySize)
-        //     {
-        //         _preArraySize = arrayProp.arraySize;
-        //         MultiColumnListView multiColumnListView = container.Q<MultiColumnListView>();
-        //         multiColumnListView.itemsSource = MakeSource(arrayProp);
-        //         multiColumnListView.Rebuild();
-        //         container.Q<IntegerField>(name: NameArraySize(property)).SetValueWithoutNotify(arrayProp.arraySize);
         //     }
         // }
 

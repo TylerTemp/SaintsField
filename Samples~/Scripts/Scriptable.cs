@@ -8,6 +8,14 @@ namespace SaintsField.Samples.Scripts
     // [CreateAssetMenu(fileName = "Scriptable", menuName = "ScriptableObjects/Scriptable", order = 0)]
     public class Scriptable : ScriptableObject, IInterface2, IDummy
     {
+        [TableHide] public int hideMeInTable;
+
+        [TableColumn("HideGroup"), TableHide]
+        public int hideMeGroup1;
+
+        [TableColumn("HideGroup")] [ShowInInspector]
+        private const int HideMeGroup2 = 2;
+
         [SerializeField]
         [RichLabel("<color=red><label /></color>")]
         [PropRange(0, 100)]

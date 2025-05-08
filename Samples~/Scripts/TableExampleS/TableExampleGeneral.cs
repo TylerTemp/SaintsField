@@ -26,6 +26,14 @@ namespace SaintsField.Samples.Scripts.TableExampleS
             [TableColumn("Value")]
             public SubStruct subStruct;
 
+            [TableHide] public int hideMeInTable;
+
+            [TableColumn("HideGroup"), TableHide]
+            public int hideMeGroup1;
+
+            [TableColumn("HideGroup")] [ShowInInspector]
+            private const int HideMeGroup2 = 2;
+
             [TableColumn("")]
             [Button] private void B1() {}
             [TableColumn("")]

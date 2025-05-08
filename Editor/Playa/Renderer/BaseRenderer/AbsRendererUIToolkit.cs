@@ -231,6 +231,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render start {label}/{valueType}/{value}");
 #endif
+            if (valueType == typeof(Placeholder))
+            {
+                return null;
+            }
 
             Color reColor = EColor.EditorSeparator.GetColor();
 
