@@ -1,5 +1,6 @@
 using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using Spine.Unity;
 using UnityEditor;
 using UnityEngine;
@@ -32,6 +33,11 @@ namespace SaintsField.Editor.Drawers.Spine
                 Debug.LogError(error);
 #endif
                 return (error, null);
+            }
+
+            if (RuntimeUtil.IsNull(uObj))
+            {
+                return ($"Target `{callback}` is null", null);
             }
 
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
