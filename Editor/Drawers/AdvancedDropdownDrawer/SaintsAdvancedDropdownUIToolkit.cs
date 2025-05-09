@@ -32,16 +32,18 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         {
             int screenHeight = Screen.currentResolution.height;
 
-            float maxHeight = Screen.currentResolution.height - rootWorldBound.y - rootWorldBound.height - 100;
+            const float edgeHeight = 150;
+
+            float maxHeight = screenHeight - rootWorldBound.yMax - edgeHeight;
             Rect worldBound = new Rect(rootWorldBound);
             // Debug.Log(worldBound);
             // ReSharper disable once InvertIf
-            if (maxHeight < 100)
+            if (maxHeight < edgeHeight)
             {
                 // worldBound.x -= 400;
-                worldBound.y -= 100 + worldBound.height;
+                worldBound.y -= edgeHeight + worldBound.height;
                 // Debug.Log(worldBound);
-                maxHeight = Mathf.Max(100, screenHeight - 100);
+                maxHeight = Mathf.Max(edgeHeight, screenHeight - edgeHeight);
             }
 
             return (worldBound, maxHeight);
@@ -375,6 +377,13 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
             root.RegisterCallback<AttachToPanelEvent>(_ => root.Q<TextField>().Q("unity-text-input").Focus());
 
+#if UNITY_2023_2_OR_NEWER
+            // don't lose focus
+            root.RegisterCallback<PointerDownEvent>(
+                evt => root.focusController.IgnoreEvent(evt),
+                TrickleDown.TrickleDown);
+#endif
+
             return root;
         }
 
@@ -388,14 +397,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 return string.Join("/", SelectStacks.Select(each => $"[{each.Index}]:{each.Display}"));
             }
         }
-
-        // public struct SearchPathStackAcc
-        // {
-        //     public int Index;
-        //     public string Display;
-        //     public IReadOnlyList<string> ParentDisplays;
-        // }
-
 
         private static IEnumerable<SearchPathStack> SearchPath(IReadOnlyList<string> searchFragments, IAdvancedDropdownList dropdownList)
         {
@@ -463,38 +464,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             float height = contentContainer.resolvedStyle.height + toolbarSearchContainer.resolvedStyle.height + toolbarBreadcrumbs.resolvedStyle.height + 8;
 
             editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, Mathf.Min(height, _maxHeight));
-            // editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, height);
-            // VisualElement target = (VisualElement)evt.target;
-            // // float newHeight = evt.newRect.height + 5;
-            // float newHeight = target.resolvedStyle.height + 1;
-            //
-            // DelayUpdateSize delayUpdateSize = (DelayUpdateSize)target.userData;
-            //
-            // target.userData = new DelayUpdateSize
-            // {
-            //     IsDelay = true,
-            //     Height = newHeight,
-            // };
-            //
-            // if (delayUpdateSize.IsDelay)
-            // {
-            //     Debug.Log($"delay to {newHeight}");
-            //     return;
-            // }
-            //
-            // Debug.Log($"will update {newHeight}");
-            // ((VisualElement) evt.target).schedule.Execute(() =>
-            // {
-            //     DelayUpdateSize newSize = (DelayUpdateSize)target.userData;
-            //     Debug.Log($"start to update {newSize.Height}");
-            //     editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, newSize.Height);
-            //     // _delayUpdateSize = false;
-            //     target.userData = new DelayUpdateSize
-            //     {
-            //         IsDelay = false,
-            //         Height = newSize.Height,
-            //     };
-            // });
         }
 
         private static void SwapToolbarBreadcrumbs(ToolbarBreadcrumbs toolbarBreadcrumbs, IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> pageStack, Action<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> goToStack)
@@ -651,6 +620,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     }).ToArray();
 
                     itemContainer.clicked += () => goToStack(nextPageStack);
+
+                    elementItem.RegisterCallback<PointerEnterEvent>(_ => Debug.Log(dropdownItem.displayName));
                 }
                 else
                 {
@@ -664,6 +635,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     {
                         itemContainer.pickingMode = PickingMode.Ignore;
                         itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+                        elementItem.RegisterCallback<PointerEnterEvent>(_ => Debug.Log(dropdownItem.displayName));
                     }
                     else
                     {
@@ -675,6 +647,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             // allSelectImage.ForEach(each => each.visible = false);
                             // selectImage.visible = true;
                         };
+                        elementItem.RegisterCallback<PointerEnterEvent>(_ => Debug.Log(dropdownItem.displayName));
                     }
                 }
 
@@ -731,13 +704,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 // targetItem.RegisterCallback<TransitionRunEvent>(Debug.Log);
                 targetItem.RegisterCallback<TransitionEndEvent>(TransitionDestroy);
             });
-
-            // targetItem.RemoveFromClassList("saintsfield-advanced-dropdown-anim-in-view");
-            // targetItem.RegisterCallback<TransitionEndEvent>(TransitionDestroy);
-            // targetItem.RegisterCallback<TransitionCancelEvent>(Debug.Log);
-            // targetItem.RegisterCallback<TransitionStartEvent>(Debug.Log);
-            // targetItem.RegisterCallback<TransitionRunEvent>(Debug.Log);
-            // targetItem.AddToClassList(className);
         }
 
         private static void TransitionDestroy(TransitionEndEvent evt)

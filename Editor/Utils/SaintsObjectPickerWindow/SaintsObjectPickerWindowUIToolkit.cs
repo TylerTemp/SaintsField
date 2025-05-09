@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -461,6 +462,26 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             // OnMoveBlockView(evt.direction);
             NavigationMoveEvent.Direction direction = evt.direction;
 
+            List<ObjectInfo> checkingTargets = _currentOnAssets ? AssetsObjects : SceneObjects;
+
+            if (_currentActive is { Display: false })
+            {
+                // Debug.Log($"current is not display, try pick the first displayed item");
+                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                foreach (ObjectInfo objectInfo in checkingTargets)
+                {
+                    if (!objectInfo.Display)
+                    {
+                        continue;
+                    }
+                    SetItemActive(objectInfo.BaseInfo);
+                    _blockView.ScrollTo(objectInfo.BlockItem);
+                    OnSelectedEvent.Invoke(objectInfo);
+                    return;
+                }
+                return;
+            }
+
             // Debug.Log(direction);
             VisualElement currentBlockItem = _currentActive?.BlockItem;
             if (currentBlockItem == null)
@@ -503,16 +524,26 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
             // Debug.Log($"{currentBound} -> {shrinkBound}");
 
-            List<ObjectInfo> checkingTargets = _currentOnAssets ? AssetsObjects : SceneObjects;
+
             foreach (ObjectInfo objectInfo in checkingTargets)
             {
+                if (!objectInfo.Display)
+                {
+                    continue;
+                }
+
                 VisualElement checkingBlockItem = objectInfo.BlockItem;
+                if (checkingBlockItem.panel == null)
+                {
+                    continue;
+                }
                 Rect checkingWorldBound = checkingBlockItem.worldBound;
                 if (double.IsNaN(checkingWorldBound.height) || double.IsNaN(checkingWorldBound.width))
                 {
                     continue;
                 }
 
+                // ReSharper disable once InvertIf
                 if (shrinkBound.Overlaps(checkingWorldBound))
                 {
                     SetItemActive(objectInfo.BaseInfo);
@@ -526,6 +557,21 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             if (direction == NavigationMoveEvent.Direction.Up)
             {
                 _toolbarSearchField.Focus();
+            }
+            else
+            {
+                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                foreach (ObjectInfo objectInfo in checkingTargets)
+                {
+                    if (!objectInfo.Display)
+                    {
+                        continue;
+                    }
+                    SetItemActive(objectInfo.BaseInfo);
+                    _blockView.ScrollTo(objectInfo.BlockItem);
+                    OnSelectedEvent.Invoke(objectInfo);
+                    break;
+                }
             }
         }
 
@@ -688,13 +734,22 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
                 if (target is Component comp)
                 {
-                    target = targetGo = comp.gameObject;
+                    targetGo = comp.gameObject;
                     isComp = true;
-
                 }
 
-                Texture2D preview = AssetPreview.GetAssetPreview(target);
-                if (preview != null && preview.width > 1)
+                Texture2D preview = GetPreview(target);
+                if (preview is null)
+                {
+                    objectInfo.PreviewLoadCount++;
+                    // ReSharper disable once InvertIf
+                    if (objectInfo.BlockItemPreview.image == null && isComp)
+                    {
+                        Texture2D previewIcon = AssetPreview.GetMiniThumbnail(targetGo);
+                        objectInfo.BlockItemPreview.image = previewIcon;
+                    }
+                }
+                else
                 {
                     // Debug.Log($"{objectInfo.BaseInfo.Name}: {preview}");
                     objectInfo.Preview = preview;
@@ -703,16 +758,23 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                     objectInfo.BlockItemIcon.style.display = DisplayStyle.Flex;
                     objectInfo.BlockItemPreview.image = preview;
                 }
-                else
-                {
-                    objectInfo.PreviewLoadCount++;
-                    if (objectInfo.BlockItemPreview.image == null && isComp)
-                    {
-                        Texture2D previewIcon = AssetPreview.GetMiniThumbnail(targetGo);
-                        objectInfo.BlockItemPreview.image = previewIcon;
-                    }
-                }
             }
+        }
+
+        private static Texture2D GetPreview(Object target)
+        {
+            Object previewTarget = target;
+            if (target is Component comp)
+            {
+                previewTarget = comp.gameObject;
+            }
+            Texture2D preview = AssetPreview.GetAssetPreview(previewTarget);
+            if (preview != null && preview.width > 1)
+            {
+                return preview;
+            }
+
+            return null;
         }
 
         public void RefreshDisplay()
@@ -832,6 +894,34 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             _selectedPreviewPath.text = objectInfo.BaseInfo.Path;
         }
 
+        public void SetInitDetailPanel(ObjectBaseInfo baseInfo)
+        {
+            _selectedPreviewName.text = baseInfo.Name;
+            _selectedPreviewType.text = baseInfo.TypeName;
+            _selectedPreviewPath.text = baseInfo.Path;
+
+            // ReSharper disable once InvertIf
+            if(!RuntimeUtil.IsNull(baseInfo.Target))
+            {
+                Texture2D image = GetPreview(baseInfo.Target);
+                if (image is null)
+                {
+                    if (baseInfo.Target is Component comp)
+                    {
+                        _selectedPreviewImage.image = AssetPreview.GetMiniThumbnail(comp.gameObject);
+                    }
+                    else
+                    {
+                        _selectedPreviewImage.image = AssetPreview.GetMiniThumbnail(baseInfo.Target);
+                    }
+                }
+                else
+                {
+                    _selectedPreviewImage.image = image;
+                }
+            }
+        }
+
         private void UpdateDetailPreview()
         {
             if (_currentActive == null)
@@ -896,10 +986,17 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         private void EnqueueToAssetsObjects(bool isAssets, IEnumerable<ObjectBaseInfo> objectBaseInfos)
         {
+            string searchTarget = _toolbarSearchField.value;
+            string[] searchFragments = searchTarget.Split(' ');
+
             foreach (ObjectBaseInfo objectBaseInfo in objectBaseInfos)
             {
                 VisualElement listItem = _listItemAsset.CloneTree();
                 VisualElement blockItem = _blockItemAsset.CloneTree();
+
+                bool display = string.IsNullOrEmpty(searchTarget) || searchFragments.All(fragment =>
+                    objectBaseInfo.Name.Contains(fragment, StringComparison.OrdinalIgnoreCase));
+
                 ObjectInfo objectInfo = new ObjectInfo
                 {
                     BaseInfo = objectBaseInfo,
@@ -911,12 +1008,12 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                     BlockItemButton = blockItem.Q<Button>(),
                     BlockItemIcon = blockItem.Q<Image>(name: "saints-field-object-picker-block-item-icon"),
                     BlockItemPreview = blockItem.Q<Image>(name: "saints-field-object-picker-block-item-preview"),
-                    Display = true,
+                    Display = display,
                 };
 
                 InitItem(_slider.value, objectInfo, listItem, blockItem);
 
-                if (isAssets == _currentOnAssets)
+                if (display && isAssets == _currentOnAssets)
                 {
                     _listViewContent.Add(objectInfo.ListItem);
                     _blockViewContent.Add(objectInfo.BlockItem);

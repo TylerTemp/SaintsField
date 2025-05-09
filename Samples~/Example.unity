@@ -1766,43 +1766,59 @@ MonoBehaviour:
     myObject: {fileID: 11400000, guid: a1531069d26bcec459484c6bc0dd9cbe, type: 2}
     subStruct:
       sub: 
+    hideMeInTable: 0
+    hideMeGroup1: 0
   - myInt: 1
     myString: 
     myObject: {fileID: 11400000, guid: aef5010cd48df3848851357eb5f31ae8, type: 2}
     subStruct:
       sub: 
+    hideMeInTable: 0
+    hideMeGroup1: 0
   - myInt: 2
     myString: 
     myObject: {fileID: 11400000, guid: d68a85fa51eca994b9c3400927090e99, type: 2}
     subStruct:
       sub: 
+    hideMeInTable: 0
+    hideMeGroup1: 0
   - myInt: 49
     myString: 
     myObject: {fileID: 11400000, guid: 11b61b95052fba44788a2dd17d2bde74, type: 2}
     subStruct:
       sub: 
+    hideMeInTable: 0
+    hideMeGroup1: 0
   defaultExpanded2:
   - myInt: 0
     myString: 
     myObject: {fileID: 0}
     subStruct:
       sub: 
+    hideMeInTable: 0
+    hideMeGroup1: 0
   hideButtons:
   - myInt: 132
     myString: 
     myObject: {fileID: 0}
     subStruct:
       sub: 
+    hideMeInTable: 0
+    hideMeGroup1: 0
   - myInt: 0
     myString: 
     myObject: {fileID: 0}
     subStruct:
       sub: 
+    hideMeInTable: 0
+    hideMeGroup1: 0
   - myInt: 0
     myString: 
     myObject: {fileID: 0}
     subStruct:
       sub: 
+    hideMeInTable: 0
+    hideMeGroup1: 0
 --- !u!1 &215164999
 GameObject:
   m_ObjectHideFlags: 0
@@ -22773,7 +22789,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   go: {fileID: 0}
-  anyObj: {fileID: 11500000, guid: 30f42e8a12eb842acbe9a63057fb00e4, type: 3}
+  anyObj: {fileID: 2800000, guid: 7b95bf5cafcb0784797af29d94c664bf, type: 3}
 --- !u!1 &1755597643
 GameObject:
   m_ObjectHideFlags: 0

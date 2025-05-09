@@ -9,6 +9,7 @@ using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -159,6 +160,24 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                     SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
                     // objectPickerWindowUIToolkit.ResetClose();
                     objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {requiredComp} for {fieldType}");
+                    (string __, int _, object curValue) = Util.GetValue(property, info, parent);
+                    Object curValueObj = curValue as Object;
+                    bool curValueObjIsNull = RuntimeUtil.IsNull(curValueObj);
+                    if (curValueObjIsNull)
+                    {
+                        objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+                    }
+                    else
+                    {
+                        objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                            curValueObj,
+                            // ReSharper disable once PossibleNullReferenceException
+                            curValueObj.name,
+                            curValueObj.GetType().Name,
+                            AssetDatabase.GetAssetPath(curValueObj)
+                        ));
+                    }
+
                     if(_useCache)
                     {
                         objectPickerWindowUIToolkit.AssetsObjects =

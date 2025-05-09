@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.8.1 ##
+
+1.  UI Toolkit: fix custom picker when you have search in block view, arrow key gives error if the currently selected item is not in loaded results
+2.  UI Toolkit: fix custom picker show placeholder information when the selected item has not appeared in loading results yet
+3.  UI Toolkit: fix custom picker showing results that does not match the search when you start typing before the loading process finished
+4.  UI Toolkit: fix `AdvancedDropdown` layout issue that an item can overlap a bit with the search box
+
 ## 4.8.0 ##
 
 1.  UI Toolkit: Add `TableHide` to exclude a field/column from `Table` [#225](https://github.com/TylerTemp/SaintsField/issues/225)

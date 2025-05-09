@@ -97,15 +97,27 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 image = Util.LoadResource<Texture2D>("close.png"),
             });
 
+            Texture2D pickerImage = EditorGUIUtility.IconContent("d_pick_uielements").image as Texture2D;
             Button selectorButton = new Button
             {
-                text = "●",
+                // text = "●",
                 style =
                 {
                     width = SingleLineHeight,
                     display = DisplayStyle.None,
                     marginLeft = 0,
                     marginRight = 0,
+                    backgroundImage = pickerImage,
+                    borderTopLeftRadius = 0,
+                    borderBottomLeftRadius = 0,
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
                 },
                 name = NameSelectorButton(property, index),
             };
@@ -338,6 +350,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         return;
                     }
                     Object curValueObj = (Object)curValue;
+                    bool curValueObjIsNull = RuntimeUtil.IsNull(curValueObj);
 
                     if (getValueError != "")
                     {
@@ -362,6 +375,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = EditorWindow.GetWindow<SaintsObjectPickerWindowUIToolkit>();
                     // objectPickerWindowUIToolkit.ResetClose();
                     objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {genericCache.ExpectedType}" + (genericCache.ExpectedInterface == null? "": $"({genericCache.ExpectedInterface})"));
+
+                    if (curValueObjIsNull)
+                    {
+                        objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+                    }
+                    else
+                    {
+                        objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                            curValueObj,
+                            // ReSharper disable once PossibleNullReferenceException
+                            curValueObj.name,
+                            curValueObj.GetType().Name,
+                            AssetDatabase.GetAssetPath(curValueObj)
+                        ));
+                    }
 
                     if(_useCache)
                     {
