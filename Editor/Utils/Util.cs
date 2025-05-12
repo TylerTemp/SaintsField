@@ -40,6 +40,13 @@ namespace SaintsField.Editor.Utils
             return result;
         }
 
+        // positive mod
+        public static int PositiveMod(int x, int m)
+        {
+            int r = x % m;
+            return r < 0 ? r + m : r;
+        }
+
         public static float BoundFloatStep(float curValue, float start, float end, float step)
         {
             float distance = curValue - start;

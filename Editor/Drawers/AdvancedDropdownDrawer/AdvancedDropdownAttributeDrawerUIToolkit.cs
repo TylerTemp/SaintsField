@@ -52,6 +52,25 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return helpBox;
         }
 
+        // public class DebugPopupExample : EditorWindow
+        // {
+        //     public static SaintsAdvancedDropdownUIToolkit SaintsAdvancedDropdownUIToolkit;
+        //
+        //     private void CreateGUI()
+        //     {
+        //         // Create an instance of your PopupWindowContent
+        //         var popupContent = SaintsAdvancedDropdownUIToolkit;
+        //
+        //         // Manually call OnOpen to initialize the UI
+        //         // popupContent.editorWindow = this;
+        //         // popupContent.OnOpen();
+        //
+        //         var r = popupContent.DebugCloneTree();
+        //         // Add the PopupWindowContent's root VisualElement to the EditorWindow
+        //         rootVisualElement.Add(r);
+        //     }
+        // }
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -64,41 +83,34 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             dropdownButton.ButtonElement.clicked += () =>
             {
                 AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false);
-                // Debug.Log(root.worldBound);
-                // Debug.Log(Screen.height);
-                // float maxHeight = Mathf.Max(400, Screen.height - root.worldBound.y - root.worldBound.height - 200);
-
-                // float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
-                // float maxHeight = Screen.currentResolution.height - root.worldBound.y - root.worldBound.height - 100;
-                // Rect worldBound = root.worldBound;
-                // // Debug.Log(worldBound);
-                // if (maxHeight < 100)
-                // {
-                //     // worldBound.x -= 400;
-                //     worldBound.y -= 100 + worldBound.height;
-                //     // Debug.Log(worldBound);
-                //     maxHeight = 100;
-                // }
 
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
+                SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
                     metaInfo,
                     root.worldBound.width,
                     maxHeight,
                     false,
                     (newDisplay, curItem) =>
                     {
-                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curItem);
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
+                            parent, curItem);
                         Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
 
-                        dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).ButtonLabelElement.text = newDisplay;
+                        dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).ButtonLabelElement
+                            .text = newDisplay;
                         dropdownButton.userData = curItem;
                         onValueChangedCallback(curItem);
                         // dropdownButton.buttonLabelElement.text = newDisplay;
                     }
-                ));
+                );
+
+                // DebugPopupExample.SaintsAdvancedDropdownUIToolkit = sa;
+                // var editorWindow = EditorWindow.GetWindow<DebugPopupExample>();
+                // editorWindow.Show();
+
+                UnityEditor.PopupWindow.Show(worldBound, sa);
 
                 string curError = metaInfo.Error;
                 HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));

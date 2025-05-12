@@ -114,5 +114,23 @@ namespace SaintsField.Samples.Scripts
         }
 
         private string ListEnumLabel(ListEnum value, int index) => $"{value}/{listEnum[index]}";
+
+        [Serializable, Flags]
+        public enum F
+        {
+            Zero,
+            [RichLabel("Opt/1")]
+            One = 1,
+            [RichLabel("Opt/2")]
+            Two = 1 << 1,
+            [RichLabel("Opt/3")]
+            Three = 1 << 2,
+            [RichLabel("Opt/4")]
+            Four = 1 << 3,
+            Five = 1 << 4,
+        }
+
+        [FlagsDropdown]
+        public F flags;
     }
 }
