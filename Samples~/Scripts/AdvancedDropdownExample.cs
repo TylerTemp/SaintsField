@@ -10,7 +10,9 @@ namespace SaintsField.Samples.Scripts
         public int place3;
         public int place4;
 
-        [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
+        [AdvancedDropdown(nameof(AdvDropdown)), PostFieldButton(nameof(Reset), "R")] public int selectIt;
+
+        private void Reset() => selectIt = 0;
 
         public AdvancedDropdownList<int> AdvDropdown()
         {
