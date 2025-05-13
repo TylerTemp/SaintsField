@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
+using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Playa;
 using UnityEditorInternal;
 using UnityEngine;
@@ -718,7 +719,24 @@ namespace SaintsField.Editor.Utils
                     {
                         return null;
                     }
-                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout, null, makeRenderer, doTweenPlayRecorder, parent);
+
+                    if (propertyType == SerializedPropertyType.ManagedReference)
+                    {
+                        ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
+                        ReferencePickerAttributeDrawer referencePickerAttributeDrawer = (ReferencePickerAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(ReferencePickerAttributeDrawer), fieldInfo, referencePickerAttribute, label);
+                        referencePickerAttributeDrawer.OverridePropertyAttributes = new PropertyAttribute[]
+                        {
+                            referencePickerAttribute,
+                            new SaintsRowAttribute(),
+                        };
+                        referencePickerAttributeDrawer.InHorizontalLayout = inHorizontalLayout;
+                        return referencePickerAttributeDrawer.CreatePropertyGUI(property);
+                    }
+                    else
+                    {
+                        return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout,
+                            null, makeRenderer, doTweenPlayRecorder, parent);
+                    }
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:
