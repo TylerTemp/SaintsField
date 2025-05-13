@@ -47,6 +47,95 @@ namespace SaintsField.Editor.Utils
             return r < 0 ? r + m : r;
         }
 
+        // binary format
+        // empty string for failure
+        public static string FormatBinary(string formatControl, object value)
+        {
+            if (value is IFormattable iFormattable)
+            {
+                try
+                {
+                    return iFormattable.ToString(formatControl, null);
+                }
+                catch (Exception)
+                {
+                    // do nothing
+                }
+            }
+
+            int bitLength = 0;
+            if (formatControl.Length >= 2)
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                string lengthPart = formatControl.Substring(1);
+                // Debug.Log(lengthPart);
+                if (!int.TryParse(lengthPart, out bitLength))
+                {
+                    return "";
+                }
+            }
+
+            // Debug.Log($"ConvertToBinary {value}/{bitLength}");
+            return ConvertToBinary(value, bitLength);
+        }
+
+        private static string ConvertToBinary(object value, int bitLength)
+        {
+            if (value == null)
+            {
+                return "";
+                // throw new ArgumentNullException(nameof(value), "Value cannot be null.");
+            }
+
+            long numericValue;
+
+            if (value is int intValue)
+            {
+                numericValue = intValue;
+            }
+            else if (value is long longValue)
+            {
+                numericValue = longValue;
+            }
+            else if (value is short shortValue)
+            {
+                numericValue = shortValue;
+            }
+            else if (value is byte byteValue)
+            {
+                numericValue = byteValue;
+            }
+            else if (value is uint uintValue)
+            {
+                numericValue = uintValue;
+            }
+            else if (value is ulong ulongValue)
+            {
+                numericValue = (long)ulongValue;
+            }
+            else if (value is sbyte sbyteValue)
+            {
+                numericValue = sbyteValue;
+            }
+            else if (value is Enum)
+            {
+                numericValue = Convert.ToInt64(value);;
+            }
+            else
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogError($"Unsupported type for binary conversion: {value.GetType()}");
+#endif
+                return "";
+            }
+
+            string binaryString = Convert.ToString(numericValue, 2);
+
+            return bitLength <= 0
+                ? binaryString
+                : binaryString.PadLeft(bitLength, '0');
+        }
+
         public static float BoundFloatStep(float curValue, float start, float end, float step)
         {
             float distance = curValue - start;

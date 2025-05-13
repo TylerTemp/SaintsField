@@ -54,6 +54,7 @@ namespace SaintsField.Editor.Core
 
         // public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
         public IReadOnlyList<PropertyAttribute> AppendPropertyAttributes = null;
+        public IReadOnlyList<PropertyAttribute> OverridePropertyAttributes = null;
 
         protected List<SaintsPropertyInfo> SaintsPropertyDrawers;
 
@@ -87,9 +88,17 @@ namespace SaintsField.Editor.Core
             };
 
             (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
-            PropertyAttribute[] allAttributes = AppendPropertyAttributes == null
-                ? allAttributesRaw
-                : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
+            PropertyAttribute[] allAttributes;
+            if (OverridePropertyAttributes != null)
+            {
+                allAttributes = OverridePropertyAttributes.ToArray();
+            }
+            else
+            {
+                allAttributes = AppendPropertyAttributes == null
+                    ? allAttributesRaw
+                    : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
+            }
 
             ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
             // Debug.Assert(iSaintsAttributes.Length > 0, property.propertyPath);

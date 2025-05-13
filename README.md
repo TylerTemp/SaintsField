@@ -90,14 +90,17 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.8.1**
+**4.9.0**
 
-1. UI Toolkit: now you can use keyboard (up/down/left/right arrow, return key) to select an `AdvancedDropdown`
-2. UI Toolkit: fix custom picker when you have search in block view, arrow key gives error if the currently selected item is not in loaded results
-3. UI Toolkit: fix custom picker show placeholder information when the selected item has not appeared in loading results yet
-4. UI Toolkit: fix custom picker showing results that does not match the search when you start typing before the loading process finished
-5. UI Toolkit: fix `AdvancedDropdown` layout issue that an item can overlap a bit with the search box
-6. UI Toolkit: fix `AdvancedDropdown` didn't show the selected group when you backward a page
+1.  UI Toolkit: if you have `SaintsEditor` enabled, `enum` will automatically use `AdvancedDropdown` drawer
+2.  UI Toolkit: if you have `SaintsEditor` enabled, `enum` with `[Flags]` will automatically use `FlagsDropdown` drawer
+3.  UI Toolkit: now you can use keyboard (up/down/left/right arrow, return key) to select an `AdvancedDropdown`
+4.  UI Toolkit: fix custom picker when you have search in block view, arrow key gives error if the currently selected item is not in loaded results
+5.  UI Toolkit: fix custom picker show placeholder information when the selected item has not appeared in loading results yet
+6.  UI Toolkit: fix custom picker showing results that does not match the search when you start typing before the loading process finished
+7.  UI Toolkit: fix `AdvancedDropdown` layout issue that an item can overlap a bit with the search box
+8.  UI Toolkit: fix `AdvancedDropdown` didn't show the selected group when you backward a page
+9.  If you use a low version of `.NET` which does not support `B`, `B8` formatting string, `RichLabel` can now property format it like `<field=B/>`, `<field=B16/>`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

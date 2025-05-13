@@ -10,6 +10,8 @@ using UnityEditor;
 using System;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Playa;
 using UnityEditorInternal;
 using UnityEngine;
@@ -1257,113 +1259,133 @@ namespace SaintsField.Editor.Utils
                 {
                     bool hasFlags = rawType.GetCustomAttributes(typeof(FlagsAttribute), true).Length > 0;
 
-                    Enum enumValue = (Enum)Enum.ToObject(rawType, property.intValue);
+                    // Enum enumValue = (Enum)Enum.ToObject(rawType, property.intValue);
 
                     if (hasFlags)
                     {
-                        if (originalField is EnumFlagsField enumFlagsField)
+                        if (originalField != null)
                         {
-                            enumFlagsField.SetValueWithoutNotify(enumValue);
                             return null;
                         }
 
-                        enumFlagsField = new EnumFlagsField(label, enumValue)
-                        {
-                            style =
-                            {
-                                flexGrow = 1,
-                                flexShrink = 1,
-                            },
-                        };
-                        enumFlagsField.BindProperty(property);
-                        enumFlagsField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
 
-                        if (inHorizontalLayout)
-                        {
-                            enumFlagsField.style.flexDirection = FlexDirection.Column;
-                        }
-                        else
-                        {
-                            enumFlagsField.AddToClassList(EnumFlagsField.alignedFieldUssClassName);
-                        }
-
-                        return enumFlagsField;
+                        FlagsDropdownAttribute flagsDropdownAttribute = new FlagsDropdownAttribute();
+                        FlagsDropdownAttributeDrawer flagsDropdownDrawer = (FlagsDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(FlagsDropdownAttributeDrawer), fieldInfo, flagsDropdownAttribute, label);
+                        flagsDropdownDrawer.OverridePropertyAttributes = new[] { flagsDropdownAttribute };
+                        return flagsDropdownDrawer.CreatePropertyGUI(property);
+                        // if (originalField is EnumFlagsField enumFlagsField)
+                        // {
+                        //     enumFlagsField.SetValueWithoutNotify(enumValue);
+                        //     return null;
+                        // }
+                        //
+                        // enumFlagsField = new EnumFlagsField(label, enumValue)
+                        // {
+                        //     style =
+                        //     {
+                        //         flexGrow = 1,
+                        //         flexShrink = 1,
+                        //     },
+                        // };
+                        // enumFlagsField.BindProperty(property);
+                        // enumFlagsField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                        //
+                        // if (inHorizontalLayout)
+                        // {
+                        //     enumFlagsField.style.flexDirection = FlexDirection.Column;
+                        // }
+                        // else
+                        // {
+                        //     enumFlagsField.AddToClassList(EnumFlagsField.alignedFieldUssClassName);
+                        // }
+                        //
+                        // return enumFlagsField;
                     }
 
-                    List<object> enumRawValues = Enum.GetValues(rawType)
-                        .Cast<object>()
-                        .ToList();
-
-                    List<string> enumDisplayNames = enumRawValues
-                        .Select(each =>
-                        {
-                            (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(rawType, each);
-                            return found ? richName : Enum.GetName(rawType, each);
-                        })
-                        .ToList();
-
-                    // Debug.Log($"property.enumValueIndex={property.enumValueIndex}");
-                    int propertyFieldIndex = property.enumValueIndex < 0 || property.enumValueIndex >= enumDisplayNames.Count
-                        ? -1
-                        : property.enumValueIndex;
-
-                    if (originalField is PopupField<string> popupField)
+                    if (originalField != null)
                     {
-                        popupField.index = propertyFieldIndex;
                         return null;
                     }
+
+                    AdvancedDropdownAttribute advancedDropdownAttribute = new AdvancedDropdownAttribute();
+                    AdvancedDropdownAttributeDrawer advancedDropdownDrawer = (AdvancedDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(AdvancedDropdownAttributeDrawer), fieldInfo, advancedDropdownAttribute, label);
+                    advancedDropdownDrawer.OverridePropertyAttributes = new[] { advancedDropdownAttribute };
+                    return advancedDropdownDrawer.CreatePropertyGUI(property);
+
+                    // List<object> enumRawValues = Enum.GetValues(rawType)
+                    //     .Cast<object>()
+                    //     .ToList();
                     //
-                    // Dictionary<object, string> enumObjectToFancyName = enumRawValues
-                    //     .ToDictionary(each => each, each =>
+                    // List<string> enumDisplayNames = enumRawValues
+                    //     .Select(each =>
                     //     {
                     //         (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(rawType, each);
                     //         return found ? richName : Enum.GetName(rawType, each);
-                    //     });
-
-                    popupField = new PopupField<string>(label)
-                    {
-                        style =
-                        {
-                            flexGrow = 1,
-                            flexShrink = 1,
-                        },
-                        choices = enumDisplayNames,
-                        index = propertyFieldIndex,
-                    };
-
-                    popupField.BindProperty(property);
-
-                    // popupField.RegisterValueChangedCallback(e =>
-                    // {
-                    //     string newValue = e.newValue;
-                    //     // Debug.Log(newValue);
-                    //     // int index = enumFancyNames.IndexOf(newValue);
-                    //     // if (index == -1)
-                    //     // {
-                    //     //     return;
-                    //     // }
-                    //     // Debug.Log(index);
-                    //     if (newValue == null)
-                    //     {
-                    //         return;
-                    //     }
+                    //     })
+                    //     .ToList();
                     //
-                    //     property.intValue = (int)newValue;
-                    //     property.serializedObject.ApplyModifiedProperties();
-                    // });
-
-                    popupField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
-
-                    if (inHorizontalLayout)
-                    {
-                        popupField.style.flexDirection = FlexDirection.Column;
-                    }
-                    else
-                    {
-                        popupField.AddToClassList(PopupField<string>.alignedFieldUssClassName);
-                    }
-
-                    return popupField;
+                    // // Debug.Log($"property.enumValueIndex={property.enumValueIndex}");
+                    // int propertyFieldIndex = property.enumValueIndex < 0 || property.enumValueIndex >= enumDisplayNames.Count
+                    //     ? -1
+                    //     : property.enumValueIndex;
+                    //
+                    // if (originalField is PopupField<string> popupField)
+                    // {
+                    //     popupField.index = propertyFieldIndex;
+                    //     return null;
+                    // }
+                    // //
+                    // // Dictionary<object, string> enumObjectToFancyName = enumRawValues
+                    // //     .ToDictionary(each => each, each =>
+                    // //     {
+                    // //         (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(rawType, each);
+                    // //         return found ? richName : Enum.GetName(rawType, each);
+                    // //     });
+                    //
+                    // popupField = new PopupField<string>(label)
+                    // {
+                    //     style =
+                    //     {
+                    //         flexGrow = 1,
+                    //         flexShrink = 1,
+                    //     },
+                    //     choices = enumDisplayNames,
+                    //     index = propertyFieldIndex,
+                    // };
+                    //
+                    // popupField.BindProperty(property);
+                    //
+                    // // popupField.RegisterValueChangedCallback(e =>
+                    // // {
+                    // //     string newValue = e.newValue;
+                    // //     // Debug.Log(newValue);
+                    // //     // int index = enumFancyNames.IndexOf(newValue);
+                    // //     // if (index == -1)
+                    // //     // {
+                    // //     //     return;
+                    // //     // }
+                    // //     // Debug.Log(index);
+                    // //     if (newValue == null)
+                    // //     {
+                    // //         return;
+                    // //     }
+                    // //
+                    // //     property.intValue = (int)newValue;
+                    // //     property.serializedObject.ApplyModifiedProperties();
+                    // // });
+                    //
+                    // popupField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                    //
+                    // if (inHorizontalLayout)
+                    // {
+                    //     popupField.style.flexDirection = FlexDirection.Column;
+                    // }
+                    // else
+                    // {
+                    //     popupField.AddToClassList(PopupField<string>.alignedFieldUssClassName);
+                    // }
+                    //
+                    // return popupField;
                 }
                 case SerializedPropertyType.Vector2:
                 {

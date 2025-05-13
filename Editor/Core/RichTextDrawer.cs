@@ -387,30 +387,45 @@ namespace SaintsField.Editor.Core
 
                                     if (!hasError)
                                     {
-                                        string tagFinalResult;
+                                        string tagFinalResult = $"{finalValue}";
                                         if (RuntimeUtil.IsNull(finalValue))
                                         {
                                             tagFinalResult = "";
                                         }
                                         else if (string.IsNullOrEmpty(parsedResult.value))
                                         {
-                                            tagFinalResult = $"{finalValue}";
+                                            // tagFinalResult = $"{finalValue}";
                                         }
                                         else
                                         {
-                                            string formatString = $"{{0:{parsedResult.value}}}";
-                                            try
+                                            bool binaryFormatted = false;
+                                            if (parsedResult.value.StartsWith("B"))
                                             {
-                                                tagFinalResult = string.Format(formatString, finalValue);
+                                                string binaryFormatResult = Util.FormatBinary(parsedResult.value, finalValue);
+                                                // Debug.Log($"{parsedResult.value}/{finalValue}/{binaryFormatResult}");
+                                                binaryFormatted = binaryFormatResult != "";
+                                                if (binaryFormatted)
+                                                {
+                                                    tagFinalResult = binaryFormatResult;
+                                                }
                                             }
-#pragma warning disable CS0168
-                                            catch (Exception ex)
-#pragma warning restore CS0168
+
+                                            if(!binaryFormatted)
                                             {
+                                                string formatString = $"{{0:{parsedResult.value}}}";
+                                                try
+                                                {
+                                                    tagFinalResult = string.Format(formatString, finalValue);
+                                                }
+#pragma warning disable CS0168
+                                                catch (Exception ex)
+#pragma warning restore CS0168
+                                                {
 #if SAINTSFIELD_DEBUG
-                                                Debug.LogException(ex);
+                                                    // Debug.LogException(ex);
 #endif
-                                                tagFinalResult = $"{finalValue}";
+                                                    tagFinalResult = $"{finalValue}";
+                                                }
                                             }
                                         }
                                         richText.Append(tagFinalResult);
