@@ -179,7 +179,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 // Debug.Log(evt.keyCode);
                 if (evt.keyCode == KeyCode.Escape)
                 {
-                    editorWindow.Close();
+                    // editorWindow.Close();
+                    _toolbarSearchField.Focus();
                     return;
                 }
 
@@ -271,7 +272,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             // search
             IReadOnlyList<(IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)> flattenOptions = AdvancedDropdownAttributeDrawer.Flatten(_metaInfo.DropdownListValue).ToArray();
             // Dictionary<string, VisualElement> stackDisplayToElement = new Dictionary<string, VisualElement>();
-            _toolbarSearchField.focusable = true;
+            // _toolbarSearchField.focusable = true;
+            _toolbarSearchField.placeholderText = "Search";
             _toolbarSearchField.RegisterCallback<NavigationMoveEvent>(evt =>
             {
                 // ReSharper disable once InvertIf
@@ -291,6 +293,13 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     string.IsNullOrEmpty(_toolbarSearchField.value))
                 {
                     _pagePreAction?.Invoke();
+                }
+            }, TrickleDown.TrickleDown);
+            _toolbarSearchField.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if(evt.keyCode == KeyCode.Escape && string.IsNullOrEmpty(_toolbarSearchField.value))
+                {
+                    editorWindow.Close();
                 }
             }, TrickleDown.TrickleDown);
             _toolbarSearchField.RegisterValueChangedCallback(evt =>

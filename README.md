@@ -90,11 +90,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.8.0**
+**4.8.1**
 
-1.  UI Toolkit: Add `TableHide` to exclude a field/column from `Table` [#225](https://github.com/TylerTemp/SaintsField/issues/225)
-2.  Fix the error check in SpineAnimationPickerAttributeDrawerUIToolkit:UpdateDisplay for SkeletonData being null is backwards [#229](https://github.com/TylerTemp/SaintsField/issues/229)
-3.  Fix (SpineAnimationPicker) skeletonTarget callbacks do not check for null prefabs or null instances [#230](https://github.com/TylerTemp/SaintsField/issues/230)
+1. UI Toolkit: now you can use keyboard (up/down/left/right arrow, return key) to select an `AdvancedDropdown`
+2. UI Toolkit: fix custom picker when you have search in block view, arrow key gives error if the currently selected item is not in loaded results
+3. UI Toolkit: fix custom picker show placeholder information when the selected item has not appeared in loading results yet
+4. UI Toolkit: fix custom picker showing results that does not match the search when you start typing before the loading process finished
+5. UI Toolkit: fix `AdvancedDropdown` layout issue that an item can overlap a bit with the search box
+6. UI Toolkit: fix `AdvancedDropdown` didn't show the selected group when you backward a page
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

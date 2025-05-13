@@ -20315,10 +20315,11 @@ MonoBehaviour:
   place2: 45
   place3: 19
   place4: 33
-  selectIt: 6
+  selectIt: 2
   strTyp:
     selectIt: 2
   listEnum: 00000000010000000200000003000000
+  flags: 0
 --- !u!4 &1509173913
 Transform:
   m_ObjectHideFlags: 0
