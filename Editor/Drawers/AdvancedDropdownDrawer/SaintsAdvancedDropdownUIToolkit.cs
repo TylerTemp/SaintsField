@@ -201,7 +201,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 // Debug.Log(Input.GetKey(KeyCode.CapsLock));
                 // Debug.Log(Array.IndexOf(NormalInputKeys, evt.keyCode) != -1);
                 // ReSharper disable once InvertIf
-                if (searchField.focusController.focusedElement != searchField
+                if (searchField.focusController?.focusedElement != searchField
                     && evt.modifiers == EventModifiers.None
                     && Array.IndexOf(NormalInputKeys, evt.keyCode) != -1)
                 {
@@ -273,7 +273,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             IReadOnlyList<(IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)> flattenOptions = AdvancedDropdownAttributeDrawer.Flatten(_metaInfo.DropdownListValue).ToArray();
             // Dictionary<string, VisualElement> stackDisplayToElement = new Dictionary<string, VisualElement>();
             // _toolbarSearchField.focusable = true;
+#if UNITY_6000_0_OR_NEWER
             _toolbarSearchField.placeholderText = "Search";
+#endif
             _toolbarSearchField.RegisterCallback<NavigationMoveEvent>(evt =>
             {
                 // ReSharper disable once InvertIf
