@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.9.1 ##
+
+1.  UI Toolkit: `MinMaxSlider` friendly error if been used on wrong type [#232](https://github.com/TylerTemp/SaintsField/issues/232)
+2.  UI Toolkit: `ShowInInspector` now shows an error box if the target attributes raises an error in its getter
+
 ## 4.9.0 ##
 
 1.  UI Toolkit: if you have `SaintsEditor` enabled, `enum` will automatically use `AdvancedDropdown` drawer

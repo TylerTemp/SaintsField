@@ -17,6 +17,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
         private string NameContainer() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}";
         private string NameResult() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-result";
+        private string NameErrorBox() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-error";
 
         private class DataPayload
         {
@@ -37,7 +38,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 return (null, false);
             }
 
-            object value = GetValue(FieldWithInfo);
+            (string error, object value) = GetValue(FieldWithInfo);
 
             VisualElement container = new VisualElement
             {
@@ -54,8 +55,27 @@ namespace SaintsField.Editor.Playa.Renderer
                 },
                 name = NameContainer(),
             };
-            // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
             Action<object> setter = GetSetterOrNull(FieldWithInfo);
+
+            if (error != "")
+            {
+                container.Add(new HelpBox(error, HelpBoxMessageType.Error)
+                {
+                    name = NameErrorBox(),
+                });
+                container.userData = new DataPayload
+                {
+                    HasDrawer = false,
+                    Value = null,
+                    Setter = setter,
+                    IsGeneralCollection = false,
+                    OldCollection = Array.Empty<object>(),
+                };
+                return (container, true);
+            }
+
+            // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
+
             Type fieldType = GetFieldType(FieldWithInfo);
             VisualElement result = UIToolkitValueEdit(null, NoLabel? null: GetNiceName(FieldWithInfo), fieldType, value, null, setter, true, InAnyHorizontalLayout);
 
@@ -113,9 +133,36 @@ namespace SaintsField.Editor.Playa.Renderer
 
             VisualElement container= root.Q<VisualElement>(NameContainer());
 
-            DataPayload userData = (DataPayload)container.userData;
+            (string error, object value) = GetValue(FieldWithInfo);
 
-            object value = GetValue(FieldWithInfo);
+            string nameErrorBox = NameErrorBox();
+            var errorHelpBox = container.Q<HelpBox>(nameErrorBox);
+            if (error == "")
+            {
+                if (errorHelpBox != null)
+                {
+                    errorHelpBox.RemoveFromHierarchy();
+                }
+            }
+            else
+            {
+                if (errorHelpBox == null)
+                {
+                    container.Add(new HelpBox(error, HelpBoxMessageType.Error)
+                    {
+                        name = nameErrorBox,
+                    });
+
+                }
+                else if (errorHelpBox.text != error)
+                {
+                    errorHelpBox.text = error;
+                }
+
+                return preCheckResult;
+            }
+
+            DataPayload userData = (DataPayload)container.userData;
             bool valueIsNull = RuntimeUtil.IsNull(value);
             bool isEqual = userData.HasDrawer && Util.GetIsEqual(userData.Value, value);
             if(isEqual && userData.IsGeneralCollection)

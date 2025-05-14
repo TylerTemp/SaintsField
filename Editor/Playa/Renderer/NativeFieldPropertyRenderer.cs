@@ -24,14 +24,27 @@ namespace SaintsField.Editor.Playa.Renderer
         {
         }
 
-        private static object GetValue(SaintsFieldWithInfo fieldWithInfo)
+        private static (string error, object value) GetValue(SaintsFieldWithInfo fieldWithInfo)
         {
             if (fieldWithInfo.FieldInfo != null)
-                return fieldWithInfo.FieldInfo.GetValue(fieldWithInfo.Target);
+            {
+                return ("", fieldWithInfo.FieldInfo.GetValue(fieldWithInfo.Target));
+            }
 
-            return fieldWithInfo.PropertyInfo.CanRead
-                ? fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Target)
-                : null;
+            if (fieldWithInfo.PropertyInfo.CanRead)
+            {
+                try
+                {
+                    return ("", fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Target));
+                }
+                catch (Exception e)
+                {
+                    string message = e.InnerException?.Message ?? e.Message;
+                    return ($"{GetFriendlyName(fieldWithInfo)}: {message}", null);
+                }
+            }
+
+            return ($"Can not get value of {GetFriendlyName(fieldWithInfo)}", null);
         }
 
         private static string GetName(SaintsFieldWithInfo fieldWithInfo) =>

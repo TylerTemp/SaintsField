@@ -262,6 +262,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             }
         }
 
-        [ShowInInspector] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
+        [ShowInInspector, Ordered] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
+
+        [ShowInInspector, Ordered]
+        private int WrongGetter => throw new NotSupportedException("Expected Exception");
     }
 }

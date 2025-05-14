@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 return 0f;
             }
-            return FieldHeight(GetValue(FieldWithInfo), GetNiceName(FieldWithInfo));
+            return FieldHeight(GetValue(FieldWithInfo).value, GetNiceName(FieldWithInfo));
         }
 
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            FieldPosition(position, GetValue(FieldWithInfo), GetNiceName(FieldWithInfo));
+            FieldPosition(position, GetValue(FieldWithInfo).value, GetNiceName(FieldWithInfo));
         }
     }
 }
