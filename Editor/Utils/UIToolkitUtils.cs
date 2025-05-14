@@ -1592,13 +1592,13 @@ namespace SaintsField.Editor.Utils
                 {
                     if (originalField is TextField textField)
                     {
-                        textField.SetValueWithoutNotify(property.stringValue);
+                        textField.SetValueWithoutNotify(string.IsNullOrEmpty(property.stringValue)? '\0'.ToString(): property.stringValue[..1]);
                         return null;
                     }
 
                     textField = new TextField(label)
                     {
-                        value = property.stringValue,
+                        value = string.IsNullOrEmpty(property.stringValue)? '\0'.ToString(): property.stringValue[..1],
                         maxLength = 1,
                         style =
                         {

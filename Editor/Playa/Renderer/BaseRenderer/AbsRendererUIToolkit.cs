@@ -1382,7 +1382,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 if (oldElement is CurveField curveField)
                 {
-                    curveField.value = value as AnimationCurve;
+                    curveField.SetValueWithoutNotify(value as AnimationCurve);
                     return (null, false);
                 }
                 CurveField element = new CurveField(label)
@@ -1423,7 +1423,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 if (oldElement is Hash128Field hash128Field)
                 {
-                    hash128Field.value = (Hash128)value;
+                    hash128Field.SetValueWithoutNotify((Hash128)value);
                     return (null, false);
                 }
                 Hash128Field element = new Hash128Field(label)
@@ -1464,7 +1464,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 if (oldElement is GradientField gradientField)
                 {
-                    gradientField.value = value as Gradient;
+                    gradientField.SetValueWithoutNotify(value as Gradient);
                     return (null, false);
                 }
 
