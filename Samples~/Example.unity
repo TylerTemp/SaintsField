@@ -17519,6 +17519,7 @@ MonoBehaviour:
   nonFreeMinMax: {x: 0, y: 2.6000001}
   freeInput: {x: -9.570033, y: 20}
   freeInputInt: {x: 0, y: 10}
+  incorrectType: 0
 --- !u!1 &1250645939
 GameObject:
   m_ObjectHideFlags: 0
