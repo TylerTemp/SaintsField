@@ -275,6 +275,27 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             set => throw new NotSupportedException("Expected Exception");
         }
 
-        [ShowInInspector, Ordered] private IEnumerator _ienumerator = Array.Empty<object>().GetEnumerator();
+        [ShowInInspector, Ordered, PlayaInfoBox("nested field can be error handled too")]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Local
+        private IEnumerator _ienumerator = new []{1, 2, 3}.GetEnumerator();
+
+        [LayoutStart("IEnumerator", ELayout.Horizontal)]
+        [Button, Ordered] private void MoveIt() => _ienumerator.MoveNext();
+        [LayoutTerminateHere]
+        [Button, Ordered] private void ReCreateIt() => _ienumerator = new []{1, 2, 3}.GetEnumerator();
+
+        private class NestChange
+        {
+            public int NestedValue;
+        }
+
+        // ReSharper disable once FieldCanBeMadeReadOnly.Local
+        [ShowInInspector, Ordered] private NestChange _nestChange = new NestChange();
+
+        [Button, Ordered]
+        private void ChangeNestedValue()
+        {
+            _nestChange.NestedValue = (_nestChange.NestedValue + 1) % 3;
+        }
     }
 }

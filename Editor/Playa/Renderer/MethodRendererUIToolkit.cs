@@ -154,7 +154,7 @@ namespace SaintsField.Editor.Playa.Renderer
                             },
                             false,
                             true
-                        );
+                        ).result;
                         // ReSharper disable once InvertIf
                         if (r != null)
                         {

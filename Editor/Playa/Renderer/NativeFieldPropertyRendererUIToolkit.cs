@@ -43,6 +43,7 @@ namespace SaintsField.Editor.Playa.Renderer
             public object Value;
             public bool IsGeneralCollection;
             public IReadOnlyList<object> OldCollection;
+            public bool AlwaysCheckUpdate;
         }
 
         // private double _lastValueChangedTime;
@@ -107,6 +108,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     Setter = setter,
                     IsGeneralCollection = false,
                     OldCollection = Array.Empty<object>(),
+                    AlwaysCheckUpdate = true,
                 };
                 return (container, true);
             }
@@ -114,7 +116,7 @@ namespace SaintsField.Editor.Playa.Renderer
             // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
 
             Type fieldType = GetFieldType(FieldWithInfo);
-            VisualElement result = UIToolkitValueEdit(null, NoLabel? null: GetNiceName(FieldWithInfo), fieldType, value, null, setter, true, InAnyHorizontalLayout);
+            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, NoLabel? null: GetNiceName(FieldWithInfo), fieldType, value, null, setter, true, InAnyHorizontalLayout);
 
             bool isCollection = !typeof(UnityEngine.Object).IsAssignableFrom(fieldType) && (fieldType.IsArray || typeof(IEnumerable).IsAssignableFrom(fieldType));
             // Debug.Log(isCollection);
@@ -143,6 +145,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     Setter = setter,
                     IsGeneralCollection = isCollection,
                     OldCollection = oldCollection,
+                    AlwaysCheckUpdate = isNestedField,
                 };
             }
             else
@@ -154,6 +157,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     Setter = setter,
                     IsGeneralCollection = isCollection,
                     OldCollection = null,
+                    AlwaysCheckUpdate = isNestedField,
                 };
             }
 
@@ -194,7 +198,16 @@ namespace SaintsField.Editor.Playa.Renderer
 
             DataPayload userData = (DataPayload)container.userData;
             bool valueIsNull = RuntimeUtil.IsNull(value);
-            bool isEqual = userData.HasDrawer && Util.GetIsEqual(userData.Value, value);
+            bool isEqual;
+            if (userData.AlwaysCheckUpdate)
+            {
+                isEqual = false;
+            }
+            else
+            {
+                isEqual = userData.HasDrawer && Util.GetIsEqual(userData.Value, value);
+            }
+
             if(isEqual && userData.IsGeneralCollection)
             {
                 IReadOnlyList<object> oldCollection = userData.OldCollection;
@@ -240,7 +253,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         userData.OldCollection = null;
                     }
                 }
-                VisualElement result = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, true, InAnyHorizontalLayout);
+                VisualElement result = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, true, InAnyHorizontalLayout).result;
                 // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {

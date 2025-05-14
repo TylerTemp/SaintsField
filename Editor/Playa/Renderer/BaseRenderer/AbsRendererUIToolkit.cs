@@ -220,20 +220,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
         // before set: useful for struct editing that C# will messup and change the value of the reference you have
-        protected static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
+        protected static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
-
-            // Debug.Log(valueType);
-            // if (RuntimeUtil.IsNull(value))
-            // {
-            //     return null;
-            // }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render start {label}/{valueType}/{value}");
 #endif
             if (valueType == typeof(Placeholder))
             {
-                return null;
+                return (null, false);
             }
 
             Color reColor = EColor.EditorSeparator.GetColor();
@@ -243,7 +237,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (oldElement is Toggle oldToggle)
                 {
                     oldToggle.SetValueWithoutNotify(Convert.ToBoolean(value));
-                    return null;
+                    return (null, false);
                 }
 
                 Toggle element = new Toggle(label)
@@ -281,14 +275,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(sbyte) || value is sbyte)
             {
                 if (oldElement is IntegerField integerField)
                 {
                     integerField.SetValueWithoutNotify((sbyte)value);
-                    return null;
+                    return (null, false);
                 }
 
                 IntegerField element = new IntegerField(label)
@@ -326,14 +320,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(byte) || value is byte)
             {
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((byte)value);
-                    return null;
+                    return (null, false);
                 }
 
                 IntegerField element = new IntegerField(label)
@@ -371,14 +365,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(short) || value is short)
             {
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((short)value);
-                    return null;
+                    return (null, false);
                 }
 
                 IntegerField element = new IntegerField(label)
@@ -415,14 +409,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         }
                     });
                 }
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(ushort) || value is ushort)
             {
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((ushort)value);
-                    return null;
+                    return (null, false);
                 }
 
                 IntegerField element = new IntegerField(label)
@@ -460,14 +454,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(int) || value is int)
             {
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((int)value);
-                    return null;
+                    return (null, false);
                 }
 
                 IntegerField element = new IntegerField(label)
@@ -507,7 +501,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(uint) || value is uint)
             {
@@ -515,7 +509,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (oldElement is UnsignedIntegerField oldUnsignedIntegerField)
                 {
                     oldUnsignedIntegerField.SetValueWithoutNotify((uint)value);
-                    return null;
+                    return (null, false);
                 }
 
                 UnsignedIntegerField element = new UnsignedIntegerField(label)
@@ -552,7 +546,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (oldElement is IntegerField oldLongField)
                 {
                     oldLongField.SetValueWithoutNotify((int)(uint)value);
-                    return null;
+                    return (null, false);
                 }
 
                 IntegerField element = new IntegerField(label)
@@ -587,14 +581,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
 #endif
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(long) || value is long)
             {
                 if (oldElement is LongField oldLongField)
                 {
                     oldLongField.SetValueWithoutNotify((long)value);
-                    return null;
+                    return (null, false);
                 }
 
                 LongField element = new LongField(label)
@@ -627,7 +621,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(ulong) || value is ulong)
             {
@@ -636,7 +630,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (oldElement is UnsignedLongField oldLongField)
                 {
                     oldLongField.SetValueWithoutNotify(ulongRawValue);
-                    return null;
+                    return (null, false);
                 }
 
                 UnsignedLongField element = new UnsignedLongField(label)
@@ -674,7 +668,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if (oldElement is LongField oldLongField)
                 {
                     oldLongField.SetValueWithoutNotify(ulongRawValue);
-                    return null;
+                    return (null, false);
                 }
 
                 LongField element = new LongField(label)
@@ -709,14 +703,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
 #endif
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(float) || value is float)
             {
                 if (oldElement is FloatField oldFloatField)
                 {
                     oldFloatField.SetValueWithoutNotify((float)value);
-                    return null;
+                    return (null, false);
                 }
 
                 FloatField element = new FloatField(label)
@@ -749,14 +743,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(double) || value is double)
             {
                 if (oldElement is DoubleField oldDoubleField)
                 {
                     oldDoubleField.SetValueWithoutNotify((double)value);
-                    return null;
+                    return (null, false);
                 }
 
                 DoubleField element = new DoubleField(label)
@@ -789,14 +783,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(string) || value is string)
             {
                 if (oldElement is TextField oldTextField)
                 {
                     oldTextField.SetValueWithoutNotify((string)value);
-                    return null;
+                    return (null, false);
                 }
 
                 TextField element = new TextField(label)
@@ -830,7 +824,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(char) || value is char)
             {
@@ -838,7 +832,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     oldTextField.maxLength = 1;
                     oldTextField.SetValueWithoutNotify($"{value}");
-                    return null;
+                    return (null, false);
                 }
 
                 TextField element = new TextField(label)
@@ -896,14 +890,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(Vector2) || value is Vector2)
             {
                 if (oldElement is Vector2Field oldVector2Field)
                 {
                     oldVector2Field.SetValueWithoutNotify((Vector2)value);
-                    return null;
+                    return (null, false);
                 }
 
                 Vector2Field element = new Vector2Field(label)
@@ -944,14 +938,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(Vector3) || value is Vector3)
             {
                 if (oldElement is Vector3Field oldVector3Field)
                 {
                     oldVector3Field.SetValueWithoutNotify((Vector3)value);
-                    return null;
+                    return (null, false);
                 }
 
                 Vector3Field element = new Vector3Field(label)
@@ -993,14 +987,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(Vector4) || value is Vector4)
             {
                 if (oldElement is Vector4Field oldVector4Field)
                 {
                     oldVector4Field.SetValueWithoutNotify((Vector4)value);
-                    return null;
+                    return (null, false);
                 }
 
                 Vector4Field element = new Vector4Field(label)
@@ -1041,14 +1035,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(Vector2Int) || value is Vector2Int)
             {
                 if (oldElement is Vector2IntField oldVector2IntField)
                 {
                     oldVector2IntField.SetValueWithoutNotify((Vector2Int)value);
-                    return null;
+                    return (null, false);
                 }
 
                 Vector2IntField element = new Vector2IntField(label)
@@ -1089,14 +1083,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(Vector3Int) || value is Vector3Int)
             {
                 if (oldElement is Vector3IntField oldVector3IntField)
                 {
                     oldVector3IntField.SetValueWithoutNotify((Vector3Int)value);
-                    return null;
+                    return (null, false);
                 }
 
                 Vector3IntField element = new Vector3IntField(label)
@@ -1137,14 +1131,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(Color) || value is Color)
             {
                 if (oldElement is ColorField oldColorField)
                 {
                     oldColorField.SetValueWithoutNotify((Color)value);
-                    return null;
+                    return (null, false);
                 }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
@@ -1184,14 +1178,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(Bounds) || value is Bounds)
             {
                 if (oldElement is BoundsField oldBoundsField)
                 {
                     oldBoundsField.SetValueWithoutNotify((Bounds)value);
-                    return null;
+                    return (null, false);
                 }
 
                 BoundsField element = new BoundsField(label)
@@ -1232,14 +1226,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(Rect) || value is Rect)
             {
                 if (oldElement is RectField oldRectField)
                 {
                     oldRectField.SetValueWithoutNotify((Rect)value);
-                    return null;
+                    return (null, false);
                 }
 
                 RectField element = new RectField(label)
@@ -1280,14 +1274,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType == typeof(RectInt) || value is RectInt)
             {
                 if (oldElement is RectIntField oldRectIntField)
                 {
                     oldRectIntField.SetValueWithoutNotify((RectInt)value);
-                    return null;
+                    return (null, false);
                 }
 
                 RectIntField element = new RectIntField(label)
@@ -1328,14 +1322,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (valueType.BaseType == typeof(Enum) || value is Enum)
             {
                 if (oldElement is EnumField oldEnumField)
                 {
                     oldEnumField.SetValueWithoutNotify((Enum)value);
-                    return null;
+                    return (null, false);
                 }
 
                 EnumField element = new EnumField(label, (Enum)value);
@@ -1375,16 +1369,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
 
-                return element;
+                return (element, false);
             }
             if (typeof(UnityEngine.Object).IsAssignableFrom(valueType) || value is UnityEngine.Object)
             {
-                return UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                return (UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet,
+                    setterOrNull, labelGrayColor, inHorizontalLayout), false);
             }
 
             if (typeof(AnimationCurve).IsAssignableFrom(valueType) || value is AnimationCurve)
             {
 
+                if (oldElement is CurveField curveField)
+                {
+                    curveField.value = value as AnimationCurve;
+                    return (null, false);
+                }
                 CurveField element = new CurveField(label)
                 {
                     value = value as AnimationCurve,
@@ -1416,11 +1416,16 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         setterOrNull(evt.newValue);
                     });
                 }
-                return element;
+                return (element, false);
             }
 
             if (typeof(Hash128).IsAssignableFrom(valueType) || value is Hash128)
             {
+                if (oldElement is Hash128Field hash128Field)
+                {
+                    hash128Field.value = (Hash128)value;
+                    return (null, false);
+                }
                 Hash128Field element = new Hash128Field(label)
                 {
                     value = (Hash128)value,
@@ -1452,11 +1457,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         setterOrNull(evt.newValue);
                     });
                 }
-                return element;
+                return (element, false);
             }
 
             if (typeof(Gradient).IsAssignableFrom(valueType) || value is Gradient)
             {
+                if (oldElement is GradientField gradientField)
+                {
+                    gradientField.value = value as Gradient;
+                    return (null, false);
+                }
+
                 GradientField element = new GradientField(label)
                 {
                     value = value as Gradient,
@@ -1488,7 +1499,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         setterOrNull(evt.newValue);
                     });
                 }
-                return element;
+                return (element, false);
             }
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
@@ -1540,7 +1551,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
                 bool isReadOnly = !isNormalDictionary;
                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
-                return MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly, dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                return (MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly,
+                    dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
+                    inHorizontalLayout), false);
 #else  // WTF Unity, backport it!
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1625,14 +1638,16 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // foldout.Add(valueContainer);
                 }
 
-                return foldout;
+                return (foldout, false);
 #endif
             }
             if (value is IEnumerable enumerableValue)
             {
                 // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
 
-                return MakeListView(oldElement as Foldout, label, valueType, enumerableValue, enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                return (MakeListView(oldElement as Foldout, label, valueType, enumerableValue,
+                    enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor,
+                    inHorizontalLayout), false);
             }
 
             // Debug.Log(valueType);
@@ -1640,10 +1655,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (valueType.BaseType == typeof(TypeInfo))  // generic type?
             {
                 // EditorGUILayout.TextField(label, value.ToString());
-                return WrapVisualElement(new TextField(label)
+                return (WrapVisualElement(new TextField(label)
                 {
                     value = value.ToString(),
-                });
+                }), false);
             }
 
             if (valueIsNull)
@@ -1672,7 +1687,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         labelButtonField.labelElement.style.color = reColor;
                     }
                     labelButtonField.AddToClassList(LabelButtonField.alignedFieldUssClassName);
-                    return labelButtonField;
+                    return (labelButtonField, true);
                 }
 
                 if (setterOrNull == null)
@@ -1693,7 +1708,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                     textField.styleSheets.Add(_nullUss);
 
-                    return WrapVisualElement(textField);
+                    return (WrapVisualElement(textField), true);
                 }
 
                 // UIToolkitUtils.DropdownButtonField dropdownButton = MakeTypeDropdown(label, valueType, null,
@@ -1861,14 +1876,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     objFieldResult.label = "";
                 }
 
-                return useOld? null: genFoldout;
+                return (useOld ? null : genFoldout, true);
             }
 
             if (valueIsNull)
             {
                 fieldsBody.Clear();
                 payload.State = UIToolkitValueEditPayloadState.FieldObject;
-                return useOld? null: genFoldout;
+                return (useOld ? null : genFoldout, true);
             }
 
             payload.State = UIToolkitValueEditPayloadState.GenericType;
@@ -1922,12 +1937,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #endif
                     getValueSucceed = false;
                     string msg = e.InnerException?.Message ?? e.Message;
-                    if (oldElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField errorField)
+                    if (oldItemElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField errorField)
                     {
                         errorField.SetErrorMessage(msg);
                     }
                     else
                     {
+                        oldElement?.RemoveFromHierarchy();
+                        oldElement = null;
                         NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField r = new NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField(
                             thisLabel,
                             new HelpBox(msg, HelpBoxMessageType.Error)
@@ -1953,6 +1970,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 if(getValueSucceed)
                 {
+                    if (oldItemElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField)
+                    {
+                        oldItemElement.RemoveFromHierarchy();
+                        oldItemElement = null;
+                    }
                     result = UIToolkitValueEdit(
                         oldItemElement,
                         thisLabel,
@@ -1970,7 +1992,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             setterOrNull?.Invoke(value);
                         },
                         labelGrayColor,
-                        inHorizontalLayout);
+                        inHorizontalLayout).result;
                 }
                 // Debug.Log($"{name}: {result}: {fieldInfo.FieldType}");
                 // ReSharper disable once InvertIf
@@ -2015,12 +2037,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     Debug.LogWarning(e.InnerException ?? e);
 #endif
                     string msg = e.InnerException?.Message ?? e.Message;
-                    if (oldElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField errorField)
+                    if (oldItemElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField errorField)
                     {
                         errorField.SetErrorMessage(msg);
                     }
                     else
                     {
+                        oldItemElement?.RemoveFromHierarchy();
+                        oldItemElement = null;
                         NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField r = new NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField(
                             thisLabel,
                             new HelpBox(msg, HelpBoxMessageType.Error)
@@ -2044,6 +2068,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 if (getValueSucceed)
                 {
+                    if (oldItemElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField)
+                    {
+                        oldItemElement.RemoveFromHierarchy();
+                        oldItemElement = null;
+                    }
                     result = UIToolkitValueEdit(
                         oldItemElement,
                         thisLabel,
@@ -2058,7 +2087,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             }
                             : null,
                         labelGrayColor,
-                        inHorizontalLayout);
+                        inHorizontalLayout).result;
                 }
 
                 // ReSharper disable once InvertIf
@@ -2076,7 +2105,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 genFoldout.AddToClassList(ClassSaintsFieldEditingDisabled);
             }
 
-            return useOld? null: genFoldout;
+            return (useOld ? null : genFoldout, true);
         }
 
         private static readonly Type[] SkipTypes = { typeof(IntPtr), typeof(UIntPtr), typeof(void) };
@@ -2195,15 +2224,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
                 };
 
-                Rect worldBound = dropdownButton.worldBound;
-                float maxHeight = Screen.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
-                if (maxHeight < 100)
-                {
-                    // Debug.LogError($"near out of screen: {maxHeight}");
-                    worldBound.y -= 300 + worldBound.height;
-                    maxHeight = 300;
-                }
-                worldBound.height = SaintsPropertyDrawer.SingleLineHeight;
+                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(dropdownButton.worldBound);
+
                 UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
                     metaInfo,
                     dropdownButton.worldBound.width,
@@ -2413,7 +2435,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             }
                          : null,
                         false,
-                        inHorizontalLayout);
+                        inHorizontalLayout).result;
                     if (item != null)
                     {
                         visualElement.Clear();
@@ -2752,7 +2774,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 // listView.itemsSource[sourceIndex] = newKey;
                                 key = newKey;
                                 keyChanged = true;
-                            }, false, true);
+                            }, false, true).result;
 
                             if (editing != null)
                             {
@@ -2812,7 +2834,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             object refreshedKey = listView.itemsSource[elementIndex];
                             payload.SetKeyValue(refreshedKey, newValue);
-                        }, false, true);
+                        }, false, true).result;
 
                         if (editing != null)
                         {
@@ -2942,7 +2964,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         },
                         false,
                         inHorizontalLayout
-                    );
+                    ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
                     {
@@ -2977,7 +2999,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         },
                         false,
                         inHorizontalLayout
-                    );
+                    ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
                     {
