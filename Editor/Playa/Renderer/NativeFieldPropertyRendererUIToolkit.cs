@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
@@ -12,6 +13,23 @@ namespace SaintsField.Editor.Playa.Renderer
     public partial class NativeFieldPropertyRenderer
     {
         // private VisualElement _fieldElement;
+
+        private class NativeFieldPropertyRendererErrorField: BaseField<string>
+        {
+            private readonly HelpBox _helpBox;
+            public NativeFieldPropertyRendererErrorField(string label, VisualElement visualInput) : base(label, visualInput)
+            {
+                _helpBox = (HelpBox)visualInput;
+            }
+
+            public void SetErrorMessage(string error)
+            {
+                if (_helpBox.text != error)
+                {
+                    _helpBox.text = error;
+                }
+            }
+        }
 
         private static StyleSheet _ussClassSaintsFieldEditingDisabledHide;
 
@@ -29,6 +47,29 @@ namespace SaintsField.Editor.Playa.Renderer
         }
 
         // private double _lastValueChangedTime;
+
+        private NativeFieldPropertyRendererErrorField MakeNativeFieldPropertyRendererErrorField(string error)
+        {
+            NativeFieldPropertyRendererErrorField result = new NativeFieldPropertyRendererErrorField(
+                GetFriendlyName(FieldWithInfo),
+                new HelpBox(error, HelpBoxMessageType.Error)
+            )
+            {
+                name = NameErrorBox(),
+            };
+            if (InAnyHorizontalLayout)
+            {
+                result.style.flexDirection = FlexDirection.Column;
+            }
+            else
+            {
+                result.AddToClassList(NativeFieldPropertyRendererErrorField.alignedFieldUssClassName);
+            }
+
+            result.labelElement.style.color = EColor.EditorSeparator.GetColor();
+
+            return result;
+        }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container1)
         {
@@ -59,10 +100,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if (error != "")
             {
-                container.Add(new HelpBox(error, HelpBoxMessageType.Error)
-                {
-                    name = NameErrorBox(),
-                });
+                container.Add(MakeNativeFieldPropertyRendererErrorField(error));
                 container.userData = new DataPayload
                 {
                     HasDrawer = false,
@@ -136,27 +174,20 @@ namespace SaintsField.Editor.Playa.Renderer
             (string error, object value) = GetValue(FieldWithInfo);
 
             string nameErrorBox = NameErrorBox();
-            var errorHelpBox = container.Q<HelpBox>(nameErrorBox);
+            NativeFieldPropertyRendererErrorField errorHelpBox = container.Q<NativeFieldPropertyRendererErrorField>(nameErrorBox);
             if (error == "")
             {
-                if (errorHelpBox != null)
-                {
-                    errorHelpBox.RemoveFromHierarchy();
-                }
+                errorHelpBox?.RemoveFromHierarchy();
             }
             else
             {
                 if (errorHelpBox == null)
                 {
-                    container.Add(new HelpBox(error, HelpBoxMessageType.Error)
-                    {
-                        name = nameErrorBox,
-                    });
-
+                    container.Add(MakeNativeFieldPropertyRendererErrorField(error));
                 }
-                else if (errorHelpBox.text != error)
+                else
                 {
-                    errorHelpBox.text = error;
+                    errorHelpBox.SetErrorMessage(error);
                 }
 
                 return preCheckResult;

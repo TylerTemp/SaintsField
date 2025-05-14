@@ -4,6 +4,7 @@ using UnityEditor;
 using System.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
 {
@@ -40,11 +41,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 catch (Exception e)
                 {
                     string message = e.InnerException?.Message ?? e.Message;
-                    return ($"{GetFriendlyName(fieldWithInfo)}: {message}", null);
+                    return (message, null);
                 }
             }
 
-            return ($"Can not get value of {GetFriendlyName(fieldWithInfo)}", null);
+            return ($"Can not get value", null);
         }
 
         private static string GetName(SaintsFieldWithInfo fieldWithInfo) =>
