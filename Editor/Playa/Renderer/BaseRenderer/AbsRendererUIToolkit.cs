@@ -1897,13 +1897,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 string name = fieldInfo.Name;
 
-
-                // if (fieldInfo.FieldType.IsAssignableFrom(typeof(System.IntPtr))
-                //         // fieldInfo.FieldType.Name == "System.IntPtr" || fieldInfo.FieldType.Name == "System.UIntPtr"
-                //     )
-                // {
-                //     continue;
-                // }
                 if (SkipTypeDrawing(fieldInfo.FieldType))
                 {
                     continue;
@@ -1912,47 +1905,73 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
                 Debug.Log($"render general field {name}/{fieldInfo.FieldType}/{fieldInfo.FieldType.Namespace}/{fieldInfo.FieldType.Name}");
 #endif
+                VisualElement oldItemElement = oldElement?.Q<VisualElement>(name: name);
+                string thisLabel = ObjectNames.NicifyVariableName(name);
+                VisualElement result = null;
 
-                // if (name == "m_Ptr" || name == "_ptr")
-                // {
-                //     continue;
-                // }
-                object fieldValue;
+                object fieldValue = null;
+                bool getValueSucceed = true;
                 try
                 {
                     fieldValue = fieldInfo.GetValue(value);
                 }
-#pragma warning disable CS0168 // Variable is declared but never used
                 catch (Exception e)
-#pragma warning restore CS0168 // Variable is declared but never used
                 {
 #if SAINTSFIELD_DEBUG
-                    Debug.LogWarning($"property {name}/{fieldInfo.FieldType} inside {value} gives error: {e}");
+                    Debug.LogWarning($"field {name}/{fieldInfo.FieldType} inside {value} gives error: {e}");
 #endif
-                    // throw;
-                    return null;
+                    getValueSucceed = false;
+                    string msg = e.InnerException?.Message ?? e.Message;
+                    if (oldElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField errorField)
+                    {
+                        errorField.SetErrorMessage(msg);
+                    }
+                    else
+                    {
+                        NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField r = new NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField(
+                            thisLabel,
+                            new HelpBox(msg, HelpBoxMessageType.Error)
+                        );
+                        result = r;
+                        if (inHorizontalLayout)
+                        {
+                            result.style.flexDirection = FlexDirection.Column;
+                        }
+                        else
+                        {
+                            result.AddToClassList(NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField.alignedFieldUssClassName);
+                        }
+
+                        if (labelGrayColor)
+                        {
+                            r.labelElement.style.color = reColor;
+                        }
+                    }
                 }
 
                 // Debug.Log($"try render field {name}/{fieldInfo.FieldType} under {value}/{value?.GetType()}");
 
-                VisualElement result = UIToolkitValueEdit(
-                    oldElement?.Q<VisualElement>(name: name),
-                    ObjectNames.NicifyVariableName(name),
-                    fieldInfo.FieldType,
-                    fieldValue,
-                    // _ => beforeSet?.Invoke(value),
-                    _ =>
-                    {
-                        // Debug.Log($"Before Set field {fieldInfo.Name}, invoke {value}");
-                        beforeSet?.Invoke(value);
-                    },
-                    newValue =>
-                    {
-                        fieldInfo.SetValue(value, newValue);
-                        setterOrNull?.Invoke(value);
-                    },
-                    labelGrayColor,
-                    inHorizontalLayout);
+                if(getValueSucceed)
+                {
+                    result = UIToolkitValueEdit(
+                        oldItemElement,
+                        thisLabel,
+                        fieldInfo.FieldType,
+                        fieldValue,
+                        // _ => beforeSet?.Invoke(value),
+                        _ =>
+                        {
+                            // Debug.Log($"Before Set field {fieldInfo.Name}, invoke {value}");
+                            beforeSet?.Invoke(value);
+                        },
+                        newValue =>
+                        {
+                            fieldInfo.SetValue(value, newValue);
+                            setterOrNull?.Invoke(value);
+                        },
+                        labelGrayColor,
+                        inHorizontalLayout);
+                }
                 // Debug.Log($"{name}: {result}: {fieldInfo.FieldType}");
                 // ReSharper disable once InvertIf
                 if(result != null)
@@ -1975,41 +1994,73 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
 
                 string name = propertyInfo.Name;
+                VisualElement oldItemElement = oldElement?.Q<VisualElement>(name: name);
+                string thisLabel = ObjectNames.NicifyVariableName(name);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
                 Debug.Log(
                     $"render general property {name}/{propertyInfo.PropertyType} inside {value}");
 #endif
-                object propertyValue;
+                VisualElement result = null;
+                object propertyValue = null;
+                bool getValueSucceed = true;
                 try
                 {
                     propertyValue = propertyInfo.GetValue(value);
                 }
-#pragma warning disable CS0168 // Variable is declared but never used
                 catch (Exception e)
-#pragma warning restore CS0168 // Variable is declared but never used
                 {
+                    getValueSucceed = false;
 #if SAINTSFIELD_DEBUG
                     Debug.LogWarning($"property {name}/{propertyInfo.PropertyType} inside {value} gives error: {e}");
+                    Debug.LogWarning(e.InnerException ?? e);
 #endif
-                    // throw;
-                    return null;
+                    string msg = e.InnerException?.Message ?? e.Message;
+                    if (oldElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField errorField)
+                    {
+                        errorField.SetErrorMessage(msg);
+                    }
+                    else
+                    {
+                        NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField r = new NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField(
+                            thisLabel,
+                            new HelpBox(msg, HelpBoxMessageType.Error)
+                        );
+                        result = r;
+                        if (inHorizontalLayout)
+                        {
+                            result.style.flexDirection = FlexDirection.Column;
+                        }
+                        else
+                        {
+                            result.AddToClassList(NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField.alignedFieldUssClassName);
+                        }
+
+                        if (labelGrayColor)
+                        {
+                            r.labelElement.style.color = reColor;
+                        }
+                    }
                 }
 
-                VisualElement result = UIToolkitValueEdit(
-                    oldElement?.Q<VisualElement>(name: name),
-                    ObjectNames.NicifyVariableName(name),
-                    propertyInfo.PropertyType,
-                    propertyValue,
-                    _ => beforeSet?.Invoke(value),
-                    propertyInfo.CanWrite
-                        ? newValue =>
-                        {
-                            propertyInfo.SetValue(value, newValue);
-                            setterOrNull?.Invoke(value);
-                        }
-                        : null,
-                    labelGrayColor,
-                    inHorizontalLayout);
+                if (getValueSucceed)
+                {
+                    result = UIToolkitValueEdit(
+                        oldItemElement,
+                        thisLabel,
+                        propertyInfo.PropertyType,
+                        propertyValue,
+                        _ => beforeSet?.Invoke(value),
+                        propertyInfo.CanWrite
+                            ? newValue =>
+                            {
+                                propertyInfo.SetValue(value, newValue);
+                                setterOrNull?.Invoke(value);
+                            }
+                            : null,
+                        labelGrayColor,
+                        inHorizontalLayout);
+                }
+
                 // ReSharper disable once InvertIf
                 if(result != null)
                 {

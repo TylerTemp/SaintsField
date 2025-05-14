@@ -248,6 +248,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
             public override bool Equals(object obj)
             {
+                // ReSharper disable once Unity.BurstLoadingManagedType
                 return obj is KeyStruct other && Equals(other);
             }
 
@@ -264,7 +265,16 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [ShowInInspector, Ordered] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
 
-        [ShowInInspector, Ordered]
+        [ShowInInspector, Ordered, PlayaInfoBox("If getter gives error, we display an error box")]
         private int WrongGetter => throw new NotSupportedException("Expected Exception");
+
+        [ShowInInspector, Ordered, PlayaInfoBox("We don't handle if setter gives error")]
+        private int WrongSetter  // this will just give errors to console, we won't handle it.
+        {
+            get => 20;
+            set => throw new NotSupportedException("Expected Exception");
+        }
+
+        [ShowInInspector, Ordered] private IEnumerator _ienumerator = Array.Empty<object>().GetEnumerator();
     }
 }

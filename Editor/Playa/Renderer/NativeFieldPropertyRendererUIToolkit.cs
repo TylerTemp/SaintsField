@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
@@ -14,7 +13,7 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         // private VisualElement _fieldElement;
 
-        private class NativeFieldPropertyRendererErrorField: BaseField<string>
+        public class NativeFieldPropertyRendererErrorField: BaseField<string>
         {
             private readonly HelpBox _helpBox;
             public NativeFieldPropertyRendererErrorField(string label, VisualElement visualInput) : base(label, visualInput)
