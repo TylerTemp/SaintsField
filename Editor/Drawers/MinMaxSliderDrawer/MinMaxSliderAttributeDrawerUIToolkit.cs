@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             if (property.propertyType != SerializedPropertyType.Vector2 &&
                 property.propertyType != SerializedPropertyType.Vector2Int)
             {
-                return null;
+                return PropertyFieldFallbackUIToolkit(property);
             }
 
             bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
@@ -175,6 +175,15 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             };
 
             helpBox.AddToClassList(ClassAllowDisable);
+
+            // ReSharper disable once InvertIf
+            if (property.propertyType != SerializedPropertyType.Vector2 &&
+                property.propertyType != SerializedPropertyType.Vector2Int)
+            {
+                helpBox.text = $"Expect Vector2/Vector2Int, get {property.propertyType}";
+                helpBox.style.display = DisplayStyle.Flex;
+            }
+
             return helpBox;
         }
 
@@ -182,6 +191,11 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            if (property.propertyType != SerializedPropertyType.Vector2 &&
+                property.propertyType != SerializedPropertyType.Vector2Int)
+            {
+                return;
+            }
             MinMaxSliderField minMaxSliderField =
                 container.Q<MinMaxSliderField>(NameMinMaxSliderField(property));
 
@@ -330,6 +344,12 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
+            if (property.propertyType != SerializedPropertyType.Vector2 &&
+                property.propertyType != SerializedPropertyType.Vector2Int)
+            {
+                return;
+            }
+
             bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
             MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
 

@@ -66,5 +66,7 @@ namespace SaintsField.Samples.Scripts
 
         [MinMaxSlider(0, 10, free: true), BelowRichLabel("$" + nameof(freeInput))] public Vector2 freeInput;
         [MinMaxSlider(0, 10, free: true), BelowRichLabel("$" + nameof(freeInputInt))] public Vector2Int freeInputInt;
+
+        [MinMaxSlider(0, 1f)] public float incorrectType;
     }
 }
