@@ -196,7 +196,7 @@ namespace SaintsField.Editor.Utils
 
         #region Header GUI
 
-#if SAINTSFIELD_I2_LOC
+#if SAINTSFIELD_HEADER_GUI
         [MenuItem("Window/Saints/Disable Stand-Alone Header GUI Support")]
         public static void HeaderGUI() => RemoveCompileDefine("SAINTSFIELD_HEADER_GUI");
 #else

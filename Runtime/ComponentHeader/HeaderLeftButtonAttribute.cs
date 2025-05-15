@@ -11,7 +11,7 @@ namespace SaintsField.ComponentHeader
     {
         public override bool IsLeft => true;
 
-        public HeaderLeftButtonAttribute(string title = null, string toolTip = null): base(title, toolTip)
+        public HeaderLeftButtonAttribute(string label = null, string toolTip = null): base(label, toolTip)
         {
         }
     }

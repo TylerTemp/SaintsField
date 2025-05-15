@@ -1,6 +1,5 @@
 using System.Collections;
 using SaintsField.ComponentHeader;
-using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -12,10 +11,19 @@ namespace SaintsField.Samples.Scripts.HeaderComponentExample
     public class HeaderDrawExample : SaintsMonoBehaviour
     {
 #if UNITY_EDITOR
-        [HeaderButton("B")]
-        private void BeforeBotton()
+        private bool _started;
+
+        [HeaderGhostButton("<icon=play.png/>")]
+        private IEnumerator BeforeBotton()
         {
-            _started = false;
+            _started = true;
+            while (_started)
+            {
+                range1 = (range1 + 0.0005f) % 1;
+                range2 = (range2 + 0.0009f) % 1;
+                range3 = (range3 + 0.0007f) % 1;
+                yield return null;
+            }
         }
 
         [HeaderDraw("group1")]
@@ -74,7 +82,7 @@ namespace SaintsField.Samples.Scripts.HeaderComponentExample
             return new HeaderUsed(useRect);
         }
 
-        [HeaderButton("A")]
+        [HeaderGhostButton("<icon=pause.png/>")]
         private void AfterBotton()
         {
             _started = false;
@@ -84,21 +92,5 @@ namespace SaintsField.Samples.Scripts.HeaderComponentExample
         [Range(0f, 1f)] public float range1;
         [Range(0f, 1f)] public float range2;
         [Range(0f, 1f)] public float range3;
-
-        private bool _started;
-
-        [Button]
-        private IEnumerator Dance()
-        {
-            _started = true;
-            while (_started)
-            {
-                range1 = (range1 + 0.01f) % 1;
-                range2 = (range2 + 0.03f) % 1;
-                range3 = (range3 + 0.02f) % 1;
-                yield return null;
-            }
-            // ReSharper disable once IteratorNeverReturns
-        }
     }
 }

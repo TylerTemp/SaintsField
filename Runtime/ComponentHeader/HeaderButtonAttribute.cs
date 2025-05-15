@@ -19,9 +19,9 @@ namespace SaintsField.ComponentHeader
         public override string GroupBy => null;
         public override bool IsLeft => false;
 
-        public HeaderButtonAttribute(string title = null, string tooltip = null)
+        public HeaderButtonAttribute(string label = null, string tooltip = null)
         {
-            (Title, IsCallback) = RuntimeUtil.ParseCallback(title);
+            (Title, IsCallback) = RuntimeUtil.ParseCallback(label);
             Tooltip = tooltip;
         }
     }

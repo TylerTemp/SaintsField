@@ -11,7 +11,7 @@ namespace SaintsField.ComponentHeader
     {
         public override bool IsGhost => true;
 
-        public HeaderGhostButtonAttribute(string title = null, string tooltip = null) : base(title, tooltip)
+        public HeaderGhostButtonAttribute(string label = null, string tooltip = null) : base(label, tooltip)
         {
         }
     }

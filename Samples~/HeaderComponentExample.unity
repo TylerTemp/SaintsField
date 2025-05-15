@@ -178,8 +178,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc9f6e885bc43624b87b21bfcfb5cc90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nickName: 
-  password: 
+  nickName: MyName
+  password: 12345
   age: 0
 --- !u!114 &806467993
 MonoBehaviour:
@@ -202,6 +202,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1259809732}
+  - component: {fileID: 1259809733}
   - component: {fileID: 1259809730}
   m_Layer: 0
   m_Name: HeaderDraw
@@ -240,6 +241,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1259809733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1259809729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8540c98014784f246b83c04c2194eea6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  range1: 0.669
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
