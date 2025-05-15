@@ -6,7 +6,7 @@
 2.  UI Toolkit: `MinMaxSlider` friendly error if been used on wrong type [#232](https://github.com/TylerTemp/SaintsField/issues/232)
 3.  UI Toolkit: `ShowInInspector` now shows an error box if the target attributes raises an error in its getter
 4.  UI Toolkit: `ShowInInspector` now always update the sub-field value display if the target (e.g. a class) has sub-fields/properties
-5.  UI Toolkit: if you have `SaintsEditor` enabled, a bare `[SerializedReference]` will automaticlly use `ReferencePicker` + `SaintsRow` drawer
+5.  UI Toolkit: if you have `SaintsEditor` enabled, a bare `[SerializedReference]` will automatically use `ReferencePicker` + `SaintsRow` drawer
 
 ## 4.9.0 ##
 

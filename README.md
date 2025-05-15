@@ -5218,7 +5218,7 @@ private HeaderUsed HeaderDrawRight1G1(HeaderArea headerArea)
 [Range(0f, 1f)] public float range1;
 ```
 
-[![video](http
+[![video](https://github.com/user-attachments/assets/f2a08b20-8dde-4fa0-aa5f-c7c402f62c6c)](https://github.com/user-attachments/assets/8f437f21-a4e8-4d8a-9116-090eaef5ac60)
 
 A more complex example:
 
