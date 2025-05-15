@@ -2,11 +2,11 @@
 
 ## 4.10.0 ##
 
-1.  Add `ComponentHeader.`
-1.  UI Toolkit: `MinMaxSlider` friendly error if been used on wrong type [#232](https://github.com/TylerTemp/SaintsField/issues/232)
-2.  UI Toolkit: `ShowInInspector` now shows an error box if the target attributes raises an error in its getter
-3.  UI Toolkit: `ShowInInspector` now always update the sub-field value display if the target (e.g. a class) has sub-fields/properties
-4.  UI Toolkit: if you have `SaintsEditor` enabled, a bare `[SerializedReference]` will automaticlly use `ReferencePicker` + `SaintsRow` drawer
+1.  Add `Component Header` related attributes. Now you can draw buttons, icons etc on the component header. [#154](https://github.com/TylerTemp/SaintsField/issues/154)
+2.  UI Toolkit: `MinMaxSlider` friendly error if been used on wrong type [#232](https://github.com/TylerTemp/SaintsField/issues/232)
+3.  UI Toolkit: `ShowInInspector` now shows an error box if the target attributes raises an error in its getter
+4.  UI Toolkit: `ShowInInspector` now always update the sub-field value display if the target (e.g. a class) has sub-fields/properties
+5.  UI Toolkit: if you have `SaintsEditor` enabled, a bare `[SerializedReference]` will automaticlly use `ReferencePicker` + `SaintsRow` drawer
 
 ## 4.9.0 ##
 
