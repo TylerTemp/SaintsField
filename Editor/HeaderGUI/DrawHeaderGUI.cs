@@ -203,8 +203,11 @@ namespace SaintsField.Editor.HeaderGUI
             {
                 return false;
             }
-
+#if UNITY_2023_1_OR_NEWER
             string title = ObjectNames.GetInspectorTitle(firstTarget, targets.Length > 1);
+#else
+            string title = ObjectNames.GetInspectorTitle(firstTarget);
+#endif
             float titleWidth = EditorStyles.largeLabel.CalcSize(new GUIContent(title)).x;
             bool isHierarchyInspecting = string.IsNullOrEmpty(AssetDatabase.GetAssetPath(firstTarget));
 

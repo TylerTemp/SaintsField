@@ -1601,7 +1601,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         null,
                         false,
                         inHorizontalLayout
-                    );
+                    ).result;
                     if (newKeyElement != null)
                     {
                         newKeyElement.name = keyElemName;
@@ -1620,7 +1620,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         null,
                         false,
                         inHorizontalLayout
-                    );
+                    ).result;
                     if (newValueContainer != null)
                     {
                         newValueContainer.name = valueContainerName;
