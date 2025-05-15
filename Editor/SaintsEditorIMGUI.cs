@@ -1,4 +1,5 @@
 using System;
+using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Playa;
 using UnityEditor;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace SaintsField.Editor
 
         public virtual void OnEnable()
         {
+            DrawHeaderGUI.EnsureInitLoad();
+
             if (!_saintsEditorIMGUI)
             {
                 return;
@@ -47,6 +50,8 @@ namespace SaintsField.Editor
 
         public override void OnInspectorGUI()
         {
+            DrawHeaderGUI.HelperUpdate();
+
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_renderers == null)
             {

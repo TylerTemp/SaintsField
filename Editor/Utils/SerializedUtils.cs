@@ -209,6 +209,7 @@ namespace SaintsField.Editor.Utils
             // this does not work with interface type
             // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes(typeof(ISaintsAttribute)));
             // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes());
+            // ReSharper disable once RedundantCast
             MemberInfo memberInfo = fieldOrProp.IsField ? (MemberInfo)fieldOrProp.FieldInfo : fieldOrProp.PropertyInfo;
             return (ReflectCache.GetCustomAttributes<T>(memberInfo), sourceObj);
         }

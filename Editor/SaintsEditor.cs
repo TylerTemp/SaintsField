@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
+using SaintsField.ComponentHeader;
+using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
@@ -16,11 +17,6 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-using UnityEditor.UIElements;
-using UnityEngine.UIElements;
-#endif
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using DG.DOTweenEditor;
 #endif
@@ -375,6 +371,35 @@ namespace SaintsField.Editor
             object target)
         {
             IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedPropertyDict, target).ToArray();
+
+            // let's handle some HeaderGUI here... not a good idea but...
+            bool anyChange = false;
+            foreach ((SaintsFieldWithInfo saintsFieldWithInfo, int index) in fieldWithInfosSorted.WithIndex())
+            {
+                if (saintsFieldWithInfo.MethodInfo != null)
+                {
+                    IReadOnlyList<IPlayaAttribute> playaAttributes = saintsFieldWithInfo.PlayaAttributes;
+                    AbsComponentHeaderAttribute absComponentHeaderAttribute =
+                        playaAttributes.OfType<AbsComponentHeaderAttribute>().FirstOrDefault();
+                    if (absComponentHeaderAttribute != null)
+                    {
+                        bool added = DrawHeaderGUI.AddAttributeIfNot(
+                            absComponentHeaderAttribute,
+                            saintsFieldWithInfo.MethodInfo,
+                            target,
+                            index);
+                        if (added)
+                        {
+                            anyChange = true;
+                        }
+                    }
+                }
+            }
+            if (anyChange)
+            {
+                DrawHeaderGUI.RefreshAddAttributeIfNot(target.GetType());
+            }
+
             IReadOnlyList<RendererGroupInfo> chainedGroups = ChainSaintsFieldWithInfo(fieldWithInfosSorted, serializedObject, makeRenderer);
             // Debug.Log(chainedGroups.Count);
             // ISaintsRenderer[] r = HelperFlattenRendererGroupInfoIntoRenderers(chainedGroups, serializedObject, makeRenderer, target)
@@ -872,19 +897,19 @@ namespace SaintsField.Editor
             return ori.Count == 0? "": string.Join("/", ori);
         }
 
-        private static IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
-        {
-            // e.g "a/b/c/d"
-            // first yield: "a/b/c", "a/b/c/d"
-            // then yield: "a/b", "a/b/c"
-            // then yield: "a", "a/b"
-            string[] groupChunk = longestGroupGroupBy.Split('/');
-
-            for (int i = groupChunk.Length - 1; i > 0; i--)
-            {
-                yield return (string.Join("/", groupChunk, 0, i), string.Join("/", groupChunk, 0, i + 1));
-            }
-        }
+        // private static IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
+        // {
+        //     // e.g "a/b/c/d"
+        //     // first yield: "a/b/c", "a/b/c/d"
+        //     // then yield: "a/b", "a/b/c"
+        //     // then yield: "a", "a/b"
+        //     string[] groupChunk = longestGroupGroupBy.Split('/');
+        //
+        //     for (int i = groupChunk.Length - 1; i > 0; i--)
+        //     {
+        //         yield return (string.Join("/", groupChunk, 0, i), string.Join("/", groupChunk, 0, i + 1));
+        //     }
+        // }
 
         public static IEnumerable<string> GetSerializedProperties(SerializedObject serializedObject)
         {

@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
+using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
@@ -71,6 +72,9 @@ namespace SaintsField.Editor
             root.RegisterCallback<AttachToPanelEvent>(_ => AddInstance(this));
             root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance(this));
 #endif
+
+            root.schedule.Execute(DrawHeaderGUI.HelperUpdate).Every(1);
+
             return root;
         }
     }

@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -29,43 +30,6 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            // VisualElement root = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         flexDirection = FlexDirection.Row,
-            //         height = SingleLineHeight,
-            //     },
-            // };
-            //
-            // Label label = Util.PrefixLabelUIToolKit(property.displayName, 0);
-            // label.name = NameLabel(property);
-            // // label.AddToClassList("unity-base-field__aligned");
-            // root.Add(label);
-            //
-            // RateAttribute rateAttribute = (RateAttribute)saintsAttribute;
-            // int min = rateAttribute.Min;
-            // int max = rateAttribute.Max;
-            //
-            // bool fromZero = min == 0;
-            //
-            // List<int> options = Enumerable.Range(fromZero? 0: 1, fromZero? max + 1: max).ToList();
-            // if (fromZero)
-            // {
-            //     options.Remove(0);
-            //     options.Add(0);
-            // }
-            //
-            // foreach (int option in options)
-            // {
-            //     root.Add(MakeStarUIToolkit(property, option, min));
-            // }
-            //
-            // root.AddToClassList(ClassAllowDisable);
-            // root.AddToClassList("unity-base-field__aligned");
-
-            // return root;
-
             VisualElement root = new VisualElement
             {
                 style =
@@ -230,6 +194,8 @@ namespace SaintsField.Editor.Drawers.RateDrawer
 
                 button.RegisterCallback<MouseLeaveEvent>(_ => UpdateStarUIToolkit(property.intValue, property, container));
             }
+
+            rateField.TrackPropertyValue(property, p => UpdateStarUIToolkit(p.intValue, p, container));
         }
 
         private static void UpdateStarUIToolkit(int value, SerializedProperty property, VisualElement container)

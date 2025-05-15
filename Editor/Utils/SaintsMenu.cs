@@ -194,6 +194,19 @@ namespace SaintsField.Editor.Utils
 
         #endregion
 
+        #region Header GUI
+
+#if SAINTSFIELD_I2_LOC
+        [MenuItem("Window/Saints/Disable Stand-Alone Header GUI Support")]
+        public static void HeaderGUI() => RemoveCompileDefine("SAINTSFIELD_HEADER_GUI");
+#else
+        [MenuItem("Window/Saints/Enable Stand-Alone Header GUI Support")]
+        public static void HeaderGUI() => AddCompileDefine("SAINTSFIELD_HEADER_GUI");
+#endif
+
+
+        #endregion
+
         // ReSharper disable once UnusedMember.Local
         public static void AddCompileDefine(string newDefineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)
         {
