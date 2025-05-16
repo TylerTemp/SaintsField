@@ -6,7 +6,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class ReferencePickerHijack : SaintsMonoBehaviour
     {
-#if UNITY_2021_3_OR_NEWER
         public interface IPicker
         {
 
@@ -28,6 +27,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public string displayName;
         }
 
+#if UNITY_2021_3_OR_NEWER
         [SerializeReference]
         public IPicker picker;
 #endif

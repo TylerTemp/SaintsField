@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
@@ -125,3 +126,4 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         }
     }
 }
+#endif

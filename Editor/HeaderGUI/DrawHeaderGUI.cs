@@ -139,7 +139,7 @@ namespace SaintsField.Editor.HeaderGUI
                 {
                     switch (attribute)
                     {
-                        case HeaderButtonAttribute:
+                        case HeaderButtonAttribute _:
                         {
                             if (!HeaderButtonDrawer.ValidateMethodInfo(methodInfo, reflectedType))
                             {
@@ -147,7 +147,7 @@ namespace SaintsField.Editor.HeaderGUI
                             }
                         }
                             break;
-                        case HeaderDrawAttribute:
+                        case HeaderDrawAttribute _:
                         {
                             if(!HeaderDrawDrawer.ValidateMethodInfo(methodInfo, reflectedType))
                             {
@@ -155,7 +155,7 @@ namespace SaintsField.Editor.HeaderGUI
                             }
                         }
                             break;
-                        case HeaderLabelAttribute:
+                        case HeaderLabelAttribute _:
                         {
                             if (!HeaderLabelDrawer.ValidateMethodInfo(methodInfo, reflectedType))
                             {
@@ -190,6 +190,7 @@ namespace SaintsField.Editor.HeaderGUI
 
             }
 
+#if UNITY_2021_3_OR_NEWER
             foreach (FieldInfo fieldInfo in TypeCache.GetFieldsWithAttribute<AbsComponentHeaderAttribute>())
             {
                 Type reflectedType = fieldInfo.ReflectedType;
@@ -224,6 +225,7 @@ namespace SaintsField.Editor.HeaderGUI
                     }
                 }
             }
+#endif
 
             foreach (Type reflectedType in TypeCache.GetTypesWithAttribute<AbsComponentHeaderAttribute>())
             {
@@ -631,7 +633,7 @@ namespace SaintsField.Editor.HeaderGUI
                     MethodInfo methodInfo = (MethodInfo)memberInfo;
                     switch (attribute)
                     {
-                        case HeaderButtonAttribute:
+                        case HeaderButtonAttribute _:
                         {
                             if (!HeaderButtonDrawer.ValidateMethodInfo(methodInfo, reflectedType))
                             {
@@ -639,7 +641,7 @@ namespace SaintsField.Editor.HeaderGUI
                             }
                         }
                             break;
-                        case HeaderDrawAttribute:
+                        case HeaderDrawAttribute _:
                         {
                             if (!HeaderDrawDrawer.ValidateMethodInfo(methodInfo, reflectedType))
                             {
@@ -647,7 +649,7 @@ namespace SaintsField.Editor.HeaderGUI
                             }
                         }
                             break;
-                        case HeaderLabelAttribute:
+                        case HeaderLabelAttribute _:
                         {
                             if (!HeaderLabelDrawer.ValidateMethodInfo(methodInfo, reflectedType))
                             {

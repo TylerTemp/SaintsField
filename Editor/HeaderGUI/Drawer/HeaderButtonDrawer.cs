@@ -118,9 +118,15 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                 ? GUIContent.none
                 : new GUIContent("", headerButtonAttribute.Tooltip);
 
-            GUIStyle style = headerButtonAttribute.IsGhost
-                ? EditorStyles.iconButton
-                : EditorStyles.miniButton;
+            GUIStyle style =
+#if UNITY_2021_3_OR_NEWER
+                headerButtonAttribute.IsGhost
+                    ? EditorStyles.iconButton
+                    : EditorStyles.miniButton
+#else
+                    EditorStyles.miniButton
+#endif
+                ;
 
             // ReSharper disable once InvertIf
             if (GUI.Button(buttonRect, buttonContent, style))
