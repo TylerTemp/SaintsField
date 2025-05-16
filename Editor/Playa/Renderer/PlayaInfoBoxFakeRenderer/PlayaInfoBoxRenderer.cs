@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 
         public override string ToString()
         {
-            return $"<InfoBox />";
+            return $"<InfoBox {FieldWithInfo}/>";
         }
     }
 }

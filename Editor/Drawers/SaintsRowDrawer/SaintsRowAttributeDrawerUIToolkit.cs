@@ -243,6 +243,16 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
              //     bodyElement.Add(prop);
              // }
 
+             foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(property.serializedObject, value))
+             {
+                 saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
+                 VisualElement rendererElement = saintsRenderer.CreateVisualElement();
+                 if (rendererElement != null)
+                 {
+                     bodyElement.Add(rendererElement);
+                 }
+             }
+
              // this... fixed by adding Bind()... wtf...
              foreach (ISaintsRenderer saintsRenderer in renderer)
              {

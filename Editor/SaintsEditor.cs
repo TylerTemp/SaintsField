@@ -8,6 +8,7 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
@@ -82,6 +83,57 @@ namespace SaintsField.Editor
                 .ToDictionary(each => each, serializedObject.FindProperty);
             // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
             return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
+        }
+
+        public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(SerializedObject serializedObject, object target)
+        {
+            Type objectType = target.GetType();
+            IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
+
+            // List<SaintsFieldWithInfo> saintsFieldWithInfos = new List<SaintsFieldWithInfo>(playaClassAttributes.Length);
+            foreach ((IPlayaClassAttribute playaClassAttribute, int index) in playaClassAttributes.WithIndex())
+            {
+                switch (playaClassAttribute)
+                {
+
+                    case PlayaInfoBoxAttribute infoBox:
+                    {
+                        yield return new PlayaInfoBoxRenderer(serializedObject, new SaintsFieldWithInfo
+                        {
+                            PlayaAttributes = new[] { infoBox },
+                            Target = target,
+                            RenderType = SaintsRenderType.ClassStruct,
+                            SerializedProperty = null,
+                            FieldInfo = null,
+                            PropertyInfo = null,
+                            MethodInfo = null,
+                            InherentDepth = -1,
+                            Order = int.MinValue,
+                            MemberId = $"{objectType.Name}-{infoBox}-{index}",
+                        }, infoBox);
+                    }
+                        break;
+                    case PlayaAboveRichLabelAttribute playaAboveRichLabelAttribute:
+                    {
+                        yield return new PlayaAboveRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
+                        {
+                            PlayaAttributes = new[] { playaAboveRichLabelAttribute },
+                            Target = target,
+                            RenderType = SaintsRenderType.ClassStruct,
+                            SerializedProperty = null,
+                            FieldInfo = null,
+                            PropertyInfo = null,
+                            MethodInfo = null,
+                            InherentDepth = -1,
+                            Order = int.MinValue,
+                            MemberId = $"{objectType.Name}-{playaAboveRichLabelAttribute}-{index}",
+                        }, playaAboveRichLabelAttribute);
+                    }
+                        break;
+                }
+            }
+
+            // return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
         }
 
         public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(

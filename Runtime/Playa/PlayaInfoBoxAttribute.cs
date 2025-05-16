@@ -2,13 +2,12 @@ using System;
 using System.Diagnostics;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
-using Debug = UnityEngine.Debug;
 
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class PlayaInfoBoxAttribute: Attribute, IPlayaAttribute, IPlayaIMGUIGroupBy
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
+    public class PlayaInfoBoxAttribute: Attribute, IPlayaAttribute, IPlayaClassAttribute, IPlayaIMGUIGroupBy
     {
         // public readonly string GroupBy;
         public string GroupBy { get; }

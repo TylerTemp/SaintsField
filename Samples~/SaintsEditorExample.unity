@@ -2382,6 +2382,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9393ed7ea503f2a42bc7ee52405e8d03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &960222678
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 960222679}
+  - component: {fileID: 960222680}
+  m_Layer: 0
+  m_Name: ClassinfoBoxExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &960222679
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 960222678}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &960222680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 960222678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1da549d7da7832a4686c6591ad1c4c1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dynamicContent: Dynamic Content
+  myStruct:
+    structString: 
 --- !u!1 &993888193
 GameObject:
   m_ObjectHideFlags: 0
@@ -2830,6 +2877,8 @@ Transform:
   - {fileID: 126873385}
   - {fileID: 123624942}
   - {fileID: 480485012}
+  - {fileID: 960222679}
+  - {fileID: 1656851966}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1240873459
@@ -3438,6 +3487,53 @@ MonoBehaviour:
     Weight: 7
     MinQuantity: 0
     MaxQuantity: 0
+--- !u!1 &1656851965
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1656851966}
+  - component: {fileID: 1656851967}
+  m_Layer: 0
+  m_Name: ClassPlayaAboveRichLabelExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1656851966
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1656851965}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1656851967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1656851965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f0fa2d6c4e523545b02f1537f935406, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dynamicContent: '<color=lime>Dynamic!
+
+    ----------------------------------------------'
 --- !u!1 &1668091816
 GameObject:
   m_ObjectHideFlags: 0
