@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using SaintsField.Interfaces;
 using UnityEngine;
 
 namespace SaintsField.Addressable
 {
+    [Conditional("UNITY_EDITOR")]
     public class AddressableAddressAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;

@@ -77,25 +77,34 @@ namespace SaintsField.Editor.HeaderGUI
             _initLoad = true;
         }
 
+        public enum MemberType
+        {
+            Method,
+            Field,
+            Property,
+            Class,
+        }
+
         public readonly struct RenderTargetInfo : IEquatable<RenderTargetInfo>
         {
-            // public readonly Type Type;
-            // public readonly bool FromLeft;
-            // public readonly string Group;
             public readonly AbsComponentHeaderAttribute Attribute;
-            public readonly MethodInfo MethodInfo;
-            public readonly int MetadataToken;
+            public readonly MemberType MemberType;
+            public readonly MemberInfo MemberInfo;
+            public readonly int SortOrder;
 
-            public RenderTargetInfo(AbsComponentHeaderAttribute attribute, MethodInfo methodInfo, int metadataToken)
+            public RenderTargetInfo(AbsComponentHeaderAttribute attribute, MemberType memberType, MemberInfo memberInfo, int sortOrder)
             {
                 Attribute = attribute;
-                MethodInfo = methodInfo;
-                MetadataToken = metadataToken;
+                MemberType = memberType;
+                MemberInfo = memberInfo;
+                SortOrder = sortOrder;
             }
+
+            public override string ToString() => $"<RenderTargetInfo {MemberInfo.Name} {Attribute.GetType()} {Attribute.IsLeft} {Attribute.GroupBy} />";
 
             public bool Equals(RenderTargetInfo other)
             {
-                return Equals(Attribute, other.Attribute) && Equals(MethodInfo, other.MethodInfo);
+                return Equals(Attribute, other.Attribute) && MemberType == other.MemberType && Equals(MemberInfo, other.MemberInfo);
             }
 
             public override bool Equals(object obj)
@@ -105,10 +114,9 @@ namespace SaintsField.Editor.HeaderGUI
 
             public override int GetHashCode()
             {
-                return Util.CombineHashCode(Attribute, MethodInfo);
+                return Util.CombineHashCode(Attribute, (int)MemberType, MemberInfo);
+                // return HashCode.Combine(Attribute, (int)MemberType, MemberInfo);
             }
-
-            public override string ToString() => $"<RenderTargetInfo {MethodInfo.Name} {Attribute.GetType()} {Attribute.IsLeft} {Attribute.GroupBy} />";
         }
 
         // private static readonly List<RenderTargetInfo> RenderTargetInfos = new List<RenderTargetInfo>();
@@ -127,49 +135,120 @@ namespace SaintsField.Editor.HeaderGUI
 
                 // Debug.Log(containerType);
 
-                AbsComponentHeaderAttribute attribute = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(methodInfo)[0];
-
-                switch (attribute)
+                foreach (AbsComponentHeaderAttribute attribute in ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(methodInfo))
                 {
-                    case HeaderButtonAttribute:
+                    switch (attribute)
                     {
-                        if (!HeaderButtonDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                        case HeaderButtonAttribute:
                         {
-                            continue;
+                            if (!HeaderButtonDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                            {
+                                continue;
+                            }
+                        }
+                            break;
+                        case HeaderDrawAttribute:
+                        {
+                            if(!HeaderDrawDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                            {
+                                continue;
+                            }
+                        }
+                            break;
+                        case HeaderLabelAttribute:
+                        {
+                            if (!HeaderLabelDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                            {
+                                continue;
+                            }
+                        }
+                            break;
+                    }
+
+                    RenderTargetInfo info = new RenderTargetInfo(attribute, MemberType.Method, methodInfo, methodInfo.MetadataToken);
+
+                    // subclass
+                    foreach (KeyValuePair<Type, List<RenderTargetInfo>> cachedKv in CachedTypeToRenderTargetInfos)
+                    {
+                        if (reflectedType.IsAssignableFrom(cachedKv.Key) && reflectedType != cachedKv.Key)
+                        {
+                            cachedKv.Value.Add(info);
                         }
                     }
-                        break;
-                    case HeaderDrawAttribute:
+
+                    if (!CachedTypeToRenderTargetInfos.TryGetValue(reflectedType, out List<RenderTargetInfo> renderTargetInfos))
                     {
-                        if(!HeaderDrawDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                        CachedTypeToRenderTargetInfos[reflectedType] = renderTargetInfos = new List<RenderTargetInfo>();
+                    }
+
+                    if (!renderTargetInfos.Contains(info))
+                    {
+                        // Debug.Log(methodInfo.Name);
+                        renderTargetInfos.Add(info);
+                    }
+                }
+
+            }
+
+            foreach (FieldInfo fieldInfo in TypeCache.GetFieldsWithAttribute<AbsComponentHeaderAttribute>())
+            {
+                Type reflectedType = fieldInfo.ReflectedType;
+                if (reflectedType == null)
+                {
+                    continue;
+                }
+
+                // Debug.Log(containerType);
+
+                foreach (AbsComponentHeaderAttribute attribute in ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(fieldInfo))
+                {
+                    RenderTargetInfo info = new RenderTargetInfo(attribute, MemberType.Field, fieldInfo, fieldInfo.MetadataToken);
+
+                    // subclass
+                    foreach (KeyValuePair<Type, List<RenderTargetInfo>> cachedKv in CachedTypeToRenderTargetInfos)
+                    {
+                        if (reflectedType.IsAssignableFrom(cachedKv.Key) && reflectedType != cachedKv.Key)
                         {
-                            continue;
+                            cachedKv.Value.Add(info);
                         }
                     }
-                        break;
-                }
 
-                RenderTargetInfo info = new RenderTargetInfo(attribute, methodInfo, methodInfo.MetadataToken);
-
-                // subclass
-                foreach (KeyValuePair<Type, List<RenderTargetInfo>> cachedKv in CachedTypeToRenderTargetInfos)
-                {
-                    if (reflectedType.IsAssignableFrom(cachedKv.Key) && reflectedType != cachedKv.Key)
+                    if (!CachedTypeToRenderTargetInfos.TryGetValue(reflectedType, out List<RenderTargetInfo> renderTargetInfos))
                     {
-                        cachedKv.Value.Add(info);
+                        CachedTypeToRenderTargetInfos[reflectedType] = renderTargetInfos = new List<RenderTargetInfo>();
+                    }
 
+                    if (!renderTargetInfos.Contains(info))
+                    {
+                        renderTargetInfos.Add(info);
                     }
                 }
+            }
 
-                if (!CachedTypeToRenderTargetInfos.TryGetValue(reflectedType, out List<RenderTargetInfo> renderTargetInfos))
+            foreach (Type reflectedType in TypeCache.GetTypesWithAttribute<AbsComponentHeaderAttribute>())
+            {
+                foreach (AbsComponentHeaderAttribute attribute in ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(reflectedType))
                 {
-                    CachedTypeToRenderTargetInfos[reflectedType] = renderTargetInfos = new List<RenderTargetInfo>();
-                }
+                    RenderTargetInfo info = new RenderTargetInfo(attribute, MemberType.Class, null, -1);
 
-                if (!renderTargetInfos.Contains(info))
-                {
-                    // Debug.Log(methodInfo.Name);
-                    renderTargetInfos.Add(info);
+                    // subclass
+                    foreach (KeyValuePair<Type, List<RenderTargetInfo>> cachedKv in CachedTypeToRenderTargetInfos)
+                    {
+                        if (reflectedType.IsAssignableFrom(cachedKv.Key) && reflectedType != cachedKv.Key)
+                        {
+                            cachedKv.Value.Add(info);
+                        }
+                    }
+
+                    if (!CachedTypeToRenderTargetInfos.TryGetValue(reflectedType, out List<RenderTargetInfo> renderTargetInfos))
+                    {
+                        CachedTypeToRenderTargetInfos[reflectedType] = renderTargetInfos = new List<RenderTargetInfo>();
+                    }
+
+                    if (!renderTargetInfos.Contains(info))
+                    {
+                        renderTargetInfos.Add(info);
+                    }
                 }
             }
 
@@ -177,7 +256,6 @@ namespace SaintsField.Editor.HeaderGUI
             {
                 CachedTypeToRenderTargetInfos[type] = ReCreateOrdered(CachedTypeToRenderTargetInfos[type]).ToList();
             }
-
         }
 
         private static bool DrawMethod(Rect rectangle, Object[] targets)
@@ -233,56 +311,14 @@ namespace SaintsField.Editor.HeaderGUI
             rectangle.x = xMin;
             rectangle.width = xMax - xMin;
 
-            // rectangle.x -= 40;
-            // rectangle.width += 40;
-            // Debug.Log(rectangle.y);
-
-            // EditorGUI.DrawRect(rectangle, Color.blue * new Color(1, 1, 1, 0.3f));
-            // EditorGUI.DrawRect(new Rect(headerArea.SpaceStartX, headerArea.Y, headerArea.SpaceEndX - headerArea.SpaceStartX, headerArea.Height), Color.blue * new Color(1, 1, 1, 0.3f));
-
-            // Rect titleRect = new Rect(rectangle)
-            // {
-            //     x = prefixWidth,
-            //     width = titleWidth,
-            // };
-            // EditorGUI.DrawRect(titleRect, Color.yellow * new Color(1, 1, 1, 0.2f));
-            // EditorGUI.DrawRect(new Rect(headerArea.TitleStartX, headerArea.Y, headerArea.TitleEndX - headerArea.TitleStartX, headerArea.Height), Color.yellow * new Color(1, 1, 1, 0.2f));
-            // EditorGUI.LabelField(rectangle, title);
-
-            // List<Rect> nullLeftUsed = new List<Rect>();
-            // List<Rect> nullRightUsed = new List<Rect>();
-            // List<RenderTargetInfo> orderedRenderTargetInfos = new List<RenderTargetInfo>(renderTargetInfos.Count);
-            // List<RenderTargetInfo> leftInfos = new List<RenderTargetInfo>(renderTargetInfos.Count);
-            // List<RenderTargetInfo> rightInfos = new List<RenderTargetInfo>(renderTargetInfos.Count);
-            // foreach (RenderTargetInfo renderTargetInfo in renderTargetInfos)
-            // {
-            //     if (renderTargetInfo.Attribute.IsLeft)
-            //     {
-            //         leftInfos.Add(renderTargetInfo);
-            //     }
-            //     else
-            //     {
-            //         rightInfos.Insert(0, renderTargetInfo);
-            //     }
-            // }
-
-
-            // leftInfos.Sort((a, b) => string.Compare(a.Attribute.GroupBy, b.Attribute.GroupBy, StringComparison.Ordinal));
-            // rightInfos.Sort((a, b) => string.Compare(a.Attribute.GroupBy, b.Attribute.GroupBy, StringComparison.Ordinal));
 
             float xLeft = headerArea.SpaceStartX;
             float xRight = rectangle.xMax;
-
-            // Dictionary<string, List<Rect>> leftGroupToUsedRects = new Dictionary<string, List<Rect>>();
-            // Dictionary<string, List<Rect>> rightGroupToUsedRects = new Dictionary<string, List<Rect>>();
 
             string preLeftGrouBy = null;
             List<Rect> preLeftUsedRects = new List<Rect>();
             string preRightGrouBy = null;
             List<Rect> preRightUsedRects = new List<Rect>();
-
-            // rightInfos.AddRange(leftInfos);
-
 
             foreach (RenderTargetInfo renderTargetInfo in renderTargetInfos)
             {
@@ -418,6 +454,93 @@ namespace SaintsField.Editor.HeaderGUI
                         }
                     }
                         break;
+                    case HeaderLabelAttribute headerLabelAttribute:
+                    {
+                        string groupBy = headerLabelAttribute.GroupBy;
+                        IReadOnlyList<Rect> usedRects = Array.Empty<Rect>();
+                        if (!string.IsNullOrEmpty(groupBy))
+                        {
+                            // get used rect
+                            usedRects = headerLabelAttribute.IsLeft ? preLeftUsedRects : preRightUsedRects;
+
+                            // check if it's new group
+                            if (headerLabelAttribute.IsLeft)
+                            {
+                                if (preLeftGrouBy != headerLabelAttribute.GroupBy && preLeftUsedRects.Count > 0)
+                                {
+                                    preLeftGrouBy = headerLabelAttribute.GroupBy;
+                                    xLeft = Mathf.Max(xLeft, preLeftUsedRects.Max(each => each.xMax));
+                                    preLeftUsedRects.Clear();
+                                }
+                            }
+                            else
+                            {
+                                if (preRightGrouBy != headerLabelAttribute.GroupBy && preRightUsedRects.Count > 0)
+                                {
+                                    preRightGrouBy = headerLabelAttribute.GroupBy;
+                                    xRight = Mathf.Min(xRight, preRightUsedRects.Min(each => each.x));
+                                    preRightUsedRects.Clear();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (headerLabelAttribute.IsLeft)
+                            {
+                                preLeftGrouBy = null;
+                                if(preLeftUsedRects.Count > 0)
+                                {
+                                    xLeft = Mathf.Max(xLeft, preLeftUsedRects.Max(each => each.xMax));
+                                    preLeftUsedRects.Clear();
+                                }
+                            }
+                            else
+                            {
+                                preRightGrouBy = null;
+                                if(preRightUsedRects.Count > 0)
+                                {
+                                    xRight = Mathf.Min(xRight, preRightUsedRects.Min(each => each.x));
+                                    preRightUsedRects.Clear();
+                                }
+                            }
+                        }
+
+                        (bool used, HeaderUsed headerUsed) = HeaderLabelDrawer.Draw(
+                            firstTarget,
+                            headerArea.EditorWrap(headerLabelAttribute.IsLeft ? xLeft : xRight, usedRects),
+                            headerLabelAttribute,
+                            renderTargetInfo
+                        );
+
+                        if (used)
+                        {
+                            if (string.IsNullOrEmpty(groupBy))
+                            {
+                                if (headerLabelAttribute.IsLeft)
+                                {
+                                    xLeft = headerUsed.UsedRect.xMax;
+                                }
+                                else
+                                {
+                                    xRight = headerUsed.UsedRect.x;
+                                }
+                            }
+                            else
+                            {
+                                if (headerLabelAttribute.IsLeft)
+                                {
+                                    preLeftUsedRects.Add(headerUsed.UsedRect);
+                                    preLeftGrouBy = headerLabelAttribute.GroupBy;
+                                }
+                                else
+                                {
+                                    preRightUsedRects.Add(headerUsed.UsedRect);
+                                    preRightGrouBy = headerLabelAttribute.GroupBy;
+                                }
+                            }
+                        }
+                    }
+                        break;
                 }
             }
 
@@ -440,8 +563,8 @@ namespace SaintsField.Editor.HeaderGUI
                 }
             }
 
-            leftInfos.Sort((a, b) => a.MetadataToken.CompareTo(b.MetadataToken));
-            rightInfos.Sort((a, b) => -a.MetadataToken.CompareTo(b.MetadataToken));
+            leftInfos.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+            rightInfos.Sort((a, b) => -a.SortOrder.CompareTo(b.SortOrder));
 
             return ReOrdered(rightInfos).Concat(ReOrdered(leftInfos));
         }
@@ -479,45 +602,123 @@ namespace SaintsField.Editor.HeaderGUI
             }
         }
 
-        public static bool AddAttributeIfNot(AbsComponentHeaderAttribute attribute, MethodInfo methodInfo, object target, int order)
+        public static bool AddAttributeIfNot(AbsComponentHeaderAttribute attribute, MemberInfo memberInfo, object target, int order)
         {
             Type reflectedType = target.GetType();
-            switch (attribute)
+            if (memberInfo == null)
             {
-                case HeaderButtonAttribute:
+                RenderTargetInfo info = new RenderTargetInfo(attribute, MemberType.Class, null, order);
+                if (!CachedTypeToRenderTargetInfos.TryGetValue(reflectedType,
+                        out List<RenderTargetInfo> renderTargetInfos))
                 {
-                    if (!HeaderButtonDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                    CachedTypeToRenderTargetInfos[reflectedType] =
+                        renderTargetInfos = new List<RenderTargetInfo>();
+                }
+
+                if (renderTargetInfos.Contains(info))
+                {
+                    return false;
+                }
+
+                renderTargetInfos.Add(info);
+                return true;
+            }
+
+            switch (memberInfo.MemberType)
+            {
+                case MemberTypes.Method:
+                {
+                    MethodInfo methodInfo = (MethodInfo)memberInfo;
+                    switch (attribute)
+                    {
+                        case HeaderButtonAttribute:
+                        {
+                            if (!HeaderButtonDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                            {
+                                return false;
+                            }
+                        }
+                            break;
+                        case HeaderDrawAttribute:
+                        {
+                            if (!HeaderDrawDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                            {
+                                return false;
+                            }
+                        }
+                            break;
+                        case HeaderLabelAttribute:
+                        {
+                            if (!HeaderLabelDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                            {
+                                return false;
+                            }
+                        }
+                            break;
+                    }
+
+                    RenderTargetInfo info = new RenderTargetInfo(attribute, MemberType.Method, methodInfo, order);
+
+                    if (!CachedTypeToRenderTargetInfos.TryGetValue(reflectedType,
+                            out List<RenderTargetInfo> renderTargetInfos))
+                    {
+                        CachedTypeToRenderTargetInfos[reflectedType] = renderTargetInfos = new List<RenderTargetInfo>();
+                    }
+                    if (renderTargetInfos.Contains(info))
                     {
                         return false;
                     }
+                    renderTargetInfos.Add(info);
+
+                    return true;
+                }
+                case MemberTypes.Field:
+                {
+                    if(attribute is HeaderLabelAttribute)
+                    {
+                        RenderTargetInfo info = new RenderTargetInfo(attribute, MemberType.Field, memberInfo, order);
+                        if (!CachedTypeToRenderTargetInfos.TryGetValue(reflectedType,
+                                out List<RenderTargetInfo> renderTargetInfos))
+                        {
+                            CachedTypeToRenderTargetInfos[reflectedType] =
+                                renderTargetInfos = new List<RenderTargetInfo>();
+                        }
+
+                        if (renderTargetInfos.Contains(info))
+                        {
+                            return false;
+                        }
+
+                        renderTargetInfos.Add(info);
+                        return true;
+                    }
                 }
                     break;
-                case HeaderDrawAttribute:
+                case MemberTypes.Property:
                 {
-                    if(!HeaderDrawDrawer.ValidateMethodInfo(methodInfo, reflectedType))
+                    if (attribute is HeaderLabelAttribute)
                     {
-                        return false;
+                        RenderTargetInfo info = new RenderTargetInfo(attribute, MemberType.Property, memberInfo, order);
+                        if (!CachedTypeToRenderTargetInfos.TryGetValue(reflectedType,
+                                out List<RenderTargetInfo> renderTargetInfos))
+                        {
+                            CachedTypeToRenderTargetInfos[reflectedType] =
+                                renderTargetInfos = new List<RenderTargetInfo>();
+                        }
+
+                        if (renderTargetInfos.Contains(info))
+                        {
+                            return false;
+                        }
+
+                        renderTargetInfos.Add(info);
+                        return true;
                     }
                 }
                     break;
             }
 
-            RenderTargetInfo info = new RenderTargetInfo(attribute, methodInfo, order);
-
-            if (!CachedTypeToRenderTargetInfos.TryGetValue(reflectedType, out List<RenderTargetInfo> renderTargetInfos))
-            {
-                CachedTypeToRenderTargetInfos[reflectedType] = renderTargetInfos = new List<RenderTargetInfo>();
-            }
-
-            if (renderTargetInfos.Contains(info))
-            {
-                return false;
-            }
-
-            // Debug.Log(methodInfo.Name);
-            renderTargetInfos.Add(info);
-            return true;
-
+            return false;
         }
 
         public static void RefreshAddAttributeIfNot(Type targetType)

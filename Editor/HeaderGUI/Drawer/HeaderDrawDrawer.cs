@@ -49,8 +49,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
 
         public static (bool used, HeaderUsed headerUsed) Draw(Object target, HeaderArea headerArea, DrawHeaderGUI.RenderTargetInfo renderTargetInfo)
         {
-            MethodInfo method = renderTargetInfo.MethodInfo;
-
+            MethodInfo method = (MethodInfo)renderTargetInfo.MemberInfo;
 
             ParameterInfo[] methodParams = method.GetParameters();
             object[] methodPass = new object[methodParams.Length];

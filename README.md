@@ -90,13 +90,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.10.0**
+**4.11.0**
 
-1.  Add `Component Header` related attributes. Now you can draw buttons, icons etc on the component header. [#154](https://github.com/TylerTemp/SaintsField/issues/154)
-2.  UI Toolkit: `MinMaxSlider` friendly error if been used on wrong type [#232](https://github.com/TylerTemp/SaintsField/issues/232)
-3.  UI Toolkit: `ShowInInspector` now shows an error box if the target attributes raises an error in its getter
-4.  UI Toolkit: `ShowInInspector` now always update the sub-field value display if the target (e.g. a class) has sub-fields/properties
-5.  UI Toolkit: if you have `SaintsEditor` enabled, a bare `[SerializedReference]` will automaticlly use `ReferencePicker` + `SaintsRow` drawer
+1.  Add `HeaderLabel` to draw a label in component header
+2.  `Required` now check truly value for `I2.LocalizedString`
+3.  Add customize `Required` message type [#234](https://github.com/TylerTemp/SaintsField/issues/234)
+4.  Add `AddressableSubAssetRequired` to validate `subAsset` in types like `Addressable.AssetReferenceSprite`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2924,7 +2923,8 @@ If you have addressable installed, using `Required` on addressable's `AssetRefer
 Parameters:
 
 *   `string errorMessage = null` Error message. Default is `{label} is required`
-*   AllowMultiple: No
+*   `EMessageType messageType = EMessageType.Error` Custom message type.
+*   Allow Multiple: No
 
 ```csharp
 using SaintsField;
@@ -2946,6 +2946,13 @@ public MyStruct myStruct;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/04d29948-bd1c-4448-9148-ef1103f3feab)
+
+```csharp
+[Required(messageType: EMessageType.Info)]
+public GameObject empty2;
+```
+
+![Image](https://github.com/user-attachments/assets/7c099777-11f8-4d4c-8adf-8f03ce217f00)
 
 #### `ValidateInput` ####
 
@@ -5119,6 +5126,37 @@ private void OnChanged() => _saveLabel = "<color=lime><icon=save.png/>";
 
 [![video](https://github.com/user-attachments/assets/510d5964-fab5-4df8-8681-0b86c833d676)](https://github.com/user-attachments/assets/6720a80c-a8d5-42d8-ba91-503874c68af0)
 
+### `HeaderLabel` / `HeaderLeftLabel` ###
+
+Draw a label in the component header. This can be used on a method, property, field, or a Component class.
+
+```csharp
+using SaintsField;
+using SaintsField.ComponentHeader;
+
+[HeaderLeftLabel("Fixed Text")]
+[HeaderLabel]  // dynamic text
+public string label;  // also works if it's a private (non-serialized) type
+```
+
+![Image](https://github.com/user-attachments/assets/0eb849f3-0325-4799-b41e-af3b5c15d940)
+
+Can be used on a component class:
+
+```csharp
+using SaintsField;
+using SaintsField.ComponentHeader;
+
+[HeaderLabel("$" + nameof(value))]
+[HeaderLeftLabel("dynamic:")]
+public class HeaderLabelClassSaExample : MonoBehaviour
+{
+    public string value;
+}
+```
+
+![Image](https://github.com/user-attachments/assets/165cdb74-4d44-48ba-8c9f-8a9f6557b1e9)
+
 ### `HeaderDraw` / `HeaderLeftDraw` ###
 
 Allow you to manually draw items on the component headers
@@ -5647,6 +5685,15 @@ A picker to select an addressable scene into a string field.
 ```
 
 [![video](https://github.com/user-attachments/assets/743def95-8b60-4453-9b1d-1a2f263165a1)](https://github.com/user-attachments/assets/e2718c8d-6372-4e16-bbdc-3b5fb331ce5e)
+
+### `AddressableSubAssetRequired` ##
+
+Validate if a sub-asset is signed in type like `Addressable.AssetReferenceSprite`
+
+```csharp
+[AddressableSubAssetRequired] public AssetReferenceSprite sprite2;
+[AddressableSubAssetRequired("Please pick a sub asset", EMessageType.Warning)] public AssetReferenceSprite sprite3;
+```
 
 ## AI Navigation ##
 

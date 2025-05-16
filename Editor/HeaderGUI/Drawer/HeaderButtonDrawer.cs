@@ -42,11 +42,11 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                 }
             }
 
-            MethodInfo method = renderTargetInfo.MethodInfo;
+            MethodInfo method = (MethodInfo)renderTargetInfo.MemberInfo;
             string friendlyName = ObjectNames.NicifyVariableName(method.Name);
             // string title;
             IReadOnlyList<RichTextDrawer.RichTextChunk> titleChunks;
-            if (string.IsNullOrEmpty(headerButtonAttribute.Title))
+            if (string.IsNullOrEmpty(headerButtonAttribute.Label))
             {
                 titleChunks = new[]
                 {
@@ -61,7 +61,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
             }
             else
             {
-                string rawTitle = headerButtonAttribute.Title;
+                string rawTitle = headerButtonAttribute.Label;
 
                 if (headerButtonAttribute.IsCallback)
                 {
@@ -100,11 +100,19 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
             // GUIContent content = new GUIContent(title);
             // Vector2 size = GUI.skin.button.CalcSize(content);
             // float buttonWidth = size.x;
-            float buttonWidth = drawNeedWidth + 4;
-
-            Rect buttonRect = headerButtonAttribute.IsLeft
-                ? headerArea.MakeXWidthRect(headerArea.GroupStartX, buttonWidth)
-                : headerArea.MakeXWidthRect(headerArea.GroupStartX - buttonWidth, buttonWidth);
+            Rect usedRect = headerButtonAttribute.IsLeft
+                ? headerArea.MakeXWidthRect(headerArea.GroupStartX, drawNeedWidth + 8)
+                : headerArea.MakeXWidthRect(headerArea.GroupStartX - drawNeedWidth  - 8, drawNeedWidth + 8);
+            Rect buttonRect = new Rect(usedRect)
+            {
+                x = usedRect.x + 2,
+                width = usedRect.width - 4,
+            };
+            Rect labelRect = new Rect(buttonRect)
+            {
+                x = buttonRect.x + 2,
+                width = buttonRect.width - 4,
+            };
 
             GUIContent buttonContent = string.IsNullOrEmpty(headerButtonAttribute.Tooltip)
                 ? GUIContent.none
@@ -146,17 +154,9 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                 }
             }
 
-            richTextDrawer.DrawChunks(new Rect(buttonRect)
-            {
-                x = buttonRect.x + 2,
-                width = buttonRect.width - 4,
-            }, oldLabel, titleChunks);
+            richTextDrawer.DrawChunks(labelRect, oldLabel, titleChunks);
 
-            return (true, new HeaderUsed(new Rect(buttonRect)
-            {
-                x = buttonRect.x - 2,
-                width = buttonRect.width + 4,
-            }));
+            return (true, new HeaderUsed(usedRect));
         }
 
         public static void Update()

@@ -1366,6 +1366,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77a967d9cf09d3a4596a83be87b37873, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  empty1: {fileID: 0}
+  empty2: {fileID: 0}
 --- !u!1 &164392812
 GameObject:
   m_ObjectHideFlags: 0
@@ -10998,37 +11000,6 @@ MonoBehaviour:
   searchParent: {fileID: 579857408}
   searchParentDifferentType: {fileID: 579857407}
   searchNoSuch: {fileID: 0}
---- !u!1 &682622973
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 682622975}
-  m_Layer: 0
-  m_Name: WwiseGlobal
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &682622975
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 682622973}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &682673172
 GameObject:
   m_ObjectHideFlags: 0
@@ -23837,7 +23808,7 @@ MonoBehaviour:
   - {fileID: 1328998356}
   - {fileID: 938225136}
   - {fileID: 933455685}
-  - {fileID: 682622973}
+  - {fileID: 0}
 --- !u!1 &1826537367
 GameObject:
   m_ObjectHideFlags: 0
@@ -32408,4 +32379,3 @@ SceneRoots:
   - {fileID: 2102148597}
   - {fileID: 272774834}
   - {fileID: 2138214539}
-  - {fileID: 682622975}

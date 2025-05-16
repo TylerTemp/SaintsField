@@ -7,19 +7,16 @@ namespace SaintsField.ComponentHeader
 {
     [MeansImplicitUse]
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Method)]
-    public class HeaderButtonAttribute: AbsComponentHeaderAttribute
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class)]
+    public class HeaderLabelAttribute: AbsComponentHeaderAttribute
     {
-        public readonly string Label;
         public readonly bool IsCallback;
+        public readonly string Label;
         public readonly string Tooltip;
-
-        public virtual bool IsGhost => false;
-
         public override string GroupBy => "";
         public override bool IsLeft => false;
 
-        public HeaderButtonAttribute(string label = null, string tooltip = null)
+        public HeaderLabelAttribute(string label = null, string tooltip = null)
         {
             (Label, IsCallback) = RuntimeUtil.ParseCallback(label);
             Tooltip = tooltip;

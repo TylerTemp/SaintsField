@@ -56,9 +56,5 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         // {
         //     return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         // }
-        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
-        {
-            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
-        }
     }
 }

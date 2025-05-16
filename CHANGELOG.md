@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.11.0 ##
+
+1.  Add `HeaderLabel` to draw a label in component header
+2.  `Required` now check truly value for `I2.LocalizedString`
+3.  Add customize `Required` message type [#234](https://github.com/TylerTemp/SaintsField/issues/234)
+4.  Add `AddressableSubAssetRequired` to validate `subAsset` in types like `Addressable.AssetReferenceSprite`
+
 ## 4.10.0 ##
 
 1.  Add `Component Header` related attributes. Now you can draw buttons, icons etc on the component header. [#154](https://github.com/TylerTemp/SaintsField/issues/154)

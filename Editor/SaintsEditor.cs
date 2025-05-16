@@ -374,24 +374,34 @@ namespace SaintsField.Editor
 
             // let's handle some HeaderGUI here... not a good idea but...
             bool anyChange = false;
+            // target.GetType()
+
+            AbsComponentHeaderAttribute[] classAttributes = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(target.GetType());
+            foreach ((AbsComponentHeaderAttribute componentHeaderAttribute, int order) in classAttributes.WithIndex(-classAttributes.Length))
+            {
+                bool added = DrawHeaderGUI.AddAttributeIfNot(
+                    componentHeaderAttribute,
+                    null,
+                    target,
+                    order);
+                if (added)
+                {
+                    anyChange = true;
+                }
+            }
             foreach ((SaintsFieldWithInfo saintsFieldWithInfo, int index) in fieldWithInfosSorted.WithIndex())
             {
-                if (saintsFieldWithInfo.MethodInfo != null)
+                IReadOnlyList<IPlayaAttribute> playaAttributes = saintsFieldWithInfo.PlayaAttributes;
+                foreach (AbsComponentHeaderAttribute componentHeaderAttribute in playaAttributes.OfType<AbsComponentHeaderAttribute>())
                 {
-                    IReadOnlyList<IPlayaAttribute> playaAttributes = saintsFieldWithInfo.PlayaAttributes;
-                    AbsComponentHeaderAttribute absComponentHeaderAttribute =
-                        playaAttributes.OfType<AbsComponentHeaderAttribute>().FirstOrDefault();
-                    if (absComponentHeaderAttribute != null)
+                    bool added = DrawHeaderGUI.AddAttributeIfNot(
+                        componentHeaderAttribute,
+                        saintsFieldWithInfo.MethodInfo ?? (MemberInfo)saintsFieldWithInfo.FieldInfo ?? saintsFieldWithInfo.PropertyInfo,
+                        target,
+                        index);
+                    if (added)
                     {
-                        bool added = DrawHeaderGUI.AddAttributeIfNot(
-                            absComponentHeaderAttribute,
-                            saintsFieldWithInfo.MethodInfo,
-                            target,
-                            index);
-                        if (added)
-                        {
-                            anyChange = true;
-                        }
+                        anyChange = true;
                     }
                 }
             }
