@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             return _richTextDrawer;
         }
 
-        protected override void RenderTargetIMGUI(float width, AbsRenderer.PreCheckResult preCheckResult)
+        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
         {
             float height = GetHeightIMGUI(width);
             if (height <= Mathf.Epsilon)
@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             RenderPositionTargetIMGUI(rect, preCheckResult);
         }
 
-        protected override float GetFieldHeightIMGUI(float width, AbsRenderer.PreCheckResult preCheckResult)
+        protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             if (!preCheckResult.IsShown)
             {
@@ -59,39 +59,39 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
                 return 0;
             }
 
-            (MemberInfo memberInfo, string label) = PlayaFullWidthRichLabelRenderer.GetMemberAndLabel(FieldWithInfo);
+            (MemberInfo memberInfo, string label) = GetMemberAndLabel(FieldWithInfo);
 
             IEnumerable<RichTextDrawer.RichTextChunk> xml = RichTextDrawer.ParseRichXml(content, label, FieldWithInfo.SerializedProperty, memberInfo,
                 FieldWithInfo.Target);
             float fullWidth = GetRichTextDrawer().GetWidth(new GUIContent(label), EditorGUIUtility.singleLineHeight, xml);
-            return Mathf.CeilToInt(Mathf.Max(1, fullWidth / EditorGUIUtility.singleLineHeight)) * EditorGUIUtility.singleLineHeight;
+            return Mathf.CeilToInt(Mathf.Max(1, fullWidth / width)) * EditorGUIUtility.singleLineHeight;
         }
 
-        private IEnumerable<RichTextDrawer.RichTextChunk> ReParseToSingleXml(
-            IEnumerable<RichTextDrawer.RichTextChunk> xml)
-        {
-            foreach (RichTextDrawer.RichTextChunk richTextChunk in xml)
-            {
-                if (richTextChunk.IsIcon)
-                {
-                    yield return richTextChunk;
-                }
-                else
-                {
-                    foreach (char c in richTextChunk.Content)
-                    {
-                        yield return new RichTextDrawer.RichTextChunk
-                        {
-                            IsIcon = false,
-                            Content = c.ToString(),
-                            RawContent = c.ToString(),
-                        };
-                    }
-                }
-            }
-        }
+        // private IEnumerable<RichTextDrawer.RichTextChunk> ReParseToSingleXml(
+        //     IEnumerable<RichTextDrawer.RichTextChunk> xml)
+        // {
+        //     foreach (RichTextDrawer.RichTextChunk richTextChunk in xml)
+        //     {
+        //         if (richTextChunk.IsIcon)
+        //         {
+        //             yield return richTextChunk;
+        //         }
+        //         else
+        //         {
+        //             foreach (char c in richTextChunk.Content)
+        //             {
+        //                 yield return new RichTextDrawer.RichTextChunk
+        //                 {
+        //                     IsIcon = false,
+        //                     Content = c.ToString(),
+        //                     RawContent = c.ToString(),
+        //                 };
+        //             }
+        //         }
+        //     }
+        // }
 
-        protected override void RenderPositionTargetIMGUI(Rect position, AbsRenderer.PreCheckResult preCheckResult)
+        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
             (string error, string content) = GetLabelRawContent(FieldWithInfo, _playaBelowRichLabelAttribute);
             if (error != "")
@@ -105,7 +105,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
                 return;
             }
 
-            (MemberInfo memberInfo, string label) = PlayaFullWidthRichLabelRenderer.GetMemberAndLabel(FieldWithInfo);
+            (MemberInfo memberInfo, string label) = GetMemberAndLabel(FieldWithInfo);
 
             IEnumerable<RichTextDrawer.RichTextChunk> xml = RichTextDrawer.ParseRichXml(content, label, FieldWithInfo.SerializedProperty, memberInfo,
                 FieldWithInfo.Target);
@@ -114,7 +114,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             float x = position.x;
             float y = position.y;
             GUIContent labelContent = new GUIContent(label);
-            foreach (RichTextDrawer.RichTextChunk richTextChunk in ReParseToSingleXml(xml))
+            foreach (RichTextDrawer.RichTextChunk richTextChunk in xml)
             {
                 float charWidth = richDrawer.GetWidth(labelContent, EditorGUIUtility.singleLineHeight, new[]{richTextChunk});
                 Rect rect = new Rect(x, y, charWidth, EditorGUIUtility.singleLineHeight);
