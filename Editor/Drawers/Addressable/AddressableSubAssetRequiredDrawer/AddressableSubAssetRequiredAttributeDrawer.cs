@@ -16,9 +16,11 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSubAssetRequiredDraw
     [CustomPropertyDrawer(typeof(AddressableSubAssetRequiredAttribute))]
     public partial class AddressableSubAssetRequiredAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
+        private const string MSubObjectName = "m_SubObjectName";
+
         private static (string error, string result) ValidateProperty(SerializedProperty property)
         {
-            SerializedProperty sp = property.FindPropertyRelative("m_SubObjectName");
+            SerializedProperty sp = property.FindPropertyRelative(MSubObjectName);
             if (sp == null)
             {
                 return ("No sub object field found", "");

@@ -41,14 +41,21 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSubAssetRequiredDraw
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            AddressableSubAssetRequiredAttribute assetRequiredAttribute =
-                ((AddressableSubAssetRequiredAttribute)saintsAttribute);
+            SerializedProperty prop = property.FindPropertyRelative(MSubObjectName);
+            if (prop == null)
+            {
+                Debug.LogWarning($"Property {MSubObjectName} not found in {property.propertyPath}");
+                return;
+            }
+
+            AddressableSubAssetRequiredAttribute assetRequiredAttribute = (AddressableSubAssetRequiredAttribute)saintsAttribute;
 
             HelpBoxMessageType helpBoxMessageType = assetRequiredAttribute.MessageType.GetUIToolkitMessageType();
             string customMessage = assetRequiredAttribute.ErrorMessage;
 
             HelpBox helpBox = container.Q<HelpBox>(NameRequiredBox(property, index));
-            helpBox.TrackPropertyValue(property.FindPropertyRelative("m_SubObjectGUID"), _ => ValidateDisplay(property, customMessage, helpBox, helpBoxMessageType));
+
+            helpBox.TrackPropertyValue(prop, _ => ValidateDisplay(property, customMessage, helpBox, helpBoxMessageType));
             ValidateDisplay(property, customMessage, helpBox, helpBoxMessageType);
         }
 
