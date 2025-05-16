@@ -1,28 +1,28 @@
-using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
+namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 {
-    public partial class PlayaAboveRichLabelRenderer
+    public partial class PlayaFullWidthRichLabelRenderer
     {
         private class AboveRichLabelUserData
         {
             public string XmlContent;
 
-            public PlayaAboveRichLabelAttribute PlayaAboveRichLabelAttribute;
+            public PlayaBelowRichLabelAttribute PlayaBelowRichLabelAttribute;
             public SaintsFieldWithInfo FieldWithInfo;
             public RichTextDrawer RichTextDrawer;
         }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
-            (VisualElement labelContainer, bool needUpdate) = CreateRichLabelContainer(FieldWithInfo, _playaAboveRichLabelAttribute);
+            (VisualElement labelContainer, bool needUpdate) = CreateRichLabelContainer(FieldWithInfo, _playaBelowRichLabelAttribute);
             labelContainer.name = FieldWithInfo.MemberId;
             return (labelContainer, needUpdate);
         }
@@ -34,14 +34,14 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
             return result;
         }
 
-        private (VisualElement labelContainer, bool needUpdate) CreateRichLabelContainer(SaintsFieldWithInfo fieldWithInfo, PlayaAboveRichLabelAttribute playaAboveRichLabelAttribute)
+        private (VisualElement labelContainer, bool needUpdate) CreateRichLabelContainer(SaintsFieldWithInfo fieldWithInfo, PlayaBelowRichLabelAttribute playaAboveRichLabelAttribute)
         {
             RichTextDrawer richTextDrawer = new RichTextDrawer();
             AboveRichLabelUserData aboveRichLabelUserData = new AboveRichLabelUserData
             {
                 XmlContent = "",
 
-                PlayaAboveRichLabelAttribute = playaAboveRichLabelAttribute,
+                PlayaBelowRichLabelAttribute = playaAboveRichLabelAttribute,
                 FieldWithInfo = fieldWithInfo,
                 RichTextDrawer = richTextDrawer,
             };
@@ -65,12 +65,12 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
         private static void UpdateContainer(VisualElement container)
         {
             AboveRichLabelUserData userData = (AboveRichLabelUserData)container.userData;
-            string xmlContent = userData.PlayaAboveRichLabelAttribute.Content;
+            string xmlContent = userData.PlayaBelowRichLabelAttribute.Content;
 
-            if (userData.PlayaAboveRichLabelAttribute.IsCallback)
+            if (userData.PlayaBelowRichLabelAttribute.IsCallback)
             {
                 (string error, object rawResult) =
-                    GetCallback(userData.FieldWithInfo, userData.PlayaAboveRichLabelAttribute.Content);
+                    GetCallback(userData.FieldWithInfo, userData.PlayaBelowRichLabelAttribute.Content);
 
                 if (error != "")
                 {

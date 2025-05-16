@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.12.0 ##
+
+1.  Add `PlayaAboveRichLabel`/`PlayaBelowRichLabel` to draw a rich label above/below a field/method/property (including array/list)
+2.  UI Toolkit: Allow `PlayaAboveRichLabel` & `PlayaInfoBox` be applied to a class/struct defination
+
 ## 4.11.0 ##
 
 1.  Add `HeaderLabel` to draw a label in component header

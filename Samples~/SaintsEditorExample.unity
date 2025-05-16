@@ -3531,9 +3531,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0fa2d6c4e523545b02f1537f935406, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dynamicContent: '<color=lime>Dynamic!
-
-    ----------------------------------------------'
+  dynamicContent: <color=lime>Dynamic! ----------------------------------------------
+  myStruct:
+    structString: 
 --- !u!1 &1668091816
 GameObject:
   m_ObjectHideFlags: 0
@@ -3951,6 +3951,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1872748882
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1872748883}
+  - component: {fileID: 1872748884}
+  m_Layer: 0
+  m_Name: AboveBelowRichLabel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1872748883
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1872748882}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1872748884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1872748882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faa9b5612d7f98244bb2dd656f935cdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  s: []
+  dynamicContent: <color=brown>dynamic!
 --- !u!1 &1872824170
 GameObject:
   m_ObjectHideFlags: 0
@@ -4510,4 +4556,5 @@ SceneRoots:
   - {fileID: 1453253530}
   - {fileID: 171104906}
   - {fileID: 452664843}
+  - {fileID: 1872748883}
   - {fileID: 1175289511}

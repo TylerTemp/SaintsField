@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
+namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 {
-    public partial class PlayaAboveRichLabelRenderer
+    public partial class PlayaFullWidthRichLabelRenderer
     {
         private RichTextDrawer _richTextDrawer;
 
@@ -24,7 +25,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
             return _richTextDrawer;
         }
 
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
+        protected override void RenderTargetIMGUI(float width, AbsRenderer.PreCheckResult preCheckResult)
         {
             float height = GetHeightIMGUI(width);
             if (height <= Mathf.Epsilon)
@@ -35,19 +36,19 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
             RenderPositionTargetIMGUI(rect, preCheckResult);
         }
 
-        protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
+        protected override float GetFieldHeightIMGUI(float width, AbsRenderer.PreCheckResult preCheckResult)
         {
             if (!preCheckResult.IsShown)
             {
                 return 0;
             }
 
-            return GetTextHeightIMGUI(width, _playaAboveRichLabelAttribute);
+            return GetTextHeightIMGUI(width, _playaBelowRichLabelAttribute);
         }
 
-        private float GetTextHeightIMGUI(float width, PlayaAboveRichLabelAttribute playaAboveRichLabelAttribute)
+        private float GetTextHeightIMGUI(float width, PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute)
         {
-            (string error, string content) = GetLabelRawContent(FieldWithInfo, playaAboveRichLabelAttribute);
+            (string error, string content) = GetLabelRawContent(FieldWithInfo, playaBelowRichLabelAttribute);
             if (error != "")
             {
                 return ImGuiHelpBox.GetHeight(content, width, MessageType.Error);
@@ -58,7 +59,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
                 return 0;
             }
 
-            (MemberInfo memberInfo, string label) = GetMemberAndLabel(FieldWithInfo);
+            (MemberInfo memberInfo, string label) = PlayaFullWidthRichLabelRenderer.GetMemberAndLabel(FieldWithInfo);
 
             IEnumerable<RichTextDrawer.RichTextChunk> xml = RichTextDrawer.ParseRichXml(content, label, FieldWithInfo.SerializedProperty, memberInfo,
                 FieldWithInfo.Target);
@@ -90,9 +91,9 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
             }
         }
 
-        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+        protected override void RenderPositionTargetIMGUI(Rect position, AbsRenderer.PreCheckResult preCheckResult)
         {
-            (string error, string content) = GetLabelRawContent(FieldWithInfo, _playaAboveRichLabelAttribute);
+            (string error, string content) = GetLabelRawContent(FieldWithInfo, _playaBelowRichLabelAttribute);
             if (error != "")
             {
                 EditorGUI.HelpBox(position, error, MessageType.Error);
@@ -104,7 +105,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
                 return;
             }
 
-            (MemberInfo memberInfo, string label) = GetMemberAndLabel(FieldWithInfo);
+            (MemberInfo memberInfo, string label) = PlayaFullWidthRichLabelRenderer.GetMemberAndLabel(FieldWithInfo);
 
             IEnumerable<RichTextDrawer.RichTextChunk> xml = RichTextDrawer.ParseRichXml(content, label, FieldWithInfo.SerializedProperty, memberInfo,
                 FieldWithInfo.Target);
@@ -129,13 +130,13 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
             }
         }
 
-        private static (string error, string content) GetLabelRawContent(SaintsFieldWithInfo fieldWithInfo, PlayaAboveRichLabelAttribute playaAboveRichLabelAttribute)
+        private static (string error, string content) GetLabelRawContent(SaintsFieldWithInfo fieldWithInfo, PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute)
         {
-            string xmlContent = playaAboveRichLabelAttribute.Content;
+            string xmlContent = playaBelowRichLabelAttribute.Content;
 
-            if (playaAboveRichLabelAttribute.IsCallback)
+            if (playaBelowRichLabelAttribute.IsCallback)
             {
-                (string error, object rawResult) = GetCallback(fieldWithInfo, playaAboveRichLabelAttribute.Content);
+                (string error, object rawResult) = GetCallback(fieldWithInfo, playaBelowRichLabelAttribute.Content);
 
                 if (error != "")
                 {

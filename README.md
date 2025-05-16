@@ -193,7 +193,7 @@ private MyStruct _myStructWorkAround;
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/5e865350-6eeb-4f2a-8305-c7d8b8720eac)](https://github.com/TylerTemp/SaintsField/assets/6391063/25f6c7cc-ee7e-444e-b078-007dd6df499e)
 
-Here is an example of using on a array:
+Here is an example of using on an array:
 
 ```csharp
 using SaintsField;
@@ -370,6 +370,61 @@ private string MethodLabel(string[] values)
 
 ![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
 
+#### `PlayaAboveRichLabel` /  `PlayaBelowRichLabel` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Just like `AboveRichLabel` / `BelowRichLabel` but it can be applied on a top of an array/list, a property or a method
+
+For `AboveRichLabel`, it can also be applied on a class/struct.
+
+Parameters:
+
+*   `string content` the content to show. If it starts with `$`, then a callback/propery/field value is used. When a callback gives null or empty string, the label will be hidden.
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+
+[PlayaAboveRichLabel("<color=gray>-- Above --")]
+[PlayaAboveRichLabel("$" + nameof(dynamicContent))]
+[PlayaBelowRichLabel("$" + nameof(dynamicContent))]
+[PlayaBelowRichLabel("<color=gray>-- Below --")]
+public string[] s;
+
+[Space(20)]
+public string dynamicContent;
+```
+
+![Image](https://github.com/user-attachments/assets/5c29a43b-7276-488a-98fa-da133e77edc4)
+
+Example of using on a class/struct like a data comment:
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+
+[PlayaAboveRichLabel("<color=gray>This is a class message")]
+[PlayaAboveRichLabel("$" + nameof(dynamicContent))]
+public class ClassPlayaAboveRichLabelExample : MonoBehaviour
+{
+    [ResizableTextArea]
+    public string dynamicContent;
+
+    [Serializable]
+    [PlayaAboveRichLabel("<color=gray>--This is a struct message--")]
+    public struct MyStruct
+    {
+        public string structString;
+    }
+
+    public MyStruct myStruct;
+}
+```
+
+![Image](https://github.com/user-attachments/assets/de9e6bf2-5e7b-4a4a-92f5-66801984544e)
+
 #### `InfoBox`/`BelowInfoBox` ####
 
 Draw an info box above/below the field.
@@ -440,7 +495,9 @@ private string DynamicMessage() => _content ? "False" : "True";
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-This is like `InfoBox`, but it can be applied to array/list/button etc.
+This is like `InfoBox`, but it can be applied to array/list/method etc.
+
+For `PlayaInfoBox`, it can also be directly applied on a class/struct defination.
 
 *   `string content`
 
@@ -505,6 +562,31 @@ public void Method()
 ```
 
 ![image](https://github.com/user-attachments/assets/81d82ee4-4f8d-4ae3-bae5-dcb13d3af7c5)
+
+Example of using on a class/struct defination like a data comment:
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+
+[PlayaInfoBox("This is a class message", EMessageType.None)]
+[PlayaInfoBox("$" + nameof(dynamicContent))]
+public class ClassInfoBoxExample : MonoBehaviour  // The info box will show in inspector wherever you attach this component
+{
+    public string dynamicContent;
+
+    [Serializable]
+    [PlayaInfoBox("This is a struct message")]
+    public struct MyStruct  // The info box will show at first row wherever you use this struct
+    {
+        public string structString;
+    }
+
+    public MyStruct myStruct;
+}
+```
+
+![Image](https://github.com/user-attachments/assets/70a8613e-e17f-4463-8653-a6500b9e757f)
 
 #### `Separator` / `BelowSeparator` ####
 
@@ -899,7 +981,7 @@ public LayerMask myLayerMask;
 
 #### `Scene` ####
 
-A dropdown selector for a scene in the build list, plus a "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
+A dropdown selector for a scene in the build list, plus "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
 
 **Parameters**:
 
@@ -919,7 +1001,7 @@ using SaintsField;
 
 #### `SortingLayer` ####
 
-A dropdown selector for sorting layer, plus a "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
+A dropdown selector for sorting layer, plus an "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
 
 *   AllowMultiple: No
 
@@ -948,7 +1030,7 @@ using SaintsField;
 
 #### `InputAxis` ####
 
-A string dropdown selector for an input axis, plus a "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
+A string dropdown selector for an input axis, plus an "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
 
 *   AllowMultiple: No
 
@@ -1145,7 +1227,7 @@ Known issues:
 
     For more information about why this is impossible under IMGUI, see [Issue 25](https://github.com/TylerTemp/SaintsField/issues/25)
 
-2.  IMGUI: the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside of the rect will make the target non-interactable.
+2.  IMGUI: the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside the rect will make the target non-interactable.
     But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect on top leve, but not on array/list level... so you may see different outcomes on different Unity version.
 
     If you see unexpected space or overlap between foldout and label, use `Window` - `Saints` - `Create or Edit SaintsField Config` to change the config.
@@ -1258,7 +1340,7 @@ public IRefInterface myInterface;
 
 #### `SaintsRow` ####
 
-`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
+`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc. (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
 
 This attribute does NOT need `SaintsEditor` enabled. It's an out-of-box tool.
 
@@ -1967,7 +2049,7 @@ to get more useful info from the state, you can use `AnimatorStateBase`/`Animato
 *   `string stateName` actual state name
 *   `float stateSpeed` the `Speed` parameter of the state
 *   `string stateTag` the `Tag` of the state
-*   `string[] subStateMachineNameChain` the sub-state machine hierarchy name list of the state
+*   `string[] subStateMachineNameChain` the substate machine hierarchy name list of the state
 
 `AnimatorState` added the following attribute(s):
 
@@ -2338,7 +2420,7 @@ Automatically sign a component to a field by a given path.
     Options are:
 
     *   `EGetComp.ForceResign`: when the target changed (e.g. you delete/create one), automatically resign the new correct component.
-    *   `EGetComp.NoResignButton`: do not display a resign button when the target mismatches.
+    *   `EGetComp.NoResignButton`: do not display a re-sign button when the target mismatches.
 
 *   `string paths...`
 
@@ -2346,7 +2428,7 @@ Automatically sign a component to a field by a given path.
 
 *   AllowMultiple: Yes. But not necessary.
 
-The `path` is a bit like html's `XPath` but with less functions:
+The `path` is a bit like html's `XPath` but with less function:
 
 | Path            | Meaning                                                        |
 |-----------------|----------------------------------------------------------------|
@@ -2532,7 +2614,7 @@ For callback (functions, fields, properties):
 
 *   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
 
 *   `object by...`
 
@@ -2707,7 +2789,7 @@ Arguments:
 
 *   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
 
 *   `object by...`
 
@@ -2964,7 +3046,7 @@ Validate the input of the field when the value changes.
 
     1.  If the function accepts no arguments, then no argument will be passed
     2.  If the function accepts required arguments, the first required argument will receive the field's value. If there is another required argument and the field is inside a list/array, the index will be passed.
-    3.  If the function only has optional arguments, it will try to pass the field's value and index if possible. Otherwise the default value of the parameter will be passed.
+    3.  If the function only has optional arguments, it will try to pass the field's value and index if possible, otherwise the default value of the parameter will be passed.
 
     **Return**:
 
@@ -3209,7 +3291,7 @@ private void EditorButton()
 
 A layout decorator to group fields.
 
-*   `string groupBy` the grouping key. Use `/` to separate different groups and create sub groups.
+*   `string groupBy` the grouping key. Use `/` to separate different groups and create subgroups.
 *   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
 *   `bool keepGrouping=false`: See `LayoutStart` below
 *   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
@@ -3221,7 +3303,7 @@ Options are:
 *   `Horizontal`
 *   `Background` draw a background color for the whole group
 *   `Title` show the title
-*   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw an separator between title and the rest of the content.
+*   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw a separator between title and the rest of the content.
     On `UI Toolkit` it will draw a background color for the title.
 *   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
 *   `Collapse` Same as `Foldout` but is collapsed by default.
@@ -3232,10 +3314,10 @@ Options are:
 
 **Known Issue**
 
-`Horizental` style is buggy, for the following reasons:
+About `Horizental` style:
 
 1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
-2.  On UI Toolkit the label will be put into a new line above. It'll have some issue for struct/class but I'm working on it.
+2.  On UI Toolkit the label will be put into a new line above
 
 ![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
 
@@ -3616,7 +3698,7 @@ Arguments:
 
 *   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter), it does not check the mode at all.
+    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
 
 *   `object by...`
 
@@ -3674,7 +3756,7 @@ Arguments:
 
 *   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter), it does not check the mode at all.
+    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
 
 *   `object by...`
 
@@ -3732,7 +3814,7 @@ If you want a searchable dropdown, see `AdvancedDropdown`.
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
 *   `bool slashAsSub=true` treat `/` as a sub item.
 
-    Note: In `IMGUI`, this just replace `/` to Unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit overlap with nearby characters.
+    Note: In `IMGUI`, this just replace `/` to Unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit of overlap with nearby characters.
 
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
@@ -3851,13 +3933,13 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 
 2.  UI Toolkit:
 
-    The group indicator uses `ToolbarBreadcrumbs`. Sometimes you can see text get wrapped into lines. This is because Unity's UI Toolkit has some layout issue, that it can not has the same layout even with same elements+style+boundary size.
+    The group indicator uses `ToolbarBreadcrumbs`. Sometimes you can see text get wrapped into lines. This is because Unity's UI Toolkit has some layout issue, that it can not have the same layout even with same elements+style+boundary size.
 
     This issue is not fixable unless Unity fixes it. This issue might be different on different Unity (UI Toolkit) version.
 
 **Arguments**
 
-*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc).
+*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
     When omitted, it will try to find all the static values from the field type.
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
@@ -3866,11 +3948,11 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 **`AdvancedDropdownList<T>`**
 
 *   `string displayName` item name to display
-*   `T value` or `IEnumerable<AdvancedDropdownList<T>> children`: value means it's a value item. Otherwise it's a group of items, which the values are specified by `children`
+*   `T value` or `IEnumerable<AdvancedDropdownList<T>> children`: value means it's a value item. Otherwise, it's a group of items, which the values are specified by `children`
 *   `bool disabled = false` if item is disabled
 *   `string icon = null` the icon for the item.
 
-    Note: setting an icon for a parent group will result an weird issue on it's sub page's title and block the items. This is not fixable unless Unity decide to fix it.
+    Note: setting an icon for a parent group will result a weird issue on its subpage's title and block the items. This is not fixable unless Unity decide to fix it.
 
 *   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
 
@@ -4184,7 +4266,7 @@ Parameters:
 
 *   `bool customPicker=true`: use a custom object pick that only display objects which meet the requirements
 *   `Type compType`: the type of the component. It can be a component, or an object like `GameObject`, `Sprite`. The field will be this type. It can NOT be an interface
-*   `params Type[] requiredTypes`: a list of required components or interfaces you want. Only objects with all of the types can be signed.
+*   `params Type[] requiredTypes`: a list of required components or interfaces you want. Only objects with all the types can be signed.
 *   AllowMultiple: No
 
 **Known Issue**: IMGUI, manually sign a null object by using Unity's default pick will sign an empty string instead of null. Use custom pick to avoid this inconsistency.
@@ -6030,7 +6112,7 @@ Compared with `NaughtyAttributes` and `MarkupAttributes`:
 3.  `SaintsEditor`
 
     *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). it has `LayoutGrooup`/`LayoutEnd` for convenience coding.
-    *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
+    *   It provides `Button` (with less function) and a way to show a non-field property (`ShowInInspector`).
     *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
     *   Supports both `UI Toolkit` and `IMGUI`.
 
@@ -6569,7 +6651,7 @@ Note: `csc.rsp` can override settings by Saints Menu.
 
 UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Validator`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
 
-This tool allows you to check if some target has `Required` but not filled, or a auto getters (e.g. `GetComponentInChildren`) but not filled or mismatched. Auto getters error will give you an button to fix it there. Note the fix function might be broken if the target is inside a prefab.
+This tool allows you to check if some target has `Required` but not filled, or an auto getter (e.g. `GetComponentInChildren`) but not filled or mismatched. Auto getters error will give you a button to fix it there. Note the fix function might be broken if the target is inside a prefab.
 
 You can specify the targets as you want. Currently, it supports scenes, and folder searching.
 

@@ -8,7 +8,6 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
-using SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
@@ -18,6 +17,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
+using PlayaFullWidthRichLabelRenderer = SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer.PlayaFullWidthRichLabelRenderer;
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using DG.DOTweenEditor;
 #endif
@@ -115,7 +115,7 @@ namespace SaintsField.Editor
                         break;
                     case PlayaAboveRichLabelAttribute playaAboveRichLabelAttribute:
                     {
-                        yield return new PlayaAboveRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
+                        yield return new PlayaFullWidthRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
                         {
                             PlayaAttributes = new[] { playaAboveRichLabelAttribute },
                             Target = target,
@@ -819,6 +819,22 @@ namespace SaintsField.Editor
                         else
                         {
                             yield return playaInfoBoxRenderer;
+                        }
+                    }
+                        break;
+                    case PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute:
+                    {
+                        PlayaFullWidthRichLabelRenderer playaFullWidthRichLabelRenderer = new PlayaFullWidthRichLabelRenderer(serializedObject, fieldWithInfo, playaBelowRichLabelAttribute);
+
+                        SaintsFieldWithRenderer playaFullWidthRichLabelRendererInfo =
+                            new SaintsFieldWithRenderer(playaBelowRichLabelAttribute, playaFullWidthRichLabelRenderer);
+                        if (playaBelowRichLabelAttribute.Below)
+                        {
+                            postRenderer.Add(playaFullWidthRichLabelRendererInfo);
+                        }
+                        else
+                        {
+                            yield return playaFullWidthRichLabelRendererInfo;
                         }
                     }
                         break;

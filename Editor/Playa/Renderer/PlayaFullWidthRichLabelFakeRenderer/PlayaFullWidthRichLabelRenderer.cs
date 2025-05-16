@@ -3,15 +3,15 @@ using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
 using UnityEditor;
 
-namespace SaintsField.Editor.Playa.Renderer.PlayaAboveRichLabelFakeRenderer
+namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 {
-    public partial class PlayaAboveRichLabelRenderer: AbsRenderer
+    public partial class PlayaFullWidthRichLabelRenderer: AbsRenderer
     {
-        private readonly PlayaAboveRichLabelAttribute _playaAboveRichLabelAttribute;
+        private readonly PlayaBelowRichLabelAttribute _playaBelowRichLabelAttribute;
 
-        public PlayaAboveRichLabelRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, PlayaAboveRichLabelAttribute playaAboveRichLabelAttribute) : base(serializedObject, fieldWithInfo)
+        public PlayaFullWidthRichLabelRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute) : base(serializedObject, fieldWithInfo)
         {
-            _playaAboveRichLabelAttribute = playaAboveRichLabelAttribute;
+            _playaBelowRichLabelAttribute = playaBelowRichLabelAttribute;
         }
 
         public override void OnDestroy()
