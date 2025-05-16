@@ -12,10 +12,12 @@ namespace SaintsField
 
         // ReSharper disable once InconsistentNaming
         public readonly string ErrorMessage;
+        public readonly EMessageType MessageType;
 
-        public RequiredAttribute(string errorMessage = null)
+        public RequiredAttribute(string errorMessage = null, EMessageType messageType = EMessageType.Error)
         {
             ErrorMessage = errorMessage;
+            MessageType = messageType;
         }
     }
 }

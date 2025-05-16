@@ -89,7 +89,7 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
                 return position;
             }
 
-            Rect leftOut = ImGuiHelpBox.Draw(position, error, MessageType.Error);
+            Rect leftOut = ImGuiHelpBox.Draw(position, error, ((RequiredAttribute) saintsAttribute).MessageType.GetMessageType());
 
             // EditorGUI.DrawRect(leftOut, Color.yellow);
 

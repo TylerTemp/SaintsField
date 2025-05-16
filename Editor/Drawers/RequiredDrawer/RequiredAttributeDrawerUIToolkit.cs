@@ -11,18 +11,18 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
 {
     public partial class RequiredAttributeDrawer
     {
-
         private static string NameRequiredBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__Required";
-
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
             string typeError = ValidateType(property, info.FieldType);
 
+            HelpBoxMessageType helpBoxMessageType = ((RequiredAttribute) saintsAttribute).MessageType.GetUIToolkitMessageType();
+
             // Debug.Log(typeError);
-            HelpBox helpBox = new HelpBox(typeError, HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox(typeError, helpBoxMessageType)
             {
                 style =
                 {

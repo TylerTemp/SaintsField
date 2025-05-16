@@ -9,6 +9,9 @@ using UnityEngine;
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using UnityEngine.AddressableAssets;
 #endif
+#if SAINTSFIELD_I2_LOC
+using I2.Loc;
+#endif
 
 namespace SaintsField.Editor.Drawers.RequiredDrawer
 {
@@ -57,33 +60,47 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
 
         private static string ValidateValue(object curValue)
         {
-            if (ReflectUtils.Truly(curValue))
+            if (!ReflectUtils.Truly(curValue))
             {
-#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
-                if (curValue is AssetReference ar)
-                {
-                    return ValidateAddresable(ar);
-                }
-#endif
-
-                return "";
+                return $"Target `{curValue}` is not a truly value";
             }
 
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (curValue is AssetReference ar)
+            {
+                return ValidateAddresable(ar);
+            }
+#endif
+#if SAINTSFIELD_I2_LOC
+            if(curValue is LocalizedString localString)
+            {
+                return ValidateLocalizedString(localString);
+            }
+#endif
 
+            return "";
 
-            return $"Target `{curValue}` is not a truly value";
         }
 
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
         private static string ValidateAddresable(AssetReference ar)
         {
-            if (ar.editorAsset == null)
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (ar.editorAsset)
             {
-                return $"AssetReference is null";
+                return "";
+
             }
 
-            return "";
+            return "AssetReference is null";
         }
+#endif
+#if SAINTSFIELD_I2_LOC
+        private static string ValidateLocalizedString(LocalizedString localizedString) =>
+            string.IsNullOrEmpty(localizedString.mTerm)
+                ? "LocalizedString is null"
+                : "";
 #endif
 
         private struct MetaInfo
