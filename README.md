@@ -90,12 +90,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.11.0**
+**4.12.0**
 
-1.  Add `HeaderLabel` to draw a label in component header
-2.  `Required` now check truly value for `I2.LocalizedString`
-3.  Add customize `Required` message type [#234](https://github.com/TylerTemp/SaintsField/issues/234)
-4.  Add `AddressableSubAssetRequired` to validate `subAsset` in types like `Addressable.AssetReferenceSprite`
+1.  Add `PlayaAboveRichLabel`/`PlayaBelowRichLabel` to draw a rich label above/below a field/method/property (including array/list)
+2.  UI Toolkit: Allow `PlayaAboveRichLabel` & `PlayaInfoBox` be applied to a class/struct definition
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -497,7 +495,7 @@ private string DynamicMessage() => _content ? "False" : "True";
 
 This is like `InfoBox`, but it can be applied to array/list/method etc.
 
-For `PlayaInfoBox`, it can also be directly applied on a class/struct defination.
+For `PlayaInfoBox`, it can also be directly applied on a class/struct definition.
 
 *   `string content`
 
@@ -563,7 +561,7 @@ public void Method()
 
 ![image](https://github.com/user-attachments/assets/81d82ee4-4f8d-4ae3-bae5-dcb13d3af7c5)
 
-Example of using on a class/struct defination like a data comment:
+Example of using on a class/struct definition like a data comment:
 
 ```csharp
 using SaintsField;
