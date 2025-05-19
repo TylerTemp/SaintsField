@@ -8,6 +8,7 @@ using SaintsField.SaintsXPathParser;
 using SaintsField.SaintsXPathParser.XPathAttribute;
 using SaintsField.SaintsXPathParser.XPathFilter;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.Wwise.GetBankDrawer
 {
