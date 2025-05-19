@@ -146,6 +146,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return helpBox;
         }
 
+        protected static HelpBox GetHelpBox(VisualElement container, SerializedProperty property, int index) => container.Q<HelpBox>(name: NameHelpBox(property, index));
+
         private SaintsObjectPickerWindowUIToolkit _objectPickerWindowUIToolkit;
         private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
         private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
@@ -226,40 +228,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 });
             }
 
-//             bool needUpdate = !configExists;
-//             if (configExists)
-//             {
-//                 double curTime = EditorApplication.timeSinceStartup;
-//                 double loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
-//                 needUpdate = curTime - genericCache.UpdatedLastTime > loopInterval / 1000f;
-//                 // if(needUpdate)
-//                 // {
-//                 //     Debug.Log($"needUpdate: {curTime - genericCache.UpdatedLastTime} > {loopInterval / 1000f}");
-//                 // }
-//             }
-//
-//             if (needUpdate)
-//             {
-//                 genericCache ??= new GetByXPathGenericCache
-//                 {
-//                     Error = "",
-//                     GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray(),
-//                 };
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-//                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
-// #endif
-//                 UpdateSharedCache(genericCache, !configExists, property, info, false);
-//                 if (genericCache.Error != "")
-//                 {
-//                     SetErrorMessage(genericCache.Error, container.Q<HelpBox>(name: NameHelpBox(property, index)), property, index);
-//                     return;
-//                 }
-//                 SharedCache[arrayRemovedKey] = genericCache;
-//             }
-
             if (genericCache.Error != "")
             {
-                SetErrorMessage(genericCache.Error, container.Q<HelpBox>(name: NameHelpBox(property, index)), property, index);
+                SetErrorMessage(genericCache.Error, GetHelpBox(container, property, index));
                 return;
             }
 
@@ -299,7 +270,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             if (propertyCache.Error != "")
             {
                 Debug.Log(propertyCache.Error);
-                SetErrorMessage(propertyCache.Error, container.Q<HelpBox>(name: NameHelpBox(property, index)), property, index);
+                SetErrorMessage(propertyCache.Error, GetHelpBox(container, property, index));
                 return;
             }
 
@@ -341,7 +312,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         return;
                     }
 
-                    (string getValueError, int _, object curValue) = Util.GetValue(property, info, updatedParent);
+                    (string getValueError, object curValue) = GetCurValue(property, info, updatedParent);
 
                     // ReSharper disable once UseNegatedPatternInIsExpression
                     if (!(curValue is Object) && curValue != null)
@@ -472,24 +443,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         _useCache = true;
                         _enumeratorResources = LoadResourcesFromResult(r, curValueObj);
                     }
-
-                    // OpenPicker(property, info, genericCache.GetByXPathAttributes, genericCache.ExpectedType, genericCache.ExpectedInterface,
-                    //     newValue =>
-                    //     {
-                    //         object oldValue = propertyCache.TargetValue;
-                    //         propertyCache.TargetValue = newValue;
-                    //         if(DoSignPropertyCache(propertyCache, false))
-                    //         {
-                    //             property.serializedObject.ApplyModifiedProperties();
-                    //             onValueChangedCallback.Invoke(newValue);
-                    //         }
-                    //         else
-                    //         {
-                    //             propertyCache.TargetValue = oldValue;
-                    //         }
-                    //     }, updatedParent);
-
-                    // container.schedule.Execute(() => _objectPickerWindowUIToolkit.Close()).StartingIn(1000);
                 };
 
                 if (!getByXPathAttribute.KeepOriginalPicker)
@@ -512,14 +465,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
             }).Every(1);
 
-            container.RegisterCallback<AttachToPanelEvent>(e =>
-            {
-                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshResults);
-            });
-            container.RegisterCallback<DetachFromPanelEvent>(e =>
-            {
-                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults);
-            });
+            container.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshResults));
+            container.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults));
             // int loop = SaintsFieldConfigUtil.GetByXPathLoopIntervalMs();
             // if (loop > 0)
             // {
@@ -619,179 +566,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 target.UpdateResourceAfterTime = double.MinValue;
                 UpdateSharedCacheSetValue(target, false, property);
             }
-
-            // UpdateSharedCacheSetValue(target, false, property, info);
         }
 
-        // private string _toastInfoUIToolkit = "";
-        // private static readonly HashSet<string> ToastInfoUIToolkit = new HashSet<string>();
-
-//         private static void ActualUpdateUIToolkit(SerializedProperty property, int index,
-//             VisualElement container, Action<object> onValueChanged, FieldInfo info)
-//         {
-//             if (EditorApplication.isPlayingOrWillChangePlaymode)
-//             {
-//                 return;
-//             }
-//
-//             string arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
-//
-//             bool configExists = SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
-//             bool needUpdate = !configExists;
-//             if (configExists)
-//             {
-//                 double curTime = EditorApplication.timeSinceStartup;
-//                 double loopInterval = SaintsFieldConfigUtil.GetByXPathLoopIntervalMsIMGUI();
-//                 needUpdate = curTime - genericCache.UpdatedLastTime > loopInterval / 1000f;
-//                 // if(needUpdate)
-//                 // {
-//                 //     Debug.Log($"needUpdate: {curTime - genericCache.UpdatedLastTime} > {loopInterval / 1000f}");
-//                 // }
-//             }
-//
-//             if (needUpdate)
-//             {
-//                 genericCache ??= new GetByXPathGenericCache
-//                 {
-//                     Error = "",
-//                 };
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-//                 Debug.Log($"#GetByXPath# UpdateImGuiSharedCache for {arrayRemovedKey} ({property.propertyPath}), firstTime={!configExists}");
-// #endif
-//                 UpdateSharedCache(genericCache, !configExists, property, info, false);
-//                 SharedCache[arrayRemovedKey] = genericCache;
-//             }
-//
-//             // VisualElement firstRoot = container.Q<VisualElement>(NameContainer(property, index));
-// //             if (firstRoot == null)
-// //             {
-// // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-// //                 Debug.Log($"{property.propertyPath} no root");
-// // #endif
-// //                 return;
-// //             }
-//
-//             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-//             // update information for this property
-//             if (!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
-//             {
-//                 return;
-//             }
-//             GetByXPathAttribute firstAttribute = genericCache.GetByXPathAttributes[0];
-//             Button refreshButton = container.Q<Button>(NameResignButton(property, index));
-//             Button removeButton = container.Q<Button>(NameRemoveButton(property, index));
-//             if (propertyCache.MisMatch)
-//             {
-//                 if (firstAttribute.UseResignButton)
-//                 {
-//
-//
-//                     bool targetIsNull = propertyCache.TargetIsNull;
-//                     if (targetIsNull)
-//                     {
-//                         if (removeButton.style.display != DisplayStyle.Flex)
-//                         {
-//                             removeButton.style.display = DisplayStyle.Flex;
-//                         }
-//
-//                         if (refreshButton.style.display != DisplayStyle.None)
-//                         {
-//                             refreshButton.style.display = DisplayStyle.None;
-//                         }
-//                     }
-//                     else
-//                     {
-//                         if (removeButton.style.display != DisplayStyle.None)
-//                         {
-//                             removeButton.style.display = DisplayStyle.None;
-//                         }
-//
-//                         if (refreshButton.style.display != DisplayStyle.Flex)
-//                         {
-//                             refreshButton.style.display = DisplayStyle.Flex;
-//                         }
-//                     }
-//                 }
-//                 else if (firstAttribute.UseErrorMessage)
-//                 {
-//                     SetErrorMessage(
-//                         GetMismatchErrorMessage(propertyCache.OriginalValue, propertyCache.TargetValue, propertyCache.TargetIsNull),
-//                         container.Q<HelpBox>(name: NameHelpBox(property, index)),
-//                         property,
-//                         index);
-//                 }
-//             }
-//             else
-//             {
-//                 // Debug.Log(container.Q<HelpBox>(name: NameHelpBox(property, index)));
-//                 SetErrorMessage(
-//                     "",
-//                     container.Q<HelpBox>(name: NameHelpBox(property, index)),
-//                     property,
-//                     index);
-//                 if (removeButton.style.display != DisplayStyle.None)
-//                 {
-//                     removeButton.style.display = DisplayStyle.None;
-//                 }
-//                 if (refreshButton.style.display != DisplayStyle.None)
-//                 {
-//                     refreshButton.style.display = DisplayStyle.None;
-//                 }
-//             }
-//         }
-
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container,
-            FieldInfo info,
-            object parent,
-            Action<object> onValueChangedCallback,
-            object newValue)
+        private static void SetErrorMessage(string error, HelpBox helpBox)
         {
-            // ActualUpdateUIToolkit(property, index, container, onValueChangedCallback,
-            //     info, false);
-        }
-
-        // private static IEnumerable<(bool hasRoot, VisualElement root, bool hasValue, object value)> ZipTwoLongest(IEnumerable<VisualElement> left, IEnumerable<object> right)
-        // {
-        //
-        //     // IEnumerator<T> leftEnumerator = left.GetEnumerator();
-        //     // IEnumerator<T> rightEnumerator = right.GetEnumerator();
-        //
-        //     // ReSharper disable once ConvertToUsingDeclaration
-        //     using(IEnumerator<VisualElement> leftEnumerator = left.GetEnumerator())
-        //     using(IEnumerator<object> rightEnumerator = right.GetEnumerator())
-        //     {
-        //         bool hasLeft = leftEnumerator.MoveNext();
-        //         bool hasRight = rightEnumerator.MoveNext();
-        //
-        //         while (hasLeft || hasRight)
-        //         {
-        //             // ReSharper disable once ConvertIfStatementToSwitchStatement
-        //             if (hasLeft && hasRight)
-        //             {
-        //                 yield return (true, leftEnumerator.Current, true, rightEnumerator.Current);
-        //             }
-        //             else if (hasLeft)
-        //             {
-        //                 yield return (true, leftEnumerator.Current, false, null);
-        //             }
-        //             else
-        //             {
-        //                 yield return (false, null, true, rightEnumerator.Current);
-        //             }
-        //
-        //             hasLeft = leftEnumerator.MoveNext();
-        //             hasRight = rightEnumerator.MoveNext();
-        //         }
-        //     }
-        // }
-
-        private static void SetErrorMessage(string error, HelpBox helpBox, SerializedProperty property, int index)
-        {
-            // HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property, index));
-            // Debug.Log(container.Q<HelpBox>(name: NameHelpBox(property, index)));
-            // Debug.Log(helpBox);
-            // Debug.Log(error);
             if (helpBox.text == error)
             {
                 return;

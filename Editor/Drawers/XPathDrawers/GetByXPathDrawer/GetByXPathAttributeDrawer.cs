@@ -139,7 +139,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 Object r = Util.GetTypeFromObj(uObject, expectType);
 
-                if (r == null)
+                if (!r)
                 {
                     return (false, null);
                 }
@@ -165,7 +165,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 foreach (Component component in resultComponent.GetComponents<Component>())
                 {
                     // Debug.Log($"{expectInterface}/{component}")
-                    if (component == null)  // some broken component
+                    if (!component)  // some broken component
                     {
                         continue;
                     }
@@ -296,7 +296,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
         }
 
-        private static void UpdateSharedCacheSource(GetByXPathGenericCache target, SerializedProperty property, FieldInfo info)
+        private void UpdateSharedCacheSource(GetByXPathGenericCache target, SerializedProperty property, FieldInfo info)
         {
             // Debug.Log(property.propertyPath);
             // target.ImGuiResourcesLastTime = EditorApplication.timeSinceStartup;
@@ -322,14 +322,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     : new[] { iterResults.Results.FirstOrDefault() };
         }
 
-        private struct ProcessPropertyInfo
+        private readonly struct ProcessPropertyInfo
         {
-            public SerializedProperty Property;
-            public object Value;
-            public PropertyCache PropertyCache;
+            public readonly object Value;
+            public readonly PropertyCache PropertyCache;
+
+            public ProcessPropertyInfo(object value, PropertyCache propertyCache)
+            {
+                Value = value;
+                PropertyCache = propertyCache;
+            }
         }
 
-        private static void UpdateSharedCacheSetValue(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property)
+        private void UpdateSharedCacheSetValue(GetByXPathGenericCache target, bool isFirstTime, SerializedProperty property)
         {
             if (target.Error != "")
             {
@@ -448,11 +453,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 processingTargets.Add(targetResult);
                 processingProperties.Add(new ProcessPropertyInfo
-                {
-                    Property = processingProperty,
-                    Value = originalValue,
-                    PropertyCache = propertyCache,
-                });
+                (
+                    originalValue,
+                    propertyCache
+                ));
             }
 
             if (nothingSigner)
@@ -559,8 +563,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 //             UpdateSharedCacheSetValue(target, isFirstTime, property, info, isImGui);
 //         }
 
-        // no longer process with element remove, because we'll always adjust array size to correct size.
-        private static bool DoSignPropertyCache(PropertyCache propertyCache, bool notice)
+        protected virtual void ActualSignPropertyCache(PropertyCache propertyCache)
+        {
+            HelperDoSignPropertyCache(propertyCache);
+        }
+
+        private static bool HelperPreDoSignPropertyCache(PropertyCache propertyCache, bool notice)
         {
             try
             {
@@ -596,9 +604,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     $"Auto sign {(propertyCache.TargetIsNull ? "null" : propertyCache.TargetValue)} to {propertyCache.SerializedProperty.displayName}");
             }
 
-            // Debug.Log(propertyCache.SerializedProperty.propertyPath);
-            // Debug.Log(propertyCache.TargetValue);
+            return true;
+        }
 
+        private static void HelperDoSignPropertyCache(PropertyCache propertyCache)
+        {
             ReflectUtils.SetValue(
                 propertyCache.SerializedProperty.propertyPath,
                 propertyCache.SerializedProperty.serializedObject.targetObject,
@@ -606,7 +616,10 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 propertyCache.Parent,
                 propertyCache.TargetValue);
             Util.SignPropertyValue(propertyCache.SerializedProperty, propertyCache.MemberInfo, propertyCache.Parent, propertyCache.TargetValue);
+        }
 
+        private static void HelperPostDoSignPropertyCache(PropertyCache propertyCache)
+        {
             // check prefab instance
             GameObject inspectingGo = null;
             if (propertyCache.SerializedProperty.serializedObject.targetObject is GameObject go)
@@ -618,17 +631,34 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 inspectingGo = comp.gameObject;
             }
 
+            // ReSharper disable once UseNegatedPatternInIsExpression
             if (!(inspectingGo is null))
             {
                 Object prefabHandle = PrefabUtility.GetPrefabInstanceHandle(inspectingGo);
                 // Debug.Log($"prefabHandle={prefabHandle}");
-                if (prefabHandle != null)
+                if (prefabHandle)
                 {
                     PrefabUtility.RecordPrefabInstancePropertyModifications(prefabHandle);
                 }
             }
+        }
 
+        // no longer process with element remove, because we'll always adjust array size to correct size.
+        private bool DoSignPropertyCache(PropertyCache propertyCache, bool notice)
+        {
+            if (!HelperPreDoSignPropertyCache(propertyCache, notice))
+            {
+                return false;
+            }
+            ActualSignPropertyCache(propertyCache);
+            HelperPostDoSignPropertyCache(propertyCache);
             return true;
+        }
+
+        protected virtual (string error, object value) GetCurValue(SerializedProperty property, MemberInfo memberInfo, object parent)
+        {
+            (string getValueError, int _, object curValue) = Util.GetValue(property, memberInfo, parent);
+            return (getValueError, curValue);
         }
 
         public static bool HelperGetArraySize(SerializedProperty arrayProperty, FieldInfo info, bool isImGui)
@@ -692,7 +722,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 Debug.Log($"#GetByXPath# refresh resources for {arrayProperty.propertyPath}");
 #endif
 
-                GetXPathValuesResult iterResults = GetXPathValues(
+                GetXPathValuesResult iterResults = CalcXPathValues(
                     target.GetByXPathAttributes
                         .Select(xPathAttribute => new XPathResourceInfo
                         {
@@ -773,8 +803,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                     Debug.Log($"#GetByXPath# Helper: Sign {propertyCache.SerializedProperty.propertyPath} from {propertyCache.OriginalValue} to {propertyCache.TargetValue}");
 #endif
-                    if (DoSignPropertyCache(propertyCache, true))
+
+                    bool canSign = HelperPreDoSignPropertyCache(propertyCache, true);
+
+                    // ReSharper disable once InvertIf
+                    if (canSign)
                     {
+                        HelperDoSignPropertyCache(propertyCache);
+                        HelperPostDoSignPropertyCache(propertyCache);
                         propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
                     }
                 }

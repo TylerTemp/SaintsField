@@ -52,22 +52,27 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         //     }
         // }
 
-        private class GetXPathValuesResult
+        protected class GetXPathValuesResult
         {
             public string XPathError;
             // ReSharper disable once NotAccessedField.Local
-            public bool AnyResult;
             public IEnumerable<object> Results;
         }
 
-        private struct XPathResourceInfo
+        protected struct XPathResourceInfo
         {
             // ReSharper disable once NotAccessedField.Local
             public OptimizationPayload OptimizationPayload;
             public IReadOnlyList<GetByXPathAttribute.XPathInfo> OrXPathInfoList;
         }
 
-        private static GetXPathValuesResult GetXPathValues(IReadOnlyList<XPathResourceInfo> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
+        protected virtual GetXPathValuesResult GetXPathValues(IReadOnlyList<XPathResourceInfo> andXPathInfoList,
+            Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
+        {
+            return CalcXPathValues(andXPathInfoList, expectedType, expectedInterface, property, info, parent);
+        }
+
+        private static GetXPathValuesResult CalcXPathValues(IReadOnlyList<XPathResourceInfo> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
         {
             // Debug.Log($"andXPathInfoList Count={andXPathInfoList.Count}");
             bool anyResult = false;
@@ -138,15 +143,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         IEnumerable<ResourceInfo> attrResources = GetValuesFromAttr(xPathStep.Attr, nodeTestResources);
                         IEnumerable<ResourceInfo> predicatesResources = GetValuesFromPredicates(xPathStep.Predicates, attrResources);
                         accValues = predicatesResources;
-                        //                     accValues = predicatesResources.ToArray();
-                        //                     if (accValues.Count == 0)
-                        //                     {
-                        //                         // Debug.Log($"Found 0 in {xPathStep}, break");
-                        // #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                        //                         Debug.Log($"Found 0 in {xPathStep}");
-                        // #endif
-                        //                         break;
-                        //                     }
                     }
 
                     IEnumerable<object> results = accValues
@@ -204,13 +200,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 ? new GetXPathValuesResult
                 {
                     XPathError = "",
-                    AnyResult = true,
                     Results = finalResultsCollected.SelectMany(each => each),
                 }
                 : new GetXPathValuesResult
                 {
                     XPathError = string.Join("\n", errors),
-                    AnyResult = false,
                     Results = Array.Empty<object>(),
                 };
         }
@@ -230,7 +224,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         private static IEnumerable<T> RePrependEnumerable<T>(T first, IEnumerator<T> enumerator)
         {
             yield return first;
-            while (enumerator.MoveNext()) {
+            while (enumerator.MoveNext())
+            {
                 yield return enumerator.Current;
             }
         }
@@ -826,7 +821,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         case ResourceType.Object:
                         {
                             Transform parentTransform = GetParentFromResourceInfo(resourceInfo);
-                            if (parentTransform != null)
+                            if (parentTransform)
                             {
                                 yield return new ResourceInfo
                                 {
@@ -1029,7 +1024,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     Object uObject = AssetDatabase.LoadAssetAtPath<Object>(string.IsNullOrEmpty(resourceInfo.FolderPath)
                         ? (string) resourceInfo.Resource
                         : $"{resourceInfo.FolderPath}/{resourceInfo.Resource}");
-                    if (uObject != null)
+                    if (uObject)
                     {
                         switch (uObject)
                         {
@@ -1052,7 +1047,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 case ResourceType.Object:
                 {
                     GameObject go = resourceInfo.Resource as GameObject;
-                    if (go != null)
+                    if (go)
                     {
                         return new ResourceInfo
                         {
@@ -1109,7 +1104,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 Object uObject = AssetDatabase.LoadAssetAtPath<Object>(string.IsNullOrEmpty(axisResource.FolderPath)
                     ? (string) axisResource.Resource
                     : $"{axisResource.FolderPath}/{axisResource.Resource}");
-                if (uObject == null)
+                if (!uObject)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                     Debug.Log($"FakeEval failed to load {axisResource.FolderPath}/{axisResource.Resource}, return nothing");
@@ -1130,11 +1125,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         Component[] components;
                         if (result is GameObject go)
                         {
-                            components = go.GetComponents<Component>().Where(each => each != null).ToArray();
+                            components = go.GetComponents<Component>().Where(each => each).ToArray();
                         }
                         else if (result is Component comp)
                         {
-                            components = comp.GetComponents<Component>().Where(each => each != null).ToArray();
+                            components = comp.GetComponents<Component>().Where(each => each).ToArray();
                         }
 
                         else
@@ -1389,7 +1384,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         {
             if (withSelf)
             {
-                if (!insidePrefab || PrefabUtility.GetPrefabInstanceHandle(go) != null)
+                if (!insidePrefab || PrefabUtility.GetPrefabInstanceHandle(go))
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
                     Debug.Log($"Ancestor {go} return itself");
@@ -1406,7 +1401,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 if (insidePrefab)
                 {
-                    bool isInsidePrefab = PrefabUtility.GetPrefabInstanceHandle(go) != null;
+                    bool isInsidePrefab = PrefabUtility.GetPrefabInstanceHandle(go);
                     if (!isInsidePrefab)
                     {
                         yield break;
@@ -1426,7 +1421,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         private static IEnumerable<GameObject> GetRecursivelyParentGameObject(GameObject go)
         {
             Transform cur = go.transform.parent;
-            while (cur != null)
+            while (cur)
             {
                 yield return cur.gameObject;
                 cur = cur.parent;
