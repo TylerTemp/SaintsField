@@ -209,10 +209,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 };
         }
 
-
-
-
-
         private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, Axis axis, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues, SerializedProperty property)
         {
             switch (axis)

@@ -1,3 +1,4 @@
+#if WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE && !SAINTSFIELD_WWISE_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -50,3 +51,5 @@ namespace SaintsField.Editor.Drawers.Wwise.GetBankDrawer
         }
     }
 }
+
+#endif

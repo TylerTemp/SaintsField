@@ -129,7 +129,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return valid ? (true, result) : (false, null);
         }
 
-        private static (string error, Type expectType, Type expectInterface) GetExpectedTypeOfProp(
+        protected static (string error, Type expectType, Type expectInterface) GetExpectedTypeOfProp(
             SerializedProperty property, MemberInfo info)
         {
             Type targetType = info is FieldInfo fi ? fi.FieldType : ((PropertyInfo)info).PropertyType;
@@ -478,7 +478,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             HelperDoSignPropertyCache(propertyCache);
         }
 
-        private static bool HelperPreDoSignPropertyCache(PropertyCache propertyCache, bool notice)
+        protected static bool HelperPreDoSignPropertyCache(PropertyCache propertyCache, bool notice)
         {
             try
             {
@@ -528,7 +528,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             Util.SignPropertyValue(propertyCache.SerializedProperty, propertyCache.MemberInfo, propertyCache.Parent, propertyCache.TargetValue);
         }
 
-        private static void HelperPostDoSignPropertyCache(PropertyCache propertyCache)
+        protected static void HelperPostDoSignPropertyCache(PropertyCache propertyCache)
         {
             // check prefab instance
             GameObject inspectingGo = null;
@@ -751,7 +751,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return $"Expected {(targetValueIsNull? "null": targetValue)}, but got {(RuntimeUtil.IsNull(originalValue)? "null": originalValue)}";
         }
 
-        private static bool NothingSigner(GetByXPathAttribute getByXPathAttribute)
+        protected static bool NothingSigner(GetByXPathAttribute getByXPathAttribute)
         {
             return !getByXPathAttribute.AutoResignToValue && !getByXPathAttribute.AutoResignToNull && !getByXPathAttribute.InitSign
                 && !getByXPathAttribute.UseResignButton && !getByXPathAttribute.UseErrorMessage;
