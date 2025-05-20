@@ -814,8 +814,11 @@ namespace SaintsField.Editor.Core
                         using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
                         {
                             // Debug.Log($"Fall {property.propertyPath}");
+                            // This works with Wwise.Bank/Event in list; not work with AYellowPaper.SerializedDictionary
                             // EditorGUILayout.PropertyField(property, label, true);
                             // Debug.Log($"Fall Done {property.propertyPath}");
+
+                            // This not work with Wwise.Bank/Event in list; But for other situation it works just fine
                             float height = drawerInstance.GetPropertyHeight(property, label);
                             Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
                             drawerInstance.OnGUI(rect, property, label);
