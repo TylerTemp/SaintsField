@@ -491,6 +491,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _assetsObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
         private readonly List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo> _sceneObjectBaseInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo>();
 
+        protected virtual SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo MakeObjectBaseInfo(Object objResult,
+            string assetPath) => new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+            objResult,
+            objResult.name,
+            objResult.GetType().Name,
+            assetPath
+        );
+
         private IEnumerator LoadResourcesFromResult(GetXPathValuesResult getXPathValuesResult, Object curValue)
         {
             _objectPickerWindowUIToolkit.SetLoadingImage(true);
@@ -505,12 +513,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
                 string assetPath = AssetDatabase.GetAssetPath(objResult);
 
-                SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
-                    objResult,
-                    objResult.name,
-                    objResult.GetType().Name,
-                    assetPath
-                );
+                SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo baseInfo = MakeObjectBaseInfo(objResult, assetPath);
 
                 if (assetPath != "")
                 {

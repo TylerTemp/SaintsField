@@ -1,12 +1,15 @@
 using AK.Wwise;
+using MaJiang.Utils;
 using SaintsField.Wwise;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.Wwise
 {
-    public class GetBankExample : MonoBehaviour
+    public class GetBankExample : SaintsMonoBehaviour
     {
-        [GetBank("//BGMMain")]
+        [GetBank("BGM*")]
         public Bank bank;
+
+        [GetBank("*BGM*")]
+        public Bank[] banks;
     }
 }

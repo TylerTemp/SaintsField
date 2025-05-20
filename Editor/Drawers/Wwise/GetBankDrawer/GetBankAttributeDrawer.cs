@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.SaintsXPathParser;
 using SaintsField.SaintsXPathParser.XPathAttribute;
 using SaintsField.SaintsXPathParser.XPathFilter;
+using SaintsField.Wwise;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,14 +19,14 @@ namespace SaintsField.Editor.Drawers.Wwise.GetBankDrawer
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
 #endif
-    [CustomPropertyDrawer(typeof(GetBankAttributeDrawer))]
+    [CustomPropertyDrawer(typeof(GetBankAttribute), true)]
     public partial class GetBankAttributeDrawer: GetByXPathAttributeDrawer
     {
         private const string PropNameWwiseObjectReference = "WwiseObjectReference";
 
         protected override void ActualSignPropertyCache(PropertyCache propertyCache)
         {
-            propertyCache.SerializedProperty.objectReferenceValue = (UnityEngine.Object)propertyCache.TargetValue;
+            propertyCache.SerializedProperty.FindPropertyRelative(PropNameWwiseObjectReference).objectReferenceValue = (UnityEngine.Object)propertyCache.TargetValue;
         }
 
         protected override (string error, object value) GetCurValue(SerializedProperty property, MemberInfo memberInfo, object parent)
@@ -100,23 +103,55 @@ namespace SaintsField.Editor.Drawers.Wwise.GetBankDrawer
             }
         }
 
+        private static readonly Dictionary<Guid, string> GuidToPath = new Dictionary<Guid, string>();
+
+        protected override SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo MakeObjectBaseInfo(UnityEngine.Object objResult,
+            string assetPath)
+        {
+            if (objResult is WwiseObjectReference wwiseObjectReference)
+            {
+                return new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                    wwiseObjectReference,
+                    wwiseObjectReference.ObjectName,
+                    "Wwise Bank",
+                    GuidToPath.GetValueOrDefault(wwiseObjectReference.Guid, "")
+                );
+            }
+
+            if (!objResult)
+            {
+                return SaintsObjectPickerWindowUIToolkit.NoneObjectInfo;
+            }
+
+            throw new ArgumentException($"Unsupported args {objResult}", nameof(objResult));
+        }
+
         private static (bool hasResults, IEnumerable<WwiseObjectReference> results) GetMatchedWwiseObject(IReadOnlyList<AkWwiseProjectData.AkInfoWorkUnit> banks, IReadOnlyList<XPathStep> xPathSteps)
         {
-            List<Processing> allInfos = banks
+            List<Processing> allInfoFlatten = banks
                 .SelectMany(bank => bank.List)
                 .Select(each => new Processing(
                     each,
-                    new List<string>(each.Path.Split('/'))
+                    new List<string>(each.Path.Replace('\\', '/').Split('/'))
                 ))
                 .ToList();
 
+            foreach (Processing processing in allInfoFlatten)
+            {
+                GuidToPath[processing.Target.Guid] = processing.Target.Path;
+            }
+
+            IEnumerable<Processing> allInfos = allInfoFlatten;
+
+            // return (false, Array.Empty<WwiseObjectReference>());
+
             foreach (XPathStep xPathStep in xPathSteps)
             {
+                // Debug.Log(xPathStep.SepCount);
                 allInfos = xPathStep.SepCount == 2
-                    ? ExpandSeps(allInfos)
-                    : allInfos;
+                    ? ExpandSeps(allInfos, xPathStep.NodeTest)
+                    : FilterOutNodeTest(allInfos, xPathStep.NodeTest);
 
-                allInfos = FilterOutNodeTest(allInfos, xPathStep.NodeTest).ToList();
                 XPathPredicate indexPredicte = xPathStep.Predicates
                     .SelectMany(each => each)
                     // ReSharper disable once MergeIntoPattern
@@ -126,25 +161,24 @@ namespace SaintsField.Editor.Drawers.Wwise.GetBankDrawer
                 {
                     // FilterComparerInt compare = (FilterComparerInt)indexPredicte.FilterComparer;
                     int indexValue = compare.Value;
-                    int useIndex = indexValue % allInfos.Count;
+                    IReadOnlyList<Processing> allInfoExpanded = allInfos.ToArray();
+                    int useIndex = indexValue % allInfoExpanded.Count;
                     if (useIndex < 0)
                     {
-                        useIndex += allInfos.Count;
+                        useIndex += allInfoExpanded.Count;
                     }
 
-                    allInfos = new List<Processing>
-                    {
-                        allInfos[useIndex],
-                    };
+                    allInfos = new[]{allInfoExpanded[useIndex]};
                 }
             }
 
-            return (allInfos.Count > 0, allInfos.Select(each =>
-                WwiseObjectReference.FindOrCreateWwiseObject(WwiseObjectType.Soundbank, each.Target.Name,
-                    each.Target.Guid)));
+            (bool hasElement, IEnumerable<Processing> elements) = Util.HasAnyElement(allInfos.DistinctBy(each => each.Target.Guid));
+            return (hasElement, elements.Select(each => WwiseObjectReference.FindOrCreateWwiseObject(WwiseObjectType.Soundbank, each.Target.Name,
+                each.Target.Guid)));
         }
 
-        private static IEnumerable<Processing> FilterOutNodeTest(List<Processing> allInfos, NodeTest nodeTest)
+
+        private static IEnumerable<Processing> FilterOutNodeTest(IEnumerable<Processing> allInfos, NodeTest nodeTest)
         {
             foreach (Processing processing in allInfos)
             {
@@ -156,27 +190,44 @@ namespace SaintsField.Editor.Drawers.Wwise.GetBankDrawer
                 if (NodeTestMatch.NodeMatch(processing.XPathGroupSegs[0], nodeTest))
                 {
                     processing.XPathGroupSegs.RemoveAt(0);
-                    yield return processing;
+                    if(processing.XPathGroupSegs.Count > 0)
+                    {
+
+                        yield return processing;
+                    }
                 }
             }
         }
 
-        private static List<Processing> ExpandSeps(List<Processing> allInfos)
+        private static IEnumerable<Processing> ExpandSeps(IEnumerable<Processing> allInfos, NodeTest nodeTest)
         {
+
             return allInfos
                 .SelectMany(each =>
-                    ExpandSepLis(each.XPathGroupSegs)
+                    ExpandSepLis(each.XPathGroupSegs, nodeTest)
                         .Select(lis => new Processing(each.Target, lis))
-                )
-                .ToList();
+                );
+            // return allInfos[0]
         }
 
-        private static IEnumerable<List<string>> ExpandSepLis(List<string> eachXPathGroupSegs)
+        private static IEnumerable<List<string>> ExpandSepLis(List<string> eachXPathGroupSegs, NodeTest nodeTest)
         {
-            for (int startIndex = 0; startIndex < eachXPathGroupSegs.Count; )
+            // Debug.Log($"TEST {nodeTest}: {string.Join("/", eachXPathGroupSegs)}");
+            // yield break;
+            for (int startIndex = 0; startIndex < eachXPathGroupSegs.Count; startIndex++)
             {
-                yield return eachXPathGroupSegs.Skip(startIndex).ToList();
+                string first = eachXPathGroupSegs[startIndex];
+                // Debug.Log($"FIRST {first}");
+                if(NodeTestMatch.NodeMatch(first, nodeTest))
+                {
+                    List<string> result = eachXPathGroupSegs.Skip(startIndex).ToList();
+                    // Debug.Log($"MATCHED  {nodeTest}: {string.Join("/", result)}");
+                    yield return result;
+                }
+
             }
         }
+
+
     }
 }

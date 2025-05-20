@@ -163,6 +163,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff9d65dbeeda6de4ab6678757320eb1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bank:
+    idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: b4d74ecd16d3cd14bb9e0302728b04af, type: 2}
+  banks: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

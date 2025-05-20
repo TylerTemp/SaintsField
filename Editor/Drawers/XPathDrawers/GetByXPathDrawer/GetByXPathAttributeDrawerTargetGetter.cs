@@ -182,7 +182,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     //     finalResults.AddRange(results);
                     //     break;
                     // }
-                    (bool hasElement, IEnumerable<object> elements) = HasAnyElement(results);
+                    (bool hasElement, IEnumerable<object> elements) = Util.HasAnyElement(results);
                     if (hasElement)
                     {
                         anyResult = true;
@@ -209,26 +209,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 };
         }
 
-        private static (bool hasElement, IEnumerable<T> elements) HasAnyElement<T>(IEnumerable<T> elements)
-        {
-            IEnumerator<T> enumerator = elements.GetEnumerator();
-            if (!enumerator.MoveNext())
-            {
-                return (false, Array.Empty<T>());
-            }
 
-            T first = enumerator.Current;
-            return (true, RePrependEnumerable(first, enumerator));
-        }
 
-        private static IEnumerable<T> RePrependEnumerable<T>(T first, IEnumerator<T> enumerator)
-        {
-            yield return first;
-            while (enumerator.MoveNext())
-            {
-                yield return enumerator.Current;
-            }
-        }
+
 
         private static IEnumerable<ResourceInfo> GetValuesFromSep(int sepCount, Axis axis, NodeTest nodeTest, IEnumerable<ResourceInfo> accValues, SerializedProperty property)
         {

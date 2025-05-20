@@ -1439,6 +1439,27 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static (bool hasElement, IEnumerable<T> elements) HasAnyElement<T>(IEnumerable<T> elements)
+        {
+            IEnumerator<T> enumerator = elements.GetEnumerator();
+            if (!enumerator.MoveNext())
+            {
+                return (false, Array.Empty<T>());
+            }
+
+            T first = enumerator.Current;
+            return (true, RePrependEnumerable(first, enumerator));
+        }
+
+        private static IEnumerable<T> RePrependEnumerable<T>(T first, IEnumerator<T> enumerator)
+        {
+            yield return first;
+            while (enumerator.MoveNext())
+            {
+                yield return enumerator.Current;
+            }
+        }
+
         #region Scene Related
 
         public struct TargetWorldPosInfo

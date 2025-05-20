@@ -10,32 +10,24 @@ using UnityEngine;
 namespace SaintsField.Wwise
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field)]
-    public class GetBankAttribute: PropertyAttribute, ISaintsAttribute
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
+    public class GetBankAttribute: GetByXPathAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy => "";
-
-        public readonly bool IsCallback;
-        public readonly string Callback;
-
-#if UNITY_EDITOR
-        public IReadOnlyList<XPathStep> XPathSteps;
-        // public override string ToString()
-        // {
-        //     return XPathSteps == null? Callback: string.Join("/", XPathSteps);
-        // }
-#endif
-
-        public GetBankAttribute(string bank)
+        public GetBankAttribute(params string[] bank)
         {
-            (Callback, IsCallback) = RuntimeUtil.ParseCallback(bank);
-            if (!IsCallback)
-            {
-#if UNITY_EDITOR
-                XPathSteps = XPathParser.Parse(bank).ToArray();
-#endif
-            }
+            ParseOptions(EXP.NoAutoResignToNull | EXP.NoPicker);
+            ParseXPaths(bank.Select(TrasformPath).ToArray());
+        }
+
+        public GetBankAttribute(EXP config, params string[] bank)
+        {
+            ParseOptions(config);
+            ParseXPaths(bank.Select(TrasformPath).ToArray());
+        }
+
+        private static string TrasformPath(string path)
+        {
+            return path.Contains('/')? path: $"//{path}";
         }
     }
 }
