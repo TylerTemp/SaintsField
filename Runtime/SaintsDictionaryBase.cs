@@ -304,6 +304,29 @@ namespace SaintsField
             return Dictionary.ContainsKey(key);
         }
 
+        #region Dictionary Extension
+
+
+        public TValue GetValueOrDefault(TKey key)
+        {
+            if (TryGetValue(key, out TValue value))
+            {
+                return value;
+            }
+
+            return default;
+        }
+
+        public TValue GetValueOrDefault(TKey key, TValue defaultValue)
+        {
+            if (TryGetValue(key, out TValue value))
+            {
+                return value;
+            }
+
+            return defaultValue;
+        }
+
         public bool Remove(TKey key)
         {
             if (Dictionary.Remove(key))
@@ -339,6 +362,7 @@ namespace SaintsField
 #endif
             return true;
         }
+        #endregion
 
         public TValue this[TKey key]
         {
