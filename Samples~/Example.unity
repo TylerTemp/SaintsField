@@ -22136,9 +22136,9 @@ MonoBehaviour:
     _keys: 
     _values: []
     _saintsKeys:
-    - value: 2
+    - value: 1
     _saintsValues:
-    - value: {r: 0, g: 0, b: 0, a: 0}
+    - value: {r: 0.5188679, g: 0.3054789, b: 0.13950694, a: 1}
 --- !u!1 &1700820806
 GameObject:
   m_ObjectHideFlags: 0

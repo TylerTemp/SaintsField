@@ -15,6 +15,5 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         }
 
         public SaintsDictionary<CollectableType, Color> colors;
-
     }
 }

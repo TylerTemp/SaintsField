@@ -257,6 +257,18 @@ namespace SaintsField.Editor.Utils
             // dropdownButtonField.AddToClassList("unity-base-field__aligned");
             dropdownButtonField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
 
+            // workaround an issue that SaintsField will want to find a label when using with RichLabel
+            if (string.IsNullOrEmpty(label))
+            {
+                dropdownButtonField.Insert(0, new Label
+                {
+                    style =
+                    {
+                        display = DisplayStyle.None,
+                    },
+                });
+            }
+
             dropdownButtonField.Add(new Image
             {
                 image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
