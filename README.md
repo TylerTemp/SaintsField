@@ -90,10 +90,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.12.0**
+**4.13.0**
 
-1.  Add `PlayaAboveRichLabel`/`PlayaBelowRichLabel` to draw a rich label above/below a field/method/property (including array/list)
-2.  UI Toolkit: Allow `PlayaAboveRichLabel` & `PlayaInfoBox` be applied to a class/struct definition
+1.  UI Toolkit: Add `GetWwise` to automatically get a Wwise object
+2.  Fix a false array detection in SaintsEditor
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -6079,6 +6079,36 @@ public Sequence DoNotIncludeMe() => DOTween.Sequence();    // this will NOT be a
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/db6b60b5-0d1d-43e2-9ab9-b2c7912d7e8d)
+
+## Wwise ##
+
+Wwise itself already has very nice drawer. SaintsField only provide some utility to make it easier to use.
+
+If you can't see the wwise related attributes, please add marco `SAINTSFIELD_WWISE` to enable it.
+
+If you face compatibility issue because of API changes in Wwise, please add marco `SAINTSFIELD_WWISE_DISABLE` to disable it.
+
+### `GetWwise` ###
+
+Like the auto getters, this can auto-sign a wwise object (a state, a switch, a soundBank etc.) to a field.
+
+```csharp
+using SaintsField.Wwise;
+
+[GetWwise("BGM*")]  // Get a soundBank starts with `BGM`
+public Bank bank;
+
+[GetWwise("*BGM*")]  // Get all events contains `BGM`
+public Event[] events;
+
+[GetWwise]  // Get the first rtpc found
+public RTPC rtpc;
+
+[GetWwise("*/BGM/Stop*")]  // Get events that's under any work unit, under BGM folder, and starts with `Stop`
+public Event stopEvents;
+```
+
+![image](https://github.com/user-attachments/assets/72007c35-a0f5-4c66-bc29-803947b4d74a)
 
 ## I2 Localization ##
 

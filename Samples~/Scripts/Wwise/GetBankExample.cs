@@ -6,10 +6,18 @@ namespace SaintsField.Samples.Scripts.Wwise
 {
     public class GetBankExample : SaintsMonoBehaviour
     {
-        [GetBank("BGM*")]
+        [GetWwise("BGM*")]
         public Bank bank;
 
-        [GetBank("*BGM*")]
-        public Bank[] banks;
+        [GetWwise("*BGM*")]
+        public Event[] events;
+
+        [GetWwise]
+        public RTPC rtpc;
+
+        [GetWwise] public string incorrectType;
+
+        [GetWwise("*/BGM/Stop*")]
+        public Event[] stopEvents;
     }
 }

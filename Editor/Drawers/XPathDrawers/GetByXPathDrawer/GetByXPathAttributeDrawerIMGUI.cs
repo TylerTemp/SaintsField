@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             public SerializedProperty SerializedProperty;
         }
 
-        protected class GetByXPathGenericCache
+        public class GetByXPathGenericCache
         {
             // public int ImGuiRenderCount;  // IMGUI fix
             // public double ImGuiResourcesLastTime;  // IMGUI fix
@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             public readonly Dictionary<int, PropertyCache> IndexToPropertyCache = new Dictionary<int, PropertyCache>();
         }
 
-        protected static readonly Dictionary<string, GetByXPathGenericCache> SharedCache = new Dictionary<string, GetByXPathGenericCache>();
+        public static readonly Dictionary<string, GetByXPathGenericCache> SharedCache = new Dictionary<string, GetByXPathGenericCache>();
 
         // private static readonly Dictionary<UnityEngine.Object, HashSet<string>> InspectingTargets = new Dictionary<UnityEngine.Object, HashSet<string>>();
 

@@ -52,14 +52,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         //     }
         // }
 
-        protected class GetXPathValuesResult
+        public class GetXPathValuesResult
         {
             public string XPathError;
             // ReSharper disable once NotAccessedField.Local
             public IEnumerable<object> Results;
         }
 
-        protected struct XPathResourceInfo
+        public struct XPathResourceInfo
         {
             // ReSharper disable once NotAccessedField.Local
             public OptimizationPayload OptimizationPayload;

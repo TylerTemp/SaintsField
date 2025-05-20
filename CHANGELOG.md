@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.13.0 ##
+
+1.  UI Toolkit: Add `GetWwise` to automatically get a Wwise object
+2.  Fix a false array detection in SaintsEditor
+
 ## 4.12.0 ##
 
 1.  Add `PlayaAboveRichLabel`/`PlayaBelowRichLabel` to draw a rich label above/below a field/method/property (including array/list)

@@ -167,25 +167,85 @@ MonoBehaviour:
     idInternal: 0
     valueGuidInternal: 
     WwiseObjectReference: {fileID: 11400000, guid: b4d74ecd16d3cd14bb9e0302728b04af, type: 2}
-  banks:
+  events:
   - idInternal: 0
     valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: b4d74ecd16d3cd14bb9e0302728b04af, type: 2}
+    WwiseObjectReference: {fileID: 11400000, guid: 44b1ecca33fdd3c45af6e0c270c36431, type: 2}
   - idInternal: 0
     valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: 529d074cbcf4ff042aa9cb3afe80596b, type: 2}
+    WwiseObjectReference: {fileID: 11400000, guid: f27083d6d4e96e447af32b42c7aafb1e, type: 2}
   - idInternal: 0
     valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: 0085f167cbe4c554aa8b501aa5326a2b, type: 2}
+    WwiseObjectReference: {fileID: 11400000, guid: 61b96192458e4b94f8090f04b337014d, type: 2}
   - idInternal: 0
     valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: 6e2287493b26eda44a53a65e0b9b6682, type: 2}
+    WwiseObjectReference: {fileID: 11400000, guid: a6c463fc642c8254592a0ee3879a5519, type: 2}
   - idInternal: 0
     valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: 6ef41d9fa18affe4c96963511d64041f, type: 2}
+    WwiseObjectReference: {fileID: 11400000, guid: 5a6f4a147efd3ef4883f59193c3be0f9, type: 2}
   - idInternal: 0
     valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: 06c9480338bb5df46a9b4fe4268365f2, type: 2}
+    WwiseObjectReference: {fileID: 11400000, guid: d94e84963a920034684139a5d0415c30, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 4beefd566e413994d893db49007ab2ee, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 8a71d758f2ee63a44b8bf25adfff8b14, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: d8ac40a6eb20dff4dac8b3e12d065016, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: a55182c66d6488e4b85649cb563de95e, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 4ce69b770427eb84885516ff238e7df6, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: fef7ff6be62aa6747acd3b6170225633, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: f9261862f0998a746b393d432850f55c, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 7798205c6b93f834892304a6d91ec54e, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 729fd78fe5402804daa43f450dea192b, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 157a50d81755b7b459ef7a94f07b25c1, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: d79d9114a2d2a2c488321087b58015d6, type: 2}
+  rtpc:
+    idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 5883dc5eb1ff4db4bb71e8d5f7ddbd48, type: 2}
+  incorrectType: 
+  stopEvents:
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 4ce69b770427eb84885516ff238e7df6, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: fef7ff6be62aa6747acd3b6170225633, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: f9261862f0998a746b393d432850f55c, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 7798205c6b93f834892304a6d91ec54e, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 729fd78fe5402804daa43f450dea192b, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 157a50d81755b7b459ef7a94f07b25c1, type: 2}
+  - idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: d79d9114a2d2a2c488321087b58015d6, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
