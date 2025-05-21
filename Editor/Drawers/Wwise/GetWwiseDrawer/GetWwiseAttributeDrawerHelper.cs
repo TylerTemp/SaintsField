@@ -144,20 +144,31 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
             {
                 return true;
             }
-
-            arrayProperty.arraySize = expandedResults.Count;
-            SaintsPropertyDrawer.EnqueueSceneViewNotification($"Adjust array {arrayProperty.displayName} to length {arrayProperty.arraySize}");
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-            Debug.Log($"#GetByXPath# Helper: Adjust array {arrayProperty.displayName} to length {arrayProperty.arraySize}");
-#endif
-            arrayProperty.serializedObject.ApplyModifiedProperties();
-
             GetByXPathAttribute getByXPathAttribute = target.GetByXPathAttributes[0];
+
+            if (arrayProperty.arraySize != 0 && arrayProperty.arraySize < expandedResults.Count && !getByXPathAttribute.AutoResignToNull)
+            {
+            }
+            else
+            {
+                arrayProperty.arraySize = expandedResults.Count;
+                SaintsPropertyDrawer.EnqueueSceneViewNotification(
+                    $"Adjust array {arrayProperty.displayName} to length {arrayProperty.arraySize}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                Debug.Log($"#GetByXPath# Helper: Adjust array {arrayProperty.displayName} to length {arrayProperty.arraySize}");
+#endif
+                arrayProperty.serializedObject.ApplyModifiedProperties();
+            }
 
             if(getByXPathAttribute.InitSign)
             {
                 foreach ((object targetResult, int propertyCacheKey) in expandedResults.WithIndex())
                 {
+                    if(propertyCacheKey >= target.ArrayProperty.arraySize)
+                    {
+                        continue;
+                    }
+
                     SerializedProperty processingProperty;
                     try
                     {

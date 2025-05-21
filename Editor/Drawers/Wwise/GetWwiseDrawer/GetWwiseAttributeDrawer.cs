@@ -93,7 +93,10 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
             if (value is IWrapProp wrapProp)
             {
                 object w = Util.GetWrapValue(wrapProp);
-                return ("", w);
+                if (w is AK.Wwise.BaseType bt)
+                {
+                    return ("", bt.ObjectReference);
+                }
             }
 
             return ($"Unsupported type {value?.GetType()}", null);

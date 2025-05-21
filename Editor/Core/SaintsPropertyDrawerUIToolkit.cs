@@ -776,7 +776,7 @@ namespace SaintsField.Editor.Core
 
 
                 // This works fine with: AYellowPaper.SerializedDictionary, Wwise.Event, I2Language.LocalizedString
-                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
+                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(passedLabel);
 
                 IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
                 {

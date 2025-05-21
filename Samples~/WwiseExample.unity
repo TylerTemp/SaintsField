@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 10
+  serializedVersion: 9
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -38,12 +38,13 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 13
-  m_BakeOnSceneLoad: 0
+  serializedVersion: 12
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,6 +67,9 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
+    m_FinalGather: 0
+    m_FinalGatherFiltering: 1
+    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -170,7 +174,7 @@ MonoBehaviour:
   events:
   - idInternal: 0
     valueGuidInternal: 
-    WwiseObjectReference: {fileID: 11400000, guid: 44b1ecca33fdd3c45af6e0c270c36431, type: 2}
+    WwiseObjectReference: {fileID: 11400000, guid: 262898999c84ea942b4b60f82e6bab06, type: 2}
   - idInternal: 0
     valueGuidInternal: 
     WwiseObjectReference: {fileID: 11400000, guid: f27083d6d4e96e447af32b42c7aafb1e, type: 2}
@@ -249,15 +253,8 @@ MonoBehaviour:
   bgmSwitchDictioary:
     _keys: 
     _values: []
-    _saintsKeys:
-    - value: 0
-    _saintsValues:
-    - value:
-        idInternal: 0
-        valueGuidInternal: 
-        groupIdInternal: 0
-        groupGuidInternal: 
-        WwiseObjectReference: {fileID: 0}
+    _saintsKeys: []
+    _saintsValues: []
   bgSwitch:
     idInternal: 0
     valueGuidInternal: 
@@ -265,15 +262,8 @@ MonoBehaviour:
     groupGuidInternal: 
     WwiseObjectReference: {fileID: 11400000, guid: 8d4b41abc5b91f04a81a328e40b7f9a8, type: 2}
   bgmSwitchDict:
-    _saintsKeys:
-    - value: 0
-    _saintsValues:
-    - value:
-        idInternal: 0
-        valueGuidInternal: 
-        groupIdInternal: 0
-        groupGuidInternal: 
-        WwiseObjectReference: {fileID: 0}
+    _saintsKeys: []
+    _saintsValues: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

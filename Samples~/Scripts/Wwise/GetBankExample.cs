@@ -58,5 +58,6 @@ namespace SaintsField.Samples.Scripts.Wwise
         }
 
         [DefaultExpand] public BGMSwitchDictioary bgmSwitchDict;
+
     }
 }

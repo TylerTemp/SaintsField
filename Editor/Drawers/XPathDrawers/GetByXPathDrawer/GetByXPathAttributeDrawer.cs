@@ -293,12 +293,17 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             IReadOnlyList<object> expandedResults = target.CachedResults;
             bool isArray = SerializedUtils.PropertyPathIndex(property.propertyPath) != -1;
 
-            bool nothingSigner = NothingSigner(target.GetByXPathAttributes[0]);
 
-            bool forceReOrder = target.GetByXPathAttributes[0].ForceReOrder;
+            GetByXPathAttribute getByXPathAttribute = target.GetByXPathAttributes[0];
+
+            bool nothingSigner = NothingSigner(getByXPathAttribute);
+
+            bool forceReOrder = getByXPathAttribute.ForceReOrder;
+
 
             if(!nothingSigner && isArray && target.ArrayProperty.arraySize != expandedResults.Count)
             {
+                bool arrayShiftNeedApply = false;
                 if(!forceReOrder)
                 {
                     if (expandedResults.Count <
@@ -328,6 +333,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 #endif
 
                                     target.ArrayProperty.MoveArrayElement(arrayIndex, accValueIndex);
+                                    arrayShiftNeedApply = true;
                                 }
 
                                 accValueIndex += 1;
@@ -335,15 +341,28 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         }
                     }
                 }
-                target.ArrayProperty.arraySize = expandedResults.Count;
-                EnqueueSceneViewNotification($"Adjust array {target.ArrayProperty.displayName} to length {target.ArrayProperty.arraySize}");
+
+                // TODO: add size for it because null ones still takes the places
+                if (expandedResults.Count < target.ArrayProperty.arraySize && !getByXPathAttribute.AutoResignToNull)
+                {
+
+                }
+                else
+                {
+                    target.ArrayProperty.arraySize = expandedResults.Count;
+                    EnqueueSceneViewNotification(
+                        $"Adjust array {target.ArrayProperty.displayName} to length {target.ArrayProperty.arraySize}");
+                    arrayShiftNeedApply = true;
+                }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
                 Debug.Log($"#GetByXPath# Raw: Adjust array {target.ArrayProperty.displayName} to length {target.ArrayProperty.arraySize}");
 #endif
-                target.ArrayProperty.serializedObject.ApplyModifiedProperties();
+                if(arrayShiftNeedApply)
+                {
+                    target.ArrayProperty.serializedObject.ApplyModifiedProperties();
+                }
             }
 
-            GetByXPathAttribute getByXPathAttribute = target.GetByXPathAttributes[0];
 
             // Debug.Log($"expandedResults count = {expandedResults.Count}");
 
@@ -439,6 +458,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 propertyInfo.PropertyCache.MisMatch = Mismatch(propertyInfo.Value, targetResult);
 
+                // Debug.Log($"mismatch {propertyInfo.PropertyCache.MisMatch}: {propertyInfo.Value} => {targetResult}");
+
                 // Debug.Log($"#GetByXPath# o={originalValue}({processingProperty.propertyPath}), t={targetResult}, mismatch={propertyCache.MisMatch}");
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
@@ -451,14 +472,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     if (!resign)
                     {
                         resign = getByXPathAttribute.AutoResignToNull && targetIsNull;
+                        // Debug.Log($"{resign}=getByXPathAttribute.AutoResignToNull={getByXPathAttribute.AutoResignToNull}/targetIsNull={targetIsNull}");
                     }
                     if (!resign)
                     {
                         resign = isFirstTime && getByXPathAttribute.InitSign && fieldIsNull && !targetIsNull;
+                        // Debug.Log($"{resign}: isFirstTime={isFirstTime}&&getByXPathAttribute.InitSign={getByXPathAttribute.InitSign}&&fieldIsNull={fieldIsNull}&&!targetIsNull={!targetIsNull}");
                     }
 
+
+                    // Debug.Log($"resign={resign}: {propertyInfo.PropertyCache.SerializedProperty.propertyPath}");
                     if (resign)
                     {
+                        // Debug.Log($"start to sign {propertyInfo.PropertyCache.SerializedProperty.propertyPath}");
                         if (DoSignPropertyCache(propertyInfo.PropertyCache, true))
                         {
                             propertyInfo.PropertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
@@ -669,14 +695,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return true;
             }
 
-            arrayProperty.arraySize = expandedResults.Count;
-            EnqueueSceneViewNotification($"Adjust array {arrayProperty.displayName} to length {arrayProperty.arraySize}");
+            GetByXPathAttribute getByXPathAttribute = target.GetByXPathAttributes[0];
+
+            if (arrayProperty.arraySize != 0 && arrayProperty.arraySize < expandedResults.Count && !getByXPathAttribute.AutoResignToNull)
+            {
+            }
+            else
+            {
+                arrayProperty.arraySize = expandedResults.Count;
+                EnqueueSceneViewNotification(
+                    $"Adjust array {arrayProperty.displayName} to length {arrayProperty.arraySize}");
+            }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
             Debug.Log($"#GetByXPath# Helper: Adjust array {arrayProperty.displayName} to length {arrayProperty.arraySize}");
 #endif
             arrayProperty.serializedObject.ApplyModifiedProperties();
-
-            GetByXPathAttribute getByXPathAttribute = target.GetByXPathAttributes[0];
 
             if(getByXPathAttribute.InitSign)
             {
