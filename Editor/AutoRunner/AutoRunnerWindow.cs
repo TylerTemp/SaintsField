@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer;
 using SaintsField.Playa;
@@ -13,46 +14,19 @@ namespace SaintsField.Editor.AutoRunner
 {
     public class AutoRunnerWindow: AutoRunnerWindowBase
     {
-#if !UNITY_2019_4_OR_NEWER
-        [ListDrawerSettings]
-#endif
-        [Ordered, LeftToggle] public bool buildingScenes;
-
-        [Ordered, ShowInInspector, PlayaShowIf(nameof(buildingScenes))]
-        // ReSharper disable once UnusedMember.Local
-        private static SceneAsset[] InBuildScenes => EditorBuildSettings.scenes
-            .Where(scene => scene.enabled)
-            .Select(each => AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path))
-            .ToArray();
 
 #if !UNITY_2019_4_OR_NEWER
         [ListDrawerSettings]
 #endif
-        [Ordered] public SceneAsset[] sceneList = {};
+        [Ordered, DefaultExpand] public SceneAsset[] sceneList = {};
 
-        protected override IEnumerable<SceneAsset> GetSceneList()
-        {
-            if (buildingScenes)
-            {
-                foreach (SceneAsset sceneAsset in EditorBuildSettings.scenes
-                             .Where(scene => scene.enabled)
-                             .Select(each => AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path)))
-                {
-                    yield return sceneAsset;
-                }
-            }
+        protected override IEnumerable<SceneAsset> GetSceneList() => sceneList;
 
-            foreach (SceneAsset sceneAsset in sceneList)
-            {
-                yield return sceneAsset;
-            }
-        }
-
-        [Ordered, RichLabel("$" + nameof(FolderSearchLabel))] public FolderSearch[] folderSearches = {};
+        [Ordered, RichLabel("$" + nameof(FolderSearchLabel)), DefaultExpand] public FolderSearch[] folderSearches = {};
 
         protected override IEnumerable<FolderSearch> GetFolderSearches() => folderSearches;
 
-        [Ordered, PlayaRichLabel("Extra Resources")]
+        [Ordered, PlayaRichLabel("Extra Resources"), DefaultExpand]
         public Object[] extraResources = Array.Empty<Object>();
 
         protected override IEnumerable<Object> GetExtraAssets() => extraResources;
@@ -74,9 +48,56 @@ namespace SaintsField.Editor.AutoRunner
 
         [Ordered, ShowInInspector, PlayaShowIf(nameof(_processedItemCount))] private int _processedItemCount;
 
-        // private IEnumerator _running;
+        [LayoutStart("Add Buttons", ELayout.Horizontal)]
 
-        [LayoutStart("Buttons", ELayout.Horizontal)]
+        [Ordered, Button, PlayaEnableIf(nameof(LackSceneInBuild))]
+        private void AddScenesInBuild()
+        {
+            sceneList = sceneList.Concat(GetLackSceneInBuild()).ToArray();
+        }
+
+        private bool LackSceneInBuild()
+        {
+            return GetLackSceneInBuild().Any();
+        }
+
+        private IEnumerable<SceneAsset> GetLackSceneInBuild()
+        {
+            return EditorBuildSettings.scenes
+                .Where(scene => scene.enabled)
+                .Select(each => AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path))
+                .Except(sceneList);
+        }
+
+        [Ordered, Button, PlayaDisableIf(nameof(HasAllAssets))]
+        private void AddAllAssets()
+        {
+            folderSearches = folderSearches
+                .Append(new FolderSearch {
+                    path = "Assets",
+                    searchPattern = "*",
+                    searchOption = SearchOption.AllDirectories,
+                })
+                .ToArray();
+        }
+
+        private bool HasAllAssets()
+        {
+            // foreach (FolderSearch each in folderSearches)
+            // {
+            //     Debug.Log((each.path == "Assets" || each.path == "Assets/"));
+            //     Debug.Log((each.searchPattern == "*" || each.searchPattern == "*.*"));
+            //     Debug.Log(each.searchOption == SearchOption.AllDirectories);
+            // }
+            return folderSearches.Any(each =>
+                // ReSharper disable once MergeIntoLogicalPattern
+                (each.path == "Assets" || each.path == "Assets/")
+                // ReSharper disable once MergeIntoLogicalPattern
+                && (each.searchPattern == "*" || each.searchPattern == "*.*")
+                && each.searchOption == SearchOption.AllDirectories);
+        }
+
+        [LayoutStart("Start Buttons", ELayout.Horizontal)]
 
         [Ordered, Button("Run!")]
         // ReSharper disable once UnusedMember.Local

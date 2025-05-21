@@ -124,36 +124,45 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             object[] useResult = isArray ? expandedResults : new[] { expandedResults.FirstOrDefault() };
 
+            bool forceReOrder = getByXPathAttributes[0].ForceReOrder;
+
+            List<object> processingTargets = new List<object>();
+            List<ProcessPropertyInfo> processingProperties = new List<ProcessPropertyInfo>();
+
             // not directly array target
             foreach ((object targetResult, int index) in useResult.WithIndex())
             {
                 SerializedProperty processingProperty;
                 if (isArray)
                 {
-                    if(index >= target.ArrayProperty.arraySize)
+                    if (index >= target.ArrayProperty.arraySize)
                     {
-                        return null;  // let the array target to deal with this
+                        return null; // let the array target to deal with this
                     }
+
                     processingProperty = target.ArrayProperty.GetArrayElementAtIndex(index);
                 }
                 else
                 {
                     processingProperty = property;
                 }
-                (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) = SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
+
+                (SerializedUtils.FieldOrProp fieldOrProp, object fieldParent) =
+                    SerializedUtils.GetFieldInfoAndDirectParent(processingProperty);
 
                 PropertyCache propertyCache = new PropertyCache
                 {
                     Error = "",
                     // ReSharper disable once RedundantCast
-                    MemberInfo = fieldOrProp.IsField? (MemberInfo)fieldOrProp.FieldInfo: fieldOrProp.PropertyInfo,
+                    MemberInfo = fieldOrProp.IsField ? (MemberInfo)fieldOrProp.FieldInfo : fieldOrProp.PropertyInfo,
                     Parent = fieldParent,
                     SerializedProperty = processingProperty,
                 };
 
                 // propertyCache.SerializedProperty = processingProperty;
 
-                (string originalValueError, int _, object originalValue) = Util.GetValue(processingProperty, propertyCache.MemberInfo, propertyCache.Parent);
+                (string originalValueError, int _, object originalValue) = Util.GetValue(processingProperty,
+                    propertyCache.MemberInfo, propertyCache.Parent);
                 if (originalValueError != "")
                 {
                     return new AutoRunnerFixerResult
@@ -163,15 +172,40 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     };
                 }
 
-                propertyCache.OriginalValue = originalValue;
-                bool fieldIsNull = RuntimeUtil.IsNull(originalValue);
-                propertyCache.TargetValue = targetResult;
+                processingTargets.Add(targetResult);
+                processingProperties.Add(new ProcessPropertyInfo
+                (
+                    originalValue,
+                    propertyCache
+                ));
+            }
+
+            if(!forceReOrder)
+            {
+                foreach ((object processingTarget, int processingTargetIndex) in processingTargets.WithIndex().Reverse()
+                             .ToArray())
+                {
+                    int processingPropertyMatchedIndex =
+                        processingProperties.FindIndex(each => each.Value == processingTarget);
+                    if (processingPropertyMatchedIndex >= 0)
+                    {
+                        processingTargets.RemoveAt(processingTargetIndex);
+                        processingProperties.RemoveAt(processingPropertyMatchedIndex);
+                    }
+                }
+            }
+            foreach ((object targetResult, ProcessPropertyInfo propertyInfo) in processingTargets.Zip(processingProperties, (targetResult, propertyInfo) => (targetResult, propertyInfo)))
+            {
+                propertyInfo.PropertyCache.OriginalValue = propertyInfo.Value;
+                bool fieldIsNull = RuntimeUtil.IsNull(propertyInfo.Value);
+                propertyInfo.PropertyCache.TargetValue = targetResult;
                 bool targetIsNull = RuntimeUtil.IsNull(targetResult);
-                propertyCache.TargetIsNull = targetIsNull;
+                propertyInfo.PropertyCache.TargetIsNull = targetIsNull;
 
-                propertyCache.MisMatch = Mismatch(originalValue, targetResult);
+                propertyInfo.PropertyCache.MisMatch = Mismatch(propertyInfo.Value, targetResult);
 
-                if(propertyCache.MisMatch)
+
+                if(propertyInfo.PropertyCache.MisMatch)
                 {
                     bool resign = getByXPathAttribute.AutoResignToValue && !targetIsNull;
                     if (!resign)
@@ -187,14 +221,14 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     {
                         return new AutoRunnerFixerResult
                         {
-                            Error = $"{property.displayName}({property.propertyPath}): Value mismatch {originalValue} -> {targetResult}",
+                            Error = $"{property.displayName}({property.propertyPath}): Value mismatch {propertyInfo.Value} -> {targetResult}",
                             ExecError = "",
                             CanFix = true,
                             Callback = () =>
                             {
-                                if (DoSignPropertyCache(propertyCache, true))
+                                if (DoSignPropertyCache(propertyInfo.PropertyCache, true))
                                 {
-                                    propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                                    propertyInfo.PropertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
                                 }
                             },
                         };

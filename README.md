@@ -90,10 +90,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.13.0**
+**4.13.1**
 
-1.  UI Toolkit: Add `GetWwise` to automatically get a Wwise object
-2.  Fix a false array detection in SaintsEditor
+1.  UI Toolkit: fix `SaintsDictionary` enum dropdown didn't display the correct selected value [#236](https://github.com/TylerTemp/SaintsField/issues/236)
+2.  Fix auto getter order checking issue in auto validator
+3.  Auto validator now only check prefab & `ScriptableObject` for assets
+4.  Add `Add Scenes In Build` & `Add All Assets` buttons in auto validator window for quick checking
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -6089,6 +6091,9 @@ If you can't see the wwise related attributes, please add marco `SAINTSFIELD_WWI
 If you face compatibility issue because of API changes in Wwise, please add marco `SAINTSFIELD_WWISE_DISABLE` to disable it.
 
 ### `GetWwise` ###
+
+> [!NOTE]
+> This feature is UI Toolkit only
 
 Like the auto getters, this can auto-sign a wwise object (a state, a switch, a soundBank etc.) to a field.
 

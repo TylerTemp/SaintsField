@@ -50,11 +50,14 @@ namespace SaintsField.Editor.AutoRunner
             string[] listed = string.IsNullOrEmpty(folderSearch.searchPattern)
                 ? Directory.GetFiles(folderSearch.path)
                 : Directory.GetFiles(folderSearch.path, folderSearch.searchPattern, folderSearch.searchOption);
-            foreach (string file in listed.Where(each => !each.EndsWith(".meta")).Select(each => each.Replace("\\", "/")))
+            foreach (string file in listed
+                         // .Where(each => !each.EndsWith(".meta"))
+                         .Where(each => each.EndsWith(".prefab") || each.EndsWith(".asset") )
+                         .Select(each => each.Replace("\\", "/")))
             {
                 // Debug.Log($"#AutoRunner# Processing {file}");
                 Object obj = AssetDatabase.LoadAssetAtPath<Object>(file);
-                if (obj == null)
+                if (!obj)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
                     Debug.Log($"#AutoRunner# Skip null object {file} under folder {folderSearch.path}");
@@ -62,22 +65,26 @@ namespace SaintsField.Editor.AutoRunner
                     continue;
                 }
 
-                SerializedObject so;
-                try
+                // ReSharper disable once MergeIntoLogicalPattern
+                if(obj is GameObject || obj is ScriptableObject)
                 {
-                    so = new SerializedObject(obj);
-                }
+                    SerializedObject so;
+                    try
+                    {
+                        so = new SerializedObject(obj);
+                    }
 #pragma warning disable CS0168
-                catch (Exception e)
+                    catch (Exception e)
 #pragma warning restore CS0168
-                {
+                    {
 #if SAINTSFIELD_DEBUG
-                    Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
+                        Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
 #endif
-                    continue;
-                }
+                        continue;
+                    }
 
-                yield return so;
+                    yield return so;
+                }
             }
         }
 

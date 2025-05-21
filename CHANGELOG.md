@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.13.1 ##
+
+1.  UI Toolkit: fix `SaintsDictionary` enum dropdown didn't display the correct selected value [#236](https://github.com/TylerTemp/SaintsField/issues/236)
+2.  Fix auto getter order checking issue in auto validator
+3.  Auto validator now only check prefab & `ScriptableObject` for assets
+4.  Add `Add Scenes In Build` & `Add All Assets` buttons in auto validator window for quick checking
+
 ## 4.13.0 ##
 
 1.  UI Toolkit: Add `GetWwise` to automatically get a Wwise object
