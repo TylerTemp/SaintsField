@@ -1055,11 +1055,20 @@ namespace SaintsField.Editor.Utils
                     toggle.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     if (inHorizontalLayout)
                     {
-                        // element.style.flexDirection = FlexDirection.RowReverse;
+                        // Debug.Log($"inHorizontalLayout{property.propertyPath}");
+                        toggle.style.flexDirection = FlexDirection.RowReverse;
                         Label toggleLabel = toggle.Q<Label>();
+                        VisualElement toggleInput = toggle.Q<VisualElement>(className: Toggle.inputUssClassName);
                         if(toggleLabel != null)
                         {
-                            toggleLabel.style.minWidth = 0;
+                            // toggleLabel.style.minWidth = 0;
+                            toggleLabel.style.flexGrow = 1;
+                        }
+
+                        Debug.Log(toggleInput);
+                        if (toggleInput != null)
+                        {
+                            toggleInput.style.flexGrow = 0;
                         }
                     }
                     else
