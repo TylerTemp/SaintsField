@@ -70,11 +70,26 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            string propertyName;
+            try
+            {
+                propertyName = property.displayName;
+            }
+#pragma warning disable CS0168 // Variable is declared but never used
+            catch (InvalidOperationException e)
+#pragma warning restore CS0168 // Variable is declared but never used
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning(e);
+#endif
+                return;
+            }
+
             VisualElement richContainer = container.Q<VisualElement>(NameRichLabelContainer(property));
             PayloadUIToolkit payload =
                 new PayloadUIToolkit(container.Q<PropertyField>(name: UIToolkitFallbackName(property)))
                 {
-                    XmlContent = property.displayName,
+                    XmlContent = propertyName,
                 };
 
             richContainer.userData = payload;

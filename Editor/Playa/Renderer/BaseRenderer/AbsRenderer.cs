@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
+using SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer;
 #if WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE && !SAINTSFIELD_WWISE_DISABLE
-using SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer;
 #endif
 using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
 using SaintsField.Editor.Playa.Utils;
@@ -190,7 +190,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         return (-1, -1);
                     }
-                    _getByXPathKeepUpdate = WwiseAutoGetterAttributeDrawerHelper.HelperGetArraySize(property, info, isImGui);
+                    _getByXPathKeepUpdate = GetWwiseAttributeDrawerHelper.HelperGetArraySize(property, info, isImGui);
                 }
                     return (-1, -1);
 #endif

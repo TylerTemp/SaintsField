@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             if (property.propertyType != SerializedPropertyType.Vector2 &&
                 property.propertyType != SerializedPropertyType.Vector2Int)
             {
-                PropertyField fallback = PropertyFieldFallbackUIToolkit(property);
+                PropertyField fallback = PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
                 fallback.AddToClassList(ClassFieldUIToolkit(property));
                 return fallback;
             }

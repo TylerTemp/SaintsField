@@ -648,7 +648,7 @@ namespace SaintsField.Editor.Core
 
             PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);
 
-            VisualElement element = DrawUsingDrawerInstance(drawerType, typeDrawer, property, info,
+            VisualElement element = DrawUsingDrawerInstance(passedPreferredLabel, drawerType, typeDrawer, property, info,
                 saintsPropertyDrawers, containerElement);
             // ReSharper disable once InvertIf
             if (element != null)
@@ -660,7 +660,7 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
+        private static VisualElement DrawUsingDrawerInstance(string passedLabel, Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
         {
             Debug.Assert(drawerType != null);
             if (drawerInstance == null)
@@ -673,7 +673,7 @@ namespace SaintsField.Editor.Core
             if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType == typeof(PropertyDrawer))  // null: old Unity || did not override
             {
 #if UNITY_6000_0_OR_NEWER
-                return PropertyFieldFallbackUIToolkit(property);
+                return PropertyFieldFallbackUIToolkit(property, passedLabel);
 #else
 
                 Action<object> onValueChangedCallback = null;
@@ -694,6 +694,8 @@ namespace SaintsField.Editor.Core
                             onValueChangedCallback,
                             value);
                     }
+
+                    SaintsEditorApplicationChanged.OnAnyEvent.Invoke();
                 };
 
                 // This breaks: AYellowPaper SerializedDictionary
@@ -917,6 +919,7 @@ namespace SaintsField.Editor.Core
                         onValueChangedCallback,
                         obj);
                 }
+                SaintsEditorApplicationChanged.OnAnyEvent.Invoke();
             };
 
             PropertyField fallbackField = containerElement.Q<PropertyField>(name: UIToolkitFallbackName(property));
@@ -1386,10 +1389,10 @@ namespace SaintsField.Editor.Core
             return _noDecoratorDrawer;
         }
 
-        protected static PropertyField PropertyFieldFallbackUIToolkit(SerializedProperty property)
+        protected static PropertyField PropertyFieldFallbackUIToolkit(SerializedProperty property, string label)
         {
             // PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
-            PropertyField propertyField = new PropertyField(property)
+            PropertyField propertyField = new PropertyField(property, label)
             {
                 style =
                 {

@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
             using(new SaintsRowAttributeDrawer.ForceInlineScoop(true))
             {
                 return UnityFallbackUIToolkit(
-                    realInfo, realProp, allAttributes, container, GetPreferredLabel(property), SaintsPropertyDrawers,
+                    realInfo, realProp, allAttributes, container, "", SaintsPropertyDrawers,
                     realParent);
             }
             // return PropertyFieldFallbackUIToolkit(realProp);

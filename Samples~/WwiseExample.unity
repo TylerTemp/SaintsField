@@ -246,6 +246,34 @@ MonoBehaviour:
   - idInternal: 0
     valueGuidInternal: 
     WwiseObjectReference: {fileID: 11400000, guid: d79d9114a2d2a2c488321087b58015d6, type: 2}
+  bgmSwitchDictioary:
+    _keys: 
+    _values: []
+    _saintsKeys:
+    - value: 0
+    _saintsValues:
+    - value:
+        idInternal: 0
+        valueGuidInternal: 
+        groupIdInternal: 0
+        groupGuidInternal: 
+        WwiseObjectReference: {fileID: 0}
+  bgSwitch:
+    idInternal: 0
+    valueGuidInternal: 
+    groupIdInternal: 0
+    groupGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: 8d4b41abc5b91f04a81a328e40b7f9a8, type: 2}
+  bgmSwitchDict:
+    _saintsKeys:
+    - value: 0
+    _saintsValues:
+    - value:
+        idInternal: 0
+        valueGuidInternal: 
+        groupIdInternal: 0
+        groupGuidInternal: 
+        WwiseObjectReference: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -90,13 +90,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.13.1**
+**4.13.3**
 
-1.  UI Toolkit: fix `SaintsDictionary` enum dropdown didn't display the correct selected value [#236](https://github.com/TylerTemp/SaintsField/issues/236)
-2.  Fix auto getter order checking issue in auto validator
-3.  Auto validator now only check prefab & `ScriptableObject` for assets
-4.  Add `Add Scenes In Build` & `Add All Assets` buttons in auto validator window for quick checking
-5.  UI Toolkit: fix `bool` type display in horizontal layout
+1.  UI Toolkit: Fix `GetWwise` can not find `State`, `Switch`
+2.  UI Toolkit: Fix `GetWwise` can not work with `IWrapProp` (`SaintsDictionary`)
+3.  UI Toolkit: Fix some label issue when fallback to IMGUI drawer
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

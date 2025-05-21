@@ -970,7 +970,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
             // return (result, false);
 
-            // Debug.Log($"{useAttribute}/{useDrawerType}");
+            // Debug.Log($"{useAttribute}/{useDrawerType}: {serializedProperty.propertyPath}");
 
             PropertyDrawer propertyDrawer = MakePropertyDrawer(useDrawerType, info, useAttribute, null);
             // Debug.Log(saintsPropertyDrawer);
@@ -998,7 +998,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
             // We don't need to handle decorators either
-            PropertyField result = new PropertyField(serializedProperty)
+            PropertyField result = new PropertyField(serializedProperty, string.Empty)
             {
                 style =
                 {

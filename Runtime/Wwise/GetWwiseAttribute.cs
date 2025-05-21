@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using SaintsField.Utils;
 
 namespace SaintsField.Wwise
 {
@@ -29,7 +30,12 @@ namespace SaintsField.Wwise
 
         private static string TrasformPath(string path)
         {
-            return path.Contains('/')? path: $"//{path}";
+            if (RuntimeUtil.ParseCallback(path).isCallback)
+            {
+                return path;
+            }
+            // return path.Contains('/')? path: $"//{path}";
+            return path.StartsWith('/')? path: $"//{path}";
         }
     }
 }

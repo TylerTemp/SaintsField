@@ -14,9 +14,9 @@ using UnityEditor;
 using UnityEngine;
 using Event = AK.Wwise.Event;
 
-namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
+namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
 {
-    public static class WwiseAutoGetterAttributeDrawerHelper
+    public static class GetWwiseAttributeDrawerHelper
     {
         public static WwiseObjectType GetWwiseObjectType(Type fieldType)
         {
@@ -121,7 +121,7 @@ namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
 #endif
                 Type rawType = ReflectUtils.GetElementType(info.FieldType);
 
-                GetByXPathAttributeDrawer.GetXPathValuesResult iterResults = WwiseAutoGetterAttributeDrawer.CalcXPathValues(
+                GetByXPathAttributeDrawer.GetXPathValuesResult iterResults = GetWwiseAttributeDrawer.CalcXPathValues(
                     GetWwiseObjectType(rawType),
                     target.GetByXPathAttributes
                         .Select(xPathAttribute => new GetByXPathAttributeDrawer.XPathResourceInfo
@@ -203,7 +203,7 @@ namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
                     // ReSharper disable once InvertIf
                     if (canSign)
                     {
-                        WwiseAutoGetterAttributeDrawer.HelperDoSignPropertyCache(propertyCache);
+                        GetWwiseAttributeDrawer.HelperDoSignPropertyCache(propertyCache);
                         GetByXPathAttributeDrawer.HelperPostDoSignPropertyCache(propertyCache);
                         propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
                     }

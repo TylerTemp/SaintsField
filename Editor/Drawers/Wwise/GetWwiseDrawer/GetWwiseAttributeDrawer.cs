@@ -13,15 +13,16 @@ using SaintsField.SaintsXPathParser.XPathFilter;
 using SaintsField.Wwise;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
+namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
 {
 
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(GetWwiseAttribute), true)]
-    public partial class WwiseAutoGetterAttributeDrawer: GetByXPathAttributeDrawer
+    public partial class GetWwiseAttributeDrawer: GetByXPathAttributeDrawer
     {
         private const string PropNameWwiseObjectReference = "WwiseObjectReference";
 
@@ -32,33 +33,91 @@ namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
 
         public static void HelperDoSignPropertyCache(PropertyCache propertyCache)
         {
-            propertyCache.SerializedProperty.FindPropertyRelative(PropNameWwiseObjectReference).objectReferenceValue = (UnityEngine.Object)propertyCache.TargetValue;
+            // Debug.Log($"Do Sign {propertyCache}");
+            UnityEngine.Object targetValue = (UnityEngine.Object)propertyCache.TargetValue;
+            SerializedProperty property = propertyCache.SerializedProperty;
+            MemberInfo info = propertyCache.MemberInfo;
+            Type infoRawType;
+
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            switch (info.MemberType)
+            {
+                case MemberTypes.Field:
+                    infoRawType = ((FieldInfo)info).FieldType;
+                    break;
+                case MemberTypes.Property:
+                    infoRawType = ((PropertyInfo)info).PropertyType;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(info), info, null);
+            }
+
+            SerializedProperty prop = propertyCache.SerializedProperty.FindPropertyRelative(PropNameWwiseObjectReference);
+            if (prop == null)
+            {
+                Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) == -1
+                    ? infoRawType
+                    : ReflectUtils.GetElementType(infoRawType);
+
+                string wrapPropName = ReflectUtils.GetIWrapPropName(rawType);
+                SerializedProperty wrapProp = property.FindPropertyRelative(wrapPropName) ??
+                                              SerializedUtils.FindPropertyByAutoPropertyName(property, wrapPropName);
+
+                prop = wrapProp.FindPropertyRelative(PropNameWwiseObjectReference) ??
+                       SerializedUtils.FindPropertyByAutoPropertyName(wrapProp,
+                           PropNameWwiseObjectReference);
+
+            }
+
+            // Debug.Log($"sign {prop.propertyPath} to {targetValue}");
+
+            prop.objectReferenceValue = targetValue;
         }
 
         protected override (string error, object value) GetCurValue(SerializedProperty property, MemberInfo memberInfo, object parent)
         {
-            return ("", property.FindPropertyRelative(PropNameWwiseObjectReference).objectReferenceValue);
+            SerializedProperty prop = property.FindPropertyRelative(PropNameWwiseObjectReference);
+            if(prop != null)
+            {
+                return ("", prop.objectReferenceValue);
+            }
+
+            (string error, int _, object value) = Util.GetValue(property, memberInfo, parent);
+            if (error != "")
+            {
+                return (error, value);
+            }
+
+            // ReSharper disable once InvertIf
+            if (value is IWrapProp wrapProp)
+            {
+                object w = Util.GetWrapValue(wrapProp);
+                return ("", w);
+            }
+
+            return ($"Unsupported type {value?.GetType()}", null);
         }
 
         protected override GetXPathValuesResult GetXPathValues(IReadOnlyList<XPathResourceInfo> andXPathInfoList, Type expectedType, Type expectedInterface,
             SerializedProperty property, MemberInfo info, object parent)
         {
-            return CalcXPathValues(WwiseAutoGetterAttributeDrawerHelper.GetWwiseObjectType(expectedType), andXPathInfoList, expectedType, expectedInterface, property, info, parent);
+            return CalcXPathValues(GetWwiseAttributeDrawerHelper.GetWwiseObjectType(expectedType), andXPathInfoList, expectedType, expectedInterface, property, info, parent);
         }
 
         private readonly struct Processing
         {
-            public readonly AkWwiseProjectData.AkInformation Target;
+            public readonly WwiseBasicInfo Target;
             public readonly List<string> XPathGroupSegs;
 
-            public Processing(AkWwiseProjectData.AkInformation target, List<string> xPathGroupSegs)
+            public Processing(WwiseBasicInfo target, List<string> xPathGroupSegs)
             {
                 Target = target;
                 XPathGroupSegs = xPathGroupSegs;
             }
         }
 
-        private static readonly Dictionary<Guid, (string path, WwiseObjectType wwiseType)> GuidToPath = new Dictionary<Guid, (string path, WwiseObjectType wwiseType)>();
+        private static readonly Dictionary<Guid, WwiseBasicInfo> GuidToPath = new Dictionary<Guid, WwiseBasicInfo>();
 
         protected override SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo MakeObjectBaseInfo(UnityEngine.Object objResult,
             string assetPath)
@@ -68,10 +127,10 @@ namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
                 string path = "";
                 string type = "";
                 // ReSharper disable once InvertIf
-                if (GuidToPath.TryGetValue(wwiseObjectReference.Guid, out (string path, WwiseObjectType wwiseType) value))
+                if (GuidToPath.TryGetValue(wwiseObjectReference.Guid, out WwiseBasicInfo value))
                 {
-                    path = value.path;
-                    type = value.wwiseType.ToString();
+                    path = string.Join("/", value.BasicPathSegments);
+                    type = value.WwiseObjectType.ToString();
                 }
                 return new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
                     wwiseObjectReference,
@@ -89,7 +148,7 @@ namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
             throw new ArgumentException($"Unsupported args {objResult}", nameof(objResult));
         }
 
-        private static (bool hasResults, IEnumerable<WwiseObjectReference> results) GetMatchedWwiseObject(WwiseObjectType wwiseObjectType, IReadOnlyList<AkWwiseProjectData.AkInformation> akInfos, IReadOnlyList<XPathStep> xPathSteps)
+        private static (bool hasResults, IEnumerable<WwiseObjectReference> results) GetMatchedWwiseObject(WwiseObjectType wwiseObjectType, IReadOnlyList<WwiseBasicInfo> akInfos, IReadOnlyList<XPathStep> xPathSteps)
         {
             // List<Processing> allInfoFlatten =
             //     .ToList();
@@ -102,7 +161,7 @@ namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
             IEnumerable<Processing> allInfos = akInfos
                 .Select(each => new Processing(
                     each,
-                    new List<string>(each.Path.Replace('\\', '/').Split('/').Skip(1))
+                    new List<string>(each.BasicPathSegments)
                 ));
 
             foreach (XPathStep xPathStep in xPathSteps)
@@ -138,10 +197,26 @@ namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
 
             return (hasElement, elements.Select(each =>
             {
-                GuidToPath[each.Target.Guid] = (each.Target.Path, wwiseObjectType);
+                GuidToPath[each.Target.Guid] = each.Target;
                 return WwiseObjectReference.FindOrCreateWwiseObject(wwiseObjectType, each.Target.Name,
                     each.Target.Guid);
             }));
+        }
+
+        private readonly struct WwiseBasicInfo
+        {
+            public readonly WwiseObjectType WwiseObjectType;
+            public readonly Guid Guid;
+            public readonly string Name;
+            public readonly IReadOnlyList<string> BasicPathSegments;
+
+            public WwiseBasicInfo(WwiseObjectType wwiseObjectType, Guid guid, string name, IReadOnlyList<string> basicPathSegments)
+            {
+                WwiseObjectType = wwiseObjectType;
+                Guid = guid;
+                Name = name;
+                BasicPathSegments = basicPathSegments;
+            }
         }
 
         private static IEnumerable<Processing> FilterOutNodeTest(IEnumerable<Processing> allInfos, NodeTest nodeTest)
@@ -196,36 +271,75 @@ namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
             }
         }
 
+        private static IReadOnlyList<string> ParseBasicPath(string rawPath) => rawPath.Replace("\\", "/").Split('/');
+
+        private static IEnumerable<WwiseBasicInfo> ParseToBasicInfo(WwiseObjectType wwiseObjectType, AkWwiseProjectData.AkInfoWorkUnit workUnit)
+        {
+            return workUnit.List.Select(akInformation => new WwiseBasicInfo(wwiseObjectType, akInformation.Guid, akInformation.Name,
+                ParseBasicPath(akInformation.Path).Skip(1).ToArray()));
+        }
+
+        private static IEnumerable<WwiseBasicInfo> ParseToBasicInfo(WwiseObjectType wwiseObjectType, AkWwiseProjectData.EventWorkUnit workUnit)
+        {
+            return workUnit.List.Select(akEvent => new WwiseBasicInfo(wwiseObjectType, akEvent.Guid, akEvent.Name,
+                ParseBasicPath(akEvent.Path).Skip(1).ToArray()));
+        }
+
+        private static IEnumerable<WwiseBasicInfo> ParseToBasicInfo(WwiseObjectType wwiseObjectType, AkWwiseProjectData.GroupValWorkUnit workUnit)
+        {
+            foreach (AkWwiseProjectData.GroupValue groupValue in workUnit.List)
+            {
+                // Debug.Log($"groupValue.Path={groupValue.Path}");
+                string[] basePath = ParseBasicPath(groupValue.Path).Skip(1).ToArray();
+                foreach (AkWwiseProjectData.AkBaseInformation baseInfo in groupValue.values)
+                {
+                    // Debug.Log(baseInfo.Name);
+                    // Debug.Log(baseInfo.Id);
+                    List<string> newPath = new List<string>(basePath)
+                    {
+                        baseInfo.Name,
+                    };
+                    yield return new WwiseBasicInfo(wwiseObjectType, baseInfo.Guid, baseInfo.Name, newPath);
+                }
+            }
+        }
+
         public static GetXPathValuesResult CalcXPathValues(WwiseObjectType wwiseObjectType, IReadOnlyList<XPathResourceInfo> andXPathInfoList, Type expectedType, Type expectedInterface, SerializedProperty property, MemberInfo info, object parent)
         {
             AkWwiseProjectData wwiseData = AkWwiseProjectInfo.GetData();
             // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-            IEnumerable<AkWwiseProjectData.AkInformation> wwiseInfoIe = wwiseObjectType switch
+            IReadOnlyList<WwiseBasicInfo> wwiseInfos = wwiseObjectType switch
             {
-                WwiseObjectType.AuxBus => wwiseData.AuxBusWwu.SelectMany(each => each.List),
-                WwiseObjectType.Event => wwiseData.EventWwu.SelectMany(each => each.List),
-                WwiseObjectType.Soundbank => wwiseData.BankWwu.SelectMany(each => each.List),
-                WwiseObjectType.State => wwiseData.StateWwu.SelectMany(each => each.List),
-                WwiseObjectType.Switch => wwiseData.SwitchWwu.SelectMany(each => each.List),
-                WwiseObjectType.GameParameter => wwiseData.RtpcWwu.SelectMany(each => each.List),
-                WwiseObjectType.Trigger => wwiseData.TriggerWwu.SelectMany(each => each.List),
-                WwiseObjectType.AcousticTexture => wwiseData.AcousticTextureWwu.SelectMany(each => each.List),
-                WwiseObjectType.None => Array.Empty<AkWwiseProjectData.AkInformation>(),
+                WwiseObjectType.AuxBus => wwiseData.AuxBusWwu.SelectMany(each => ParseToBasicInfo(wwiseObjectType, each)).ToArray(),
+                WwiseObjectType.Event => wwiseData.EventWwu.SelectMany(each => ParseToBasicInfo(wwiseObjectType, each)).ToArray(),
+                WwiseObjectType.Soundbank => wwiseData.BankWwu.SelectMany(each => ParseToBasicInfo(wwiseObjectType, each)).ToArray(),
+                WwiseObjectType.State => wwiseData.StateWwu.SelectMany(each => ParseToBasicInfo(wwiseObjectType, each)).ToArray(),
+                WwiseObjectType.Switch => wwiseData.SwitchWwu.SelectMany(each => ParseToBasicInfo(wwiseObjectType, each)).ToArray(),
+                WwiseObjectType.GameParameter => wwiseData.RtpcWwu.SelectMany(each => ParseToBasicInfo(wwiseObjectType, each)).ToArray(),
+                WwiseObjectType.Trigger => wwiseData.TriggerWwu.SelectMany(each => ParseToBasicInfo(wwiseObjectType, each)).ToArray(),
+                WwiseObjectType.AcousticTexture => wwiseData.AcousticTextureWwu.SelectMany(each => ParseToBasicInfo(wwiseObjectType, each)).ToArray(),
+                WwiseObjectType.None => Array.Empty<WwiseBasicInfo>(),
                 _ => throw new ArgumentOutOfRangeException(nameof(wwiseObjectType), wwiseObjectType, null),
             };
+
+            // foreach (WwiseBasicInfo wwiseBasicInfo in wwiseInfos)
+            // {
+            //     Debug.Log(string.Join("/", wwiseBasicInfo.BasicPathSegments));
+            // }
 
             bool anyResult = false;
             List<string> errors = new List<string>();
             // IEnumerable<object> finalResults = Array.Empty<object>();
             List<IEnumerable<WwiseObjectReference>> finalResultsCollected = new List<IEnumerable<WwiseObjectReference>>();
 
-            IReadOnlyList<AkWwiseProjectData.AkInformation> wwiseInfos = wwiseInfoIe.ToArray();
+            // Debug.Log(wwiseInfos.Count);
 
             foreach (XPathResourceInfo orXPathInfoList in andXPathInfoList)
             {
                 foreach (GetByXPathAttribute.XPathInfo xPathInfo in orXPathInfoList.OrXPathInfoList)
                 {
                     IReadOnlyList<XPathStep> xPathSteps;
+                    // Debug.Log($"xPathInfo.IsCallback={xPathInfo.IsCallback}/{xPathInfo.Callback}");
                     if (xPathInfo.IsCallback)
                     {
                         (string error, string xPathString) = Util.GetOf(xPathInfo.Callback, "", property, info, parent);
@@ -236,7 +350,9 @@ namespace SaintsField.Editor.Drawers.Wwise.WwiseAutoGetterDrawer
                             continue;
                         }
 
-                        xPathSteps = XPathParser.Parse(xPathString).ToArray();
+                        string actualString = xPathString.StartsWith('/') ? xPathString : $"//{xPathString}";
+
+                        xPathSteps = XPathParser.Parse(actualString).ToArray();
                     }
                     else
                     {

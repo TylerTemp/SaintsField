@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.13.3 ##
+
+1.  UI Toolkit: Fix `GetWwise` can not find `State`, `Switch`
+2.  UI Toolkit: Fix `GetWwise` can not work with `IWrapProp` (`SaintsDictionary`)
+3.  UI Toolkit: Fix some label issue when fallback to IMGUI drawer
+
 ## 4.13.2 ##
 
 Fix the way to get IMGUI fallback drawer height. This inflects both IMGUI, and UI Toolkit falling-back to IMGUI

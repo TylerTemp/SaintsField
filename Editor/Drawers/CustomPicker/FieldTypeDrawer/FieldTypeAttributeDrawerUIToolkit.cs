@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                 Debug.LogException(e);
 
                 VisualElement root = new VisualElement();
-                root.Add(PropertyFieldFallbackUIToolkit(property));
+                root.Add(PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property)));
                 root.Add(new HelpBox(e.Message, HelpBoxMessageType.Error));
                 root.AddToClassList(ClassAllowDisable);
                 return root;
