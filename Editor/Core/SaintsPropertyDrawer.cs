@@ -492,9 +492,9 @@ namespace SaintsField.Editor.Core
                 else
                 {
                     matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                        Debug.Log($"{propertyAttributeToPropertyDrawer.Key}/{matched}/{string.Join(",", propertyAttributeToPropertyDrawer.Value.Select(each => each.DrawerType))}");
-#endif
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+//                         Debug.Log($"{propertyAttributeToPropertyDrawer.Key}/{matched}/{string.Join(",", propertyAttributeToPropertyDrawer.Value.Select(each => each.DrawerType))}");
+// #endif
                     if (!matched && propertyAttributeToPropertyDrawer.Key.IsGenericType)
                     {
                         matched = ReflectUtils.IsSubclassOfRawGeneric(propertyAttributeToPropertyDrawer.Key, fieldType);

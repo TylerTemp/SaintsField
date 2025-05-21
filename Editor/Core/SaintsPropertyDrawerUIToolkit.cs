@@ -885,7 +885,7 @@ namespace SaintsField.Editor.Core
             IReadOnlyList<PropertyAttribute> allAttributes, bool manuallyWatch)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-            Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute.GetType().Name))}");
+            Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute?.GetType().Name))}");
 #endif
             try
             {

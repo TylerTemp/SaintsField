@@ -720,7 +720,7 @@ namespace SaintsField.Editor.Utils
                         return null;
                     }
 
-                    if (propertyType == SerializedPropertyType.ManagedReference)
+                    if (propertyType == SerializedPropertyType.ManagedReference && allAttributes.All(each => each is not ReferencePickerAttribute))
                     {
                         ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
                         ReferencePickerAttributeDrawer referencePickerAttributeDrawer = (ReferencePickerAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(ReferencePickerAttributeDrawer), fieldInfo, referencePickerAttribute, label);
@@ -732,11 +732,9 @@ namespace SaintsField.Editor.Utils
                         referencePickerAttributeDrawer.InHorizontalLayout = inHorizontalLayout;
                         return referencePickerAttributeDrawer.CreatePropertyGUI(property);
                     }
-                    else
-                    {
-                        return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout,
-                            null, makeRenderer, doTweenPlayRecorder, parent);
-                    }
+
+                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout,
+                        null, makeRenderer, doTweenPlayRecorder, parent);
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:
