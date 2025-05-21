@@ -319,12 +319,9 @@ namespace SaintsField
 
         public TValue GetValueOrDefault(TKey key, TValue defaultValue)
         {
-            if (TryGetValue(key, out TValue value))
-            {
-                return value;
-            }
-
-            return defaultValue;
+            return TryGetValue(key, out TValue value)
+                ? value
+                : defaultValue;
         }
 
         public bool Remove(TKey key)
@@ -361,6 +358,43 @@ namespace SaintsField
             SerializedValues.Add(wrapValue);
 #endif
             return true;
+        }
+
+        public TValue GetOrAddNonNull(TKey key, Func<TKey, TValue> valueFactory)
+        {
+            if (TryGetValue(key, out TValue value))
+            {
+                return value;
+            }
+
+            TValue createdValue = valueFactory.Invoke(key);
+            Add(key, createdValue);
+            return createdValue;
+        }
+
+        public TValue GetValueOrAdd(
+            TKey key,
+            Func<TKey, TValue> valueProvider)
+        {
+            if(TryGetValue(key, out TValue value))
+            {
+                return value;
+            }
+
+            TValue createdValue = valueProvider.Invoke(key);
+            Add(key, createdValue);
+            return createdValue;
+        }
+
+        public bool TryRemove(TKey key, out TValue value)
+        {
+            if(TryGetValue(key, out TValue foundValue))
+            {
+                value = foundValue;
+                return Remove(key);
+            }
+            value = default;
+            return false;
         }
         #endregion
 

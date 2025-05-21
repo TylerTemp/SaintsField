@@ -102,6 +102,11 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
             int index,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
+            if (string.IsNullOrEmpty(GetPreferredLabel(property)))
+            {
+                return;
+            }
+
             string richLabelContainerName = NameRichLabelContainer(property);
 
             VisualElement richContainer = container.Q<VisualElement>(richLabelContainerName);
