@@ -386,7 +386,8 @@ namespace SaintsField
             return createdValue;
         }
 
-        public bool TryRemove(TKey key, out TValue value)
+        // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Global
+        public bool TryRemove(TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TValue value)
         {
             if(TryGetValue(key, out TValue foundValue))
             {
