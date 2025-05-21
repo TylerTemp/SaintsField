@@ -2721,9 +2721,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452cdf6963e577a448280ca711ba798b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ot: 
+  st: 
+  inOneStruct:
+    ss: 
+    si: 0
   g11: 
-  r1: 
-  r2: 0
+  g12: 
+  myStruct:
+    ss: 
+    si: 0
+  g13: 
+  g21: 
+  g22: fdsfds
+  g23:
+  - 
+  - 
+  toggle: 0
+  soV: {fileID: 0}
+  animBaseV:
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: 0
+    <stateName>k__BackingField: 
+    <stateSpeed>k__BackingField: 0
+    <stateTag>k__BackingField: 
+    <subStateMachineNameChain>k__BackingField: []
+  so: {fileID: 0}
+  animBase:
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: 0
+    <stateName>k__BackingField: 
+    <stateSpeed>k__BackingField: 0
+    <stateTag>k__BackingField: 
+    <subStateMachineNameChain>k__BackingField: []
 --- !u!1 &1152953110
 GameObject:
   m_ObjectHideFlags: 0

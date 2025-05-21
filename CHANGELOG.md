@@ -6,6 +6,7 @@
 2.  Fix auto getter order checking issue in auto validator
 3.  Auto validator now only check prefab & `ScriptableObject` for assets
 4.  Add `Add Scenes In Build` & `Add All Assets` buttons in auto validator window for quick checking
+5.  UI Toolkit: fix `bool` type display in horizontal layout
 
 ## 4.13.0 ##
 

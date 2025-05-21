@@ -1065,7 +1065,7 @@ namespace SaintsField.Editor.Utils
                             toggleLabel.style.flexGrow = 1;
                         }
 
-                        Debug.Log(toggleInput);
+                        // Debug.Log(toggleInput);
                         if (toggleInput != null)
                         {
                             toggleInput.style.flexGrow = 0;
