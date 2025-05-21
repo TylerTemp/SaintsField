@@ -97,6 +97,7 @@ namespace: `SaintsField`
 3.  UI Toolkit: Fix some label issue when fallback to IMGUI drawer
 4.  Change the behavior of auto getters when `ResignToNull` is on: it'll not try to reduce the size of the array
 5.  UI Toolkit: Fix duplicated `ReferencePicker` when user already uses one [#237](https://github.com/TylerTemp/SaintsField/issues/237)
+6.  Fix the way to get IMGUI fallback drawer height. This inflects both IMGUI, and UI Toolkit falling-back to IMGUI
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
