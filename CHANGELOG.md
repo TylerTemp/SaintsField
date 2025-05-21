@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.13.2 ##
+
+Fix the way to get IMGUI fallback drawer height. This inflects both IMGUI, and UI Toolkit falling-back to IMGUI
+
 ## 4.13.1 ##
 
 1.  UI Toolkit: fix `SaintsDictionary` enum dropdown didn't display the correct selected value [#236](https://github.com/TylerTemp/SaintsField/issues/236)
