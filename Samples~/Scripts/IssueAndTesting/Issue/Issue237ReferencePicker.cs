@@ -15,7 +15,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         [Serializable]
         public struct Data1 : IReferenceData
         {
-            public int Value1;
+            public GameObject Value1;
+        }
+
+        [Serializable]
+        public struct Data2 : IReferenceData
+        {
+            public GameObject Value1;
         }
 
         [SerializeReference, ReferencePicker] public List<IReferenceData> Data;

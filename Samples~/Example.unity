@@ -14601,22 +14601,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Data:
-  - rid: 7049377450077716482
-  - rid: 7049377450077716483
-  - rid: -2
+  - rid: 7049377450077716484
+  - rid: 7049377450077716485
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 7049377450077716482
+    - rid: 7049377450077716484
       type: {class: Issue237ReferencePicker/Data1, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
-        Value1: 28
-    - rid: 7049377450077716483
+        Value1: {fileID: 1696357884}
+    - rid: 7049377450077716485
       type: {class: Issue237ReferencePicker/Data1, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
-        Value1: -22
+        Value1: {fileID: 1696357884}
 --- !u!1 &994092473
 GameObject:
   m_ObjectHideFlags: 0
