@@ -161,7 +161,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 // propertyCache.SerializedProperty = processingProperty;
 
-                (string originalValueError, int _, object originalValue) = Util.GetValue(processingProperty,
+                (string originalValueError, object originalValue) = GetCurValue(processingProperty,
                     propertyCache.MemberInfo, propertyCache.Parent);
                 if (originalValueError != "")
                 {
