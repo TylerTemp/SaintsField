@@ -69,10 +69,79 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             protected override void RowGUI(RowGUIArgs args)
             {
                 TreeViewItem item = args.item;
+                if(item.id >= ArrayProp.arraySize)
+                {
+                    return;
+                }
+
+                SerializedProperty arrayItemProp = ArrayProp.GetArrayElementAtIndex(item.id);
+
+                Rect firstRect = default;
+                bool hasFirstRect = false;
                 for (int i = 0; i < args.GetNumVisibleColumns(); i++)
                 {
-                    CellGUI(args.GetCellRect(i), item, args.GetColumn(i));
+                    Rect rect = args.GetCellRect(i);
+                    if (!hasFirstRect)
+                    {
+                        hasFirstRect = true;
+                        firstRect = rect;
+                    }
+
+
+
+                    CellGUI(args.GetCellRect(i), item, args.GetColumn(i), arrayItemProp);
                     // CellGUI(args.GetCellRect(i), item, (args.GetColumn(i) as MultiColumnHeaderState.Column).headerContent.text, ref args);
+                }
+
+                if (hasFirstRect)
+                {
+                    firstRect.width = 99999;
+                    if (Event.current.type == EventType.ContextClick && firstRect.Contains(Event.current.mousePosition))
+                    {
+                        GenericMenu menu = new GenericMenu();
+                        if (ClipboardHelper.CanCopySerializedProperty(arrayItemProp.propertyType))
+                        {
+                            menu.AddItem(new GUIContent("Copy"), false, () =>
+                            {
+                                ClipboardHelper.DoCopySerializedProperty(arrayItemProp);
+                            });
+                        }
+                        else
+                        {
+                            menu.AddDisabledItem(new GUIContent("Copy"));
+                        }
+
+                        (bool hasReflection, bool hasValue) = ClipboardHelper.CanPasteSerializedProperty(arrayItemProp.propertyType);
+                        if (hasReflection && hasValue)
+                        {
+                            menu.AddItem(new GUIContent("Paste"), false, () =>
+                            {
+                                ClipboardHelper.DoPasteSerializedProperty(arrayItemProp);
+                            });
+                        }
+                        else
+                        {
+                            menu.AddDisabledItem(new GUIContent("Paste"));
+                        }
+
+                        menu.AddSeparator("");
+                        menu.AddItem(new GUIContent("Duplicate Array Element"), false, () =>
+                        {
+                            if(arrayItemProp.DuplicateCommand())
+                            {
+                                ArrayProp.serializedObject.ApplyModifiedProperties();
+                                Reload();
+                            }
+                        });
+                        menu.AddItem(new GUIContent("Delete Array Element"), false, () =>
+                        {
+                            ArrayProp.DeleteArrayElementAtIndex(item.id);
+                            ArrayProp.serializedObject.ApplyModifiedProperties();
+                            Reload();
+                        });
+                        menu.ShowAsContext();
+                        Event.current.Use();
+                    }
                 }
             }
 
@@ -109,7 +178,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     if(arrayItemProp.propertyType == SerializedPropertyType.ObjectReference)
                     {
                         Object obj = arrayItemProp.objectReferenceValue;
-                        if (obj == null)
+                        if (!obj)
                         {
                             return EditorGUIUtility.singleLineHeight;
                         }
@@ -144,25 +213,23 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 return allHeight.Max();
             }
 
-            private void CellGUI(Rect getCellRect, TreeViewItem item, int getColumn)
+            private void CellGUI(Rect getCellRect, TreeViewItem item, int getColumn, SerializedProperty arrayItemProp)
             {
-                if(item.id >= ArrayProp.arraySize)
-                {
-                    return;
-                }
-
-                SerializedProperty arrayItemProp = ArrayProp.GetArrayElementAtIndex(item.id);
                 IReadOnlyList<string> propNames = _headerToPropNames[getColumn];
 
                 if(arrayItemProp.propertyType == SerializedPropertyType.ObjectReference)
                 {
                     Object obj = arrayItemProp.objectReferenceValue;
-                    if (obj == null)
+                    if (!obj)
                     {
                         // ReSharper disable once ConvertToUsingDeclaration
                         using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                         {
-                            Object newObj = EditorGUI.ObjectField(getCellRect, obj, _elementType, true);
+                            Object newObj;
+                            using (new EditorGUI.PropertyScope(getCellRect, null, arrayItemProp))
+                            {
+                                newObj = EditorGUI.ObjectField(getCellRect, obj, _elementType, true);
+                            }
                             // ReSharper disable once InvertIf
                             if (changed.changed)
                             {
@@ -189,8 +256,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             // ReSharper disable once ConvertToUsingDeclaration
                             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                             {
-                                EditorGUI.PropertyField(getCellRect, prop,
-                                    guiContent);
+                                using (new EditorGUI.PropertyScope(getCellRect, null, arrayItemProp))
+                                {
+                                    EditorGUI.PropertyField(getCellRect, prop,
+                                        guiContent);
+                                }
                                 if (changed.changed)
                                 {
                                     Changed = true;
@@ -214,8 +284,11 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                                     float height = EditorGUI.GetPropertyHeight(prop, guiContent, true);
                                     (Rect useRect, Rect belowRect) = RectUtils.SplitHeightRect(leftRect, height);
                                     leftRect = belowRect;
-                                    EditorGUI.PropertyField(useRect, prop,
-                                        guiContent);
+                                    using (new EditorGUI.PropertyScope(getCellRect, guiContent, arrayItemProp))
+                                    {
+                                        EditorGUI.PropertyField(useRect, prop,
+                                            guiContent);
+                                    }
 
                                 }
 
