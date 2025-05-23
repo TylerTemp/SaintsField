@@ -61,11 +61,20 @@ namespace SaintsField.Editor.AutoRunner
             return GetLackSceneInBuild().Any();
         }
 
+        private readonly Dictionary<string, SceneAsset> _sceneAssetCache = new Dictionary<string, SceneAsset>();
+
         private IEnumerable<SceneAsset> GetLackSceneInBuild()
         {
             return EditorBuildSettings.scenes
                 .Where(scene => scene.enabled)
-                .Select(each => AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path))
+                .Select(each =>
+                {
+                    if (!_sceneAssetCache.TryGetValue(each.path, out SceneAsset value))
+                    {
+                        value = AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path);
+                    }
+                    return value;
+                })
                 .Except(sceneList);
         }
 
