@@ -347,21 +347,6 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     // objectPickerWindowUIToolkit.ResetClose();
                     objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {genericCache.ExpectedType}" + (genericCache.ExpectedInterface == null? "": $"({genericCache.ExpectedInterface})"));
 
-                    if (curValueObjIsNull)
-                    {
-                        objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
-                    }
-                    else
-                    {
-                        objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
-                            curValueObj,
-                            // ReSharper disable once PossibleNullReferenceException
-                            curValueObj.name,
-                            curValueObj.GetType().Name,
-                            AssetDatabase.GetAssetPath(curValueObj)
-                        ));
-                    }
-
                     if(_useCache)
                     {
                         objectPickerWindowUIToolkit.AssetsObjects =
@@ -411,6 +396,21 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     });
 
                     objectPickerWindowUIToolkit.ShowAuxWindow();
+                    if (curValueObjIsNull)
+                    {
+                        objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+                    }
+                    else
+                    {
+                        objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                            curValueObj,
+                            // ReSharper disable once PossibleNullReferenceException
+                            curValueObj.name,
+                            curValueObj.GetType().Name,
+                            AssetDatabase.GetAssetPath(curValueObj)
+                        ));
+                    }
+
                     objectPickerWindowUIToolkit.RefreshDisplay();
                     if(_useCache)
                     {

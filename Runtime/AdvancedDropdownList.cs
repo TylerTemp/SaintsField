@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.DropdownBase;
+using SaintsField.Utils;
 
 namespace SaintsField
 {
@@ -71,7 +72,7 @@ namespace SaintsField
         // this will parse "/"
         public void Add(string displayNames, T value, bool disabled = false, string icon = null)
         {
-            AddByNames(this, new Queue<string>(displayNames.Split('/')), value, disabled, icon);
+            AddByNames(this, new Queue<string>(RuntimeUtil.SeperatePath(displayNames)), value, disabled, icon);
         }
 
         // this add a separator

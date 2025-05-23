@@ -150,12 +150,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 {
                     error = $"{funcName} return value is not a AdvancedDropdownList";
                 }
-
-                // dropdownListValue = getOfDropdownListValue;
-                // (string getOfError, IAdvancedDropdownList getOfDropdownListValue) =
-                //     Util.GetOf<IAdvancedDropdownList>(funcName, null, property, field, parentObj);
-                // error = getOfError;
-                // dropdownListValue = getOfDropdownListValue;
             }
             if(dropdownListValue == null || error != "")
             {

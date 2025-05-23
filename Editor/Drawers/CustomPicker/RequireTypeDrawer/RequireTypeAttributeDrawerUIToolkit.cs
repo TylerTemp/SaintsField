@@ -164,20 +164,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             (string __, int _, object curValue) = Util.GetValue(property, info, parent);
             Object curValueObj = curValue as Object;
             bool curValueObjIsNull = RuntimeUtil.IsNull(curValueObj);
-            if (curValueObjIsNull)
-            {
-                objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
-            }
-            else
-            {
-                objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
-                    curValueObj,
-                    // ReSharper disable once PossibleNullReferenceException
-                    curValueObj.name,
-                    curValueObj.GetType().Name,
-                    AssetDatabase.GetAssetPath(curValueObj)
-                ));
-            }
 
             if(_useCache)
             {
@@ -217,6 +203,21 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             });
 
             objectPickerWindowUIToolkit.ShowAuxWindow();
+            if (curValueObjIsNull)
+            {
+                objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+            }
+            else
+            {
+                objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                    curValueObj,
+                    // ReSharper disable once PossibleNullReferenceException
+                    curValueObj.name,
+                    curValueObj.GetType().Name,
+                    AssetDatabase.GetAssetPath(curValueObj)
+                ));
+            }
+
             objectPickerWindowUIToolkit.RefreshDisplay();
             if(_useCache)
             {

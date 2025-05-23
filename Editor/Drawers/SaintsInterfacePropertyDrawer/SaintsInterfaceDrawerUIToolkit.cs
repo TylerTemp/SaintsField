@@ -152,20 +152,6 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {interfaceType.Name} of {valueType.Name}");
                 Object curValueObj = valueProp.objectReferenceValue;
                 bool curValueObjIsNull = RuntimeUtil.IsNull(curValueObj);
-                if (curValueObjIsNull)
-                {
-                    objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
-                }
-                else
-                {
-                    objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
-                        curValueObj,
-                        // ReSharper disable once PossibleNullReferenceException
-                        curValueObj.name,
-                        curValueObj.GetType().Name,
-                        AssetDatabase.GetAssetPath(curValueObj)
-                    ));
-                }
 
                 if(_useCache)
                 {
@@ -204,6 +190,20 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 });
 
                 objectPickerWindowUIToolkit.ShowAuxWindow();
+                if (curValueObjIsNull)
+                {
+                    objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+                }
+                else
+                {
+                    objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                        curValueObj,
+                        // ReSharper disable once PossibleNullReferenceException
+                        curValueObj.name,
+                        curValueObj.GetType().Name,
+                        AssetDatabase.GetAssetPath(curValueObj)
+                    ));
+                }
                 objectPickerWindowUIToolkit.RefreshDisplay();
                 if(_useCache)
                 {
