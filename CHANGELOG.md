@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.13.4 ##
+
+1.  UI Toolkit: fix default item in object picker might give an error
+2.  Fix `AdvancedDropdown` can not property handle rich tags because `/` is used as path separator
+
 ## 4.13.3 ##
 
 1.  UI Toolkit: Fix `GetWwise` can not find `State`, `Switch`
