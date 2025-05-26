@@ -107,9 +107,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     display = DisplayStyle.None,
                     marginLeft = 0,
                     marginRight = 0,
-                    backgroundImage = pickerImage,
                     borderTopLeftRadius = 0,
                     borderBottomLeftRadius = 0,
+                    backgroundImage = pickerImage,
 #if UNITY_2022_2_OR_NEWER
                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),

@@ -105,9 +105,11 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
             propertyField.styleSheets.Add(hideStyle);
 
+            Texture2D pickerImage = EditorGUIUtility.IconContent("d_pick_uielements").image as Texture2D;
+
             Button selectButton = new Button
             {
-                text = "●",
+                // text = "●",
                 style =
                 {
                     width = 18,
@@ -115,6 +117,15 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                     marginRight = 0,
                     flexGrow = 0,
                     flexShrink = 0,
+                    backgroundImage = pickerImage,
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
                 },
             };
 
