@@ -90,10 +90,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.13.4**
+**4.13.5**
 
-1.  UI Toolkit: fix default item in object picker might give an error
-2.  Fix `AdvancedDropdown` can not property handle rich tags because `/` is used as path separator
+1.  UI Toolkit: fix unity might give an error when removing an element from list
+2.  IMGUI: add right click context menu support for `Table` [#211](https://github.com/TylerTemp/SaintsField/issues/211)
+3.  UI Toolkit: fix auto validator UI logic; add validation if an animator state has any `StateMachineBehaviour` scripts
+4.  Auto Validator add button for quick adding Addressable scenes and assets
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
