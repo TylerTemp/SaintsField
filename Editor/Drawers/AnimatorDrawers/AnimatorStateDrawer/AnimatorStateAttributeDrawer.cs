@@ -225,7 +225,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
                     break;
             }
 
-            if (controller == null)
+            if (!controller)
             {
                 return new MetaInfo
                 {
@@ -240,7 +240,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
                 foreach ((UnityEditor.Animations.AnimatorState state, IReadOnlyList<string> subStateMachineNameChain) in GetAnimatorStateRecursively(animatorControllerLayer.stateMachine, animatorControllerLayer.stateMachine.stateMachines.Select(each => each.stateMachine), Array.Empty<string>()))
                 {
                     AnimationClip clip = (AnimationClip)state.motion;
-                    if (clip != null && clipOverrideDict.TryGetValue(clip, out AnimationClip overrideClip))
+                    if (clip && clipOverrideDict.TryGetValue(clip, out AnimationClip overrideClip))
                     {
                         clip = overrideClip;
                     }
@@ -270,7 +270,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
             EditorApplication.ExecuteMenuItem("Window/Animation/Animator");
         }
 
-        private static IEnumerable<(UnityEditor.Animations.AnimatorState, IReadOnlyList<string>)> GetAnimatorStateRecursively(AnimatorStateMachine curStateMachine, IEnumerable<AnimatorStateMachine> subStateMachines, IReadOnlyList<string> accStateMachineNameChain)
+        public static IEnumerable<(UnityEditor.Animations.AnimatorState, IReadOnlyList<string>)> GetAnimatorStateRecursively(AnimatorStateMachine curStateMachine, IEnumerable<AnimatorStateMachine> subStateMachines, IReadOnlyList<string> accStateMachineNameChain)
         {
             foreach (ChildAnimatorState childAnimatorState in curStateMachine.states)
             {

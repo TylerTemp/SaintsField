@@ -6,27 +6,30 @@ using System.Linq;
 using SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer;
 using SaintsField.Playa;
 using UnityEditor;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
+#if SAINTSFIELD_ADDRESSABLE
+using UnityEditor.AddressableAssets;
+#endif
 
 namespace SaintsField.Editor.AutoRunner
 {
     public class AutoRunnerWindow: AutoRunnerWindowBase
     {
-
 #if !UNITY_2019_4_OR_NEWER
         [ListDrawerSettings]
 #endif
-        [Ordered, DefaultExpand] public SceneAsset[] sceneList = {};
+        [Ordered, ArrayDefaultExpand] public SceneAsset[] sceneList = {};
 
         protected override IEnumerable<SceneAsset> GetSceneList() => sceneList;
 
-        [Ordered, RichLabel("$" + nameof(FolderSearchLabel)), DefaultExpand] public FolderSearch[] folderSearches = {};
+        [Ordered, RichLabel("$" + nameof(FolderSearchLabel)), ArrayDefaultExpand, DefaultExpand] public FolderSearch[] folderSearches = {};
 
         protected override IEnumerable<FolderSearch> GetFolderSearches() => folderSearches;
 
-        [Ordered, PlayaRichLabel("Extra Resources"), DefaultExpand]
+        [Ordered, PlayaRichLabel("Extra Resources"), ArrayDefaultExpand, Expandable]
         public Object[] extraResources = Array.Empty<Object>();
 
         protected override IEnumerable<Object> GetExtraAssets() => extraResources;
@@ -56,10 +59,7 @@ namespace SaintsField.Editor.AutoRunner
             sceneList = sceneList.Concat(GetLackSceneInBuild()).ToArray();
         }
 
-        private bool LackSceneInBuild()
-        {
-            return GetLackSceneInBuild().Any();
-        }
+        private bool LackSceneInBuild() => GetLackSceneInBuild().Any();
 
         private readonly Dictionary<string, SceneAsset> _sceneAssetCache = new Dictionary<string, SceneAsset>();
 
@@ -71,7 +71,7 @@ namespace SaintsField.Editor.AutoRunner
                 {
                     if (!_sceneAssetCache.TryGetValue(each.path, out SceneAsset value))
                     {
-                        value = AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path);
+                        _sceneAssetCache[each.path] = value = AssetDatabase.LoadAssetAtPath<SceneAsset>(each.path);
                     }
                     return value;
                 })
@@ -106,6 +106,61 @@ namespace SaintsField.Editor.AutoRunner
                 && each.searchOption == SearchOption.AllDirectories);
         }
 
+#if SAINTSFIELD_ADDRESSABLE
+
+        [LayoutStart("Addressable", ELayout.Horizontal)]
+
+        [Ordered, Button, PlayaEnableIf(nameof(LackSceneInAddressable))]
+        private void AddAddressableScenes() => sceneList = sceneList.Concat(GetLackSceneInAddressable()).ToArray();
+
+        private bool LackSceneInAddressable() => GetLackSceneInAddressable().Any();
+
+        private IEnumerable<SceneAsset> GetLackSceneInAddressable()
+        {
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
+            if (!settings)
+            {
+                return Array.Empty<SceneAsset>();
+                // return;
+            }
+
+            return settings.groups
+                .SelectMany(each => each.entries)
+                .Where(each => typeof(SceneAsset).IsAssignableFrom(each.MainAssetType))
+                .Select(each => each.MainAsset)
+                .OfType<SceneAsset>()
+                .Except(sceneList);
+        }
+
+        [Ordered, Button, PlayaEnableIf(nameof(LackAssetsInAddressable))]
+        private void AddAddressableAssets() => extraResources = extraResources.Concat(GetLackAssetsInAddressable()).ToArray();
+
+        private bool LackAssetsInAddressable() => GetLackAssetsInAddressable().Any();
+
+        private IEnumerable<Object> GetLackAssetsInAddressable()
+        {
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
+            if (!settings)
+            {
+                return Array.Empty<Object>();
+            }
+
+            // return Array.Empty<Object>();
+            return settings.groups
+                .SelectMany(each => each.entries)
+                .Where(each =>
+                    typeof(GameObject).IsAssignableFrom(each.MainAssetType)
+                    || typeof(UnityEditor.Animations.AnimatorController).IsAssignableFrom(each.MainAssetType)
+                    || typeof(ScriptableObject).IsAssignableFrom(each.MainAssetType)
+                )
+                .Select(each => each.MainAsset)
+                .Except(extraResources);
+        }
+
+#endif
+
+        private bool _isRunning;
+
         [LayoutStart("Start Buttons", ELayout.Horizontal)]
 
         [Ordered, Button("Run!")]
@@ -124,10 +179,18 @@ namespace SaintsField.Editor.AutoRunner
                 }
             }
 
+            _isRunning = true;
+
             Debug.Log("#AutoRunner# start to run auto runners");
             // StartEditorCoroutine();
             foreach (ProcessInfo info in RunAutoRunners())
             {
+                if (!_isRunning)
+                {
+                    Debug.Log("#AutoRunner# stopped by user");
+                    yield break;
+                }
+
                 _resourceTotal = info.GroupTotal;
                 processing = info.GroupCurrent;
                 _processingMessage = info.ProcessMessage;
@@ -140,14 +203,20 @@ namespace SaintsField.Editor.AutoRunner
 
                 // yield return null;
             }
+
+            _isRunning = false;
             // StartEditorCoroutine(R());
         }
 
-        [Ordered, PlayaShowIf(nameof(AllowToRestoreScene)), Button("Restore Scene")]
+        [Ordered, Button, PlayaShowIf(nameof(AllowToRestoreScene)), PlayaShowIf(nameof(_isRunning))]
         // ReSharper disable once UnusedMember.Local
-        private void RestoreScene()
+        private void StopAndRestoreScene()
         {
-            RestoreCachedScene();
+            _isRunning = false;
+            if(AllowToRestoreScene())
+            {
+                RestoreCachedScene();
+            }
         }
 
         [LayoutEnd]

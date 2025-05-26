@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.Addressable
         public static (string error, IEnumerable<AddressableAssetEntry> assetGroups) GetAllEntries(string group, IReadOnlyList<IReadOnlyList<string>> labelFilters)
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
-            if (settings == null)
+            if (!settings)
             {
                 return (ErrorNoSettings, Array.Empty<AddressableAssetEntry>());
             }

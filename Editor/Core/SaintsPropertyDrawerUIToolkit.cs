@@ -1002,6 +1002,11 @@ namespace SaintsField.Editor.Core
                 {
                     containerElement.TrackPropertyValue(property, _ =>
                     {
+                        if (!SerializedUtils.IsOk(property))
+                        {
+                            return;
+                        }
+
                         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                         if (noCacheParent == null)
                         {
@@ -1381,7 +1386,7 @@ namespace SaintsField.Editor.Core
 
         private static StyleSheet GetNoDecoratorUss()
         {
-            if (_noDecoratorDrawer == null)
+            if (!_noDecoratorDrawer)
             {
                 _noDecoratorDrawer = Util.LoadResource<StyleSheet>(UIToolkitUtils.NoDecoratorDrawerUssFile);
             }

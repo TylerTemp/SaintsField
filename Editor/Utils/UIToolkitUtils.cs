@@ -637,11 +637,12 @@ namespace SaintsField.Editor.Utils
                                         element.Add(result);
                                     }
                                 },
-                                // onAdd = thisListView =>
-                                // {
-                                //     property.arraySize += 1;
-                                //     property.serializedObject.ApplyModifiedProperties();
-                                // },
+                                unbindItem = (element, _) =>
+                                {
+                                    element.Clear();
+                                    // Debug.Log(element);
+                                    // Debug.Log(i);
+                                },
                             };
                             Toggle listViewToggle = listView.Q<Toggle>();
                             if (listViewToggle != null && listViewToggle.style.marginLeft != -12)
@@ -702,6 +703,12 @@ namespace SaintsField.Editor.Utils
                         listView.bindingPath = property.propertyPath;
                         listView.viewDataKey = str;
                         listView.name = str;
+
+                        if (listView.itemsSource?.Count != property.arraySize)
+                        {
+                            listView.itemsSource = Enumerable.Range(0, property.arraySize)
+                                .Select(property.GetArrayElementAtIndex).ToArray();
+                        }
 
                         // this is internal too...
                         // listView.SetProperty((PropertyName) PropertyField.listViewBoundFieldProperty, (object) this);

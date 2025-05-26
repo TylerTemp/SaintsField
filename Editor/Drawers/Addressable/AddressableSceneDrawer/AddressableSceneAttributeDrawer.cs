@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
     {
         private static (string error, AddressableAssetEntry sceneEntry) GetSceneEntry(string value, AddressableSceneAttribute addressableSceneAttribute)
         {
-            if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
+            if (!AddressableAssetSettingsDefaultObject.GetSettings(false))
             {
                 return (AddressableUtil.ErrorNoSettings, null);
             }
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
         private static (string error, AddressableAssetEntry sceneEntry) GetSceneEntryFromSceneAsset(UnityEngine.Object newObj, AddressableSceneAttribute addressableSceneAttribute)
         {
-            if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
+            if (!AddressableAssetSettingsDefaultObject.GetSettings(false))
             {
                 return (AddressableUtil.ErrorNoSettings, null);
             }

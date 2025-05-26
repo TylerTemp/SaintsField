@@ -4,10 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -52,7 +54,7 @@ namespace SaintsField.Editor.AutoRunner
                 : Directory.GetFiles(folderSearch.path, folderSearch.searchPattern, folderSearch.searchOption);
             foreach (string file in listed
                          // .Where(each => !each.EndsWith(".meta"))
-                         .Where(each => each.EndsWith(".prefab") || each.EndsWith(".asset") )
+                         .Where(each => each.EndsWith(".prefab") || each.EndsWith(".asset") || each.EndsWith(".controller"))
                          .Select(each => each.Replace("\\", "/")))
             {
                 // Debug.Log($"#AutoRunner# Processing {file}");
@@ -84,6 +86,45 @@ namespace SaintsField.Editor.AutoRunner
                     }
 
                     yield return so;
+                }
+                else if (obj is Animator animator)
+                {
+                    AnimatorController controller = animator.runtimeAnimatorController as AnimatorController;
+                    // ReSharper disable once InvertIf
+                    if(controller)
+                    {
+                        foreach (AnimatorControllerLayer animatorControllerLayer in controller.layers)
+                        {
+                            foreach ((UnityEditor.Animations.AnimatorState state,
+                                         IReadOnlyList<string> _) in AnimatorStateAttributeDrawer
+                                         .GetAnimatorStateRecursively(
+                                             animatorControllerLayer.stateMachine,
+                                             animatorControllerLayer.stateMachine.stateMachines.Select(each =>
+                                                 each.stateMachine), Array.Empty<string>()))
+                            {
+                                // Debug.Log(state.behaviours);
+                                foreach (StateMachineBehaviour stateMachineBehaviour in state.behaviours)
+                                {
+                                    SerializedObject so;
+                                    try
+                                    {
+                                        so = new SerializedObject(stateMachineBehaviour);
+                                    }
+#pragma warning disable CS0168
+                                    catch (Exception e)
+#pragma warning restore CS0168
+                                    {
+#if SAINTSFIELD_DEBUG
+                                        Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
+#endif
+                                        continue;
+                                    }
+
+                                    yield return so;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -616,18 +657,17 @@ namespace SaintsField.Editor.AutoRunner
                 // mainTargetString = s;
                 return s;
             }
-            else if (target is Scene scene)
+
+            if (target is Scene scene)
             {
                 // mainTargetString = scene.path;
                 // mainTargetIsAssetPath = true;
                 return AssetDatabase.LoadAssetAtPath<SceneAsset>(scene.path);
             }
-            else
-            {
-                // mainTargetString = AssetDatabase.GetAssetPath((Object) target);
-                // mainTargetIsAssetPath = true;
-                return target;
-            }
+
+            // mainTargetString = AssetDatabase.GetAssetPath((Object) target);
+            // mainTargetIsAssetPath = true;
+            return target;
         }
 
         protected static IEnumerable<Scene> GetDirtyOpenedScene()

@@ -36,8 +36,8 @@ namespace SaintsField.Editor.AutoRunner
         private void SaveToProject()
         {
             string defaultPath;
-            var existSo = GetAllSo().FirstOrDefault();
-            if (existSo != null)
+            AutoRunnerWindow existSo = GetAllSo().FirstOrDefault();
+            if (existSo)
             {
                 defaultPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(existSo));
             }
@@ -64,7 +64,8 @@ namespace SaintsField.Editor.AutoRunner
         {
             // Debug.Log(inspectTarget);
 
-            if (editorInlineInspect == null)
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (!editorInlineInspect)
             {
                 return true;
             }
@@ -85,6 +86,7 @@ namespace SaintsField.Editor.AutoRunner
 
             AutoRunnerWindow[] allSo = GetAllSo().ToArray();
 
+            // ReSharper disable once InvertIf
             if(allSo.Length > 0)
             {
                 down.AddSeparator();
@@ -115,9 +117,9 @@ namespace SaintsField.Editor.AutoRunner
 
         private void TargetChanged(AutoRunnerWindow so)
         {
-            Debug.Log($"changed to {so}");
-            editorInlineInspect = so == null? CreateInstance<AutoRunnerWindow>(): so;
-            titleContent = new GUIContent(so == null? "Pick or Create Auto Runner": $"Auto Runner: {so.name}");
+            // Debug.Log($"changed to {so}");
+            editorInlineInspect = so? so: CreateInstance<AutoRunnerWindow>();
+            titleContent = new GUIContent(!so? "Pick or Create Auto Runner": $"Auto Runner: {so.name}");
             EditorRefreshTarget();
         }
 
@@ -125,13 +127,13 @@ namespace SaintsField.Editor.AutoRunner
 
         public override void OnEditorEnable()
         {
-            if (editorInlineInspect != null)
+            if (editorInlineInspect)
             {
                 return;
             }
 
-            AutoRunnerWindow first = GetAllSo().FirstOrDefault(each => each != null);
-            if (first == null)
+            AutoRunnerWindow first = GetAllSo().FirstOrDefault(each => each);
+            if (!first)
             {
                 TargetChanged(null);
             }

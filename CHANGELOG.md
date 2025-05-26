@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.13.5 ##
+
+1.  UI Toolkit: fix unity might give an error when removing an element from list
+2.  IMGUI: add right click context menu support for `Table`
+3.  UI Toolkit: fix auto validator UI logic; add validation if an animator state has any `StateMachineBehaviour` scripts
+4.  Auto Validator add button for quick add Addressable scenes and assets
+
 ## 4.13.4 ##
 
 1.  UI Toolkit: fix default item in object picker might give an error
