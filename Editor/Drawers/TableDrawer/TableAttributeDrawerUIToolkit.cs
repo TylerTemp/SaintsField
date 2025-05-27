@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.RendererGroup;
@@ -55,8 +54,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             if(itemIsObject)
             {
                 Object obj0 = MakeSource(arrayProp).Select(each => each.objectReferenceValue)
-                    .FirstOrDefault(each => each != null);
-                if (obj0 == null)
+                    .FirstOrDefault(each => each);
+                if (!obj0)
                 {
                     // PropertyField nullProp = new PropertyField(child0);
                     // nullProp.Bind(child0.serializedObject);
@@ -265,96 +264,94 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         title = columnName,
                         stretchable = true,
                         visible = visible,
-                    });
-
-                    multiColumnListView.columns[id].makeCell = () =>
-                    {
-                        VisualElement itemContainer = new VisualElement();
-
-                        HashSet<Toggle> toggles = new HashSet<Toggle>();
-
-                        itemContainer.schedule
-                            .Execute(() => SaintsRendererGroup.CheckOutOfScoopFoldout(itemContainer, toggles))
-                            .Every(250);
-
-                        return itemContainer;
-                    };
-
-                    multiColumnListView.columns[id].bindCell = (element, index) =>
-                    {
-                        SerializedProperty targetProp = ((SerializedProperty)multiColumnListView.itemsSource[index]).Copy();
-                        targetProp.isExpanded = true;
-
-                        Object targetPropValue = targetProp.objectReferenceValue;
-
-                        if (RuntimeUtil.IsNull(targetPropValue))
+                        makeCell = () =>
                         {
-                            ObjectField arrayItemProp = new ObjectField("")
+                            VisualElement itemContainer = new VisualElement();
+
+                            HashSet<Toggle> toggles = new HashSet<Toggle>();
+
+                            itemContainer.schedule
+                                .Execute(() => SaintsRendererGroup.CheckOutOfScoopFoldout(itemContainer, toggles))
+                                .Every(250);
+
+                            return itemContainer;
+                        },
+                        bindCell = (element, index) =>
+                        {
+                            SerializedProperty targetProp = ((SerializedProperty)multiColumnListView.itemsSource[index]).Copy();
+                            targetProp.isExpanded = true;
+
+                            Object targetPropValue = targetProp.objectReferenceValue;
+
+                            if (RuntimeUtil.IsNull(targetPropValue))
                             {
-                                objectType = ReflectUtils.GetElementType(info.FieldType),
-                            };
+                                ObjectField arrayItemProp = new ObjectField("")
+                                {
+                                    objectType = ReflectUtils.GetElementType(info.FieldType),
+                                };
+
+                                element.Clear();
+                                element.Add(arrayItemProp);
+
+                                arrayItemProp.RegisterValueChangedCallback(evt =>
+                                {
+                                    targetProp.objectReferenceValue = evt.newValue;
+                                    targetProp.serializedObject.ApplyModifiedProperties();
+                                    multiColumnListView.Rebuild();
+                                });
+                                return;
+                            }
+
+                            SerializedObject targetSerializedObject = new SerializedObject(targetPropValue);
+
+                            Dictionary<string, SerializedProperty> targetPropertyDict = SerializedUtils
+                                .GetAllField(targetSerializedObject)
+                                .Where(each => each != null)
+                                .ToDictionary(each => each.name, each => each.Copy());
+
+                            List<SaintsFieldWithInfo> allSaintsFieldWithInfos =
+                                new List<SaintsFieldWithInfo>(memberIds.Count);
+
+                            int serCount = 0;
+                            foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor
+                                         .HelperGetSaintsFieldWithInfo(targetPropertyDict, targetPropValue)
+                                         .Where(saintsFieldWithInfo => memberIds.Contains(saintsFieldWithInfo.MemberId)))
+                            {
+                                allSaintsFieldWithInfos.Add(saintsFieldWithInfo);
+                                if (saintsFieldWithInfo.SerializedProperty != null)
+                                {
+                                    serCount += 1;
+                                }
+                            }
 
                             element.Clear();
-                            element.Add(arrayItemProp);
 
-                            arrayItemProp.RegisterValueChangedCallback(evt =>
+                            bool saintsRowInline = memberIds.Count == 1;
+                            bool noLabel = serCount <= 1;
+
+                            using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline))
                             {
-                                targetProp.objectReferenceValue = evt.newValue;
-                                targetProp.serializedObject.ApplyModifiedProperties();
-                                multiColumnListView.Rebuild();
-                            });
-                            return;
-                        }
-
-                        SerializedObject targetSerializedObject = new SerializedObject(targetPropValue);
-
-                        Dictionary<string, SerializedProperty> targetPropertyDict = SerializedUtils
-                            .GetAllField(targetSerializedObject)
-                            .Where(each => each != null)
-                            .ToDictionary(each => each.name, each => each.Copy());
-
-                        List<SaintsFieldWithInfo> allSaintsFieldWithInfos =
-                            new List<SaintsFieldWithInfo>(memberIds.Count);
-
-                        int serCount = 0;
-                        foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor
-                                     .HelperGetSaintsFieldWithInfo(targetPropertyDict, targetPropValue)
-                                     .Where(saintsFieldWithInfo => memberIds.Contains(saintsFieldWithInfo.MemberId)))
-                        {
-                            allSaintsFieldWithInfos.Add(saintsFieldWithInfo);
-                            if (saintsFieldWithInfo.SerializedProperty != null)
-                            {
-                                serCount += 1;
-                            }
-                        }
-
-                        element.Clear();
-
-                        bool saintsRowInline = memberIds.Count == 1;
-                        bool noLabel = serCount <= 1;
-
-                        using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline))
-                        {
-                            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                            foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
-                            {
-                                AbsRenderer renderer =
-                                    SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo);
-                                // Debug.Log(renderer);
-                                // ReSharper disable once InvertIf
-                                if (renderer != null)
+                                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                                foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                                 {
-                                    renderer.NoLabel = noLabel;
-                                    renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
-                                    VisualElement fieldElement = renderer.CreateVisualElement();
-                                    if (fieldElement != null)
+                                    AbsRenderer renderer =
+                                        SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo);
+                                    // Debug.Log(renderer);
+                                    // ReSharper disable once InvertIf
+                                    if (renderer != null)
                                     {
-                                        element.Add(fieldElement);
+                                        renderer.NoLabel = noLabel;
+                                        renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
+                                        VisualElement fieldElement = renderer.CreateVisualElement();
+                                        if (fieldElement != null)
+                                        {
+                                            element.Add(fieldElement);
+                                        }
                                     }
                                 }
                             }
                         }
-                    };
+                    });
                 }
             }
             else  // item is general
