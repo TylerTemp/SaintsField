@@ -197,7 +197,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             {
                 Object obj0 = multiColumnListView.itemsSource.Cast<SerializedProperty>()
                     .Select(each => each.objectReferenceValue)
-                    .FirstOrDefault(each => each != null);
+                    .FirstOrDefault(each => each);
 
                 Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
                 Dictionary<string, bool> columnToDefaultHide = new Dictionary<string, bool>();
