@@ -2,11 +2,12 @@ using System;
 using System.Diagnostics;
 using SaintsField.Playa;
 using SaintsField.Utils;
+using UnityEngine;
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class TableHeadersAttribute: Attribute, IPlayaAttribute
+    public class TableHeadersAttribute: PropertyAttribute, IPlayaAttribute
     {
         // public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         // public string GroupBy => "";

@@ -72,17 +72,17 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         root.Clear();
                         property.objectReferenceValue = evt.newValue;
                         property.serializedObject.ApplyModifiedProperties();
-                        BuildContent(arrayProp, root, tableAttribute, property, info);
+                        BuildContent(arrayProp, root, tableAttribute, allAttributes, property, info, parent);
                     });
                     return root;
                 }
             }
 
-            BuildContent(arrayProp, root, tableAttribute, property, info);
+            BuildContent(arrayProp, root, tableAttribute, allAttributes, property, info, parent);
             return root;
         }
 
-        private void BuildContent(SerializedProperty arrayProp, VisualElement root, TableAttribute tableAttribute, SerializedProperty property, FieldInfo info)
+        private void BuildContent(SerializedProperty arrayProp, VisualElement root, TableAttribute tableAttribute, IReadOnlyList<PropertyAttribute> allAttributes, SerializedProperty property, FieldInfo info, object parent)
         {
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;
 
@@ -192,6 +192,61 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             root.Add(controls);
 
+            #region Headers
+
+            TableHeadersAttribute tableHeadersAttribute = allAttributes
+                .OfType<TableHeadersAttribute>()
+                .FirstOrDefault();
+            HashSet<string> valueTableHeaders = new HashSet<string>();
+            bool headerIsHide = true;
+            if (tableHeadersAttribute != null)
+            {
+                headerIsHide = tableHeadersAttribute.IsHide;
+                foreach (TableHeadersAttribute.Header header in tableHeadersAttribute.Headers)
+                {
+                    // string rawName = header.Name;
+                    List<string> rawNames = new List<string>();
+                    if (header.IsCallback)
+                    {
+                        (string error, object value) = Util.GetOfNoParams<object>(parent, header.Name, null);
+                        if (error != "")
+                        {
+#if UNITY_EDITOR
+                            Debug.LogError(error);
+#endif
+                            continue;
+                        }
+
+                        if (RuntimeUtil.IsNull(value))
+                        {
+                        }
+                        // ReSharper disable once ConvertIfStatementToSwitchStatement
+                        else if (value is string s)
+                        {
+                            rawNames.Add(s);
+                        }
+                        else if (value is IEnumerable<string> si)
+                        {
+                            rawNames.AddRange(si.Where(each => each != null));
+                        }
+                        else if (value is IEnumerable<object> oi)
+                        {
+                            rawNames.AddRange(oi.Where(each => !RuntimeUtil.IsNull(each))
+                                .Select(each => each.ToString()));
+                        }
+                    }
+                    else
+                    {
+                        rawNames.Add(header.Name);
+                    }
+
+                    valueTableHeaders.UnionWith(rawNames.SelectMany(each => new[]{each, ObjectNames.NicifyVariableName(each)}));
+                }
+            }
+
+
+            #endregion
+
             if (itemIsObject)
             {
                 Object obj0 = multiColumnListView.itemsSource.Cast<SerializedProperty>()
@@ -225,13 +280,23 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             }
                         }
 
-                        foreach (IPlayaAttribute playaAttribute in saintsFieldInfoName.SaintsFieldWithInfo.PlayaAttributes)
+                        bool headerHide = HeaderDefaultHide(columnName, valueTableHeaders, headerIsHide);
+                        if (headerHide)
                         {
-                            // ReSharper disable once InvertIf
-                            if (playaAttribute is TableHideAttribute)
+                            columnToDefaultHide[columnName] = true;
+                        }
+                        else
+                        {
+                            // ReSharper disable once LoopCanBeConvertedToQuery
+                            foreach (IPlayaAttribute playaAttribute in saintsFieldInfoName.SaintsFieldWithInfo
+                                         .PlayaAttributes)
                             {
-                                columnToDefaultHide[columnName] = true;
-                                break;
+                                // ReSharper disable once InvertIf
+                                if (playaAttribute is TableHideAttribute)
+                                {
+                                    columnToDefaultHide[columnName] = true;
+                                    break;
+                                }
                             }
                         }
 
@@ -362,9 +427,9 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     .Where(each => each != null)
                     .ToDictionary(each => each.name);
 
-                (PropertyAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(firstProp);
+                (PropertyAttribute[] _, object parentRefreshed) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(firstProp);
 
-                (string error, int index, object value) firstPropValue = Util.GetValue(firstProp, info, parent);
+                (string error, int index, object value) firstPropValue = Util.GetValue(firstProp, info, parentRefreshed);
 
                 IEnumerable<SaintsFieldWithInfo> firstSaintsFieldWithInfos = SaintsEditor
                     .HelperGetSaintsFieldWithInfo(firstSerializedPropertyDict, firstPropValue.value)
@@ -386,13 +451,22 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         }
                     }
 
-                    foreach (IPlayaAttribute playaAttribute in saintsFieldWithInfo.PlayaAttributes)
+                    bool headerHide = HeaderDefaultHide(columnName, valueTableHeaders, headerIsHide);
+                    if (headerHide)
                     {
-                        // ReSharper disable once InvertIf
-                        if (playaAttribute is TableHideAttribute)
+                        columnToDefaultHide[columnName] = true;
+                    }
+                    else
+                    {
+                        // ReSharper disable once LoopCanBeConvertedToQuery
+                        foreach (IPlayaAttribute playaAttribute in saintsFieldWithInfo.PlayaAttributes)
                         {
-                            columnToDefaultHide[columnName] = true;
-                            break;
+                            // ReSharper disable once InvertIf
+                            if (playaAttribute is TableHideAttribute)
+                            {
+                                columnToDefaultHide[columnName] = true;
+                                break;
+                            }
                         }
                     }
 
@@ -446,7 +520,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         SerializedProperty targetProp = (SerializedProperty)multiColumnListView.itemsSource[index];
                         targetProp.isExpanded = true;
 
-                        (string error, int index, object value) targetPropValue = Util.GetValue(targetProp, info, parent);
+                        (string error, int index, object value) targetPropValue = Util.GetValue(targetProp, info, parentRefreshed);
                         Dictionary<string, SerializedProperty> targetSerializedPropertyDict = SerializedUtils.GetPropertyChildren(targetProp)
                             .Where(each => each != null)
                             .ToDictionary(each => each.name);
@@ -562,6 +636,16 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 // #endif
 
             // return root;
+        }
+
+        private static bool HeaderDefaultHide(string value, ICollection<string> valueTableHeaders, bool headerIsHide)
+        {
+            bool inHeader = valueTableHeaders.Contains(value);
+            if (headerIsHide)
+            {
+                return inHeader;
+            }
+            return !inHeader;
         }
 
         private readonly struct SaintsFieldInfoName

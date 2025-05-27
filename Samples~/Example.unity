@@ -3129,6 +3129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 367834535}
   - component: {fileID: 367834536}
+  - component: {fileID: 367834537}
   m_Layer: 0
   m_Name: TableHeadersExample
   m_TagString: Untagged
@@ -3166,8 +3167,53 @@ MonoBehaviour:
   tableStruct:
   - i1: 0
     i2: 0
+    str1: 
+    str2: 
+    str3: 
+    str4: 
+    str5: 
+    str6: 
+  tableHideStruct:
   - i1: 0
     i2: 0
+    str1: 
+    str2: 
+    str3: 
+    str4: 
+    str5: 
+    str6: 
+  showTableHeader: str2
+--- !u!114 &367834537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 367834534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6a8bae4e54bec44e806d9cc7cac7456, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tableStruct:
+  - i1: 0
+    i2: 0
+    str1: 
+    str2: 
+    str3: 
+    str4: 
+    str5: 
+    str6: 
+  tableHideStruct:
+  - i1: 0
+    i2: 0
+    str1: 
+    str2: 
+    str3: 
+    str4: 
+    str5: 
+    str6: 
+  showTableHeader: str1
 --- !u!1 &373466610
 GameObject:
   m_ObjectHideFlags: 0

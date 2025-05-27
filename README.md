@@ -1699,6 +1699,88 @@ public List<MyStruct> myStructs;
 
 [![video](https://github.com/user-attachments/assets/2bf6480a-65f7-4dfc-bf96-bfee9497428e)](https://github.com/user-attachments/assets/66fa7d10-427c-4f8c-b23f-f4bb29faa9f6)
 
+**`TableHeaders`/`TableHeadersHide`**
+
+> [!NOTE]
+> This feature is UI Toolkit only
+
+You can use `TableHeaders` to default show some columns for the table, or `TableHeadersHide` to hide them.
+
+Note: this does not remove the header, but hide it by default. You can still toggle it in header - right click menu.
+
+Thus, it'll only affect the appearance when the table is rendered, and will NOT dynamicly update it, unless you select away and back, as it will trigger the re-paint process.
+
+**Parameters**:
+
+*   `string headers...`: the headers to show/hide.
+
+    If it starts with `$`, a callback/property/field value is used. The target must return a string, or `IEnumerable<string>`
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public struct TableHeaderStruct
+{
+    public int i1;
+
+    [TableColumn("Custom Header")] public int i2;
+    [TableColumn("Custom Header")] [Button] private void D() {}
+
+    public string str1;
+    public string str2;
+
+    [TableColumn("String")] public string str3;
+    [TableColumn("String")] public string str4;
+
+    public string str5;
+    public string str6;
+}
+
+[Table]
+[TableHeaders(  // what should be shown by default
+    nameof(TableHeaderStruct.i1),  // directly name
+    "Custom Header",  // directly custom name
+    "$" + nameof(showTableHeader),  // callback of a single name
+    "$" + nameof(ShowTableHeaders))  // callback of mutiple names
+]
+public TableHeaderStruct[] tableStruct;
+
+[Table]
+[TableHeadersHide(  // what should be hidden by default
+        nameof(TableHeaderStruct.i1),  // directly name
+        "Custom Header",  // directly custom name
+        "$" + nameof(showTableHeader),  // callback of a single name
+        "$" + nameof(ShowTableHeaders))  // callback of mutiple names
+]
+public TableHeaderStruct[] tableHideStruct;
+
+[Space]
+public string showTableHeader = nameof(TableHeaderStruct.str2);
+
+protected virtual IEnumerable<string> ShowTableHeaders() => new[]
+{
+    nameof(TableHeaderStruct.str5),
+    nameof(TableHeaderStruct.str6),
+};
+```
+
+Then you can inherent or change field to make the table display differently
+
+```csharp
+public class TableHeadersExampleInh : TableHeadersExample
+{
+    protected override IEnumerable<string> ShowTableHeaders() => new[]
+    {
+        "String",
+    };
+}
+```
+
+Results:
+
+![image](https://github.com/user-attachments/assets/c33a6875-bebd-4998-bfec-97575ac781ec)
+
 #### `ShowInInspector` ####
 
 > [!IMPORTANT]

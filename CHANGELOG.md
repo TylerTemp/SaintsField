@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.14.0 ##
+
+UI Toolkit: Add `TableHeaders` & `TableHeadersHide` to default show/hide table columns
+
 ## 4.13.5 ##
 
 1.  UI Toolkit: fix unity might give an error when removing an element from list
