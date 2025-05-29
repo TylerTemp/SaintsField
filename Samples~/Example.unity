@@ -24377,7 +24377,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30531ed76be3ae5419c63482b19ff456, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fField: 0.718
+  percentF: 0
+  percentI: 0
+  percentRange: 0
+  stepRange: 0
+  v: 0
 --- !u!1 &1829989614
 GameObject:
   m_ObjectHideFlags: 0
@@ -24794,7 +24798,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbddc8a24203a684ab71ec9f507fe911, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trans: {fileID: 2118824044}
+  trans: {fileID: 1060634461}
 --- !u!4 &1871678696
 Transform:
   m_ObjectHideFlags: 0

@@ -45,11 +45,16 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
 
             button.clicked += () =>
             {
-                _pickingInfo = InitPickingInfo(property, info, parent);
+                _pickingInfo = InitPickingInfo(property, info, StopPicking);
                 SceneView.duringSceneGui += OnSceneGUIUIToolkit;
             };
 
-            button.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
+            button.RegisterCallback<DetachFromPanelEvent>(_ => StopPicking());
+        }
+
+        private void StopPicking()
+        {
+            SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
         }
 
         private void OnSceneGUIUIToolkit(SceneView sceneView)

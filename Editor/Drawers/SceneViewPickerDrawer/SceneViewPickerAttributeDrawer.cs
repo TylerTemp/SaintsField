@@ -59,12 +59,16 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
 
         private struct PickingInfo
         {
-            public SerializedProperty SerializedProperty;
-            public MemberInfo MemberInfo;
-            public object Parent;
+            public readonly SerializedProperty ExpectedProperty;
+            public readonly List<FindTargetRecord> FoundTargets;
+            public readonly Action StopPicking;
 
-            public SerializedProperty ExpectedProperty;
-            public List<FindTargetRecord> FoundTargets;
+            public PickingInfo(SerializedProperty expectedProperty, List<FindTargetRecord> foundTargets, Action stopPicking)
+            {
+                ExpectedProperty = expectedProperty;
+                FoundTargets = foundTargets;
+                StopPicking = stopPicking;
+            }
         }
 
         private PickingInfo _pickingInfo;
@@ -133,17 +137,52 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 EditorGUI.LabelField(nameRect, labelContent, GUI.skin.label);
             }
 
-            // using (new EditorGUIBackgroundColor(new Color(0, 0, 0, 1.0f)))
-            // {
-            //     EditorGUI.LabelField(nameRect, labelContent, PickingTextStyle);
-            // }
+            if (Event.current.type != EventType.MouseDown || Event.current.alt ||
+                Event.current.control)
+            {
+                return;
+            }
 
+            if (Event.current.button == 0)
+            {
+                pickingInfo.ExpectedProperty.objectReferenceValue = firstPicking.FindTargetInfo.Target;
+                pickingInfo.ExpectedProperty.serializedObject.ApplyModifiedProperties();
+                pickingInfo.StopPicking.Invoke();
+                sceneView.Repaint();
+            }
+            else if (Event.current.button == 1)
+            {
+                GenericMenu menu = new GenericMenu
+                {
+                    allowDuplicateNames = true,
+                };
 
-            // objects.AddRange(rootGameObjects);
-            // for (int i = 0; i < rootGameObjects.Length; i++)
-            //     objects.AddRange(rootGameObjects[i].GetComponentsInChildren(type));
+                for (int index = 1; index < pickingInfo.FoundTargets.Count; index++)
+                {
+                    FindTargetRecord checkTarget = pickingInfo.FoundTargets[index];
+                    if (!checkTarget.InView)
+                    {
+                        continue;
+                    }
+                    // Declare this so it is referenced correctly in the anonymous method passed to the menu.
+                    // Candidate candidate = nearbyCandidates[i];
 
-            // Handles.Label(labelInfo.Center, labelInfo.Content, labelInfo.GUIStyle);
+                    menu.AddItem(new GUIContent(checkTarget.FindTargetInfo.Path), false, () =>
+                    {
+                        pickingInfo.ExpectedProperty.objectReferenceValue = checkTarget.FindTargetInfo.Target;
+                        pickingInfo.ExpectedProperty.serializedObject.ApplyModifiedProperties();
+                        pickingInfo.StopPicking.Invoke();
+                        sceneView.Repaint();
+                    });
+                }
+
+                menu.ShowAsContext();
+            }
+            else
+            {
+                pickingInfo.StopPicking.Invoke();
+                sceneView.Repaint();
+            }
         }
 
         private static Scene GetScene(Object target)
@@ -159,7 +198,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
             }
         }
 
-        private static PickingInfo InitPickingInfo(SerializedProperty property, FieldInfo info, object parent)
+        private static PickingInfo InitPickingInfo(SerializedProperty property, FieldInfo info, Action stopPicking)
         {
             Scene currentScene = GetScene(property.serializedObject.targetObject);
             Debug.Assert(currentScene.IsValid(), property.propertyPath);
@@ -220,15 +259,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 foundTargets = new List<FindTargetRecord>();
             }
 
-            return new PickingInfo
-            {
-                SerializedProperty = property,
-                MemberInfo = info,
-                Parent = parent,
-                ExpectedProperty = expectProperty,
-
-                FoundTargets = foundTargets,
-            };
+            return new PickingInfo(expectProperty, foundTargets, stopPicking);
         }
 
         private static IEnumerable<FindTargetInfo> FindComponentInRoots(GameObject[] rootGameObjects, Type expectFieldType, Type expectInterfaceType)
