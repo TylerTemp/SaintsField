@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 return SplitEachTarget(r, _interfaceType);
             }
 
-            private IEnumerable<ItemInfo> SplitEachTarget(IEnumerable<ItemInfo> itemInfos, Type interfaceType)
+            private static IEnumerable<ItemInfo> SplitEachTarget(IEnumerable<ItemInfo> itemInfos, Type interfaceType)
             {
                 foreach (ItemInfo itemInfo in itemInfos)
                 {
@@ -133,7 +133,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             private bool FetchFilter(ItemInfo itemInfo)  // gameObject, Sprite, Texture2D, ...
             {
-                if (itemInfo.Object == null)
+                if (!itemInfo.Object)
                 {
                     return true;
                 }

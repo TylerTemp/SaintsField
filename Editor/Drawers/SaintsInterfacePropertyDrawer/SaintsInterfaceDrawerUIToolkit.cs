@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
         }
 
-        private static (Type valueType, Type interfaceType) GetTypes(SerializedProperty property, FieldInfo info)
+        public static (Type valueType, Type interfaceType) GetTypes(SerializedProperty property, FieldInfo info)
         {
             Type interfaceContainer = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
                 ? ReflectUtils.GetElementType(info.FieldType)
@@ -45,7 +45,8 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 }
             }
 
-            throw new ArgumentException($"Failed to obtain generic arguments from {interfaceContainer}");
+            // throw new ArgumentException($"Failed to obtain generic arguments from {interfaceContainer}");
+            return (null, null);
         }
 
         private static IEnumerable<Type> GetGenBaseTypes(Type type)
@@ -155,6 +156,8 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             saintsInterfaceField.SetValueWithoutNotify(valueProp.objectReferenceValue);
 
             (Type valueType, Type interfaceType) = GetTypes(property, fieldInfo);
+            Debug.Assert(valueType != null);
+            Debug.Assert(interfaceType != null);
 
             selectButton.clicked += () =>
             {

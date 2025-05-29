@@ -448,14 +448,8 @@ namespace SaintsField.Editor.Utils
             return null;
         }
 
-        public static Type GetIWrapPropType(Type wrapPropType)
+        public static Type GetIWrapPropType(Type wrapPropType, string prop)
         {
-            string prop = GetIWrapPropName(wrapPropType);
-            // Debug.Log($"prop:{prop}");
-            if (string.IsNullOrEmpty(prop))
-            {
-                return null;
-            }
             PropertyInfo wrapPropertyInfo = wrapPropType.GetProperty(prop, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             if (wrapPropertyInfo != null)
             {
@@ -464,6 +458,18 @@ namespace SaintsField.Editor.Utils
             FieldInfo wrapFieldInfo = wrapPropType.GetField(prop, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             Debug.Assert(wrapFieldInfo != null);
             return wrapFieldInfo.FieldType;
+        }
+
+        public static Type GetIWrapPropType(Type wrapPropType)
+        {
+            string prop = GetIWrapPropName(wrapPropType);
+            // Debug.Log($"prop:{prop}");
+            if (string.IsNullOrEmpty(prop))
+            {
+                return null;
+            }
+
+            return GetIWrapPropType(wrapPropType, prop);
         }
 
         public static Type GetDictionaryType(Type type)
