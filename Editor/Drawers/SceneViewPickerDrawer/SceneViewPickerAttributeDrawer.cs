@@ -132,9 +132,13 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 // labelSize += Vector2.one * 4;
                 // Rect nameRect = new Rect(
                 //     Event.current.mousePosition + Vector2.down * 10 - labelSize * 0.5f, labelSize);
-                Rect nameRect = new Rect(mousePosGui.x - labelSize.x / 2, mousePosGui.y + labelSize.y, labelSize.x, labelSize.y);
+                Rect nameRect = new Rect(
+                    mousePosGui.x - labelSize.x / 2,
+                    mousePosGui.y + labelSize.y,
+                    labelSize.x + 15,
+                    labelSize.y + 2);
 
-                EditorGUI.LabelField(nameRect, labelContent, GUI.skin.label);
+                EditorGUI.DropShadowLabel(nameRect, labelContent);
             }
 
             if (Event.current.type != EventType.MouseDown || Event.current.alt ||
@@ -149,6 +153,8 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 pickingInfo.ExpectedProperty.serializedObject.ApplyModifiedProperties();
                 pickingInfo.StopPicking.Invoke();
                 sceneView.Repaint();
+
+                // EditorApplication.delayCall += () => Selection.activeObject = pickingInfo.ExpectedProperty.serializedObject.targetObject;
             }
             else if (Event.current.button == 1)
             {

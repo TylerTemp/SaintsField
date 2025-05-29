@@ -26,14 +26,6 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            // _pickingInfo = new PickingInfo
-            // {
-            //     SerializedProperty = property,
-            //     MemberInfo = info,
-            //     Parent = parent,
-            //     Error = "",
-            // };
-
             Button button = container.Q<Button>(NameButton(property));
 
             Scene currentScene = GetScene(property.serializedObject.targetObject);
