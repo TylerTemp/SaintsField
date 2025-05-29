@@ -15,7 +15,7 @@ using Object = UnityEngine.Object;
 namespace SaintsField.Editor.Drawers.InputAxisDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(InputAxisAttribute), true)]
     public partial class InputAxisAttributeDrawer: SaintsPropertyDrawer

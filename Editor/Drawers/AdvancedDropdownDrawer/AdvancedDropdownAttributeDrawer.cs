@@ -6,12 +6,12 @@ using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
-
-
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
+#endif
     [CustomPropertyDrawer(typeof(AdvancedDropdownAttribute), true)]
     public partial class AdvancedDropdownAttributeDrawer: SaintsPropertyDrawer
     {

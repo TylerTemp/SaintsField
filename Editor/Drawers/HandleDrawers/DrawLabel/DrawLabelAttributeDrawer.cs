@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(DrawLabelAttribute), true)]
     public partial class DrawLabelAttributeDrawer: SaintsPropertyDrawer

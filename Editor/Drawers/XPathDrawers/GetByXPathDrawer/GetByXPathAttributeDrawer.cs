@@ -7,14 +7,13 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(GetByXPathAttribute), true)]
     [CustomPropertyDrawer(typeof(GetComponentAttribute), true)]

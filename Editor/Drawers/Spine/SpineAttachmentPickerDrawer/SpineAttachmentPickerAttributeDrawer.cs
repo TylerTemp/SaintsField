@@ -13,7 +13,7 @@ using UnityEditor;
 namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SpineAttachmentPickerAttribute), true)]
     public partial class SpineAttachmentPickerAttributeDrawer: SaintsPropertyDrawer

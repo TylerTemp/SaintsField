@@ -24377,11 +24377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30531ed76be3ae5419c63482b19ff456, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  percentF: -0.96
-  percentI: -26
-  percentRange: 0
-  stepRange: 0.85
-  v: 0.233333
+  fField: 0.718
 --- !u!1 &1829989614
 GameObject:
   m_ObjectHideFlags: 0
@@ -24768,6 +24764,51 @@ Transform:
   m_Children:
   - {fileID: 2064374387}
   m_Father: {fileID: 1352272463}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1871678694
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1871678696}
+  - component: {fileID: 1871678695}
+  m_Layer: 0
+  m_Name: SceneViewPickerExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1871678695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1871678694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbddc8a24203a684ab71ec9f507fe911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trans: {fileID: 2118824044}
+--- !u!4 &1871678696
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1871678694}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1873355718
 GameObject:
@@ -32949,3 +32990,4 @@ SceneRoots:
   - {fileID: 2102148597}
   - {fileID: 272774834}
   - {fileID: 2138214539}
+  - {fileID: 1871678696}

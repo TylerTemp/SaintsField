@@ -16,7 +16,7 @@ using Button = UnityEngine.UI.Button;
 namespace SaintsField.Editor.Drawers
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(ColorToggleAttribute), true)]
     public class ColorToggleAttributeDrawer: SaintsPropertyDrawer

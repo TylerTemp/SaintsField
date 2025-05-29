@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation
 
 
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(NavMeshAreaAttribute), true)]
     public class NavMeshAreaAttributeDrawer: SaintsPropertyDrawer

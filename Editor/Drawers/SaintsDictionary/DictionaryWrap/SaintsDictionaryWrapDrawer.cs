@@ -1,6 +1,5 @@
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -8,7 +7,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.ValuePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SaintsDictionaryBase<,>.Wrap<>), true)]
     public partial class SaintsDictionaryWrapDrawer: SaintsPropertyDrawer

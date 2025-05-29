@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
-using SaintsField.Interfaces;
+﻿using SaintsField.Editor.Core;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.RateDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(RateAttribute), true)]
     public partial class RateAttributeDrawer: SaintsPropertyDrawer

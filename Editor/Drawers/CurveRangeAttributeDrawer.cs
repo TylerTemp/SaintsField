@@ -14,7 +14,7 @@ using UnityEngine.UIElements;
 namespace SaintsField.Editor.Drawers
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(CurveRangeAttribute), true)]
     public class CurveRangeAttributeDrawer: SaintsPropertyDrawer

@@ -3,15 +3,13 @@ using System.Reflection;
 using SaintsField.Addressable;
 using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace SaintsField.Editor.Drawers.Addressable.AddressableSubAssetRequiredDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(AddressableSubAssetRequiredAttribute))]
     public partial class AddressableSubAssetRequiredAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer

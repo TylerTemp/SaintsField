@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(DrawWireDiscAttribute), true)]
     public partial class DrawWireDiscAttributeDrawer: SaintsPropertyDrawer

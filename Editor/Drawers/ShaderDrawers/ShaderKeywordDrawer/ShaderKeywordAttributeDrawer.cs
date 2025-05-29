@@ -13,7 +13,7 @@ using UnityEngine.Rendering;
 namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(ShaderKeywordAttribute), true)]
     public partial class ShaderKeywordAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer

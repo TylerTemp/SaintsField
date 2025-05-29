@@ -10,7 +10,7 @@ using UnityEditor.UIElements;
 namespace SaintsField.Editor.Drawers.TypeDrawers
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.ValuePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SaintsList<>), true)]
     [CustomPropertyDrawer(typeof(SaintsArray<>), true)]

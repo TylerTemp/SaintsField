@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.LayerDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(LayerAttribute), true)]
     public partial class LayerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer

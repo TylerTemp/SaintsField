@@ -9,7 +9,7 @@ using UnityEditor;
 namespace SaintsField.Editor.Drawers.ReferencePicker
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(ReferencePickerAttribute), true)]
     public partial class ReferencePickerAttributeDrawer : SaintsPropertyDrawer

@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(PositionHandleAttribute), true)]
     public partial class PositionHandleAttributeDrawer: SaintsPropertyDrawer

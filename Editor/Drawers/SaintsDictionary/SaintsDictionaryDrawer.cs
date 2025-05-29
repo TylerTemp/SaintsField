@@ -10,7 +10,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.SaintsDictionary
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.ValuePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SaintsDictionaryBase<,>), true)]
     [CustomPropertyDrawer(typeof(SaintsDictionaryAttribute), true)]

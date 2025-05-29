@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.HandleDrawers
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(ArrowHandleCapAttribute), true)]
     public class ArrowHandleCapAttributeDrawer: OneDirectionHandleBase

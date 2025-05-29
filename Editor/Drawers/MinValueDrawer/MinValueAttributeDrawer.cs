@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.MinValueDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(MinValueAttribute), true)]
     public partial class MinValueAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer

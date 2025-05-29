@@ -14,7 +14,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SpineSlotPickerAttribute), true)]
     public partial class SpineSlotPickerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer

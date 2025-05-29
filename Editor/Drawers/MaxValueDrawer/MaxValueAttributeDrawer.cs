@@ -8,7 +8,7 @@ using UnityEditor;
 namespace SaintsField.Editor.Drawers.MaxValueDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(MaxValueAttribute), true)]
     public partial class MaxValueAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer

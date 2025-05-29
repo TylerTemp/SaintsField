@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
 {
 
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(GetWwiseAttribute), true)]
     public partial class GetWwiseAttributeDrawer: GetByXPathAttributeDrawer
