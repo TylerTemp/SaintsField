@@ -4784,6 +4784,11 @@ Once clicked the picking icon, use left mouse to choose a target. Once a popup i
 
 If you just want the closest one, just click, then click again (because the closest one is always at the position of your cursor)
 
+Usage:
+
+*   Left Mouse: pick; when popup is displayed, click away to close the popup
+*   Middle Mouse: cancel
+
 ```csharp
 using SaintsField;
 
