@@ -6,8 +6,10 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.HandleDrawers;
 using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
@@ -19,6 +21,21 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
     [CustomPropertyDrawer(typeof(SceneViewPickerAttribute), true)]
     public partial class SceneViewPickerAttributeDrawer: SaintsPropertyDrawer
     {
+        private static readonly UnityEvent StopAllPicking = new UnityEvent();
+
+        private static GUIStyle _leftButtonStyleCache;
+
+        private static GUIStyle LeftButtonStyle => _leftButtonStyleCache ??= new GUIStyle(GUI.skin.button)
+        {
+            border = new RectOffset(0, 0, 0, 0),
+            alignment = TextAnchor.MiddleLeft,
+            // padding = new RectOffset(8, 8, 4, 4),
+            // normal = { background = null },
+            // hover = { background = null },
+            // active = { background = null },
+            // focused = { background = null },
+        };
+
         private readonly struct FindTargetInfo
         {
             public readonly Object Target;
@@ -53,18 +70,27 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 {
                     return 1;
                 }
-                return DistanceSqrt.CompareTo(other.DistanceSqrt);
+                int distanceSqrt = DistanceSqrt.CompareTo(other.DistanceSqrt);
+                // ReSharper disable once ConvertIfStatementToReturnStatement
+                if (distanceSqrt != 0)
+                {
+                    return distanceSqrt;
+                }
+
+                return string.Compare(FindTargetInfo.Path, other.FindTargetInfo.Path, StringComparison.Ordinal);
             }
         }
 
         private struct PickingInfo
         {
             public readonly SerializedProperty ExpectedProperty;
+            public readonly string ExpectedPropertyDisplayName;
             public readonly List<FindTargetRecord> FoundTargets;
             public readonly Action StopPicking;
 
-            public PickingInfo(SerializedProperty expectedProperty, List<FindTargetRecord> foundTargets, Action stopPicking)
+            public PickingInfo(string displayName, SerializedProperty expectedProperty, List<FindTargetRecord> foundTargets, Action stopPicking)
             {
+                ExpectedPropertyDisplayName = displayName;
                 ExpectedProperty = expectedProperty;
                 FoundTargets = foundTargets;
                 StopPicking = stopPicking;
@@ -73,11 +99,55 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
 
         private PickingInfo _pickingInfo;
 
+        private static bool _showSelectingPanel;
+        // private static Vector2 _selectingPanelPos;
+        private static Vector2 _selectingPanelMouseFrozenPos;
+        private static string _selectingPanelSearching = "";
+        private static Vector2 _scrollPos;
+        private static float _selectingPanelWidth = -1f;
+
         private static void OnSceneGUIInternal(SceneView sceneView, PickingInfo pickingInfo)
         {
+            if (!SerializedUtils.IsOk(pickingInfo.ExpectedProperty))
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning("Property disposed");
+#endif
+                pickingInfo.StopPicking();
+                return;
+            }
 
             if (pickingInfo.FoundTargets.Count == 0)
             {
+                using (new HandlesBeginGUIScoop())
+                {
+                    const string label = "No Results";
+                    GUIContent labelContent = new GUIContent(label);
+                    GUIStyle guiStyle = new GUIStyle("PreOverlayLabel")
+                    {
+                        normal =
+                        {
+                            textColor = Color.red,
+                        },
+                    };
+                    Vector2 labelSize = guiStyle.CalcSize(labelContent);
+                    Rect nameRect = new Rect(
+                        Event.current.mousePosition.x - labelSize.x / 2,
+                        Event.current.mousePosition.y + labelSize.y,
+                        labelSize.x + 15,
+                        labelSize.y + 2);
+
+                    EditorGUI.DropShadowLabel(nameRect, labelContent, guiStyle);
+                }
+
+                if (Event.current.type == EventType.MouseDown || Event.current.type == EventType.MouseUp)
+                {
+                    pickingInfo.StopPicking();
+                    Event.current.Use();
+                }
+
+                sceneView.Repaint();
+
                 return;
             }
 
@@ -87,32 +157,43 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 sceneView.Repaint();
             }
 
-            Vector2 mousePosGui = Event.current.mousePosition;
-
-            foreach (FindTargetRecord findTargetRecord in pickingInfo.FoundTargets)
+            if(!_showSelectingPanel)
             {
-                Vector3 objScreenPos = sceneView.camera.WorldToScreenPoint(findTargetRecord.FindTargetInfo.Transform.position);
-                bool inView = objScreenPos.z >= 0;
-                findTargetRecord.InView = inView;
-                if (inView)
+                _selectingPanelMouseFrozenPos = Event.current.mousePosition;
+                foreach (FindTargetRecord findTargetRecord in pickingInfo.FoundTargets)
                 {
-                    findTargetRecord.DistanceSqrt = (objScreenPos - (Vector3)mousePosGui).sqrMagnitude;
+                    Vector3 objScreenPos = sceneView.camera.WorldToScreenPoint(findTargetRecord.FindTargetInfo.Transform.position);
+                    bool inView = objScreenPos.z >= 0;
+                    findTargetRecord.InView = inView;
+                    if (inView)
+                    {
+                        findTargetRecord.DistanceSqrt = (objScreenPos - (Vector3)_selectingPanelMouseFrozenPos).sqrMagnitude;
+                    }
                 }
+                pickingInfo.FoundTargets.Sort();
             }
-            pickingInfo.FoundTargets.Sort();
+
             FindTargetRecord firstPicking = pickingInfo.FoundTargets[0];
 
-            Vector3 mouseWorld = HandleUtility.GUIPointToWorldRay(mousePosGui)
+            Vector3 mouseWorld = HandleUtility.GUIPointToWorldRay(_selectingPanelMouseFrozenPos)
                 .GetPoint(10);
 
-            using (new HandleColorScoop(new Color(1, 1, 1, 0.75f)))
+            const float alpha = 0.75f;
+            Color useColor = Util.GetIsEqual(firstPicking.FindTargetInfo.Target,
+                pickingInfo.ExpectedProperty.objectReferenceValue)
+                ? Color.gray
+                : Color.white;
+            useColor.a = alpha;
+
+            using (new HandleColorScoop(useColor))
             {
                 Handles.DrawDottedLine(firstPicking.FindTargetInfo.Transform.position, mouseWorld, 2.0f);
             }
 
+            int foundCount = 1;
+
             using(new HandlesBeginGUIScoop())
             {
-                int foundCount = 1;
                 for (int index = 1; index < pickingInfo.FoundTargets.Count; index++)
                 {
                     FindTargetRecord checkTarget = pickingInfo.FoundTargets[index];
@@ -128,20 +209,154 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                     ? $"{firstPicking.FindTargetInfo.DisplayName} [+{foundCount - 1}]"
                     : firstPicking.FindTargetInfo.DisplayName;
                 GUIContent labelContent = new GUIContent(label);
-                Vector2 labelSize = GUI.skin.label.CalcSize(labelContent);
+                useColor.a = 1f;
+                GUIStyle guiStyle = new GUIStyle("PreOverlayLabel")
+                {
+                    normal =
+                    {
+                        textColor = useColor,
+                    },
+                };
+
+                Vector2 labelSize = guiStyle.CalcSize(labelContent);
                 // labelSize += Vector2.one * 4;
                 // Rect nameRect = new Rect(
                 //     Event.current.mousePosition + Vector2.down * 10 - labelSize * 0.5f, labelSize);
                 Rect nameRect = new Rect(
-                    mousePosGui.x - labelSize.x / 2,
-                    mousePosGui.y + labelSize.y,
+                    _selectingPanelMouseFrozenPos.x - labelSize.x / 2,
+                    _selectingPanelMouseFrozenPos.y + labelSize.y,
                     labelSize.x + 15,
                     labelSize.y + 2);
 
-                EditorGUI.DropShadowLabel(nameRect, labelContent);
+                EditorGUI.DropShadowLabel(nameRect, labelContent, guiStyle);
+
+                if (_showSelectingPanel)
+                {
+                    float calcWidth = 100;
+                    float height = EditorGUIUtility.singleLineHeight + 4;
+                    List<FindTargetRecord> showTargets = new List<FindTargetRecord>();
+                    foreach (FindTargetRecord findTargetRecord in pickingInfo.FoundTargets)
+                    {
+                        if (!findTargetRecord.InView)
+                        {
+                            break;
+                        }
+
+                        if(string.IsNullOrEmpty(_selectingPanelSearching) || _selectingPanelSearching.Split(' ').All(searchSeg => findTargetRecord.FindTargetInfo.Path.Contains(searchSeg, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            showTargets.Add(findTargetRecord);
+
+                            string name = findTargetRecord.FindTargetInfo.Path;
+                            if(_selectingPanelWidth < 0)
+                            {
+                                float thisWidth = GUI.skin.button.CalcSize(new GUIContent(name)).x;
+                                if (thisWidth > calcWidth)
+                                {
+                                    calcWidth = Mathf.Min(thisWidth, 400);
+                                }
+                            }
+
+                            height += EditorGUIUtility.singleLineHeight;
+                        }
+                    }
+
+                    if (_selectingPanelWidth < 0)
+                    {
+                        _selectingPanelWidth = calcWidth;
+                    }
+
+                    float useX = _selectingPanelMouseFrozenPos.x - _selectingPanelWidth / 2;
+                    // Debug.Log(useX);
+                    if (useX + _selectingPanelWidth > Screen.width)
+                    {
+                        useX = Screen.width - _selectingPanelWidth;
+                    }
+                    else if (useX < 0)
+                    {
+                        useX = 0;
+                    }
+
+                    float useY = _selectingPanelMouseFrozenPos.y -
+                                 (EditorGUIUtility.singleLineHeight + 4 + EditorGUIUtility.singleLineHeight / 2);
+                    float viewHeight = Mathf.Min(600, height, Screen.height - useY - 100);
+                    if (viewHeight < 100)
+                    {
+                        viewHeight = 100;
+                    }
+
+                    GUI.Window("SceneViewPickerAttributeDrawer".GetHashCode(), new Rect(useX, useY, _selectingPanelWidth, viewHeight), _ =>
+                    {
+                        Rect search = new Rect(2, 2, _selectingPanelWidth - 4, EditorGUIUtility.singleLineHeight);
+                        GUI.SetNextControlName("SceneViewPickerAttributeDrawerSearchField");
+                        _selectingPanelSearching = GUI.TextField(search, _selectingPanelSearching);
+                        // Content of window here
+                        // GUILayout.Button("A Button");
+
+                        using (GUIBeginScrollViewScoop scrollView = new GUIBeginScrollViewScoop(
+                                   new Rect(0, EditorGUIUtility.singleLineHeight + 4, _selectingPanelWidth, viewHeight - (EditorGUIUtility.singleLineHeight + 4)),
+                                   _scrollPos,
+                                   new Rect(0, EditorGUIUtility.singleLineHeight + 4, _selectingPanelWidth - 15, height - (EditorGUIUtility.singleLineHeight + 4)))
+                               )
+                        {
+                            _scrollPos = scrollView.ScrollPosition;
+                            int index = 0;
+                            foreach (FindTargetRecord findTargetRecord in showTargets)
+                            {
+                                Rect buttonRect = new Rect(0,
+                                    EditorGUIUtility.singleLineHeight + 4 + EditorGUIUtility.singleLineHeight * index,
+                                    _selectingPanelWidth, EditorGUIUtility.singleLineHeight);
+
+                                if (viewHeight < height)
+                                {
+                                    buttonRect.width -= 15;
+                                }
+
+                                bool isSelected = Util.GetIsEqual(findTargetRecord.FindTargetInfo.Target,
+                                    pickingInfo.ExpectedProperty.objectReferenceValue);
+
+                                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                                {
+                                    GUI.Toggle(buttonRect, isSelected, findTargetRecord.FindTargetInfo.Path,
+                                        LeftButtonStyle);
+                                    if (changed.changed)
+                                    {
+                                        if (pickingInfo.ExpectedProperty.objectReferenceValue !=
+                                            findTargetRecord.FindTargetInfo.Target)
+                                        {
+                                            pickingInfo.ExpectedProperty.objectReferenceValue =
+                                                findTargetRecord.FindTargetInfo.Target;
+                                            pickingInfo.ExpectedProperty.serializedObject.ApplyModifiedProperties();
+                                            EnqueueSceneViewNotification(
+                                                $"Sign {pickingInfo.ExpectedProperty.propertyPath} to {findTargetRecord.FindTargetInfo.Target.name}");
+                                        }
+
+                                        pickingInfo.StopPicking.Invoke();
+                                        sceneView.Repaint();
+                                        return;
+                                    }
+                                }
+
+                                index++;
+                            }
+                        }
+
+                        if (Event.current.type == EventType.Repaint) {
+                            GUI.FocusControl("SceneViewPickerAttributeDrawerSearchField");
+                            // shouldFocus = false;
+                        }
+                    }, "Title");
+
+                }
             }
 
-            if (Event.current.type != EventType.MouseDown || Event.current.alt ||
+            if (Event.current.type == EventType.KeyUp && Event.current.keyCode == KeyCode.Escape)
+            {
+                pickingInfo.StopPicking.Invoke();
+                sceneView.Repaint();
+                Event.current.Use();
+            }
+
+            if (Event.current.type != EventType.MouseUp || Event.current.alt ||
                 Event.current.control)
             {
                 return;
@@ -149,45 +364,41 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
 
             if (Event.current.button == 0)
             {
-                pickingInfo.ExpectedProperty.objectReferenceValue = firstPicking.FindTargetInfo.Target;
-                pickingInfo.ExpectedProperty.serializedObject.ApplyModifiedProperties();
-                pickingInfo.StopPicking.Invoke();
-                sceneView.Repaint();
+                if (foundCount > 1)
+                {
+                    if (!_showSelectingPanel)
+                    {
+                        _selectingPanelMouseFrozenPos = Event.current.mousePosition;
+                        _selectingPanelWidth = -1f;
+                    }
+                    _showSelectingPanel = !_showSelectingPanel;
+                }
+                else
+                {
+                    _showSelectingPanel = false;
+                    if (pickingInfo.ExpectedProperty.objectReferenceValue != firstPicking.FindTargetInfo.Target)
+                    {
+                        pickingInfo.ExpectedProperty.objectReferenceValue = firstPicking.FindTargetInfo.Target;
+                        pickingInfo.ExpectedProperty.serializedObject.ApplyModifiedProperties();
+                        EnqueueSceneViewNotification(
+                            $"Sign {firstPicking.FindTargetInfo.DisplayName} to {pickingInfo.ExpectedPropertyDisplayName}");
+                    }
 
-                // EditorApplication.delayCall += () => Selection.activeObject = pickingInfo.ExpectedProperty.serializedObject.targetObject;
+                    pickingInfo.StopPicking.Invoke();
+                    sceneView.Repaint();
+                }
+                Event.current.Use();
             }
             else if (Event.current.button == 1)
             {
-                GenericMenu menu = new GenericMenu
-                {
-                    allowDuplicateNames = true,
-                };
-
-                for (int index = 1; index < pickingInfo.FoundTargets.Count; index++)
-                {
-                    FindTargetRecord checkTarget = pickingInfo.FoundTargets[index];
-                    if (!checkTarget.InView)
-                    {
-                        continue;
-                    }
-                    // Declare this so it is referenced correctly in the anonymous method passed to the menu.
-                    // Candidate candidate = nearbyCandidates[i];
-
-                    menu.AddItem(new GUIContent(checkTarget.FindTargetInfo.Path), false, () =>
-                    {
-                        pickingInfo.ExpectedProperty.objectReferenceValue = checkTarget.FindTargetInfo.Target;
-                        pickingInfo.ExpectedProperty.serializedObject.ApplyModifiedProperties();
-                        pickingInfo.StopPicking.Invoke();
-                        sceneView.Repaint();
-                    });
-                }
-
-                menu.ShowAsContext();
+                _showSelectingPanel = false;
             }
-            else
+            else if (Event.current.button == 2)
             {
+                _showSelectingPanel = false;
                 pickingInfo.StopPicking.Invoke();
                 sceneView.Repaint();
+                Event.current.Use();
             }
         }
 
@@ -240,14 +451,31 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
 
             List<FindTargetRecord> foundTargets;
 
-            if (typeof(Component).IsAssignableFrom(expectFieldType))
+            bool expectUObjType = expectFieldType == typeof(Object);
+
+            if (typeof(Component).IsAssignableFrom(expectFieldType) || expectUObjType)
             {
-                foundTargets = FindComponentInRoots(rootGameObjects, expectFieldType, expectInterfaceType)
+                Type compType = expectUObjType
+                    ? typeof(Component)
+                    : expectFieldType;
+
+                // Debug.Log($"get component {compType}");
+
+                foundTargets = FindComponentInRoots(rootGameObjects, compType, expectInterfaceType)
                     .Select(each => new FindTargetRecord
                     {
                         FindTargetInfo = each,
                     })
                     .ToList();
+
+                if (expectUObjType && expectInterfaceType == null)
+                {
+                    foundTargets.AddRange(FindAllGameObject(rootGameObjects)
+                        .Select(each => new FindTargetRecord
+                        {
+                            FindTargetInfo = each,
+                        }));
+                }
             }
             else if(expectFieldType == typeof(GameObject))
             {
@@ -265,26 +493,28 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 foundTargets = new List<FindTargetRecord>();
             }
 
-            return new PickingInfo(expectProperty, foundTargets, stopPicking);
+            return new PickingInfo(property.displayName, expectProperty, foundTargets, stopPicking);
         }
 
         private static IEnumerable<FindTargetInfo> FindComponentInRoots(GameObject[] rootGameObjects, Type expectFieldType, Type expectInterfaceType)
         {
+            // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (GameObject rootGameObject in rootGameObjects)
             {
-                Component[] components = rootGameObject.GetComponentsInChildren(expectFieldType, true);
-                if (components.Length > 0)
+                foreach (Component component in rootGameObject.GetComponentsInChildren(expectFieldType, true))
                 {
-                    foreach (Component component in components)
+                    if (!component)
                     {
-                        if (expectInterfaceType != null && !expectInterfaceType.IsAssignableFrom(component.GetType()))
-                        {
-                            continue;
-                        }
-
-                        yield return new FindTargetInfo(component, component.name, component.transform,
-                            GetHierarchyPath(component.gameObject));
+                        continue;
                     }
+
+                    if (expectInterfaceType != null && !expectInterfaceType.IsAssignableFrom(component.GetType()))
+                    {
+                        continue;
+                    }
+
+                    yield return new FindTargetInfo(component, component.name, component.transform,
+                        GetHierarchyPath(component.gameObject));
                 }
             }
         }
@@ -303,14 +533,14 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 current = current.parent;
             }
             pathParts.Reverse();
-            return string.Join("\\", pathParts);
+            return string.Join("/", pathParts);
         }
 
         private static IEnumerable<FindTargetInfo> FindAllGameObject(IEnumerable<GameObject> rootGameObjects, string prefix = "")
         {
             foreach (GameObject rootGameObject in rootGameObjects)
             {
-                string thisName = prefix == "" ? rootGameObject.name : $"{prefix}\\{rootGameObject.name}";
+                string thisName = prefix == "" ? rootGameObject.name : $"{prefix}/{rootGameObject.name}";
 
                 yield return new FindTargetInfo(rootGameObject, rootGameObject.name, rootGameObject.transform, thisName);
 

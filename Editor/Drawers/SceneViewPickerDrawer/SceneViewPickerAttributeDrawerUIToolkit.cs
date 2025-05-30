@@ -20,8 +20,19 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
             {
                 name = NameButton(property),
                 tooltip = "Pick an object in the scene view",
+                style =
+                {
+                    width = SingleLineHeight,
+                    height = SingleLineHeight,
+                    paddingLeft = 0,
+                    paddingRight = 0,
+                    paddingTop = 0,
+                    paddingBottom = 0,
+                },
             };
         }
+
+        private bool _curPicking;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -37,16 +48,39 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
 
             button.clicked += () =>
             {
-                _pickingInfo = InitPickingInfo(property, info, StopPicking);
-                SceneView.duringSceneGui += OnSceneGUIUIToolkit;
+                StopAllPicking.Invoke();
+
+                if(!_curPicking)
+                {
+                    _pickingInfo = InitPickingInfo(property, info, StopPick);
+                    button.iconImage =
+                        EditorGUIUtility.IconContent("d_scenepicking_pickable-mixed_hover").image as Texture2D;
+                    SceneView.duringSceneGui += OnSceneGUIUIToolkit;
+                    _curPicking = true;
+                }
+                else
+                {
+                    SceneView.RepaintAll();
+                    _curPicking = false;
+                }
             };
 
-            button.RegisterCallback<DetachFromPanelEvent>(_ => StopPicking());
-        }
+            StopAllPicking.AddListener(StopPick);
 
-        private void StopPicking()
-        {
-            SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+            button.RegisterCallback<DetachFromPanelEvent>(_ =>
+            {
+                StopAllPicking.RemoveListener(StopPick);
+            });
+            return;
+
+            void StopPick()
+            {
+                SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+                _curPicking = false;
+                _showSelectingPanel = false;
+                _selectingPanelSearching = "";
+                button.iconImage = EditorGUIUtility.IconContent("d_scenepicking_pickable").image as Texture2D;
+            }
         }
 
         private void OnSceneGUIUIToolkit(SceneView sceneView)
