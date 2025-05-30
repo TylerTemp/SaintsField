@@ -30,18 +30,27 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new Button(EditorGUIUtility.IconContent("d_scenepicking_pickable").image as Texture2D)
+            return new Button
             {
                 name = NameButton(property),
                 tooltip = "Pick an object in the scene view",
                 style =
                 {
+                    backgroundImage = EditorGUIUtility.IconContent("d_scenepicking_pickable").image as Texture2D,
                     width = SingleLineHeight,
                     height = SingleLineHeight,
                     paddingLeft = 0,
                     paddingRight = 0,
                     paddingTop = 0,
                     paddingBottom = 0,
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(14, 14),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
                 },
             };
         }
@@ -68,7 +77,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 if(!_curPicking)
                 {
                     _pickingInfo = InitPickingInfo(property, info, StopPick);
-                    button.iconImage =
+                    button.style.backgroundImage =
                         EditorGUIUtility.IconContent("d_scenepicking_pickable-mixed_hover").image as Texture2D;
                     SceneView.duringSceneGui += OnSceneGUIUIToolkit;
                     _curPicking = true;
@@ -96,7 +105,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 _curPicking = false;
                 _showSelectingPanel = false;
                 _selectingPanelSearching = "";
-                button.iconImage = EditorGUIUtility.IconContent("d_scenepicking_pickable").image as Texture2D;
+                button.style.backgroundImage = EditorGUIUtility.IconContent("d_scenepicking_pickable").image as Texture2D;
                 button.RemoveFromClassList("saintsfield-toggle-button-active");
             }
         }
