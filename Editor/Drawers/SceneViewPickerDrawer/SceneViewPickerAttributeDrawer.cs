@@ -25,16 +25,28 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
 
         private static GUIStyle _leftButtonStyleCache;
 
-        private static GUIStyle LeftButtonStyle => _leftButtonStyleCache ??= new GUIStyle(GUI.skin.button)
+        private static GUIStyle LeftButtonStyle
         {
-            border = new RectOffset(0, 0, 0, 0),
-            alignment = TextAnchor.MiddleLeft,
-            // padding = new RectOffset(0, 0, 0, 0),
-            // normal = { background = null },
-            // hover = { background = null },
-            // active = { background = null },
-            // focused = { background = null },
-        };
+            get
+            {
+                // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
+                if (_leftButtonStyleCache == null)
+                {
+                    _leftButtonStyleCache = new GUIStyle(GUI.skin.button)
+                    {
+                        border = new RectOffset(0, 0, 0, 0),
+                        alignment = TextAnchor.MiddleLeft,
+                        // padding = new RectOffset(0, 0, 0, 0),
+                        // normal = { background = null },
+                        // hover = { background = null },
+                        // active = { background = null },
+                        // focused = { background = null },
+                    };
+                }
+
+                return _leftButtonStyleCache;
+            }
+        }
 
         private readonly struct FindTargetInfo
         {
@@ -245,7 +257,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                             break;
                         }
 
-                        if(string.IsNullOrEmpty(_selectingPanelSearching) || _selectingPanelSearching.Split(' ').All(searchSeg => findTargetRecord.FindTargetInfo.Path.Contains(searchSeg, StringComparison.OrdinalIgnoreCase)))
+                        if(string.IsNullOrEmpty(_selectingPanelSearching) || _selectingPanelSearching.Split(' ').All(searchSeg => findTargetRecord.FindTargetInfo.Path.Contains(searchSeg.ToLower())))
                         {
                             showTargets.Add(findTargetRecord);
 
