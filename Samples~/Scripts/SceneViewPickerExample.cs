@@ -10,5 +10,7 @@ namespace SaintsField.Samples.Scripts
 
         [SceneViewPicker] public NoThisInScene noSuch;
         [SceneViewPicker] public Object anything;
+
+        [SceneViewPicker] public MonoBehaviour[] lis;
     }
 }

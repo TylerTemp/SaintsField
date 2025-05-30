@@ -18,6 +18,53 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
     [CustomPropertyDrawer(typeof(SaintsInterface<,>), true)]
     public partial class SaintsInterfaceDrawer: PropertyDrawer
     {
+        public static (Type valueType, Type interfaceType) GetTypes(SerializedProperty property, FieldInfo info)
+        {
+            Type interfaceContainer = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                ? ReflectUtils.GetElementType(info.FieldType)
+                : info.FieldType;
+
+
+            foreach (Type thisType in GetGenBaseTypes(interfaceContainer))
+            {
+                if (thisType.IsGenericType && thisType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                {
+                    Type[] genericArguments = thisType.GetGenericArguments();
+                    // Debug.Log($"from {thisType.Name} get types: {string.Join(",", genericArguments.Select(each => each.Name))}");
+                    // Debug.Log();
+                    return (genericArguments[0], genericArguments[1]);
+                }
+            }
+
+            // throw new ArgumentException($"Failed to obtain generic arguments from {interfaceContainer}");
+            return (null, null);
+        }
+
+        private static IEnumerable<Type> GetGenBaseTypes(Type type)
+        {
+            if (type.IsGenericType)
+            {
+                yield return type;
+            }
+
+            Type lastType = type;
+            while (true)
+            {
+                Type baseType = lastType.BaseType;
+                if (baseType == null)
+                {
+                    yield break;
+                }
+
+                if (baseType.IsGenericType)
+                {
+                    yield return baseType;
+                }
+
+                lastType = baseType;
+            }
+        }
+
         private class FieldInterfaceSelectWindow : SaintsObjectPickerWindowIMGUI
         {
             private Type _fieldType;

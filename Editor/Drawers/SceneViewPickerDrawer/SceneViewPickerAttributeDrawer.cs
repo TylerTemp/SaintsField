@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
         {
             border = new RectOffset(0, 0, 0, 0),
             alignment = TextAnchor.MiddleLeft,
-            // padding = new RectOffset(8, 8, 4, 4),
+            // padding = new RectOffset(0, 0, 0, 0),
             // normal = { background = null },
             // hover = { background = null },
             // active = { background = null },
@@ -58,6 +58,9 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
             public FindTargetInfo FindTargetInfo;
             public bool InView;
             public float DistanceSqrt;
+            public Texture2D Icon;
+
+            public int IconLoadCount;
 
             public int CompareTo(FindTargetRecord other)
             {
@@ -249,7 +252,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                             string name = findTargetRecord.FindTargetInfo.Path;
                             if(_selectingPanelWidth < 0)
                             {
-                                float thisWidth = GUI.skin.button.CalcSize(new GUIContent(name)).x;
+                                float thisWidth = GUI.skin.button.CalcSize(new GUIContent(name, findTargetRecord.Icon)).x;
                                 if (thisWidth > calcWidth)
                                 {
                                     calcWidth = Mathf.Min(thisWidth, 400);
@@ -257,6 +260,20 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                             }
 
                             height += EditorGUIUtility.singleLineHeight;
+                        }
+
+                        if (findTargetRecord.IconLoadCount < 30 && findTargetRecord.Icon is null)
+                        {
+                            Texture2D icon = AssetPreview.GetMiniThumbnail(findTargetRecord.FindTargetInfo.Target);
+                            if (icon)
+                            {
+                                findTargetRecord.Icon = icon;
+                                findTargetRecord.IconLoadCount = int.MaxValue;
+                            }
+                            else
+                            {
+                                findTargetRecord.IconLoadCount++;
+                            }
                         }
                     }
 
@@ -316,7 +333,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
 
                                 using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                                 {
-                                    GUI.Toggle(buttonRect, isSelected, findTargetRecord.FindTargetInfo.Path,
+                                    GUI.Toggle(buttonRect, isSelected, new GUIContent(findTargetRecord.FindTargetInfo.Path, findTargetRecord.Icon),
                                         LeftButtonStyle);
                                     if (changed.changed)
                                     {
@@ -327,7 +344,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                                                 findTargetRecord.FindTargetInfo.Target;
                                             pickingInfo.ExpectedProperty.serializedObject.ApplyModifiedProperties();
                                             EnqueueSceneViewNotification(
-                                                $"Sign {pickingInfo.ExpectedProperty.propertyPath} to {findTargetRecord.FindTargetInfo.Target.name}");
+                                                $"Sign {findTargetRecord.FindTargetInfo.DisplayName} to {pickingInfo.ExpectedPropertyDisplayName}");
                                         }
 
                                         pickingInfo.StopPicking.Invoke();
@@ -404,6 +421,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
 
         private static Scene GetScene(Object target)
         {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (target)
             {
                 case Component component:
@@ -420,7 +438,9 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
             Scene currentScene = GetScene(property.serializedObject.targetObject);
             Debug.Assert(currentScene.IsValid(), property.propertyPath);
 
-            Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) >= 0
+            int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            bool inArray = propIndex >= 0;
+            Type rawType = inArray
                 ? ReflectUtils.GetElementType(info.FieldType)
                 : info.FieldType;
 
@@ -493,7 +513,19 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 foundTargets = new List<FindTargetRecord>();
             }
 
-            return new PickingInfo(property.displayName, expectProperty, foundTargets, stopPicking);
+            string displayName;
+            if (inArray)
+            {
+                string propPath = property.propertyPath;
+                string[] propSplit = propPath.Split('.');
+                displayName = $"{ObjectNames.NicifyVariableName(propSplit[0])}[{propIndex}]";
+            }
+            else
+            {
+                displayName = property.displayName;
+            }
+
+            return new PickingInfo(displayName, expectProperty, foundTargets, stopPicking);
         }
 
         private static IEnumerable<FindTargetInfo> FindComponentInRoots(GameObject[] rootGameObjects, Type expectFieldType, Type expectInterfaceType)

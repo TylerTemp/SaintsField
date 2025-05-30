@@ -24798,11 +24798,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbddc8a24203a684ab71ec9f507fe911, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trans: {fileID: 417762862}
+  trans: {fileID: 1404782762}
   interf:
-    <V>k__BackingField: {fileID: 867320294}
+    <V>k__BackingField: {fileID: 1389853056}
   noSuch: {fileID: 0}
-  anything: {fileID: 0}
+  anything: {fileID: 1310105966}
+  lis:
+  - {fileID: 2062798603}
+  - {fileID: 299363749}
 --- !u!4 &1871678696
 Transform:
   m_ObjectHideFlags: 0
@@ -24811,8 +24814,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1871678694}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.13501084, y: 0.86423194, z: -0.3226464, w: 0.36162767}
+  m_LocalPosition: {x: -7.630866, y: 11.201841, z: 13.7655525}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

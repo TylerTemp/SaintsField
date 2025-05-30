@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
@@ -12,6 +13,18 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
     public partial class SceneViewPickerAttributeDrawer
     {
         private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__SceneViewPicker";
+
+        private static StyleSheet _uss;
+
+        private static StyleSheet GetStyle()
+        {
+            if (!_uss)
+            {
+                _uss = Util.LoadResource<StyleSheet>("UIToolkit/ToggleButton.uss");
+            }
+
+            return _uss;
+        }
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
@@ -38,6 +51,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             Button button = container.Q<Button>(NameButton(property));
+            button.styleSheets.Add(GetStyle());
 
             Scene currentScene = GetScene(property.serializedObject.targetObject);
             if (!currentScene.IsValid())
@@ -57,6 +71,8 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                         EditorGUIUtility.IconContent("d_scenepicking_pickable-mixed_hover").image as Texture2D;
                     SceneView.duringSceneGui += OnSceneGUIUIToolkit;
                     _curPicking = true;
+
+                    button.AddToClassList("saintsfield-toggle-button-active");
                 }
                 else
                 {
@@ -80,6 +96,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 _showSelectingPanel = false;
                 _selectingPanelSearching = "";
                 button.iconImage = EditorGUIUtility.IconContent("d_scenepicking_pickable").image as Texture2D;
+                button.RemoveFromClassList("saintsfield-toggle-button-active");
             }
         }
 
