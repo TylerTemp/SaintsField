@@ -4806,7 +4806,7 @@ using SaintsField;
 
 This feature is heavily inspired by [Scene-View-Picker](https://github.com/RoyTheunissen/Scene-View-Picker)! If you like this feature, please consider go give them a star!
 
-Because Scene-View-Picker does not [provide API for script calling](https://github.com/RoyTheunissen/Scene-View-Picker/issues/4), I have to completely re-write the logic for in SaintsField instead of dependend on it.
+Because Scene-View-Picker does not [provide API for script calling](https://github.com/RoyTheunissen/Scene-View-Picker/issues/4), I have to completely re-write the logic for in SaintsField instead of depended on it.
 
 ### `DrawLabel` ###
 
