@@ -90,12 +90,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.13.5**
+**4.15.0**
 
-1.  UI Toolkit: fix unity might give an error when removing an element from list
-2.  IMGUI: add right click context menu support for `Table` [#211](https://github.com/TylerTemp/SaintsField/issues/211)
-3.  UI Toolkit: fix auto validator UI logic; add validation if an animator state has any `StateMachineBehaviour` scripts
-4.  Auto Validator add button for quick adding Addressable scenes and assets
+1.  UI Toolkit + IMGUI: Add `SceneViewPicker` to pick an object from the scene view into a field [#231](https://github.com/TylerTemp/SaintsField/issues/231)
+2.  Improve the compatibility with Odin Inspector. Now most attributes can be used together with Odin Inspector.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4776,7 +4774,34 @@ You can add/modify/remove color palette in the `Window/Saints/Color Palette` men
 
 ## Handles ##
 
-Handles is drawn in the scene view instead of inspector.
+`Handles` is drawn in the scene view instead of inspector.
+
+### `SceneViewPicker` ###
+
+Allow you to pick a target from a scene view, then sign it into your field.
+
+Once clicked the picking icon, use left mouse to choose a target. Once a popup is displayed, choose the target you want.
+
+If you just want the closest one, just click, then click again (because the closest one is always at the position of your cursor)
+
+```csharp
+using SaintsField;
+
+[SceneViewPicker] public Collider myCollider;
+// works with SaintsInterface
+[SceneViewPicker] public SaintsObjInterface<IInterface1> interf;
+
+// a notice will diplay if no target is found
+[SceneViewPicker] public NoThisInScene noSuch;
+// works for list elements too
+[SceneViewPicker] public Object[] anything;
+```
+
+[![video](https://github.com/user-attachments/assets/2f51ce8f-145e-4216-bd00-30ca1081ab4d)](https://github.com/user-attachments/assets/b994cc62-ad92-419e-9b6e-5029d662b601)
+
+This feature is heavily inspired by [Scene-View-Picker](https://github.com/RoyTheunissen/Scene-View-Picker)! If you like this feature, please consider go give them a star!
+
+Because Scene-View-Picker does not [provide API for script calling](https://github.com/RoyTheunissen/Scene-View-Picker/issues/4), I have to completely re-write the logic for in SaintsField instead of dependend on it.
 
 ### `DrawLabel` ###
 

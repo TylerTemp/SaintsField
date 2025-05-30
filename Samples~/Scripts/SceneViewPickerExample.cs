@@ -5,12 +5,13 @@ namespace SaintsField.Samples.Scripts
 {
     public class SceneViewPickerExample : MonoBehaviour
     {
-        [SceneViewPicker] public Transform trans;
+        [SceneViewPicker] public Collider myCollider;
+        // works with SaintsInterface
         [SceneViewPicker] public SaintsObjInterface<IInterface1> interf;
 
+        // a notice will diplay if no target is found
         [SceneViewPicker] public NoThisInScene noSuch;
-        [SceneViewPicker] public Object anything;
-
-        [SceneViewPicker] public MonoBehaviour[] lis;
+        // works for list elements too
+        [SceneViewPicker] public Object[] anything;
     }
 }

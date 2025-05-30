@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.15.0 ##
+
+1.  UI Toolkit + IMGUI: Add `SceneViewPicker` to pick an object from the scene view into a field [#231](https://github.com/TylerTemp/SaintsField/issues/231)
+2.  Improve the compatibility with Odin Inspector. Now most attributes can be used together with Odin Inspector.
+
 ## 4.14.0 ##
 
 UI Toolkit: Add `TableHeaders` & `TableHeadersHide` to default show/hide table columns
