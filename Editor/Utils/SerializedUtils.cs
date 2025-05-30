@@ -299,6 +299,10 @@ namespace SaintsField.Editor.Utils
             {
                 return false;
             }
+            catch (ArgumentNullException)
+            {
+                return false;
+            }
 
             return true;
         }

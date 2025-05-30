@@ -67,7 +67,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                 : EditorGUIUtility.IconContent("d_scenepicking_pickable").image as Texture2D;
 
             // ReSharper disable once InvertIf
-            if (GUI.Button(position, new GUIContent(icon), EditorStyles.iconButton))
+            if (GUI.Button(position, new GUIContent(icon), new GUIStyle("iconButton")))
             {
                 StopAllPicking.Invoke();
 
