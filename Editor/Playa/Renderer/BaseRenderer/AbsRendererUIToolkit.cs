@@ -1702,7 +1702,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         textField.labelElement.style.color = reColor;
                     }
 
-                    if(_nullUss == null)
+                    if(_nullUss is null)  // bypass life circle
                     {
                         _nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
                     }
@@ -2301,7 +2301,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // nullable
                     foldout.Q<Toggle>().Add(new Button(() =>
                     {
-                        beforeSet(rawListValue);
+                        beforeSet?.Invoke(rawListValue);
                         setterOrNull(null);
                     })
                     {
