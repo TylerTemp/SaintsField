@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.15.1 ##
+
+1.  UI Toolkit: fix `ShowInInspector` setting a list to `null` gave an error
+2.  UI Toolkit: `ShowInInspector` now fold the struct/class by default. This is to avoid a looped references stack overflow rendering. The data will only be filled the first time you expand it.
+
+    Some genius decide to use loop-referenced data in the game save data type. I can not tell them not to do so. No cap frfr.
+
 ## 4.15.0 ##
 
 1.  UI Toolkit + IMGUI: Add `SceneViewPicker` to pick an object from the scene view into a field [#231](https://github.com/TylerTemp/SaintsField/issues/231)

@@ -90,10 +90,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.15.0**
+**4.15.1**
 
-1.  UI Toolkit + IMGUI: Add `SceneViewPicker` to pick an object from the scene view into a field [#231](https://github.com/TylerTemp/SaintsField/issues/231)
-2.  Improve the compatibility with Odin Inspector. Now most attributes can be used together with Odin Inspector.
+1.  UI Toolkit: fix `ShowInInspector` setting a list to `null` gave an error
+2.  UI Toolkit: `ShowInInspector` now fold the struct/class by default. This is to avoid a looped references stack overflow rendering. The data will only be filled the first time you expand it.
+
+    Some genius decide to use loop-referenced data in the game save data type. I can not tell them not to do so. No cap frfr.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
