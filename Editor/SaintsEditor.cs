@@ -85,11 +85,8 @@ namespace SaintsField.Editor
             return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
         }
 
-        public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(SerializedObject serializedObject, object target)
+        public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(Type objectType, IEnumerable<IPlayaClassAttribute> playaClassAttributes, SerializedObject serializedObject, object target)
         {
-            Type objectType = target.GetType();
-            IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
-
             // List<SaintsFieldWithInfo> saintsFieldWithInfos = new List<SaintsFieldWithInfo>(playaClassAttributes.Length);
             foreach ((IPlayaClassAttribute playaClassAttribute, int index) in playaClassAttributes.WithIndex())
             {

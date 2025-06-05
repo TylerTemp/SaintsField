@@ -1,8 +1,13 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using SaintsField.ComponentHeader;
 using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -16,6 +21,21 @@ namespace SaintsField.Editor
         [Obsolete("No longer needed")]
         protected virtual bool TryFixUIToolkit => false;
 
+        private bool _searchableShown;
+
+        private string SearchableGetLabelXml() =>
+            _searchableShown ? "<icon=search.png/>" : "<color=gray><icon=search.png/>";
+
+        private void SearchableToggle()
+        {
+            // _searchableShown = true;
+            _searchableShown = !_searchableShown;
+            _toolbarSearchField.style.display = _searchableShown ? DisplayStyle.Flex : DisplayStyle.None;
+
+        }
+
+        private ToolbarSearchField _toolbarSearchField;
+
         public override VisualElement CreateInspectorGUI()
         {
             _saintsEditorIMGUI = false;
@@ -28,7 +48,10 @@ namespace SaintsField.Editor
 
             VisualElement root = new VisualElement();
 
-            foreach (ISaintsRenderer saintsRenderer in GetClassStructRenderer(serializedObject, target))
+            Type objectType = target.GetType();
+            IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
+
+            foreach (ISaintsRenderer saintsRenderer in GetClassStructRenderer(objectType, playaClassAttributes, serializedObject, target))
             {
                 VisualElement ve = saintsRenderer.CreateVisualElement();
                 if(ve != null)
@@ -55,6 +78,28 @@ namespace SaintsField.Editor
                     objectField.style.display = DisplayStyle.None;
                 }
                 root.Add(objectField);
+            }
+
+            if (playaClassAttributes.Any(each => each is SearchableAttribute))
+            {
+                _toolbarSearchField = new ToolbarSearchField
+                {
+                    style =
+                    {
+                        // flexGrow = 1,
+                        display = DisplayStyle.None,
+                        width = Length.Percent(100),
+                    },
+                    placeholderText = "Search Field Name",
+                };
+                root.Add(_toolbarSearchField);
+
+                DrawHeaderGUI.AddAttributeIfNot(
+                    new HeaderGhostButtonAttribute("$" + nameof(SearchableGetLabelXml)),
+                    typeof(SaintsEditor).GetMethod(nameof(SearchableToggle), BindingFlags.NonPublic | BindingFlags.Instance),
+                    this,
+                    -100
+                );
             }
 
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");

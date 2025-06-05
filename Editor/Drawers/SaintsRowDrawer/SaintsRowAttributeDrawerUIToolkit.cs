@@ -173,33 +173,33 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         value = getValue;
 
                         // Debug.Log(value);
-                        if (value == null)
-                        {
-                            // foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
-                            // {
-                            //     // switch (subProp.)
-                            //     // {
-                            //     //
-                            //     // }
-                            // }
-
-                            // var p = new PropertyField(property);
-                            // root.Add(p);
-                            // return;
-
-                            // Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
-                            //     ? ReflectUtils.GetElementType(GetMemberType(info))
-                            //     : GetMemberType(info);
-                            //
-                            // // Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
-                            // // value = Activator.CreateInstance(rawType, true);
-                            // // Util.SignPropertyValue(property, info, parent, value);
-                            //
-                            // property.boxedValue = value = Activator.CreateInstance(rawType, true);
-                            // property.serializedObject.ApplyModifiedProperties();
-
-                            // return;
-                        }
+                        // if (value == null)
+                        // {
+                        //     // foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
+                        //     // {
+                        //     //     // switch (subProp.)
+                        //     //     // {
+                        //     //     //
+                        //     //     // }
+                        //     // }
+                        //
+                        //     // var p = new PropertyField(property);
+                        //     // root.Add(p);
+                        //     // return;
+                        //
+                        //     // Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                        //     //     ? ReflectUtils.GetElementType(GetMemberType(info))
+                        //     //     : GetMemberType(info);
+                        //     //
+                        //     // // Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
+                        //     // // value = Activator.CreateInstance(rawType, true);
+                        //     // // Util.SignPropertyValue(property, info, parent, value);
+                        //     //
+                        //     // property.boxedValue = value = Activator.CreateInstance(rawType, true);
+                        //     // property.serializedObject.ApplyModifiedProperties();
+                        //
+                        //     // return;
+                        // }
 
 
 
@@ -222,6 +222,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     return;
                 }
 
+                Debug.Assert(value != null);
                 // value = getValue;
             }
 
@@ -253,7 +254,10 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
              //     bodyElement.Add(prop);
              // }
 
-             foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(property.serializedObject, value))
+             Type objectType = value.GetType();
+             IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
+
+             foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(objectType, playaClassAttributes, property.serializedObject, value))
              {
                  saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
                  VisualElement rendererElement = saintsRenderer.CreateVisualElement();

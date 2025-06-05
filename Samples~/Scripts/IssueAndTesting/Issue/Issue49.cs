@@ -26,5 +26,22 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 
             return result;
         }
+
+        [Space(700)]
+        [AdvancedDropdown(nameof(LargeAdvancedDropdownSub))]
+        public int intSubPick;
+
+        public AdvancedDropdownList<int> LargeAdvancedDropdownSub()
+        {
+            AdvancedDropdownList<int> result = new AdvancedDropdownList<int>();
+            foreach (int number in Enumerable.Range(0, 100))
+            {
+                result.Add($"{number}/Min", number);
+                result.Add($"{number}/Max", 10000 + number);
+            }
+
+            return result;
+        }
+
     }
 }
