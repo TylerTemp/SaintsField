@@ -90,7 +90,9 @@ namespace SaintsField.Editor
                         display = DisplayStyle.None,
                         width = Length.Percent(100),
                     },
+#if UNITY_6000_0_OR_NEWER
                     placeholderText = "Search Field Name",
+#endif
                 };
                 root.Add(_toolbarSearchField);
 
