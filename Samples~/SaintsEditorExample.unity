@@ -3129,7 +3129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myString: 
-  myInt: 0
+  myInt: 1
   otherString: 
   otherInt: 0
   myArray: []

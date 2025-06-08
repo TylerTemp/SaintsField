@@ -4579,7 +4579,6 @@ public string alignField;
 
 ![show_image](https://github.com/TylerTemp/SaintsField/assets/6391063/8fb6397f-12a7-4eaf-9e2b-65f563c89f97)
 
-
 #### `ParticlePlay` ####
 
 A button to play a particle system of the field value, or the one on the field value.
@@ -4603,7 +4602,6 @@ Note: because of the limitation from Unity, it can NOT detect if a `ParticleSyst
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/18ab2c32-9be9-49f5-9a3a-058fa4c3c7bd)](https://github.com/TylerTemp/SaintsField/assets/6391063/2473df2b-39fc-47bc-829e-eeb65c411131)
-
 
 #### `ButtonAddOnClick` ####
 
@@ -4771,6 +4769,50 @@ A simple color palette tool to select a color from a list of colors.
 [![video](https://github.com/user-attachments/assets/737e1f93-5860-433c-8add-09b4128f4854)](https://github.com/user-attachments/assets/47f0aebd-aa61-49a9-b4e6-fd1bf3ce31f8)
 
 You can add/modify/remove color palette in the `Window/Saints/Color Palette` menu.
+
+#### `Searchable` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+> [!NOTE]
+> This is UI Toolkit only
+
+This allows you to search for a field in a `MonoBehavior` (`Component`) or `ScriptableObject`. This is useful is you have a big list of fields.
+
+It will draw a search icon in the header. Once clicked, you can input the field name you want to search.
+
+You can also use `Ctrl` + `F` (`Command` + `F` on macOS) to open the search bar.
+
+Note: this only search the field name. It does not search the nested fields, and it does not check with the `RichLabel`, `PlayaRichLabel`.
+
+```csharp
+using SaintsField.Playa;
+
+[Searchable]
+public class SearchableMono : SaintsMonoBehaviour
+{
+    public string myString;
+    public int myInt;
+    [ShowInInspector] private string MyInspectorString => "Non Ser Prop";
+    [ShowInInspector] private string otherInspectorString = "Non Ser Field";
+    public string otherString;
+    public int otherInt;
+
+    [ListDrawerSettings(searchable: true)]
+    public string[] myArray;
+
+    [Serializable]
+    public struct MyStruct
+    {
+        public string MyStructString;
+    }
+
+    [Table] public MyStruct[] myTable;
+}
+```
+
+[![video](https://github.com/user-attachments/assets/b8273285-d24e-441d-9ceb-f277685372f3)](https://github.com/user-attachments/assets/5a6b9aae-481d-4898-9cbe-6634c51cb3e4)
 
 ## Handles ##
 
