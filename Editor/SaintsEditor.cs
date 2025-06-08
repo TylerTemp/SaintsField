@@ -25,7 +25,7 @@ using DG.DOTweenEditor;
 
 namespace SaintsField.Editor
 {
-    public partial class SaintsEditor: UnityEditor.Editor, IDOTweenPlayRecorder, IMakeRenderer
+    public partial class SaintsEditor: UnityEditor.Editor, IDOTweenPlayRecorder, IMakeRenderer, ISearchable
     {
         private static bool _saintsEditorIMGUI = true;
 
@@ -1074,6 +1074,32 @@ namespace SaintsField.Editor
         public virtual AbsRenderer MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
             return HelperMakeRenderer(so, fieldWithInfo);
+        }
+
+        public string GetRichLabel()
+        {
+            return _searchableShown ? "<icon=search.png/>" : "<color=gray><icon=search.png/>";
+        }
+
+        public virtual void OnEnable()
+        {
+            DrawHeaderGUI.EnsureInitLoad();
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+            AliveInstances.Add(this);
+#endif
+
+            OnEnableIMGUI();
+// #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+//             OnEnableUIToolkit();
+// #endif
+        }
+
+        public void OnHeaderButtonClick()
+        {
+            _searchableShown = !_searchableShown;
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+            OnHeaderButtonClickUIToolkit();
+#endif
         }
     }
 }

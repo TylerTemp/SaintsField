@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.ComponentHeader;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.HeaderGUI.Drawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -267,6 +268,8 @@ namespace SaintsField.Editor.HeaderGUI
                 return false;
             }
 
+            // EditorGUI.DrawRect(rectangle, Color.blue);
+
             Object firstTarget = targets[0];
             Type firstTargetType = firstTarget.GetType();
             if(!CachedTypeToRenderTargetInfos.TryGetValue(firstTargetType, out List<RenderTargetInfo> renderTargetInfos))
@@ -279,10 +282,66 @@ namespace SaintsField.Editor.HeaderGUI
                     .ToList();
             }
 
+            HashSet<ISearchable> removeSaintsEditor = new HashSet<ISearchable>();
+
+            // Debug.Log($"SearchableSaintsEditors={SearchableSaintsEditors.Count}");
+
+            foreach (ISearchable searchableSaintsEditor in SearchableSaintsEditors)
+            {
+                // Debug.Log(searchableSaintsEditor);
+                if (!(Object)searchableSaintsEditor)
+                {
+                    removeSaintsEditor.Add(searchableSaintsEditor);
+                    continue;
+                }
+
+                if (!Util.GetIsEqual(searchableSaintsEditor.target, firstTarget))
+                {
+                    continue;
+                }
+
+                Rect useRect = new Rect(rectangle);
+                rectangle.x -= rectangle.height;
+                rectangle.xMax -= rectangle.height;
+
+                // Rect actualRect = new Rect(useRect)
+                // {
+                //     x = useRect.x + 1,
+                //     width = useRect.width - 2,
+                //     y = useRect.y + 1,
+                //     height = useRect.height - 2,
+                // };
+
+                GUIStyle btnStyle =
+#if UNITY_2021_3_OR_NEWER
+                        EditorStyles.iconButton
+#else
+                        EditorStyles.miniButton
+#endif
+                    ;
+
+                if (GUI.Button(useRect, GUIContent.none, btnStyle))
+                {
+                    searchableSaintsEditor.OnHeaderButtonClick();
+                }
+
+                string richLabel = searchableSaintsEditor.GetRichLabel();
+                if (!CacheAndUtil.ParsedXmlCache.TryGetValue(richLabel,
+                        out IReadOnlyList<RichTextDrawer.RichTextChunk> chunks))
+                {
+                    CacheAndUtil.ParsedXmlCache[richLabel] = chunks = RichTextDrawer.ParseRichXml(richLabel, "", null, null, firstTarget).ToArray();
+                }
+
+                CacheAndUtil.GetCachedRichTextDrawer().DrawChunks(useRect, GUIContent.none, chunks);
+            }
+
+            SearchableSaintsEditors.ExceptWith(removeSaintsEditor);
+
             if (renderTargetInfos.Count == 0)
             {
                 return false;
             }
+
 #if UNITY_2023_1_OR_NEWER
             string title = ObjectNames.GetInspectorTitle(firstTarget, targets.Length > 1);
 #else
@@ -736,6 +795,13 @@ namespace SaintsField.Editor.HeaderGUI
             }
 
             HeaderButtonDrawer.Update();
+        }
+
+        private static readonly HashSet<ISearchable> SearchableSaintsEditors = new HashSet<ISearchable>();
+
+        public static void SaintsEditorEnqueueSearchable(SaintsEditor saintsEditor)
+        {
+            SearchableSaintsEditors.Add(saintsEditor);
         }
     }
 }

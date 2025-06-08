@@ -28,7 +28,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
             return true;
         }
 
-        private static readonly Dictionary<string, IReadOnlyList<RichTextDrawer.RichTextChunk>> ParsedXmlCache = new Dictionary<string, IReadOnlyList<RichTextDrawer.RichTextChunk>>();
+
 
         private static readonly Dictionary<DrawHeaderGUI.RenderTargetInfo, IEnumerator> CachedCoroutines = new Dictionary<DrawHeaderGUI.RenderTargetInfo, IEnumerator>();
 
@@ -83,10 +83,10 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                     rawTitle = result;
                 }
 
-                if(!ParsedXmlCache.TryGetValue(rawTitle, out titleChunks))
+                if(!CacheAndUtil.ParsedXmlCache.TryGetValue(rawTitle, out titleChunks))
                 {
                     // RichTextDrawer richTextDrawer = CacheAndUtil.GetCachedRichTextDrawer();
-                    ParsedXmlCache[rawTitle] = titleChunks =
+                    CacheAndUtil.ParsedXmlCache[rawTitle] = titleChunks =
                         RichTextDrawer.ParseRichXml(rawTitle, method.Name, null, method, target).ToArray();
                 }
             }

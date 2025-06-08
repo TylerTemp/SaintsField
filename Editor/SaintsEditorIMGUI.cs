@@ -10,10 +10,8 @@ namespace SaintsField.Editor
     {
         public override bool RequiresConstantRepaint() => true;
 
-        public virtual void OnEnable()
+        private void OnEnableIMGUI()
         {
-            DrawHeaderGUI.EnsureInitLoad();
-
             if (!_saintsEditorIMGUI)
             {
                 return;
@@ -28,9 +26,6 @@ namespace SaintsField.Editor
             {
                 _renderers = null;  // just... let IMGUI renderer to deal with it...
             }
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-            AliveInstances.Add(this);
-#endif
         }
 
         public virtual void OnDestroy()

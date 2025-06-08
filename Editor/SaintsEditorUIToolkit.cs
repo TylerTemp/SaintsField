@@ -1,9 +1,6 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using SaintsField.ComponentHeader;
 using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
@@ -23,18 +20,15 @@ namespace SaintsField.Editor
 
         private bool _searchableShown;
 
-        private string SearchableGetLabelXml() =>
-            _searchableShown ? "<icon=search.png/>" : "<color=gray><icon=search.png/>";
-
-        private void SearchableToggle()
+        private void OnHeaderButtonClickUIToolkit()
         {
-            // _searchableShown = true;
-            _searchableShown = !_searchableShown;
             _toolbarSearchField.style.display = _searchableShown ? DisplayStyle.Flex : DisplayStyle.None;
-
+            _toolbarSearchField.Focus();
         }
 
         private ToolbarSearchField _toolbarSearchField;
+
+        private IReadOnlyList<ISaintsRenderer> _renderersUIToolkit = Array.Empty<ISaintsRenderer>();
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -80,7 +74,17 @@ namespace SaintsField.Editor
                 root.Add(objectField);
             }
 
-            if (playaClassAttributes.Any(each => each is SearchableAttribute))
+            SearchableAttribute searchableAttribute = null;
+            foreach (IPlayaClassAttribute playaClassAttribute in playaClassAttributes)
+            {
+                if (playaClassAttribute is SearchableAttribute sa)
+                {
+                    searchableAttribute = sa;
+                    break;
+                }
+            }
+
+            if (searchableAttribute != null)
             {
                 _toolbarSearchField = new ToolbarSearchField
                 {
@@ -95,21 +99,15 @@ namespace SaintsField.Editor
 #endif
                 };
                 root.Add(_toolbarSearchField);
-
-                DrawHeaderGUI.AddAttributeIfNot(
-                    new HeaderGhostButtonAttribute("$" + nameof(SearchableGetLabelXml)),
-                    typeof(SaintsEditor).GetMethod(nameof(SearchableToggle), BindingFlags.NonPublic | BindingFlags.Instance),
-                    this,
-                    -100
-                );
+                DrawHeaderGUI.SaintsEditorEnqueueSearchable(this);
             }
 
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
 
-            IReadOnlyList<ISaintsRenderer> renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
+            _renderersUIToolkit = Setup(Array.Empty<string>(), serializedObject, this, target);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
-            foreach (ISaintsRenderer saintsRenderer in renderers)
+            foreach (ISaintsRenderer saintsRenderer in _renderersUIToolkit)
             {
                 // Debug.Log($"renderer={saintsRenderer}");
                 VisualElement ve = saintsRenderer.CreateVisualElement();

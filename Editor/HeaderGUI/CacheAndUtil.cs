@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using SaintsField.Editor.Core;
 
 namespace SaintsField.Editor.HeaderGUI
@@ -16,5 +17,7 @@ namespace SaintsField.Editor.HeaderGUI
 
             return _richTextDrawer;
         }
+
+        public static readonly Dictionary<string, IReadOnlyList<RichTextDrawer.RichTextChunk>> ParsedXmlCache = new Dictionary<string, IReadOnlyList<RichTextDrawer.RichTextChunk>>();
     }
 }
