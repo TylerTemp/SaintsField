@@ -1759,7 +1759,7 @@ namespace SaintsField.Editor.Utils
             }
 
             string targetLower = target.ToLower();
-            return search.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries).All(searchSegment => targetLower.Contains(searchSegment));
+            return search.ToLower().Split(new [] { ' ' }, StringSplitOptions.RemoveEmptyEntries).All(searchSegment => targetLower.Contains(searchSegment));
         }
     }
 }

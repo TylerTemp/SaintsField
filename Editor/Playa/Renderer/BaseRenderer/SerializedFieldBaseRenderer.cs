@@ -92,11 +92,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             InvokeCallback(callback, newValue, parent);
         }
 
+#if UNITY_2021_3_OR_NEWER
         protected readonly UnityEvent<string> OnSearchFieldUIToolkit = new UnityEvent<string>();
-
+#endif
         public override void OnSearchField(string searchString)
         {
+#if UNITY_2021_3_OR_NEWER
             OnSearchFieldUIToolkit.Invoke(searchString);
+#endif
         }
 
 

@@ -19,8 +19,6 @@ namespace SaintsField.Editor
         [Obsolete("No longer needed")]
         protected virtual bool TryFixUIToolkit => false;
 
-        private bool _searchableShown;
-
         private void OnHeaderButtonClickUIToolkit()
         {
             _toolbarSearchField.style.display = _searchableShown ? DisplayStyle.Flex : DisplayStyle.None;

@@ -27,11 +27,14 @@ namespace SaintsField.Editor.Playa.Renderer
         {
         }
 
+#if UNITY_2021_3_OR_NEWER
         private UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
-
+#endif
         public override void OnSearchField(string searchString)
         {
+#if UNITY_2021_3_OR_NEWER
             _onSearchFieldUIToolkit.Invoke(searchString);
+#endif
         }
 
         private static (string error, object value) GetValue(SaintsFieldWithInfo fieldWithInfo)

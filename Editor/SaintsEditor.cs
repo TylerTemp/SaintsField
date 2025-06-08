@@ -1095,6 +1095,8 @@ namespace SaintsField.Editor
 // #endif
         }
 
+        private bool _searchableShown;
+
         public void OnHeaderButtonClick()
         {
             _searchableShown = !_searchableShown;
