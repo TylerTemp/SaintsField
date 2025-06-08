@@ -2,6 +2,7 @@
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
 using UnityEditor;
+using UnityEngine.Events;
 
 namespace SaintsField.Editor.Playa.Renderer
 {
@@ -18,6 +19,13 @@ namespace SaintsField.Editor.Playa.Renderer
         public override void OnDestroy()
         {
 
+        }
+
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+
+        public override void OnSearchField(string searchString)
+        {
+            _onSearchFieldUIToolkit.Invoke(searchString);
         }
 
         public override string ToString()

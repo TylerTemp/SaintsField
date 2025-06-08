@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Playa;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaintsField.Editor.Playa.RendererGroup
 {
@@ -10,7 +11,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
     {
         public bool InDirectHorizontalLayout { get; set; }
         public bool InAnyHorizontalLayout { get; set; }
-        public bool NoLabel { get; set; }
 
         public class Config
         {
@@ -130,6 +130,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 renderer.OnDestroy();
             }
+        }
+
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+
+        public void OnSearchField(string searchString)
+        {
+            _onSearchFieldUIToolkit.Invoke(searchString);
         }
 
         public override string ToString() => $"<Group path={_groupPath} layout={_eLayout}/>";

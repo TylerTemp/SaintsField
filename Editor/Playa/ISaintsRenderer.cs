@@ -7,13 +7,8 @@ namespace SaintsField.Editor.Playa
 {
     public interface ISaintsRenderer
     {
-        bool InDirectHorizontalLayout { get; set; }
-        bool InAnyHorizontalLayout { get; set; }
-
-        bool NoLabel { get; set; }
-
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        public VisualElement CreateVisualElement();
+        VisualElement CreateVisualElement();
 #endif
         void RenderIMGUI(float width);
 
@@ -22,5 +17,7 @@ namespace SaintsField.Editor.Playa
         void RenderPositionIMGUI(Rect position);
 
         void OnDestroy();
+
+        void OnSearchField(string searchString);
     }
 }

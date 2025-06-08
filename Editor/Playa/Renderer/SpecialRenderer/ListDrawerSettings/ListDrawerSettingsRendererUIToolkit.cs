@@ -1075,7 +1075,22 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 root.Add(numberOfItemsTotalField);
             }
 
+            OnSearchFieldUIToolkit.AddListener(Search);
+            root.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
+
             return (root, listViewAddButton, listViewRemoveButton);
+
+            void Search(string search)
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(FieldWithInfo.SerializedProperty.displayName, search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                if (root.style.display != display)
+                {
+                    root.style.display = display;
+                }
+            }
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)

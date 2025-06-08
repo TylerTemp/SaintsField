@@ -35,7 +35,22 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
             // _hasSize = FillTable(FieldWithInfo.SerializedProperty, result, elementType, FieldWithInfo.SerializedProperty);
             FillTableToContainer(result);
 
+            OnSearchFieldUIToolkit.AddListener(Search);
+            result.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
+
             return (result, true);
+
+            void Search(string search)
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(FieldWithInfo.SerializedProperty.displayName, search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                if (result.style.display != display)
+                {
+                    result.style.display = display;
+                }
+            }
         }
 
         private void FillTableToContainer(VisualElement container)

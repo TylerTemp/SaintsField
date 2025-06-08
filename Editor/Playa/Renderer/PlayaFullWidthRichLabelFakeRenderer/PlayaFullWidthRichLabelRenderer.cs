@@ -18,6 +18,10 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         {
         }
 
+        public override void OnSearchField(string searchString)
+        {
+        }
+
         public override string ToString()
         {
             return $"<AboveRichLabel {FieldWithInfo}/>";

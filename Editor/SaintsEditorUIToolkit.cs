@@ -99,23 +99,29 @@ namespace SaintsField.Editor
 #endif
                 };
                 root.Add(_toolbarSearchField);
+
+                _toolbarSearchField.RegisterValueChangedCallback(evt => OnSearch(evt.newValue));
                 DrawHeaderGUI.SaintsEditorEnqueueSearchable(this);
             }
 
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
 
-            _renderersUIToolkit = Setup(Array.Empty<string>(), serializedObject, this, target);
+            IReadOnlyList<ISaintsRenderer> renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
-            foreach (ISaintsRenderer saintsRenderer in _renderersUIToolkit)
+            List<ISaintsRenderer> usedRenderers = new List<ISaintsRenderer>();
+            foreach (ISaintsRenderer saintsRenderer in renderers)
             {
                 // Debug.Log($"renderer={saintsRenderer}");
                 VisualElement ve = saintsRenderer.CreateVisualElement();
                 if(ve != null)
                 {
+                    usedRenderers.Add(saintsRenderer);
                     root.Add(ve);
                 }
             }
+
+            _renderersUIToolkit = usedRenderers;
 
             // root.Add(CreateVisualElement(renderers));
 
@@ -128,6 +134,16 @@ namespace SaintsField.Editor
 
             return root;
         }
+
+        private void OnSearchUIToolkit(string search)
+        {
+            foreach (ISaintsRenderer saintsRenderer in _renderersUIToolkit)
+            {
+                saintsRenderer.OnSearchField(search);
+            }
+        }
+
+        private void ResetSearchUIToolkit() => _toolbarSearchField.value = "";
     }
 }
 #endif

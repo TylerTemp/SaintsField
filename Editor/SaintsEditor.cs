@@ -17,6 +17,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using PlayaFullWidthRichLabelRenderer = SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer.PlayaFullWidthRichLabelRenderer;
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using DG.DOTweenEditor;
@@ -1099,6 +1100,22 @@ namespace SaintsField.Editor
             _searchableShown = !_searchableShown;
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
             OnHeaderButtonClickUIToolkit();
+#endif
+
+            if (!_searchableShown)
+            {
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+                ResetSearchUIToolkit();
+#endif
+            }
+        }
+
+        // private UnityEvent<string> _onSearchUIToolkit = new UnityEvent<string>();
+
+        private void OnSearch(string search)
+        {
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+            OnSearchUIToolkit(search);
 #endif
         }
     }

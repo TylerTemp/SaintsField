@@ -116,7 +116,11 @@ namespace SaintsField.Editor.Playa.Renderer
             // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
 
             Type fieldType = GetFieldType(FieldWithInfo);
-            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, NoLabel? null: GetNiceName(FieldWithInfo), fieldType, value, null, setter, true, InAnyHorizontalLayout);
+            string labelName = NoLabel ? null : GetNiceName(FieldWithInfo);
+            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, true, InAnyHorizontalLayout);
+
+            _onSearchFieldUIToolkit.AddListener(Search);
+            container.RegisterCallback<DetachFromPanelEvent>(e => _onSearchFieldUIToolkit.RemoveListener(Search));
 
             bool isCollection = !typeof(UnityEngine.Object).IsAssignableFrom(fieldType) && (fieldType.IsArray || typeof(IEnumerable).IsAssignableFrom(fieldType));
             // Debug.Log(isCollection);
@@ -162,6 +166,17 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             return (container, true);
+
+            void Search(string search)
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+                if (container.style.display != display)
+                {
+                    container.style.display = display;
+                }
+            }
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)

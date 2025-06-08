@@ -306,6 +306,24 @@ namespace SaintsField.Editor.Playa.Renderer
             buttonElement.style.borderTopLeftRadius = buttonElement.style.borderTopRightRadius = 0;
             buttonElement.style.borderLeftWidth = buttonElement.style.borderRightWidth = buttonElement.style.borderBottomWidth = 0;
             root.Add(buttonElement);
+
+            string methodNameFriendly = ObjectNames.NicifyVariableName(methodInfo.Name);
+
+            void Search(string search)
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(methodNameFriendly, search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                if (root.style.display != display)
+                {
+                    root.style.display = display;
+                }
+            }
+
+            _onSearchFieldUIToolkit.AddListener(Search);
+            root.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+
             return (root, needUpdate);
         }
 

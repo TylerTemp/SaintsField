@@ -12,6 +12,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using FontStyle = UnityEngine.FontStyle;
 #if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
@@ -28,7 +29,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
     {
         public bool InDirectHorizontalLayout { get; set; }
         public bool InAnyHorizontalLayout { get; set; }
-        public bool NoLabel { get; set; }
 
         private readonly List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)> _doTweenMethods = new List<(MethodInfo methodInfo, DOTweenPlayAttribute attribute)>();
         private readonly object _target;
@@ -425,6 +425,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
         }
 
+        public void OnSearchField(string searchString)
+        {
+            _onSearchFieldUIToolkit.Invoke(searchString);
+        }
+
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+
         // private bool _debugCheck;
 
         #endregion
@@ -537,6 +544,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
 
                 string labelName = string.IsNullOrEmpty(attribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : attribute.Label;
+
+                _onSearchFieldUIToolkit.AddListener(Search);
+                methodRoot.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+
                 // methodRoot.Add(new Label(labelName));
                 Toggle autoPlayToggle = new Toggle(labelName)
                 {
@@ -658,6 +669,18 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     stopButton.SetEnabled(false);
                     playPauseButton.style.backgroundImage = _playIcon;
                 };
+                continue;
+
+                void Search(string search)
+                {
+                    DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None;
+                    if (methodRoot.style.display != display)
+                    {
+                        methodRoot.style.display = display;
+                    }
+                }
             }
 
             root.schedule.Execute(() => OnUpdate(root, mainPlayStopButton, doTweenToolkits));

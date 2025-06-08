@@ -1750,5 +1750,16 @@ namespace SaintsField.Editor.Utils
         }
 
         #endregion
+
+        public static bool UnityDefaultSimpleSearch(string target, string search)
+        {
+            if (string.IsNullOrEmpty(search))
+            {
+                return true;
+            }
+
+            string targetLower = target.ToLower();
+            return search.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries).All(searchSegment => targetLower.Contains(searchSegment));
+        }
     }
 }

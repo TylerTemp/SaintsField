@@ -16,5 +16,9 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
         public override void OnDestroy()
         {
         }
+
+        public override void OnSearchField(string searchString)
+        {
+        }
     }
 }

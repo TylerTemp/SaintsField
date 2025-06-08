@@ -6,6 +6,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
@@ -72,7 +73,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             Debug.LogError(error);
         }
 
-        protected static void InvokeArraySizeCallback(string callback, SerializedProperty property, MemberInfo memberInfo)
+        private static void InvokeArraySizeCallback(string callback, SerializedProperty property, MemberInfo memberInfo)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             if (parent == null)
@@ -89,6 +90,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             InvokeCallback(callback, newValue, parent);
+        }
+
+        protected readonly UnityEvent<string> OnSearchFieldUIToolkit = new UnityEvent<string>();
+
+        public override void OnSearchField(string searchString)
+        {
+            OnSearchFieldUIToolkit.Invoke(searchString);
         }
 
 

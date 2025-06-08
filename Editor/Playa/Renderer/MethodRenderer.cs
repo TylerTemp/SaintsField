@@ -227,6 +227,13 @@ namespace SaintsField.Editor.Playa.Renderer
             OnDestroyIMGUI();
         }
 
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+
+        public override void OnSearchField(string searchString)
+        {
+            _onSearchFieldUIToolkit.Invoke(searchString);
+        }
+
         public override string ToString()
         {
             return $"<{FieldWithInfo.RenderType} {FieldWithInfo.MethodInfo?.Name}/>";

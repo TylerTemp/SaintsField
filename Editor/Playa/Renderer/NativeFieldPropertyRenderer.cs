@@ -4,6 +4,8 @@ using UnityEditor;
 using System.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
@@ -23,6 +25,13 @@ namespace SaintsField.Editor.Playa.Renderer
 
         public override void OnDestroy()
         {
+        }
+
+        private UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+
+        public override void OnSearchField(string searchString)
+        {
+            _onSearchFieldUIToolkit.Invoke(searchString);
         }
 
         private static (string error, object value) GetValue(SaintsFieldWithInfo fieldWithInfo)

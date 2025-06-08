@@ -21,6 +21,10 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
 
         }
 
+        public override void OnSearchField(string searchString)
+        {
+        }
+
         //
         // public override VisualElement CreateVisualElement()
         // {

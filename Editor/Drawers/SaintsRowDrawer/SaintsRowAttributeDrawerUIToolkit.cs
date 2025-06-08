@@ -259,7 +259,6 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
              foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(objectType, playaClassAttributes, property.serializedObject, value))
              {
-                 saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
                  VisualElement rendererElement = saintsRenderer.CreateVisualElement();
                  if (rendererElement != null)
                  {
@@ -270,7 +269,6 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
              // this... fixed by adding Bind()... wtf...
              foreach (ISaintsRenderer saintsRenderer in renderer)
              {
-                 saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
                  VisualElement rendererElement = saintsRenderer.CreateVisualElement();
                  if (rendererElement != null)
                  {

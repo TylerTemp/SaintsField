@@ -287,7 +287,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
         public abstract void OnDestroy();
-
+        public abstract void OnSearchField(string searchString);
 
         public static string GetFriendlyName(SaintsFieldWithInfo fieldWithInfo)
         {
