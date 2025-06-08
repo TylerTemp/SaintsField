@@ -9,13 +9,11 @@ using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 // #if SAINTSFIELD_OBVIOUS_SOAP
@@ -1147,6 +1145,7 @@ namespace SaintsField.Editor.Core
                 Debug.Log($"remove old tracker main: {trackerMain}");
 #endif
                 trackerMain.RemoveFromHierarchy();
+                UIToolkitUtils.Unbind(trackerMain, property.serializedObject);
             }
             // if (trackerMain == null)
             {
@@ -1262,6 +1261,7 @@ namespace SaintsField.Editor.Core
 #endif
                     // continue;
                     subTracker.RemoveFromHierarchy();
+                    UIToolkitUtils.Unbind(subTracker, watchSubProperty.serializedObject);
                 }
 
                 subTracker = new VisualElement
