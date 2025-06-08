@@ -6,6 +6,7 @@ using UnityEngine;
 namespace SaintsField.Samples.Scripts
 {
     // [CreateAssetMenu(fileName = "Scriptable", menuName = "ScriptableObjects/Scriptable", order = 0)]
+    [Searchable]
     public class Scriptable : ScriptableObject, IInterface2, IDummy
     {
         [TableHide] public int hideMeInTable;

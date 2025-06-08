@@ -7,6 +7,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 
@@ -23,7 +24,10 @@ namespace SaintsField.Editor
         private void OnHeaderButtonClickUIToolkit()
         {
             _toolbarSearchField.style.display = _searchableShown ? DisplayStyle.Flex : DisplayStyle.None;
-            _toolbarSearchField.Focus();
+            if(_searchableShown)
+            {
+                _toolbarSearchField.Focus();
+            }
         }
 
         private ToolbarSearchField _toolbarSearchField;
@@ -132,6 +136,19 @@ namespace SaintsField.Editor
 
             root.schedule.Execute(DrawHeaderGUI.HelperUpdate).Every(1);
 
+            // ReSharper disable once InvertIf
+            if (_toolbarSearchField != null)
+            {
+                root.focusable = true;
+                root.RegisterCallback<KeyUpEvent>(evt =>
+                {
+                    if(evt.keyCode == KeyCode.F && evt.actionKey)
+                    {
+                        OnHeaderButtonClick();
+                    }
+                }, TrickleDown.TrickleDown);
+            }
+
             return root;
         }
 
@@ -143,7 +160,16 @@ namespace SaintsField.Editor
             }
         }
 
-        private void ResetSearchUIToolkit() => _toolbarSearchField.value = "";
+        private void ResetSearchUIToolkit()
+        {
+            // ReSharper disable once InvertIf
+            if (_toolbarSearchField.parent != null)
+            {
+                _toolbarSearchField.parent.Focus();
+                _toolbarSearchField.value = "";
+            }
+
+        }
     }
 }
 #endif

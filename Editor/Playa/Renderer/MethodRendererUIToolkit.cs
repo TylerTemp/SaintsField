@@ -298,6 +298,11 @@ namespace SaintsField.Editor.Playa.Renderer
                     || each is IPlayaMethodBindAttribute) > 0;
             }
 
+            string methodNameFriendly = ObjectNames.NicifyVariableName(methodInfo.Name);
+
+            _onSearchFieldUIToolkit.AddListener(Search);
+            buttonElement.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+
             if (!hasParameters)
             {
                 return (buttonElement, needUpdate);
@@ -307,7 +312,8 @@ namespace SaintsField.Editor.Playa.Renderer
             buttonElement.style.borderLeftWidth = buttonElement.style.borderRightWidth = buttonElement.style.borderBottomWidth = 0;
             root.Add(buttonElement);
 
-            string methodNameFriendly = ObjectNames.NicifyVariableName(methodInfo.Name);
+
+            return (root, needUpdate);
 
             void Search(string search)
             {
@@ -315,16 +321,11 @@ namespace SaintsField.Editor.Playa.Renderer
                     ? DisplayStyle.Flex
                     : DisplayStyle.None;
 
-                if (root.style.display != display)
+                if (buttonElement.style.display != display)
                 {
-                    root.style.display = display;
+                    buttonElement.style.display = display;
                 }
             }
-
-            _onSearchFieldUIToolkit.AddListener(Search);
-            root.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
-
-            return (root, needUpdate);
         }
 
         // private RichTextDrawer _richTextDrawer;

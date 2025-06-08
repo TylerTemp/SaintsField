@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.16.0 ##
+
+UI Toolkit: Add `Searchable` to search field name for MonoBehavior (Component) or ScriptableObject
+
 ## 4.15.1 ##
 
 1.  UI Toolkit: fix `ShowInInspector` setting a list to `null` gave an error
