@@ -90,10 +90,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.15.1**
+**4.16.0**
 
-1.  UI Toolkit: fix `ShowInInspector` setting a list to `null` gave an error
-2.  UI Toolkit: `ShowInInspector` now fold the struct/class by default. This is to avoid a looped references stack overflow rendering. The data will only be filled the first time you expand it.
+UI Toolkit: Add `Searchable` to search field name for MonoBehavior (Component) or ScriptableObject
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
