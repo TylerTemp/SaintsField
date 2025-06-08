@@ -31945,6 +31945,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91a96c0a0e7ddf14c878a57a4814bad0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  structImpl:
+    rid: 6754517829856788599
+  references:
+    version: 2
+    RefIds:
+    - rid: 6754517829856788599
+      type: {class: ReferenceChangeTrackTest/ClassDirect, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        <TheInt>k__BackingField: 0
 --- !u!1 &2077197058
 GameObject:
   m_ObjectHideFlags: 0
