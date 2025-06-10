@@ -2,9 +2,9 @@
 
 ## 4.16.1 ##
 
-1.  UI Toolkit: `Searchable` now can search a field when you input a field name from code. In privous version it need to match the display name
+1.  UI Toolkit: `Searchable` now can search a field when you input a field name from code. In previous version it need to match the display name
 2.  UI Toolkit: if you're using Unity 6k+, we now `Unbind` the element to stop the property tracking [#239](https://github.com/TylerTemp/SaintsField/issues/239)
-3.  Fix `OnValueChanged` callback does not work when the target field is an `Enum` and the callback receives the correspoding type of `Enum`
+3.  Fix `OnValueChanged` callback does not work when the target field is an `Enum` and the callback receives the corresponding type of `Enum`
 
 ## 4.16.0 ##
 
