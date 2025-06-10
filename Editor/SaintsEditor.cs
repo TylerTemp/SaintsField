@@ -300,7 +300,7 @@ namespace SaintsField.Editor
                                 // methodInfos.RemoveAll(each => each.InherentDepth < inherentDepth && each.RenderType == SaintsRenderType.Method && each.MethodInfo.Name == methodInfo.Name);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD
-                            Debug.Log($"[{systemType}] method: {methodInfo.Name}");
+                                Debug.Log($"[{systemType}] method: {methodInfo.Name}");
 #endif
 
                                 string buttonExtraId = string.Join(":", methodInfo.GetParameters()
