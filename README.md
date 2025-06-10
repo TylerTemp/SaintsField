@@ -59,6 +59,17 @@ Unity: 2019.1 or higher
     }
     ```
 
+*   Using git upm (Unity UI):
+
+    1. `Window` - `Package Manager`
+    2. Click `+` button, `Add package from git URL`
+    3. Enter the following URL:
+
+    ```
+    https://github.com/TylerTemp/SaintsField.git
+    ```
+
+
 *   Using a `unitypackage`:
 
     Go to the [Release Page](https://github.com/TylerTemp/SaintsField/releases) to download a desired version of `unitypackage` and import it to your project

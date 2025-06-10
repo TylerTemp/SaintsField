@@ -102,7 +102,12 @@ namespace SaintsField.Editor
                 };
                 root.Add(_toolbarSearchField);
 
-                _toolbarSearchField.RegisterValueChangedCallback(evt => OnSearch(evt.newValue));
+                _toolbarSearchField.RegisterValueChangedCallback(evt =>
+                {
+                    string searchRaw = evt.newValue;
+                    string searchUse = searchRaw.Contains(' ') ? searchRaw : ObjectNames.NicifyVariableName(searchRaw);
+                    OnSearch(searchUse);
+                });
                 DrawHeaderGUI.SaintsEditorEnqueueSearchable(this);
             }
 

@@ -158,7 +158,8 @@ namespace SaintsField.Editor.Utils
                     {
                         object value = toFillQueue.Dequeue();
                         Type paramType = methodParams[index].ParameterType;
-                        if (value == null || paramType.IsInstanceOfType(value))
+                        // Debug.Log($"{value} -> {paramType}");
+                        if (value == null || paramType.IsInstanceOfType(value) || CheckSignEnum(value, paramType))
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CALLBACK
                             Debug.Log($"Push value {value} for {methodParams[index].Name}");
@@ -231,6 +232,11 @@ namespace SaintsField.Editor.Utils
                 Debug.Assert(each.IsOptional, $"No value for required parameter `{each.Name}` in method.");
                 return each.DefaultValue;
             }).ToArray();
+        }
+
+        private static bool CheckSignEnum(object value, Type paramType)
+        {
+            return value is int && paramType.IsSubclassOf(typeof(Enum));
         }
 
         private static void SetIWrapPropValue(IWrapProp wrapProp, object value)
