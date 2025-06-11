@@ -12,6 +12,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
 {
     public class SaintsDictFillerExample : SaintsMonoBehaviour
     {
+#if UNITY_2021_3_OR_NEWER
         [Serializable]
         public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
         {
@@ -171,5 +172,6 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
 //             Debug.Log(JsonConvert.SerializeObject(basicType));
 //         }
 // #endif
+#endif
     }
 }

@@ -21,6 +21,18 @@ namespace SaintsField
             return value.ToString();
         }
 
+        public SaintsList()
+        {
+        }
+        public SaintsList(IEnumerable<T> ie)
+        {
+            value = new List<T>(ie);
+        }
+        public SaintsList(int capacity)
+        {
+            value = new List<T>(capacity);
+        }
+
         // Implicit conversion operator: Converts SaintsArray<T> to T[]
         public static implicit operator List<T>(SaintsList<T> saintsArray)
         {

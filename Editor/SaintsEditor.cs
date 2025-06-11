@@ -17,7 +17,6 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 using PlayaFullWidthRichLabelRenderer = SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer.PlayaFullWidthRichLabelRenderer;
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using DG.DOTweenEditor;

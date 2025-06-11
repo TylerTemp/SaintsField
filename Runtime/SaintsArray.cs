@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SaintsField
@@ -29,6 +30,12 @@ namespace SaintsField
         public static explicit operator SaintsArray<T>(T[] array) => new SaintsArray<T> { value = array };
 
         public override string ToString() => value.ToString();
+
+        public SaintsArray()
+        {
+        }
+
+        public SaintsArray(IEnumerable<T> ie) => value = ie.ToArray();
 
         #region IReadOnlyList
         public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)value).GetEnumerator();
