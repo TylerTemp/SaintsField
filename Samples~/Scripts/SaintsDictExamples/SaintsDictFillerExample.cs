@@ -12,62 +12,135 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
 {
     public class SaintsDictFillerExample : SaintsMonoBehaviour
     {
-//         [Serializable]
-//         public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
-//         {
-//             [SerializeField, NoLabel]
-//             private List<Wrap<int>> _intKeys = new List<Wrap<int>>();
-//
-//             [SerializeField, NoLabel, GetComponentInChildren, ReadOnly]
-//             private List<Wrap<GameObject>> _objValues = new List<Wrap<GameObject>>();
-//
-// #if UNITY_EDITOR
-//             private static string EditorPropKeys => nameof(_intKeys);
-//             private static string EditorPropValues => nameof(_objValues);
-// #endif
-//             protected override List<Wrap<int>> SerializedKeys => _intKeys;
-//             protected override List<Wrap<GameObject>> SerializedValues => _objValues;
-//         }
-
-        // public ValueFillerDict valueFillerDict;
-
-        // [SaintsDictionary("Slot", "Enemy", numberOfItemsPerPage: 5)]
-        // public ValueFillerDict decValueFillerDict;
-
-        // [LayoutStart("Buttons", ELayout.Horizontal)]
-
-        // [Button]
-        // private void AddRandom()
-        // {
-        //     int[] keys = Enumerable.Range(0, 100).Except(decValueFillerDict.Keys).ToArray();
-        //     if (keys.Length == 0)
-        //     {
-        //         return;
-        //     }
-        //
-        //     int key = keys[UnityEngine.Random.Range(0, keys.Length)];
-        //     decValueFillerDict.Add(key, gameObject);
-        // }
-
-        // [Button]
-        // private void DeleteRandom()
-        // {
-        //     int[] keys = decValueFillerDict.Keys.ToArray();
-        //     if (keys.Length == 0)
-        //     {
-        //         return;
-        //     }
-        //     decValueFillerDict.Remove(keys[UnityEngine.Random.Range(0, keys.Length)]);
-        // }
-
         [Serializable]
-        public struct MyStruct
+        public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
         {
-            [NoLabel, AboveRichLabel]
-            public string myStringField;
-            [NoLabel, AboveRichLabel]
-            public int myIntField;
+            [Serializable]
+            public class SaintsWrap<T> : Wrap<T>
+            {
+                [SerializeField] public T value;
+                public override T Value { get => value; set => this.value = value; }
+
+#if UNITY_EDITOR
+                // ReSharper disable once StaticMemberInGenericType
+                public static readonly string EditorPropertyName = nameof(value);
+#endif
+            }
+
+            [SerializeField, NoLabel]
+            private List<SaintsWrap<int>> _intKeys = new List<SaintsWrap<int>>();
+
+            [SerializeField, NoLabel, GetComponentInChildren, ReadOnly]
+            private List<SaintsWrap<GameObject>> _objValues = new List<SaintsWrap<GameObject>>();
+
+#if UNITY_EDITOR
+            private static string EditorPropKeys => nameof(_intKeys);
+            private static string EditorPropValues => nameof(_objValues);
+#endif
+            protected override int SerializedKeysCount()
+            {
+                return _intKeys.Count;
+            }
+
+            protected override void SerializedKeyAdd(int key)
+            {
+                _intKeys.Add(new SaintsWrap<int>{value = key});
+            }
+
+            protected override int SerializedKeyGetAt(int index)
+            {
+                return _intKeys[index].value;
+            }
+
+            protected override void SerializedKeysClear()
+            {
+                _intKeys.Clear();
+            }
+
+            protected override int SerializedValuesCount()
+            {
+                return _objValues.Count;
+            }
+
+            protected override void SerializedValueAdd(GameObject value)
+            {
+                _objValues.Add(new SaintsWrap<GameObject> { value = value });
+            }
+
+            protected override GameObject SerializedValueGetAt(int index)
+            {
+                return _objValues[index].value;
+            }
+
+            protected override void SerializedValuesClear()
+            {
+                _objValues.Clear();
+            }
+
+            protected override void SerializedSetKeyValue(int tKey, GameObject tValue)
+            {
+                int index = _intKeys.FindIndex(wrap => wrap.value.Equals(tKey));
+                if (index >= 0)
+                {
+                    _objValues[index].value = tValue;
+                }
+                else
+                {
+                    _intKeys.Add(new SaintsWrap<int>{value = tKey});
+                    _objValues.Add(new SaintsWrap<GameObject>{value = tValue});
+                }
+            }
+
+            protected override void SerializedRemoveKeyValue(int key)
+            {
+                int index = _intKeys.FindIndex(wrap => wrap.value.Equals(key));
+                if (index >= 0)
+                {
+                    _intKeys.RemoveAt(index);
+                    _objValues.RemoveAt(index);
+                }
+            }
         }
+
+        public ValueFillerDict valueFillerDict;
+
+        [SaintsDictionary("Slot", "Enemy", numberOfItemsPerPage: 5)]
+        public ValueFillerDict decValueFillerDict;
+
+        [LayoutStart("Buttons", ELayout.Horizontal)]
+
+        [Button]
+        private void AddRandom()
+        {
+            int[] keys = Enumerable.Range(0, 100).Except(decValueFillerDict.Keys).ToArray();
+            if (keys.Length == 0)
+            {
+                return;
+            }
+
+            int key = keys[UnityEngine.Random.Range(0, keys.Length)];
+            decValueFillerDict.Add(key, gameObject);
+        }
+
+        [Button]
+        private void DeleteRandom()
+        {
+            int[] keys = decValueFillerDict.Keys.ToArray();
+            if (keys.Length == 0)
+            {
+                return;
+            }
+            decValueFillerDict.Remove(keys[UnityEngine.Random.Range(0, keys.Length)]);
+        }
+
+        // [Serializable]
+        // public struct MyStruct
+        // {
+        //     [NoLabel, AboveRichLabel]
+        //     public string myStringField;
+        //     [NoLabel, AboveRichLabel]
+        //     public int myIntField;
+        // }
 
 //         [Serializable]
 //         public class MyConfig: SaintsDictionaryBase<int, MyStruct>

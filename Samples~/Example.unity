@@ -705,6 +705,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d8104be554c34f4e9eeb7d789bd5901, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  valueFillerDict:
+    _intKeys: []
+    _objValues: []
+  decValueFillerDict:
+    _intKeys:
+    - value: 57
+    - value: 3
+    - value: 4
+    - value: 5
+    - value: 0
+    - value: 48
+    - value: 27
+    - value: 28
+    - value: 69
+    _objValues:
+    - value: {fileID: 59883450}
+    - value: {fileID: 177648926}
+    - value: {fileID: 691523130}
+    - value: {fileID: 1829989614}
+    - value: {fileID: 1649096653}
+    - value: {fileID: 59883450}
+    - value: {fileID: 59883450}
+    - value: {fileID: 59883450}
+    - value: {fileID: 59883450}
 --- !u!1 &61780217
 GameObject:
   m_ObjectHideFlags: 0

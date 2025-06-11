@@ -631,7 +631,7 @@ namespace SaintsField.Editor.Core
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property, allAttributes);
 
-            Debug.Log($"attrOrNull={attrOrNull}; drawerType={drawerType}; allAttribute={string.Join(", ", allAttributes)}");
+            // Debug.Log($"attrOrNull={attrOrNull}; drawerType={drawerType}; allAttribute={string.Join(", ", allAttributes)}");
 
             if (drawerType == null)
             {
