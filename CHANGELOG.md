@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.16.2 ##
+
+1.  UI Toolkit: If you have multiple targets selected, `Button` can be triggered on all the targets. (NOTE: this does not work on `AboveButton`, `BelowButton`, `PostFieldButton` yet)
+2.  Change the logic of `SaintsDictionary` to allow inherent
+3.  Add constructor method for `SaintsList` & `SaintsArray` so they can be used more like a native array/list
+
 ## 4.16.1 ##
 
 1.  UI Toolkit: `Searchable` now can search a field when you input a field name from code. In previous version it need to match the display name

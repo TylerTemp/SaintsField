@@ -101,11 +101,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.16.1**
+**4.16.2**
 
-1.  UI Toolkit: `Searchable` now can search a field when you input a field name from code. In previous version it need to match the display name
-2.  UI Toolkit: if you're using Unity 6k+, we now `Unbind` the element to stop the property tracking [#239](https://github.com/TylerTemp/SaintsField/issues/239)
-3.  Fix `OnValueChanged` callback does not work when the target field is an `Enum` and the callback receives the corresponding type of `Enum`
+1.  UI Toolkit: If you have multiple targets selected, `Button` can be triggered on all the targets. (NOTE: this does not work on `AboveButton`, `BelowButton`, `PostFieldButton` yet)
+2.  Change the logic of `SaintsDictionary` to allow inherent
+3.  Add constructor method for `SaintsList` & `SaintsArray` so they can be used more like a native array/list
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -5760,36 +5760,17 @@ public SaintsDictionary<int, MyStruct> basicType;
 
 ![image](https://github.com/user-attachments/assets/c2dad54d-bfa6-4c52-acee-e2aa74898d71)
 
-At last, use auto getters so it can auto-fetch some values:
-
-(Note: ATM you still need to click the plus button once to make the array filling)
+You can also inherit `SaintsDictionaryBase<TKey, TValue>` to create your own custom dictionary.
 
 > [!WARNING]
-> Custom Dictionary is still under some test and need some API changes. Please avoid inherent a custom dictionary, but use `SaintsDictionary` directly.
+> Custom Dictionary is still under some test and need some API changes. Please avoid inherit a custom dictionary, but use `SaintsDictionary` directly.
+> If you still need it, please fork this project, use the forked one, and carefully exam the project when you upgrade, as it might break your inherence.
 
-```csharp
-suing SaintsField;
+See [DictInterface](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/IssueAndTesting/Issue/Issue241DictInterface.cs) as an example of making an `SerializedReference` dictionary.
 
-[Serializable]
-public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
-{
-    [SerializeField]
-    private List<Wrap<int>> _keys = new List<Wrap<int>>();
+![Image](https://github.com/user-attachments/assets/7b252440-c11d-4bd0-b206-4808cd4c3c01)
 
-    [SerializeField]
-    // [GetComponentInChildren]
-    private List<Wrap<MyStruct>> _values = new List<Wrap<MyStruct>>();
-
-#if UNITY_EDITOR
-    private static string EditorPropKeys => nameof(_intKeys);
-    private static string EditorPropValues => nameof(_objValues);
-#endif
-    protected override List<Wrap<int>> SerializedKeys => _intKeys;  // NOTE: need this `Wrap`
-    protected override List<Wrap<GameObject>> SerializedValues => _objValues;
-}
-
-public ValueFillerDict decValueFillerDict;
-```
+See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/SaintsDictExamples/SaintsDictFillerExample.cs) as an example of making dictionary with auto getters.
 
 [![video](https://github.com/user-attachments/assets/ce2efb49-2723-4e43-a3a7-9969f229f591)](https://github.com/user-attachments/assets/38dcb22c-d30f-40d4-bd6b-420aa1b41588)
 
