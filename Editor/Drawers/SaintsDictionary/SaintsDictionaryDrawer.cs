@@ -65,6 +65,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 _valuesPropName = ReflectUtils.GetIWrapPropName(rawType, "EditorPropValues");
             }
 
+            Debug.Assert(_keysPropName != null, $"Failed to find keys property name for {rawType}. Do you froget to define `EditorPropKeys` (nameof(YourPropKeyList))?");
+            Debug.Assert(_valuesPropName != null, $"Failed to find values property name for {rawType}. Do you froget to define `EditorPropValues` (nameof(YourPropValueList))?");
+
             return (_keysPropName, _valuesPropName);
         }
 

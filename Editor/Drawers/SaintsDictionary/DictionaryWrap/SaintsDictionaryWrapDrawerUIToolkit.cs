@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
@@ -18,11 +19,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            (SerializedProperty realProp, FieldInfo realInfo) = GetBasicInfo(property, info);
-
             InHorizontalLayout = true;
 
+            (SerializedProperty realProp, FieldInfo realInfo) = GetBasicInfo(property, info);
+
             // Debug.Log($"{property.propertyPath}: {string.Join(",", allAttributes)}");
+            // IReadOnlyList<PropertyAttribute> mergedAttributes = allAttributes.Concat(ReflectCache.GetCustomAttributes<PropertyAttribute>(realInfo)).ToArray();
 
             (PropertyAttribute[] _, object realParent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(realProp);
 

@@ -12,53 +12,53 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
 {
     public class SaintsDictFillerExample : SaintsMonoBehaviour
     {
-        [Serializable]
-        public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
-        {
-            [SerializeField, NoLabel]
-            private List<Wrap<int>> _intKeys = new List<Wrap<int>>();
-
-            [SerializeField, NoLabel, GetComponentInChildren, ReadOnly]
-            private List<Wrap<GameObject>> _objValues = new List<Wrap<GameObject>>();
-
-#if UNITY_EDITOR
-            private static string EditorPropKeys => nameof(_intKeys);
-            private static string EditorPropValues => nameof(_objValues);
-#endif
-            protected override List<Wrap<int>> SerializedKeys => _intKeys;
-            protected override List<Wrap<GameObject>> SerializedValues => _objValues;
-        }
+//         [Serializable]
+//         public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
+//         {
+//             [SerializeField, NoLabel]
+//             private List<Wrap<int>> _intKeys = new List<Wrap<int>>();
+//
+//             [SerializeField, NoLabel, GetComponentInChildren, ReadOnly]
+//             private List<Wrap<GameObject>> _objValues = new List<Wrap<GameObject>>();
+//
+// #if UNITY_EDITOR
+//             private static string EditorPropKeys => nameof(_intKeys);
+//             private static string EditorPropValues => nameof(_objValues);
+// #endif
+//             protected override List<Wrap<int>> SerializedKeys => _intKeys;
+//             protected override List<Wrap<GameObject>> SerializedValues => _objValues;
+//         }
 
         // public ValueFillerDict valueFillerDict;
 
-        [SaintsDictionary("Slot", "Enemy", numberOfItemsPerPage: 5)]
-        public ValueFillerDict decValueFillerDict;
+        // [SaintsDictionary("Slot", "Enemy", numberOfItemsPerPage: 5)]
+        // public ValueFillerDict decValueFillerDict;
 
-        [LayoutStart("Buttons", ELayout.Horizontal)]
+        // [LayoutStart("Buttons", ELayout.Horizontal)]
 
-        [Button]
-        private void AddRandom()
-        {
-            int[] keys = Enumerable.Range(0, 100).Except(decValueFillerDict.Keys).ToArray();
-            if (keys.Length == 0)
-            {
-                return;
-            }
+        // [Button]
+        // private void AddRandom()
+        // {
+        //     int[] keys = Enumerable.Range(0, 100).Except(decValueFillerDict.Keys).ToArray();
+        //     if (keys.Length == 0)
+        //     {
+        //         return;
+        //     }
+        //
+        //     int key = keys[UnityEngine.Random.Range(0, keys.Length)];
+        //     decValueFillerDict.Add(key, gameObject);
+        // }
 
-            int key = keys[UnityEngine.Random.Range(0, keys.Length)];
-            decValueFillerDict.Add(key, gameObject);
-        }
-
-        [Button]
-        private void DeleteRandom()
-        {
-            int[] keys = decValueFillerDict.Keys.ToArray();
-            if (keys.Length == 0)
-            {
-                return;
-            }
-            decValueFillerDict.Remove(keys[UnityEngine.Random.Range(0, keys.Length)]);
-        }
+        // [Button]
+        // private void DeleteRandom()
+        // {
+        //     int[] keys = decValueFillerDict.Keys.ToArray();
+        //     if (keys.Length == 0)
+        //     {
+        //         return;
+        //     }
+        //     decValueFillerDict.Remove(keys[UnityEngine.Random.Range(0, keys.Length)]);
+        // }
 
         [Serializable]
         public struct MyStruct
@@ -69,27 +69,27 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
             public int myIntField;
         }
 
-        [Serializable]
-        public class MyConfig: SaintsDictionaryBase<int, MyStruct>
-        {
-            [SerializeField]
-            private List<Wrap<int>> _keys = new List<Wrap<int>>();
-
-            [SerializeField]
-            // [GetComponentInChildren]
-            private List<Wrap<MyStruct>> _values = new List<Wrap<MyStruct>>();
-
-#if UNITY_EDITOR
-            private static string EditorPropKeys => nameof(_keys);
-            private static string EditorPropValues => nameof(_values);
-#endif
-            protected override List<Wrap<int>> SerializedKeys => _keys;
-            protected override List<Wrap<MyStruct>> SerializedValues => _values;
-        }
+//         [Serializable]
+//         public class MyConfig: SaintsDictionaryBase<int, MyStruct>
+//         {
+//             [SerializeField]
+//             private List<Wrap<int>> _keys = new List<Wrap<int>>();
+//
+//             [SerializeField]
+//             // [GetComponentInChildren]
+//             private List<Wrap<MyStruct>> _values = new List<Wrap<MyStruct>>();
+//
+// #if UNITY_EDITOR
+//             private static string EditorPropKeys => nameof(_keys);
+//             private static string EditorPropValues => nameof(_values);
+// #endif
+//             protected override List<Wrap<int>> SerializedKeys => _keys;
+//             protected override List<Wrap<MyStruct>> SerializedValues => _values;
+//         }
 
         // public SaintsDictionary<int, MyStruct> basicType;
-        [Space(200)]
-        public MyConfig basicType;
+        // [Space(200)]
+        // public MyConfig basicType;
 
 // #if SAINTSFIELD_JSON
 //         [Button]

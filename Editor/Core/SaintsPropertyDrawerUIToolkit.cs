@@ -645,6 +645,10 @@ namespace SaintsField.Editor.Core
             // return PropertyFieldFallbackUIToolkit(property);
 
             PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);
+            if (typeDrawer is SaintsPropertyDrawer spd)
+            {
+                spd.InHorizontalLayout = InHorizontalLayout;
+            }
 
             VisualElement element = DrawUsingDrawerInstance(passedPreferredLabel, drawerType, typeDrawer, property, info,
                 saintsPropertyDrawers, containerElement);

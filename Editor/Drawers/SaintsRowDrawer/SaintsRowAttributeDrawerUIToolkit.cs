@@ -143,6 +143,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
         private static void FillElement(VisualElement root, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
+            // Debug.Log($"{property.propertyPath}: {inHorizontalLayout}");
             object value = null;
             if (property.propertyType == SerializedPropertyType.ManagedReference)
             {
@@ -269,6 +270,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
              // this... fixed by adding Bind()... wtf...
              foreach (ISaintsRenderer saintsRenderer in renderer)
              {
+                 saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
                  VisualElement rendererElement = saintsRenderer.CreateVisualElement();
                  if (rendererElement != null)
                  {
