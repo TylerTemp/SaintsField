@@ -7,6 +7,23 @@ namespace SaintsField
     [Serializable]
     public class SaintsDictionary<TKey, TValue>: SaintsDictionaryBase<TKey, TValue>
     {
+        [Serializable]
+        public class SaintsWrap<T> : Wrap<T>
+        {
+            [SerializeField] public T value;
+            public override T Value { get => value; set => this.value = value; }
+
+#if UNITY_EDITOR
+            // ReSharper disable once StaticMemberInGenericType
+            public static readonly string EditorPropertyName = nameof(value);
+#endif
+
+            public SaintsWrap(T v)
+            {
+                value = v;
+            }
+        }
+
         [SerializeField, Obsolete]
         private List<TKey> _keys = new List<TKey>();
 
@@ -14,10 +31,81 @@ namespace SaintsField
         private List<TValue> _values = new List<TValue>();
 
         [SerializeField]
-        private List<Wrap<TKey>> _saintsKeys = new List<Wrap<TKey>>();
+        private List<SaintsWrap<TKey>> _saintsKeys = new List<SaintsWrap<TKey>>();
 
         [SerializeField]
-        private List<Wrap<TValue>> _saintsValues = new List<Wrap<TValue>>();
+        private List<SaintsWrap<TValue>> _saintsValues = new List<SaintsWrap<TValue>>();
+
+
+        protected override int SerializedKeysCount()
+        {
+            return _saintsKeys.Count;
+        }
+
+        protected override void SerializedKeyAdd(TKey key)
+        {
+            _saintsKeys.Add(new SaintsWrap<TKey>(key));
+        }
+
+        protected override TKey SerializedKeyGetAt(int index)
+        {
+            return _saintsKeys[index].value;
+        }
+
+        protected override void SerializedKeysClear()
+        {
+            _saintsKeys.Clear();
+        }
+
+        protected override int SerializedValuesCount()
+        {
+            return _saintsValues.Count;
+        }
+
+        protected override void SerializedValueAdd(TValue value)
+        {
+            _saintsValues.Add(new SaintsWrap<TValue>(value));
+        }
+
+        protected override TValue SerializedValueGetAt(int index)
+        {
+            return _saintsValues[index].value;
+        }
+
+        protected override void SerializedValuesClear()
+        {
+            _saintsValues.Clear();
+        }
+
+        protected override void SerializedSetKeyValue(TKey tKey, TValue tValue)
+        {
+            int index = _saintsKeys.FindIndex(wrap => wrap.value.Equals(tKey));
+            if (index >= 0)
+            {
+                _saintsValues[index].value = tValue;
+            }
+            else
+            {
+                _saintsKeys.Add(new SaintsWrap<TKey>(tKey));
+                _saintsValues.Add(new SaintsWrap<TValue>(tValue));
+            }
+        }
+
+        protected override void SerializedRemoveKeyValue(TKey key)
+        {
+            int index = _saintsKeys.FindIndex(wrap => wrap.value.Equals(key));
+            if (index >= 0)
+            {
+                _saintsKeys.RemoveAt(index);
+                _saintsValues.RemoveAt(index);
+            }
+        }
+
+        protected override void OnBeforeSerializeProcesser()
+        {
+            MigrateKv();
+            base.OnBeforeSerializeProcesser();
+        }
 
 #if UNITY_EDITOR
         // ReSharper disable once UnusedMember.Local
@@ -25,8 +113,6 @@ namespace SaintsField
         // ReSharper disable once UnusedMember.Local
         private static string EditorPropValues => nameof(_saintsValues);
 #endif
-        protected override List<Wrap<TKey>> SerializedKeys => _saintsKeys;
-        protected override List<Wrap<TValue>> SerializedValues => _saintsValues;
 
         public SaintsDictionary()
         {
@@ -37,8 +123,8 @@ namespace SaintsField
             Dictionary = new Dictionary<TKey, TValue>(dictionary);
             foreach (KeyValuePair<TKey, TValue> kv in Dictionary)
             {
-                _saintsKeys.Add(new Wrap<TKey>(kv.Key));
-                _saintsValues.Add(new Wrap<TValue>(kv.Value));
+                _saintsKeys.Add(new SaintsWrap<TKey>(kv.Key));
+                _saintsValues.Add(new SaintsWrap<TValue>(kv.Value));
             }
         }
 
@@ -47,8 +133,8 @@ namespace SaintsField
             Dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
             foreach (KeyValuePair<TKey, TValue> kv in Dictionary)
             {
-                _saintsKeys.Add(new Wrap<TKey>(kv.Key));
-                _saintsValues.Add(new Wrap<TValue>(kv.Value));
+                _saintsKeys.Add(new SaintsWrap<TKey>(kv.Key));
+                _saintsValues.Add(new SaintsWrap<TValue>(kv.Value));
             }
         }
 
@@ -58,8 +144,8 @@ namespace SaintsField
             Dictionary = new Dictionary<TKey, TValue>(collection);
             foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
             {
-                _saintsKeys.Add(new Wrap<TKey>(kv.Key));
-                _saintsValues.Add(new Wrap<TValue>(kv.Value));
+                _saintsKeys.Add(new SaintsWrap<TKey>(kv.Key));
+                _saintsValues.Add(new SaintsWrap<TValue>(kv.Value));
             }
         }
 
@@ -69,8 +155,8 @@ namespace SaintsField
             Dictionary = new Dictionary<TKey, TValue>(collection, comparer);
             foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
             {
-                _saintsKeys.Add(new Wrap<TKey>(kv.Key));
-                _saintsValues.Add(new Wrap<TValue>(kv.Value));
+                _saintsKeys.Add(new SaintsWrap<TKey>(kv.Key));
+                _saintsValues.Add(new SaintsWrap<TValue>(kv.Value));
             }
         }
 #endif
@@ -80,8 +166,8 @@ namespace SaintsField
             Dictionary = new Dictionary<TKey, TValue>(comparer);
             foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
             {
-                _saintsKeys.Add(new Wrap<TKey>(kv.Key));
-                _saintsValues.Add(new Wrap<TValue>(kv.Value));
+                _saintsKeys.Add(new SaintsWrap<TKey>(kv.Key));
+                _saintsValues.Add(new SaintsWrap<TValue>(kv.Value));
             }
         }
 
@@ -96,7 +182,7 @@ namespace SaintsField
 #endif
                 foreach (TKey key in _keys)
                 {
-                    _saintsKeys.Add(new Wrap<TKey>(key));
+                    _saintsKeys.Add(new SaintsWrap<TKey>(key));
                 }
 
                 _keys.Clear();
@@ -109,7 +195,7 @@ namespace SaintsField
 #endif
                 foreach (TValue value in _values)
                 {
-                    _saintsValues.Add(new Wrap<TValue>(value));
+                    _saintsValues.Add(new SaintsWrap<TValue>(value));
                 }
                 _values.Clear();
             }
@@ -117,13 +203,6 @@ namespace SaintsField
         }
 #endif
 
-#if UNITY_EDITOR
-        protected override void OnBeforeSerializeProcesser()
-        {
-            MigrateKv();
-            base.OnBeforeSerializeProcesser();
-        }
-#endif
 
 #if UNITY_EDITOR
         protected override void OnAfterDeserializeProcess()
