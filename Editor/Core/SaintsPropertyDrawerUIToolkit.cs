@@ -629,7 +629,9 @@ namespace SaintsField.Editor.Core
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
-            (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
+            (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property, allAttributes);
+
+            Debug.Log($"attrOrNull={attrOrNull}; drawerType={drawerType}; allAttribute={string.Join(", ", allAttributes)}");
 
             if (drawerType == null)
             {

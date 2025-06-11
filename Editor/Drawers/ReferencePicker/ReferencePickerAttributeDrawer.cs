@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         private static void UpdateForType(Type type, object source, object destination)
         {
             FieldInfo[] myObjectFields = type.GetFields(
-                BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
 
             foreach (FieldInfo fi in myObjectFields)
             {

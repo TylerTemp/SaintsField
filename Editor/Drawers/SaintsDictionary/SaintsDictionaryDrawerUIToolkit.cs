@@ -921,7 +921,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 else
                 {
                     (Attribute attrOrNull, Type drawerType) =
-                        GetFallbackDrawerType(info, serializedProperty);
+                        GetFallbackDrawerType(info, serializedProperty, allAttributes);
                     // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
                     useAttribute = attrOrNull;
                     useDrawerType = drawerType;

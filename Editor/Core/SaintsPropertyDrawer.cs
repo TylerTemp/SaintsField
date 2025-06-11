@@ -387,10 +387,10 @@ namespace SaintsField.Editor.Core
             // ReSharper enable InconsistentNaming
         }
 
-        private static (Attribute attributeInstance, Type attributeDrawerType) GetOtherAttributeDrawerType(MemberInfo fieldInfo)
+        private static (Attribute attributeInstance, Type attributeDrawerType) GetOtherAttributeDrawerType(IEnumerable<Attribute> allAttributes)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression
-            foreach (Attribute fieldAttribute in ReflectCache.GetCustomAttributes(fieldInfo))
+            foreach (Attribute fieldAttribute in allAttributes)
             {
                 if (fieldAttribute is ISaintsAttribute)
                     continue;
@@ -628,13 +628,13 @@ namespace SaintsField.Editor.Core
             return _cachedDrawer[saintsAttributeWithIndex] = GetOrCreateSaintsDrawerByAttr(saintsAttributeWithIndex.SaintsAttribute);
         }
 
-        public static (Attribute attrOrNull, Type drawerType) GetFallbackDrawerType(MemberInfo info, SerializedProperty property)
+        public static (Attribute attrOrNull, Type drawerType) GetFallbackDrawerType(MemberInfo info, SerializedProperty property, IEnumerable<Attribute> allAttributes)
         {
             EnsureAndGetTypeToDrawers();
 
             // check if any property has drawer. If so, just use PropertyField
-            // if not, check if it has custom drawer. if it exists, then try use that custom drawer
-            (Attribute attr, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
+            // if not, check if it has custom drawer. if it exists, then try to use that custom drawer
+            (Attribute attr, Type attributeDrawerType) = GetOtherAttributeDrawerType(allAttributes);
             if (attributeDrawerType != null)
             {
                 return (attr, attributeDrawerType);

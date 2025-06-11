@@ -383,7 +383,7 @@ namespace SaintsField.Editor.Utils
                 {
                     (Attribute attrOrNull, Type drawerType) =
                         SaintsPropertyDrawer.GetFallbackDrawerType(fieldInfo,
-                            property);
+                            property, allAttributes);
                     // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
                     useAttribute = attrOrNull;
                     useDrawerType = drawerType;

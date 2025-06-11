@@ -23,20 +23,64 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
 
             (SerializedProperty realProp, FieldInfo realInfo) = GetBasicInfo(property, info);
 
+            // (string getValueError, int _, object thisContainer) = Util.GetValue(property, info, parent);
+            // Debug.Log($"thisContainer={}/{thisContainer.GetType()}");
+            // Debug.Log(thisContainer);
+            // Debug.Log(thisContainer.GetType());
+
+            PropertyAttribute[] fieldAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(realInfo);
+
+            // foreach (PropertyAttribute fieldAttribute in fieldAttributes)
+            // {
+            //     if (fieldAttribute is ISaintsAttribute)
+            //     {
+            //
+            //     }
+            // }
+
+
             // Debug.Log($"{property.propertyPath}: {string.Join(",", allAttributes)}");
-            // IReadOnlyList<PropertyAttribute> mergedAttributes = allAttributes.Concat(ReflectCache.GetCustomAttributes<PropertyAttribute>(realInfo)).ToArray();
+            // IReadOnlyList<PropertyAttribute> mergedAttributes = allAttributes.Concat(fieldAttributes).ToArray();
 
-            (PropertyAttribute[] _, object realParent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(realProp);
+            // Debug.Log(parent.GetType());
 
-            // UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
-
-            using(new SaintsRowAttributeDrawer.ForceInlineScoop(true))
+            // VisualElement r = null;
+            VisualElement r =
+                UIToolkitUtils.CreateOrUpdateFieldProperty(
+                    realProp,
+                    fieldAttributes,
+                    realInfo.FieldType,
+                    null,
+                    realInfo,
+                    true,
+                    this,
+                    this,
+                    null,
+                    parent
+                );
+            if (r != null)
             {
-                return UnityFallbackUIToolkit(
-                    realInfo, realProp, allAttributes, container, "", SaintsPropertyDrawers,
-                    realParent);
+                r.style.width = new StyleLength(Length.Percent(100));
+                return r;
             }
-            // return PropertyFieldFallbackUIToolkit(realProp);
+
+            return new HelpBox($"Failed to render {property.propertyPath}, please report this issue", HelpBoxMessageType.Error);
+
+            // // Debug.Log($"mergedAttributes={string.Join(" ", mergedAttributes)}");
+            //
+            // (PropertyAttribute[] _, object realParent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(realProp);
+            //
+            // // UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
+            //
+            // using(new SaintsRowAttributeDrawer.ForceInlineScoop(true))
+            // {
+            //     return UnityFallbackUIToolkit(
+            //         realInfo, realProp,
+            //         mergedAttributes,
+            //         container, "", SaintsPropertyDrawers,
+            //         realParent);
+            // }
+            // // return PropertyFieldFallbackUIToolkit(realProp);
         }
 
         protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,

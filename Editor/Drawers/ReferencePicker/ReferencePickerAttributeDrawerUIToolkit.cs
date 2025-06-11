@@ -86,6 +86,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 // },
                 style =
                 {
+                    color = Color.gray,
                     position = Position.Absolute,
                     right = SingleLineHeight,
                     display = ((ReferencePickerAttribute) saintsAttribute).HideLabel? DisplayStyle.None: DisplayStyle.Flex,

@@ -1216,7 +1216,7 @@ namespace SaintsField.Editor.Core
         private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label, FieldInfo fieldInfo, string preferredLabel)
         {
             // Wait... it works now?
-            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
+            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(ReflectCache.GetCustomAttributes(fieldInfo));
 
             if(attributeDrawerType != null)
             {

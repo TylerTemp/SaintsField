@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             [Serializable]
             public class SaintsWrap<T> : Wrap<T>
             {
-                [SerializeField, SerializeReference, ReferencePicker(hideLabel: true)] public T value;
+                [SerializeReference, SaintsRow(inline: true), ReferencePicker(hideLabel: true)] public T value;
 
                 public override T Value
                 {
