@@ -47,7 +47,7 @@ namespace SaintsField.Editor
             Type objectType = target.GetType();
             IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
 
-            foreach (ISaintsRenderer saintsRenderer in GetClassStructRenderer(objectType, playaClassAttributes, serializedObject, target))
+            foreach (ISaintsRenderer saintsRenderer in GetClassStructRenderer(objectType, playaClassAttributes, serializedObject, targets))
             {
                 VisualElement ve = saintsRenderer.CreateVisualElement();
                 if(ve != null)
@@ -113,7 +113,7 @@ namespace SaintsField.Editor
 
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
 
-            IReadOnlyList<ISaintsRenderer> renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
+            IReadOnlyList<ISaintsRenderer> renderers = Setup(Array.Empty<string>(), serializedObject, this, targets);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
             List<ISaintsRenderer> usedRenderers = new List<ISaintsRenderer>();

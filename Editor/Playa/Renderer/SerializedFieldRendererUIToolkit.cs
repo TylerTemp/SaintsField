@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 this,
                 this,
                 null,
-                FieldWithInfo.Target
+                FieldWithInfo.Targets[0]
             );
             if (r != null)
             {

@@ -53,13 +53,13 @@ namespace SaintsField.Editor.Playa.Renderer
                 if (_cachedRichTextChunksIMGUI == null)
                 {
                     _cachedRichTextChunksIMGUI = RichTextDrawer.ParseRichXml(buttonAttribute.Label,
-                        FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Target).ToArray();
+                        FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]).ToArray();
                 }
 
                 return _cachedRichTextChunksIMGUI;
             }
 
-            (string error, string result) = Util.GetOf<string>(buttonAttribute.Label, null, FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Target);
+            (string error, string result) = Util.GetOf<string>(buttonAttribute.Label, null, FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
 
             if (error != "")
             {
@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXml(result,
-                FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Target);
+                FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
             _cachedCallbackLabelIMGUI = result;
             _cachedRichTextChunksIMGUI = chunks.ToArray();
 
@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 _imGuiEnumerator = null;
             }
 
-            object target = FieldWithInfo.Target;
+            object target = FieldWithInfo.Targets[0];
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
 
             ButtonAttribute buttonAttribute = null;

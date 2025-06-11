@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         {
             if (fieldWithInfo.RenderType == SaintsRenderType.ClassStruct)
             {
-                return (null, fieldWithInfo.Target.GetType().Name);
+                return (null, fieldWithInfo.Targets[0].GetType().Name);
             }
 
             MemberInfo memberInfo = GetMemberInfo(fieldWithInfo);

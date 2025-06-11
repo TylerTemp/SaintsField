@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing.MutipleButton
         [Button]
         protected virtual void Parent()
         {
-            Debug.Log(s = "Parent!");
+            Debug.Log(s);
         }
     }
 }

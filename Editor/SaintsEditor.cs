@@ -15,6 +15,7 @@ using SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using PlayaFullWidthRichLabelRenderer = SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer.PlayaFullWidthRichLabelRenderer;
@@ -74,7 +75,7 @@ namespace SaintsField.Editor
         }
 
         public static IReadOnlyList<ISaintsRenderer> Setup(ICollection<string> skipSerializedFields, SerializedObject serializedObject, IMakeRenderer makeRenderer,
-            object target)
+            IReadOnlyList<object> targets)
         {
             string[] serializableFields = GetSerializedProperties(serializedObject).ToArray();
             // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
@@ -82,10 +83,10 @@ namespace SaintsField.Editor
                 .Where(each => !skipSerializedFields.Contains(each))
                 .ToDictionary(each => each, serializedObject.FindProperty);
             // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
-            return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
+            return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, targets);
         }
 
-        public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(Type objectType, IEnumerable<IPlayaClassAttribute> playaClassAttributes, SerializedObject serializedObject, object target)
+        public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(Type objectType, IEnumerable<IPlayaClassAttribute> playaClassAttributes, SerializedObject serializedObject, IReadOnlyList<object> targets)
         {
             // List<SaintsFieldWithInfo> saintsFieldWithInfos = new List<SaintsFieldWithInfo>(playaClassAttributes.Length);
             foreach ((IPlayaClassAttribute playaClassAttribute, int index) in playaClassAttributes.WithIndex())
@@ -98,7 +99,7 @@ namespace SaintsField.Editor
                         yield return new PlayaInfoBoxRenderer(serializedObject, new SaintsFieldWithInfo
                         {
                             PlayaAttributes = new[] { infoBox },
-                            Target = target,
+                            Targets = targets,
                             RenderType = SaintsRenderType.ClassStruct,
                             SerializedProperty = null,
                             FieldInfo = null,
@@ -115,7 +116,7 @@ namespace SaintsField.Editor
                         yield return new PlayaFullWidthRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
                         {
                             PlayaAttributes = new[] { playaAboveRichLabelAttribute },
-                            Target = target,
+                            Targets = targets,
                             RenderType = SaintsRenderType.ClassStruct,
                             SerializedProperty = null,
                             FieldInfo = null,
@@ -135,7 +136,7 @@ namespace SaintsField.Editor
 
         public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
-            object target)
+            IReadOnlyList<object> targets)
         {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
 
@@ -145,15 +146,16 @@ namespace SaintsField.Editor
             pendingSerializedProperties.Remove("m_Script");
 
             List<Type> types = new List<Type>();
-            if (target == null)
+            if (targets.Count == 0 || targets.All(RuntimeUtil.IsNull))
             {
 #if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"Target is null, use fallback workaround, #200");
+                Debug.LogWarning("Target is null, use fallback workaround, #200");
 #endif
                 // do nothing
             }
             else
             {
+                object target = targets[0];
                 types = ReflectUtils.GetSelfAndBaseTypes(target);
                 types.Reverse();
                 // base type -> this type
@@ -206,7 +208,7 @@ namespace SaintsField.Editor
                                         PlayaAttributes = playaAttributes,
                                         // PlayaAttributesQueue = playaAttributes,
                                         // LayoutBases = layoutBases,
-                                        Target = target,
+                                        Targets = targets,
 
                                         RenderType = SaintsRenderType.SerializedField,
                                         SerializedProperty = serializedPropertyDict[fieldInfo.Name],
@@ -235,7 +237,7 @@ namespace SaintsField.Editor
                                         PlayaAttributes = playaAttributes,
                                         // PlayaAttributesQueue = playaAttributes,
                                         // LayoutBases = layoutBases,
-                                        Target = target,
+                                        Targets = targets,
 
                                         RenderType = SaintsRenderType.NonSerializedField,
                                         // memberType = nonSerFieldInfo.MemberType,
@@ -265,7 +267,7 @@ namespace SaintsField.Editor
                                         PlayaAttributes = playaAttributes,
                                         // PlayaAttributesQueue = playaAttributes,
                                         // LayoutBases = layoutBases,
-                                        Target = target,
+                                        Targets = targets,
 
                                         RenderType = SaintsRenderType.NativeProperty,
                                         MemberId = propertyInfo.Name,
@@ -314,7 +316,7 @@ namespace SaintsField.Editor
                                     PlayaAttributes = playaAttributes,
                                     // PlayaAttributesQueue = playaAttributes,
                                     // LayoutBases = layoutBases,
-                                    Target = target,
+                                    Targets = targets,
 
                                     // memberType = MemberTypes.Method,
                                     RenderType = SaintsRenderType.Method,
@@ -352,7 +354,7 @@ namespace SaintsField.Editor
                         PlayaAttributes = Array.Empty<IPlayaAttribute>(),
                         // PlayaAttributesQueue = new List<IPlayaAttribute>(),
                         // LayoutBases = Array.Empty<ISaintsLayoutBase>(),
-                        Target = target,
+                        Targets = targets,
 
                         RenderType = SaintsRenderType.InjectedSerializedField,
                         SerializedProperty = pendingSer.Value,
@@ -417,21 +419,21 @@ namespace SaintsField.Editor
         public static IReadOnlyList<ISaintsRenderer> HelperGetRenderers(
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict, SerializedObject serializedObject,
             IMakeRenderer makeRenderer,
-            object target)
+            IReadOnlyList<object> targets)
         {
-            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedPropertyDict, target).ToArray();
+            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedPropertyDict, targets).ToArray();
 
             // let's handle some HeaderGUI here... not a good idea but...
             bool anyChange = false;
             // target.GetType()
 
-            AbsComponentHeaderAttribute[] classAttributes = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(target.GetType());
+            AbsComponentHeaderAttribute[] classAttributes = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(targets.GetType());
             foreach ((AbsComponentHeaderAttribute componentHeaderAttribute, int order) in classAttributes.WithIndex(-classAttributes.Length))
             {
                 bool added = DrawHeaderGUI.AddAttributeIfNot(
                     componentHeaderAttribute,
                     null,
-                    target,
+                    targets[0],
                     order);
                 if (added)
                 {
@@ -446,7 +448,7 @@ namespace SaintsField.Editor
                     bool added = DrawHeaderGUI.AddAttributeIfNot(
                         componentHeaderAttribute,
                         saintsFieldWithInfo.MethodInfo ?? (MemberInfo)saintsFieldWithInfo.FieldInfo ?? saintsFieldWithInfo.PropertyInfo,
-                        target,
+                        targets[0],
                         index);
                     if (added)
                     {
@@ -456,7 +458,7 @@ namespace SaintsField.Editor
             }
             if (anyChange)
             {
-                DrawHeaderGUI.RefreshAddAttributeIfNot(target.GetType());
+                DrawHeaderGUI.RefreshAddAttributeIfNot(targets[0].GetType());
             }
 
             IReadOnlyList<RendererGroupInfo> chainedGroups = ChainSaintsFieldWithInfo(fieldWithInfosSorted, serializedObject, makeRenderer);
@@ -595,7 +597,7 @@ namespace SaintsField.Editor
                                                 AbsGroupBy = openGroupTo,
                                                 Children = new List<RendererGroupInfo>(),
                                                 Config = new SaintsRendererGroup.Config(),
-                                                Target = saintsFieldWithInfo.Target,
+                                                Target = saintsFieldWithInfo.Targets[0],
                                             };
                                         }
 
@@ -676,7 +678,7 @@ namespace SaintsField.Editor
                             preAbsGroupBy = groupBy;
                             // Debug.Log($"{saintsGroup}: {groupBy}({saintsGroup.LayoutBy})");
 
-                            (bool newRoot, RendererGroupInfo targetGroup) = GetOrCreateGroupInfo(rootToRendererGroupInfo, groupBy, saintsFieldWithInfo.Target);
+                            (bool newRoot, RendererGroupInfo targetGroup) = GetOrCreateGroupInfo(rootToRendererGroupInfo, groupBy, saintsFieldWithInfo.Targets[0]);
                             if (newRoot)
                             {
                                 // Debug.Log($"new root {saintsGroup}: {groupBy}({saintsGroup.LayoutBy})");

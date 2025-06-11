@@ -106,7 +106,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             if (userData.FieldWithInfo.RenderType == SaintsRenderType.ClassStruct)
             {
                 member = null;
-                useLabel = ObjectNames.NicifyVariableName(userData.FieldWithInfo.Target.GetType().Name);
+                useLabel = ObjectNames.NicifyVariableName(userData.FieldWithInfo.Targets[0].GetType().Name);
             }
             else
             {
@@ -118,7 +118,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 
             container.Clear();
             foreach (VisualElement richTextElement in userData.RichTextDrawer.DrawChunksUIToolKit(
-                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, userData.FieldWithInfo.SerializedProperty, member, userData.FieldWithInfo.Target))
+                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, userData.FieldWithInfo.SerializedProperty, member, userData.FieldWithInfo.Targets[0]))
                      )
             {
                 container.Add(richTextElement);

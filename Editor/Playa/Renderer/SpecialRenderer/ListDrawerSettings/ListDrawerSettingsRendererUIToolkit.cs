@@ -120,12 +120,12 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             if (!string.IsNullOrEmpty(extraSearchCallback))
             {
-                extraSearchMethod = GetSearchMethodInfo(FieldWithInfo.Target.GetType(), elementType, extraSearchCallback);
+                extraSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, extraSearchCallback);
             }
 
             if (!string.IsNullOrEmpty(overrideSearchCallback))
             {
-                overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Target.GetType(), elementType, overrideSearchCallback);
+                overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, overrideSearchCallback);
             }
 
             IEnumerable<IReadOnlyList<int>> SearchCallback(SerializedProperty arrayProperty, string search)
@@ -145,7 +145,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                         int batchCount = 0;
                         foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
                         {
-                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Target,
+                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0],
                                     new object[] { fullIndex, searchTokens }))
                             {
                                 // yield return fullIndex;
@@ -172,7 +172,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     }
 
                     {
-                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
+                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Targets[0]);
 
                         int curIndex = 0;
 
@@ -185,7 +185,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                                 ? new[] { rawValue, searchTokens }
                                 : new[] { rawValue, curIndex, searchTokens };
 
-                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
+                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0], methodParams))
                             {
                                 batchResults.Add(curIndex);
                             }
@@ -222,7 +222,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
                         foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
                         {
-                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Target,
+                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0],
                                     new object[] { fullIndex, searchTokens }))
                             {
                                 // yield return fullIndex;
@@ -256,7 +256,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     }
 
                     {
-                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
+                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Targets[0]);
 
                         int curIndex = 0;
 
@@ -271,7 +271,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                                 ? new[] { rawValue, searchTokens }
                                 : new[] { rawValue, curIndex, searchTokens };
 
-                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
+                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0], methodParams))
                             {
                                 // Debug.Log($"yield {curIndex}/{rawValue} in extra search");
                                 // yield return curIndex;
@@ -396,7 +396,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     this,
                     this,
                     null,
-                    FieldWithInfo.Target
+                    FieldWithInfo.Targets[0]
                 );
                 // Debug.Log($"draw list item {prop.propertyPath}: {resultField}");
                 // PropertyField propertyField = (PropertyField)propertyFieldRaw;
@@ -782,7 +782,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 int max = -1;
                 if (arraySizeAttribute != null)
                 {
-                    (string error, bool dynamic, int min, int max) getArraySize = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, property, FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                    (string error, bool dynamic, int min, int max) getArraySize = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, property, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
                     if(getArraySize.error == "")
                     {
                         min = getArraySize.min;

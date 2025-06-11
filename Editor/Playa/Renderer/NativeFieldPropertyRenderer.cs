@@ -41,14 +41,14 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             if (fieldWithInfo.FieldInfo != null)
             {
-                return ("", fieldWithInfo.FieldInfo.GetValue(fieldWithInfo.Target));
+                return ("", fieldWithInfo.FieldInfo.GetValue(fieldWithInfo.Targets[0]));
             }
 
             if (fieldWithInfo.PropertyInfo.CanRead)
             {
                 try
                 {
-                    return ("", fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Target));
+                    return ("", fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Targets[0]));
                 }
                 catch (Exception e)
                 {
@@ -74,12 +74,12 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     return null;
                 }
-                return value => fieldWithInfo.FieldInfo.SetValue(fieldWithInfo.Target, value);
+                return value => fieldWithInfo.FieldInfo.SetValue(fieldWithInfo.Targets[0], value);
             }
 
             if (fieldWithInfo.PropertyInfo.CanWrite)
             {
-                return value => fieldWithInfo.PropertyInfo.SetValue(fieldWithInfo.Target, value);
+                return value => fieldWithInfo.PropertyInfo.SetValue(fieldWithInfo.Targets[0], value);
             }
 
             return null;

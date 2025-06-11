@@ -20,7 +20,7 @@ namespace SaintsField.Editor
             // Debug.Log($"OnEnable");
             try
             {
-                _renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
+                _renderers = Setup(Array.Empty<string>(), serializedObject, this, targets);
             }
             catch (Exception)
             {
@@ -50,7 +50,7 @@ namespace SaintsField.Editor
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_renderers == null)
             {
-                _renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
+                _renderers = Setup(Array.Empty<string>(), serializedObject, this, targets);
             }
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             AliveInstances.Add(this);

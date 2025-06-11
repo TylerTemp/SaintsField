@@ -81,7 +81,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             {
                 (string error, bool dynamicValue, int minValue, int maxValue) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute,
                     FieldWithInfo.SerializedProperty,
-                    FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                    FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
 
                 if (error == "")
                 {
@@ -152,7 +152,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                         _imGuiReorderableList.onCanRemoveCallback += r =>
                         {
                             (string removeError, bool _, int removeMin, int _) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
-                                FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                                FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
                             if (removeError != "")
                             {
                                 return true;
@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                         _imGuiReorderableList.onCanAddCallback += r =>
                         {
                             (string addError, bool _, int _, int addMax) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, FieldWithInfo.SerializedProperty,
-                                FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                                FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
                             if (addError != "")
                             {
                                 return true;
@@ -232,7 +232,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             {
                 (string error, bool _, int minValue, int maxValue) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute,
                     FieldWithInfo.SerializedProperty,
-                    FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                    FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
 
                 if (error == "")
                 {
@@ -319,7 +319,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 {
                     _curXmlChunks =
                         RichTextDrawer
-                            .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Target)
+                            .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0])
                             .ToArray();
                 }
 

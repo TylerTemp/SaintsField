@@ -263,7 +263,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         .Where(each => each != null)
                         .ToDictionary(each => each.name, each => each.Copy());
                     IEnumerable<SaintsFieldInfoName> saintsFieldWithInfos = SaintsEditor
-                        .HelperGetSaintsFieldWithInfo(serializedPropertyDict, obj0)
+                        .HelperGetSaintsFieldWithInfo(serializedPropertyDict, new []{obj0})
                         .Where(SaintsEditor.SaintsFieldInfoShouldDraw)
                         .Select(each => new SaintsFieldInfoName(each, AbsRenderer.GetFriendlyName(each)));
 
@@ -379,7 +379,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
                             int serCount = 0;
                             foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor
-                                         .HelperGetSaintsFieldWithInfo(targetPropertyDict, targetPropValue)
+                                         .HelperGetSaintsFieldWithInfo(targetPropertyDict, new[]{targetPropValue})
                                          .Where(saintsFieldWithInfo => memberIds.Contains(saintsFieldWithInfo.MemberId)))
                             {
                                 allSaintsFieldWithInfos.Add(saintsFieldWithInfo);
@@ -432,7 +432,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 (string error, int index, object value) firstPropValue = Util.GetValue(firstProp, info, parentRefreshed);
 
                 IEnumerable<SaintsFieldWithInfo> firstSaintsFieldWithInfos = SaintsEditor
-                    .HelperGetSaintsFieldWithInfo(firstSerializedPropertyDict, firstPropValue.value)
+                    .HelperGetSaintsFieldWithInfo(firstSerializedPropertyDict, new[]{firstPropValue.value})
                     .Where(SaintsEditor.SaintsFieldInfoShouldDraw);
 
                 Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
@@ -529,7 +529,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
                         int serCount = 0;
                         foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor
-                                     .HelperGetSaintsFieldWithInfo(targetSerializedPropertyDict, targetPropValue.value)
+                                     .HelperGetSaintsFieldWithInfo(targetSerializedPropertyDict, new[]{targetPropValue.value})
                                      .Where(saintsFieldWithInfo => memberIds.Contains(saintsFieldWithInfo.MemberId)))
                         {
                             allSaintsFieldWithInfos.Add(saintsFieldWithInfo);

@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
             SerializedObject ser = new SerializedObject(serObject);
 
-            IReadOnlyList<ISaintsRenderer> renderers = SaintsEditor.Setup(Array.Empty<string>(), ser, makeRenderer, serObject);
+            IReadOnlyList<ISaintsRenderer> renderers = SaintsEditor.Setup(Array.Empty<string>(), ser, makeRenderer, new[]{serObject});
 
             // Debug.Log(serObject);
 

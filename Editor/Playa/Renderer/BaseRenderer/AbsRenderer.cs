@@ -76,7 +76,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         (
                             visibilityAttribute.IsShow? ToggleType.Show: ToggleType.Hide,
                             visibilityAttribute.ConditionInfos,
-                            fieldWithInfo.Target
+                            fieldWithInfo.Targets[0]
                         ));
                         break;
                     case PlayaEnableIfAttribute enableIfAttribute:
@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         (
                             ToggleType.Enable,
                             enableIfAttribute.ConditionInfos,
-                            fieldWithInfo.Target
+                            fieldWithInfo.Targets[0]
                         ));
                         break;
                     case PlayaDisableIfAttribute disableIfAttribute:
@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         (
                             ToggleType.Disable,
                             disableIfAttribute.ConditionInfos,
-                            fieldWithInfo.Target
+                            fieldWithInfo.Targets[0]
                         ));
                         break;
                     case IPlayaArraySizeAttribute arraySizeAttribute:
@@ -102,7 +102,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             arraySize = (fieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic
                                          && fieldWithInfo.SerializedProperty.isArray)
                                 ? GetArraySize(arraySizeAttribute, fieldWithInfo.SerializedProperty,
-                                    fieldWithInfo.FieldInfo, fieldWithInfo.Target, isImGui)
+                                    fieldWithInfo.FieldInfo, fieldWithInfo.Targets[0], isImGui)
                                 : (-1, -1);
                         }
                         break;
@@ -210,7 +210,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         protected static (string error, object rawResult) GetCallback(SaintsFieldWithInfo fieldWithInfo, string by)
         {
-            object target = fieldWithInfo.Target;
+            object target = fieldWithInfo.Targets[0];
 
             // types.Reverse();
             foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypes(target))

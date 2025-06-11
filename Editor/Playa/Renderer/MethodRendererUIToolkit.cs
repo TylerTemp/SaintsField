@@ -31,13 +31,13 @@ namespace SaintsField.Editor.Playa.Renderer
             public bool UpdateOneMoreTime;
             public RichTextDrawer RichTextDrawer;
 
-            public IEnumerator Enumerator;
+            public List<IEnumerator> Enumerators = new List<IEnumerator>();
         }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
             container.style.flexGrow = 1;
-            object target = FieldWithInfo.Target;
+            object target = FieldWithInfo.Targets[0];
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
             // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
 
@@ -173,6 +173,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 Xml = buttonText,
                 Callback = buttonAttribute.IsCallback ? buttonAttribute.Label : "",
                 UpdateOneMoreTime = true,
+                Enumerators = new List<IEnumerator>(),
             };
             Button buttonElement = null;
             IVisualElementScheduledItem buttonTask = null;
@@ -197,43 +198,48 @@ namespace SaintsField.Editor.Playa.Renderer
 
             buttonElement = new Button(() =>
             {
-                // object[] paraValues = parameterElements.Select(each => each.GetType().GetProperty("value")!.GetValue(each)).ToArray();
-                object returnValue = methodInfo.Invoke(target, parameterValues);
-                // ReSharper disable once InvertIf
-                if (returnValue is IEnumerator enumerator)
+                IEnumerable<object> returnValues = FieldWithInfo.Targets.Select(t => methodInfo.Invoke(t, parameterValues));
+
+                buttonUserData.Enumerators.Clear();
+                buttonUserData.Enumerators.AddRange(returnValues.OfType<IEnumerator>());
+                buttonTask?.Pause();
+
+                if (buttonUserData.Enumerators.Count > 0)
                 {
                     // ButtonUserData buttonUserData = (ButtonUserData) buttonElement.userData;
                     // ReSharper disable once AccessToModifiedClosure
                     // ReSharper disable once PossibleNullReferenceException
-                    buttonUserData.Enumerator = enumerator;
-                    buttonTask?.Pause();
                     // ReSharper disable once AccessToModifiedClosure
                     // ReSharper disable once PossibleNullReferenceException
                     buttonTask = buttonElement.schedule.Execute(() =>
                     {
-                        // ReSharper disable once AccessToModifiedClosure
-                        // ReSharper disable once PossibleNullReferenceException
-                        // ReSharper disable once InvertIf
-                        // ReSharper disable once ConvertTypeCheckPatternToNullCheck
-                        if (buttonUserData.Enumerator is IEnumerator bindEnumerator)
+                        List<IEnumerator> finishedEnumerators = new List<IEnumerator>();
+                        // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+                        foreach (IEnumerator bindEnumerator in buttonUserData.Enumerators)
                         {
-                            bool show = true;
                             if (!bindEnumerator.MoveNext())
                             {
-                                show = false;
-                                // ReSharper disable once AccessToModifiedClosure
-                                // ReSharper disable once PossibleNullReferenceException
-                                buttonTask?.Pause();
-                            }
-
-                            DisplayStyle style = show? DisplayStyle.Flex : DisplayStyle.None;
-                            if(buttonRotator.style.display != style)
-                            {
-                                buttonRotator.style.display = style;
+                                finishedEnumerators.Add(bindEnumerator);
                             }
                         }
+
+                        buttonUserData.Enumerators.RemoveAll(each => finishedEnumerators.Contains(each));
+
+                        bool show = buttonUserData.Enumerators.Count > 0;
+                        DisplayStyle style = show? DisplayStyle.Flex : DisplayStyle.None;
+                        if(buttonRotator.style.display != style)
+                        {
+                            buttonRotator.style.display = style;
+                        }
+
+                        // ReSharper disable once AccessToModifiedClosure
+                        // ReSharper disable once PossibleNullReferenceException
+                        buttonTask?.Pause();
                     }).Every(1);
                 }
+
+                // ReSharper disable once InvertIf
+
             })
             {
                 text = "",
@@ -245,7 +251,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     justifyContent = Justify.Center,
                     position = Position.Relative,
                 },
-                name = ButtonName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
+                name = ButtonName(FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]),
                 userData = buttonUserData,
             };
 
@@ -269,11 +275,11 @@ namespace SaintsField.Editor.Playa.Renderer
                     flexDirection = FlexDirection.Row,
                     justifyContent = Justify.Center,
                 },
-                name = ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Target),
+                name = ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]),
             };
             buttonElement.Add(buttonLabelContainer);
             foreach (VisualElement element in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(buttonText,
-                         FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Target)))
+                         FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0])))
             {
                 buttonLabelContainer.Add(element);
             }
@@ -347,7 +353,7 @@ namespace SaintsField.Editor.Playa.Renderer
             Button buttonElement;
             try
             {
-                buttonElement = root.Q<Button>(name: ButtonName(FieldWithInfo.MethodInfo, FieldWithInfo.Target));
+                buttonElement = root.Q<Button>(name: ButtonName(FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]));
             }
             catch (NullReferenceException)
             {
@@ -370,7 +376,7 @@ namespace SaintsField.Editor.Playa.Renderer
             if(!string.IsNullOrEmpty(labelCallback))
             {
                 (string error, string result) = Util.GetOf<string>(labelCallback, null,
-                    FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Target);
+                    FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
                 // Debug.Log($"{error}/{result}");
                 if (error != "")
                 {
@@ -407,7 +413,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 // buttonElement.text = "";
                 // buttonElement.Clear();
-                VisualElement buttonLabelContainer = root.Q<VisualElement>(name: ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Target));
+                VisualElement buttonLabelContainer = root.Q<VisualElement>(name: ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]));
                 buttonLabelContainer.Clear();
 
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
@@ -427,7 +433,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 IEnumerable<VisualElement> chunks = buttonUserData.RichTextDrawer.DrawChunksUIToolKit(
                     RichTextDrawer.ParseRichXml(result,
-                        FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Target));
+                        FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]));
 
                 foreach (VisualElement chunk in chunks)
                 {

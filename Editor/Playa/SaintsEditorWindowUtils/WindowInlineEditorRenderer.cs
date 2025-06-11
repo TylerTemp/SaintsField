@@ -47,8 +47,8 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
         private Object GetValue()
         {
             object v = _fieldWithInfo.FieldInfo != null
-                ? _fieldWithInfo.FieldInfo.GetValue(_fieldWithInfo.Target)
-                : _fieldWithInfo.PropertyInfo.GetValue(_fieldWithInfo.Target);
+                ? _fieldWithInfo.FieldInfo.GetValue(_fieldWithInfo.Targets[0])
+                : _fieldWithInfo.PropertyInfo.GetValue(_fieldWithInfo.Targets[0]);
             return v as Object;
         }
     }

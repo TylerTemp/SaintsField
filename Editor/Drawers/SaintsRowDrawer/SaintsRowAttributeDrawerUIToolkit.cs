@@ -235,7 +235,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             // SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)attribute;
 
             IReadOnlyList<ISaintsRenderer> renderer =
-                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, value);
+                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, new []{value});
 
 //             // Debug.Log($"{renderer.Count}");
 //
@@ -258,7 +258,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
              Type objectType = value.GetType();
              IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
 
-             foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(objectType, playaClassAttributes, property.serializedObject, value))
+             foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(objectType, playaClassAttributes, property.serializedObject, new[]{value}))
              {
                  VisualElement rendererElement = saintsRenderer.CreateVisualElement();
                  if (rendererElement != null)

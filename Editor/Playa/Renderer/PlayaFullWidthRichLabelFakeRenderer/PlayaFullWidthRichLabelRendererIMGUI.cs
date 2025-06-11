@@ -62,7 +62,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             (MemberInfo memberInfo, string label) = GetMemberAndLabel(FieldWithInfo);
 
             IEnumerable<RichTextDrawer.RichTextChunk> xml = RichTextDrawer.ParseRichXml(content, label, FieldWithInfo.SerializedProperty, memberInfo,
-                FieldWithInfo.Target);
+                FieldWithInfo.Targets[0]);
             float fullWidth = GetRichTextDrawer().GetWidth(new GUIContent(label), EditorGUIUtility.singleLineHeight, xml);
             return Mathf.CeilToInt(Mathf.Max(1, fullWidth / width)) * EditorGUIUtility.singleLineHeight;
         }
@@ -108,7 +108,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             (MemberInfo memberInfo, string label) = GetMemberAndLabel(FieldWithInfo);
 
             IEnumerable<RichTextDrawer.RichTextChunk> xml = RichTextDrawer.ParseRichXml(content, label, FieldWithInfo.SerializedProperty, memberInfo,
-                FieldWithInfo.Target);
+                FieldWithInfo.Targets[0]);
 
             RichTextDrawer richDrawer = GetRichTextDrawer();
             float x = position.x;
