@@ -103,7 +103,9 @@ namespace SaintsField
 
         protected override void OnBeforeSerializeProcesser()
         {
+#if UNITY_EDITOR
             MigrateKv();
+#endif
             base.OnBeforeSerializeProcesser();
         }
 
