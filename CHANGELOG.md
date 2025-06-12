@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.16.2 ##
+
+Fix project failed to compile due to code changed in SaintsDictionary
+
 ## 4.16.1 ##
 
 1.  UI Toolkit: `Searchable` now can search a field when you input a field name from code. In previous version it need to match the display name

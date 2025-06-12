@@ -101,11 +101,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.16.1**
+**4.16.2**
 
-1.  UI Toolkit: `Searchable` now can search a field when you input a field name from code. In previous version it need to match the display name
-2.  UI Toolkit: if you're using Unity 6k+, we now `Unbind` the element to stop the property tracking [#239](https://github.com/TylerTemp/SaintsField/issues/239)
-3.  Fix `OnValueChanged` callback does not work when the target field is an `Enum` and the callback receives the corresponding type of `Enum`
+Fix project failed to compile due to code changed in SaintsDictionary
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
