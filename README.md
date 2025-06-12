@@ -101,7 +101,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.16.2**
+**4.16.3**
 
 Fix project failed to compile due to code changed in SaintsDictionary
 
@@ -5758,36 +5758,17 @@ public SaintsDictionary<int, MyStruct> basicType;
 
 ![image](https://github.com/user-attachments/assets/c2dad54d-bfa6-4c52-acee-e2aa74898d71)
 
-At last, use auto getters so it can auto-fetch some values:
-
-(Note: ATM you still need to click the plus button once to make the array filling)
+You can also inherit `SaintsDictionaryBase<TKey, TValue>` to create your own custom dictionary.
 
 > [!WARNING]
-> Custom Dictionary is still under some test and need some API changes. Please avoid inherent a custom dictionary, but use `SaintsDictionary` directly.
+> Custom Dictionary is still under some test and need some API changes. Please avoid inherit a custom dictionary, but use `SaintsDictionary` directly.
+> If you still need it, please fork this project, use the forked one, and carefully exam the project when you upgrade, as it might break your inherence.
 
-```csharp
-suing SaintsField;
+See [DictInterface](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/IssueAndTesting/Issue/Issue241DictInterface.cs) as an example of making an `SerializedReference` dictionary.
 
-[Serializable]
-public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
-{
-    [SerializeField]
-    private List<Wrap<int>> _keys = new List<Wrap<int>>();
+![Image](https://github.com/user-attachments/assets/7b252440-c11d-4bd0-b206-4808cd4c3c01)
 
-    [SerializeField]
-    // [GetComponentInChildren]
-    private List<Wrap<MyStruct>> _values = new List<Wrap<MyStruct>>();
-
-#if UNITY_EDITOR
-    private static string EditorPropKeys => nameof(_intKeys);
-    private static string EditorPropValues => nameof(_objValues);
-#endif
-    protected override List<Wrap<int>> SerializedKeys => _intKeys;  // NOTE: need this `Wrap`
-    protected override List<Wrap<GameObject>> SerializedValues => _objValues;
-}
-
-public ValueFillerDict decValueFillerDict;
-```
+See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/SaintsDictExamples/SaintsDictFillerExample.cs) as an example of making dictionary with auto getters.
 
 [![video](https://github.com/user-attachments/assets/ce2efb49-2723-4e43-a3a7-9969f229f591)](https://github.com/user-attachments/assets/38dcb22c-d30f-40d4-bd6b-420aa1b41588)
 

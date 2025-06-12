@@ -6,6 +6,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 {
     public class Issue241DictInterface : MonoBehaviour
     {
+#if UNITY_2021_3_OR_NEWER
         [Serializable]
         public class InterfaceDictionary<TKey, TValue> : SaintsDictionaryBase<TKey, TValue>
         {
@@ -174,5 +175,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         }
 
         public InterfaceDictionary<IMyKey, IMyValue> iDict;
+#endif
     }
 }
