@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 
@@ -75,17 +76,68 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         {
             int size = keysProp.arraySize;
 
-            List<int> results = string.IsNullOrEmpty(keySearch)
-                ? Enumerable.Range(0, size).ToList()
-                : SerializedUtils.SearchArrayProperty(keysProp, keySearch).Where(each => each != -1).ToList();
-            // int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
-            if (string.IsNullOrEmpty(valueSearch))
+            bool keySearchEmpty = string.IsNullOrEmpty(keySearch);
+            bool valueSearchEmpty = string.IsNullOrEmpty(valueSearch);
+
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (keySearchEmpty && valueSearchEmpty)
             {
-                return results;
+                for (int index = 0; index < size; index++)
+                {
+                    yield return index;
+                }
+                yield break;
             }
 
-            int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).Where(each => each != -1).ToArray();
-            return results.Where(each => valueResults.Contains(each));
+            if (keySearchEmpty)
+            {
+                foreach (int index in SerializedUtils.SearchArrayProperty(valuesProp, valueSearch))
+                {
+                    yield return index;
+                }
+
+                yield break;
+            }
+
+
+
+            IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(valueSearch).ToArray();
+            foreach (int index in SerializedUtils.SearchArrayProperty(keysProp, keySearch))
+            {
+                if (index == -1)
+                {
+                    yield return -1;
+                }
+                else
+                {
+                    SerializedProperty valueProp = valuesProp.GetArrayElementAtIndex(index);
+                    if (searchTokens.All(search => SerializedUtils.SearchProp(valueProp, search.Token)))
+                    {
+                        yield return index;
+                    }
+                    else
+                    {
+                        yield return -1;
+                    }
+                }
+            }
+            //
+            // IEnumerable<int> results = string.IsNullOrEmpty(keySearch)
+            //     ? Enumerable.Range(0, size)
+            //     : SerializedUtils.SearchArrayProperty(keysProp, keySearch);
+            // // int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
+            // if (string.IsNullOrEmpty(valueSearch))
+            // {
+            //     return results;
+            // }
+            //
+            // Debug.Log("Search value");
+            //
+            // IEnumerable<int> valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch);
+            //
+            // Debug.Log("Filter value");
+            //
+            // return results.Where(each => each != -1 && valueResults.Contains(each));
         }
 
         private static string GetKeyLabel(SaintsDictionaryAttribute saintsDictionaryAttribute) => saintsDictionaryAttribute is null

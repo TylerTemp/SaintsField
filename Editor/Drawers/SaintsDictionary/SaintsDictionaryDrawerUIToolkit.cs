@@ -350,6 +350,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
         private AsyncSearchItems _asyncSearchItems;
 
+        private const float DebounceTime = 0.6f;
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
@@ -435,18 +437,26 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             #region Paging & Search
 
+            SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
+
+            int initNumberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
+            List<int> initTargets = initNumberOfItemsPerPage <= 0
+                ? new List<int>(Enumerable.Range(0, keysProp.arraySize))
+                : new List<int>(Enumerable.Range(0, keysProp.arraySize).Take(initNumberOfItemsPerPage));
+
             _asyncSearchItems = new AsyncSearchItems
             {
                 Started = true,
                 Finished = true,
                 SourceGenerator = null,
-                HitTargetIndexes = new List<int>(Enumerable.Range(0, keysProp.arraySize)),
-                CachedHitTargetIndexes = new List<int>(Enumerable.Range(0, keysProp.arraySize)),
+                HitTargetIndexes = new List<int>(initTargets),
+                CachedHitTargetIndexes = new List<int>(initTargets),
                 KeySearchText = "",
                 ValueSearchText = "",
                 DebounceSearchTime = 0,
                 Size = keysProp.arraySize,
                 TotalPage = 1,
+                NumberOfItemsPerPage = initNumberOfItemsPerPage,
             };
 
             // string preKeySearch = "";
@@ -454,8 +464,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             int prePageIndex = 0;
             // int preSize = 0;
             int preTotalPage = 1;
-
-            SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
 
             void RefreshList()
             {
@@ -627,14 +635,22 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     keySearch.RegisterValueChangedCallback(evt =>
                     {
                         _asyncSearchItems.KeySearchText = evt.newValue;
+                        _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTime;
                         _asyncSearchItems.Started = false;
                         _asyncSearchItems.Finished = false;
-                        _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + 0.6f;
                         _asyncSearchItems.HitTargetIndexes.Clear();
                         _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
                         _asyncSearchItems.LoadingImages.Add(keyLoadingImage);
                         RefreshList();
                     });
+
+                    keySearch.RegisterCallback<KeyDownEvent>(evt =>
+                    {
+                        if (evt.keyCode == KeyCode.Return)
+                        {
+                            _asyncSearchItems.DebounceSearchTime = 0f;
+                        }
+                    }, TrickleDown.TrickleDown);
                     return header;
                 },
                 makeCell = () => new VisualElement(),
@@ -745,14 +761,22 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     {
                         // Debug.Log($"value search {evt.newValue}");
                         _asyncSearchItems.ValueSearchText = evt.newValue;
+                        _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTime;
                         _asyncSearchItems.Started = false;
                         _asyncSearchItems.Finished = false;
-                        _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + 0.6f;
                         _asyncSearchItems.HitTargetIndexes.Clear();
                         _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
                         _asyncSearchItems.LoadingImages.Add(valueLoadingImage);
                         RefreshList();
                     });
+
+                    valueSearch.RegisterCallback<KeyDownEvent>(evt =>
+                    {
+                        if (evt.keyCode == KeyCode.Return)
+                        {
+                            _asyncSearchItems.DebounceSearchTime = 0f;
+                        }
+                    }, TrickleDown.TrickleDown);
                     return header;
                 },
                 makeCell = () => new VisualElement(),
@@ -932,7 +956,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     return;
                 }
 
-                if (_asyncSearchItems.DebounceSearchTime > EditorApplication.timeSinceStartup)
+                bool emptySearch = string.IsNullOrEmpty(_asyncSearchItems.KeySearchText) &&
+                                   string.IsNullOrEmpty(_asyncSearchItems.ValueSearchText);
+
+                if (!emptySearch && _asyncSearchItems.DebounceSearchTime > EditorApplication.timeSinceStartup)
                 {
                     if(keyLoadingImage.style.visibility != Visibility.Hidden)
                     {
@@ -942,10 +969,18 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     {
                         valueLoadingImage.style.visibility = Visibility.Hidden;
                     }
+
+                    // Debug.Log("Search wait");
                     return;
                 }
 
-                _asyncSearchItems.Started = true;
+                if(!_asyncSearchItems.Started)
+                {
+                    // Debug.Log($"Search start {_asyncSearchItems.DebounceSearchTime} -> {EditorApplication.timeSinceStartup}");
+                    _asyncSearchItems.Started = true;
+                    RefreshList();
+                }
+
                 if (_asyncSearchItems.LoadingImages.Count == 0)
                 {
                     _asyncSearchItems.LoadingImages.Add(keyLoadingImage);
@@ -962,16 +997,28 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 }
 
                 // Debug.Log($"start to search: {EditorApplication.timeSinceStartup - _asyncSearchItems.DebounceSearchTime}");
-                int searchBatch = string.IsNullOrEmpty(_asyncSearchItems.KeySearchText) && string.IsNullOrEmpty(_asyncSearchItems.ValueSearchText)
+                int searchBatch = emptySearch
                     ? int.MaxValue
-                    : 20;
+                    : 50;
+
+                // _asyncSearchBusy = true;
+
+                bool needRefreshDisplay = false;
+
+                // return;
 
                 for (int searchTick = 0; searchTick < searchBatch; searchTick++)
                 {
+                    // Debug.Log($"searching {searchTick}");
                     if (_asyncSearchItems.SourceGenerator.MoveNext())
                     {
-                        // Debug.Log($"search found {_asyncSearchItems.SourceGenerator.Current}");
-                        _asyncSearchItems.HitTargetIndexes.Add(_asyncSearchItems.SourceGenerator.Current);
+                        // ReSharper disable once InvertIf
+                        if(_asyncSearchItems.SourceGenerator.Current != -1)
+                        {
+                            needRefreshDisplay = true;
+                            // Debug.Log($"search found {_asyncSearchItems.SourceGenerator.Current}");
+                            _asyncSearchItems.HitTargetIndexes.Add(_asyncSearchItems.SourceGenerator.Current);
+                        }
                     }
                     else
                     {
@@ -979,7 +1026,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         _asyncSearchItems.CachedHitTargetIndexes = new List<int>(_asyncSearchItems.HitTargetIndexes);
                         _asyncSearchItems.SourceGenerator.Dispose();
                         _asyncSearchItems.SourceGenerator = null;
-                        RefreshList();
+
                         // Debug.Log($"search finished {_asyncSearchItems.HitTargetIndexes.Count}");
 
                         if(keyLoadingImage.style.visibility != Visibility.Hidden)
@@ -991,14 +1038,23 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             valueLoadingImage.style.visibility = Visibility.Hidden;
                         }
                         _asyncSearchItems.LoadingImages.Clear();
+                        needRefreshDisplay = true;
                         break;
                     }
                 }
+
+                if(needRefreshDisplay)
+                {
+                    RefreshList();
+                }
+                // _asyncSearchBusy = false;
 
 
             }).Every(1);
             // Debug.Log($"{string.Join(",", itemIndexToPropertyIndex)}");
         }
+
+        // private bool _asyncSearchBusy;
 
         // private static List<int> MakeSource(SerializedProperty property)
         // {

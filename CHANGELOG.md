@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.16.4 ##
+
+1.  `ListDrawerSetting`, `Table`, `SaintsDictionary` search now support `SerializeReference` field search, and is case-insensitive.
+2.  UI Toolkit: `SaintsDictionary` now support debounce search
+3.  
+
 ## 4.16.3 ##
 
 Fix project failed to compile due to code changed in SaintsDictionary

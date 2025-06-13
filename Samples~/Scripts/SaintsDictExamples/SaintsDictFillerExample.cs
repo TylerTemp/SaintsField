@@ -31,7 +31,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
             [SerializeField, NoLabel]
             private List<SaintsWrap<int>> _intKeys = new List<SaintsWrap<int>>();
 
-            [SerializeField, NoLabel, GetComponentInChildren, ReadOnly]
+            [SerializeField, NoLabel, GetByXPath("scene:://*"), ReadOnly]
             private List<SaintsWrap<GameObject>> _objValues = new List<SaintsWrap<GameObject>>();
 
 #if UNITY_EDITOR
