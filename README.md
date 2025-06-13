@@ -101,10 +101,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.16.4**
+**4.16.5**
 
-1.  `ListDrawerSetting`, `Table`, `SaintsDictionary` search now support `SerializeReference` field search, and is case-insensitive.
-2.  UI Toolkit: `SaintsDictionary` now support debounce search
+If you have multiple targets selected, `AboveButton`, `BelowButton`, `PostFieldButton` can be triggered on all selected targets.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.16.5 ##
+
+If you have multiple targets selected, `AboveButton`, `BelowButton`, `PostFieldButton` can be triggered on all selected targets.
+
 ## 4.16.4 ##
 
 1.  `ListDrawerSetting`, `Table`, `SaintsDictionary` search now support `SerializeReference` field search, and is case-insensitive.
