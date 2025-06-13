@@ -716,7 +716,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             if (!string.IsNullOrEmpty(cachedInfo.KeySearch) || !string.IsNullOrEmpty(cachedInfo.ValueSearch))
             {
-                refreshedHitTargetIndexes = Search(cachedInfo.KeysProp, cachedInfo.ValuesProp, cachedInfo.KeySearch, cachedInfo.ValueSearch);
+                refreshedHitTargetIndexes = Search(cachedInfo.KeysProp, cachedInfo.ValuesProp, cachedInfo.KeySearch, cachedInfo.ValueSearch).ToList();
             }
 
             if (cachedInfo.NumberOfItemsPerPage > 0)

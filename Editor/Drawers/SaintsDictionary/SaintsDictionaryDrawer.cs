@@ -65,13 +65,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 _valuesPropName = ReflectUtils.GetIWrapPropName(rawType, "EditorPropValues");
             }
 
-            Debug.Assert(_keysPropName != null, $"Failed to find keys property name for {rawType}. Do you froget to define `EditorPropKeys` (nameof(YourPropKeyList))?");
-            Debug.Assert(_valuesPropName != null, $"Failed to find values property name for {rawType}. Do you froget to define `EditorPropValues` (nameof(YourPropValueList))?");
+            Debug.Assert(_keysPropName != null, $"Failed to find keys property name for {rawType}. Do you froget to define a `static string EditorPropKeys` (nameof(YourPropKeyList))?");
+            Debug.Assert(_valuesPropName != null, $"Failed to find values property name for {rawType}. Do you froget to define a `static string EditorPropValues` (nameof(YourPropValueList))?");
 
             return (_keysPropName, _valuesPropName);
         }
 
-        private static List<int> Search(SerializedProperty keysProp, SerializedProperty valuesProp, string keySearch, string valueSearch)
+        private static IEnumerable<int> Search(SerializedProperty keysProp, SerializedProperty valuesProp, string keySearch, string valueSearch)
         {
             int size = keysProp.arraySize;
 
@@ -85,7 +85,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).Where(each => each != -1).ToArray();
-            return results.Where(each => valueResults.Contains(each)).ToList();
+            return results.Where(each => valueResults.Contains(each));
         }
 
         private static string GetKeyLabel(SaintsDictionaryAttribute saintsDictionaryAttribute) => saintsDictionaryAttribute is null

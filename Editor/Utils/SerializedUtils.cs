@@ -366,7 +366,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static bool SearchProp(SerializedProperty property, string token)
+        public static bool SearchProp(SerializedProperty property, string rawToken)
         {
             SerializedPropertyType propertyType;
             try
@@ -381,6 +381,8 @@ namespace SaintsField.Editor.Utils
             {
                 return false;
             }
+
+            string token = rawToken.ToLower();
 
             // Debug.Log($"{property.propertyPath} is {propertyType}");
 

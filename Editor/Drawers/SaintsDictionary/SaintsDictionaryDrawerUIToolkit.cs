@@ -90,7 +90,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 // value = keysProp.arraySize,
                 label = "",
-                isDelayed = true,
+                // isDelayed = true,
                 style =
                 {
                     minWidth = 50,
@@ -328,6 +328,28 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             return (keysField, keysParent);
         }
 
+        private class AsyncSearchItems
+        {
+            public bool Started;
+            public bool Finished;
+            public IEnumerator<int> SourceGenerator;
+            public string KeySearchText;
+            public string ValueSearchText;
+            public double DebounceSearchTime;
+
+            public List<int> HitTargetIndexes;
+            public List<int> CachedHitTargetIndexes;
+
+            public int PageIndex;
+            public int Size;
+            public int TotalPage = 1;
+            public int NumberOfItemsPerPage;
+
+            public readonly HashSet<Image> LoadingImages = new HashSet<Image>();
+        }
+
+        private AsyncSearchItems _asyncSearchItems;
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
@@ -353,84 +375,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             // property.FindPropertyRelative(propValuesNameCompact) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesNameCompact);
             Debug.Assert(valuesProp != null, $"Failed to get values prop from {propValuesNameCompact}");
 
-            // object keysIterTarget = info.GetValue(parent);
-            // List<object> keysParents = new List<object>(2);
-            // Type keysParentType = rawType;
-            // FieldInfo keysField = null;
-            // Debug.Log($"propKeysNameCompact={propKeysNameCompact}");
-            // foreach (string propKeysName in propKeysNameCompact.Split('.'))
-            // {
-            //     Debug.Log($"propKeysName={propKeysName}");
-            //
-            //     // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            //     foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(keysParentType))
-            //     {
-            //         FieldInfo field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-            //         if (field == null)
-            //         {
-            //             continue;
-            //         }
-            //
-            //         // Debug.Log($"field={field}; keysField={keysField}");
-            //
-            //         keysField = field;
-            //         keysParentType = keysField.FieldType;
-            //         keysIterTarget = keysField.GetValue(keysIterTarget);
-            //         keysParents.Add(keysIterTarget);
-            //         Debug.Log($"set keysField={keysField}/keysParentType={keysParentType}/keysIterTarget={keysIterTarget}");
-            //         break;
-            //     }
-            //
-            //     Debug.Assert(keysField != null, $"Failed to get key {propKeysName} from {property.propertyPath}");
-            // }
-            //
-            // int keysParentsCount = keysParents.Count;
-            //
-            // object keysParent = keysParentsCount >= 2? keysParents[keysParentsCount - 2]: keysParents[0];
-            //
-            // Debug.Log($"keysParent={keysParent}; keysField={keysField}");
-
             (FieldInfo keysField, object keysParent) = GetTargetInfo(propKeysNameCompact, info, rawType, parent);
-
-            // Debug.Log($"!!!!!!!! keysField={keysField}, keysParent={keysParent}/{keysParent.GetType()}");
-
-            // return;
 
             Debug.Assert(keysField != null, $"Failed to get keys field {propKeysNameCompact} from {property.propertyPath}");
             Type keyType = ReflectUtils.GetElementType(keysField.FieldType);
 
-            // object valuesParent = info.GetValue(parent);
-            // Type valuesParentType = rawType;
-            // FieldInfo valuesField = null;
-            // Debug.Log($"propKeysNameCompact={propKeysNameCompact}");
-            // foreach (string propKeysName in propKeysNameCompact.Split('.'))
-            // {
-            //     Debug.Log($"propKeysName={propKeysName}");
-            //
-            //     // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            //     foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(valuesParentType))
-            //     {
-            //         FieldInfo field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-            //         if (field == null)
-            //         {
-            //             continue;
-            //         }
-            //
-            //         // Debug.Log($"field={field}; keysField={keysField}");
-            //
-            //         valuesField = field;
-            //         valuesParentType = valuesField.FieldType;
-            //         valuesParent = valuesField.GetValue(valuesParent);
-            //         Debug.Log($"set valuesField={valuesField}/valuesParentType={valuesParentType}/valuesParent={valuesParent}");
-            //         break;
-            //     }
-            //
-            //     Debug.Assert(valuesField != null, $"Failed to get value {propKeysName} from {property.propertyPath}");
-            // }
-
             (FieldInfo valuesField, object valuesParent) = GetTargetInfo(propValuesNameCompact, info, rawType, parent);
-
-            // Debug.Log($"valuesField={valuesField}; valuesParent={valuesParent}/{valuesParent.GetType()}");
 
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
             Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);
@@ -485,79 +435,82 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             #region Paging & Search
 
-            string preKeySearch = "";
-            string preValueSearch = "";
+            _asyncSearchItems = new AsyncSearchItems
+            {
+                Started = true,
+                Finished = true,
+                SourceGenerator = null,
+                HitTargetIndexes = new List<int>(Enumerable.Range(0, keysProp.arraySize)),
+                CachedHitTargetIndexes = new List<int>(Enumerable.Range(0, keysProp.arraySize)),
+                KeySearchText = "",
+                ValueSearchText = "",
+                DebounceSearchTime = 0,
+                Size = keysProp.arraySize,
+                TotalPage = 1,
+            };
+
+            // string preKeySearch = "";
+            // string preValueSearch = "";
             int prePageIndex = 0;
-            int preSize = 0;
-            // int preNumberOfItemsPerPage = -1;
+            // int preSize = 0;
             int preTotalPage = 1;
 
             SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
-            // int numberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
-            List<int> hitTargetIndexes = new List<int>(itemIndexToPropertyIndex);
 
-            void RefreshList(string keySearch, string valueSearch, int curPageIndex, int numberOfItemsPerPage)
+            void RefreshList()
             {
+                int curPageIndex = _asyncSearchItems.PageIndex;
+                int numberOfItemsPerPage = _asyncSearchItems.NumberOfItemsPerPage;
                 // bool needRebuild = false;
                 int nowArraySize = keysProp.arraySize;
 
-                List<int> fullList = Enumerable.Range(0, nowArraySize).ToList();
+                // List<int> fullList = Enumerable.Range(0, nowArraySize).ToList();
                 // List<int> useIndexes = new List<int>(itemIndexToPropertyIndex);
                 // ReSharper disable once AccessToModifiedClosure
-                List<int> refreshedHitTargetIndexes = new List<int>(hitTargetIndexes);
-                // if (forceRebuild)
-                // {
-                //     refreshedHitTargetIndexes = Enumerable.Range(0, nowArraySize).ToList();
-                // }
-                if (nowArraySize != preSize)
+                List<int> refreshedHitTargetIndexes = new List<int>(_asyncSearchItems.Started? _asyncSearchItems.HitTargetIndexes: _asyncSearchItems.CachedHitTargetIndexes);
+                if (nowArraySize != _asyncSearchItems.Size)
                 {
-                    preSize = nowArraySize;
-                    // needRebuild = true;
-                    refreshedHitTargetIndexes = fullList;
+                    _asyncSearchItems.Size = nowArraySize;
+                    _asyncSearchItems.DebounceSearchTime = 0;
+                    _asyncSearchItems.Started = false;
+                    _asyncSearchItems.Finished = false;
+                    _asyncSearchItems.HitTargetIndexes.Clear();
+                    _asyncSearchItems.SourceGenerator?.Dispose();
+                    _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp,
+                        _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
+
+                    // Debug.Log("size changed, tail call refresh list");
+                    // ReSharper disable once TailRecursiveCall
+                    RefreshList();
+                    return;
                 }
 
                 // processing search result
-                bool needSearchAgain = false;
-                // if (needRebuild)
+                // bool needSearchAgain = false;
+                // if (preKeySearch != keySearch)
                 // {
-                //     needSearchAgain = true;
+                //     preKeySearch = keySearch;
+                //     // needSearchAgain = true;
                 // }
-                // else
-                {
-                    if (preKeySearch != keySearch)
-                    {
-                        preKeySearch = keySearch;
-                        needSearchAgain = true;
-                    }
+                //
+                // if (preValueSearch != valueSearch)
+                // {
+                //     preValueSearch = valueSearch;
+                //     // needSearchAgain = true;
+                // }
 
-                    if (preValueSearch != valueSearch)
-                    {
-                        preValueSearch = valueSearch;
-                        needSearchAgain = true;
-                    }
-                }
-
-                if (needSearchAgain)
-                {
-                    // needRebuild = true;
-                    refreshedHitTargetIndexes = Search(keysProp, valuesProp, keySearch, valueSearch);
-                    // Debug.Log($"hit search {keySearch}/{valueSearch}: {string.Join(",", refreshedHitTargetIndexes)}");
-                }
-
-                hitTargetIndexes = refreshedHitTargetIndexes;
-                // preNumberOfItemsPerPage = numberOfItemsPerPage;
-                // paging
+                // hitTargetIndexes = refreshedHitTargetIndexes;
                 if (numberOfItemsPerPage > 0)
                 {
                     int startIndex = curPageIndex * numberOfItemsPerPage;
-                    if (startIndex >= hitTargetIndexes.Count)
+                    if (startIndex >= refreshedHitTargetIndexes.Count)
                     {
                         startIndex = 0;
                         curPageIndex = 0;
                     }
-                    int endIndex = Mathf.Min((curPageIndex + 1) * numberOfItemsPerPage, hitTargetIndexes.Count);
-                    itemIndexToPropertyIndex = hitTargetIndexes.GetRange(startIndex, endIndex - startIndex);
-                    int totalPage = Mathf.Max(1, Mathf.CeilToInt(hitTargetIndexes.Count / (float)numberOfItemsPerPage));
+                    int endIndex = Mathf.Min((curPageIndex + 1) * numberOfItemsPerPage, refreshedHitTargetIndexes.Count);
+                    itemIndexToPropertyIndex = refreshedHitTargetIndexes.GetRange(startIndex, endIndex - startIndex);
+                    int totalPage = Mathf.Max(1, Mathf.CeilToInt(refreshedHitTargetIndexes.Count / (float)numberOfItemsPerPage));
 
                     // pageField.SetValueWithoutNotify(curPageIndex + 1);
 
@@ -572,11 +525,23 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 }
                 else
                 {
-                    itemIndexToPropertyIndex = hitTargetIndexes;
+                    itemIndexToPropertyIndex = refreshedHitTargetIndexes;
                 }
 
-                // if (needRebuild)
+                // Debug.Log(multiColumnListView.itemsSource);
+                // Debug.Log(itemIndexToPropertyIndex);
+
+                bool needRebuild = multiColumnListView.itemsSource == null
+                                   || !multiColumnListView.itemsSource.Cast<int>().SequenceEqual(itemIndexToPropertyIndex);
+                // if (multiColumnListView.itemsSource != null)
+                // {
+                //     Debug.Log(string.Join(", ", multiColumnListView.itemsSource.Cast<int>()));
+                //     Debug.Log(string.Join(", ", itemIndexToPropertyIndex));
+                // }
+
+                if (needRebuild)
                 {
+                    // Debug.Log("rebuild list view");
                     multiColumnListView.itemsSource = itemIndexToPropertyIndex.ToList();
                     multiColumnListView.Rebuild();
                     pagePreButton.SetEnabled(prePageIndex > 0);
@@ -591,8 +556,40 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             IntegerField numberOfItemsPerPage = container.Q<IntegerField>(name: NameNumberOfItemsPerPage(property));
             numberOfItemsPerPage.RegisterValueChangedCallback(evt =>
             {
-                RefreshList(preKeySearch, preValueSearch, prePageIndex, evt.newValue);
+                _asyncSearchItems.NumberOfItemsPerPage = evt.newValue;
+                RefreshList();
             });
+
+            Image keyLoadingImage = new Image
+            {
+                image = Util.LoadResource<Texture2D>("refresh.png"),
+                pickingMode = PickingMode.Ignore,
+                tintColor = EColor.Gray.GetColor(),
+                style =
+                {
+                    position = Position.Absolute,
+                    right = 0,
+                    top = 1,
+                    width = 12,
+                    height = 12,
+                    visibility = Visibility.Hidden,
+                },
+            };
+            Image valueLoadingImage = new Image
+            {
+                image = Util.LoadResource<Texture2D>("refresh.png"),
+                pickingMode = PickingMode.Ignore,
+                tintColor = EColor.Gray.GetColor(),
+                style =
+                {
+                    position = Position.Absolute,
+                    right = 0,
+                    top = 1,
+                    width = 12,
+                    height = 12,
+                    visibility = Visibility.Hidden,
+                },
+            };
 
             multiColumnListView.columns.Add(new Column
             {
@@ -609,7 +606,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }
                     ToolbarSearchField keySearch = new ToolbarSearchField
                     {
-                        // isDelayed = true,
                         style =
                         {
                             marginRight = 3,
@@ -619,19 +615,25 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             width = Length.Percent(97f),
                         },
                     };
-                    TextField keySearchText = keySearch.Q<TextField>();
-                    if (keySearchText != null)
-                    {
-                        keySearchText.isDelayed = true;
-                    }
+
+                    TextField searchTextField = keySearch.Q<TextField>();
+                    searchTextField.style.position = Position.Relative;
+
+                    searchTextField.Add(keyLoadingImage);
+                    UIToolkitUtils.KeepRotate(keyLoadingImage);
+                    keyLoadingImage.RegisterCallback<AttachToPanelEvent>(_ => keyLoadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(keyLoadingImage)));
+
                     header.Add(keySearch);
                     keySearch.RegisterValueChangedCallback(evt =>
                     {
-                        // Debug.Log($"key search {evt.newValue}");
-                        if(evt.newValue != preKeySearch)
-                        {
-                            RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
-                        }
+                        _asyncSearchItems.KeySearchText = evt.newValue;
+                        _asyncSearchItems.Started = false;
+                        _asyncSearchItems.Finished = false;
+                        _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + 0.6f;
+                        _asyncSearchItems.HitTargetIndexes.Clear();
+                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
+                        _asyncSearchItems.LoadingImages.Add(keyLoadingImage);
+                        RefreshList();
                     });
                     return header;
                 },
@@ -721,7 +723,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     // header.Add(new Label("Values"));
                     ToolbarSearchField valueSearch = new ToolbarSearchField
                     {
-                        // isDelayed = true,
                         style =
                         {
                             marginRight = 3,
@@ -731,19 +732,26 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             width = Length.Percent(97f),
                         },
                     };
-                    TextField valueSearchText = valueSearch.Q<TextField>();
-                    if (valueSearchText != null)
-                    {
-                        valueSearchText.isDelayed = true;
-                    }
+
+                    TextField searchTextField = valueSearch.Q<TextField>();
+                    searchTextField.style.position = Position.Relative;
+
+                    searchTextField.Add(valueLoadingImage);
+                    UIToolkitUtils.KeepRotate(valueLoadingImage);
+                    valueLoadingImage.RegisterCallback<AttachToPanelEvent>(_ => valueLoadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(valueLoadingImage)));
+
                     header.Add(valueSearch);
                     valueSearch.RegisterValueChangedCallback(evt =>
                     {
                         // Debug.Log($"value search {evt.newValue}");
-                        if(evt.newValue != preValueSearch)
-                        {
-                            RefreshList(preKeySearch, evt.newValue, prePageIndex, numberOfItemsPerPage.value);
-                        }
+                        _asyncSearchItems.ValueSearchText = evt.newValue;
+                        _asyncSearchItems.Started = false;
+                        _asyncSearchItems.Finished = false;
+                        _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + 0.6f;
+                        _asyncSearchItems.HitTargetIndexes.Clear();
+                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
+                        _asyncSearchItems.LoadingImages.Add(valueLoadingImage);
+                        RefreshList();
                     });
                     return header;
                 },
@@ -801,17 +809,20 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             pagePreButton.clicked += () =>
             {
-                RefreshList(preKeySearch, preValueSearch, Mathf.Max(0, prePageIndex - 1), numberOfItemsPerPage.value);
+                _asyncSearchItems.PageIndex = Mathf.Max(0, _asyncSearchItems.PageIndex - 1);
+                RefreshList();
             };
 
             pageField.RegisterValueChangedCallback(evt =>
             {
-                RefreshList(preKeySearch, preValueSearch, Mathf.Clamp(evt.newValue - 1, 0, preTotalPage - 1), numberOfItemsPerPage.value);
+                _asyncSearchItems.PageIndex = Mathf.Clamp(evt.newValue - 1, 0, _asyncSearchItems.TotalPage - 1);
+                RefreshList();
             });
 
             pageNextButton.clicked += () =>
             {
-                RefreshList(preKeySearch, preValueSearch, Mathf.Min(prePageIndex + 1, preTotalPage - 1), numberOfItemsPerPage.value);
+                _asyncSearchItems.PageIndex = Mathf.Min(_asyncSearchItems.PageIndex + 1, _asyncSearchItems.TotalPage - 1);
+                RefreshList();
             };
 
             Button addButton = container.Q<Button>(name: NameAddButton(property));
@@ -819,8 +830,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 IncreaseArraySize(keysProp.arraySize + 1, keysProp, valuesProp);
                 property.serializedObject.ApplyModifiedProperties();
-                //
-                RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+                _asyncSearchItems.DebounceSearchTime = 0;
+                // Debug.Log("Add button call refresh list");
+                RefreshList();
                 // multiColumnListView.Rebuild();
             };
             Button deleteButton = container.Q<Button>(name: NameRemoveButton(property));
@@ -854,16 +866,17 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 // keysProp.serializedObject.ApplyModifiedProperties();
                 // valuesProp.serializedObject.ApplyModifiedProperties();
                 // multiColumnListView.Rebuild();
-                RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+                _asyncSearchItems.DebounceSearchTime = 0;
+                RefreshList();
                 // multiColumnListView.Rebuild();
                 // Debug.Log($"new size = {keysProp.arraySize}");
             };
 
             multiColumnListView.TrackPropertyValue(keysProp, _ =>
             {
-                if (preSize != keysProp.arraySize)
+                if (_asyncSearchItems.Size != keysProp.arraySize)
                 {
-                    RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+                    RefreshList();
                 }
             });
 
@@ -879,15 +892,111 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 valuesProp.MoveArrayElement(fromPropIndex, toPropIndex);
 
                 ListSwapValue(itemIndexToPropertyIndex, fromPropIndex, toPropIndex);
-                ListSwapValue(hitTargetIndexes, fromPropIndex, toPropIndex);
+                ListSwapValue(_asyncSearchItems.Started? _asyncSearchItems.HitTargetIndexes: _asyncSearchItems.CachedHitTargetIndexes, fromPropIndex, toPropIndex);
+                // Debug.Log($"swap {fromPropIndex} -> {toPropIndex}; {string.Join(", ", _asyncSearchItems.HitTargetIndexes)}");
 
                 property.serializedObject.ApplyModifiedProperties();
-                multiColumnListView.itemsSource = itemIndexToPropertyIndex.ToList();
+                RefreshList();
                 // multiColumnListView.Rebuild();
             };
 
             // multiColumnListView.Rebuild();
-            RefreshList(preKeySearch, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+            // _asyncSearchItems.DebounceSearchTime = 0;
+            RefreshList();
+
+            multiColumnListView.schedule.Execute(() =>
+            {
+                if (_asyncSearchItems.Finished)
+                {
+                    if(keyLoadingImage.style.visibility != Visibility.Hidden)
+                    {
+                        keyLoadingImage.style.visibility = Visibility.Hidden;
+                    }
+                    if(valueLoadingImage.style.visibility != Visibility.Hidden)
+                    {
+                        valueLoadingImage.style.visibility = Visibility.Hidden;
+                    }
+                    return;
+                }
+
+                if (_asyncSearchItems.SourceGenerator == null)
+                {
+                    if(keyLoadingImage.style.visibility != Visibility.Hidden)
+                    {
+                        keyLoadingImage.style.visibility = Visibility.Hidden;
+                    }
+                    if(valueLoadingImage.style.visibility != Visibility.Hidden)
+                    {
+                        valueLoadingImage.style.visibility = Visibility.Hidden;
+                    }
+                    return;
+                }
+
+                if (_asyncSearchItems.DebounceSearchTime > EditorApplication.timeSinceStartup)
+                {
+                    if(keyLoadingImage.style.visibility != Visibility.Hidden)
+                    {
+                        keyLoadingImage.style.visibility = Visibility.Hidden;
+                    }
+                    if(valueLoadingImage.style.visibility != Visibility.Hidden)
+                    {
+                        valueLoadingImage.style.visibility = Visibility.Hidden;
+                    }
+                    return;
+                }
+
+                _asyncSearchItems.Started = true;
+                if (_asyncSearchItems.LoadingImages.Count == 0)
+                {
+                    _asyncSearchItems.LoadingImages.Add(keyLoadingImage);
+                    _asyncSearchItems.LoadingImages.Add(valueLoadingImage);
+                }
+
+                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                foreach (Image loadingImage in _asyncSearchItems.LoadingImages)
+                {
+                    if(loadingImage.style.visibility != Visibility.Visible)
+                    {
+                        loadingImage.style.visibility = Visibility.Visible;
+                    }
+                }
+
+                // Debug.Log($"start to search: {EditorApplication.timeSinceStartup - _asyncSearchItems.DebounceSearchTime}");
+                int searchBatch = string.IsNullOrEmpty(_asyncSearchItems.KeySearchText) && string.IsNullOrEmpty(_asyncSearchItems.ValueSearchText)
+                    ? int.MaxValue
+                    : 20;
+
+                for (int searchTick = 0; searchTick < searchBatch; searchTick++)
+                {
+                    if (_asyncSearchItems.SourceGenerator.MoveNext())
+                    {
+                        // Debug.Log($"search found {_asyncSearchItems.SourceGenerator.Current}");
+                        _asyncSearchItems.HitTargetIndexes.Add(_asyncSearchItems.SourceGenerator.Current);
+                    }
+                    else
+                    {
+                        _asyncSearchItems.Finished = true;
+                        _asyncSearchItems.CachedHitTargetIndexes = new List<int>(_asyncSearchItems.HitTargetIndexes);
+                        _asyncSearchItems.SourceGenerator.Dispose();
+                        _asyncSearchItems.SourceGenerator = null;
+                        RefreshList();
+                        // Debug.Log($"search finished {_asyncSearchItems.HitTargetIndexes.Count}");
+
+                        if(keyLoadingImage.style.visibility != Visibility.Hidden)
+                        {
+                            keyLoadingImage.style.visibility = Visibility.Hidden;
+                        }
+                        if(valueLoadingImage.style.visibility != Visibility.Hidden)
+                        {
+                            valueLoadingImage.style.visibility = Visibility.Hidden;
+                        }
+                        _asyncSearchItems.LoadingImages.Clear();
+                        break;
+                    }
+                }
+
+
+            }).Every(1);
             // Debug.Log($"{string.Join(",", itemIndexToPropertyIndex)}");
         }
 

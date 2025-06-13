@@ -12103,9 +12103,14 @@ MonoBehaviour:
     - value:
         rid: 6754517887425970844
     - value:
-        rid: 6754517887425970844
+        rid: 6754517933460553839
     - value:
         rid: 6754517887425970844
+  numDict:
+    _keys: 
+    _values: []
+    _saintsKeys: []
+    _saintsValues: []
   references:
     version: 2
     RefIds:
@@ -12125,6 +12130,10 @@ MonoBehaviour:
       type: {class: Issue241DictInterface/Key2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
         k2: value
+    - rid: 6754517933460553839
+      type: {class: Issue241DictInterface/Value2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        v2: V2
 --- !u!1 &787857617
 GameObject:
   m_ObjectHideFlags: 0
