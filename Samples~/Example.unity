@@ -21623,6 +21623,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   s: 1
+  myStruct:
+    myString: 1
+  myStructs:
+  - myString: 'first[0]'
 --- !u!1 &1470035493
 GameObject:
   m_ObjectHideFlags: 0
@@ -33916,6 +33920,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   s: 2
+  myStruct:
+    myString: 2
+  myStructs:
+  - myString: 'second[0]'
 --- !u!1 &2095648703
 GameObject:
   m_ObjectHideFlags: 0

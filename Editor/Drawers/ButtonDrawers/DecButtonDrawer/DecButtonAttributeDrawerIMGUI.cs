@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
         {
             public string Error = "";
             public string ExecError = "";
-            public IEnumerator Enumerator;
+            public readonly HashSet<IEnumerator> Enumerators = new HashSet<IEnumerator>();
         }
 
         private static readonly Dictionary<string, ButtonInfo> ImGuiSharedInfo = new Dictionary<string, ButtonInfo>();
@@ -104,10 +104,15 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             keySet.Add(key);
 
             ButtonInfo buttonInfo = GetOrCreateButtonInfo(property);
-            if(buttonInfo.Enumerator != null && !buttonInfo.Enumerator.MoveNext())
+            HashSet<IEnumerator> completedEnumerators = new HashSet<IEnumerator>();
+            foreach (IEnumerator enumerator in buttonInfo.Enumerators)
             {
-                buttonInfo.Enumerator = null;
+                if (!enumerator.MoveNext())
+                {
+                    completedEnumerators.Add(enumerator);
+                }
             }
+            completedEnumerators.ExceptWith(completedEnumerators);
 
             DecButtonAttribute decButtonAttribute = (DecButtonAttribute) saintsAttribute;
 
@@ -123,15 +128,21 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
             if (GUI.Button(buttonRect, string.Empty))
             {
-                (string error, object result) = CallButtonFunc(property, decButtonAttribute, info, target);
-                buttonInfo.ExecError = error;
-                if (result is IEnumerator enumerator)
+                buttonInfo.ExecError = "";
+
+                foreach ((string error, object result)  in CallButtonFunc(property, decButtonAttribute, info, target))
                 {
-                    buttonInfo.Enumerator = enumerator;
-                }
-                else
-                {
-                    buttonInfo.Enumerator = null;
+                    if (error == "")
+                    {
+                        if (result is IEnumerator enumerator)
+                        {
+                            buttonInfo.Enumerators.Add(enumerator);
+                        }
+                    }
+                    else
+                    {
+                        buttonInfo.ExecError += error;
+                    }
                 }
             }
 

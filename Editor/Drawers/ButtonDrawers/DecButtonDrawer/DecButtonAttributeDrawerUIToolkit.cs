@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -25,8 +26,9 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
         protected static VisualElement DrawUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent, VisualElement container)
         {
-            Button buttonElement = null;
+            // Button buttonElement = null;
             IVisualElementScheduledItem buttonTask = null;
+            HashSet<IEnumerator> enumerators = new HashSet<IEnumerator>();
             Image buttonRotator = new Image
             {
                 image = Util.LoadResource<Texture2D>("refresh.png"),
@@ -43,37 +45,61 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 tintColor = EColor.Lime.GetColor(),
                 name = NameButtonRotator(property, index),
             };
-            buttonElement = new Button(() =>
+            Button buttonElement = new Button(() =>
             {
-                (string buttonError, object buttonResult) = CallButtonFunc(property, (DecButtonAttribute) saintsAttribute, info, parent);
                 HelpBox helpBox = container.Query<HelpBox>(className: ClassExecError(property, index)).First();
-                helpBox.style.display = buttonError == ""? DisplayStyle.None: DisplayStyle.Flex;
-                helpBox.text = buttonError;
+                string buttonError = "";
+                // ReSharper disable once PossibleNullReferenceException
+                // ReSharper disable once AccessToModifiedClosure
+                // HashSet<IEnumerator> enumerators = (HashSet<IEnumerator>)buttonElement.userData;
+                foreach ((string eachError, object buttonResult) in CallButtonFunc(property, (DecButtonAttribute) saintsAttribute, info, parent))
+                {
+                    // Debug.Log($"{eachError}/{buttonResult}");
+                    if (eachError == "")
+                    {
+                        // Debug.Log(buttonResult is IEnumerator);
+                        if (buttonResult is IEnumerator enumerator)
+                        {
+                            enumerators.Add(enumerator);
+                        }
+                    }
+                    else
+                    {
+                        buttonError += eachError;
+                    }
+                }
 
                 buttonTask?.Pause();
-                if (buttonResult is System.Collections.IEnumerator enumerator)
-                {
-                    buttonElement.userData = enumerator;
-                    buttonTask?.Pause();
-                    buttonTask = buttonElement.schedule.Execute(() =>
-                    {
-                        if (buttonElement.userData is System.Collections.IEnumerator bindEnumerator)
-                        {
-                            bool show = true;
-                            if (!bindEnumerator.MoveNext())
-                            {
-                                show = false;
-                                buttonTask?.Pause();
-                            }
 
-                            DisplayStyle style = show? DisplayStyle.Flex : DisplayStyle.None;
-                            if(buttonRotator.style.display != style)
+                if (enumerators.Count > 0)
+                {
+                    // ReSharper disable once PossibleNullReferenceException
+                    // ReSharper disable once AccessToModifiedClosure
+                    buttonTask = container.schedule.Execute(() =>
+                    {
+                        HashSet<IEnumerator> completedEnumerators = new HashSet<IEnumerator>();
+
+                        foreach (IEnumerator enumerator in enumerators)
+                        {
+                            if (!enumerator.MoveNext())
                             {
-                                buttonRotator.style.display = style;
+                                completedEnumerators.Add(enumerator);
                             }
+                        }
+
+                        enumerators.ExceptWith(completedEnumerators);
+                        bool show = enumerators.Count > 0;
+
+                        DisplayStyle style = show? DisplayStyle.Flex : DisplayStyle.None;
+                        if(buttonRotator.style.display != style)
+                        {
+                            buttonRotator.style.display = style;
                         }
                     }).Every(1);
                 }
+
+                helpBox.style.display = buttonError == ""? DisplayStyle.None: DisplayStyle.Flex;
+                helpBox.text = buttonError;
             })
             {
                 style =
@@ -81,6 +107,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                     height = EditorGUIUtility.singleLineHeight,
                     flexGrow = 1,
                 },
+                userData = new HashSet<IEnumerator>(),
             };
 
             buttonElement.Add(buttonRotator);
