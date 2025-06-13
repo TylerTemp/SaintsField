@@ -2014,18 +2014,18 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private static bool _fallbackUnbindReflectionFailed;
-        private static Type _serializedObjectBindingContextType;
-        private static MethodInfo _serializedObjectBindingContextFindMethod;
+        // private static bool _fallbackUnbindReflectionFailed;
+        // private static Type _serializedObjectBindingContextType;
+        // private static MethodInfo _serializedObjectBindingContextFindMethod;
 
         /// <summary>
-        /// Remove proerty track from the element (Unbind)
+        /// Remove property track from the element (Unbind)
         /// Thanks to [@Zallist](https://github.com/Zallist) in [#239](https://github.com/TylerTemp/SaintsField/issues/239)
         /// </summary>
         // ReSharper disable once UnusedParameter.Global
         public static void Unbind(VisualElement element, SerializedObject serializedObject)
         {
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_2021_3_OR_NEWER
             element.Unbind();
 // not working atm, comment out
 // #else
