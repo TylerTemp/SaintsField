@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
@@ -449,7 +450,20 @@ namespace SaintsField.Editor.Utils
                     return property.boundsIntValue.ToString().Contains(token);
 #if UNITY_2019_3_OR_NEWER
                 case SerializedPropertyType.ManagedReference:
-                    return property.managedReferenceFullTypename.Contains(token);
+                    // if (property.managedReferenceFullTypename.Contains(token))
+                    // {
+                    //     return true;
+                    // }
+
+                    foreach ((string _, SerializedProperty subProp)  in SaintsRowAttributeDrawer.GetSerializableFieldInfo(property))
+                    {
+                        if (SearchProp(subProp, token))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
 #endif
                 case SerializedPropertyType.Generic:
                 {
