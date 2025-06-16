@@ -17,7 +17,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue240SaintsRowStr
             private void FooInline()
             {
 #if UNITY_EDITOR
-                SaintsContext.SerializedProperty.intValue++;
+                SaintsContext.SerializedProperty.intValue++;  // for inline buttons we get the decorated property
                 SaintsContext.SerializedProperty.serializedObject.ApplyModifiedProperties();
 #endif
             }
@@ -28,6 +28,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue240SaintsRowStr
             private void IncrementFoo()
             {
 #if UNITY_EDITOR
+                // for `Button` we get the property of the container (`foo1` field here)
                 SaintsContext.SerializedProperty.FindPropertyRelative(nameof(foo)).intValue++;
                 SaintsContext.SerializedProperty.serializedObject.ApplyModifiedProperties();
 #endif

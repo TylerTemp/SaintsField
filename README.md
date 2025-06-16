@@ -101,9 +101,19 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.16.5**
+**4.17.0**
 
-If you have multiple targets selected, `AboveButton`, `BelowButton`, `PostFieldButton` can be triggered on all selected targets.
+1.  Add `EMode.InstanceInScene`, `EMode.InstanceInPrefab`, `EMode.Regular`, `EMode.Variant`, `EMode.NonPrefabInstance` which can be used for `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, and `Playa*` version of them.
+
+    *   `EMode.InstanceInScene`: target is a prefab placed in a scene
+    *   `EMode.InstanceInPrefab`: target is inside a prefab (but is not the top root of that prefab)
+    *   `EMode.Regular`: target is at the top root of the prefab
+    *   `EMode.Variant`: target is at the top root of the prefab, and is also a variant prefab
+    *   `EMode.NonPrefabInstance`: target is not a prefab (but can be inside a prefab)
+    *   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
+    *   `EMode.PrefabAsset` = `Variant | Regular`
+
+2.  Provide a workaround solution for [#240](https://github.com/TylerTemp/SaintsField/issues/240), for editing a field inside a serializable struct.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2702,9 +2712,11 @@ Arguments:
 
 For callback (functions, fields, properties):
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
@@ -2877,9 +2889,11 @@ Show or hide the field based on a condition. . Supports callbacks (function/fiel
 
 Arguments:
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
@@ -3786,9 +3800,11 @@ Disable or enable an entire layout group. These attributes will work on the firs
 
 Arguments:
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
@@ -3844,9 +3860,11 @@ Show or hide an entire layout group. These attributes will work on the first lay
 
 Arguments:
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
@@ -6483,6 +6501,18 @@ group with any decorator that has the same `groupBy` for this field. The same gr
 This only works for decorator draws above or below the field. The above drawer will not groupd with the below drawer, and vice versa.
 
 `""` means no group.
+
+### `EMode` ###
+
+*   `EMode.Edit`: the Unity Editor is not playing
+*   `EMode.Play`: the Unity Editor is playing
+*   `EMode.InstanceInScene`: target is a prefab placed in a scene
+*   `EMode.InstanceInPrefab`: target is inside a prefab (but is not the top root of that prefab)
+*   `EMode.Regular`: target is at the top root of the prefab
+*   `EMode.Variant`: target is at the top root of the prefab, and is also a variant prefab
+*   `EMode.NonPrefabInstance`: target is not a prefab (but can be inside a prefab)
+*   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
+*   `EMode.PrefabAsset` = `Variant | Regular`
 
 ### Syntax for Show/Hide/Enable/Disable-If ##
 

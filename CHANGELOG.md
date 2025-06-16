@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.17.0 ##
+
+1.  Add `EMode.InstanceInScene`, `EMode.InstanceInPrefab`, `EMode.Regular`, `EMode.Variant`, `EMode.NonPrefabInstance` which can be used for `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, and `Playa*` version of them.
+
+    *   `EMode.InstanceInScene`: target is a prefab placed in a scene
+    *   `EMode.InstanceInPrefab`: target is inside a prefab (but is not the top root of that prefab)
+    *   `EMode.Regular`: target is at the top root of the prefab
+    *   `EMode.Variant`: target is at the top root of the prefab, and is also a variant prefab
+    *   `EMode.NonPrefabInstance`: target is not a prefab (but can be inside a prefab)
+    *   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
+    *   `EMode.PrefabAsset` = `Variant | Regular`
+
+2.  Provide a workaround solution for [#240](https://github.com/TylerTemp/SaintsField/issues/240), for editing a field inside a serializable struct.
+
 ## 4.16.5 ##
 
 If you have multiple targets selected, `AboveButton`, `BelowButton`, `PostFieldButton` can be triggered on all selected targets.
