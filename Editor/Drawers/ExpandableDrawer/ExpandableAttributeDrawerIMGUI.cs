@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
         }
     }
 
-    public partial class ExpandableAttributeDrawer: IMakeRenderer
+    public partial class ExpandableAttributeDrawer
     {
 
         private class ExpandableInfo
@@ -318,11 +318,6 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             }
 
             IdToInfo.Remove(key);
-        }
-
-        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
-        {
-            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         }
     }
 }

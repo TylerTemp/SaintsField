@@ -399,18 +399,19 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                                 foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                                 {
-                                    AbsRenderer renderer =
-                                        SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo);
-                                    // Debug.Log(renderer);
-                                    // ReSharper disable once InvertIf
-                                    if (renderer != null)
+                                    foreach (AbsRenderer renderer in SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo))
                                     {
-                                        renderer.NoLabel = noLabel;
-                                        renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
-                                        VisualElement fieldElement = renderer.CreateVisualElement();
-                                        if (fieldElement != null)
+                                        // Debug.Log(renderer);
+                                        // ReSharper disable once InvertIf
+                                        if (renderer != null)
                                         {
-                                            element.Add(fieldElement);
+                                            renderer.NoLabel = noLabel;
+                                            renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
+                                            VisualElement fieldElement = renderer.CreateVisualElement();
+                                            if (fieldElement != null)
+                                            {
+                                                element.Add(fieldElement);
+                                            }
                                         }
                                     }
                                 }
@@ -549,18 +550,17 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                             foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                             {
-                                AbsRenderer renderer =
-                                    SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo);
-                                // Debug.Log(renderer);
-                                // ReSharper disable once InvertIf
-                                if (renderer != null)
+                                foreach (AbsRenderer renderer in SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo))
                                 {
-                                    renderer.NoLabel = noLabel;
-                                    renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
-                                    VisualElement fieldElement = renderer.CreateVisualElement();
-                                    if (fieldElement != null)
+                                    if(renderer != null)
                                     {
-                                        element.Add(fieldElement);
+                                        renderer.NoLabel = noLabel;
+                                        renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
+                                        VisualElement fieldElement = renderer.CreateVisualElement();
+                                        if (fieldElement != null)
+                                        {
+                                            element.Add(fieldElement);
+                                        }
                                     }
                                 }
                             }

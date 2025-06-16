@@ -13,10 +13,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-
-namespace SaintsField.Editor.Playa.Renderer
+namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 {
-    public partial class MethodRenderer
+    public partial class ButtonRenderer
     {
         private static string ButtonName(MethodInfo methodInfo, object target) => $"{target?.GetHashCode()}_{methodInfo.Name}_{string.Join("_", methodInfo.GetParameters().Select(each => each.Name))}__ButtonRenderer";
         private static string ButtonLabelContainerName(MethodInfo methodInfo, object target) => $"{target?.GetHashCode()}_{methodInfo.Name}_{string.Join("_", methodInfo.GetParameters().Select(each => each.Name))}__ButtonLabelContainer";
@@ -37,40 +36,9 @@ namespace SaintsField.Editor.Playa.Renderer
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
             container.style.flexGrow = 1;
-            object target = FieldWithInfo.Targets[0];
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
             // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
-
-            ButtonAttribute buttonAttribute = null;
-            List<IPlayaMethodBindAttribute> methodBindAttributes = new List<IPlayaMethodBindAttribute>();
-
-            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
-            {
-                if(playaAttribute is ButtonAttribute button)
-                {
-                    buttonAttribute = button;
-                }
-                else if(playaAttribute is IPlayaMethodBindAttribute methodBindAttribute)
-                {
-                    methodBindAttributes.Add(methodBindAttribute);
-                }
-            }
-
-            foreach (IPlayaMethodBindAttribute playaMethodBindAttribute in methodBindAttributes)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
-                Debug.Log($"button click {playaMethodBindAttribute}");
-#endif
-                CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
-            }
-
-            if (buttonAttribute == null)
-            {
-                return (null, methodBindAttributes.Count > 0);
-            }
-            // Debug.Assert(methodInfo.GetParameters().All(p => p.IsOptional));
-
-            string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) || buttonAttribute.IsCallback ? ObjectNames.NicifyVariableName(methodInfo.Name) : buttonAttribute.Label;
+            string buttonText = string.IsNullOrEmpty(_buttonAttribute.Label) || _buttonAttribute.IsCallback ? ObjectNames.NicifyVariableName(methodInfo.Name) : _buttonAttribute.Label;
             // object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
             ParameterInfo[] parameters = methodInfo.GetParameters();
             bool hasParameters = parameters.Length > 0;
@@ -171,7 +139,7 @@ namespace SaintsField.Editor.Playa.Renderer
             ButtonUserData buttonUserData = new ButtonUserData
             {
                 Xml = buttonText,
-                Callback = buttonAttribute.IsCallback ? buttonAttribute.Label : "",
+                Callback = _buttonAttribute.IsCallback ? _buttonAttribute.Label : "",
                 UpdateOneMoreTime = true,
                 Enumerators = new List<IEnumerator>(),
             };
@@ -292,7 +260,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             buttonElement.Add(buttonRotator);
 
-            bool needUpdate = buttonAttribute.IsCallback;
+            bool needUpdate = _buttonAttribute.IsCallback;
 
             if (!needUpdate)
             {

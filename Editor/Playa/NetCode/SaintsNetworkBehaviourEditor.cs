@@ -13,11 +13,10 @@ namespace SaintsField.Editor.Playa.NetCode
     // public partial class SaintsNetworkBehaviourEditor : SaintsEditor
     {
         private IReadOnlyList<ISaintsRenderer> _renderers;
-        public AbsRenderer MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        public IEnumerable<AbsRenderer> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
             return SaintsEditor.HelperMakeRenderer(so, fieldWithInfo);
         }
-
 
         private FieldInfo _mInitializedField;
         private MethodInfo _initMethod;

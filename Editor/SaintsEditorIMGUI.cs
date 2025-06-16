@@ -28,7 +28,7 @@ namespace SaintsField.Editor
             }
         }
 
-        public virtual void OnDestroy()
+        private void OnDestroyIMGUI()
         {
             if (_renderers != null)
             {
@@ -38,9 +38,6 @@ namespace SaintsField.Editor
                 }
             }
             _renderers = null;
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-            RemoveInstance(this);
-#endif
         }
 
         public override void OnInspectorGUI()

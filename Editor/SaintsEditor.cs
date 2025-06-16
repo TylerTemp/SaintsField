@@ -8,6 +8,8 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
@@ -793,8 +795,14 @@ namespace SaintsField.Editor
 
         private static IEnumerable<SaintsFieldWithRenderer> GetPlayaAndRenderer(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject, IMakeRenderer makeRenderer)
         {
-            return WrapAroundSaintsRenderer(makeRenderer.MakeRenderer(serializedObject, fieldWithInfo), fieldWithInfo,
-                serializedObject);
+            foreach (AbsRenderer baseRenderer in makeRenderer.MakeRenderer(serializedObject, fieldWithInfo))
+            {
+                foreach (SaintsFieldWithRenderer renderer in WrapAroundSaintsRenderer(baseRenderer, fieldWithInfo,
+                             serializedObject))
+                {
+                    yield return renderer;
+                }
+            }
         }
 
         private static IEnumerable<SaintsFieldWithRenderer> WrapAroundSaintsRenderer(AbsRenderer baseRenderer, SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject)
@@ -1038,7 +1046,7 @@ namespace SaintsField.Editor
         //     return new VerticalGroup(layoutInfo);
         // }
 
-        public static AbsRenderer HelperMakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        public static IEnumerable<AbsRenderer> HelperMakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             // Debug.Log($"field {fieldWithInfo.fieldInfo?.Name}/{fieldWithInfo.fieldInfo?.GetCustomAttribute<ExtShowHideConditionBase>()}");
             switch (fieldWithInfo.RenderType)
@@ -1050,30 +1058,46 @@ namespace SaintsField.Editor
                         switch (playaAttribute)
                         {
                             case TableAttribute _:
-                                return new TableRenderer(serializedObject, fieldWithInfo);
+                                yield return new TableRenderer(serializedObject, fieldWithInfo);
+                                yield break;
 
                             case ListDrawerSettingsAttribute _:
-                                return new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo);
+                                yield return new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo);
+                                yield break;
                         }
                     }
 
-                    return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
+                    yield return new SerializedFieldRenderer(serializedObject, fieldWithInfo);
+                    yield break;
                 }
                 case SaintsRenderType.InjectedSerializedField:
-                    return new SerializedFieldBareRenderer(serializedObject, fieldWithInfo);
+                    yield return new SerializedFieldBareRenderer(serializedObject, fieldWithInfo);
+                    yield break;
 
                 case SaintsRenderType.NonSerializedField:
                 case SaintsRenderType.NativeProperty:
-                    return new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo);
+                    yield return new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo);
+                    yield break;
 
                 case SaintsRenderType.Method:
-                    return new MethodRenderer(serializedObject, fieldWithInfo);
+                    foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
+                    {
+                        if (playaAttribute is IPlayaMethodBindAttribute methodBindAttribute)
+                        {
+                            yield return new MethodBindRenderer(methodBindAttribute, serializedObject, fieldWithInfo);
+                        }
+                        else if (playaAttribute is ButtonAttribute buttonAttribute)
+                        {
+                            yield return new ButtonRenderer(buttonAttribute, serializedObject, fieldWithInfo);
+                        }
+                    }
+                    yield break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
             }
         }
 
-        public virtual AbsRenderer MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        public virtual IEnumerable<AbsRenderer> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
             return HelperMakeRenderer(so, fieldWithInfo);
         }
@@ -1094,6 +1118,18 @@ namespace SaintsField.Editor
 // #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 //             OnEnableUIToolkit();
 // #endif
+        }
+
+        public virtual void OnDestroy()
+        {
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+            RemoveInstance(this);
+#endif
+
+            OnDestroyIMGUI();
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+            OnDestroyUIToolkit();
+#endif
         }
 
         private bool _searchableShown;

@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
@@ -12,15 +11,18 @@ using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SaintsField.Editor.Playa.Renderer
+namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 {
-    public partial class MethodRenderer: AbsRenderer
+    public partial class MethodBindRenderer: AbsRenderer
     {
         private readonly SerializedObject _serializedObject;
 
-        public MethodRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
+        private readonly IPlayaMethodBindAttribute _methodBindAttribute;
+
+        public MethodBindRenderer(IPlayaMethodBindAttribute methodBindAttribute, SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
             _serializedObject = serializedObject;
+            _methodBindAttribute = methodBindAttribute;
         }
 
         private void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
@@ -37,7 +39,7 @@ namespace SaintsField.Editor.Playa.Renderer
             object value = playaMethodBindAttribute.Value;
 
             UnityEventBase unityEventBase = null;
-            UnityEngine.Object unityEventContainerObject = null;
+            UnityEngine.Object unityEventContainerObject;
             List<Type> invokeRequiredTypes = new List<Type>();
             string eventDisplayName;
             if (methodBind == MethodBind.ButtonOnClick)
@@ -50,7 +52,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 Debug.Log($"find button `{uiButton}`");
 #endif
 
-                if (uiButton == null)
+                if (!uiButton)
                 {
                     return;
                 }
@@ -206,41 +208,23 @@ namespace SaintsField.Editor.Playa.Renderer
         }
 
 
-        private static object GetParameterDefaultValue(ParameterInfo parameterInfo)
+        private void OnApplicationChanged()
         {
-            if (parameterInfo.IsOptional)
-            {
-                return parameterInfo.DefaultValue;
-            }
+            CheckMethodBind(_methodBindAttribute, FieldWithInfo);
+        }
 
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if(parameterInfo.ParameterType.IsValueType)
-            {
-                return Activator.CreateInstance(parameterInfo.ParameterType);
-            }
-
-            return null;
+        public override void OnSearchField(string searchString)
+        {
         }
 
         public override void OnDestroy()
         {
-            OnDestroyIMGUI();
-        }
-
-#if UNITY_2021_3_OR_NEWER
-        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
-#endif
-
-        public override void OnSearchField(string searchString)
-        {
-#if UNITY_2021_3_OR_NEWER
-            _onSearchFieldUIToolkit.Invoke(searchString);
-#endif
+            SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(OnApplicationChanged);
         }
 
         public override string ToString()
         {
-            return $"<{FieldWithInfo.RenderType} {FieldWithInfo.MethodInfo?.Name}/>";
+            return $"<MethodBind {FieldWithInfo.RenderType} {FieldWithInfo.MethodInfo?.Name}/>";
         }
 
         private IEnumerator _imGuiEnumerator;

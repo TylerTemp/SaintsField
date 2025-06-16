@@ -8,6 +8,7 @@ using DG.Tweening;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer;
+using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -77,7 +78,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public void Add(string groupPath, ISaintsRenderer renderer)
         {
-            MethodRenderer methodRenderer = renderer as MethodRenderer;
+            ButtonRenderer methodRenderer = renderer as ButtonRenderer;
             Debug.Assert(methodRenderer != null, $"You can NOT nest {renderer} in {this}");
 
             DOTweenPlayAttribute doTweenPlayAttribute = methodRenderer.FieldWithInfo.PlayaAttributes.OfType<DOTweenPlayAttribute>().FirstOrDefault();

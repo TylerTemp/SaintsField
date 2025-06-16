@@ -9,9 +9,9 @@ using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Playa.Renderer
+namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 {
-    public partial class MethodRenderer
+    public partial class ButtonRenderer
     {
         private RichTextDrawer _richTextDrawer;
 
@@ -127,35 +127,6 @@ namespace SaintsField.Editor.Playa.Renderer
             object target = FieldWithInfo.Targets[0];
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
 
-            ButtonAttribute buttonAttribute = null;
-            List<IPlayaMethodBindAttribute> methodBindAttributes = new List<IPlayaMethodBindAttribute>();
-
-            foreach (IPlayaAttribute playaAttribute in FieldWithInfo.PlayaAttributes)
-            {
-                switch (playaAttribute)
-                {
-                    case ButtonAttribute button:
-                        buttonAttribute = button;
-                        break;
-                    case IPlayaMethodBindAttribute methodBindAttribute:
-                        methodBindAttributes.Add(methodBindAttribute);
-                        break;
-                }
-            }
-
-            foreach (IPlayaMethodBindAttribute playaMethodBindAttribute in methodBindAttributes)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
-                Debug.Log($"button click {playaMethodBindAttribute}");
-#endif
-                CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
-            }
-
-            if(buttonAttribute == null)
-            {
-                return;
-            }
-
             ParameterInfo[] parameters = FieldWithInfo.MethodInfo.GetParameters();
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_imGuiParameterValues == null)
@@ -214,7 +185,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     }
                 }
 
-                IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks = GetRichIMGUI(buttonAttribute, methodInfo);
+                IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks = GetRichIMGUI(_buttonAttribute, methodInfo);
                 GUIContent oldLabel = new GUIContent(ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name));
                 Rect lastRect = buttonRect;
                 float drawNeedWidth = _richTextDrawer.GetWidth(oldLabel, lastRect.height, richTextChunks);
