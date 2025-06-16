@@ -10,6 +10,7 @@ using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using Scene = UnityEngine.SceneManagement.Scene;
 
 namespace SaintsField.Editor.Utils
@@ -922,26 +923,223 @@ namespace SaintsField.Editor.Utils
             return Array.Empty<UnityEngine.Object>();
         }
 
-        private static bool ConditionEditModeChecker(EMode editorMode)
+        private static IEnumerable<int> SplitBits(int value)
         {
-            bool editorRequiresEdit = editorMode.HasFlagFast(EMode.Edit);
-            bool editorRequiresPlay = editorMode.HasFlagFast(EMode.Play);
-            // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if(editorRequiresEdit && editorRequiresPlay)
+            while (value != 0)
             {
-                return true;
+                int lowestBit = value & -value; // Isolate lowest set bit
+                yield return lowestBit;
+                value &= ~lowestBit; // Remove that bit
             }
+        }
 
-            if(!editorRequiresEdit && !editorRequiresPlay)
+        private static IEnumerable<bool> ConditionEditModeChecker(EMode editorMode, SerializedProperty property)
+        {
+            foreach (int splitBit in SplitBits((int)editorMode))
             {
-                return false;
-            }
+                EMode mode = (EMode)splitBit;
+                switch (mode)
+                {
+                    case EMode.Edit:
+                        yield return !EditorApplication.isPlayingOrWillChangePlaymode;
+                        break;
+                    case EMode.Play:
+                        yield return EditorApplication.isPlayingOrWillChangePlaymode;
+                        break;
+                    case EMode.InstanceInScene:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
 
-            return (
-                !editorRequiresEdit || !EditorApplication.isPlaying
-            ) && (
-                !editorRequiresPlay || EditorApplication.isPlaying
-            );
+                        Scene goScene = go.scene;
+                        if (!goScene.IsValid())
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(go);
+                        if (status == PrefabInstanceStatus.NotAPrefab)
+                        {
+                            yield return false;
+                            break;
+                        }
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(go);
+                        if (assetType == PrefabAssetType.NotAPrefab)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        IEnumerable<Scene> openedScenes =  Enumerable.Range(0, SceneManager.sceneCount).Select(SceneManager.GetSceneAt);
+                        if (!openedScenes.Contains(goScene))
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        yield return true;
+                        break;
+                    }
+
+                    case EMode.InstanceInPrefab:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        GameObject parent = go.transform.parent?.gameObject;
+                        if(!parent)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(parent);
+                        if (status == PrefabInstanceStatus.NotAPrefab)
+                        {
+                            yield return false;
+                            break;
+                        }
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(parent);
+                        if (assetType == PrefabAssetType.NotAPrefab)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        yield return true;
+                        break;
+                    }
+                    case EMode.Regular:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(go);
+                        // Debug.Log(assetType);
+                        if (assetType != PrefabAssetType.Regular)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        yield return true;
+                        break;
+                    }
+                    case EMode.Variant:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        // PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(go);
+                        // if (status == PrefabInstanceStatus.NotAPrefab)
+                        // {
+                        //     yield return false;
+                        //     break;
+                        // }
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(go);
+
+                        if (assetType != PrefabAssetType.Variant)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        yield return true;
+                        break;
+                    }
+
+                    case EMode.NonPrefabInstance:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
+                        PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(go);
+                        if (status == PrefabInstanceStatus.NotAPrefab)
+                        {
+                            yield return true;
+                            break;
+                        }
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(go);
+                        if (assetType == PrefabAssetType.NotAPrefab)
+                        {
+                            yield return true;
+                            break;
+                        }
+
+                        yield return false;
+                        break;
+                    }
+                    case EMode.PrefabInstance:
+                    case EMode.PrefabAsset:
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(editorMode), editorMode, $"{mode}");
+                }
+            }
         }
 
         public static (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) ConditionChecker(IEnumerable<ConditionInfo> conditionInfos, SerializedProperty property, MemberInfo info, object target)
@@ -953,7 +1151,7 @@ namespace SaintsField.Editor.Utils
             {
                 if (conditionInfo.Compare == LogicCompare.EditorMode)
                 {
-                    callbackBoolResults.Add(ConditionEditModeChecker((EMode) conditionInfo.Target));
+                    callbackBoolResults.AddRange(ConditionEditModeChecker((EMode) conditionInfo.Target, property));
                     continue;
                 }
                 // ReSharper disable once UseNegatedPatternInIsExpression

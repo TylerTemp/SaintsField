@@ -63,6 +63,7 @@ namespace SaintsField.Condition
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CONDITION
                     Debug.Log($"#Condition# {rawCondition} is reverse");
 #endif
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(1);
                 }
                 else if (rawCondition.StartsWith("$"))
@@ -70,6 +71,7 @@ namespace SaintsField.Condition
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CONDITION
                     Debug.Log($"#Condition# {rawCondition} remove !");
 #endif
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(1);
                 }
 
@@ -80,6 +82,7 @@ namespace SaintsField.Condition
                 if (rawCondition.EndsWith("&"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 1);
                     logicCompare = LogicCompare.BitAnd;
                     value = rawConditions[index + 1];
@@ -87,6 +90,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("&$"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
                     logicCompare = LogicCompare.BitAnd;
                     value = rawConditions[index + 1];
@@ -95,6 +99,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("^"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 1);
                     logicCompare = LogicCompare.BitXor;
                     value = rawConditions[index + 1];
@@ -102,6 +107,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("^$"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
                     logicCompare = LogicCompare.BitXor;
                     value = rawConditions[index + 1];
@@ -110,6 +116,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("&=="))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
                     logicCompare = LogicCompare.BitHasFlag;
                     value = rawConditions[index + 1];
@@ -117,6 +124,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("&==$"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 4);
                     logicCompare = LogicCompare.BitHasFlag;
                     value = rawConditions[index + 1];
@@ -126,6 +134,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("=="))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
                     logicCompare = LogicCompare.Equal;
                     value = rawConditions[index + 1];
@@ -133,6 +142,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("==$"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
                     logicCompare = LogicCompare.Equal;
                     value = rawConditions[index + 1];
@@ -141,6 +151,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("!="))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
                     logicCompare = LogicCompare.NotEqual;
                     value = rawConditions[index + 1];
@@ -148,6 +159,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("!=$"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
                     logicCompare = LogicCompare.NotEqual;
                     value = rawConditions[index + 1];
@@ -156,6 +168,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith(">"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 1);
                     logicCompare = LogicCompare.GreaterThan;
                     value = rawConditions[index + 1];
@@ -163,6 +176,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith(">$"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
                     logicCompare = LogicCompare.GreaterThan;
                     value = rawConditions[index + 1];
@@ -178,6 +192,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith(">=$"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
                     logicCompare = LogicCompare.GreaterEqual;
                     value = rawConditions[index + 1];
@@ -186,6 +201,7 @@ namespace SaintsField.Condition
                 else if(rawCondition.EndsWith("<"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 1);
                     logicCompare = LogicCompare.LessThan;
                     value = rawConditions[index + 1];
@@ -193,6 +209,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("<$"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
                     logicCompare = LogicCompare.LessThan;
                     value = rawConditions[index + 1];
@@ -201,6 +218,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("<="))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 2);
                     logicCompare = LogicCompare.LessEqual;
                     value = rawConditions[index + 1];
@@ -208,6 +226,7 @@ namespace SaintsField.Condition
                 else if (rawCondition.EndsWith("<=$"))
                 {
                     skipNext = true;
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     rawCondition = rawCondition.Substring(0, rawCondition.Length - 3);
                     logicCompare = LogicCompare.LessEqual;
                     value = rawConditions[index + 1];
