@@ -166,6 +166,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
             buttonElement = new Button(() =>
             {
+                SaintsContext.SerializedProperty = _serializedProperty;
                 IEnumerable<object> returnValues = FieldWithInfo.Targets.Select(t => methodInfo.Invoke(t, parameterValues));
 
                 buttonUserData.Enumerators.Clear();

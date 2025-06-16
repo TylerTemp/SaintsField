@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 #if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
 #endif
@@ -21,5 +22,7 @@ namespace SaintsField.Editor.Playa
         void OnDestroy();
 
         void OnSearchField(string searchString);
+
+        void SetSerializedProperty(SerializedProperty property);
     }
 }

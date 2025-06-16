@@ -431,6 +431,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
             _onSearchFieldUIToolkit.Invoke(searchString);
         }
 
+        public void SetSerializedProperty(SerializedProperty property)
+        {
+        }
+
         private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
 
         // private bool _debugCheck;

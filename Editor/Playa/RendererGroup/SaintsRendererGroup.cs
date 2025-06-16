@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Playa;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -140,6 +141,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
 #if UNITY_2021_3_OR_NEWER
             _onSearchFieldUIToolkit.Invoke(searchString);
 #endif
+        }
+
+        public void SetSerializedProperty(SerializedProperty property)
+        {
+            foreach ((string _, ISaintsRenderer renderer) in _renderers)
+            {
+                renderer.SetSerializedProperty(property);
+            }
         }
 
         public override string ToString() => $"<Group path={_groupPath} layout={_eLayout}/>";

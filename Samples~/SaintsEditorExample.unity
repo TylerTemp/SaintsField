@@ -1452,7 +1452,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickVoid
         m_Mode: 1
         m_Arguments:
@@ -1464,7 +1465,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickInt
         m_Mode: 3
         m_Arguments:
@@ -1476,7 +1478,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickBool
         m_Mode: 6
         m_Arguments:
@@ -1488,7 +1491,8 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickFloat
         m_Mode: 4
         m_Arguments:
@@ -1500,7 +1504,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 607623396}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.OnButtonClickExample,
+          today.comes.saintsfield.Samples
         m_MethodName: OnButtonClickComp
         m_Mode: 2
         m_Arguments:

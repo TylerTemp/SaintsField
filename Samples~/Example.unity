@@ -15260,7 +15260,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   foo1:
-    foo: 3
+    fooInline: 5
+    foo: 40
 --- !u!1 &887127787
 GameObject:
   m_ObjectHideFlags: 0
@@ -16694,19 +16695,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 992757023}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 992757020}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: OnClick
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &992757023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23113,6 +23102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   foo1:
+    fooInline: 0
     foo: 3
 --- !u!1 &1551478299
 GameObject:
@@ -24149,7 +24139,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1651359469}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1830942043}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8.ButtonAddOnClickBase,
+          today.comes.saintsfield.Samples
+        m_MethodName: ButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1651359469
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34035,8 +34038,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7690add14fc29f4e93946588d302f73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  instanceInScene: 
+  instanceInPrefab: 
   regular: 
   variant: 
+  nonPrefabInstance: 
 --- !u!1 &2095648703
 GameObject:
   m_ObjectHideFlags: 0
@@ -35126,8 +35132,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7690add14fc29f4e93946588d302f73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  instanceInScene: 
+  instanceInPrefab: 
   regular: 
   variant: 
+  nonPrefabInstance: 
 --- !u!1001 &4398206394473841023
 PrefabInstance:
   m_ObjectHideFlags: 0

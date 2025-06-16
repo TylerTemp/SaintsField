@@ -11,6 +11,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
     {
         private static IEnumerable<(string error, object result)> CallButtonFunc(SerializedProperty property, DecButtonAttribute decButtonAttribute, FieldInfo fieldInfo, object target)
         {
+            SaintsContext.SerializedProperty = property;
+
             if (property.serializedObject.targetObjects.Length < 2)
             {
                 yield return Util.GetMethodOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, target);

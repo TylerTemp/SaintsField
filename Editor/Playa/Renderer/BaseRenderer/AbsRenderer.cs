@@ -289,6 +289,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         public abstract void OnDestroy();
         public abstract void OnSearchField(string searchString);
 
+        protected SerializedProperty _serializedProperty;
+
+        public void SetSerializedProperty(SerializedProperty property)
+        {
+            _serializedProperty = property;
+        }
+
         public static string GetFriendlyName(SaintsFieldWithInfo fieldWithInfo)
         {
             if (fieldWithInfo.SerializedProperty != null)
