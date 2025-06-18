@@ -59,6 +59,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)

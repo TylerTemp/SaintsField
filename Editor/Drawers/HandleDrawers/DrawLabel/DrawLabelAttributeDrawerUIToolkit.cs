@@ -17,7 +17,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
         private LabelInfo _labelInfoUIToolkit;
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             DrawLabelAttribute drawLabelAttribute = (DrawLabelAttribute)saintsAttribute;
             Util.TargetWorldPosInfo targetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(drawLabelAttribute.Space, property, info, parent);

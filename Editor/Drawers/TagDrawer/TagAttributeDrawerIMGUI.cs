@@ -37,12 +37,14 @@ namespace SaintsField.Editor.Drawers.TagDrawer
             }
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent) => property.propertyType != SerializedPropertyType.String;
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) =>
             property.propertyType != SerializedPropertyType.String
                 ? ImGuiHelpBox.GetHeight($"Expect string, get {property.propertyType}", width, MessageType.Error)

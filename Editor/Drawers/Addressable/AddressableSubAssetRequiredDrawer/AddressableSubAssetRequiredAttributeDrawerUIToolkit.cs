@@ -17,7 +17,9 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSubAssetRequiredDraw
         private static string NameRequiredBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__AddressableSubAssetRequired";
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             (string error, string _) = ValidateProperty(property);

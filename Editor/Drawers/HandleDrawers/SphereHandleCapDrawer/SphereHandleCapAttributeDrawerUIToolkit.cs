@@ -17,7 +17,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
         private SphereInfo _sphereInfo;
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -47,7 +48,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             container.Add(child);
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             HelpBox helpBox = container.Q<HelpBox>(name: NameDrawWireDiscHelpBox(property, index));

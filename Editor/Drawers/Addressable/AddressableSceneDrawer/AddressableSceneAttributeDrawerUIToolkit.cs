@@ -73,7 +73,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -171,6 +172,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)

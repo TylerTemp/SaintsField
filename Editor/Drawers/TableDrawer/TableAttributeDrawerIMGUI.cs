@@ -727,13 +727,15 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             }
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
             return _error != "";
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute,
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
             return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);

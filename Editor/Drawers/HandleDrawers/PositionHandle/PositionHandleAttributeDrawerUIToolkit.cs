@@ -18,7 +18,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
         private PositionHandleInfo _positionHandleInfoUIToolkit;
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             return null;
         }

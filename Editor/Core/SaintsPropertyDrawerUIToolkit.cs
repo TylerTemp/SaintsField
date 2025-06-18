@@ -567,7 +567,7 @@ namespace SaintsField.Editor.Core
                 {
                     // belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute);
                     VisualElement creatBelow = saintsPropertyInfo.Drawer.CreateBelowUIToolkit(property,
-                        saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, fieldInfo, parent);
+                        saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, allAttributes, containerElement, fieldInfo, parent);
                     if(creatBelow != null)
                     {
                         groupByContainer.Add(creatBelow);
@@ -1349,12 +1349,15 @@ namespace SaintsField.Editor.Core
             // }
 
             // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
-            OnUpdateUiToolKitInternal(property, containerElement, saintsPropertyDrawers, onValueChangedCallback, fieldInfo);
+            OnUpdateUiToolKitInternal(property, allAttributes, containerElement, saintsPropertyDrawers, onValueChangedCallback, fieldInfo);
         }
 
-        private static void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement container,
+        private static void OnUpdateUiToolKitInternal(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container,
             // ReSharper disable once ParameterTypeCanBeEnumerable.Local
-            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, Action<object> onValueChangedCallback,
+            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers,
+            Action<object> onValueChangedCallback,
             FieldInfo info
         )
         {
@@ -1382,12 +1385,12 @@ namespace SaintsField.Editor.Core
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, info);
+                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, allAttributes, container, onValueChangedCallback, info);
             }
 
             // Debug.Log($"container={container}/parent={container.parent}");
 
-            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(SaintsFieldConfig.UpdateLoopDefaultMs);
+            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, allAttributes, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(SaintsFieldConfig.UpdateLoopDefaultMs);
         }
 
         private static StyleSheet GetNoDecoratorUss()
@@ -1510,7 +1513,8 @@ namespace SaintsField.Editor.Core
         #region Callbacks
 
         protected virtual VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             return null;
         }
@@ -1566,6 +1570,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
         }

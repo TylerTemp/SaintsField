@@ -7,6 +7,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
@@ -73,7 +74,8 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement();
 
@@ -100,6 +102,7 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;

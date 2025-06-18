@@ -48,7 +48,9 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             };
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             VisualElement root = new VisualElement
@@ -212,7 +214,9 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             }
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             // ReSharper disable once InvertIf

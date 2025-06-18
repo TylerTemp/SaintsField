@@ -128,12 +128,14 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent) => EnsureKey((MinValueAttribute) saintsAttribute, property, index, info, parent).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string error = EnsureKey((MinValueAttribute)saintsAttribute, property, index, info, parent).Error;

@@ -105,7 +105,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
             }
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
             string mismatch = GetTypeMismatchError(property);
@@ -122,7 +123,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
             return infoIMGUI.Error != "";
         }
 
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute,
+        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
             string error = GetTypeMismatchError(property);

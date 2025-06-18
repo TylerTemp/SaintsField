@@ -155,7 +155,8 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
@@ -172,6 +173,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
         private const int ButtonPaddding = 1;
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);

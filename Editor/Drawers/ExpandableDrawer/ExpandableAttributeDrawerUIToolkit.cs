@@ -50,6 +50,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             VisualElement visualElement = new VisualElement
@@ -93,6 +94,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;

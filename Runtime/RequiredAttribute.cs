@@ -10,7 +10,6 @@ namespace SaintsField
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
 
-        // ReSharper disable once InconsistentNaming
         public readonly string ErrorMessage;
         public readonly EMessageType MessageType;
 
@@ -18,6 +17,10 @@ namespace SaintsField
         {
             ErrorMessage = errorMessage;
             MessageType = messageType;
+        }
+
+        public RequiredAttribute(EMessageType messageType): this(null, messageType)
+        {
         }
     }
 }

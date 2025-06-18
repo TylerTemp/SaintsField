@@ -112,7 +112,9 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             return button;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             if (_initError is not null)
@@ -229,6 +231,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             if (_initError is not null)

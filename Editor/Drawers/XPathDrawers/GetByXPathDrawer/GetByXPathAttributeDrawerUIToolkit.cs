@@ -131,7 +131,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -552,7 +553,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             string arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);

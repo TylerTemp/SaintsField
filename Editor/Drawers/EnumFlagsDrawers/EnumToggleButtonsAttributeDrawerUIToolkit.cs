@@ -303,7 +303,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             return expandButton;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);

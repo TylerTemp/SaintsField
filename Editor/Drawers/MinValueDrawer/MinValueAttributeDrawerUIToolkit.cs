@@ -1,9 +1,11 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.MinValueDrawer
@@ -15,6 +17,7 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
@@ -31,6 +34,7 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));

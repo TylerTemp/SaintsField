@@ -137,7 +137,8 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
@@ -156,6 +157,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
         private static string GetMismatchError(SerializedProperty property) => $"target {property.propertyPath} is not a string: {property.propertyType}";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)

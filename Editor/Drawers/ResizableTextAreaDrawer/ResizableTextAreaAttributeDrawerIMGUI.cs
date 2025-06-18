@@ -100,12 +100,14 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                 EditorGUIUtility.singleLineHeight * SaintsFieldConfigUtil.ResizableTextAreaMinRow());
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent) => _error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) =>
             _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 

@@ -289,7 +289,7 @@ namespace SaintsField.Editor.Core
                     .Where(each => each > 0)
                     .DefaultIfEmpty(0);
                 IEnumerable<float> belowHeights = grouped
-                    .Select(each => each.Value.GetBelowExtraHeight(property, label, eachWidth, each.Key.SaintsAttribute,
+                    .Select(each => each.Value.GetBelowExtraHeight(property, label, eachWidth, TODO, each.Key.SaintsAttribute,
                         each.Key.Index, fieldInfo, parent))
                     .Where(each => each > 0)
                     .DefaultIfEmpty(0);
@@ -361,6 +361,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return 0;
@@ -877,7 +878,7 @@ namespace SaintsField.Editor.Core
                         : GetOrCreateSaintsDrawer(eachAttributeWithIndex);
                     // Debug.Log($"get instance {eachAttribute}: {drawerInstance}");
                     // ReSharper disable once InvertIf
-                    if (drawerInstance.WillDrawBelow(property, eachAttributeWithIndex.SaintsAttribute,
+                    if (drawerInstance.WillDrawBelow(property, allAttributes, eachAttributeWithIndex.SaintsAttribute,
                             eachAttributeWithIndex.Index, fieldInfo, parent))
                     {
                         if (!groupedDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute?.GroupBy ?? "",
@@ -1017,7 +1018,8 @@ namespace SaintsField.Editor.Core
         {
         }
 
-        protected virtual bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected virtual bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)

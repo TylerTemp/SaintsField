@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -51,11 +52,16 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
             return errorMessage ?? $"{property.displayName} is required";
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
         {
+            if (allAttributes.Any(each => each is RequiredIfAttribute))
+            {
+                return false;
+            }
             string error = GetErrorImGui(property, saintsAttribute, info, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"WillDrawBelow error=`{error}`");
@@ -64,6 +70,7 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string error = GetErrorImGui(property, saintsAttribute, info, parent);
@@ -80,6 +87,11 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
+            if (allAttributes.Any(each => each is RequiredIfAttribute))
+            {
+                return position;
+            }
+
             string error = GetErrorImGui(property, saintsAttribute, info, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"belowHeight has={position.height}/width={position.width}");

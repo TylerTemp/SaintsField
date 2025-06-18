@@ -39,6 +39,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers.VisibilityDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
@@ -56,7 +57,8 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers.VisibilityDrawer
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info)
         {
             IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassVisibility(property)).ToList();
             VisualElement topElement = visibilityElements[0];

@@ -162,6 +162,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             // if (parent == null)

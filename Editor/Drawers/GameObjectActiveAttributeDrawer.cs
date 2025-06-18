@@ -79,7 +79,8 @@ namespace SaintsField.Editor.Drawers
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
@@ -88,6 +89,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
@@ -238,12 +240,13 @@ namespace SaintsField.Editor.Drawers
 
                 Undo.RecordObject(go, $"GameObjectActive: {property.propertyPath}");
                 go.SetActive(!go.activeSelf);
-                OnUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info);
+                OnUpdateUIToolkit(property, saintsAttribute, index, allAttributes, container, onValueChangedCallback, info);
             };
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;

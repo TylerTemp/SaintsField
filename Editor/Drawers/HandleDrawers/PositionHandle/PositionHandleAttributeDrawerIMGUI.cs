@@ -48,7 +48,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             return positionHandleInfo;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
@@ -58,6 +59,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string error = EnsureKey(property, (PositionHandleAttribute)saintsAttribute, info, parent).Error;
