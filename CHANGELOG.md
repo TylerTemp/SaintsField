@@ -3,8 +3,9 @@
 ## 4.18.0 ##
 
 1.  Add `RequiredIf` for conditional required field; `EMode` supported
-2.  Add Auto Validatior for `OnEvent` & `OnButtonClick`
+2.  Add Auto Validator for `OnEvent` & `OnButtonClick`
 3.  Fix `Button` of `IEnumerator` won't hide the loading icon even the coroutine is done
+4.  Fix Auto Validator won't check sub object of a prefab
 
 ## 4.17.0 ##
 

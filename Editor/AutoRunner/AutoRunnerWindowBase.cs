@@ -70,12 +70,34 @@ namespace SaintsField.Editor.AutoRunner
                 }
 
                 // ReSharper disable once MergeIntoLogicalPattern
-                if(obj is GameObject || obj is ScriptableObject)
+                if(obj is GameObject go)
+                {
+                    foreach (Component comp in go.transform.GetComponentsInChildren<Component>(true))
+                    {
+                        SerializedObject so;
+                        try
+                        {
+                            so = new SerializedObject(comp);
+                        }
+#pragma warning disable CS0168
+                        catch (Exception e)
+#pragma warning restore CS0168
+                        {
+#if SAINTSFIELD_DEBUG
+                            Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
+#endif
+                            continue;
+                        }
+
+                        yield return so;
+                    }
+                }
+                else if (obj is ScriptableObject scriptableObject)
                 {
                     SerializedObject so;
                     try
                     {
-                        so = new SerializedObject(obj);
+                        so = new SerializedObject(scriptableObject);
                     }
 #pragma warning disable CS0168
                     catch (Exception e)
@@ -275,7 +297,7 @@ namespace SaintsField.Editor.AutoRunner
                 switch (extraResource)
                 {
                     case GameObject go:
-                        serializeObjects = go.transform.GetComponentsInChildren<Component>().Cast<Object>().ToArray();
+                        serializeObjects = go.transform.GetComponentsInChildren<Component>(true).Cast<Object>().ToArray();
                         break;
                     case ScriptableObject scriptableObject:
                         serializeObjects = new Object[] { scriptableObject };
