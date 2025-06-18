@@ -169,7 +169,9 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                             target, methodInfo));
                     SaintsPropertyDrawer.EnqueueSceneViewNotification(
                         $"Bind callback `{methodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`");
+#if UNITY_2021_3_OR_NEWER
                     AssetDatabase.SaveAssetIfDirty(unityEventContainerObject);
+#endif
                 });
             }
 
@@ -192,7 +194,9 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 Util.BindEventWithValue(unityEventBase, methodInfo, invokeRequiredTypes.ToArray(), target, value);
                 SaintsPropertyDrawer.EnqueueSceneViewNotification(
                     $"Bind callback `{methodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`({value})");
+#if UNITY_2021_3_OR_NEWER
                 AssetDatabase.SaveAssetIfDirty(unityEventContainerObject);
+#endif
             });
         }
 
