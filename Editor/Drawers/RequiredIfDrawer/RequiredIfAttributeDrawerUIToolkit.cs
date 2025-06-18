@@ -3,11 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -51,73 +49,85 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
             return helpBox;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             RequiredIfAttribute requiredIfAttribute = (RequiredIfAttribute)saintsAttribute;
+            RequiredIfAttribute[] requiredIfAttributes = allAttributes.OfType<RequiredIfAttribute>().ToArray();
+
+            if (!requiredIfAttribute.Equals(requiredIfAttributes[0]))
+            {
+                return;  // only use the first one for logic
+            }
+
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                return;
+            }
 
             HelpBox helpBox = container.Q<HelpBox>(name: NameRequiredIfBox(property, index));
 
-            helpBox.TrackPropertyValue(property, prop =>
+            RequiredAttribute requiredAttribute = allAttributes.OfType<RequiredAttribute>().FirstOrDefault();
+            string errorMessage = requiredAttribute?.ErrorMessage ?? "";
+            MetaInfo metaInfo = (MetaInfo)helpBox.userData;
+
+            if (metaInfo.TypeError)
             {
-                MetaInfo metaInfo = (MetaInfo)helpBox.userData;
+                return;
+            }
 
-                if (metaInfo.TypeError)
-                {
-                    return;
-                }
+            (string trulyError, bool isTruly) = Truly(requiredIfAttributes, property, info, parent);
 
-                (string trulyError, bool isTruly) = Truly(requiredIfAttribute, prop, info, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
-                Debug.Log(isTruly);
+            Debug.Log(isTruly);
 #endif
 
-                string error;
-                if (trulyError == "")
+            string error;
+            if (trulyError == "")
+            {
+                // Debug.Log($"{isTruly}/{metaInfo.IsTruly}");
+                if(!isTruly)
                 {
-                    // Debug.Log($"{isTruly}/{metaInfo.IsTruly}");
-                    if(!isTruly)
+                    if (string.IsNullOrEmpty(errorMessage))
                     {
-                        string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;
-                        if (errorMessage == null)
+                        int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                        string propertyName = property.displayName;
+                        if (arrayIndex != -1)
                         {
-                            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-                            string propertyName = property.displayName;
-                            if (arrayIndex != -1)
-                            {
-                                propertyName = $"{ObjectNames.NicifyVariableName(info.Name)}[{arrayIndex}]";
-                            }
-                            error = $"{propertyName} is required";
+                            propertyName = $"{ObjectNames.NicifyVariableName(info.Name)}[{arrayIndex}]";
                         }
-                        else
-                        {
-                            error = errorMessage;
-                        }
+                        error = $"{propertyName} is required";
                     }
                     else
                     {
-                        error = "";
+                        error = errorMessage;
                     }
                 }
                 else
                 {
-                    error = trulyError;
+                    error = "";
                 }
+            }
+            else
+            {
+                error = trulyError;
+            }
 
-                if (error != helpBox.text)
-                {
-                    // Debug.Log($"Update error: {error}");
-                    helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-                    helpBox.text = error;
+            if (error != helpBox.text)
+            {
+                // Debug.Log($"Update error: {error}");
+                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                helpBox.text = error;
 
-                    // helpBox.userData = new MetaInfo
-                    // {
-                    //     TypeError = false,
-                    //     // IsTruly = isTruly,
-                    // };
+                // helpBox.userData = new MetaInfo
+                // {
+                //     TypeError = false,
+                //     // IsTruly = isTruly,
+                // };
 
-                }
-            });
+            }
         }
     }
 }

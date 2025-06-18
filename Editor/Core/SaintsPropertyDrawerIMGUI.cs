@@ -289,7 +289,7 @@ namespace SaintsField.Editor.Core
                     .Where(each => each > 0)
                     .DefaultIfEmpty(0);
                 IEnumerable<float> belowHeights = grouped
-                    .Select(each => each.Value.GetBelowExtraHeight(property, label, eachWidth, TODO, each.Key.SaintsAttribute,
+                    .Select(each => each.Value.GetBelowExtraHeight(property, label, eachWidth, allAttributes, each.Key.SaintsAttribute,
                         each.Key.Index, fieldInfo, parent))
                     .Where(each => each > 0)
                     .DefaultIfEmpty(0);

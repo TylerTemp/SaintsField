@@ -101,19 +101,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.17.0**
+**4.18.0**
 
-1.  Add `EMode.InstanceInScene`, `EMode.InstanceInPrefab`, `EMode.Regular`, `EMode.Variant`, `EMode.NonPrefabInstance` which can be used for `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, and `Playa*` version of them.
-
-    *   `EMode.InstanceInScene`: target is a prefab placed in a scene
-    *   `EMode.InstanceInPrefab`: target is inside a prefab (but is not the top root of that prefab)
-    *   `EMode.Regular`: target is at the top root of the prefab
-    *   `EMode.Variant`: target is at the top root of the prefab, and is also a variant prefab
-    *   `EMode.NonPrefabInstance`: target is not a prefab (but can be inside a prefab)
-    *   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
-    *   `EMode.PrefabAsset` = `Variant | Regular`
-
-2.  Provide a workaround solution for [#240](https://github.com/TylerTemp/SaintsField/issues/240), for editing a field inside a serializable struct.
+1.  Add `RequiredIf` for conditional required field; `EMode` supported
+2.  Add Auto Validatior for `OnEvent` & `OnButtonClick`
+3.  Fix `Button` of `IEnumerator` won't hide the loading icon even the coroutine is done
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2842,7 +2834,7 @@ public bool boolVal;
 [EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditAndBool;
 ```
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 #### `PlayaEnableIf`/`PlayaDisableIf` ####
 
@@ -2881,7 +2873,7 @@ using SaintsField.Playa;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 #### `ShowIf` / `HideIf` ####
 
@@ -3037,7 +3029,7 @@ public bool boolValue;
 [HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
 ```
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 
 #### `PlayaShowIf`/`PlayaHideIf` ####
@@ -3092,7 +3084,7 @@ public bool boolValue;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/eb07de01-3210-4f4b-be58-b5fadd899f1a)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 #### `Required` ####
 
@@ -3105,6 +3097,8 @@ This will check if the field value is a `truly` value, which means:
 3.  You may not want to use it on `int`, `float` (because only `0` is not `truly`) or `bool`, but it's still allowed if you insist
 
 If you have addressable installed, using `Required` on addressable's `AssetReference` will check if the target asset is valid
+
+If you have `RequiredIf`, `Required` will work as a config privider instead. See `RequiredIf` section for more information.
 
 Parameters:
 
@@ -3139,6 +3133,78 @@ public GameObject empty2;
 ```
 
 ![Image](https://github.com/user-attachments/assets/7c099777-11f8-4d4c-8adf-8f03ce217f00)
+
+### `RequiredIf` ###
+
+Like `Required`, but only required if the condition is a `truly` result.
+
+Parameters:
+
+Arguments:
+
+*   (Optional) `EMode editorMode`
+
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
+
+*   `object by...`
+
+    callbacks or attributes for the condition.
+
+*   Allow Multiple: Yes
+
+You can use multiple `RequiredIf`. The field will be required if **ALL** condition is true (`and` operation)
+
+For multiple `RequiredIf`: The field will be required if **ANY** condition is true (`or` operation)
+
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
+
+You can use `Required` to change the notice message & icon. See the example below
+
+```csharp
+using SaintsField;
+
+[Separator("Depende on other field or callback")]
+public GameObject go;
+[RequiredIf(nameof(go))]  // if a field is a dependence of another field
+public GameObject requiredIfGo;
+
+public int intValue;
+[RequiredIf(nameof(intValue) + ">=", 0)]
+public GameObject requiredIfPositive;  // if meet some condition; callback is also supported.
+
+[Separator("EMode condition")]
+
+[RequiredIf(EMode.InstanceInScene)]
+public GameObject sceneObj;  // if it's a prefab in a scene
+
+[Separator("Suggestion")]
+
+// use as a notice
+public Transform hand;
+[RequiredIf(nameof(hand))]
+[Required("It's suggested to set this field if 'hand' is set", EMessageType.Info)]  // this is now a config provider
+public GameObject suggestedIfHand;
+
+[Separator("And")]
+
+// You can also chain multiple conditions as "and" operation
+public GameObject andCondition;
+[RequiredIf(EMode.InstanceInScene, nameof(andCondition))]
+public GameObject instanceInSceneAndCondition;  // if it's a prefab in a scene and 'andCondition' is set
+
+[Separator("Or")]
+
+// You can also chain multiple RequiredIf as "or" operation
+public GameObject orCondition;
+public int orValue;
+[RequiredIf(nameof(orCondition))]
+[RequiredIf(nameof(orValue) + ">=", 0)]
+public GameObject requiredOr;  // if it's a prefab in a scene and 'andCondition' is set
+```
+
+[![video](https://github.com/user-attachments/assets/1dbd5e3b-1fcd-4b79-a1e5-d990628794db)](https://github.com/user-attachments/assets/9ffd8fef-60dd-482d-b644-ec97cae76451)
 
 #### `ValidateInput` ####
 
@@ -3820,7 +3886,7 @@ For `LayoutEnableIf`: The layout group will be enabled if **ANY** condition is t
 
 For multiple attributes: The layout group will be disabled if **ANY** condition is true (`or` operation)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 ```csharp
 using SaintsField.Playa;
@@ -6514,9 +6580,9 @@ This only works for decorator draws above or below the field. The above drawer w
 *   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
 *   `EMode.PrefabAsset` = `Variant | Regular`
 
-### Syntax for Show/Hide/Enable/Disable-If ##
+### Syntax for Show/Hide/Enable/Disable/Required-If ##
 
-This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
+This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `RequiredIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
 
 These decorators accept many objects.
 

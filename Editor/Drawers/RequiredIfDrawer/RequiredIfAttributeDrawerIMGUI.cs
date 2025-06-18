@@ -28,10 +28,8 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
                 return error;
             }
 
-            RequiredIfAttribute requiredIfAttribute = (RequiredIfAttribute)saintsAttribute;
-
             // property.serializedObject.ApplyModifiedProperties();
-            (string trulyError, bool isTruly) = Truly(requiredIfAttribute, property, info, parent);
+            (string trulyError, bool isTruly) = Truly(allAttributes.OfType<RequiredIfAttribute>(), property, info, parent);
 
             if(trulyError != "")
             {
@@ -60,10 +58,12 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
             FieldInfo info,
             object parent)
         {
-            if (allAttributes.Any(each => each is RequiredIfAttribute))
+            RequiredIfAttribute requiredIfAttribute = (RequiredIfAttribute) saintsAttribute;
+            if (!requiredIfAttribute.Equals(allAttributes.OfType<RequiredIfAttribute>().First()))
             {
                 return false;
             }
+
             string error = GetErrorImGui(property, allAttributes, saintsAttribute, info, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"WillDrawBelow error=`{error}`");
@@ -89,7 +89,8 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
-            if (allAttributes.Any(each => each is RequiredIfAttribute))
+            RequiredIfAttribute requiredIfAttribute = (RequiredIfAttribute) saintsAttribute;
+            if (!requiredIfAttribute.Equals(allAttributes.OfType<RequiredIfAttribute>().First()))
             {
                 return position;
             }
@@ -107,7 +108,9 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
                 return position;
             }
 
-            Rect leftOut = ImGuiHelpBox.Draw(position, error, ((RequiredAttribute) saintsAttribute).MessageType.GetMessageType());
+            RequiredAttribute requiredAttribute = allAttributes.OfType<RequiredAttribute>().FirstOrDefault();
+
+            Rect leftOut = ImGuiHelpBox.Draw(position, error, requiredAttribute?.MessageType.GetMessageType() ?? MessageType.Error);
 
             // EditorGUI.DrawRect(leftOut, Color.yellow);
 

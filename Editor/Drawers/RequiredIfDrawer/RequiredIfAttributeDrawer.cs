@@ -22,15 +22,16 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
     [CustomPropertyDrawer(typeof(RequiredIfAttribute), true)]
     public partial class RequiredIfAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
-        private static (string error, bool result) Truly(RequiredIfAttribute requiredIfAttribute, SerializedProperty property, MemberInfo field, object target)
+        private static (string error, bool result) Truly(IEnumerable<RequiredIfAttribute> requiredIfAttributes, SerializedProperty property, MemberInfo field, object target)
         {
-            (IReadOnlyList<string> conditionErrors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(requiredIfAttribute.ConditionInfos, property, field, target);
-            if (conditionErrors.Count > 0)
+            (string error, bool required) = GetIfRequired(requiredIfAttributes, property, field, target);
+            // (IReadOnlyList<string> conditionErrors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(requiredIfAttribute.ConditionInfos, property, field, target);
+            if (error != "")
             {
-                return (string.Join("\n", conditionErrors), false);
+                return (error, false);
             }
 
-            if (boolResults.Any(each => !each))
+            if (!required)
             {
                 return ("", true);
             }
@@ -39,6 +40,34 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
             return curError != ""
                 ? (curError, false)
                 : ("", string.IsNullOrEmpty(ValidateValue(curValue)));
+        }
+
+        private static (string error, bool required) GetIfRequired(IEnumerable<RequiredIfAttribute> requiredIfAttributes, SerializedProperty property, MemberInfo info, object parent)
+        {
+            List<bool> orResults = new List<bool>();
+            string error = "";
+            foreach (RequiredIfAttribute requiredIfAttribute in requiredIfAttributes)
+            {
+                (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(requiredIfAttribute.ConditionInfos, property, info, parent);
+
+                if (errors.Count > 0)
+                {
+                    error = string.Join("\n", errors);
+                    break;
+                }
+
+                // and
+                orResults.Add(boolResults.All(each => each));
+            }
+
+            if (error != "")
+            {
+                return (error, false);
+            }
+
+            Debug.Assert(orResults.Count > 0);
+            // or
+            return ("", orResults.Any(each => each));
         }
 
         private static string ValidateValue(object curValue)
