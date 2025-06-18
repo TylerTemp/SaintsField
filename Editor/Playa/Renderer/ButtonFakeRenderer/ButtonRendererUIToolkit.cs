@@ -194,16 +194,19 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                         buttonUserData.Enumerators.RemoveAll(each => finishedEnumerators.Contains(each));
 
-                        bool show = buttonUserData.Enumerators.Count > 0;
-                        DisplayStyle style = show? DisplayStyle.Flex : DisplayStyle.None;
+                        bool stillHaveRunner = buttonUserData.Enumerators.Count > 0;
+                        DisplayStyle style = stillHaveRunner? DisplayStyle.Flex : DisplayStyle.None;
                         if(buttonRotator.style.display != style)
                         {
                             buttonRotator.style.display = style;
                         }
 
-                        // ReSharper disable once AccessToModifiedClosure
-                        // ReSharper disable once PossibleNullReferenceException
-                        buttonTask?.Pause();
+                        if(!stillHaveRunner)
+                        {
+                            // ReSharper disable once AccessToModifiedClosure
+                            // ReSharper disable once PossibleNullReferenceException
+                            buttonTask?.Pause();
+                        }
                     }).Every(1);
                 }
 

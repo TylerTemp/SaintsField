@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
@@ -32,7 +33,12 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 return;
             }
 
-            ParameterInfo[] methodParams = fieldWithInfo.MethodInfo.GetParameters();
+            CheckMethodBindInternal(playaMethodBindAttribute, fieldWithInfo.MethodInfo, _serializedObject.targetObject, fieldWithInfo.Targets[0]).fixer?.Invoke();
+        }
+
+        private static (string error, Action fixer) CheckMethodBindInternal(IPlayaMethodBindAttribute playaMethodBindAttribute, MethodInfo methodInfo, UnityEngine.Object serializedTarget, object target)
+        {
+            ParameterInfo[] methodParams = methodInfo.GetParameters();
 
             MethodBind methodBind = playaMethodBindAttribute.MethodBind;
             string eventTarget = playaMethodBindAttribute.EventTarget;
@@ -45,8 +51,8 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             if (methodBind == MethodBind.ButtonOnClick)
             {
                 UnityEngine.UI.Button uiButton = eventTarget is null
-                    ? TryFindButton(fieldWithInfo.Targets[0])
-                    : GetButton(eventTarget, fieldWithInfo.Targets[0]);
+                    ? TryFindButton(target)
+                    : GetButton(eventTarget, target);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
                 Debug.Log($"find button `{uiButton}`");
@@ -54,7 +60,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
                 if (!uiButton)
                 {
-                    return;
+                    return ("Button not found", null);
                 }
 
                 unityEventContainerObject = uiButton;
@@ -74,9 +80,9 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                     attrNames.Add(eventTarget);
                 }
 
-                object target = fieldWithInfo.Targets[0];
+                object accTarget = target;
 
-                unityEventContainerObject = _serializedObject.targetObject;
+                unityEventContainerObject = serializedTarget;
 
                 while (attrNames.Count > 0)
                 {
@@ -85,11 +91,11 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                     if (attrNames.Count == 0)
                     {
                         (string error, UnityEventBase foundValue) =
-                            Util.GetOfNoParams<UnityEventBase>(target, searchAttr, null);
+                            Util.GetOfNoParams<UnityEventBase>(accTarget, searchAttr, null);
                         // Debug.Log($"{searchAttr}, {foundValue}");
                         if (error != "")
                         {
-                            return;
+                            return (error, null);
                         }
 
                         unityEventBase = foundValue;
@@ -97,19 +103,19 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                     else
                     {
                         (string error, object foundValue) =
-                            Util.GetOfNoParams<object>(target, searchAttr, null);
+                            Util.GetOfNoParams<object>(accTarget, searchAttr, null);
                         // Debug.Log($"{searchAttr}, {foundValue}");
                         if (error != "")
                         {
-                            return;
+                            return (error, null);
                         }
 
                         if (foundValue == null)
                         {
-                            return;
+                            return (error, null);
                         }
 
-                        target = foundValue;
+                        accTarget = foundValue;
                         if(foundValue is UnityEngine.Object foundUObject)
                         {
                             unityEventContainerObject = foundUObject;
@@ -119,7 +125,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
                 if (unityEventBase == null)
                 {
-                    return;
+                    return ("Event not found", null);
                 }
 
                 Type unityEventType = unityEventBase.GetType();
@@ -133,18 +139,18 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             {
                 UnityEngine.Object persistentTarget = unityEventBase.GetPersistentTarget(eventIndex);
                 string persistentMethodName = unityEventBase.GetPersistentMethodName(eventIndex);
-                if (ReferenceEquals(persistentTarget, fieldWithInfo.Targets[0]) && persistentMethodName == fieldWithInfo.MethodInfo.Name)
+                if (ReferenceEquals(persistentTarget, target) && persistentMethodName == methodInfo.Name)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
                     Debug.Log($"`{persistentMethodName}` already added to `{unityEventBase}`");
 #endif
-                    return;
+                    return ("", null);
                 }
             }
 
             // UnityAction action = (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), fieldWithInfo.Target, fieldWithInfo.MethodInfo);
 
-            Undo.RecordObject(unityEventContainerObject, "AddEventListener");
+
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
             Debug.Log($"add `{fieldWithInfo.MethodInfo.Name}` to `{unityEventBase}` event on target {unityEventContainerObject}");
@@ -153,29 +159,84 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             // Undo.RecordObject(unityEventBase, "AddOnClick");
             if (methodParams.Length == 0)
             {
-                UnityEventTools.AddVoidPersistentListener(
-                    unityEventBase,
-                    (UnityAction)Delegate.CreateDelegate(typeof(UnityAction),
-                        fieldWithInfo.Targets[0], fieldWithInfo.MethodInfo));
-                EditorUtility.SetDirty(unityEventContainerObject);
-                SaintsPropertyDrawer.EnqueueSceneViewNotification($"Bind callback `{fieldWithInfo.MethodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`");
-                return;
+                return ("", () =>
+                {
+                    Undo.RecordObject(unityEventContainerObject, "AddEventListener");
+                    EditorUtility.SetDirty(unityEventContainerObject);
+                    UnityEventTools.AddVoidPersistentListener(
+                        unityEventBase,
+                        (UnityAction)Delegate.CreateDelegate(typeof(UnityAction),
+                            target, methodInfo));
+                    SaintsPropertyDrawer.EnqueueSceneViewNotification(
+                        $"Bind callback `{methodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`");
+                    AssetDatabase.SaveAssetIfDirty(unityEventContainerObject);
+                });
             }
 
             if (playaMethodBindAttribute.IsCallback)
             {
-                (string error, object foundValue) = Util.GetOfNoParams<object>(fieldWithInfo.Targets[0], (string)value, null);
+                (string error, object foundValue) = Util.GetOfNoParams<object>(target, (string)value, null);
 
                 if (error != "")
                 {
-                    return;
+                    return (error, null);
                 }
 
                 value = foundValue;
             }
-            Util.BindEventWithValue(unityEventBase, fieldWithInfo.MethodInfo, invokeRequiredTypes.ToArray(), fieldWithInfo.Targets[0], value);
-            SaintsPropertyDrawer.EnqueueSceneViewNotification($"Bind callback `{fieldWithInfo.MethodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`({value})");
-            EditorUtility.SetDirty(unityEventContainerObject);
+
+            return ("", () =>
+            {
+                Undo.RecordObject(unityEventContainerObject, "AddEventListener");
+                EditorUtility.SetDirty(unityEventContainerObject);
+                Util.BindEventWithValue(unityEventBase, methodInfo, invokeRequiredTypes.ToArray(), target, value);
+                SaintsPropertyDrawer.EnqueueSceneViewNotification(
+                    $"Bind callback `{methodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`({value})");
+                AssetDatabase.SaveAssetIfDirty(unityEventContainerObject);
+            });
+        }
+
+        public static AutoRunnerFixerResult AutoRunFix(IPlayaMethodBindAttribute playaMethodBindAttribute, MethodInfo methodInfo, UnityEngine.Object serializedTarget, object target)
+        {
+            string error;
+            Action fixer;
+            try
+            {
+                (error, fixer) =
+                    CheckMethodBindInternal(playaMethodBindAttribute, methodInfo, serializedTarget, target);
+            }
+            catch (Exception e)
+            {
+                return new AutoRunnerFixerResult
+                {
+                    CanFix = false,
+                    Error = "",
+                    ExecError = e.ToString(),
+                };
+            }
+
+            if (error != "")
+            {
+                return new AutoRunnerFixerResult
+                {
+                    CanFix = false,
+                    Error = error,
+                    ExecError = "",
+                };
+            }
+
+            if (fixer == null)
+            {
+                return null;
+            }
+
+            return new AutoRunnerFixerResult
+            {
+                CanFix = true,
+                Callback = fixer,
+                Error = $"Method {methodInfo.Name} not bind to target",
+                ExecError = "",
+            };
         }
 
         private static UnityEngine.UI.Button GetButton(string by, object target)

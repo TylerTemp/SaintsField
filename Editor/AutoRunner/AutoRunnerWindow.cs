@@ -181,13 +181,17 @@ namespace SaintsField.Editor.AutoRunner
 
             _isRunning = true;
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
             Debug.Log("#AutoRunner# start to run auto runners");
+#endif
             // StartEditorCoroutine();
             foreach (ProcessInfo info in RunAutoRunners())
             {
                 if (!_isRunning)
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
                     Debug.Log("#AutoRunner# stopped by user");
+#endif
                     yield break;
                 }
 
@@ -205,6 +209,9 @@ namespace SaintsField.Editor.AutoRunner
             }
 
             _isRunning = false;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
+            Debug.Log("#AutoRunner# finished");
+#endif
             // StartEditorCoroutine(R());
         }
 
@@ -222,6 +229,7 @@ namespace SaintsField.Editor.AutoRunner
         [LayoutEnd]
 
         // ReSharper disable once UnusedMember.Global
+        [PlayaSeparator(5), PlayaSeparator(EColor.Gray), PlayaSeparator(5)]
         [Ordered, AutoRunnerWindowResults] public List<AutoRunnerResult> ShowResults => Results;
 
         public override void OnEditorEnable()
