@@ -14,7 +14,8 @@
         "Obvious.Soap",
         "Unity.TextMeshPro",
         "Kybernetik.UltEvents",
-        "AYellowpaper.SerializeInterfaces"
+        "AYellowpaper.SerializeInterfaces",
+        "com.inter-illusion.i2"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

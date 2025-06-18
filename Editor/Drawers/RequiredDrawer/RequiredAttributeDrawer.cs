@@ -126,6 +126,12 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
             // an array, list, struct or class && not struct
             if (property.propertyType == SerializedPropertyType.Generic && fieldType.IsValueType)
             {
+#if SAINTSFIELD_I2_LOC
+                if(fieldType == typeof(LocalizedString))
+                {
+                    return "";
+                }
+#endif
                 return $"`{property.displayName}` can not be a valued type: {fieldType}";
             }
 

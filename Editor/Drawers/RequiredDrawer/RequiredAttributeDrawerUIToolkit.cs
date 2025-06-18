@@ -17,7 +17,10 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            string typeError = ValidateType(property, info.FieldType);
+            Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) < 0
+                ? info.FieldType
+                : ReflectUtils.GetElementType(info.FieldType);
+            string typeError = ValidateType(property, rawType);
 
             HelpBoxMessageType helpBoxMessageType = ((RequiredAttribute) saintsAttribute).MessageType.GetUIToolkitMessageType();
 

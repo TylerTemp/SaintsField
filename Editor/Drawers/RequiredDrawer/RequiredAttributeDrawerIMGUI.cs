@@ -13,7 +13,11 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
         private static string GetErrorImGui(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info, object parent)
         {
-            string error = ValidateType(property, info.FieldType);
+            Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) < 0
+                ? info.FieldType
+                : ReflectUtils.GetElementType(info.FieldType);
+
+            string error = ValidateType(property, rawType);
             if(error != "")
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
