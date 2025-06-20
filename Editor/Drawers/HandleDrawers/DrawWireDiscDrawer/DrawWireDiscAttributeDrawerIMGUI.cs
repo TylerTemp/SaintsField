@@ -36,6 +36,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 {
                     _idToWireDiscInfo.Remove(key);
                     SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+                    HandleVisibility.SetOutView(wireDiscInfo.Id);
                 });
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;
                 SceneView.RepaintAll();

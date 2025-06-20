@@ -27,6 +27,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             public float Radius;
             public Color Color;
             public Vector3 Center;
+
+            public string Id;
         }
 
         private static SphereInfo CreateSphereInfo(SphereHandleCapAttribute sphereHandleCapAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
@@ -42,6 +44,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
                 Radius = sphereHandleCapAttribute.Radius,
                 Color = sphereHandleCapAttribute.Color,
                 // TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(drawWireDiscAttribute.Space, serializedProperty, memberInfo, parent),
+
+                Id = SerializedUtils.GetUniqueId(serializedProperty),
             };
         }
 
@@ -51,8 +55,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 
             if (!string.IsNullOrEmpty(sphereInfo.TargetWorldPosInfo.Error))
             {
+                HandleVisibility.SetOutView(sphereInfo.Id);
                 return;
             }
+
+            HandleVisibility.SetInView(sphereInfo.Id, sphereInfo.SerializedProperty.propertyPath, sphereInfo.SerializedProperty.serializedObject.targetObject.name, EditorGUIUtility.IconContent("PreMatSphere").image as Texture2D);
 
             // using(new GiamosColorScoop(sphereInfo.Color))
             // {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
@@ -30,6 +31,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                 Parent = parent,
 
                 Color = oneDirectionBaseAttribute.Color,
+
+                Id = SerializedUtils.GetUniqueId(property),
             };
 
             VisualElement child = new VisualElement
@@ -41,7 +44,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                 SceneView.duringSceneGui += OnSceneGUIUIToolkit;
                 SceneView.RepaintAll();
             });
-            child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
+            child.RegisterCallback<DetachFromPanelEvent>(_ =>
+            {
+                SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+                HandleVisibility.SetOutView(oneDirectionInfoUIToolkit.Id);
+            });
             container.Add(child);
 
             return;

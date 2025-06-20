@@ -35,6 +35,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
                 {
                     _idToSphereInfo.Remove(key);
                     SceneView.duringSceneGui -= OnSceneGUIIMGUI;
+                    HandleVisibility.SetOutView(sphereInfo.Id);
                 });
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;
                 SceneView.RepaintAll();

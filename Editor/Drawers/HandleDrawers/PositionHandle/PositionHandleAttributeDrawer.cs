@@ -131,9 +131,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
                 return;
             }
 
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_moveIcon is null)
             {
-                _moveIcon = Util.LoadResource<Texture2D>("Vector3Field");
+                _moveIcon = Util.LoadResource<Texture2D>("position-handle.png");
             }
 
             HandleVisibility.SetInView(positionHandleInfo.UniqueId,

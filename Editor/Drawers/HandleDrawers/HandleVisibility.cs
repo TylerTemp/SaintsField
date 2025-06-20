@@ -80,9 +80,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
         private static bool IsListening;
 
-        public static void SetInView(string id, string name, string containerName, Texture2D icon)
+        public static void SetInView(string id, string propPath, string containerName, Texture2D icon)
         {
-            Info info = new Info(id, name, containerName, icon);
+            Info info = new Info(id, propPath, containerName, icon);
             if (!InView.Contains(info))
             {
                 InView.Add(info);
@@ -217,7 +217,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             sv.Repaint();
         }
 
-        public static void DrawMenu()
+        private static void DrawMenu()
         {
             List<Info> showTargets;
             if (string.IsNullOrEmpty(_selectingPanelSearching))
@@ -330,13 +330,16 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                                 height = buttonRect.height - 2,
                             }, findTargetRecord.Icon);
 
-                            GUI.DrawTexture(new Rect(buttonRect)
+                            if(findTargetRecord.Info.Icon)
                             {
-                                x = buttonRect.x + 4 + EditorGUIUtility.singleLineHeight + 2,
-                                y = buttonRect.y + 1,
-                                width = EditorGUIUtility.singleLineHeight,
-                                height = buttonRect.height - 2,
-                            }, findTargetRecord.Info.Icon);
+                                GUI.DrawTexture(new Rect(buttonRect)
+                                {
+                                    x = buttonRect.x + 4 + EditorGUIUtility.singleLineHeight + 2,
+                                    y = buttonRect.y + 1,
+                                    width = EditorGUIUtility.singleLineHeight,
+                                    height = EditorGUIUtility.singleLineHeight,
+                                }, findTargetRecord.Info.Icon);
+                            }
 
                             GUI.Label(new Rect(buttonRect)
                             {

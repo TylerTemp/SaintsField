@@ -25,7 +25,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             public Util.TargetWorldPosInfo StartTargetWorldPosInfo;
             public Util.TargetWorldPosInfo EndTargetWorldPosInfo;
             public Color Color;
+
+            public string Id;
         }
+
+        protected abstract Texture2D GetIcon();
 
         private static void UpdateOneDirectionInfo(OneDirectionInfo oneDirectionConstInfo)
         {
@@ -363,7 +367,18 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             return true;
         }
 
-        protected abstract void OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo, Vector3 worldPosStart, Vector3 worldPosEnd);
+        protected virtual bool OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo,
+            Vector3 worldPosStart, Vector3 worldPosEnd)
+        {
+            if (!SerializedUtils.IsOk(oneDirectionInfo.SerializedProperty))
+            {
+                HandleVisibility.SetOutView(oneDirectionInfo.Id);
+                return false;
+            }
+
+            HandleVisibility.SetInView(oneDirectionInfo.Id, oneDirectionInfo.SerializedProperty.propertyPath, oneDirectionInfo.SerializedProperty.serializedObject.targetObject.name, GetIcon());
+            return true;
+        }
 
         private static (bool ok, Vector3 worldPos) GetWorldPosFromInfo(Util.TargetWorldPosInfo worldPosInfo)
         {

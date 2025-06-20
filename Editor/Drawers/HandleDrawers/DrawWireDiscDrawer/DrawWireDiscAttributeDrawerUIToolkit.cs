@@ -44,7 +44,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 SceneView.duringSceneGui += OnSceneGUIUIToolkit;
                 SceneView.RepaintAll();
             });
-            child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
+            child.RegisterCallback<DetachFromPanelEvent>(_ =>
+            {
+                SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+                HandleVisibility.SetOutView(_wireDiscInfo.Id);
+            });
             container.Add(child);
         }
 

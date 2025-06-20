@@ -49,7 +49,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
                 SceneView.duringSceneGui += OnSceneGUIUIToolkit;
                 SceneView.RepaintAll();
             });
-            child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
+            child.RegisterCallback<DetachFromPanelEvent>(_ =>
+            {
+                SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+                HandleVisibility.SetOutView(sphereInfo.Id);
+            });
             container.Add(child);
 
             return;
