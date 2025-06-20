@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
         {
             UpdateWireDiscInfo(wireDiscInfo);
 
-            if (!string.IsNullOrEmpty(wireDiscInfo.TargetWorldPosInfo.Error))
+            if (!string.IsNullOrEmpty(wireDiscInfo.TargetWorldPosInfo.Error) || !string.IsNullOrEmpty(wireDiscInfo.Error))
             {
                 return;
             }

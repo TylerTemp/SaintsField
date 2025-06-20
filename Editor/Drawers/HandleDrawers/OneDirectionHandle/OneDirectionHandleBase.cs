@@ -61,7 +61,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
-                    Debug.Log(error);
+                    Debug.LogWarning(error);
 #endif
                     oneDirectionConstInfo.Error = error;
                     return;
