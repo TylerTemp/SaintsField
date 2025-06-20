@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 
                 TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(positionHandleAttribute.Space, property, info, parent),
 
-                UniqueId = SerializedUtils.GetUniqueId(property),
+                Id = SerializedUtils.GetUniqueId(property),
             };
 
             VisualElement child = new VisualElement
@@ -77,14 +77,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             {
                 Debug.LogWarning("Property disposed, removing SceneGUI");
                 SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
-                HandleVisibility.SetOutView(_positionHandleInfoUIToolkit.UniqueId);
+                HandleVisibility.SetOutView(_positionHandleInfoUIToolkit.Id);
                 return;
             }
             catch (ObjectDisposedException)
             {
                 Debug.LogWarning("Property disposed, removing SceneGUI");
                 SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
-                HandleVisibility.SetOutView(_positionHandleInfoUIToolkit.UniqueId);
+                HandleVisibility.SetOutView(_positionHandleInfoUIToolkit.Id);
                 return;
             }
 

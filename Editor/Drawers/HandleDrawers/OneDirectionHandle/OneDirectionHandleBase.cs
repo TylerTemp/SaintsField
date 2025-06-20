@@ -377,6 +377,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             }
 
             HandleVisibility.SetInView(oneDirectionInfo.Id, oneDirectionInfo.SerializedProperty.propertyPath, oneDirectionInfo.SerializedProperty.serializedObject.targetObject.name, GetIcon());
+
+            if (HandleVisibility.IsHidden(oneDirectionInfo.Id))
+            {
+                return false;
+            }
             return true;
         }
 

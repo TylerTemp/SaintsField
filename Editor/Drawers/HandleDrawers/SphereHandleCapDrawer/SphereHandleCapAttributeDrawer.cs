@@ -61,6 +61,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 
             HandleVisibility.SetInView(sphereInfo.Id, sphereInfo.SerializedProperty.propertyPath, sphereInfo.SerializedProperty.serializedObject.targetObject.name, EditorGUIUtility.IconContent("PreMatSphere").image as Texture2D);
 
+            if (HandleVisibility.IsHidden(sphereInfo.Id))
+            {
+                return;
+            }
+
             // using(new GiamosColorScoop(sphereInfo.Color))
             // {
             //     Gizmos.DrawSphere(sphereInfo.Center, sphereInfo.Radius);

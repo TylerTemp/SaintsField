@@ -50,6 +50,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 wireDiscInfo.SerializedProperty.serializedObject.targetObject.name,
                 EditorGUIUtility.IconContent("CircleCollider2D Icon").image as Texture2D);
 
+            if (HandleVisibility.IsHidden(wireDiscInfo.Id))
+            {
+                return;
+            }
+
             // Handles.DrawWireDisc(pos, Vector3.up, wireDiscInfo.Radius);
             using(new HandleColorScoop(wireDiscInfo.Color))
             {

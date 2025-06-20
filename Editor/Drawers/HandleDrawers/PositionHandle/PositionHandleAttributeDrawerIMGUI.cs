@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
                     Parent = parent,
                     Space = positionHandleAttribute.Space,
 
-                    UniqueId = key,
+                    Id = key,
                 };
 
                 // ReSharper disable once InconsistentNaming
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
                 NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
                     _idToInfoImGui.Remove(key);
-                    HandleVisibility.SetOutView(positionHandleInfo.UniqueId);
+                    HandleVisibility.SetOutView(positionHandleInfo.Id);
                     SceneView.duringSceneGui -= OnSceneGUIIMGUI;
                 });
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;

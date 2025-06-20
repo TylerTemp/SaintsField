@@ -110,7 +110,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             public Vector3 Center;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
 
-            public string UniqueId;
+            public string Id;
         }
 
         private static Texture2D _moveIcon;
@@ -126,21 +126,21 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
                 return;
             }
 
-            if (HandleVisibility.IsHidden(positionHandleInfo.UniqueId))
-            {
-                return;
-            }
-
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_moveIcon is null)
             {
                 _moveIcon = Util.LoadResource<Texture2D>("position-handle.png");
             }
 
-            HandleVisibility.SetInView(positionHandleInfo.UniqueId,
+            HandleVisibility.SetInView(positionHandleInfo.Id,
                 positionHandleInfo.SerializedProperty.propertyPath,
                 positionHandleInfo.SerializedProperty.serializedObject.targetObject.name,
                 _moveIcon);
+
+            if (HandleVisibility.IsHidden(positionHandleInfo.Id))
+            {
+                return;
+            }
 
             Vector3 worldPos = positionHandleInfo.Center;
 

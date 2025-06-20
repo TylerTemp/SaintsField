@@ -145,7 +145,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         {
             if (_eyeSlashIcon is null)
             {
-                return _eyeSlashIcon = Util.LoadResource<Texture2D>("eye-slash.png");
+                return _eyeSlashIcon = Util.LoadResource<Texture2D>("eye-slash-gray.png");
             }
 
             return _eyeSlashIcon;
