@@ -56,7 +56,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                     }
                     else
                     {
-                        Handles.DrawLine(worldPosStart, worldPosEnd, 2f);
+                        Handles.DrawLine(worldPosStart, worldPosEnd
+#if UNITY_2021_3_OR_NEWER
+                            , 2f
+#endif
+                        );
                     }
                 }
             }
