@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
         private static string NameDrawWireDisc(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_DrawWireDisc";
         private static string NameDrawWireDiscHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_DrawWireDisc_HelpBox";
 
-        private SphereInfo _sphereInfo;
+        // private SphereInfo _sphereInfo;
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
@@ -38,7 +38,12 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             {
                 name = NameDrawWireDisc(property, index),
             };
-            _sphereInfo = CreateSphereInfo((SphereHandleCapAttribute) saintsAttribute, property, info, parent);
+
+            SphereInfo sphereInfo = CreateSphereInfo((SphereHandleCapAttribute) saintsAttribute, property, info, parent);
+            HelpBox helpBox = container.Q<HelpBox>(name: NameDrawWireDiscHelpBox(property, index));
+
+            UpdateErrorBox(helpBox, sphereInfo);
+
             child.RegisterCallback<AttachToPanelEvent>(_ =>
             {
                 SceneView.duringSceneGui += OnSceneGUIUIToolkit;
@@ -46,27 +51,29 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             });
             child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
             container.Add(child);
+
+            return;
+
+            // ReSharper disable once InconsistentNaming
+            void OnSceneGUIUIToolkit(SceneView sceneView)
+            {
+                UpdateErrorBox(helpBox, sphereInfo);
+                OnSceneGUIInternal(sceneView, sphereInfo);
+            }
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        private static void UpdateErrorBox(HelpBox helpBox, SphereInfo sphereInfo)
         {
-            HelpBox helpBox = container.Q<HelpBox>(name: NameDrawWireDiscHelpBox(property, index));
-            if (helpBox.text == _sphereInfo.Error)
+            if (helpBox.text == sphereInfo.Error)
             {
                 return;
             }
 
-            helpBox.text = _sphereInfo.Error;
-            helpBox.style.display = string.IsNullOrEmpty(_sphereInfo.Error) ? DisplayStyle.None : DisplayStyle.Flex;
+            helpBox.text = sphereInfo.Error;
+            helpBox.style.display = string.IsNullOrEmpty(sphereInfo.Error) ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
-        private void OnSceneGUIUIToolkit(SceneView sceneView)
-        {
-            OnSceneGUIInternal(sceneView, _sphereInfo);
-        }
+
     }
 }
 #endif

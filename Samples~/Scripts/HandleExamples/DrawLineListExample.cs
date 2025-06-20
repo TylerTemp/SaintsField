@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
             // connect every element in the list
             DrawLine(eColor: EColor.Green),
             // connect every element to the `centerPoint`
-            DrawLineTo(target: nameof(centerPoint), eColor: EColor.Red),
+            DrawLineTo(target: nameof(centerPoint), eColor: EColor.Red, alpha: 0.5f, dotted: 1f),
 
             // PositionHandle(space: Space.Self),
             DrawLabel("$" + nameof(PosIndexLabel)),

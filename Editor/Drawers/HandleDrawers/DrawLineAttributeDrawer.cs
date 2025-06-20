@@ -16,7 +16,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         {
             using (new HandleColorScoop(oneDirectionInfo.Color))
             {
-                Handles.DrawLine(worldPosStart, worldPosEnd);
+                if (oneDirectionInfo.OneDirectionAttribute.Dotted > 0f)
+                {
+                    Handles.DrawDottedLine(worldPosStart, worldPosEnd, oneDirectionInfo.OneDirectionAttribute.Dotted);
+                }
+                else
+                {
+                    Handles.DrawLine(worldPosStart, worldPosEnd);
+                }
             }
         }
     }

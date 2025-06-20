@@ -13,14 +13,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
     {
         private static string NameSaintsArrow(SerializedProperty property) => $"{property.propertyPath}_OneDirectionHandle";
 
-        private OneDirectionInfo _oneDirectionInfoUIToolkit;
+        // private OneDirectionInfo _oneDirectionInfoUIToolkit;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             OneDirectionBaseAttribute oneDirectionBaseAttribute = (OneDirectionBaseAttribute)saintsAttribute;
-            _oneDirectionInfoUIToolkit = new OneDirectionInfo
+            OneDirectionInfo oneDirectionInfoUIToolkit = new OneDirectionInfo
             {
                 Error = "",
 
@@ -43,19 +43,24 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             });
             child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
             container.Add(child);
-        }
 
-        private void OnSceneGUIUIToolkit(SceneView sceneView)
-        {
-            // Debug.Log($"render {_arrowInfoUIToolkit}");
+            return;
 
-            // ReSharper disable once InvertIf
-            if (!OnSceneGUIInternal(sceneView, _oneDirectionInfoUIToolkit))
+            // ReSharper disable once InconsistentNaming
+            void OnSceneGUIUIToolkit(SceneView sceneView)
             {
-                Debug.LogWarning($"Target disposed, remove SceneGUI");
-                SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+                // Debug.Log($"render {_arrowInfoUIToolkit}");
+
+                // ReSharper disable once InvertIf
+                if (!OnSceneGUIInternal(sceneView, oneDirectionInfoUIToolkit))
+                {
+                    Debug.LogWarning("Target disposed, remove SceneGUI");
+                    SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+                }
             }
         }
+
+
     }
 }
 

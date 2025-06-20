@@ -60,7 +60,7 @@ namespace SaintsField.Editor.Core
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-            Debug.Log($"Create property gui {property.propertyPath}/{property.displayName}/{this}");
+            Debug.Log($"Create property gui {property.propertyPath}/{this}/{GetHashCode()}");
 #endif
             if (!SerializedUtils.IsOk(property))
             {

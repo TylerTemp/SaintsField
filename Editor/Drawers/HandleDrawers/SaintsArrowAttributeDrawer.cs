@@ -33,9 +33,21 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
             using (new HandleColorScoop(oneDirectionInfo.Color))
             {
-                Handles.DrawLine(head, tail);
-                Handles.DrawLine(head, arrowheadLeft);
-                Handles.DrawLine(head, arrowheadRight);
+                DrawLine(head, tail, oneDirectionInfo.OneDirectionAttribute.Dotted);
+                DrawLine(head, arrowheadLeft, oneDirectionInfo.OneDirectionAttribute.Dotted);
+                DrawLine(head, arrowheadRight, oneDirectionInfo.OneDirectionAttribute.Dotted);
+            }
+        }
+
+        private static void DrawLine(Vector3 start, Vector3 end, float dotted)
+        {
+            if(dotted > 0f)
+            {
+                Handles.DrawDottedLine(start, end, dotted);
+            }
+            else
+            {
+                Handles.DrawLine(start, end);
             }
         }
     }

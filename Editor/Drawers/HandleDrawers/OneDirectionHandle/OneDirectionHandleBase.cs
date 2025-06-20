@@ -375,12 +375,5 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             Transform trans = worldPosInfo.Transform;
             return trans == null ? (false, Vector3.zero) : (true, trans.position);
         }
-
-#if UNITY_2021_3_OR_NEWER
-        ~OneDirectionHandleBase()
-        {
-            SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
-        }
-#endif
     }
 }

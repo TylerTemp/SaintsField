@@ -18,11 +18,13 @@ namespace SaintsField
         public readonly string EndSpace;
         public readonly Color Color;
         public readonly string ColorCallback;
+        public readonly float Dotted;
 
         protected OneDirectionBaseAttribute(
             string start = null, int startIndex = 0, string startSpace = "this",
             string end = null, int endIndex = 0, string endSpace = "this",
-            EColor eColor = EColor.White, string color = null
+            EColor eColor = EColor.White, float alpha = 1f, string color = null,
+            float dotted = -1f
         )
         {
             Start = start;
@@ -32,7 +34,13 @@ namespace SaintsField
             EndIndex = endIndex;
             EndSpace = endSpace;
 
+            Dotted = dotted;
+
             Color = eColor.GetColor();
+            if (alpha < 1f)
+            {
+                Color.a = alpha;
+            }
 
             bool colorIsString = !string.IsNullOrEmpty(color);
             ColorCallback = null;
