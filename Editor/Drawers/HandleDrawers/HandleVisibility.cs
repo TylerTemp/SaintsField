@@ -93,7 +93,16 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 IsListening = true;
                 SceneView.duringSceneGui -= OnSceneGUI;
                 SceneView.duringSceneGui += OnSceneGUI;
+
+                Selection.selectionChanged -= SelectionChanged;
+                Selection.selectionChanged += SelectionChanged;
             }
+        }
+
+        private static void SelectionChanged()
+        {
+            _showSelectingPanel = false;
+            ClearMenu();
         }
 
         public static void SetOutView(string id)
@@ -111,18 +120,18 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             public readonly Info Info;
             public readonly Texture2D Icon;
             public readonly string ItemDisplay;
-            public readonly bool IsHidden;
+            public readonly bool Hidden;
 
-            public ShowInfo(Info info, Texture2D icon, string itemDisplay, bool isHidden)
+            public ShowInfo(Info info, Texture2D icon, string itemDisplay, bool hidden)
             {
                 Info = info;
                 Icon = icon;
                 ItemDisplay = itemDisplay;
-                IsHidden = isHidden;
+                Hidden = hidden;
             }
         }
 
-        public static void ClearMenu()
+        private static void ClearMenu()
         {
             _selectingPanelWidth = -1f;
             _selectingPanelSearching = "";
@@ -183,6 +192,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
         private static bool _showSelectingPanel;
         private static Vector2 _selectingPanelMouseFrozenPos;
 
+        private static Vector2 _lastRightClickPos;
+        private static double _lastRightClickTime;
+
         private static void OnSceneGUI(SceneView sv)
         {
             if (InView.Count == 0)
@@ -195,21 +207,36 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 DrawMenu();
             }
 
-            if (Event.current.type != EventType.MouseUp || Event.current.alt ||
+            if (Event.current.alt ||
                 Event.current.control)
             {
                 return;
             }
 
-            if (Event.current.button != 1)
+            if (Event.current.button == 1 && Event.current.type == EventType.MouseDown)
             {
+                _lastRightClickPos = Event.current.mousePosition;
+                _lastRightClickTime = EditorApplication.timeSinceStartup;
+                // Debug.Log($"dn {_lastRightClickPos}/{_lastRightClickTime}");
+                return;
+            }
+
+            if (Event.current.button != 1 || Event.current.type != EventType.MouseUp)
+            {
+                return;
+            }
+
+            if (!((_lastRightClickPos - Event.current.mousePosition).sqrMagnitude < 0.1f) ||
+                !(EditorApplication.timeSinceStartup - _lastRightClickTime < 0.1f))
+            {
+                // Debug.Log($"up {Event.current.mousePosition}/{EditorApplication.timeSinceStartup}: {(_lastRightClickPos - Event.current.mousePosition).sqrMagnitude}, {EditorApplication.timeSinceStartup - _lastRightClickTime}");
                 return;
             }
 
             if (!_showSelectingPanel)
             {
                 _selectingPanelMouseFrozenPos = Event.current.mousePosition;
-                _selectingPanelWidth = -1f;
+                ClearMenu();
             }
 
             _showSelectingPanel = !_showSelectingPanel;
@@ -318,7 +345,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                             if (GUI.Button(buttonRect, GUIContent.none, LeftButtonStyle))
                             {
                                 // Debug.Log(findTargetRecord.ItemDisplay);
-                                SetHidden(findTargetRecord.Info.Id, !findTargetRecord.IsHidden);
+                                SetHidden(findTargetRecord.Info.Id, !findTargetRecord.Hidden);
                                 return;
                             }
 

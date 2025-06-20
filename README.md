@@ -101,12 +101,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.18.0**
+**4.18.1**
 
-1.  Add `RequiredIf` for conditional required field; `EMode` supported
-2.  Add Auto Validator for `OnEvent` & `OnButtonClick`
-3.  Fix `Button` of `IEnumerator` won't hide the loading icon even the coroutine is done
-4.  Fix Auto Validator won't check sub object of a prefab
+1.  `Handles` displays now can be toggled using right click context menu [#217](https://github.com/TylerTemp/SaintsField/issues/217)
+2.  Fix some handles not displayed on list
+3.  Add `dotted` for line, arrow type of handles
+4.  Add `alpha` for handles' `eColor` color control
+5.  Improved `ArrowHandleCap` with better scaling
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4913,6 +4914,10 @@ public class SearchableMono : SaintsMonoBehaviour
 
 `Handles` is drawn in the scene view instead of inspector.
 
+When using handles (except `SceneViewPicker` and `DrawLabel`), you can use right click to show/hide some handles.
+
+![image](https://github.com/user-attachments/assets/d86350c6-bd97-43d0-a7ef-1c959cd22364)
+
 ### `SceneViewPicker` ###
 
 Allow you to pick a target from a scene view, then sign it into your field.
@@ -4988,6 +4993,8 @@ Parameters:
 
 *   `string space="this"`:the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value. Only works for `Vector3`/`Vector2` type.
 
+You can use right click to show/hide handles.
+
 Example of using it with vector types + `DrawLabel`:
 
 ```csharp
@@ -5019,6 +5026,8 @@ private string LabelName(MeshRenderer target, int index) => $"{target.name}[{ind
 
 Draw a line between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
 
+You can use right click to show/hide handles.
+
 Parameters:
 
 *   `string start = null`: where does the line start. `null` for the current field.
@@ -5027,8 +5036,10 @@ Parameters:
 *   `string end = null`: where does the line end. `null` for the current field.
 *   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
 *   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `EColor color = EColor.White`: the color of the line.
-*   `float colorAlpha = 1f`: the alpha of the color.
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 
 And also `DrawLineFrom`, `DrawLineTo` as a shortcut to connect current field with another:
 
@@ -5036,8 +5047,10 @@ And also `DrawLineFrom`, `DrawLineTo` as a shortcut to connect current field wit
 *   `int targetIndex = 0`: if the target is a list/array, specify the index of the target.
 *   `string targetSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `string space = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `EColor color = EColor.White`: the color of the line.
-*   `float colorAlpha = 1f`: the alpha of the color.
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 
 ```csharp
 using SaintsField;
@@ -5083,8 +5096,10 @@ Parameters:
 *   `string end = null`: where does the arrow end. `null` for the current field.
 *   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
 *   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `EColor color = EColor.White`: the color of the arrow.
-*   `float colorAlpha = 1f`: the alpha of the color.
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 *   `float headLength = 0.5f`: the length of the arrow head.
 *   `float headAngle = 20.0f`: the angle of the arrow head.
 
@@ -5131,8 +5146,6 @@ Like `SaintsArrow` but using Unity's default `ArrowHandleCap` to draw. (No depen
 
 Draw an arrow between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
 
-Note: Unity's arrow handle does not allow much controlling. You might see a giant arrow depending on your scaling.
-
 Parameters:
 
 *   `string start = null`: where does the arrow start. `null` for the current field.
@@ -5141,8 +5154,10 @@ Parameters:
 *   `string end = null`: where does the arrow end. `null` for the current field.
 *   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
 *   `Space endSpace = Space.World`: if the end is a `Vector3`/`Vector2`, should it be in world space or local space.
-*   `EColor color = EColor.White`: the color of the arrow.
-*   `float colorAlpha = 1f`: the alpha of the color.
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 
 Specially
 1.  using on an array/list without specifying `start` and `end` will arrow-connect the element from first to last.
@@ -5182,7 +5197,7 @@ public Vector3[] worldPos;
 private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
 ```
 
-![image](https://github.com/user-attachments/assets/ebb83a0b-2f1d-49c9-9897-9e900db4e471)
+![image](https://github.com/user-attachments/assets/e78c94c0-803b-436d-b8ff-ba319aefbe93)
 
 ### `DrawWireDisc` ###
 
@@ -5203,8 +5218,9 @@ Parameters:
 *   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
 *   `float rotX = 0f, float rotY = 0f, float rotZ = 0f`: rotation of the disc related to `space`
 *   `string rotCallback = null`: use a callback or a field value as the rotation. The value must be a `Quaternion`
-*   `EColor eColor = EColor.White`: line color of the disc
-*   `string color = null`: If it's starting with `#`, use a html color for the line. Otherwise, use a callback or a field value as the color. The value must be a `Color`
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
 
 ```csharp
 using SaintsField;
@@ -5296,8 +5312,9 @@ Draw a sphere in the scene like Unity's [`SphereHandleCap`](https://docs.unity3d
 *   `string space = "this"`: the containing space of the sphere. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: `Vector3` position offset for the sphere related to the `space`
 *   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
-*   `EColor eColor = EColor.White`: color of the sphere
-*   `string color = null`: If it's starting with `#`, use a html color for the sphere. Otherwise, use a callback or a field value as the color. The value must be a `Color`
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
 
 ```csharp
 [DrawLine]  // also draw the lines

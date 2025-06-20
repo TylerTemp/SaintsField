@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.18.1 ##
+
+1.  `Handles` displays now can be toggled using right click context menu [#217](https://github.com/TylerTemp/SaintsField/issues/217)
+2.  Fix some handles not displayed on list
+3.  Add `dotted` for line, arrow type of handles
+4.  Add `alpha` for handles' `eColor` color control
+5.  Improved `ArrowHandleCap` with better scaling
+
 ## 4.18.0 ##
 
 1.  Add `RequiredIf` for conditional required field; `EMode` supported
