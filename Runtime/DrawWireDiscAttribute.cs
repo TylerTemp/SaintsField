@@ -37,7 +37,7 @@ namespace SaintsField
             float norX = 0f, float norY = 0f, float norZ = 1f, string norCallback = null,
             float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f, string posOffsetCallback = null,
             float rotX = 0f, float rotY = 0f, float rotZ = 0f, string rotCallback = null,
-            EColor eColor = EColor.White, string color = null
+            EColor eColor = EColor.White, float alpha = 1f, string color = null
         )
         {
             Radius = radius;
@@ -51,6 +51,10 @@ namespace SaintsField
             RotCallback = rotCallback;
 
             Color = eColor.GetColor();
+            if (alpha < 1f)
+            {
+                Color.a = alpha;
+            }
 
             bool colorIsString = !string.IsNullOrEmpty(color);
             ColorCallback = null;
