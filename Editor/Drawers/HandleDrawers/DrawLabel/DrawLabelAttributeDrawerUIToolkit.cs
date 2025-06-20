@@ -53,6 +53,14 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             });
             child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
             container.Add(child);
+
+            // container.schedule.Execute(() =>
+            // {
+            //     if (!SerializedUtils.IsOk(labelInfoUIToolkit.SerializedProperty))
+            //     {
+            //         SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
+            //     }
+            // }).Every(1000);
             return;
 
             // ReSharper disable once InconsistentNaming

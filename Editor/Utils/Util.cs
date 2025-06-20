@@ -36,8 +36,21 @@ namespace SaintsField.Editor.Utils
                 }
             }
 
-            T result = (T)EditorGUIUtility.Load(resourcePath);
-            Debug.Assert(result != null, $"{resourcePath} not found in {string.Join(", ", ResourceSearchFolder)}");
+            T result = EditorGUIUtility.Load(resourcePath) as T;
+
+            if (typeof(T) == typeof(Texture2D))
+            {
+                if (!result)
+                {
+                    Texture2D r = EditorGUIUtility.IconContent(resourcePath).image as Texture2D;
+                    if (r)
+                    {
+                        result = r as T;
+                    }
+                }
+            }
+
+            Debug.Assert(result, $"{resourcePath} not found in {string.Join(", ", ResourceSearchFolder)}");
             return result;
         }
 

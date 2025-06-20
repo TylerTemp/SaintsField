@@ -155,8 +155,8 @@ namespace SaintsField.Editor.Drawers
 
         private struct Payload
         {
-            public bool isActive;
-            public bool isNull;
+            public bool IsActive;
+            public bool IsNull;
         }
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
@@ -177,8 +177,8 @@ namespace SaintsField.Editor.Drawers
                 name = NameButton(property, index),
                 userData = new Payload
                 {
-                    isActive = true,
-                    isNull = false,
+                    IsActive = true,
+                    IsNull = false,
                 },
             };
 
@@ -271,13 +271,13 @@ namespace SaintsField.Editor.Drawers
 
             bool hasChange = false;
 
-            if (payload.isNull != goIsNull)
+            if (payload.IsNull != goIsNull)
             {
                 hasChange = true;
                 button.SetEnabled(!goIsNull);
             }
 
-            if (payload.isActive != goActive)
+            if (payload.IsActive != goActive)
             {
                 hasChange = true;
                 container.Q<Image>(NameButtonLabelActive(property, index)).style.display = goActive ? DisplayStyle.Flex : DisplayStyle.None;
@@ -288,8 +288,8 @@ namespace SaintsField.Editor.Drawers
             {
                 button.userData = new Payload
                 {
-                    isActive = goActive,
-                    isNull = goIsNull,
+                    IsActive = goActive,
+                    IsNull = goIsNull,
                 };
             }
         }

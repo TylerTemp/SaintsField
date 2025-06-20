@@ -109,7 +109,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             public string Error;
             public Vector3 Center;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
+
+            public string UniqueId;
         }
+
+        private static Texture2D _moveIcon;
 
         private static void OnSceneGUIInternal(SceneView _, PositionHandleInfo positionHandleInfo)
         {
@@ -121,6 +125,21 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 #endif
                 return;
             }
+
+            if (HandleVisibility.IsHidden(positionHandleInfo.UniqueId))
+            {
+                return;
+            }
+
+            if (_moveIcon is null)
+            {
+                _moveIcon = Util.LoadResource<Texture2D>("Vector3Field");
+            }
+
+            HandleVisibility.SetInView(positionHandleInfo.UniqueId,
+                positionHandleInfo.SerializedProperty.propertyPath,
+                positionHandleInfo.SerializedProperty.serializedObject.targetObject.name,
+                _moveIcon);
 
             Vector3 worldPos = positionHandleInfo.Center;
 

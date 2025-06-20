@@ -4431,7 +4431,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   worldPos3: {x: 0.81925553, y: 0.23773932, z: -2.54068}
-  worldPos2: {x: -1.6748761, y: 1.2846097}
+  worldPos2: {x: -1.9, y: 1.2846097}
   localPos3: {x: -0.35697484, y: 0.4203025, z: -4.602842}
   localPos2: {x: 0.23284078, y: -4.4419274}
 --- !u!1 &308851076
@@ -16134,7 +16134,7 @@ Transform:
   m_GameObject: {fileID: 937423347}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.3049052, y: 1.19925, z: 0.17940831}
+  m_LocalPosition: {x: 2.9890285, y: 0.695279, z: 0.17940831}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

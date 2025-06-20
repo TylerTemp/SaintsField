@@ -257,7 +257,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                             break;
                         }
 
-                        if(string.IsNullOrEmpty(_selectingPanelSearching) || _selectingPanelSearching.Split(' ').All(searchSeg => findTargetRecord.FindTargetInfo.Path.Contains(searchSeg.ToLower())))
+                        if(string.IsNullOrEmpty(_selectingPanelSearching) || _selectingPanelSearching.ToLower().Split(' ').All(searchSeg => findTargetRecord.FindTargetInfo.Path.ToLower().Contains(searchSeg)))
                         {
                             showTargets.Add(findTargetRecord);
 
@@ -295,7 +295,6 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
                     }
 
                     float useX = _selectingPanelMouseFrozenPos.x - _selectingPanelWidth / 2;
-                    // Debug.Log(useX);
                     if (useX + _selectingPanelWidth > Screen.width)
                     {
                         useX = Screen.width - _selectingPanelWidth;

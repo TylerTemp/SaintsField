@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             if (!string.IsNullOrEmpty(labelInfo.Error))
             {
 #if SAINTSFIELD_DEBUG
-                Debug.LogError(labelInfo.Error);
+                Debug.LogWarning(labelInfo.Error);
 #endif
                 return;
             }
