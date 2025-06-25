@@ -1,0 +1,10 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <engine:Template name="Chip" src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/Chip/Chip.uxml?fileID=9197481963319205126&amp;guid=b8895b7effe58184c9b8d0fa73a124cd&amp;type=3#Chip" />
+    <engine:VisualElement style="flex-grow: 1; flex-direction: row; flex-wrap: wrap; padding-top: 1px; padding-right: 1px; padding-bottom: 1px; padding-left: 1px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-left-color: rgba(0, 0, 0, 0.28); border-right-color: rgba(0, 0, 0, 0.28); border-top-color: rgba(0, 0, 0, 0.28); border-bottom-color: rgba(0, 0, 0, 0.28); border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px;">
+        <engine:Instance template="Chip" />
+        <engine:Instance template="Chip" />
+        <engine:Instance template="Chip" />
+        <engine:Instance template="Chip" />
+        <engine:TextField value="Test Content Goes Here Waaa" style="height: 18px; min-width: 60px; max-width: 100px;" />
+    </engine:VisualElement>
+</engine:UXML>
