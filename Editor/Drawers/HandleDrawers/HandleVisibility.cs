@@ -280,9 +280,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
                 if(_selectingPanelWidth < 0)
                 {
-                    float thisWidth = GUI.skin.label.CalcSize(new GUIContent($"{showTarget.PropPath} ({showTarget.ContainerName})", showInfo.Icon)).x
-                        + EditorGUIUtility.singleLineHeight * 2;
-                    // Debug.Log($"{thisWidth}: {calcWidth}");
+                    float thisWidth = GUI.skin.label.CalcSize(new GUIContent($"{showTarget.PropPath} ({showTarget.ContainerName})")).x
+                        + EditorGUIUtility.singleLineHeight * 2 + 6;
                     if (thisWidth > calcWidth)
                     {
                         calcWidth = thisWidth;
