@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -23,7 +24,7 @@ namespace SaintsField
         {
             GroupBy = groupBy;
 
-            ImageCallback = image;
+            ImageCallback = RuntimeUtil.ParseCallback(image).content;
             Above = above;
             MaxWidth = maxWidth;
             MaxHeight = maxHeight;

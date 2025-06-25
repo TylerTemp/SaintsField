@@ -25,13 +25,18 @@ namespace SaintsField.Utils
             {
                 return (content.Substring(1, content.Length - 1), true);
             }
+            // // ReSharper disable once ConvertIfStatementToReturnStatement
+            // if (content.StartsWith(":"))
+            // {
+            //     return (content, true);
+            // }
 
             return (content, false);
         }
 
         public static bool IsNull(object obj)
         {
-            if (obj is UnityEngine.Object uObject)
+            if (obj is Object uObject)
             {
                 return !uObject;
             }
@@ -296,9 +301,8 @@ namespace SaintsField.Utils
                             // ReSharper disable once UseIndexFromEndExpression
                             ChunkType.IconTag, iconColor: colors.Count > 0 ? colors[colors.Count - 1] : null);
 
-                        for (int index = 0; index < openTags.Count; index++)
+                        foreach ((string tagName, string tagValueOrNull, string rawContent) reOpenTag in openTags)
                         {
-                            (string tagName, string tagValueOrNull, string rawContent) reOpenTag = openTags[index];
                             yield return new RichTextParsedChunk(reOpenTag.rawContent, ChunkType.NormalTag,
                                 tagType: TagType.StartTag, tagName: reOpenTag.tagName,
                                 tagValue: reOpenTag.tagValueOrNull);

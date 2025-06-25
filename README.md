@@ -101,13 +101,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.18.1**
+**4.19.0**
 
-1.  `Handles` displays now can be toggled using right click context menu [#217](https://github.com/TylerTemp/SaintsField/issues/217)
-2.  Fix some handles not displayed on list
-3.  Add `dotted` for line, arrow type of handles
-4.  Add `alpha` for handles' `eColor` color control
-5.  Improved `ArrowHandleCap` with better scaling
+1.  You can now use `$:ClassName.CallbackName` or `$:ClassName.FieldName` to call a static/const value/method in most place like `ShowIf/HideIf`, `EnableIf/DisableIf`, `RequiredIf`, `BelowImage/AboveImage` etc.
+2.  When a callback returns a `null` result, `AboveImage`, `BelowImage` now shows nothing, instead of giving an error notice.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2714,7 +2711,7 @@ For callback (functions, fields, properties):
 
 *   `object by...`
 
-    callbacks or attributes for the condition.
+    callbacks or attributes for the condition. For more information, see `Callback` section
 
 *   AllowMultiple: Yes
 
@@ -2740,6 +2737,14 @@ using SaintsField;
 private bool ShouldBeDisabled  // change the logic here
 {
     return true;
+}
+
+// This also works on static/const callbacks using `$:`
+[DisableIf("$:" + nameof(Util) + "." + nameof(_shouldDisable))] public int disableThis;
+// you can put this under another file like `Util.cs`
+public static class Util
+{
+    [ShowInIspector] private static bool _shouldDisable;
 }
 ```
 
@@ -2891,7 +2896,7 @@ Arguments:
 
 *   `object by...`
 
-    callbacks or attributes for the condition.
+    callbacks or attributes for the condition. For more information, see `Callback` section.
 
 *   AllowMultiple: Yes
 
@@ -2922,6 +2927,14 @@ public int showMe;
 public bool ShouldShow()  // change the logic here
 {
     return true;
+}
+
+// This also works on static/const callbacks using `$:`
+[HideIf("$:" + nameof(Util) + "." + nameof(_shouldHide))] public int hideMe;
+// you can put this under another file like `Util.cs`
+public static class Util
+{
+    [ShowInIspector] private static bool _shouldHide;
 }
 ```
 
@@ -6597,6 +6610,56 @@ This only works for decorator draws above or below the field. The above drawer w
 *   `EMode.NonPrefabInstance`: target is not a prefab (but can be inside a prefab)
 *   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
 *   `EMode.PrefabAsset` = `Variant | Regular`
+
+### Callback ###
+
+For decorators that accept a callback, you can usually use `$` to indicate that you want a callback. The callback can be a method, a property, or a field.
+
+Use `\\$` if you do not want it to be a callback. This is useful for decorators like `RichLabel`, `InfoBox` that the displaying string itself starts with `$`.
+
+Using `$:` if the callback is a static/const field. We support the following style:
+
+```csharp
+namespace SaintsField.Samples.Scripts
+{
+    public class StaticCallback : SaintsMonoBehaviour
+    {
+        private static readonly string StaticString = "This is a static string";
+        private const string ConstString = "This is a constant string";
+
+        // using full type name
+        [AboveRichLabel("$:SaintsField.Samples.Scripts." + nameof(StaticCallback) + "." + nameof(StaticString))]
+        // using only type name. This is slow and might find the incorrect target.
+        // We'll first search the assembly of this object. If not found, then search all assemblies.
+        [InfoBox("$:" + nameof(StaticCallback) + "." + nameof(ConstString))]
+        public int field;
+
+#if UNITY_EDITOR
+        private static Texture2D ImageCallback(string name) =>
+            AssetDatabase.LoadAssetAtPath<Texture2D>(
+                $"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/{name}.png");
+#endif
+
+#if UNITY_EDITOR
+        // use only field/method name. This will only try to search on the current target.
+        [BelowImage("$:" + nameof(ImageCallback), maxWidth: 20)]
+#endif
+        public string imgName;
+
+        [ShowInInspector] private static bool _disableMe = true;
+
+#if UNITY_EDITOR
+        [DisableIf("$:" + nameof(_disableMe))]
+        [RequiredIf("$:" + nameof(_disableMe), false)]
+#endif
+        public string disableIf;
+    }
+}
+```
+
+You can skip the `namespace` part. And if you also skip the `type` part, we'll try to find the callback from the current type first, then search all types in the current assembly, and finally search all types in all assemblies.
+
+Note: decorators like `OnEvent`, `OnButtonClick` does not support this `$:` yet. I'm still working on making all APIs consistent.
 
 ### Syntax for Show/Hide/Enable/Disable/Required-If ##
 

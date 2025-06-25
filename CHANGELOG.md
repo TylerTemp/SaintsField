@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.19.0 ##
+
+1.  You can now use `$:ClassName.CallbackName` or `$:ClassName.FieldName` to call a static/const value/method in most place like `ShowIf/HideIf`, `EnableIf/DisableIf`, `RequiredIf`, `BelowImage/AboveImage` etc.
+2.  When a callback returns a `null` result, `AboveImage`, `BelowImage` now shows nothing, instead of giving an error notice.
+
 ## 4.18.1 ##
 
 1.  `Handles` displays now can be toggled using right click context menu [#217](https://github.com/TylerTemp/SaintsField/issues/217)

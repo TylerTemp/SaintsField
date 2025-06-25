@@ -101,11 +101,27 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             if (helpBox.text != error)
             {
                 helpBox.text = error;
-                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                DisplayStyle helpDisplay = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                if (helpBox.style.display != helpDisplay)
+                {
+                    helpBox.style.display = helpDisplay;
+                }
             }
 
             ShowImageField root = container.Q<ShowImageField>(NameRoot(property, index));
             Image image = root.ImageElement;
+
+            DisplayStyle imageDisplay = error == "" ? DisplayStyle.Flex : DisplayStyle.None;
+            if (preview == null)
+            {
+                imageDisplay = DisplayStyle.None;
+            }
+
+            if (image.style.display != imageDisplay)
+            {
+                image.style.display = imageDisplay;
+            }
+
             Payload payload = (Payload)image.userData;
             // ReSharper disable once Unity.NoNullPropagation
             // int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;
