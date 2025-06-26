@@ -1,0 +1,5 @@
+#chip-input > TextInput {
+    background-color: rgba(20, 20, 20, 0.35);
+    padding: 0;
+    color: white;
+}
