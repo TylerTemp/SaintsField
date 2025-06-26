@@ -1,12 +1,10 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <engine:Template name="Chip" src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/Chip/Chip.uxml?fileID=9197481963319205126&amp;guid=b8895b7effe58184c9b8d0fa73a124cd&amp;type=3#Chip" />
-    <engine:Template name="ChipInput" src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/Chip/ChipInput.uxml?fileID=9197481963319205126&amp;guid=5cd0e445e80341641a349f9fadb66ae0&amp;type=3#ChipInput" />
     <Style src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/Chip/TextFieldStyle.uss?fileID=7433441132597879392&amp;guid=f5a7fb87535ecdf4eaae187cf3d3de66&amp;type=3#TextFieldStyle" />
-    <engine:VisualElement name="container-root" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap; padding-top: 1px; padding-right: 1px; padding-bottom: 1px; padding-left: 1px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-left-color: rgba(0, 0, 0, 0.18); border-right-color: rgba(0, 0, 0, 0.18); border-top-color: rgba(0, 0, 0, 0.18); border-bottom-color: rgba(0, 0, 0, 0.18); border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; width: 190px; margin-top: 2px; margin-right: 2px; margin-bottom: 2px; margin-left: 2px;">
-        <engine:Instance template="Chip" name="Chip" />
-        <engine:Instance template="Chip" name="Chip" />
-        <engine:Instance template="Chip" name="Chip" />
-        <engine:Instance template="Chip" name="Chip" />
-        <engine:Instance template="ChipInput" name="ChipInput" />
+    <engine:VisualElement name="container-root" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap; padding-top: 1px; padding-right: 1px; padding-bottom: 1px; padding-left: 1px; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-left-color: rgba(0, 0, 0, 0.18); border-right-color: rgba(0, 0, 0, 0.18); border-top-color: rgba(0, 0, 0, 0.18); border-bottom-color: rgba(0, 0, 0, 0.18); border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; width: 180px; margin-top: 2px; margin-right: 2px; margin-bottom: 2px; margin-left: 2px;">
+        <SaintsField.Editor.UIToolkitElements.DualButtonChip />
+        <SaintsField.Editor.UIToolkitElements.DualButtonChip />
+        <SaintsField.Editor.UIToolkitElements.DualButtonChip />
+        <SaintsField.Editor.UIToolkitElements.DualButtonChip />
+        <SaintsField.Editor.UIToolkitElements.CleanableTextInput />
     </engine:VisualElement>
 </engine:UXML>

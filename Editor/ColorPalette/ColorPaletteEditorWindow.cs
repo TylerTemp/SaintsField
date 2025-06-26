@@ -1,7 +1,9 @@
 using SaintsField.Editor.Core;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.ColorPalette
@@ -50,6 +52,8 @@ namespace SaintsField.Editor.ColorPalette
             };
             rootScoller.Insert(0, containerLayout);
 
+            // StyleSheet style = Util.LoadResource<StyleSheet>("UIToolkit/Chip/ChipStyle.uss");
+
             for (int _ = 0; _ < 10; _++)
             {
                 TemplateContainer container = containerTree.CloneTree();
@@ -58,7 +62,6 @@ namespace SaintsField.Editor.ColorPalette
                 foreach (VisualElement child in containerRoot.Query<VisualElement>("chip-root").ToList())
                 {
                     child.RemoveFromHierarchy();
-                    // Debug.Log(child);
                 }
 
                 VisualElement colorContainer = new VisualElement
@@ -82,6 +85,15 @@ namespace SaintsField.Editor.ColorPalette
                 colorContainer.Add(colorField);
 
                 containerRoot.Insert(0, colorContainer);
+
+                for (int index = 0; index < 4; index++)
+                {
+                    ColorPaletteLabel colorPaletteLabel = new ColorPaletteLabel($"Label{index}");
+                    // colorPaletteLabel.styleSheets.Add(style);
+                    // colorPaletteLabel.DualButtonChip.Button1.style.cursor = UIElementsEditorUtility.CreateDefaultCursorStyle(
+                    //     MouseCursor.Pan);
+                    containerRoot.Add(colorPaletteLabel);
+                }
 
                 containerLayout.Add(container);
             }
