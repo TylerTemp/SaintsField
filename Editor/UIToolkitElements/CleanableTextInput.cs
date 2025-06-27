@@ -1,16 +1,19 @@
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Utils;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
+#if UNITY_6000_0_OR_NEWER
     [UxmlElement]
+#endif
     public partial class CleanableTextInput: VisualElement
     {
         private readonly Button _chipInputClean;
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public CleanableTextInput()
+        public CleanableTextInput(): this(null){}
+        public CleanableTextInput(string label)
         {
             VisualTreeAsset chipInputTree = Util.LoadResource<VisualTreeAsset>("UIToolkit/Chip/ChipInput.uxml");
             VisualElement chipInputRoot = chipInputTree.CloneTree().Q<VisualElement>("chip-input-root");
@@ -22,6 +25,8 @@ namespace SaintsField.Editor.UIToolkitElements
                 chipInput.value = string.Empty;
                 chipInput.Focus();
             };
+
+            chipInput.SetValueWithoutNotify(string.IsNullOrEmpty(label)? "": label);
 
             chipInput.RegisterValueChangedCallback(evt => UpdateCleanButtonDisplay(evt.newValue));
             UpdateCleanButtonDisplay(chipInput.value);

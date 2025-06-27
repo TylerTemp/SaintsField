@@ -1,11 +1,12 @@
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Utils;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
+#if UNITY_6000_0_OR_NEWER
     [UxmlElement]
+#endif
     // ReSharper disable once ClassNeverInstantiated.Global
     public partial class DualButtonChip : VisualElement
     {
