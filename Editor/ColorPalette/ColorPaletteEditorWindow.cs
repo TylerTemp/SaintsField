@@ -89,7 +89,6 @@ namespace SaintsField.Editor.ColorPalette
             // foreach (ColorPaletteArray.ColorInfo colorInfo in colorPaletteArray)
 
             var prop = _so.FindProperty(nameof(ColorPaletteArray.colorInfoArray));
-            Debug.Log(nameof(ColorPaletteArray.colorInfoArray));
 
             for (int index = 0; index < prop.arraySize; index++)
             {
@@ -131,23 +130,26 @@ namespace SaintsField.Editor.ColorPalette
 
                 SerializedProperty colorInfoLabelsProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels));
 
-                // foreach (string colorInfoLabel in colorInfo.labels)
-                for (int labelIndex = 0; labelIndex < colorInfoLabelsProp.arraySize; labelIndex++)
-                {
-                    int thisIndex = labelIndex;
-                    SerializedProperty labelProp = colorInfoLabelsProp.GetArrayElementAtIndex(thisIndex);
-                    ColorPaletteLabel colorPaletteLabel = new ColorPaletteLabel();
-                    colorPaletteLabel.BindProperty(labelProp);
-                    colorPaletteLabel.OnDeleteClicked.AddListener(() =>
-                    {
-                        colorInfoLabelsProp.DeleteArrayElementAtIndex(thisIndex);
-                        colorInfoLabelsProp.serializedObject.ApplyModifiedProperties();
-                        colorPaletteLabel.RemoveFromHierarchy();
-                    });
-                    containerRoot.Add(colorPaletteLabel);
-                }
+                // for (int labelIndex = 0; labelIndex < colorInfoLabelsProp.arraySize; labelIndex++)
+                // {
+                //     int thisIndex = labelIndex;
+                //     SerializedProperty labelProp = colorInfoLabelsProp.GetArrayElementAtIndex(thisIndex);
+                //     ColorPaletteLabel colorPaletteLabel = new ColorPaletteLabel();
+                //     colorPaletteLabel.BindProperty(labelProp);
+                //     colorPaletteLabel.OnDeleteClicked.AddListener(() =>
+                //     {
+                //         colorInfoLabelsProp.DeleteArrayElementAtIndex(thisIndex);
+                //         colorInfoLabelsProp.serializedObject.ApplyModifiedProperties();
+                //         colorPaletteLabel.RemoveFromHierarchy();
+                //     });
+                //     containerRoot.Add(colorPaletteLabel);
+                // }
 
-                containerRoot.Add(new CleanableTextInput());
+                ColorPaletteLabels labels = new ColorPaletteLabels(colorInfoLabelsProp);
+                // labels.BindProperty(colorInfoLabelsProp);
+                containerRoot.Add(labels);
+
+                labels.Add(new CleanableTextInput());
 
                 containerLayout.Add(container);
             }

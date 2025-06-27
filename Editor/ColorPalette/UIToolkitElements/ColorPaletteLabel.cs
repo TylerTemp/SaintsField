@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.UIToolkitElements;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
@@ -11,14 +12,18 @@ namespace SaintsField.Editor.ColorPalette.UIToolkitElements
     [UxmlElement]
 #endif
     // ReSharper disable once ClassNeverInstantiated.Global
-    public partial class ColorPaletteLabel: BaseField<string>
+    // ReSharper disable once PartialTypeWithSinglePart
+    public partial class ColorPaletteLabel: BindableElement, INotifyValueChanged<string>
     {
+        public new class UxmlTraits : BindableElement.UxmlTraits { }
+        public new class UxmlFactory : UxmlFactory<ColorPaletteLabel, UxmlTraits> { }
+
         private readonly DualButtonChip _dualButtonChip;
         private readonly CancelableTextInput _cancelableTextInput;
 
         public readonly UnityEvent OnDeleteClicked = new UnityEvent();
 
-        public ColorPaletteLabel() : base(null, null)
+        public ColorPaletteLabel()
         {
             _dualButtonChip = new DualButtonChip();
             _dualButtonChip.Button1.clicked += OnEditClicked;
@@ -54,9 +59,12 @@ namespace SaintsField.Editor.ColorPalette.UIToolkitElements
                 return;
             }
 
+            // Debug.Log(binding);
 
-            _dualButtonChip.Label.text = newValue;
-            _cancelableTextInput.TextField.SetValueWithoutNotify(newValue);
+            value = newValue;
+            // SetValueWithoutNotify(value);
+            // _dualButtonChip.Label.text = newValue;
+            // _cancelableTextInput.TextField.SetValueWithoutNotify(newValue);
         }
 
         private void OnEditClicked()
@@ -91,21 +99,32 @@ namespace SaintsField.Editor.ColorPalette.UIToolkitElements
             _dualButtonChip.style.display = DisplayStyle.Flex;
         }
 
-        public override void SetValueWithoutNotify(string newValue)
+        public void SetValueWithoutNotify(string newValue)
         {
-            base.SetValueWithoutNotify(newValue);
-
             _dualButtonChip.Label.text = newValue;
             _cancelableTextInput.TextField.SetValueWithoutNotify(newValue);
         }
 
-        public override string value
+        public string value
         {
             get => _dualButtonChip.Label.text;
             set
             {
-                _dualButtonChip.Label.text = value;
-                _cancelableTextInput.TextField.SetValueWithoutNotify(value);
+                if (value == this.value)
+                {
+                    return;
+                }
+
+                string previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<string> evt = ChangeEvent<string>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+
+                // Debug.Log($"value={value}");
+                // _dualButtonChip.Label.text = value;
+                // _cancelableTextInput.TextField.SetValueWithoutNotify(value);
             }
         }
     }
