@@ -492,11 +492,12 @@ namespace SaintsField.Editor.Utils
                     // {
                     //     return true;
                     // }
-
+#if UNITY_2021_3_OR_NEWER
                     if (!searchedObjects.Add(property.managedReferenceValue))
                     {
                         return false;
                     }
+#endif
 
                     foreach ((string _, SerializedProperty subProp)  in SaintsRowAttributeDrawer.GetSerializableFieldInfo(property))
                     {
