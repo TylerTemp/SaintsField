@@ -96,7 +96,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         ));
                         break;
                     case IPlayaArraySizeAttribute arraySizeAttribute:
-                        if(fieldWithInfo.SerializedProperty != null)
+                        if(SerializedUtils.IsOk(fieldWithInfo.SerializedProperty))
                         {
                             // ReSharper disable once ArrangeRedundantParentheses
                             arraySize = (fieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic
