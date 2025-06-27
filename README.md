@@ -101,10 +101,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.19.0**
+**4.19.1**
 
-1.  You can now use `$:ClassName.CallbackName` or `$:ClassName.FieldName` to call a static/const value/method in most place like `ShowIf/HideIf`, `EnableIf/DisableIf`, `RequiredIf`, `BelowImage/AboveImage` etc.
-2.  When a callback returns a `null` result, `AboveImage`, `BelowImage` now shows nothing, instead of giving an error notice.
+1.  Fix search function got `StackOverflow` when a target contains a looped-reference. [#250](https://github.com/TylerTemp/SaintsField/issues/250)
+2.  Add `<index/>`, `<index=D4/>` tag for rich label. If the property is in a list/array, the coresponding index value will be used for this tag
+3.  Add `{0:formatControl}` support for `<index/>` and `<field/>` tag like a Unity's standard `string.Format`. You can now even do weird shit like: `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
