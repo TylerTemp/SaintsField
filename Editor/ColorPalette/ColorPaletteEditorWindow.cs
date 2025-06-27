@@ -1,3 +1,4 @@
+#if UNITY_6000_0_OR_NEWER
 using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
@@ -100,3 +101,4 @@ namespace SaintsField.Editor.ColorPalette
         }
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if UNITY_6000_0_OR_NEWER
 using System.Web;
 using SaintsField.Editor.Utils;
 using UnityEngine.UIElements;
@@ -30,3 +31,4 @@ namespace SaintsField.Editor.UIToolkitElements
         }
     }
 }
+#endif
