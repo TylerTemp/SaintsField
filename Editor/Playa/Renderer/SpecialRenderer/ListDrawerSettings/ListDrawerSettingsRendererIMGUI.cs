@@ -122,9 +122,16 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 return;
             }
 
-            IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(_imGuiListInfo.SearchText)
-                ? Enumerable.Range(0, property.arraySize).ToList()
-                : SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText).Where(each => each != -1).ToList();
+            IReadOnlyList<int> fullIndexResults;
+            if (string.IsNullOrEmpty(_imGuiListInfo.SearchText))
+            {
+                fullIndexResults = Enumerable.Range(0, property.arraySize).ToList();
+            }
+            else
+            {
+                fullIndexResults = SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText)
+                    .Where(each => each != -1).ToList();
+            }
             PagingInfo newPagingInfo = GetPagingInfo(_imGuiListInfo.PageIndex, fullIndexResults, _imGuiListInfo.NumberOfItemsPrePage);
             if (!newPagingInfo.IndexesCurPage.SequenceEqual(_imGuiListInfo.PagingInfo.IndexesCurPage))
             {

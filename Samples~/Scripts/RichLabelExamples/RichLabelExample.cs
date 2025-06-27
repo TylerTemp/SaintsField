@@ -100,5 +100,8 @@ namespace SaintsField.Samples.Scripts.RichLabelExamples
 
         [RichLabel("<color=lime>Get Rich!</color>")]
         public UnityEvent<int, GameObject> richEvent;
+
+        [RichLabel("<field=\">><color=yellow>{0}</color><<\"/> <index=\"[<color=blue>>></color>{0}<color=blue><<</color>]\"/>")]
+        public string[] sindices;
     }
 }

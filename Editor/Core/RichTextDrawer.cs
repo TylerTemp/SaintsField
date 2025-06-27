@@ -127,11 +127,12 @@ namespace SaintsField.Editor.Core
         {
             List<string> colors = new List<string>();
 
-            // Define a regular expression pattern to match the tags
-            const string pattern = "(<[^>]+>)";
-
-            // Use Regex.Split to split the string by tags
-            string[] splitByTags = Regex.Split(richXml, pattern);
+            // // Define a regular expression pattern to match the tags
+            // const string pattern = "(<[^>]+>)";
+            //
+            // // Use Regex.Split to split the string by tags
+            // string[] splitByTags = Regex.Split(richXml, pattern);
+            string[]  splitByTags = RuntimeUtil.SplitByTags(richXml).Select(each => each.stringChunk).ToArray();
 
             // List<string> colorPresent = new List<string>();
             // List<string> stringPresent = new List<string>();
@@ -212,6 +213,18 @@ namespace SaintsField.Editor.Core
                             richText.Append(baseType == null? "": baseType.Name);
                         }
                             break;
+                        case "index":
+                        {
+                            if (property != null && SerializedUtils.IsOk(property))
+                            {
+                                int index = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                                if (index >= 0)
+                                {
+                                    richText.Append(TagStringFormatter(index, parsedResult.value));
+                                }
+                            }
+                        }
+                            break;
                         case "icon":
                         {
                             Debug.Assert(parsedResult.value != null);
@@ -276,9 +289,9 @@ namespace SaintsField.Editor.Core
                                             foreach (string attrName in subFields)
                                             {
                                                 MemberInfo accMemberInfo = null;
-                                                foreach (var type in ReflectUtils.GetSelfAndBaseTypes(accParent))
+                                                foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(accParent))
                                                 {
-                                                    foreach (var info in type.GetMember(attrName,
+                                                    foreach (MemberInfo info in type.GetMember(attrName,
                                                                  BindingFlags.Public | BindingFlags.NonPublic |
                                                                  BindingFlags.Instance | BindingFlags.Static |
                                                                  BindingFlags.FlattenHierarchy))
@@ -323,47 +336,7 @@ namespace SaintsField.Editor.Core
 
                                     if (!hasError)
                                     {
-                                        string tagFinalResult = $"{finalValue}";
-                                        if (RuntimeUtil.IsNull(finalValue))
-                                        {
-                                            tagFinalResult = "";
-                                        }
-                                        else if (string.IsNullOrEmpty(parsedResult.value))
-                                        {
-                                            // tagFinalResult = $"{finalValue}";
-                                        }
-                                        else
-                                        {
-                                            bool binaryFormatted = false;
-                                            if (parsedResult.value.StartsWith("B"))
-                                            {
-                                                string binaryFormatResult = Util.FormatBinary(parsedResult.value, finalValue);
-                                                // Debug.Log($"{parsedResult.value}/{finalValue}/{binaryFormatResult}");
-                                                binaryFormatted = binaryFormatResult != "";
-                                                if (binaryFormatted)
-                                                {
-                                                    tagFinalResult = binaryFormatResult;
-                                                }
-                                            }
-
-                                            if(!binaryFormatted)
-                                            {
-                                                string formatString = $"{{0:{parsedResult.value}}}";
-                                                try
-                                                {
-                                                    tagFinalResult = string.Format(formatString, finalValue);
-                                                }
-#pragma warning disable CS0168
-                                                catch (Exception ex)
-#pragma warning restore CS0168
-                                                {
-#if SAINTSFIELD_DEBUG
-                                                    // Debug.LogException(ex);
-#endif
-                                                    tagFinalResult = $"{finalValue}";
-                                                }
-                                            }
-                                        }
+                                        string tagFinalResult = TagStringFormatter(finalValue, parsedResult.value);
                                         richText.Append(tagFinalResult);
                                     }
                                 }
@@ -396,6 +369,62 @@ namespace SaintsField.Editor.Core
             }
 
             // return richTextChunks;
+        }
+
+        private static string TagStringFormatter(object finalValue, string parsedResultValue)
+        {
+            if (RuntimeUtil.IsNull(finalValue))
+            {
+                // ReSharper disable once TailRecursiveCall
+                return TagStringFormatter("", parsedResultValue);
+            }
+
+            if (string.IsNullOrEmpty(parsedResultValue))
+            {
+                return $"{finalValue}";
+            }
+
+            if (parsedResultValue.Contains("{") && parsedResultValue.Contains("}"))
+            {
+                try
+                {
+                    return string.Format(parsedResultValue, finalValue);
+                }
+#pragma warning disable CS0168
+                catch (Exception ex)
+#pragma warning restore CS0168
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(ex);
+#endif
+                    return $"{finalValue}";
+                }
+            }
+
+            if (parsedResultValue.StartsWith("B"))
+            {
+                string binaryFormatResult = Util.FormatBinary(parsedResultValue, finalValue);
+                // Debug.Log($"{parsedResult.value}/{finalValue}/{binaryFormatResult}");
+                if (binaryFormatResult != "")
+                {
+                    return binaryFormatResult;
+                }
+            }
+
+            string formatString = $"{{0:{parsedResultValue}}}";
+            try
+            {
+                return string.Format(formatString, finalValue);
+            }
+#pragma warning disable CS0168
+            catch (Exception ex)
+#pragma warning restore CS0168
+            {
+#if SAINTSFIELD_DEBUG
+                // Debug.LogException(ex);
+#endif
+                return $"{finalValue}";
+            }
         }
 
         private enum RichPartType

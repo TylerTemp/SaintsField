@@ -11,17 +11,17 @@ namespace SaintsField.Editor.ColorPalette
     public class ColorPaletteEditorWindow: SaintsEditorWindow
     {
 
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Color Palette...")]
-#else
-        [MenuItem("Window/Saints/Color Palette...")]
-#endif
-        public static void OpenColorPaletteEditorWindow()
-        {
-            ColorPaletteEditorWindow window = GetWindow<ColorPaletteEditorWindow>(false, "Color Palette");
-            window.Show();
-        }
-
+// #if SAINTSFIELD_DEBUG
+//         [MenuItem("Saints/Color Palette...")]
+// #else
+//         [MenuItem("Window/Saints/Color Palette...")]
+// #endif
+//         public static void OpenColorPaletteEditorWindow()
+//         {
+//             ColorPaletteEditorWindow window = GetWindow<ColorPaletteEditorWindow>(false, "Color Palette");
+//             window.Show();
+//         }
+//
 // #if SAINTSFIELD_DEBUG
 //         [InitializeOnLoadMethod]
 //         private static void ReOpen()

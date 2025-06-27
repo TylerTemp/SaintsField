@@ -350,15 +350,33 @@ namespace SaintsField.Editor.Utils
         public static IEnumerable<int> SearchArrayProperty(SerializedProperty property, string searchFull)
         {
             IReadOnlyList<ListSearchToken> searchTokens = ParseSearch(searchFull).ToArray();
-            for (int i = 0; i < property.arraySize; i++)
+            for (int arrayElementIndex = 0; arrayElementIndex < property.arraySize; arrayElementIndex++)
             {
-                SerializedProperty childProperty = property.GetArrayElementAtIndex(i);
-                if (searchTokens.All(search => SearchProp(childProperty, search.Token)))
+                SerializedProperty childProperty = property.GetArrayElementAtIndex(arrayElementIndex);
+                bool all = true;
+                HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                    .Select(_ => new HashSet<object>())
+                    .ToArray();
+                for (int tokenIndex = 0; tokenIndex < searchTokens.Count; tokenIndex++)
+                {
+                    ListSearchToken search = searchTokens[tokenIndex];
+                    HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+                    Debug.Log($"#Search# searching token@{tokenIndex}={search.Token} of property={property.name}@{arrayElementIndex} with seachedObjects={string.Join(",", searchedObjects)}");
+#endif
+                    if (!SearchProp(childProperty, search.Token, searchedObjects))
+                    {
+                        all = false;
+                        break;
+                    }
+                }
+
+                if (all)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"found: {childProperty.propertyPath}");
 #endif
-                    yield return i;
+                    yield return arrayElementIndex;
                 }
                 else
                 {
@@ -367,7 +385,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        public static bool SearchProp(SerializedProperty property, string rawToken)
+        public static bool SearchProp(SerializedProperty property, string rawToken, HashSet<object> searchedObjects)
         {
             SerializedPropertyType propertyType;
             try
@@ -409,7 +427,19 @@ namespace SaintsField.Editor.Utils
                     // ReSharper disable once Unity.NoNullPropagation
                     if (property.objectReferenceValue is ScriptableObject so)
                     {
-                        return SearchSoProp(so, token);
+//                         if (!searchedObjects.Add(so))
+//                         {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+//                             Debug.Log($"#Search# Already searched {so.name} ({so.GetType()}) for {token}, skip");
+// #endif
+//                             return false;
+//                         }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+                        Debug.Log($"#Search# nested search {so.name} with searchedObjects={string.Join(",", searchedObjects)}");
+#endif
+
+                        return SearchSoProp(so, token, searchedObjects);
                     }
                     return property.objectReferenceValue.name.ToLower().Contains(token);
                 case SerializedPropertyType.LayerMask:
@@ -463,9 +493,14 @@ namespace SaintsField.Editor.Utils
                     //     return true;
                     // }
 
+                    if (!searchedObjects.Add(property.managedReferenceValue))
+                    {
+                        return false;
+                    }
+
                     foreach ((string _, SerializedProperty subProp)  in SaintsRowAttributeDrawer.GetSerializableFieldInfo(property))
                     {
-                        if (SearchProp(subProp, token))
+                        if (SearchProp(subProp, token, searchedObjects))
                         {
                             return true;
                         }
@@ -482,7 +517,7 @@ namespace SaintsField.Editor.Utils
 #endif
                         for (int i = 0; i < property.arraySize; i++)
                         {
-                            if (SearchProp(property.GetArrayElementAtIndex(i), token))
+                            if (SearchProp(property.GetArrayElementAtIndex(i), token, searchedObjects))
                             {
                                 return true;
                             }
@@ -493,7 +528,7 @@ namespace SaintsField.Editor.Utils
                     // ReSharper disable once LoopCanBeConvertedToQuery
                     foreach (SerializedProperty child in GetPropertyChildren(property))
                     {
-                        if(SearchProp(child, token))
+                        if(SearchProp(child, token, searchedObjects))
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                             Debug.Log($"found child: {child.propertyPath}");
@@ -513,15 +548,23 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private static bool SearchSoProp(ScriptableObject so, string search)
+        private static bool SearchSoProp(ScriptableObject so, string search, HashSet<object> searchedObjects)
         {
+            if (!searchedObjects.Add(so))
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+                Debug.Log($"#Search# skip {so.name} as already searched in searchedObjects={string.Join(",", searchedObjects)}");
+#endif
+                return false;
+            }
+
             // ReSharper disable once ConvertToUsingDeclaration
             using(SerializedObject serializedObject = new SerializedObject(so))
             {
                 SerializedProperty iterator = serializedObject.GetIterator();
                 while (iterator.NextVisible(true))
                 {
-                    if (SearchProp(iterator, search))
+                    if (SearchProp(iterator, search, searchedObjects))
                     {
                         return true;
                     }

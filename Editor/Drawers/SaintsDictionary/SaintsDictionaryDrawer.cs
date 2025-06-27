@@ -111,7 +111,23 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 else
                 {
                     SerializedProperty valueProp = valuesProp.GetArrayElementAtIndex(index);
-                    if (searchTokens.All(search => SerializedUtils.SearchProp(valueProp, search.Token)))
+                    HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                        .Select(_ => new HashSet<object>())
+                        .ToArray();
+                    bool all = true;
+                    for (int tokenIndex = 0; tokenIndex < searchTokens.Count; tokenIndex++)
+                    {
+                        ListSearchToken search = searchTokens[tokenIndex];
+                        HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
+                        // ReSharper disable once InvertIf
+                        if (!SerializedUtils.SearchProp(valueProp, search.Token, searchedObjects))
+                        {
+                            all = false;
+                            break;
+                        }
+                    }
+
+                    if (all)
                     {
                         yield return index;
                     }

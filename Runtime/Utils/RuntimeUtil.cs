@@ -220,10 +220,11 @@ namespace SaintsField.Utils
             List<string> colors = new List<string>();
 
             // Define a regular expression pattern to match the tags
-            const string pattern = "(<[^>]+>)";
-
-            // Use Regex.Split to split the string by tags
-            string[] splitByTags = Regex.Split(richXml, pattern);
+            // const string pattern = "(<[^>]+>)";
+            //
+            // // Use Regex.Split to split the string by tags
+            // string[] splitByTags = Regex.Split(richXml, pattern);
+            string[] splitByTags = SplitByTags(richXml).Select(each => each.stringChunk).ToArray();
 
             // List<string> colorPresent = new List<string>();
             // List<string> stringPresent = new List<string>();
@@ -349,6 +350,131 @@ namespace SaintsField.Utils
             {
                 yield return new RichTextParsedChunk(leftContent, ChunkType.Text);
             }
+        }
+
+        public static IEnumerable<(bool isTag, string stringChunk)> SplitByTags(string richXml)
+        {
+            bool insideTag = false;
+            bool insideDoubleQuote = false;
+
+            StringBuilder contentBuilder = new StringBuilder();
+            StringBuilder tagBuilder = new StringBuilder();
+
+
+            foreach (char c in richXml)
+            {
+                if (c == '<')
+                {
+                    if (insideTag)
+                    {
+                        if (insideDoubleQuote)
+                        {
+                            tagBuilder.Append("<");
+                        }
+                        else  // abnormal inside tag, treat as content
+                        {
+                            string tagString = tagBuilder.ToString();
+                            if (!string.IsNullOrEmpty(tagString))
+                            {
+                                yield return (false, tagString);
+                                tagBuilder.Clear();
+                            }
+                            tagBuilder.Append("<");
+                        }
+                    }
+                    else
+                    {
+                        string contentString = contentBuilder.ToString();
+                        if (!string.IsNullOrEmpty(contentString))
+                        {
+                            yield return (false, contentString);
+                            contentBuilder.Clear();
+                        }
+                        string tagString = tagBuilder.ToString();
+                        if (!string.IsNullOrEmpty(tagString))
+                        {
+                            yield return (false, tagString);
+                            tagBuilder.Clear();
+                        }
+
+                        insideTag = true;
+                        tagBuilder.Append("<");
+                    }
+                }
+                else if (c == '"')
+                {
+                    insideDoubleQuote = !insideDoubleQuote;
+                    if (insideTag)
+                    {
+                        tagBuilder.Append("\"");
+                    }
+                    else
+                    {
+                        contentBuilder.Append("\"");
+                    }
+                }
+                else if (c == '>')
+                {
+                    if (insideDoubleQuote)
+                    {
+                        if (insideTag)
+                        {
+                            tagBuilder.Append(c);
+                        }
+                        else
+                        {
+                            contentBuilder.Append(c);
+                        }
+                    }
+                    else
+                    {
+                        if (insideTag)
+                        {
+                            tagBuilder.Append(">");
+                            yield return (true, tagBuilder.ToString());
+                            tagBuilder.Clear();
+                            insideTag = false;
+                        }
+                        else
+                        {
+                            contentBuilder.Append(">");
+                        }
+                    }
+                }
+                else
+                {
+                    if (insideTag)
+                    {
+                        tagBuilder.Append(c);
+                    }
+                    else
+                    {
+                        contentBuilder.Append(c);
+                    }
+                }
+            }
+
+
+            string contentStringFinal = contentBuilder.ToString();
+            if (!string.IsNullOrEmpty(contentStringFinal))
+            {
+                yield return (false, contentStringFinal);
+                contentBuilder.Clear();
+            }
+
+            if(insideTag)  // abnormal insiding tag
+            {
+                string tagString = tagBuilder.ToString();
+                if (!string.IsNullOrEmpty(tagString))
+                {
+                    yield return (false, tagString);
+                    tagBuilder.Clear();
+                }
+            }
+            // const string pattern = "(<[^>]+>)";
+            //
+            // // Use Regex.Split to split the string by tags
+            // string[] splitByTags = Regex.Split(richXml, pattern);
         }
 
 

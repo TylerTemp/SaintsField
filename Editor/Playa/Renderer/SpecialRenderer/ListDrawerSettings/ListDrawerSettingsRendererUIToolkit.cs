@@ -231,7 +231,23 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                             else
                             {
                                 SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(fullIndex);
-                                if (searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
+                                HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                                    .Select(_ => new HashSet<object>())
+                                    .ToArray();
+                                bool all = true;
+                                for (int index = 0; index < searchTokens.Count; index++)
+                                {
+                                    ListSearchToken token = searchTokens[index];
+                                    HashSet<object> searchedObject = searchedObjectsArray[index];
+                                    // ReSharper disable once InvertIf
+                                    if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObject))
+                                    {
+                                        all = false;
+                                        break;
+                                    }
+                                }
+
+                                if (all)
                                 {
                                     // yield return fullIndex;
                                     batchResults.Add(fullIndex);
@@ -280,7 +296,23 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                             else
                             {
                                 SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(curIndex);
-                                if (searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
+                                HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                                    .Select(_ => new HashSet<object>())
+                                    .ToArray();
+
+                                bool all = true;
+                                for (int index = 0; index < searchTokens.Count; index++)
+                                {
+                                    ListSearchToken token = searchTokens[index];
+                                    HashSet<object> searchedObjects = searchedObjectsArray[index];
+                                    if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObjects))
+                                    {
+                                        all = false;
+                                        break;
+                                    }
+                                }
+
+                                if (all)
                                 {
                                     // yield return curIndex;
                                     batchResults.Add(curIndex);

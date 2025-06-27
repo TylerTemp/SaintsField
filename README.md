@@ -124,6 +124,12 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
     *   `<field />`, `<field.subField/>`, `<field.subField=formatControl />` read the value from the field first, if tag has sub-field, continue to read, then use `string.Format` if there is a `formatControl`. See the example below.
     *   `<container.Type />` for the class/struct name of the container of the field
     *   `<container.Type.BaseType />` for the class/struct name of the field's container's parent
+    *   `<index />`, `<index=formatControl />` for the index if the target is an array/list
+
+    Note about format control:
+
+    *   If the format contains `{}`, it will be used like a `string.Format`. E.g. `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
+    *   Otherwise, it will be re-written to `{0:formatControl}`. E.g. `<index=D4/>` will be interpreted like `string.Format("{0:D4}", index)`.
 
     `null` means no label
 
@@ -249,6 +255,15 @@ public class SubField : MonoBehaviour
 ```
 
 [![video](https://github.com/user-attachments/assets/dc65d897-fcbf-4a40-b4aa-d99a8a4975a7)](https://github.com/user-attachments/assets/a6d93600-500b-4a0e-bf2d-9f2e8fb8bc32)
+
+Example of quoted fancy formatting:
+
+```csharp
+[RichLabel("<field=\">><color=yellow>{0}</color><<\"/> <index=\"[<color=blue>>></color>{0}<color=blue><<</color>]\"/>")]
+public string[] sindices;
+```
+
+![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
 
 #### `AboveRichLabel` / `BelowRichLabel` ####
 
