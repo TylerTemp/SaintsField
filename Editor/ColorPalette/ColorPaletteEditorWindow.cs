@@ -1,10 +1,12 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-using SaintsField.Editor.ColorPalette.UIToolkitElements;
+using System.Collections.Generic;
+using SaintsField.Editor.ColorPalette.UIToolkit;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.ColorPalette
@@ -57,6 +59,8 @@ namespace SaintsField.Editor.ColorPalette
             _so?.Update();
         }
 
+        // private readonly List<ColorPaletteLabels> _colorPaletteLabels = new List<ColorPaletteLabels>();
+
         protected override void EditorRelinkRootUIToolkit()
         {
             VisualElement root = rootVisualElement;
@@ -87,8 +91,9 @@ namespace SaintsField.Editor.ColorPalette
             // ReSharper disable once PossibleNullReferenceException
             // foreach (ColorPaletteArray.ColorInfo colorInfo in colorPaletteArray)
 
-            var prop = _so.FindProperty(nameof(ColorPaletteArray.colorInfoArray));
+            SerializedProperty prop = _so.FindProperty(nameof(ColorPaletteArray.colorInfoArray));
 
+            List<ColorPaletteLabels> allColorPaletteLabels = new List<ColorPaletteLabels>();
             for (int index = 0; index < prop.arraySize; index++)
             {
                 SerializedProperty colorInfoProp = prop.GetArrayElementAtIndex(index);
@@ -129,28 +134,22 @@ namespace SaintsField.Editor.ColorPalette
 
                 SerializedProperty colorInfoLabelsProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels));
 
-                // for (int labelIndex = 0; labelIndex < colorInfoLabelsProp.arraySize; labelIndex++)
-                // {
-                //     int thisIndex = labelIndex;
-                //     SerializedProperty labelProp = colorInfoLabelsProp.GetArrayElementAtIndex(thisIndex);
-                //     ColorPaletteLabel colorPaletteLabel = new ColorPaletteLabel();
-                //     colorPaletteLabel.BindProperty(labelProp);
-                //     colorPaletteLabel.OnDeleteClicked.AddListener(() =>
-                //     {
-                //         colorInfoLabelsProp.DeleteArrayElementAtIndex(thisIndex);
-                //         colorInfoLabelsProp.serializedObject.ApplyModifiedProperties();
-                //         colorPaletteLabel.RemoveFromHierarchy();
-                //     });
-                //     containerRoot.Add(colorPaletteLabel);
-                // }
+                ColorPaletteLabels colorPaletteLabels = new ColorPaletteLabels(containerRoot, colorInfoLabelsProp);
+                allColorPaletteLabels.Add(colorPaletteLabels);
+                containerRoot.Add(colorPaletteLabels);
 
-                ColorPaletteLabels labels = new ColorPaletteLabels(colorInfoLabelsProp);
-                // labels.BindProperty(colorInfoLabelsProp);
-                containerRoot.Add(labels);
-
-                labels.Add(new CleanableTextInput());
+                colorPaletteLabels.Add(new CleanableTextInput());
 
                 containerLayout.Add(container);
+            }
+
+            foreach (ColorPaletteLabels colorPaletteLabels in allColorPaletteLabels)
+            {
+                colorPaletteLabels.BindAllColorPaletteLabels(rootVisualElement, allColorPaletteLabels);
+                foreach (ColorPaletteLabel colorPaletteLabel in colorPaletteLabels.Labels)
+                {
+                    LabelPointerManipulator _ = new LabelPointerManipulator(rootVisualElement, colorPaletteLabel, colorPaletteLabels, allColorPaletteLabels);
+                }
             }
         }
     }
