@@ -7,9 +7,11 @@ namespace SaintsField.Editor.UIToolkitElements
 #if UNITY_6000_0_OR_NEWER
     [UxmlElement]
 #endif
+    // ReSharper disable once PartialTypeWithSinglePart
     public partial class CleanableTextInput: VisualElement
     {
         private readonly Button _chipInputClean;
+        public readonly TextField TextField;
 
         // ReSharper disable once MemberCanBePrivate.Global
         public CleanableTextInput(): this(null){}
@@ -18,18 +20,18 @@ namespace SaintsField.Editor.UIToolkitElements
             VisualTreeAsset chipInputTree = Util.LoadResource<VisualTreeAsset>("UIToolkit/Chip/ChipInput.uxml");
             VisualElement chipInputRoot = chipInputTree.CloneTree().Q<VisualElement>("chip-input-root");
 
-            TextField chipInput = chipInputRoot.Q<TextField>("chip-input");
+            TextField = chipInputRoot.Q<TextField>("chip-input");
             _chipInputClean = chipInputRoot.Q<Button>("chip-input-close");
             _chipInputClean.clicked += () =>
             {
-                chipInput.value = string.Empty;
-                chipInput.Focus();
+                TextField.value = string.Empty;
+                TextField.Focus();
             };
 
-            chipInput.SetValueWithoutNotify(string.IsNullOrEmpty(label)? "": label);
+            TextField.SetValueWithoutNotify(string.IsNullOrEmpty(label)? "": label);
 
-            chipInput.RegisterValueChangedCallback(evt => UpdateCleanButtonDisplay(evt.newValue));
-            UpdateCleanButtonDisplay(chipInput.value);
+            TextField.RegisterValueChangedCallback(evt => UpdateCleanButtonDisplay(evt.newValue));
+            UpdateCleanButtonDisplay(TextField.value);
 
             Add(chipInputRoot);
         }

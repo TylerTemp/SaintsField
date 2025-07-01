@@ -67,6 +67,7 @@ namespace SaintsField.Editor.ColorPalette
             root.Clear();
 
             ScrollView rootScoller = EditorCreatInspectingTarget();
+            rootScoller.style.position = Position.Relative;
             root.Add(rootScoller);
 
             if (_so == null)
@@ -138,7 +139,7 @@ namespace SaintsField.Editor.ColorPalette
                 allColorPaletteLabels.Add(colorPaletteLabels);
                 containerRoot.Add(colorPaletteLabels);
 
-                colorPaletteLabels.Add(new CleanableTextInput());
+                colorPaletteLabels.Add(new CleanableTextInputTypeAhead(colorInfoLabelsProp, rootScoller, prop));
 
                 containerLayout.Add(container);
             }
