@@ -100,7 +100,25 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             else if (newSize < _arraySize)
             {
                 Labels.Clear();
-                Labels.AddRange(Children().OfType<ColorPaletteLabel>().Take(newSize));
+
+                int index = 0;
+                foreach (ColorPaletteLabel colorPaletteLabel in Children().OfType<ColorPaletteLabel>().ToArray())
+                {
+                    if(index < newSize)
+                    {
+                        colorPaletteLabel.BindProperty(sp.GetArrayElementAtIndex(index));
+                        Labels.Add(colorPaletteLabel);
+                    }
+                    else
+                    {
+                        // Debug.Log($"remove {colorPaletteLabel.value} for {_arrayProp.propertyPath}");
+                        colorPaletteLabel.RemoveFromHierarchy();
+#if UNITY_6000_0_OR_NEWER
+                        colorPaletteLabel.Unbind();
+#endif
+                    }
+                    index++;
+                }
                 Debug.Assert(Labels.Count == newSize);
 
 //                 for (int outIndex = _arraySize - 1; outIndex > newSize - 1; outIndex--)
@@ -114,12 +132,12 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 //                     Labels.RemoveAt(outIndex);
 //                 }
 
-                Debug.Log($"decrease {_arraySize} -> {newSize}: {Labels.Count}");
-                for (int i = 0; i < Labels.Count; i++)
-                {
-                    Debug.Log($"rebind {i} for {_arrayProp.propertyPath}");
-                    Labels[i].BindProperty(sp.GetArrayElementAtIndex(i));
-                }
+                // Debug.Log($"decrease {_arraySize} -> {newSize}: {Labels.Count}");
+                // for (int i = 0; i < Labels.Count; i++)
+                // {
+                //     Debug.Log($"rebind {i} for {_arrayProp.propertyPath}");
+                //     Labels[i].BindProperty(sp.GetArrayElementAtIndex(i));
+                // }
 
                 // for (int i = 0; i < Labels.Count; i++)
                 // {

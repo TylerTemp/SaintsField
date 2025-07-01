@@ -640,7 +640,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         // private List<int> _displayPageSelectIndices;
         private int _displayKeyboardHighlight = -1;
 
-        private const string KeyboardHoverClass = "saintsfield-advanced-dropdown-item-keyboard-active";
+        public const string KeyboardHoverClass = "saintsfield-advanced-dropdown-item-keyboard-active";
         // private const Color KeyboardHoverHardColor = new Color(89 / 255f, 89 / 255f, 89 / 255f);
 
         private void OnPageCursorEnter(int index)
