@@ -91,23 +91,41 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     }
                 }
 
-                for (int i = 0; i < Labels.Count; i++)
-                {
-                    Debug.Log($"rebind {i} for {_arrayProp.propertyPath}");
-                    Labels[i].BindProperty(sp.GetArrayElementAtIndex(i));
-                }
+                // for (int i = 0; i < Labels.Count; i++)
+                // {
+                //     Debug.Log($"rebind {i} for {_arrayProp.propertyPath}");
+                //     Labels[i].BindProperty(sp.GetArrayElementAtIndex(i));
+                // }
             }
             else if (newSize < _arraySize)
             {
                 Labels.Clear();
                 Labels.AddRange(Children().OfType<ColorPaletteLabel>().Take(newSize));
-                Debug.Log($"decrease {_arraySize} -> {newSize}: {Labels.Count}");
+                Debug.Assert(Labels.Count == newSize);
 
+//                 for (int outIndex = _arraySize - 1; outIndex > newSize - 1; outIndex--)
+//                 {
+//                     Debug.Log($"remove {outIndex} for {_arrayProp.propertyPath}");
+//                     ColorPaletteLabel outTarget = Labels[outIndex];
+//                     outTarget.RemoveFromHierarchy();
+// #if UNITY_6000_0_OR_NEWER
+//                     outTarget.Unbind();
+// #endif
+//                     Labels.RemoveAt(outIndex);
+//                 }
+
+                Debug.Log($"decrease {_arraySize} -> {newSize}: {Labels.Count}");
                 for (int i = 0; i < Labels.Count; i++)
                 {
                     Debug.Log($"rebind {i} for {_arrayProp.propertyPath}");
                     Labels[i].BindProperty(sp.GetArrayElementAtIndex(i));
                 }
+
+                // for (int i = 0; i < Labels.Count; i++)
+                // {
+                //     Debug.Log($"rebind {i} for {_arrayProp.propertyPath}");
+                //     Labels[i].BindProperty(sp.GetArrayElementAtIndex(i));
+                // }
             }
 
             _arraySize = newSize;
@@ -121,6 +139,8 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         }
 
         private ColorPaletteLabelPlaceholder _placeholder;
+
+        // private int _dragOverIndex = -1;
 
         public bool IfDragOver(Vector2 worldMousePos, ColorPaletteLabel targetLabel)
         {
@@ -139,38 +159,49 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             _placeholder ??= new ColorPaletteLabelPlaceholder(targetLabel.value);
 
             Insert(insertIndex, _placeholder);
-
             return true;
         }
 
         private int GetDragIndex(Vector2 worldMousePos, ColorPaletteLabel target)
         {
-            int insertIndex = 0;
-            int labelsCount = Labels.Count;
+            // Debug.Log(worldMousePos);
+            // const int insertIndex = 0;
+            int labelsCount = _worldBounds.Length;
             for (int checkIndex = 0; checkIndex < labelsCount; checkIndex++)
             {
-                ColorPaletteLabel checkLabel = Labels[checkIndex];
-                if (checkLabel == target)
-                {
-                    return -1;
-                }
+                Rect wb = _worldBounds[checkIndex];
+                // if (checkLabel == target)
+                // {
+                //     return -1;
+                // }
                 // Debug.Log($"{worldMousePos}/{checkLabel.worldBound}/{checkLabel.worldBound.Contains(worldMousePos)}");
-                if (checkLabel.worldBound.Contains(worldMousePos))
+                if (wb.Contains(worldMousePos))
                 {
+                    if (Labels[checkIndex] == target)
+                    {
+                        return -1;
+                    }
+
                     // var checkPoint = (checkLabel.worldBound.x + checkLabel.worldBound.xMax) / 2f;
-                    float checkPoint = Mathf.Lerp(checkLabel.worldBound.x, checkLabel.worldBound.xMax, 0.2f);
-                    bool afterThis = worldMousePos.x > checkPoint;
-                    // Debug.Log($"{checkLabel.value}/{checkIndex}/afterThis={afterThis}");
-                    return afterThis && checkIndex < Labels.Count - 1 ? checkIndex + 1 : checkIndex;
+                    // float checkPoint = Mathf.Lerp(worldBound.x, worldBound.xMax, 0.2f);
+                    // bool afterThis = worldMousePos.x > checkPoint;
+                    // Debug.Log($"{GetHashCode()} drag over {checkIndex}/afterThis={afterThis};labelsCount={labelsCount}");
+                    // // return afterThis && checkIndex < Labels.Count - 1 ? checkIndex + 1 : checkIndex;
+                    // return afterThis ? checkIndex + 1 : checkIndex;
+                    return checkIndex;
                 }
             }
 
-            if (Labels.Count > 0 && worldMousePos.y > Labels[labelsCount - 1].worldBound.yMax)
+            // Debug.Log($"{worldMousePos.y}: {string.Join(",", Labels.Select(l => l.worldBound.yMax))}");
+
+            if (labelsCount > 0 && _worldBounds.All(wb => wb.yMin < worldMousePos.y))
             {
+                Debug.Log($"{GetHashCode()} drag over use last {labelsCount}");
                 return labelsCount;
             }
 
-            return insertIndex;
+            Debug.Log($"{GetHashCode()} drag over no match use 0");
+            return 0;
         }
 
         public void RemovePlaceholder()
@@ -206,13 +237,25 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             bool isNew = existsIndex == -1;
             if (isNew)  // is new
             {
-                Debug.Log($"insert new {targetLabel.value}@{insertIndex}");
+                Debug.Log($"insert new {targetLabel.value}@{insertIndex}; arraySize={_arrayProp.arraySize}");
                 // ReSharper disable once ExtractCommonBranchingCode
                 _arrayProp.InsertArrayElementAtIndex(insertIndex);
                 _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue = targetLabel.value;
             }
             else  // shifting
             {
+                if (insertIndex >= Labels.Count)  // just swap to end
+                {
+                    insertIndex = Labels.Count - 1;
+                }
+
+                if (existsIndex == insertIndex)
+                {
+                    Debug.Log($"no swap {existsIndex} <-> {insertIndex}");
+                    return false;
+                }
+
+                Debug.Log($"swap {existsIndex} <-> {insertIndex}");
                 (_arrayProp.GetArrayElementAtIndex(existsIndex).stringValue,
                         _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue) =
                     (_arrayProp.GetArrayElementAtIndex(insertIndex).stringValue,
@@ -238,11 +281,12 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 if (label == targetLabel)
                 {
                     Debug.Log($"remove {targetLabel.value}@{index}");
-                    Labels.RemoveAt(index);
+                    // Labels.RemoveAt(index);
                     targetLabel.RemoveFromHierarchy();
 
                     _arrayProp.DeleteArrayElementAtIndex(index);
                     _arrayProp.serializedObject.ApplyModifiedProperties();
+
                     return;
                 }
             }
@@ -257,6 +301,13 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         {
             _rootVisualElement = rootVisualElement;
             _allColorPaletteLabels = allColorPaletteLabels;
+        }
+
+        private Rect[] _worldBounds;
+
+        public void FrozenPositions()
+        {
+            _worldBounds = Labels.Select(each => each.worldBound).ToArray();
         }
     }
 }

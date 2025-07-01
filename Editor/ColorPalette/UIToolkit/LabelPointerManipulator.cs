@@ -51,6 +51,12 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         {
             targetStartPosition = target.transform.position;
             pointerStartPosition = evt.position;
+
+            foreach (ColorPaletteLabels colorPaletteLabels in _allColorPaletteLabels)
+            {
+                colorPaletteLabels.FrozenPositions();
+            }
+
             target.CapturePointer(evt.pointerId);
             enabled = true;
             // _targetLabels.StartDrag(_targetLabel);
@@ -100,6 +106,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     allColorPaletteLabels.RemovePlaceholder();
                 }
                 enabled = false;
+                _targetLabel.style.translate = StyleKeyword.Null;
             }
         }
 
@@ -113,6 +120,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             if (enabled)
             {
                 DragEnd(evt.originalMousePosition);
+                _targetLabel.style.translate = StyleKeyword.Null;
                 enabled = false;
             }
         }
@@ -135,6 +143,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                         if (colorPaletteLabels.AddOrSwap(originalMousePosition, _targetLabel))
                         {
                             _targetLabels.RemoveLabel(_targetLabel);
+                            // _targetLabel.style.translate = StyleKeyword.Initial;
                         }
                     }
                 }
