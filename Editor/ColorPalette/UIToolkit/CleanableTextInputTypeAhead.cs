@@ -27,45 +27,36 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             _cleanableTextInput = new CleanableTextInput();
             _cleanableTextInput.TextField.RegisterCallback<FocusInEvent>(_ =>
             {
+                // Debug.Log("Focused");
                 _focused = true;
 
-                Vector2 worldAnchor = new Vector2(_cleanableTextInput.worldBound.xMin, _cleanableTextInput.worldBound.yMax);
-                Vector2 localAnchor = root.contentContainer.WorldToLocal(worldAnchor);
-                _pop.style.top = localAnchor.y;
-                _pop.style.left = localAnchor.x;
-
-                FillOptions(_cleanableTextInput.TextField.value, colorInfoLabelsProp, colorInfoArray);
-
-                root.Add(_pop);
+                SetupTypeAhead(colorInfoLabelsProp, root, colorInfoArray);
             });
-            _cleanableTextInput.TextField.RegisterCallback<BlurEvent>(_ =>
-            {
-                _focused = false;
-
-                if (!_hoverOptions)
-                {
-                    _pop.RemoveFromHierarchy();
-                }
-                // schedule.Execute(() => root.Remove(pop)).StartingIn(30);
-            });
+            _cleanableTextInput.TextField.RegisterCallback<BlurEvent>(OnBlurEvent);
 
             _cleanableTextInput.TextField.RegisterValueChangedCallback(e =>
             {
                 _highlightLabel = "";
-                FillOptions(e.newValue, colorInfoLabelsProp, colorInfoArray);
+                FillOptions(e.newValue, colorInfoLabelsProp, root, colorInfoArray);
             });
 
-            _cleanableTextInput.TextField.RegisterCallback<KeyUpEvent>(e =>
+            _cleanableTextInput.TextField.RegisterCallback<KeyDownEvent>(e =>
             {
-                if (e.keyCode is KeyCode.Return or KeyCode.KeypadEnter)
+                if (e.keyCode is KeyCode.Return or KeyCode.KeypadEnter || e.character == '\n')
                 {
+                    e.StopPropagation();
+                    e.PreventDefault();
                     int getIndex = GetHighlightedIndex();
                     if (getIndex != -1)
                     {
                         if(OnInputOption(_buttonItems[getIndex].LabelText, colorInfoLabelsProp))
                         {
-                            _cleanableTextInput.TextField.Focus();
-                            FillOptions("", colorInfoLabelsProp, colorInfoArray);
+                            _highlightLabel = "";
+                            _cleanableTextInput.TextField.value = "";
+                            // e.StopPropagation();
+                            // _cleanableTextInput.TextField.UnregisterCallback<BlurEvent>(OnBlurEvent);
+                            // FillOptions("", colorInfoLabelsProp, colorInfoArray);
+                            // _cleanableTextInput.TextField.RegisterCallback<BlurEvent>(OnBlurEvent);
                         }
 
                         return;
@@ -76,8 +67,14 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     {
                         if(OnInputOption(newValue, colorInfoLabelsProp))
                         {
-                            _cleanableTextInput.TextField.Focus();
-                            FillOptions("", colorInfoLabelsProp, colorInfoArray);
+                            _highlightLabel = "";
+                            _cleanableTextInput.TextField.value = "";
+
+                            // _cleanableTextInput.TextField.UnregisterCallback<BlurEvent>(OnBlurEvent);
+                            // FillOptions("", colorInfoLabelsProp, colorInfoArray);
+                            // _cleanableTextInput.TextField.RegisterCallback<BlurEvent>(OnBlurEvent);
+                            // SetupTypeAhead(colorInfoLabelsProp, root, colorInfoArray);
+                            // e.StopPropagation();
                         }
                     }
 
@@ -151,11 +148,56 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 _hoverOptions = false;
                 if (!_focused)
                 {
+                    Debug.Log("_pop.RemoveFromHierarchy");
                     _pop.RemoveFromHierarchy();
                 }
             });
 
             Add(_cleanableTextInput);
+
+            schedule.Execute(() =>
+            {
+                if (_focused)
+                {
+                    PosTypeAhead(root);
+                }
+            }).Every(100);
+        }
+
+        private void OnBlurEvent(BlurEvent evt)
+        {
+            _focused = false;
+
+            if (!_hoverOptions)
+            {
+                Debug.Log("_pop.RemoveFromHierarchy _cleanableTextInput.BlurEvent");
+                _pop.RemoveFromHierarchy();
+            }
+        }
+
+        private void SetupTypeAhead(SerializedProperty colorInfoLabelsProp, ScrollView root,  SerializedProperty colorInfoArray)
+        {
+            PosTypeAhead(root);
+
+            FillOptions(_cleanableTextInput.TextField.value, colorInfoLabelsProp, root, colorInfoArray);
+
+            Debug.Log("_pop Add");
+            root.Add(_pop);
+        }
+
+        private void PosTypeAhead(ScrollView root)
+        {
+            Vector2 worldAnchor = new Vector2(_cleanableTextInput.worldBound.xMin, _cleanableTextInput.worldBound.yMax);
+            Vector2 localAnchor = root.contentContainer.WorldToLocal(worldAnchor);
+            if (_pop.style.top != localAnchor.y)
+            {
+                _pop.style.top = localAnchor.y;
+            }
+
+            if (_pop.style.left != localAnchor.x)
+            {
+                _pop.style.left = localAnchor.x;
+            }
         }
 
         private readonly List<ButtonItem> _buttonItems = new List<ButtonItem>();
@@ -166,7 +208,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             return _buttonItems.FindIndex(each => each.LabelText == _highlightLabel);
         }
 
-        private void FillOptions(string search, SerializedProperty colorInfoLabelsProp,
+        private void FillOptions(string search, SerializedProperty colorInfoLabelsProp, ScrollView root,
             SerializedProperty colorInfoArray)
         {
             string[] searchLowerPieces = search.ToLower().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -213,7 +255,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 .Select(i => colorInfoLabelsProp.GetArrayElementAtIndex(i).stringValue);
         }
 
-        private bool OnInputOption(string value, SerializedProperty colorInfoLabelsProp)
+        private static bool OnInputOption(string value, SerializedProperty colorInfoLabelsProp)
         {
             if (GetLabels(colorInfoLabelsProp).Any(each => each == value))
             {
@@ -225,10 +267,6 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             SerializedProperty newLabelProp = colorInfoLabelsProp.GetArrayElementAtIndex(index);
             newLabelProp.stringValue = value;
             newLabelProp.serializedObject.ApplyModifiedProperties();
-
-            _pop.RemoveFromHierarchy();
-            _highlightLabel = "";
-            _cleanableTextInput.TextField.SetValueWithoutNotify("");
             return true;
         }
 

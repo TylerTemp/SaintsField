@@ -214,11 +214,11 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
             if (labelsCount > 0 && _worldBounds.All(wb => wb.yMin < worldMousePos.y))
             {
-                Debug.Log($"{GetHashCode()} drag over use last {labelsCount}");
+                // Debug.Log($"{GetHashCode()} drag over use last {labelsCount}");
                 return labelsCount;
             }
 
-            Debug.Log($"{GetHashCode()} drag over no match use 0");
+            // Debug.Log($"{GetHashCode()} drag over no match use 0");
             return 0;
         }
 
@@ -248,14 +248,14 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
             if (insertIndex == -1)
             {
-                Debug.Log("no index, skip");
+                // Debug.Log("no index, skip");
                 return false;
             }
 
             bool isNew = existsIndex == -1;
             if (isNew)  // is new
             {
-                Debug.Log($"insert new {targetLabel.value}@{insertIndex}; arraySize={_arrayProp.arraySize}");
+                // Debug.Log($"insert new {targetLabel.value}@{insertIndex}; arraySize={_arrayProp.arraySize}");
                 // ReSharper disable once ExtractCommonBranchingCode
                 _arrayProp.InsertArrayElementAtIndex(insertIndex);
                 _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue = targetLabel.value;
@@ -269,11 +269,11 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
                 if (existsIndex == insertIndex)
                 {
-                    Debug.Log($"no swap {existsIndex} <-> {insertIndex}");
+                    // Debug.Log($"no swap {existsIndex} <-> {insertIndex}");
                     return false;
                 }
 
-                Debug.Log($"swap {existsIndex} <-> {insertIndex}");
+                // Debug.Log($"swap {existsIndex} <-> {insertIndex}");
                 (_arrayProp.GetArrayElementAtIndex(existsIndex).stringValue,
                         _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue) =
                     (_arrayProp.GetArrayElementAtIndex(insertIndex).stringValue,
@@ -295,10 +295,10 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         {
             for (int index = 0; index < Labels.Count; index++)
             {
-                var label = Labels[index];
+                ColorPaletteLabel label = Labels[index];
                 if (label == targetLabel)
                 {
-                    Debug.Log($"remove {targetLabel.value}@{index}");
+                    // Debug.Log($"remove {targetLabel.value}@{index}");
                     // Labels.RemoveAt(index);
                     targetLabel.RemoveFromHierarchy();
 
@@ -309,7 +309,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 }
             }
 
-            Debug.LogError($"index of {targetLabel.value} not found in Labels {string.Join(", ", Labels.Select(l => l.value))}");
+            // Debug.LogError($"index of {targetLabel.value} not found in Labels {string.Join(", ", Labels.Select(l => l.value))}");
         }
 
         private IReadOnlyList<ColorPaletteLabels> _allColorPaletteLabels;
