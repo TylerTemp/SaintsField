@@ -2,45 +2,47 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.Editor.UIToolkitElements;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.ColorPalette.UIToolkit
+namespace SaintsField.Editor.UIToolkitElements
 {
 #if UNITY_6000_0_OR_NEWER
     [UxmlElement]
 #endif
-    public class CleanableTextInputTypeAhead: VisualElement
+    // ReSharper disable once PartialTypeWithSinglePart
+    public abstract partial class CleanableTextInputTypeAhead: VisualElement
     {
         private bool _hoverOptions;
         private bool _focused;
 
-        private readonly CleanableTextInput _cleanableTextInput;
+        public readonly CleanableTextInput CleanableTextInput;
         private readonly VisualElement _pop;
 
-        public CleanableTextInputTypeAhead(SerializedProperty colorInfoLabelsProp, ScrollView root,  SerializedProperty colorInfoArray)
+        public CleanableTextInputTypeAhead(): this(null){}
+
+        public CleanableTextInputTypeAhead(VisualElement root)
         {
             _pop = CreatePop();
 
-            _cleanableTextInput = new CleanableTextInput();
-            _cleanableTextInput.TextField.RegisterCallback<FocusInEvent>(_ =>
+            CleanableTextInput = new CleanableTextInput();
+            CleanableTextInput.TextField.RegisterCallback<FocusInEvent>(_ =>
             {
                 // Debug.Log("Focused");
                 _focused = true;
 
-                SetupTypeAhead(colorInfoLabelsProp, root, colorInfoArray);
+                SetupTypeAhead(root);
             });
-            _cleanableTextInput.TextField.RegisterCallback<BlurEvent>(OnBlurEvent);
+            CleanableTextInput.TextField.RegisterCallback<BlurEvent>(OnBlurEvent);
 
-            _cleanableTextInput.TextField.RegisterValueChangedCallback(e =>
+            CleanableTextInput.TextField.RegisterValueChangedCallback(e =>
             {
                 _highlightLabel = "";
-                FillOptions(e.newValue, colorInfoLabelsProp, root, colorInfoArray);
+                FillOptions(e.newValue, root);
             });
 
-            _cleanableTextInput.TextField.RegisterCallback<KeyDownEvent>(e =>
+            CleanableTextInput.TextField.RegisterCallback<KeyDownEvent>(e =>
             {
                 if (e.keyCode is KeyCode.Return or KeyCode.KeypadEnter || e.character == '\n')
                 {
@@ -49,10 +51,10 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     int getIndex = GetHighlightedIndex();
                     if (getIndex != -1)
                     {
-                        if(OnInputOption(_buttonItems[getIndex].LabelText, colorInfoLabelsProp))
+                        if(OnInputOption(_buttonItems[getIndex].LabelText))
                         {
                             _highlightLabel = "";
-                            _cleanableTextInput.TextField.value = "";
+                            CleanableTextInput.TextField.value = "";
                             // e.StopPropagation();
                             // _cleanableTextInput.TextField.UnregisterCallback<BlurEvent>(OnBlurEvent);
                             // FillOptions("", colorInfoLabelsProp, colorInfoArray);
@@ -62,13 +64,13 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                         return;
                     }
 
-                    string newValue = _cleanableTextInput.TextField.value;
+                    string newValue = CleanableTextInput.TextField.value;
                     if (!string.IsNullOrEmpty(newValue))
                     {
-                        if(OnInputOption(newValue, colorInfoLabelsProp))
+                        if(OnInputOption(newValue))
                         {
                             _highlightLabel = "";
-                            _cleanableTextInput.TextField.value = "";
+                            CleanableTextInput.TextField.value = "";
 
                             // _cleanableTextInput.TextField.UnregisterCallback<BlurEvent>(OnBlurEvent);
                             // FillOptions("", colorInfoLabelsProp, colorInfoArray);
@@ -91,7 +93,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 }
             });
 
-            _cleanableTextInput.TextField.RegisterCallback<NavigationMoveEvent>(e =>
+            CleanableTextInput.TextField.RegisterCallback<NavigationMoveEvent>(e =>
             {
                 int count = _buttonItems.Count;
                 if (count == 0)
@@ -153,7 +155,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 }
             });
 
-            Add(_cleanableTextInput);
+            Add(CleanableTextInput);
 
             schedule.Execute(() =>
             {
@@ -175,20 +177,20 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             }
         }
 
-        private void SetupTypeAhead(SerializedProperty colorInfoLabelsProp, ScrollView root,  SerializedProperty colorInfoArray)
+        private void SetupTypeAhead(VisualElement root)
         {
             PosTypeAhead(root);
 
-            FillOptions(_cleanableTextInput.TextField.value, colorInfoLabelsProp, root, colorInfoArray);
+            FillOptions(CleanableTextInput.TextField.value, root);
 
             Debug.Log("_pop Add");
             root.Add(_pop);
         }
 
-        private void PosTypeAhead(ScrollView root)
+        private void PosTypeAhead(VisualElement root)
         {
-            Vector2 worldAnchor = new Vector2(_cleanableTextInput.worldBound.xMin, _cleanableTextInput.worldBound.yMax);
-            Vector2 localAnchor = root.contentContainer.WorldToLocal(worldAnchor);
+            Vector2 worldAnchor = new Vector2(CleanableTextInput.worldBound.xMin, CleanableTextInput.worldBound.yMax);
+            Vector2 localAnchor = (root.contentContainer ?? root).WorldToLocal(worldAnchor);
             if (_pop.style.top != localAnchor.y)
             {
                 _pop.style.top = localAnchor.y;
@@ -208,22 +210,15 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             return _buttonItems.FindIndex(each => each.LabelText == _highlightLabel);
         }
 
-        private void FillOptions(string search, SerializedProperty colorInfoLabelsProp, ScrollView root,
-            SerializedProperty colorInfoArray)
+        protected abstract IEnumerable<string> GetOptions();
+
+        private void FillOptions(string search, VisualElement root)
         {
             string[] searchLowerPieces = search.ToLower().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            HashSet<string> curLabels = new HashSet<string>(GetLabels(colorInfoLabelsProp))
-            {
-                "",  // filter out empty labels too
-            };
 
-            IEnumerable<string> options = Enumerable.Range(0, colorInfoArray.arraySize)
-                .Select(i => colorInfoArray.GetArrayElementAtIndex(i).FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels)))
-                .SelectMany(GetLabels)
-                .Except(curLabels)
-                .OrderBy(each => each.ToLower())
-                .Distinct()
-                .Where(label => Search(searchLowerPieces, label));
+
+            IEnumerable<string> options = GetOptions()
+                .Where(label => Search(searchLowerPieces, label.ToLower()));
 
             _pop.Clear();
             _buttonItems.Clear();
@@ -237,7 +232,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     item.Button.clicked += () =>
                     {
                         // Debug.Log($"Selected: {option}");
-                        OnInputOption(option, colorInfoLabelsProp);
+                        OnInputOption(option);
                     };
                     if (option == _highlightLabel)
                     {
@@ -255,20 +250,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 .Select(i => colorInfoLabelsProp.GetArrayElementAtIndex(i).stringValue);
         }
 
-        private static bool OnInputOption(string value, SerializedProperty colorInfoLabelsProp)
-        {
-            if (GetLabels(colorInfoLabelsProp).Any(each => each == value))
-            {
-                return false;
-            }
-
-            int index = colorInfoLabelsProp.arraySize;
-            colorInfoLabelsProp.arraySize++;
-            SerializedProperty newLabelProp = colorInfoLabelsProp.GetArrayElementAtIndex(index);
-            newLabelProp.stringValue = value;
-            newLabelProp.serializedObject.ApplyModifiedProperties();
-            return true;
-        }
+        protected abstract bool OnInputOption(string value);
 
         private static bool Search(IReadOnlyList<string> searchLowers, string label)
         {

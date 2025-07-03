@@ -313,11 +313,12 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     return false;
                 }
 
-                Debug.Log($"swap {existsIndex} <-> {insertIndex} ({GetHashCode()}");
-                (_arrayProp.GetArrayElementAtIndex(existsIndex).stringValue,
-                        _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue) =
-                    (_arrayProp.GetArrayElementAtIndex(insertIndex).stringValue,
-                        _arrayProp.GetArrayElementAtIndex(existsIndex).stringValue);
+                Debug.Log($"swap {existsIndex} <-> {insertIndex} ({GetHashCode()})");
+                _arrayProp.MoveArrayElement(existsIndex, insertIndex);
+                // (_arrayProp.GetArrayElementAtIndex(existsIndex).stringValue,
+                //         _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue) =
+                //     (_arrayProp.GetArrayElementAtIndex(insertIndex).stringValue,
+                //         _arrayProp.GetArrayElementAtIndex(existsIndex).stringValue);
                 // Labels.Remove(targetLabel);
                 // Remove(targetLabel);
                 // _arrayProp.DeleteArrayElementAtIndex(existsIndex);
@@ -362,7 +363,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         private Rect[] _worldBounds;
         private Vector2[] _worldPos;
 
-        public void FrozenPositions(CleanableTextInputTypeAhead typeAhead)
+        public void FrozenPositions(CleanableLabelInputTypeAhead typeAhead)
         {
             // Debug.Log(typeAhead);
             _worldBounds = Labels.Select(each => each.worldBound).ToArray();

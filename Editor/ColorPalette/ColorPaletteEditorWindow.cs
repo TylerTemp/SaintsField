@@ -1,12 +1,7 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-using System.Collections.Generic;
 using SaintsField.Editor.ColorPalette.UIToolkit;
-using SaintsField.Editor.Core;
-using SaintsField.Editor.UIToolkitElements;
-using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -26,15 +21,15 @@ namespace SaintsField.Editor.ColorPalette
             window.Show();
         }
 
-#if SAINTSFIELD_DEBUG
-        [InitializeOnLoadMethod]
-        private static void ReOpen()
-        {
-            ColorPaletteEditorWindow window = GetWindow<ColorPaletteEditorWindow>(false, "Color Palette");
-            window.Close();
-            OpenColorPaletteEditorWindow();
-        }
-#endif
+// #if SAINTSFIELD_DEBUG
+//         [InitializeOnLoadMethod]
+//         private static void ReOpen()
+//         {
+//             ColorPaletteEditorWindow window = GetWindow<ColorPaletteEditorWindow>(false, "Color Palette");
+//             window.Close();
+//             OpenColorPaletteEditorWindow();
+//         }
+// #endif
 
         [GetScriptableObject, NoLabel, OnValueChanged(nameof(ColorPaletteArrayChanged))]
         public ColorPaletteArray colorPaletteArray;

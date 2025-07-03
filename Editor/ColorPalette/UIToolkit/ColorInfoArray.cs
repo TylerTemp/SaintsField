@@ -20,11 +20,11 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             public readonly ColorField ColorField;
             public readonly Button DeleteButton;
             public readonly ColorPaletteLabels ColorPaletteLabels;
-            public readonly CleanableTextInputTypeAhead CleanableTextInputTypeAhead;
+            public readonly CleanableLabelInputTypeAhead CleanableLabelInputTypeAhead;
 
             private Container(TemplateContainer root, VisualElement containerRoot, VisualElement moveIcon,
                 ColorField colorField, Button deleteButton, ColorPaletteLabels colorPaletteLabels,
-                CleanableTextInputTypeAhead cleanableTextInputTypeAhead)
+                CleanableLabelInputTypeAhead cleanableLabelInputTypeAhead)
             {
                 Root = root;
                 ContainerRoot = containerRoot;
@@ -32,12 +32,12 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 ColorField = colorField;
                 DeleteButton = deleteButton;
                 ColorPaletteLabels = colorPaletteLabels;
-                CleanableTextInputTypeAhead = cleanableTextInputTypeAhead;
+                CleanableLabelInputTypeAhead = cleanableLabelInputTypeAhead;
             }
 
             public const string ColorInfoContainerName = "color-info-container";
 
-            public static Container CreateContainer(SerializedProperty colorInfoLabelsProp, CleanableTextInputTypeAhead cleanableTextInputTypeAhead)
+            public static Container CreateContainer(SerializedProperty colorInfoLabelsProp, CleanableLabelInputTypeAhead cleanableLabelInputTypeAhead)
             {
                 // VisualTreeAsset containerTree = Util.LoadResource<VisualTreeAsset>("UIToolkit/ColorPalette/Container.uxml");
                 //
@@ -75,9 +75,9 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 Container result = CreateEmpty();
 
                 ColorPaletteLabels colorPaletteLabels = new ColorPaletteLabels(result.ContainerRoot, colorInfoLabelsProp);
-                colorPaletteLabels.Add(cleanableTextInputTypeAhead);
+                colorPaletteLabels.Add(cleanableLabelInputTypeAhead);
                 result.ContainerRoot.Add(colorPaletteLabels);
-                return new Container(result.Root, result.ContainerRoot, result.MoveIcon, result.ColorField, result.DeleteButton, colorPaletteLabels, cleanableTextInputTypeAhead);
+                return new Container(result.Root, result.ContainerRoot, result.MoveIcon, result.ColorField, result.DeleteButton, colorPaletteLabels, cleanableLabelInputTypeAhead);
             }
 
             public static Container CreateEmpty()
@@ -146,8 +146,8 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 int thisIndex = i;
                 SerializedProperty colorInfoProp = ColorInfoArrayProp.GetArrayElementAtIndex(thisIndex);
                 SerializedProperty colorInfoLabelsProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels));
-                CleanableTextInputTypeAhead cleanableTextInputTypeAhead = new CleanableTextInputTypeAhead(colorInfoLabelsProp, RootScoller, ColorInfoArrayProp);
-                Container container = Container.CreateContainer(colorInfoLabelsProp, cleanableTextInputTypeAhead);
+                CleanableLabelInputTypeAhead cleanableLabelInputTypeAhead = new CleanableLabelInputTypeAhead(colorInfoLabelsProp, RootScoller, ColorInfoArrayProp);
+                Container container = Container.CreateContainer(colorInfoLabelsProp, cleanableLabelInputTypeAhead);
 
                 SerializedProperty colorInfoColorProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.color));
                 container.ColorField.BindProperty(colorInfoColorProp);

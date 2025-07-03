@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.ColorPalette;
+using SaintsField.Editor.ColorPalette.UIToolkit;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -17,11 +18,10 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 {
     public partial class ColorPaletteAttributeDrawer
     {
-        private static string ToggleButtonName(SerializedProperty property) => $"{property.propertyPath}__ColorPalette_ToggleButton";
-        private static string BelowRootName(SerializedProperty property) => $"{property.propertyPath}__ColorPalette_Below";
-        private static string DropdownName(SerializedProperty property) => $"{property.propertyPath}__ColorPalette_Dropdown";
-        private static string SearchInputName(SerializedProperty property) => $"{property.propertyPath}__ColorPalette_SearchInput";
-        private static string ColorButtonsName(SerializedProperty property) => $"{property.propertyPath}__ColorPalette_ColorButtons";
+        private static string ToggleButtonName(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorPalette_ToggleButton";
+        private static string BelowRootName(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorPalette_Below";
+        private static string TypeAheadName(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorPalette_TypeAhead";
+        private static string ColorButtonsName(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ColorPalette_ColorButtons";
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
@@ -44,8 +44,26 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     paddingLeft = 8,
                     paddingRight = 8,
                 },
-                name = ToggleButtonName(property),
+                name = ToggleButtonName(property, index),
             };
+        }
+
+        private static ColorPaletteArray _colorPaletteArray;
+
+        private static ColorPaletteArray EnsureColorPaletteArray()
+        {
+            if (_colorPaletteArray)
+            {
+                return _colorPaletteArray;
+            }
+
+            string[] guids = AssetDatabase.FindAssets("t:" + typeof(ColorPaletteArray).FullName);
+            if (guids.Length == 0)
+            {
+                return null;
+            }
+            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            return _colorPaletteArray = AssetDatabase.LoadAssetAtPath<ColorPaletteArray>(path);
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -53,6 +71,10 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
+            if (!EnsureColorPaletteArray())
+            {
+                return new HelpBox("No Color Palette found. Please go `Window` - `Saints` - `Color Palette` to create one.", HelpBoxMessageType.Warning);
+            }
             VisualElement root = new VisualElement
             {
                 style =
@@ -64,47 +86,15 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     paddingLeft = 2,
                     paddingRight = 4,
                 },
-                name = BelowRootName(property),
+                name = BelowRootName(property, index),
             };
 
-            VisualElement paletteInput = new VisualElement
+            SearchTypeAhead searchTypeAhead = new SearchTypeAhead(container)
             {
-                style =
-                {
-                    flexGrow = 1,
-                    flexDirection = FlexDirection.Row,
-                },
+                name = TypeAheadName(property, index),
             };
-            root.Add(paletteInput);
-
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit("Palette");
-            dropdownButton.name = DropdownName(property);
-            // dropdownButton.userData = new List<SaintsField.ColorPalette>();
-            dropdownButton.userData = new PaletteSelectorInfo
-            {
-                SelectedPalettes = Array.Empty<SaintsField.ColorPalette>(),
-                AllPalettes = new List<SaintsField.ColorPalette>(),
-            };
-            paletteInput.Add(dropdownButton);
-
-            ToolbarSearchField searchField = new ToolbarSearchField
-            {
-                style =
-                {
-                    width = Length.Percent(20),
-                },
-                name = SearchInputName(property),
-            };
-
-            // TextField searchField = new TextField
-            // {
-            //     style =
-            //     {
-            //         width = Length.Percent(20),
-            //     },
-            //     name = SearchInputName(property),
-            // };
-            paletteInput.Add(searchField);
+            searchTypeAhead.CleanableTextInput.TextField.style.maxWidth = StyleKeyword.Null;
+            root.Add(searchTypeAhead);
 
             VisualElement colors = new VisualElement
             {
@@ -115,7 +105,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     flexWrap = Wrap.Wrap,
                     justifyContent = Justify.FlexEnd,
                 },
-                name = ColorButtonsName(property),
+                name = ColorButtonsName(property, index),
             };
             root.Add(colors);
 
@@ -123,11 +113,11 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
         }
 
         // private readonly List<SaintsField.ColorPalette> _colorPalettes = new List<SaintsField.ColorPalette>();
-        private class PaletteSelectorInfo
-        {
-            public IReadOnlyList<SaintsField.ColorPalette> SelectedPalettes;
-            public List<SaintsField.ColorPalette> AllPalettes;
-        }
+        // private class PaletteSelectorInfo
+        // {
+        //     public IReadOnlyList<SaintsField.ColorPalette> SelectedPalettes;
+        //     public List<SaintsField.ColorPalette> AllPalettes;
+        // }
 
         private Color _color;
 
@@ -136,82 +126,60 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
         {
             _color = property.colorValue;
 
-            VisualElement belowRoot = container.Q<VisualElement>(name: BelowRootName(property));
+            VisualElement belowRoot = container.Q<VisualElement>(name: BelowRootName(property, index));
+            if (belowRoot == null)
+            {
+                return;
+            }
 
-            container.Q<ToolbarToggle>(name: ToggleButtonName(property))
+            container.Q<ToolbarToggle>(name: ToggleButtonName(property, index))
                 .RegisterCallback<ClickEvent>(_ => belowRoot.style.display = belowRoot.style.display == DisplayStyle.None? DisplayStyle.Flex: DisplayStyle.None);
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(name: DropdownName(property));
-            PaletteSelectorInfo colorPaletteInfo = (PaletteSelectorInfo) dropdownButton.userData;
-            ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute) saintsAttribute;
-            FillColorPalettes(colorPaletteInfo.AllPalettes, colorPaletteAttribute.ColorPaletteSources, property, info, parent);
-
-            // find the init color palette
-            Color color = property.colorValue;
-            SaintsField.ColorPalette initColorPalette =
-                colorPaletteInfo.AllPalettes.FirstOrDefault(colorPalette =>
-                    colorPalette.colors.Any(each => each.color == color)
-                );
-
-            if (initColorPalette != null)
+            SearchTypeAhead searchTypeAhead = container.Q<SearchTypeAhead>(name: TypeAheadName(property, index));
+            searchTypeAhead.GetOptionsFunc = () =>
             {
-                colorPaletteInfo.SelectedPalettes = new[] { initColorPalette };
-            }
-            else if(colorPaletteInfo.SelectedPalettes.Count == 0)
-            {
-                colorPaletteInfo.SelectedPalettes = colorPaletteInfo.AllPalettes;
-            }
-
-            dropdownButton.ButtonElement.clicked += () =>
-            {
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(colorPaletteInfo.SelectedPalettes, colorPaletteInfo.AllPalettes, false);
-
-                float maxHeight = Screen.currentResolution.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
-                Rect worldBound = dropdownButton.worldBound;
-                if (maxHeight < 100)
+                Debug.Log(EnsureColorPaletteArray());
+                if (!EnsureColorPaletteArray())
                 {
-                    worldBound.y -= 100 + worldBound.height;
-                    maxHeight = 100;
+                    return Array.Empty<string>();
                 }
-
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
-                    dropdownMetaInfo,
-                    dropdownButton.worldBound.width,
-                    maxHeight,
-                    false,
-                    (_, curItem) =>
-                    {
-                        if (curItem is null)
-                        {
-                            // Debug.Log("Open Editor");
-                            ColorPaletteMenu.OpenWindow();
-                            return;
-                        }
-
-                        colorPaletteInfo.SelectedPalettes = (IReadOnlyList<SaintsField.ColorPalette>) curItem;
-                        RefreshColorButtons(container, property, onValueChangedCallback);
-                    }
-                ));
+                return _colorPaletteArray
+                    .SelectMany(each => each.labels)
+                    .OrderBy(each => each.ToLower())
+                    .Concat(_colorPaletteArray.Select(each => $"#{ColorUtility.ToHtmlStringRGBA(each.color)}"))
+                    .Distinct();
+            };
+            searchTypeAhead.OnInputOptionFunc = value =>
+            {
+                Debug.Log(value);
+                return true;
             };
 
-            ToolbarSearchField searchInput = container.Q<ToolbarSearchField>(name: SearchInputName(property));
-            searchInput.RegisterValueChangedCallback(_ =>
-                RefreshColorButtons(container, property, onValueChangedCallback));
+            // PaletteSelectorInfo colorPaletteInfo = (PaletteSelectorInfo) dropdownButton.userData;
+            ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute) saintsAttribute;
+            IReadOnlyList<ColorPaletteArray.ColorInfo> colorInfos = FillColorPalettes(colorPaletteAttribute.ColorPaletteSources, property, info, parent);
 
-            ColorPaletteRegister.OnColorPalettesChanged.AddListener(FillColorPalettesParamless);
-            belowRoot.RegisterCallback<DetachFromPanelEvent>(_ => ColorPaletteRegister.OnColorPalettesChanged.RemoveListener(FillColorPalettesParamless));
+            // find the init color palette
+            // Color color = property.colorValue;
+            // ColorPaletteArray.ColorInfo initColorPalette =
+            //     colorInfos.FirstOrDefault(colorPalette =>
+            //         colorPalette.color == color
+            //     );
 
-            RefreshColorButtons(container, property, onValueChangedCallback);
-            return;
+            // ColorPaletteRegister.OnColorPalettesChanged.AddListener(FillColorPalettesParamless);
+            // belowRoot.RegisterCallback<DetachFromPanelEvent>(_ => ColorPaletteRegister.OnColorPalettesChanged.RemoveListener(FillColorPalettesParamless));
 
-            void FillColorPalettesParamless()
-            {
-                if (FillColorPalettes(colorPaletteInfo.AllPalettes, colorPaletteAttribute.ColorPaletteSources, property,
-                        info, parent))
-                {
-                    RefreshColorButtons(container, property, onValueChangedCallback);
-                }
-            }
+            RefreshColorButtons(container, property, index, onValueChangedCallback);
+            // return;
+
+            // void FillColorPalettesParamless()
+            // {
+            //     // if (FillColorPalettes(colorPaletteInfo.AllPalettes, colorPaletteAttribute.ColorPaletteSources, property,
+            //     //         info, parent))
+            //     // {
+            //     //     RefreshColorButtons(container, property, onValueChangedCallback);
+            //     // }
+            // }
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -219,11 +187,15 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
+            if (!_colorPaletteArray)
+            {
+                return;
+            }
             // ReSharper disable once InvertIf
             if(property.colorValue != _color)
             {
                 _color = property.colorValue;
-                RefreshColorButtons(container, property, onValueChanged);
+                RefreshColorButtons(container, property, index, onValueChanged);
             }
             // RefreshColorButtons(container, property, onValueChanged);
         }
@@ -231,28 +203,38 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
         protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
             FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
         {
+            if (!_colorPaletteArray)
+            {
+                return;
+            }
+
             _color = (Color)newValue;
-            RefreshColorButtons(container, property, onValueChangedCallback);
+            RefreshColorButtons(container, property, index, onValueChangedCallback);
         }
 
-        private static void RefreshColorButtons(VisualElement container, SerializedProperty property, Action<object> onValueChanged)
+        private static void RefreshColorButtons(VisualElement container, SerializedProperty property, int index, Action<object> onValueChanged)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(name: DropdownName(property));
-            PaletteSelectorInfo paletteSelectorInfo = (PaletteSelectorInfo) dropdownButton.userData;
+            SearchTypeAhead searchTypeAhead = container.Q<SearchTypeAhead>(name: TypeAheadName(property, index));
+            if (searchTypeAhead == null)
+            {
+                return;
+            }
 
-            dropdownButton.ButtonLabelElement.text = string.Join(",", paletteSelectorInfo.SelectedPalettes.Select(each => each.displayName));
+            // PaletteSelectorInfo paletteSelectorInfo = (PaletteSelectorInfo) dropdownButton.userData;
 
-            ToolbarSearchField searchInput = container.Q<ToolbarSearchField>(name: SearchInputName(property));
-            string searchContent = searchInput.value.Trim();
+            // dropdownButton.ButtonLabelElement.text = string.Join(",", paletteSelectorInfo.SelectedPalettes.Select(each => each.displayName));
 
-            VisualElement colorsContainer = container.Q<VisualElement>(name: ColorButtonsName(property));
+            // ToolbarSearchField searchInput = container.Q<ToolbarSearchField>(name: SearchInputName(property));
+            // string searchContent = searchInput.value.Trim();
+            //
+            VisualElement colorsContainer = container.Q<VisualElement>(name: ColorButtonsName(property, index));
             colorsContainer.Clear();
 
             Color selectedColor = property.colorValue;
 
-            foreach (DisplayColorEntry displayColorEntry in GetDisplayColorEntries(selectedColor, searchContent, paletteSelectorInfo.SelectedPalettes))
+            foreach (DisplayColorEntry displayColorEntry in GetDisplayColorEntries(selectedColor, searchTypeAhead.CleanableTextInput.TextField.value, _colorPaletteArray))
             {
-                SaintsField.ColorPalette.ColorEntry colorEntry = displayColorEntry.ColorEntry;
+                ColorPaletteArray.ColorInfo colorEntry = displayColorEntry.ColorEntry;
                 Color reverseColor = displayColorEntry.ReversedColor;
                 bool isSelected = displayColorEntry.IsSelected;
                 Button button = new Button(() =>
@@ -262,7 +244,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     onValueChanged.Invoke(colorEntry.color);
                 })
                 {
-                    tooltip = colorEntry.displayName,
+                    tooltip = string.Join("\n", colorEntry.labels),
                     style =
                     {
                         backgroundColor = colorEntry.color,
@@ -281,9 +263,9 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 colorsContainer.Add(button);
             }
 
-            bool anySelected = paletteSelectorInfo.AllPalettes.Any(eachPalettes =>
-                eachPalettes.colors.Any(eachColorEntry => eachColorEntry.color == selectedColor));
-            ToolbarToggle toggleButton = container.Q<ToolbarToggle>(name: ToggleButtonName(property));
+            bool anySelected = _colorPaletteArray.Any(eachPalettes =>
+                eachPalettes.color == selectedColor);
+            ToolbarToggle toggleButton = container.Q<ToolbarToggle>(name: ToggleButtonName(property, index));
             Texture2D icon = anySelected? _colorPaletteIcon: _colorPaletteWarningIcon;
             if (toggleButton.style.backgroundImage != icon)
             {

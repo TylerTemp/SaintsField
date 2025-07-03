@@ -59,9 +59,9 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     SearchText = "",
                 };
 
-                FillColorPalettes(paletteSelectorInfo.AllPalettes, colorPaletteAttribute.ColorPaletteSources,
-                    property,
-                    info, parent);
+                // FillColorPalettes(paletteSelectorInfo.AllPalettes, colorPaletteAttribute.ColorPaletteSources,
+                //     property,
+                //     info, parent);
 
                 SaintsField.ColorPalette initColorPalette =
                     paletteSelectorInfo.AllPalettes.FirstOrDefault(colorPalette =>
@@ -79,9 +79,9 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 
                 void FillColorPalettesParamless()
                 {
-                    FillColorPalettes(paletteSelectorInfo.AllPalettes, colorPaletteAttribute.ColorPaletteSources,
-                        property,
-                        info, parent);
+                    // FillColorPalettes(paletteSelectorInfo.AllPalettes, colorPaletteAttribute.ColorPaletteSources,
+                    //     property,
+                    //     info, parent);
                 }
 
                 ColorPaletteRegister.OnColorPalettesChanged.AddListener(FillColorPalettesParamless);
@@ -189,18 +189,19 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             }
 
             float dropdownHeight = SingleLineHeight;
-            int colorCount = GetDisplayColorEntries(property.colorValue, paletteSelectorInfo.SearchText,
-                paletteSelectorInfo.SelectedPalettes).Count();
-            if (colorCount == 0)
-            {
-                return dropdownHeight + SingleLineHeight;
-            }
+            // int colorCount = GetDisplayColorEntries(property.colorValue, paletteSelectorInfo.SearchText,
+            //     paletteSelectorInfo.SelectedPalettes).Count();
+            // if (colorCount == 0)
+            // {
+            //     return dropdownHeight + SingleLineHeight;
+            // }
 
             float useWidth = width - 2;
             const int buttonWidthSpace = ButtonPaddding * 2 + ColorButtonSize;
             int buttonRowCount = Mathf.FloorToInt(useWidth / buttonWidthSpace);
-            int rowCount = Mathf.CeilToInt(colorCount / (float) buttonRowCount);
-            return dropdownHeight + rowCount * buttonWidthSpace + 2;  // 2 is for padding
+            // int rowCount = Mathf.CeilToInt(colorCount / (float) buttonRowCount);
+            // return dropdownHeight + rowCount * buttonWidthSpace + 2;  // 2 is for padding
+            return 0;
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
@@ -262,61 +263,61 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 width = colorPickerRectRaw.width - 2,
             };
 
-            DisplayColorEntry[] displayColorEntries = GetDisplayColorEntries(property.colorValue, paletteSelectorInfo.SearchText,
-                paletteSelectorInfo.SelectedPalettes).ToArray();
+            // DisplayColorEntry[] displayColorEntries = GetDisplayColorEntries(property.colorValue, paletteSelectorInfo.SearchText,
+            //     paletteSelectorInfo.SelectedPalettes).ToArray();
             float useWidth = colorPickerRect.width;
             const int buttonWidthSpace = ButtonPaddding * 2 + ColorButtonSize;
             int buttonRowCount = Mathf.FloorToInt(useWidth / buttonWidthSpace);
             const float buttonHeight = ColorButtonSize + ButtonPaddding;
             const float buttonWidth = ColorButtonSize + ButtonPaddding;
-            for (int colorIndex = 0; colorIndex < displayColorEntries.Length; colorIndex++)
-            {
-                int row = colorIndex / buttonRowCount;
-                int col = colorIndex % buttonRowCount;
-                Rect buttonRect = new Rect(colorPickerRect.x + useWidth - (col + 1) * buttonWidthSpace, colorPickerRect.y + row * buttonHeight, buttonWidth, buttonHeight);
-                DisplayColorEntry displayColorEntry = displayColorEntries[colorIndex];
-
-                EditorGUI.DrawRect(new Rect(buttonRect.x + ButtonPaddding, buttonRect.y + ButtonPaddding, ColorButtonSize, ColorButtonSize), displayColorEntry.ColorEntry.color);
-                // frame
-                if (displayColorEntry.IsSelected)
-                {
-                    const float frameWidth = 2;
-
-                    Rect top = new Rect(buttonRect)
-                    {
-                        height = frameWidth,
-                    };
-                    EditorGUI.DrawRect(top, displayColorEntry.ReversedColor);
-
-                    Rect bottom = new Rect(buttonRect)
-                    {
-                        y = buttonRect.y + buttonRect.height - frameWidth,
-                        height = frameWidth,
-                    };
-                    EditorGUI.DrawRect(bottom, displayColorEntry.ReversedColor);
-
-                    Rect left = new Rect(buttonRect)
-                    {
-                        width = frameWidth,
-                    };
-                    EditorGUI.DrawRect(left, displayColorEntry.ReversedColor);
-
-                    Rect right = new Rect(buttonRect)
-                    {
-                        x = buttonRect.x + buttonRect.width - frameWidth,
-                        width = frameWidth,
-                    };
-                    EditorGUI.DrawRect(right, displayColorEntry.ReversedColor);
-                }
-                if (GUI.Button(buttonRect, new GUIContent(GUIContent.none)
-                    {
-                        tooltip = displayColorEntry.ColorEntry.displayName,
-                    }, GUIStyle.none))
-                {
-                    property.colorValue = displayColorEntry.ColorEntry.color;
-                    onGuiPayload.SetValue(property.colorValue);
-                }
-            }
+            // for (int colorIndex = 0; colorIndex < displayColorEntries.Length; colorIndex++)
+            // {
+            //     int row = colorIndex / buttonRowCount;
+            //     int col = colorIndex % buttonRowCount;
+            //     Rect buttonRect = new Rect(colorPickerRect.x + useWidth - (col + 1) * buttonWidthSpace, colorPickerRect.y + row * buttonHeight, buttonWidth, buttonHeight);
+            //     DisplayColorEntry displayColorEntry = displayColorEntries[colorIndex];
+            //
+            //     EditorGUI.DrawRect(new Rect(buttonRect.x + ButtonPaddding, buttonRect.y + ButtonPaddding, ColorButtonSize, ColorButtonSize), displayColorEntry.ColorEntry.color);
+            //     // frame
+            //     if (displayColorEntry.IsSelected)
+            //     {
+            //         const float frameWidth = 2;
+            //
+            //         Rect top = new Rect(buttonRect)
+            //         {
+            //             height = frameWidth,
+            //         };
+            //         EditorGUI.DrawRect(top, displayColorEntry.ReversedColor);
+            //
+            //         Rect bottom = new Rect(buttonRect)
+            //         {
+            //             y = buttonRect.y + buttonRect.height - frameWidth,
+            //             height = frameWidth,
+            //         };
+            //         EditorGUI.DrawRect(bottom, displayColorEntry.ReversedColor);
+            //
+            //         Rect left = new Rect(buttonRect)
+            //         {
+            //             width = frameWidth,
+            //         };
+            //         EditorGUI.DrawRect(left, displayColorEntry.ReversedColor);
+            //
+            //         Rect right = new Rect(buttonRect)
+            //         {
+            //             x = buttonRect.x + buttonRect.width - frameWidth,
+            //             width = frameWidth,
+            //         };
+            //         EditorGUI.DrawRect(right, displayColorEntry.ReversedColor);
+            //     }
+            //     if (GUI.Button(buttonRect, new GUIContent(GUIContent.none)
+            //         {
+            //             tooltip = displayColorEntry.ColorEntry.displayName,
+            //         }, GUIStyle.none))
+            //     {
+            //         property.colorValue = displayColorEntry.ColorEntry.color;
+            //         onGuiPayload.SetValue(property.colorValue);
+            //     }
+            // }
 
             return new Rect(position)
             {

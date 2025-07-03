@@ -55,7 +55,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
             foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
             {
-                container.ColorPaletteLabels.FrozenPositions(container.CleanableTextInputTypeAhead);
+                container.ColorPaletteLabels.FrozenPositions(container.CleanableLabelInputTypeAhead);
             }
 
             target.CapturePointer(evt.pointerId);

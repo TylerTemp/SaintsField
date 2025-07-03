@@ -79,20 +79,22 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             };
         }
 
-        private static bool FillColorPalettes(List<SaintsField.ColorPalette> colorPalettes,
+        private static IReadOnlyList<ColorPaletteArray.ColorInfo> FillColorPalettes(
             IReadOnlyList<ColorPaletteAttribute.ColorPaletteSource> colorPaletteSources, SerializedProperty property,
             MemberInfo info, object parent)
         {
-            List<SaintsField.ColorPalette> foundColorPalettes = new List<SaintsField.ColorPalette>();
+            ColorPaletteArray allPalette = EnsureColorPaletteArray();
+
+            List<ColorPaletteArray.ColorInfo> foundColorPalettes = new List<ColorPaletteArray.ColorInfo>();
             if (colorPaletteSources.Count == 0)
             {
-                foundColorPalettes.AddRange(ColorPaletteRegister.ColorPalettes);
+                foundColorPalettes.AddRange(allPalette);
             }
             else
             {
                 foreach (ColorPaletteAttribute.ColorPaletteSource colorPaletteSource in colorPaletteSources)
                 {
-                    SaintsField.ColorPalette findTarget = null;
+                    // List<ColorPaletteArray.ColorInfo> findTargets = new List<ColorPaletteArray.ColorInfo>();
                     if (colorPaletteSource.IsCallback)
                     {
                         string callback = colorPaletteSource.Name;
@@ -105,66 +107,40 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 #endif
                         }
                         // ReSharper disable once ConvertIfStatementToSwitchStatement
-                        else if (result is SaintsField.ColorPalette palette)
-                        {
-                            findTarget = palette;
-                        }
                         else if (result is string paletteName)
                         {
-                            findTarget =
-                                ColorPaletteRegister.ColorPalettes.FirstOrDefault(each =>
-                                    each.displayName == paletteName);
+                            foundColorPalettes.AddRange(allPalette.Where(each => each.labels.Contains(paletteName)));
+                        }
+                        else if(result is IEnumerable<string> paletteNames)
+                        {
+                            foreach (string name in paletteNames)
+                            {
+                                foundColorPalettes.AddRange(allPalette.Where(each => each.labels.Contains(name)));
+                            }
                         }
                     }
                     else
                     {
-                        findTarget =
-                            ColorPaletteRegister.ColorPalettes.FirstOrDefault(each =>
-                                each.displayName == colorPaletteSource.Name);
-                    }
-
-                    if (findTarget != null && !foundColorPalettes.Contains(findTarget))
-                    {
-                        foundColorPalettes.Add(findTarget);
+                        foundColorPalettes.AddRange(allPalette.Where(colorInfo => colorInfo.labels.Contains(colorPaletteSource.Name)));
                     }
                 }
             }
 
-            bool changed = false;
-
-            // check add
-            foreach (SaintsField.ColorPalette found in
-                     foundColorPalettes.Where(found => !colorPalettes.Contains(found)))
-            {
-                changed = true;
-                colorPalettes.Add(found);
-            }
-
-            // check delete
-            foreach (SaintsField.ColorPalette exist in colorPalettes.ToArray())
-            {
-                // ReSharper disable once InvertIf
-                if (!foundColorPalettes.Contains(exist))
-                {
-                    changed = true;
-                    colorPalettes.Remove(exist);
-                }
-            }
-
-            return changed;
+            return foundColorPalettes;
         }
 
         private struct DisplayColorEntry
         {
-            public SaintsField.ColorPalette.ColorEntry ColorEntry;
+            public ColorPaletteArray.ColorInfo ColorEntry;
             public bool IsSelected;
             public Color ReversedColor;
         }
 
-        private static IEnumerable<DisplayColorEntry> GetDisplayColorEntries(Color selectedColor, string searchContent, IReadOnlyList<SaintsField.ColorPalette> selectedPalettes)
+        private static IEnumerable<DisplayColorEntry> GetDisplayColorEntries(Color selectedColor, string searchContent, IReadOnlyList<ColorPaletteArray.ColorInfo> selectedPalettes)
         {
+            string[] lowerSearchs = searchContent.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (SaintsField.ColorPalette.ColorEntry colorEntry in selectedPalettes.SelectMany(each => each.colors).Where(each => string.IsNullOrEmpty(searchContent) || each.displayName.Contains(searchContent)))
+            foreach (ColorPaletteArray.ColorInfo colorEntry in selectedPalettes.Where(each => ColorInfoSearch(each, lowerSearchs)))
             {
                 Color reverseColor = ReverseColor(colorEntry.color);
                 bool isSelected = selectedColor == colorEntry.color;
@@ -175,6 +151,41 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     ReversedColor = reverseColor,
                 };
             }
+        }
+
+        private static bool ColorInfoSearch(ColorPaletteArray.ColorInfo colorInfo, string[] searchContent)
+        {
+            if (searchContent.Length == 0)
+            {
+                return true;
+            }
+
+            string[] lowLables = colorInfo.labels.Select(each => each.ToLower()).ToArray();
+            foreach (string searchSeg in searchContent)
+            {
+                if (searchSeg.StartsWith("#"))
+                {
+                    if (ColorUtility.TryParseHtmlString(searchSeg, out Color color))
+                    {
+                        if (colorInfo.color != color)
+                        {
+                            return false;
+                        }
+                    }
+                    else if(Array.IndexOf(lowLables, searchSeg) == -1)
+                    {
+                        return false;
+                    }
+                }
+
+
+                if (Array.IndexOf(lowLables, searchSeg) == -1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static Color ReverseColor(Color oriColor)
@@ -200,7 +211,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 
             ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute)propertyAttribute;
             List<SaintsField.ColorPalette> allPalettes = new List<SaintsField.ColorPalette>();
-            FillColorPalettes(allPalettes, colorPaletteAttribute.ColorPaletteSources, property, memberInfo, parent);
+            // FillColorPalettes(allPalettes, colorPaletteAttribute.ColorPaletteSources, property, memberInfo, parent);
             Color selectedColor = property.colorValue;
             bool anySelected = allPalettes.Any(eachPalettes =>
                 eachPalettes.colors.Any(eachColorEntry => eachColorEntry.color == selectedColor));
