@@ -9,14 +9,17 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
     {
         private readonly ColorPaletteLabel _targetLabel;
         private readonly ColorPaletteLabels _targetLabels;
-        private readonly IReadOnlyCollection<ColorPaletteLabels> _allColorPaletteLabels;
+        private readonly IReadOnlyCollection<ColorInfoArray.Container> _allColorPaletteLabels;
 
-        public LabelPointerManipulator(VisualElement root, ColorPaletteLabel target, ColorPaletteLabels targetLabels, IReadOnlyCollection<ColorPaletteLabels> allColorPaletteLabels)
+        private Vector2 _targetStartPosition;
+        private Vector3 _pointerStartPosition;
+        private bool _enabled;
+
+        public LabelPointerManipulator(ColorPaletteLabel target, ColorPaletteLabels targetLabels, IReadOnlyCollection<ColorInfoArray.Container> allColorPaletteLabels)
         {
             _targetLabel = target;
             _targetLabels = targetLabels;
             this.target = target;
-            this.root = root;
             _allColorPaletteLabels = allColorPaletteLabels;
         }
 
@@ -37,28 +40,26 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             target.UnregisterCallback<PointerUpEvent>(PointerUpHandler);
             target.UnregisterCallback<PointerCaptureOutEvent>(PointerCaptureOutHandler);
         }
-        private Vector2 targetStartPosition { get; set; }
-
-        private Vector3 pointerStartPosition { get; set; }
-
-        private bool enabled { get; set; }
-
-        private VisualElement root { get; }
 
         // This method stores the starting position of target and the pointer,
         // makes target capture the pointer, and denotes that a drag is now in progress.
         private void PointerDownHandler(PointerDownEvent evt)
         {
-            targetStartPosition = target.transform.position;
-            pointerStartPosition = evt.position;
-
-            foreach (ColorPaletteLabels colorPaletteLabels in _allColorPaletteLabels)
+            if (_targetLabel.Editing)
             {
-                colorPaletteLabels.FrozenPositions();
+                return;
+            }
+
+            _targetStartPosition = target.transform.position;
+            _pointerStartPosition = evt.position;
+
+            foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
+            {
+                container.ColorPaletteLabels.FrozenPositions();
             }
 
             target.CapturePointer(evt.pointerId);
-            enabled = true;
+            _enabled = true;
             // _targetLabels.StartDrag(_targetLabel);
         }
 
@@ -66,16 +67,17 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         // If both are true, calculates a new position for target within the bounds of the window.
         private void PointerMoveHandler(PointerMoveEvent evt)
         {
-            if (enabled && target.HasPointerCapture(evt.pointerId))
+            if (_enabled && target.HasPointerCapture(evt.pointerId))
             {
-                Vector3 pointerDelta = evt.position - pointerStartPosition;
-                target.transform.position = targetStartPosition + (Vector2)pointerDelta;
+                Vector3 pointerDelta = evt.position - _pointerStartPosition;
+                target.transform.position = _targetStartPosition + (Vector2)pointerDelta;
 
                 // Vector2 rootMousePosition = root.WorldToLocal(evt.originalMousePosition);
 
                 bool captured = false;
-                foreach (ColorPaletteLabels colorPaletteLabels in _allColorPaletteLabels)
+                foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
                 {
+                    ColorPaletteLabels colorPaletteLabels = container.ColorPaletteLabels;
                     if (captured)
                     {
                         colorPaletteLabels.RemovePlaceholder();
@@ -96,16 +98,17 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         // If both are true, makes target release the pointer.
         private void PointerUpHandler(PointerUpEvent evt)
         {
-            if (enabled && target.HasPointerCapture(evt.pointerId))
+            if (_enabled && target.HasPointerCapture(evt.pointerId))
             {
                 DragEnd(evt.originalMousePosition);
                 target.ReleasePointer(evt.pointerId);
 
-                foreach (ColorPaletteLabels allColorPaletteLabels in _allColorPaletteLabels)
+                foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
                 {
-                    allColorPaletteLabels.RemovePlaceholder();
+                    ColorPaletteLabels colorPaletteLabels = container.ColorPaletteLabels;
+                    colorPaletteLabels.RemovePlaceholder();
                 }
-                enabled = false;
+                _enabled = false;
                 _targetLabel.style.translate = StyleKeyword.Null;
             }
         }
@@ -117,19 +120,20 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         // if there is no overlapping slot.
         private void PointerCaptureOutHandler(PointerCaptureOutEvent evt)
         {
-            if (enabled)
+            if (_enabled)
             {
                 DragEnd(evt.originalMousePosition);
                 _targetLabel.style.translate = StyleKeyword.Null;
-                enabled = false;
+                _enabled = false;
             }
         }
 
         private void DragEnd(Vector2 originalMousePosition)
         {
             bool captured = false;
-            foreach (ColorPaletteLabels colorPaletteLabels in _allColorPaletteLabels)
+            foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
             {
+                ColorPaletteLabels colorPaletteLabels = container.ColorPaletteLabels;
                 if (captured)
                 {
                     colorPaletteLabels.RemovePlaceholder();
@@ -151,7 +155,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
             if (!captured)
             {
-                _targetLabel.transform.position = targetStartPosition;
+                _targetLabel.transform.position = _targetStartPosition;
             }
 
             // VisualElement slotsContainer = root.Q<VisualElement>("slots");
@@ -169,36 +173,6 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             //     closestOverlappingSlot != null ?
             //     closestPos :
             //     targetStartPosition;
-        }
-
-        private bool OverlapsTarget(VisualElement slot)
-        {
-            return target.worldBound.Overlaps(slot.worldBound);
-        }
-
-        private VisualElement FindClosestSlot(IEnumerable<VisualElement> slotsList)
-        {
-            // List<VisualElement> slotsList = slots.ToList();
-            float bestDistanceSq = float.MaxValue;
-            VisualElement closest = null;
-            foreach (VisualElement slot in slotsList)
-            {
-                Vector3 displacement =
-                    RootSpaceOfSlot(slot) - target.transform.position;
-                float distanceSq = displacement.sqrMagnitude;
-                if (distanceSq < bestDistanceSq)
-                {
-                    bestDistanceSq = distanceSq;
-                    closest = slot;
-                }
-            }
-            return closest;
-        }
-
-        private Vector3 RootSpaceOfSlot(VisualElement slot)
-        {
-            Vector2 slotWorldSpace = slot.parent.LocalToWorld(slot.layout.position);
-            return root.WorldToLocal(slotWorldSpace);
         }
     }
 }

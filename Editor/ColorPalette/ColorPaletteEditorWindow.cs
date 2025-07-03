@@ -4,6 +4,7 @@ using SaintsField.Editor.ColorPalette.UIToolkit;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -36,10 +37,27 @@ namespace SaintsField.Editor.ColorPalette
 #endif
 
         [GetScriptableObject, NoLabel, OnValueChanged(nameof(ColorPaletteArrayChanged))]
-        [BelowSeparator(5), BelowSeparator(EColor.Gray), BelowSeparator(5)]
         public ColorPaletteArray colorPaletteArray;
 
         private SerializedObject _so;
+
+        [Button("Add")]
+        [PlayaBelowSeparator(5), PlayaBelowSeparator(EColor.Gray), PlayaBelowSeparator(5)]
+        private void AddNew()
+        {
+            SerializedProperty prop = _so?.FindProperty(nameof(ColorPaletteArray.colorInfoArray));
+            if (prop == null)
+            {
+                return;
+            }
+
+            int index = prop.arraySize;
+            prop.arraySize += 1;
+            SerializedProperty eleProp = prop.GetArrayElementAtIndex(index);
+            eleProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.color)).colorValue = Color.black;
+            eleProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels)).arraySize = 0;
+            prop.serializedObject.ApplyModifiedProperties();
+        }
 
         private void ColorPaletteArrayChanged(ColorPaletteArray cpa)
         {
@@ -75,9 +93,25 @@ namespace SaintsField.Editor.ColorPalette
                 return;
             }
 
-            VisualTreeAsset containerTree = Util.LoadResource<VisualTreeAsset>("UIToolkit/Chip/Container.uxml");
+            // VisualTreeAsset containerTree = Util.LoadResource<VisualTreeAsset>("UIToolkit/ColorPalette/Container.uxml");
 
-            VisualElement containerLayout = new VisualElement
+            // VisualElement containerLayout = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         flexDirection = FlexDirection.Row,
+            //         flexWrap = Wrap.Wrap,
+            //     },
+            // };
+            // rootScoller.Add(containerLayout);
+
+            // StyleSheet style = Util.LoadResource<StyleSheet>("UIToolkit/Chip/ChipStyle.uss");
+
+            // ReSharper disable once PossibleNullReferenceException
+            // foreach (ColorPaletteArray.ColorInfo colorInfo in colorPaletteArray)
+
+            SerializedProperty colorInfoArrayProp = _so.FindProperty(nameof(ColorPaletteArray.colorInfoArray));
+            ColorInfoArray result = new ColorInfoArray(rootVisualElement, rootScoller, colorInfoArrayProp)
             {
                 style =
                 {
@@ -85,73 +119,50 @@ namespace SaintsField.Editor.ColorPalette
                     flexWrap = Wrap.Wrap,
                 },
             };
-            rootScoller.Add(containerLayout);
+            rootScoller.Add(result);
 
-            // StyleSheet style = Util.LoadResource<StyleSheet>("UIToolkit/Chip/ChipStyle.uss");
-
-            // ReSharper disable once PossibleNullReferenceException
-            // foreach (ColorPaletteArray.ColorInfo colorInfo in colorPaletteArray)
-
-            SerializedProperty prop = _so.FindProperty(nameof(ColorPaletteArray.colorInfoArray));
-
-            List<ColorPaletteLabels> allColorPaletteLabels = new List<ColorPaletteLabels>();
-            for (int index = 0; index < prop.arraySize; index++)
-            {
-                SerializedProperty colorInfoProp = prop.GetArrayElementAtIndex(index);
-
-                TemplateContainer container = containerTree.CloneTree();
-                VisualElement containerRoot = container.Q<VisualElement>("container-root");
-
-                // foreach (VisualElement child in containerRoot.Query<VisualElement>("chip-root").ToList())
-                // {
-                //     child.RemoveFromHierarchy();
-                // }
-
-                VisualElement colorContainer = new VisualElement
-                {
-                    style =
-                    {
-                        width = Length.Percent(100),
-                        height = SaintsPropertyDrawer.SingleLineHeight,
-                        marginBottom = 4,
-                    },
-                };
-
-                SerializedProperty colorInfoColorProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.color));
-
-                ColorField colorField = new ColorField
-                {
-                    value = colorInfoColorProp.colorValue,
-                    style =
-                    {
-                        width = Length.Percent(100),
-                        height = SaintsPropertyDrawer.SingleLineHeight - 2,
-                    },
-                };
-                colorField.BindProperty(colorInfoColorProp);
-                colorContainer.Add(colorField);
-
-                containerRoot.Insert(0, colorContainer);
-
-                SerializedProperty colorInfoLabelsProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels));
-
-                ColorPaletteLabels colorPaletteLabels = new ColorPaletteLabels(containerRoot, colorInfoLabelsProp);
-                allColorPaletteLabels.Add(colorPaletteLabels);
-                containerRoot.Add(colorPaletteLabels);
-
-                colorPaletteLabels.Add(new CleanableTextInputTypeAhead(colorInfoLabelsProp, rootScoller, prop));
-
-                containerLayout.Add(container);
-            }
-
-            foreach (ColorPaletteLabels colorPaletteLabels in allColorPaletteLabels)
-            {
-                colorPaletteLabels.BindAllColorPaletteLabels(rootVisualElement, allColorPaletteLabels);
-                foreach (ColorPaletteLabel colorPaletteLabel in colorPaletteLabels.Labels)
-                {
-                    LabelPointerManipulator _ = new LabelPointerManipulator(rootVisualElement, colorPaletteLabel, colorPaletteLabels, allColorPaletteLabels);
-                }
-            }
+            // List<ColorPaletteLabels> allColorPaletteLabels = new List<ColorPaletteLabels>();
+            // for (int index = 0; index < colorInfoArrayProp.arraySize; index++)
+            // {
+            //     SerializedProperty colorInfoProp = colorInfoArrayProp.GetArrayElementAtIndex(index);
+            //
+            //     TemplateContainer container = containerTree.CloneTree();
+            //     VisualElement containerRoot = container.Q<VisualElement>("container-root");
+            //
+            //     VisualElement colorContainer = containerRoot.Q<VisualElement>("color-container");
+            //
+            //     SerializedProperty colorInfoColorProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.color));
+            //
+            //     ColorField colorField = colorContainer.Q<ColorField>("color");
+            //     colorField.BindProperty(colorInfoColorProp);
+            //
+            //     Button delete = colorContainer.Q<Button>("delete");
+            //     int thisIndex = index;
+            //     delete.clicked += () =>
+            //     {
+            //         colorInfoArrayProp.DeleteArrayElementAtIndex(thisIndex);
+            //         colorInfoArrayProp.serializedObject.ApplyModifiedProperties();
+            //     };
+            //
+            //     SerializedProperty colorInfoLabelsProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels));
+            //
+            //     ColorPaletteLabels colorPaletteLabels = new ColorPaletteLabels(containerRoot, colorInfoLabelsProp);
+            //     allColorPaletteLabels.Add(colorPaletteLabels);
+            //     containerRoot.Add(colorPaletteLabels);
+            //
+            //     colorPaletteLabels.Add(new CleanableTextInputTypeAhead(colorInfoLabelsProp, rootScoller, colorInfoArrayProp));
+            //
+            //     containerLayout.Add(container);
+            // }
+            //
+            // foreach (ColorPaletteLabels colorPaletteLabels in allColorPaletteLabels)
+            // {
+            //     colorPaletteLabels.BindAllColorPaletteLabels(rootVisualElement, allColorPaletteLabels);
+            //     foreach (ColorPaletteLabel colorPaletteLabel in colorPaletteLabels.Labels)
+            //     {
+            //         LabelPointerManipulator _ = new LabelPointerManipulator(colorPaletteLabel, colorPaletteLabels, allColorPaletteLabels);
+            //     }
+            // }
         }
     }
 }

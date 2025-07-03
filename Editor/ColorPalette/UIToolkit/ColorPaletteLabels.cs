@@ -1,7 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.Editor.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -68,13 +67,14 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             if (newSize > _arraySize)
             {
                 // Increase array size
+                // Debug.Log($"increase size {_arraySize} -> {newSize} {GetHashCode()}");
                 for (int i = _arraySize; i < newSize; i++)
                 {
                     int thisIndex = i;
                     ColorPaletteLabel label = new ColorPaletteLabel();
                     SerializedProperty arrayElementProp = sp.GetArrayElementAtIndex(i);
                     label.BindProperty(arrayElementProp);
-                    Debug.Log($"add {arrayElementProp.stringValue}@{i}: {arrayElementProp.propertyPath}");
+                    // Debug.Log($"increase size add {arrayElementProp.stringValue}@{i}: {arrayElementProp.propertyPath}");
                     label.OnDeleteClicked.AddListener(() =>
                     {
                         // Debug.Log($"Remove label {i}");
@@ -85,9 +85,9 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     // Add(label);
                     Insert(i, label);
 
-                    if (_allColorPaletteLabels != null)
+                    if (_allContainer != null)
                     {
-                        LabelPointerManipulator _ = new LabelPointerManipulator(_rootVisualElement, label, this, _allColorPaletteLabels);
+                        LabelPointerManipulator _ = new LabelPointerManipulator(label, this, _allContainer);
                     }
                 }
 
@@ -99,6 +99,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             }
             else if (newSize < _arraySize)
             {
+                // Debug.Log($"decrease size {_arraySize} -> {newSize}");
                 Labels.Clear();
 
                 int index = 0;
@@ -120,30 +121,6 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     index++;
                 }
                 Debug.Assert(Labels.Count == newSize);
-
-//                 for (int outIndex = _arraySize - 1; outIndex > newSize - 1; outIndex--)
-//                 {
-//                     Debug.Log($"remove {outIndex} for {_arrayProp.propertyPath}");
-//                     ColorPaletteLabel outTarget = Labels[outIndex];
-//                     outTarget.RemoveFromHierarchy();
-// #if UNITY_6000_0_OR_NEWER
-//                     outTarget.Unbind();
-// #endif
-//                     Labels.RemoveAt(outIndex);
-//                 }
-
-                // Debug.Log($"decrease {_arraySize} -> {newSize}: {Labels.Count}");
-                // for (int i = 0; i < Labels.Count; i++)
-                // {
-                //     Debug.Log($"rebind {i} for {_arrayProp.propertyPath}");
-                //     Labels[i].BindProperty(sp.GetArrayElementAtIndex(i));
-                // }
-
-                // for (int i = 0; i < Labels.Count; i++)
-                // {
-                //     Debug.Log($"rebind {i} for {_arrayProp.propertyPath}");
-                //     Labels[i].BindProperty(sp.GetArrayElementAtIndex(i));
-                // }
             }
 
             _arraySize = newSize;
@@ -244,18 +221,19 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         public bool AddOrSwap(Vector2 worldMousePos, ColorPaletteLabel targetLabel)
         {
             int existsIndex = Labels.IndexOf(targetLabel);
+            Debug.Log($"target={targetLabel.value}({targetLabel.GetHashCode()}); Labels={string.Join(", ", Labels.Select(l => $"{l.value}({l.GetHashCode()})"))}; existsIndex={existsIndex}");
             int insertIndex = GetDragIndex(worldMousePos, targetLabel);
 
             if (insertIndex == -1)
             {
-                // Debug.Log("no index, skip");
+                Debug.Log("no index, skip");
                 return false;
             }
 
             bool isNew = existsIndex == -1;
             if (isNew)  // is new
             {
-                // Debug.Log($"insert new {targetLabel.value}@{insertIndex}; arraySize={_arrayProp.arraySize}");
+                Debug.Log($"insert new {targetLabel.value}@{insertIndex}; arraySize={_arrayProp.arraySize}");
                 // ReSharper disable once ExtractCommonBranchingCode
                 _arrayProp.InsertArrayElementAtIndex(insertIndex);
                 _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue = targetLabel.value;
@@ -273,7 +251,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     return false;
                 }
 
-                // Debug.Log($"swap {existsIndex} <-> {insertIndex}");
+                Debug.Log($"swap {existsIndex} <-> {insertIndex} ({GetHashCode()}");
                 (_arrayProp.GetArrayElementAtIndex(existsIndex).stringValue,
                         _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue) =
                     (_arrayProp.GetArrayElementAtIndex(insertIndex).stringValue,
@@ -312,13 +290,11 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             // Debug.LogError($"index of {targetLabel.value} not found in Labels {string.Join(", ", Labels.Select(l => l.value))}");
         }
 
-        private IReadOnlyList<ColorPaletteLabels> _allColorPaletteLabels;
-        private VisualElement _rootVisualElement;
+        private IReadOnlyList<ColorInfoArray.Container> _allContainer;
 
-        public void BindAllColorPaletteLabels(VisualElement rootVisualElement, List<ColorPaletteLabels> allColorPaletteLabels)
+        public void BindAllColorPaletteLabels(List<ColorInfoArray.Container> allColorPaletteLabels)
         {
-            _rootVisualElement = rootVisualElement;
-            _allColorPaletteLabels = allColorPaletteLabels;
+            _allContainer = allColorPaletteLabels;
         }
 
         private Rect[] _worldBounds;

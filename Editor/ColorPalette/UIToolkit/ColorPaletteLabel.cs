@@ -21,6 +21,8 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
         public readonly UnityEvent OnDeleteClicked = new UnityEvent();
 
+        public bool Editing { get; private set; }
+
         public ColorPaletteLabel()
         {
             _dualButtonChip = new DualButtonChip();
@@ -67,6 +69,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
         private void OnEditClicked()
         {
+            Editing = true;
             _cancelableTextInput.TextField.SetValueWithoutNotify(value);
             _cancelableTextInput.style.display = DisplayStyle.Flex;
             _dualButtonChip.style.display = DisplayStyle.None;
@@ -93,6 +96,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
         private void OnInputCancelClicked()
         {
+            Editing = false;
             _cancelableTextInput.style.display = DisplayStyle.None;
             _dualButtonChip.style.display = DisplayStyle.Flex;
         }
