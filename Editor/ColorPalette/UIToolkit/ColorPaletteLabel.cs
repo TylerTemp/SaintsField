@@ -53,7 +53,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         {
             OnInputCancelClicked();
 
-            string newValue = _cancelableTextInput.TextField.value;
+            string newValue = _cancelableTextInput.TextField.value.Trim();
             if (newValue == value)
             {
                 return;
