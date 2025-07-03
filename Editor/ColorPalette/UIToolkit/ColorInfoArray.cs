@@ -77,7 +77,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 ColorPaletteLabels colorPaletteLabels = new ColorPaletteLabels(result.ContainerRoot, colorInfoLabelsProp);
                 colorPaletteLabels.Add(cleanableTextInputTypeAhead);
                 result.ContainerRoot.Add(colorPaletteLabels);
-                return new Container(result.Root, result.ContainerRoot, result.MoveIcon, result.ColorField, result.DeleteButton, colorPaletteLabels, result.CleanableTextInputTypeAhead);
+                return new Container(result.Root, result.ContainerRoot, result.MoveIcon, result.ColorField, result.DeleteButton, colorPaletteLabels, cleanableTextInputTypeAhead);
             }
 
             public static Container CreateEmpty()
@@ -209,10 +209,6 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             }
 
             int currentIndex = _allContainers.FindIndex(each => each.Root == container.Root);
-            // if (currentIndex <= index)
-            // {
-            //     index += 1;
-            // }
             if(currentIndex + 1 != index)
             {
                 Insert(index, EnsurePlaceholder(container).Root);

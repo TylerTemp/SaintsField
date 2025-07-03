@@ -55,7 +55,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
             foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
             {
-                container.ColorPaletteLabels.FrozenPositions();
+                container.ColorPaletteLabels.FrozenPositions(container.CleanableTextInputTypeAhead);
             }
 
             target.CapturePointer(evt.pointerId);
@@ -72,8 +72,6 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 Vector3 pointerDelta = evt.position - _pointerStartPosition;
                 target.transform.position = _targetStartPosition + (Vector2)pointerDelta;
 
-                // Vector2 rootMousePosition = root.WorldToLocal(evt.originalMousePosition);
-
                 bool captured = false;
                 foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
                 {
@@ -85,8 +83,10 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     else
                     {
                         // Debug.Log($"{rootMousePosition}/{colorPaletteLabels.worldBound}");
-                        if (colorPaletteLabels.IfDragOver(evt.originalMousePosition, _targetLabel))
+                        (bool isOver, Vector2 offset) = colorPaletteLabels.DragOver(evt.originalMousePosition, _targetLabel);
+                        if (isOver)
                         {
+                            target.transform.position = (Vector2)pointerDelta - offset;
                             captured = true;
                         }
                     }
@@ -141,7 +141,8 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 else
                 {
                     // Debug.Log($"{rootMousePosition}/{colorPaletteLabels.worldBound}");
-                    if (colorPaletteLabels.IfDragOver(originalMousePosition, _targetLabel))
+                    (bool isOver, Vector2 _) = colorPaletteLabels.DragOver(originalMousePosition, _targetLabel);
+                    if (isOver)
                     {
                         captured = true;
                         if (colorPaletteLabels.AddOrSwap(originalMousePosition, _targetLabel))

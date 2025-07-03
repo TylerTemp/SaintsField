@@ -137,66 +137,119 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
         // private int _dragOverIndex = -1;
 
-        public bool IfDragOver(Vector2 worldMousePos, ColorPaletteLabel targetLabel)
+        public (bool isOver, Vector2 offset) DragOver(Vector2 worldMousePos, ColorPaletteLabel targetLabel)
         {
-            if (!_containerRoot.worldBound.Contains(worldMousePos))
+            (int index, Vector3 placedTargetRealPos) = GetDragIndex(worldMousePos, targetLabel);
+            if (index < 0)
             {
                 RemovePlaceholder();
-                return false;
+                return (false, placedTargetRealPos);
             }
-            int insertIndex = GetDragIndex(worldMousePos, targetLabel);
-            if (insertIndex == -1)
+
+            int currentIndex = Labels.FindIndex(each => each == targetLabel);
+            if(currentIndex + 1 != index)
+            {
+                Insert(index, _placeholder ??= new ColorPaletteLabelPlaceholder(targetLabel.value));
+            }
+            else
             {
                 RemovePlaceholder();
-                return false;
             }
-
-            _placeholder ??= new ColorPaletteLabelPlaceholder(targetLabel.value);
-
-            Insert(insertIndex, _placeholder);
-            return true;
+            return (true, placedTargetRealPos);
         }
 
-        private int GetDragIndex(Vector2 worldMousePos, ColorPaletteLabel target)
+        private (int index, Vector3 placedTargetRealPos) GetDragIndex(Vector2 worldMousePos, ColorPaletteLabel target)
         {
-            // Debug.Log(worldMousePos);
-            // const int insertIndex = 0;
-            int labelsCount = _worldBounds.Length;
-            for (int checkIndex = 0; checkIndex < labelsCount; checkIndex++)
+            // // Debug.Log(worldMousePos);
+            // // const int insertIndex = 0;
+            // int labelsCount = _worldBounds.Length;
+            // for (int checkIndex = 0; checkIndex < labelsCount; checkIndex++)
+            // {
+            //     Rect wb = _worldBounds[checkIndex];
+            //     if (wb.Contains(worldMousePos))
+            //     {
+            //         if (Labels[checkIndex] == target)
+            //         {
+            //             return -1;
+            //         }
+            //         return checkIndex;
+            //     }
+            // }
+            //
+            // // Debug.Log($"{worldMousePos.y}: {string.Join(",", Labels.Select(l => l.worldBound.yMax))}");
+            //
+            // if (labelsCount > 0 && _worldBounds.All(wb => wb.yMin < worldMousePos.y))
+            // {
+            //     // Debug.Log($"{GetHashCode()} drag over use last {labelsCount}");
+            //     return labelsCount;
+            // }
+            //
+            // // Debug.Log($"{GetHashCode()} drag over no match use 0");
+            // return 0;
+
+            if (!worldBound.Contains(worldMousePos))
             {
-                Rect wb = _worldBounds[checkIndex];
-                // if (checkLabel == target)
-                // {
-                //     return -1;
-                // }
-                // Debug.Log($"{worldMousePos}/{checkLabel.worldBound}/{checkLabel.worldBound.Contains(worldMousePos)}");
-                if (wb.Contains(worldMousePos))
+                return (-1, Vector2.zero);
+            }
+
+            int allCount = _worldBounds.Length;
+            int currentIndex = Labels.FindIndex(each => each == target);
+            // Debug.Log($"{target.value} -> {string.Join(", ", Labels.Select(l => l.value))}; currentIndex={currentIndex}");
+            // Debug.Assert(currentIndex >= 0);
+            Vector2 currentIndexPos = _worldPos[currentIndex];
+
+            // bool found = false;
+            for (int index = 0; index < _worldBounds.Length; index++)
+            {
+                Rect eachBound = _worldBounds[index];
+
+                // ReSharper disable once InvertIf
+                if (eachBound.Contains(worldMousePos))
                 {
-                    if (Labels[checkIndex] == target)
+                    int placeIndex = index;
+                    // Container eachContainer = _allContainers[index];
+                    if (placeIndex == currentIndex)
                     {
-                        return -1;
+                        return (-1, Vector2.zero);
                     }
 
-                    // var checkPoint = (checkLabel.worldBound.x + checkLabel.worldBound.xMax) / 2f;
-                    // float checkPoint = Mathf.Lerp(worldBound.x, worldBound.xMax, 0.2f);
-                    // bool afterThis = worldMousePos.x > checkPoint;
-                    // Debug.Log($"{GetHashCode()} drag over {checkIndex}/afterThis={afterThis};labelsCount={labelsCount}");
-                    // // return afterThis && checkIndex < Labels.Count - 1 ? checkIndex + 1 : checkIndex;
-                    // return afterThis ? checkIndex + 1 : checkIndex;
-                    return checkIndex;
+                    bool isPre = placeIndex < currentIndex;
+                    Vector2 pushedIndexPos = currentIndexPos;
+                    if (isPre)
+                    {
+                        Debug.Log($"isPre, currentIndex={currentIndex}");
+                        int pushedAfterIndex = currentIndex + 1;
+                        if (pushedAfterIndex < _worldBounds.Length)
+                        {
+                            pushedIndexPos = _worldPos[pushedAfterIndex];
+                            Debug.Log($"isPre, pushedAfterIndex={pushedAfterIndex}, pushedIndexPos={pushedIndexPos}");
+                        }
+                        else  // last one, how do we get the fucking pushed position...?
+                        {
+                            pushedIndexPos = _worldPos[pushedAfterIndex];
+                        }
+
+                    }
+
+                    Debug.Log($"PlaceIndex={placeIndex}");
+                    return (placeIndex, pushedIndexPos - currentIndexPos);
+
+
                 }
             }
 
-            // Debug.Log($"{worldMousePos.y}: {string.Join(",", Labels.Select(l => l.worldBound.yMax))}");
-
-            if (labelsCount > 0 && _worldBounds.All(wb => wb.yMin < worldMousePos.y))
+            if (allCount > 0 && _worldBounds.All(wb => wb.yMin < worldMousePos.y))
             {
-                // Debug.Log($"{GetHashCode()} drag over use last {labelsCount}");
-                return labelsCount;
+                return (allCount, Vector2.zero);
             }
 
-            // Debug.Log($"{GetHashCode()} drag over no match use 0");
-            return 0;
+            Vector2 pushedPos = currentIndexPos;
+            if (currentIndex + 1 < _worldBounds.Length)
+            {
+                pushedPos = _worldPos[currentIndex + 1];
+            }
+
+            return (0, pushedPos - currentIndexPos);
         }
 
         public void RemovePlaceholder()
@@ -222,7 +275,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         {
             int existsIndex = Labels.IndexOf(targetLabel);
             Debug.Log($"target={targetLabel.value}({targetLabel.GetHashCode()}); Labels={string.Join(", ", Labels.Select(l => $"{l.value}({l.GetHashCode()})"))}; existsIndex={existsIndex}");
-            int insertIndex = GetDragIndex(worldMousePos, targetLabel);
+            int insertIndex = GetDragIndex(worldMousePos, targetLabel).index;
 
             if (insertIndex == -1)
             {
@@ -240,9 +293,18 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             }
             else  // shifting
             {
+                if (insertIndex > existsIndex)
+                {
+                    insertIndex--;
+                }
+
                 if (insertIndex >= Labels.Count)  // just swap to end
                 {
                     insertIndex = Labels.Count - 1;
+                }
+                else if (insertIndex < 0)
+                {
+                    insertIndex = 0;
                 }
 
                 if (existsIndex == insertIndex)
@@ -298,10 +360,18 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         }
 
         private Rect[] _worldBounds;
+        private Vector2[] _worldPos;
 
-        public void FrozenPositions()
+        public void FrozenPositions(CleanableTextInputTypeAhead typeAhead)
         {
+            // Debug.Log(typeAhead);
             _worldBounds = Labels.Select(each => each.worldBound).ToArray();
+            _worldPos = Labels
+                .Select(each => each.worldBound.position)
+                .Append(typeAhead.worldBound.position)
+                .ToArray();
+
+            Debug.Log($"_worldPos={string.Join(", ", _worldPos)}");
         }
     }
 }
