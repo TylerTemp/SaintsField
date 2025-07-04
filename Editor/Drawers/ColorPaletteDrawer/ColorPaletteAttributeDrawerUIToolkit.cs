@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.ColorPalette;
 using SaintsField.Editor.ColorPalette.UIToolkit;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -138,26 +139,60 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             SearchTypeAhead searchTypeAhead = container.Q<SearchTypeAhead>(name: TypeAheadName(property, index));
             searchTypeAhead.GetOptionsFunc = () =>
             {
-                Debug.Log(EnsureColorPaletteArray());
                 if (!EnsureColorPaletteArray())
                 {
                     return Array.Empty<string>();
                 }
+
+                // string[] searchLower = searchTypeAhead.CleanableTextInput.TextField.value.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                string[] searchLower;
+                string curSearch = searchTypeAhead.CleanableTextInput.TextField.value;
+                if (curSearch.EndsWith(' ') || string.IsNullOrWhiteSpace(curSearch))
+                {
+                    searchLower = Array.Empty<string>();
+                }
+                else
+                {
+                    searchLower = new[]
+                    {
+                        curSearch.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries).Last(),
+                    };
+                }
+
                 return _colorPaletteArray
                     .SelectMany(each => each.labels)
                     .OrderBy(each => each.ToLower())
                     .Concat(_colorPaletteArray.Select(each => $"#{ColorUtility.ToHtmlStringRGBA(each.color)}"))
+                    .Where(each =>
+                    {
+                        // Debug.Log($"each={each}; searchLower={string.Join(' ', searchLower)}; r={CleanableTextInputTypeAhead.Search(searchLower, each)}");
+                        return CleanableTextInputTypeAhead.Search(searchLower, each.ToLower());
+                    })
                     .Distinct();
             };
-            searchTypeAhead.OnInputOptionFunc = value =>
+            searchTypeAhead.OnInputOptionTypeAheadFunc = value =>
             {
-                Debug.Log(value);
-                return true;
+                string curValue = searchTypeAhead.CleanableTextInput.TextField.value;
+                if (curValue.EndsWith(' ') || string.IsNullOrWhiteSpace(curValue))
+                {
+                    searchTypeAhead.CleanableTextInput.TextField.value = value + " ";
+                }
+                else
+                {
+                    searchTypeAhead.CleanableTextInput.TextField.value = string.Join(' ', curValue.Split(' ', StringSplitOptions.RemoveEmptyEntries).SkipLast(1).Append(value)) + " ";
+                }
+
+                searchTypeAhead.CleanableTextInput.TextField.cursorIndex = searchTypeAhead.CleanableTextInput.TextField.selectIndex = searchTypeAhead.CleanableTextInput.TextField.value.Length;
+                return false;
             };
+            searchTypeAhead.CleanableTextInput.TextField.style.minWidth = StyleKeyword.None;
+            searchTypeAhead.CleanableTextInput.TextField.style.maxWidth = StyleKeyword.None;
+            searchTypeAhead.CleanableTextInput.TextField.RegisterValueChangedCallback(_ =>
+                RefreshColorButtons(container, property, index, onValueChangedCallback));
 
             // PaletteSelectorInfo colorPaletteInfo = (PaletteSelectorInfo) dropdownButton.userData;
-            ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute) saintsAttribute;
-            IReadOnlyList<ColorPaletteArray.ColorInfo> colorInfos = FillColorPalettes(colorPaletteAttribute.ColorPaletteSources, property, info, parent);
+            // ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute) saintsAttribute;
+            // IReadOnlyList<ColorPaletteArray.ColorInfo> colorInfos = FillColorPalettes(colorPaletteAttribute.ColorPaletteSources, property, info, parent);
 
             // find the init color palette
             // Color color = property.colorValue;

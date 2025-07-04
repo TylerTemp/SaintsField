@@ -167,19 +167,21 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 {
                     if (ColorUtility.TryParseHtmlString(searchSeg, out Color color))
                     {
-                        if (colorInfo.color != color)
+                        if (ColorUtility.ToHtmlStringRGBA(colorInfo.color) != ColorUtility.ToHtmlStringRGBA(color))
                         {
                             return false;
                         }
                     }
-                    else if(Array.IndexOf(lowLables, searchSeg) == -1)
+                    else if(lowLables.All(lowLabel => !lowLabel.Contains(searchSeg)))
                     {
                         return false;
                     }
+
+                    continue;
                 }
 
 
-                if (Array.IndexOf(lowLables, searchSeg) == -1)
+                if (lowLables.All(lowLabel => !lowLabel.Contains(searchSeg)))
                 {
                     return false;
                 }

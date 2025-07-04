@@ -51,7 +51,7 @@ namespace SaintsField.Editor.UIToolkitElements
                     int getIndex = GetHighlightedIndex();
                     if (getIndex != -1)
                     {
-                        if(OnInputOption(_buttonItems[getIndex].LabelText))
+                        if(OnInputOptionTypeAhead(_buttonItems[getIndex].LabelText))
                         {
                             _highlightLabel = "";
                             CleanableTextInput.TextField.value = "";
@@ -67,7 +67,7 @@ namespace SaintsField.Editor.UIToolkitElements
                     string newValue = CleanableTextInput.TextField.value;
                     if (!string.IsNullOrEmpty(newValue))
                     {
-                        if(OnInputOption(newValue))
+                        if(OnInputOptionReturn(newValue))
                         {
                             _highlightLabel = "";
                             CleanableTextInput.TextField.value = "";
@@ -217,8 +217,8 @@ namespace SaintsField.Editor.UIToolkitElements
             string[] searchLowerPieces = search.ToLower().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
 
-            IEnumerable<string> options = GetOptions()
-                .Where(label => Search(searchLowerPieces, label.ToLower()));
+            IEnumerable<string> options = GetOptions();
+                // .Where(label => Search(searchLowerPieces, label.ToLower()));
 
             _pop.Clear();
             _buttonItems.Clear();
@@ -232,7 +232,7 @@ namespace SaintsField.Editor.UIToolkitElements
                     item.Button.clicked += () =>
                     {
                         // Debug.Log($"Selected: {option}");
-                        OnInputOption(option);
+                        OnInputOptionTypeAhead(option);
                     };
                     if (option == _highlightLabel)
                     {
@@ -250,9 +250,10 @@ namespace SaintsField.Editor.UIToolkitElements
                 .Select(i => colorInfoLabelsProp.GetArrayElementAtIndex(i).stringValue);
         }
 
-        protected abstract bool OnInputOption(string value);
+        protected abstract bool OnInputOptionReturn(string value);
+        protected abstract bool OnInputOptionTypeAhead(string value);
 
-        private static bool Search(IReadOnlyList<string> searchLowers, string label)
+        public static bool Search(IReadOnlyList<string> searchLowers, string label)
         {
             if (searchLowers.Count == 0)
             {

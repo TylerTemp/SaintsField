@@ -1,4 +1,5 @@
 #if UNITY_2021_3_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.UIToolkitElements;
@@ -38,11 +39,13 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             {
                 "",  // filter out empty labels too
             };
+            string[] searchLowerFragments = CleanableTextInput.TextField.value.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             return Enumerable.Range(0, _colorInfoArray.arraySize)
                 .Select(i => _colorInfoArray.GetArrayElementAtIndex(i).FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels)))
                 .SelectMany(GetLabels)
                 .Except(curLabels)
+                .Where(each => Search(searchLowerFragments, each))
                 .Distinct();
         }
 
@@ -52,7 +55,17 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 .Select(i => colorInfoLabelsProp.GetArrayElementAtIndex(i).stringValue);
         }
 
-        protected override bool OnInputOption(string value)
+        protected override bool OnInputOptionReturn(string value)
+        {
+            return OnInputOption(value);
+        }
+
+        protected override bool OnInputOptionTypeAhead(string value)
+        {
+            return OnInputOption(value);
+        }
+
+        private bool OnInputOption(string value)
         {
             if (GetLabels(_colorInfoLabelsProp).Any(each => each == value))
             {

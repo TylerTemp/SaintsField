@@ -9,18 +9,25 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
     public class SearchTypeAhead: CleanableTextInputTypeAhead
     {
         public Func<IEnumerable<string>> GetOptionsFunc;
-        public Func<string, bool> OnInputOptionFunc;
+        public Func<string, bool> OnInputOptionTypeAheadFunc;
 
-        public SearchTypeAhead(VisualElement root): base(root){}
+        public SearchTypeAhead(VisualElement root) : base(root)
+        {
+        }
 
         protected override IEnumerable<string> GetOptions()
         {
             return GetOptionsFunc?.Invoke() ?? Array.Empty<string>();
         }
 
-        protected override bool OnInputOption(string value)
+        protected override bool OnInputOptionReturn(string value)
         {
-            return OnInputOptionFunc?.Invoke(value) ?? false;
+            return false;
+        }
+
+        protected override bool OnInputOptionTypeAhead(string value)
+        {
+            return OnInputOptionTypeAheadFunc?.Invoke(value) ?? false;
         }
     }
 }
