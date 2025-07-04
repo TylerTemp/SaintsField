@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -8,7 +9,7 @@ namespace SaintsField
     public class SaintsDictionary<TKey, TValue>: SaintsDictionaryBase<TKey, TValue>
     {
         [Serializable]
-        public class SaintsWrap<T> : Wrap<T>
+        public class SaintsWrap<T> : BaseWrap<T>
         {
             [SerializeField] public T value;
             public override T Value { get => value; set => this.value = value; }

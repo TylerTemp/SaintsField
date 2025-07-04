@@ -10,42 +10,6 @@ namespace SaintsField
     [Serializable]
     public abstract class SaintsDictionaryBase<TKey, TValue>: IDictionary, IDictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
-        [Serializable]
-        public abstract class Wrap<T> : IWrapProp, IEquatable<Wrap<T>>
-        {
-            // [SerializeField] public T value;
-
-            public abstract T Value { get; set; }
-
-            // public Wrap(T value)
-            // {
-            //     this.value = value;
-            // }
-
-            public override int GetHashCode()
-            {
-                return EqualityComparer<T>.Default.GetHashCode(Value);
-            }
-
-            public bool Equals(Wrap<T> other)
-            {
-                if (other is null) return false;
-                if (ReferenceEquals(this, other)) return true;
-                return EqualityComparer<T>.Default.Equals(Value, other.Value);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (obj is null) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != GetType()) return false;
-                return Equals((Wrap<T>)obj);
-            }
-        }
-
-        // protected abstract List<Wrap<TKey>> SerializedKeys { get; }
-        // protected abstract List<Wrap<TValue>> SerializedValues { get; }
-
         protected abstract int SerializedKeysCount();
         protected abstract void SerializedKeyAdd(TKey key);
         protected abstract TKey SerializedKeyGetAt(int index);
