@@ -33,6 +33,8 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         {
             _colorInfoLabelsProp = colorInfoLabelsProp;
             _colorInfoArray = colorInfoArray;
+
+            PopClosedEvent.AddListener(() => (root.contentContainer ?? root).style.minHeight = StyleKeyword.Null);
         }
 
         protected override IReadOnlyList<string> GetOptions()

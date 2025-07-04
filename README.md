@@ -4901,9 +4901,11 @@ Use `Window` - `Saints` - `Color Palette` to manage the color palette.
 [ColorPalette] public Color allPalette;
 ```
 
-[![video](https://github.com/user-attachments/assets/737e1f93-5860-433c-8add-09b4128f4854)](https://github.com/user-attachments/assets/47f0aebd-aa61-49a9-b4e6-fd1bf3ce31f8)
+[![video](https://github.com/user-attachments/assets/7cec6366-e731-4cd1-9d13-a6b0f0f2fa1c)](https://github.com/user-attachments/assets/e5b93ec2-ab77-47d9-9e3b-15f87fd5cecd)
 
-You can add/modify/remove color palette in the `Window/Saints/Color Palette` menu.
+`Window` - `Saints` - `Color Palette`:
+
+[![video](https://github.com/user-attachments/assets/526bb4e9-990b-4d7a-8bba-6293e880ee78)](https://github.com/user-attachments/assets/30c2613c-c8c5-4a3e-b188-fb03e8b06ee7)
 
 #### `Searchable` ####
 
