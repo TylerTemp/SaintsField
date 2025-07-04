@@ -10,7 +10,7 @@ NOTE: if you're using the previous `ColorPalette`, you WILL lose this palette da
 
 This version removes the `group` idea. A color is only marked with many tags. In the feature version, it'll have main tags for you to easily grouping them.
 
-The search bar now also support `#RRGGBB` search. If you're using UI Toolkit, a nicly `TypeAhead` popup will show you the possible options.
+The search bar now also support `#RRGGBB` search. If you're using UI Toolkit, a nicely `TypeAhead` popup will show you the possible options.
 
 ## 4.19.1 ##
 
