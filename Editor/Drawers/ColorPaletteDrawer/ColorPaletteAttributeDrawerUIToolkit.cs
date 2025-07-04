@@ -166,7 +166,9 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     searchTypeAhead.CleanableTextInput.TextField.value = string.Join(' ', curValue.Split(' ', StringSplitOptions.RemoveEmptyEntries).SkipLast(1).Append(value)) + " ";
                 }
 
+#if UNITY_2022_3_OR_NEWER
                 searchTypeAhead.CleanableTextInput.TextField.cursorIndex = searchTypeAhead.CleanableTextInput.TextField.selectIndex = searchTypeAhead.CleanableTextInput.TextField.value.Length;
+#endif
                 return false;
             };
             searchTypeAhead.CleanableTextInput.TextField.style.minWidth = StyleKeyword.None;
