@@ -9,7 +9,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 #endif
     // ReSharper disable once ClassNeverInstantiated.Global
     // ReSharper disable once PartialTypeWithSinglePart
-    public class ColorPaletteLabelPlaceholder: VisualElement
+    public partial class ColorPaletteLabelPlaceholder: VisualElement
     {
         public ColorPaletteLabelPlaceholder() : this(null)
         {

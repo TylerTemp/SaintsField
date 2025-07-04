@@ -4907,6 +4907,8 @@ Use `Window` - `Saints` - `Color Palette` to manage the color palette.
 
 [![video](https://github.com/user-attachments/assets/526bb4e9-990b-4d7a-8bba-6293e880ee78)](https://github.com/user-attachments/assets/30c2613c-c8c5-4a3e-b188-fb03e8b06ee7)
 
+[![video](https://github.com/user-attachments/assets/f58da949-7d2a-4a52-b2d7-237d7747e88a)](https://github.com/user-attachments/assets/cbbe5269-09f3-49c1-ac02-5ea49d256d9d)
+
 #### `Searchable` ####
 
 > [!IMPORTANT]

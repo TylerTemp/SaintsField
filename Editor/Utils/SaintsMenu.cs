@@ -218,26 +218,25 @@ namespace SaintsField.Editor.Utils
         public static void ColorPaletteMenu()
         {
             string[] guids = AssetDatabase.FindAssets("t:" + typeof(ColorPaletteArray).FullName);
-            if (guids.Length == 0)
+            if (guids.Length > 0)
             {
-                bool result = EditorUtility.DisplayDialog(
-                    "Create Color Palette",
-                    "You don't have a Color Palette in your project. Create One?",
-                    "Create",
-                    "Cancel"
-                );
-
-                if (result)
-                {
-                    // Debug.Log("User clicked OK");
-                    CreateAndOpenColorPalette();
-                }
-                else
-                {
-                    return;
-                }
+                OpenColorPaletteInstance(
+                    AssetDatabase.LoadAssetAtPath<ColorPaletteArray>(AssetDatabase.GUIDToAssetPath(guids[0])));
+                return;
             }
-            OpenColorPaletteInstance(AssetDatabase.LoadAssetAtPath<ColorPaletteArray>(AssetDatabase.GUIDToAssetPath(guids[0])));
+
+            bool result = EditorUtility.DisplayDialog(
+                "Create Color Palette",
+                "You don't have a Color Palette in your project. Create One?",
+                "Create",
+                "Cancel"
+            );
+
+            if (result)
+            {
+                // Debug.Log("User clicked OK");
+                CreateAndOpenColorPalette();
+            }
         }
 
         private static void CreateAndOpenColorPalette()
