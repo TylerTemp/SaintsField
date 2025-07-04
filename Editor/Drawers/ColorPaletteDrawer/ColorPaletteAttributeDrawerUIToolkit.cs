@@ -113,6 +113,8 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 return;
             }
 
+            ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute) saintsAttribute;
+
             container.Q<ToolbarToggle>(name: ToggleButtonName(property, index))
                 .RegisterCallback<ClickEvent>(_ => belowRoot.style.display = belowRoot.style.display == DisplayStyle.None? DisplayStyle.Flex: DisplayStyle.None);
 
@@ -141,11 +143,22 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     };
                 }
 
-                string[] r = _colorPaletteArray
-                    .SelectMany(each => each.labels)
-                    .OrderBy(each => each.ToLower())
-                    .Concat(_colorPaletteArray.Select(each => $"#{ColorUtility.ToHtmlStringRGBA(each.color)}"))
+                List<string> labels = new List<string>();
+                List<string> colors = new List<string>();
+                (HashSet<string> filterLabels, IEnumerable<ColorPaletteArray.ColorInfo> colorInfos) = FilterOutColorInfo(colorPaletteAttribute, property, info, parent);
+                foreach (ColorPaletteArray.ColorInfo each in colorInfos)
+                {
+                    labels.AddRange(each.labels);
+                    colors.Add($"#{ColorUtility.ToHtmlStringRGBA(each.color)}");
+                }
+
+                labels.Sort((a, b) => string.Compare(a.ToLower(), b.ToLower(), StringComparison.Ordinal));
+
+                labels.AddRange(colors);
+
+                string[] r = labels
                     .Where(each => CleanableTextInputTypeAhead.Search(searchLower, each.ToLower()))
+                    .Except(filterLabels)
                     .Distinct()
                     .ToArray();
 
@@ -174,7 +187,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             searchTypeAhead.CleanableTextInput.TextField.style.minWidth = StyleKeyword.None;
             searchTypeAhead.CleanableTextInput.TextField.style.maxWidth = StyleKeyword.None;
             searchTypeAhead.CleanableTextInput.TextField.RegisterValueChangedCallback(_ =>
-                RefreshColorButtons(container, property, index, onValueChangedCallback));
+                RefreshColorButtons(container, colorPaletteAttribute, property, index, onValueChangedCallback, info, parent));
 
             // PaletteSelectorInfo colorPaletteInfo = (PaletteSelectorInfo) dropdownButton.userData;
             // ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute) saintsAttribute;
@@ -190,7 +203,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             // ColorPaletteRegister.OnColorPalettesChanged.AddListener(FillColorPalettesParamless);
             // belowRoot.RegisterCallback<DetachFromPanelEvent>(_ => ColorPaletteRegister.OnColorPalettesChanged.RemoveListener(FillColorPalettesParamless));
 
-            RefreshColorButtons(container, property, index, onValueChangedCallback);
+            RefreshColorButtons(container, colorPaletteAttribute, property, index, onValueChangedCallback, info, parent);
             // return;
 
             // void FillColorPalettesParamless()
@@ -216,7 +229,10 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             if(property.colorValue != _color)
             {
                 _color = property.colorValue;
-                RefreshColorButtons(container, property, index, onValueChanged);
+
+                object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
+                RefreshColorButtons(container, (ColorPaletteAttribute) saintsAttribute, property, index, onValueChanged, info, parent);
             }
             // RefreshColorButtons(container, property, onValueChanged);
         }
@@ -230,10 +246,10 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             }
 
             _color = (Color)newValue;
-            RefreshColorButtons(container, property, index, onValueChangedCallback);
+            RefreshColorButtons(container, (ColorPaletteAttribute) saintsAttribute, property, index, onValueChangedCallback, info, parent);
         }
 
-        private static void RefreshColorButtons(VisualElement container, SerializedProperty property, int index, Action<object> onValueChanged)
+        private static void RefreshColorButtons(VisualElement container, ColorPaletteAttribute colorPaletteAttribute, SerializedProperty property, int index, Action<object> onValueChanged, MemberInfo info, object parent)
         {
             SearchTypeAhead searchTypeAhead = container.Q<SearchTypeAhead>(name: TypeAheadName(property, index));
             if (searchTypeAhead == null)
@@ -241,19 +257,15 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 return;
             }
 
-            // PaletteSelectorInfo paletteSelectorInfo = (PaletteSelectorInfo) dropdownButton.userData;
-
-            // dropdownButton.ButtonLabelElement.text = string.Join(",", paletteSelectorInfo.SelectedPalettes.Select(each => each.displayName));
-
-            // ToolbarSearchField searchInput = container.Q<ToolbarSearchField>(name: SearchInputName(property));
-            // string searchContent = searchInput.value.Trim();
-            //
             VisualElement colorsContainer = container.Q<VisualElement>(name: ColorButtonsName(property, index));
             colorsContainer.Clear();
 
             Color selectedColor = property.colorValue;
 
-            foreach (DisplayColorEntry displayColorEntry in GetDisplayColorEntries(selectedColor, searchTypeAhead.CleanableTextInput.TextField.value, _colorPaletteArray))
+            ColorPaletteArray.ColorInfo[] allPalettes = FilterOutColorInfo(
+                colorPaletteAttribute, property, info, parent).colorInfos.ToArray();
+
+            foreach (DisplayColorEntry displayColorEntry in GetDisplayColorEntries(selectedColor, searchTypeAhead.CleanableTextInput.TextField.value, allPalettes))
             {
                 ColorPaletteArray.ColorInfo colorEntry = displayColorEntry.ColorEntry;
                 Color reverseColor = displayColorEntry.ReversedColor;

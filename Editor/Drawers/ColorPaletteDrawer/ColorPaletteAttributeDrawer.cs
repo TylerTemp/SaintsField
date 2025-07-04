@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.ColorPalette;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,7 +15,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(ColorPaletteAttribute), true)]
-    public partial class ColorPaletteAttributeDrawer : SaintsPropertyDrawer  //, IAutoRunnerFixDrawer
+    public partial class ColorPaletteAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static Texture2D _colorPaletteIcon;
         private static Texture2D _colorPaletteWarningIcon;
@@ -107,34 +110,110 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             return _colorPaletteArray = AssetDatabase.LoadAssetAtPath<ColorPaletteArray>(path);
         }
 
-        // public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute,
-        //     IReadOnlyList<PropertyAttribute> allAttributes,
-        //     SerializedProperty property, MemberInfo memberInfo, object parent)
-        // {
-        //     // Debug.Log($"{property.propertyPath}/{property.propertyType}");
-        //     if (property.propertyType != SerializedPropertyType.Color)
-        //     {
-        //         return new AutoRunnerFixerResult
-        //         {
-        //             Error = "ColorPaletteAttribute can only be used on Color fields",
-        //             ExecError = "",
-        //         };
-        //     }
-        //
-        //     ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute)propertyAttribute;
-        //     List<ColorPaletteArray.ColorInfo> allPalettes = new List<ColorPaletteArray.ColorInfo>();
-        //     // FillColorPalettes(allPalettes, colorPaletteAttribute.ColorPaletteSources, property, memberInfo, parent);
-        //     Color selectedColor = property.colorValue;
-        //     bool anySelected = allPalettes.Any(eachPalettes =>
-        //         eachPalettes.colors.Any(eachColorEntry => eachColorEntry.color == selectedColor));
-        //     return anySelected
-        //         ? null
-        //         : new AutoRunnerFixerResult
-        //         {
-        //             Error =
-        //                 $"Color not found in any of the selected ColorPalettes: {string.Join(", ", allPalettes.Select(each => each.displayName))}",
-        //             ExecError = "",
-        //         };
-        // }
+        private static (HashSet<string> labels, IEnumerable<ColorPaletteArray.ColorInfo> colorInfos) FilterOutColorInfo(ColorPaletteAttribute colorPaletteAttribute,
+            SerializedProperty property,
+            MemberInfo info, object parent)
+        {
+            // ColorPaletteArray colorPaletteArray = EnsureColorPaletteArray();
+            if (!_colorPaletteArray)
+            {
+                return (new HashSet<string>(), Array.Empty<ColorPaletteArray.ColorInfo>());
+            }
+
+            HashSet<string> labels = GetAttributeLabels(colorPaletteAttribute, property, info, parent);
+
+            if (labels.Count == 0)
+            {
+                return (labels, _colorPaletteArray);
+            }
+
+            return (labels, _colorPaletteArray
+                .Where(each => labels.All(checkLabel => each.labels.Contains(checkLabel))));
+        }
+
+        private static HashSet<string> GetAttributeLabels(ColorPaletteAttribute colorPaletteAttribute,
+            SerializedProperty property,
+            MemberInfo info, object parent)
+        {
+            HashSet<string> foundLabels = new HashSet<string>();
+            foreach (ColorPaletteAttribute.ColorPaletteSource colorPaletteSource in colorPaletteAttribute.ColorPaletteSources)
+            {
+                if (colorPaletteSource.IsCallback)
+                {
+                    string callback = colorPaletteSource.Name;
+                    (string error, object result) =
+                        Util.GetOf<object>(callback, null, property, info, parent);
+                    if (error != "")
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogError(error);
+#endif
+                    }
+                    // ReSharper disable once ConvertIfStatementToSwitchStatement
+                    else if (result is string label)
+                    {
+                        foundLabels.Add(label);
+                    }
+                    else if (result is IEnumerable<string> labels)
+                    {
+                        foundLabels.UnionWith(labels);
+                    }
+#if SAINTSFIELD_DEBUG
+                    else
+                    {
+                        Debug.LogWarning($"not supported type {result}");
+                    }
+#endif
+                }
+                else
+                {
+                    foundLabels.Add(colorPaletteSource.Name);
+                }
+            }
+
+            return foundLabels;
+        }
+
+        public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
+            SerializedProperty property, MemberInfo memberInfo, object parent)
+        {
+            if (!EnsureColorPaletteArray())
+            {
+                return new AutoRunnerFixerResult
+                {
+                    Error = ErrorMessageMissingPalette,
+                    ExecError = "",
+                };
+            }
+
+            // Debug.Log($"{property.propertyPath}/{property.propertyType}");
+            if (property.propertyType != SerializedPropertyType.Color)
+            {
+                return new AutoRunnerFixerResult
+                {
+                    Error = "ColorPaletteAttribute can only be used on Color fields",
+                    ExecError = "",
+                };
+            }
+
+            ColorPaletteAttribute colorPaletteAttribute = (ColorPaletteAttribute)propertyAttribute;
+            (HashSet<string> _, IEnumerable<ColorPaletteArray.ColorInfo> colorInfos) = FilterOutColorInfo(colorPaletteAttribute, property, memberInfo, parent);
+
+            // List<ColorPaletteArray.ColorInfo> allPalettes = new List<ColorPaletteArray.ColorInfo>();
+            // FillColorPalettes(allPalettes, colorPaletteAttribute.ColorPaletteSources, property, memberInfo, parent);
+            Color selectedColor = property.colorValue;
+
+            bool anySelected = colorInfos.Any(eachPalettes =>
+                eachPalettes.color == selectedColor);
+            return anySelected
+                ? null
+                : new AutoRunnerFixerResult
+                {
+                    Error =
+                        "Color not found in any of the selected ColorPalettes",
+                    ExecError = "",
+                };
+        }
     }
 }

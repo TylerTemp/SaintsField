@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.20.1 ##
+
+Fix `ColorPalette` attribute arguments not working, fix its auto validatior.
+
 ## 4.20.0 ##
 
 **Breaking Changes**: `ColorPalette` overhaul.

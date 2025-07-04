@@ -60,7 +60,8 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 ImGuiCache[key] = new PaletteSelectorInfoImGui
                 {
                     Expanded = false,
-                    AllPalettes = EnsureColorPaletteArray(),
+                    AllPalettes = FilterOutColorInfo(
+                        (ColorPaletteAttribute)saintsAttribute, property, info, parent).colorInfos.ToArray(),
                     SearchText = "",
                     Selected = default,
                 };
@@ -179,19 +180,18 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 return 0;
             }
 
-            float dropdownHeight = SingleLineHeight;
             int colorCount = GetDisplayColorEntries(property.colorValue, paletteSelectorInfo.SearchText,
                 paletteSelectorInfo.AllPalettes).Count();
             if (colorCount == 0)
             {
-                return dropdownHeight + SingleLineHeight;
+                return SingleLineHeight + SingleLineHeight;
             }
 
             float useWidth = width - 2;
             const int buttonWidthSpace = ButtonPaddding * 2 + ColorButtonSize;
             int buttonRowCount = Mathf.FloorToInt(useWidth / buttonWidthSpace);
             int rowCount = Mathf.CeilToInt(colorCount / (float) buttonRowCount);
-            return dropdownHeight + rowCount * buttonWidthSpace + 2;  // 2 is for padding
+            return SingleLineHeight + rowCount * buttonWidthSpace + 2;  // 2 is for padding
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
