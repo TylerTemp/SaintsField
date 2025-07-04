@@ -11,11 +11,11 @@ namespace SaintsField.Editor.ColorPalette
 {
     public class ColorPaletteMenu: SaintsEditorWindow
     {
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Color Palette")]
-#else
-        [MenuItem("Window/Saints/Color Palette")]
-#endif
+// #if SAINTSFIELD_DEBUG
+//         [MenuItem("Saints/Color Palette...")]
+// #else
+//         [MenuItem("Window/Saints/Color Palette...")]
+// #endif
         public static void OpenWindow()
         {
             EditorWindow window = GetWindow<ColorPaletteMenu>(false, "SaintsField Color Palette");

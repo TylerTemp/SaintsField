@@ -10,15 +10,16 @@ namespace SaintsField.Editor.ColorPalette
     public class ColorPaletteEditorWindow: SaintsEditorWindow
     {
 
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Color Palette...")]
-#else
-        [MenuItem("Window/Saints/Color Palette...")]
-#endif
-        public static void OpenColorPaletteEditorWindow()
+// #if SAINTSFIELD_DEBUG
+//         [MenuItem("Saints/Color Palette...")]
+// #else
+//         [MenuItem("Window/Saints/Color Palette...")]
+// #endif
+        public static ColorPaletteEditorWindow OpenColorPaletteEditorWindow()
         {
             ColorPaletteEditorWindow window = GetWindow<ColorPaletteEditorWindow>(false, "Color Palette");
-            window.Show();
+            // window.Show();
+            return window;
         }
 
 // #if SAINTSFIELD_DEBUG
@@ -54,7 +55,7 @@ namespace SaintsField.Editor.ColorPalette
             prop.serializedObject.ApplyModifiedProperties();
         }
 
-        private void ColorPaletteArrayChanged(ColorPaletteArray cpa)
+        public void ColorPaletteArrayChanged(ColorPaletteArray cpa)
         {
             _so?.ApplyModifiedProperties();
             _so = new SerializedObject(cpa);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SaintsField.Editor.ColorPalette;
 using SaintsField.Editor.I2Setup;
 using SaintsField.Utils;
 using UnityEditor;
@@ -204,6 +205,84 @@ namespace SaintsField.Editor.Utils
         public static void HeaderGUI() => AddCompileDefine("SAINTSFIELD_HEADER_GUI");
 #endif
 
+
+        #endregion
+
+        #region Color Palette
+
+#if SAINTSFIELD_DEBUG
+        [MenuItem("Saints/Color Palette...")]
+#else
+        [MenuItem("Window/Saints/Color Palette...")]
+#endif
+        public static void ColorPaletteMenu()
+        {
+            string[] guids = AssetDatabase.FindAssets("t:" + typeof(ColorPaletteArray).FullName);
+            if (guids.Length == 0)
+            {
+                bool result = EditorUtility.DisplayDialog(
+                    "Create Color Palette",
+                    "You don't have a Color Palette in your project. Create One?",
+                    "Create",
+                    "Cancel"
+                );
+
+                if (result)
+                {
+                    // Debug.Log("User clicked OK");
+                    CreateAndOpenColorPalette();
+                }
+                else
+                {
+                    return;
+                }
+            }
+            OpenColorPaletteInstance(AssetDatabase.LoadAssetAtPath<ColorPaletteArray>(AssetDatabase.GUIDToAssetPath(guids[0])));
+        }
+
+        private static void CreateAndOpenColorPalette()
+        {
+            if (!Directory.Exists("Assets/Editor Default Resources"))
+            {
+                Debug.Log($"Create folder: Assets/Editor Default Resources");
+                AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
+            }
+
+            if (!Directory.Exists("Assets/Editor Default Resources/SaintsField"))
+            {
+                Debug.Log($"Create folder: Assets/Editor Default Resources/SaintsField");
+                AssetDatabase.CreateFolder("Assets/Editor Default Resources", "SaintsField");
+            }
+
+            ColorPaletteArray colorPaletteArray = ScriptableObject.CreateInstance<ColorPaletteArray>();
+            colorPaletteArray.colorInfoArray = new[]
+            {
+                new ColorPaletteArray.ColorInfo
+                {
+                    color = Color.black,
+                    labels = new[] { "Your Label" },
+                },
+            };
+
+            string path = EditorUtility.SaveFilePanelInProject("Create Color Palette", "ColorPalette", "asset", "Create a Color Palette in this project folder","Assets/Editor Default Resources/SaintsField");
+            Debug.Log($"Create ColorPaletteArray: {path}");
+            AssetDatabase.CreateAsset(colorPaletteArray, path);
+
+            OpenColorPaletteInstance(AssetDatabase.LoadAssetAtPath<ColorPaletteArray>(path));
+            // AssetDatabase.SaveAssets();
+        }
+
+        private static void OpenColorPaletteInstance(ColorPaletteArray colorPaletteArray)
+        {
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+            ColorPaletteEditorWindow window = ColorPaletteEditorWindow.OpenColorPaletteEditorWindow();
+            // window.EditorInspectingTarget = colorPaletteArray;
+            window.ColorPaletteArrayChanged(window.colorPaletteArray = colorPaletteArray);
+            window.Show();
+#else
+            Selection.activeObject = colorPaletteArray;
+#endif
+        }
 
         #endregion
 
