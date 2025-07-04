@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 
         private static IEnumerable<DisplayColorEntry> GetDisplayColorEntries(Color selectedColor, string searchContent, IReadOnlyList<ColorPaletteArray.ColorInfo> selectedPalettes)
         {
-            string[] lowerSearchs = searchContent.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string[] lowerSearchs = searchContent.ToLower().Split(new[]{' '}, StringSplitOptions.RemoveEmptyEntries);
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (ColorPaletteArray.ColorInfo colorEntry in selectedPalettes.Where(each => ColorInfoSearch(each, lowerSearchs)))
             {

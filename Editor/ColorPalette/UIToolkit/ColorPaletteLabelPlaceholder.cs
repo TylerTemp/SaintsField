@@ -1,7 +1,7 @@
+#if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.UIToolkitElements;
 using UnityEngine.UIElements;
 
-#if UNITY_2021_3_OR_NEWER
 namespace SaintsField.Editor.ColorPalette.UIToolkit
 {
 #if UNITY_6000_0_OR_NEWER
