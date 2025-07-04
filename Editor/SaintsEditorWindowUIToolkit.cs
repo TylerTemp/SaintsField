@@ -54,7 +54,14 @@ namespace SaintsField.Editor
         {
             SaintsEditorWindowSpecialEditor editor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(EditorGetTargetInternal(), EditorDrawerType);
             editor.EditorShowMonoScript = EditorShowMonoScript;
-            InspectorElement element = new InspectorElement(editor);
+            InspectorElement element = new InspectorElement(editor)
+            {
+                style =
+                {
+                    width = Length.Percent(100),
+                    flexGrow = 0,
+                },
+            };
 
             ScrollView sv = new ScrollView();
             sv.Add(element);

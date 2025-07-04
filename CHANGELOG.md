@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.20.0 ##
+
+**Breaking Changes**: `ColorPalette` overhaul.
+
+NOTE: if you're using the previous `ColorPalette`, you WILL lose this palette data.
+
+`ColorPalette` now using a tag to mark every color. For UI Toolkit, it now also have a way much better UI for you to create palette with drag/drop support.
+
+This version removes the `group` idea. A color is only marked with many tags. In the feature version, it'll have main tags for you to easily grouping them.
+
+The search bar now also support `#RRGGBB` search. If you're using UI Toolkit, a nicly `TypeAhead` popup will show you the possible options.
+
 ## 4.19.1 ##
 
 1.  Fix search function got `StackOverflow` when a target contains a looped-reference. [#250](https://github.com/TylerTemp/SaintsField/issues/250)

@@ -103,11 +103,18 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.19.1**
+**4.20.0**
 
-1.  Fix search function got `StackOverflow` when a target contains a looped-reference. [#250](https://github.com/TylerTemp/SaintsField/issues/250)
-2.  Add `<index/>`, `<index=D4/>` tag for rich label. If the property is in a list/array, the coresponding index value will be used for this tag
-3.  Add `{0:formatControl}` support for `<index/>` and `<field/>` tag like a Unity's standard `string.Format`. You can now even do weird shit like: `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
+**Breaking Changes**: `ColorPalette` overhaul.
+
+NOTE: if you're using the previous `ColorPalette`, you WILL lose this palette data.
+
+`ColorPalette` now using a tag to mark every color. For UI Toolkit, it now also have a way much better UI for you to create palette with drag/drop support.
+
+This version removes the `group` idea. A color is only marked with many tags. In the feature version, it'll have main tags for you to easily grouping them.
+
+The search bar now also support `#RRGGBB` search. If you're using UI Toolkit, a nicly `TypeAhead` popup will show you the possible options.
+
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4882,15 +4889,16 @@ public class CustomEventExample : SaintsMonoBehaviour
 
 A simple color palette tool to select a color from a list of colors.
 
+Use `Window` - `Saints` - `Color Palette` to manage the color palette.
+
 **Parameters**:
 
-*   `string[] names`: the display name of the palette. If null, it'll use all the palette in the project. If it starts with `$`, then a property/callback will be invoked,
-    which should either returns a string for the display name, or the `SaintsField.ColorPalette` instance.
+*   `string[] names`: the tags of the palette. If null, it'll use all the palette in the project. If it starts with `$`, then a property/callback will be invoked,
+    which should returns a string (or a collection of string) for the tags.
 *   Allow Multiple: No
 
 ```csharp
 [ColorPalette] public Color allPalette;
-[ColorPalette("TestPalette")] public Color fromOnePalette;
 ```
 
 [![video](https://github.com/user-attachments/assets/737e1f93-5860-433c-8add-09b4128f4854)](https://github.com/user-attachments/assets/47f0aebd-aa61-49a9-b4e6-fd1bf3ce31f8)

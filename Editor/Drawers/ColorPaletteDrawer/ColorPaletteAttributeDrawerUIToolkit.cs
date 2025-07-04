@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.ColorPalette;
-using SaintsField.Editor.ColorPalette.UIToolkit;
-using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -49,24 +47,6 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
             };
         }
 
-        private static ColorPaletteArray _colorPaletteArray;
-
-        private static ColorPaletteArray EnsureColorPaletteArray()
-        {
-            if (_colorPaletteArray)
-            {
-                return _colorPaletteArray;
-            }
-
-            string[] guids = AssetDatabase.FindAssets("t:" + typeof(ColorPaletteArray).FullName);
-            if (guids.Length == 0)
-            {
-                return null;
-            }
-            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-            return _colorPaletteArray = AssetDatabase.LoadAssetAtPath<ColorPaletteArray>(path);
-        }
-
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes,
@@ -74,7 +54,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
         {
             if (!EnsureColorPaletteArray())
             {
-                return new HelpBox("No Color Palette found. Please go `Window` - `Saints` - `Color Palette` to create one.", HelpBoxMessageType.Warning);
+                return new HelpBox(ErrorMessageMissingPalette, HelpBoxMessageType.Warning);
             }
             VisualElement root = new VisualElement
             {
@@ -169,7 +149,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     .Distinct()
                     .ToArray();
 
-                belowRoot.style.minHeight = r.Length * SingleLineHeight;
+                belowRoot.style.minHeight = (r.Length + 2) * SingleLineHeight;
                 // belowRoot.style.backgroundColor = Color.green;
 
                 return r;

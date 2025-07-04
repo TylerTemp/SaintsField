@@ -194,9 +194,9 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
             int allCount = _worldBounds.Length;
             int currentIndex = Labels.FindIndex(each => each == target);
+            bool isFromOtherLabel = currentIndex == -1;
             // Debug.Log($"{target.value} -> {string.Join(", ", Labels.Select(l => l.value))}; currentIndex={currentIndex}");
             // Debug.Assert(currentIndex >= 0);
-            Vector2 currentIndexPos = _worldPos[currentIndex];
 
             // bool found = false;
             for (int index = 0; index < _worldBounds.Length; index++)
@@ -210,28 +210,31 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     // Container eachContainer = _allContainers[index];
                     if (placeIndex == currentIndex)
                     {
-                        return (-1, Vector2.zero);
+                        return (-1, Vector3.zero);
+                    }
+
+                    if (isFromOtherLabel)
+                    {
+                        return (placeIndex, Vector3.zero);
                     }
 
                     bool isPre = placeIndex < currentIndex;
+                    Vector2 currentIndexPos = _worldPos[currentIndex];
                     Vector2 pushedIndexPos = currentIndexPos;
                     if (isPre)
                     {
-                        Debug.Log($"isPre, currentIndex={currentIndex}");
+                        // Debug.Log($"isPre, currentIndex={currentIndex}");
                         int pushedAfterIndex = currentIndex + 1;
-                        if (pushedAfterIndex < _worldBounds.Length)
-                        {
-                            pushedIndexPos = _worldPos[pushedAfterIndex];
-                            Debug.Log($"isPre, pushedAfterIndex={pushedAfterIndex}, pushedIndexPos={pushedIndexPos}");
-                        }
-                        else  // last one, how do we get the fucking pushed position...?
-                        {
-                            pushedIndexPos = _worldPos[pushedAfterIndex];
-                        }
+                        // if (pushedAfterIndex < _worldBounds.Length)
+                        // {
+                        //     // Debug.Log($"isPre, pushedAfterIndex={pushedAfterIndex}, pushedIndexPos={pushedIndexPos}");
+                        // }
 
+                        // last one, how do we get the fucking pushed position...?
+                        pushedIndexPos = _worldPos[pushedAfterIndex];
                     }
 
-                    Debug.Log($"PlaceIndex={placeIndex}");
+                    // Debug.Log($"PlaceIndex={placeIndex}");
                     return (placeIndex, pushedIndexPos - currentIndexPos);
 
 
@@ -240,16 +243,22 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
             if (allCount > 0 && _worldBounds.All(wb => wb.yMin < worldMousePos.y))
             {
-                return (allCount, Vector2.zero);
+                return (allCount, Vector3.zero);
             }
 
-            Vector2 pushedPos = currentIndexPos;
+            if (isFromOtherLabel)
+            {
+                return (0, Vector3.zero);
+            }
+
+            Vector2 currentPos = _worldPos[currentIndex];
+            Vector2 pushedPos = currentPos;
             if (currentIndex + 1 < _worldBounds.Length)
             {
                 pushedPos = _worldPos[currentIndex + 1];
             }
 
-            return (0, pushedPos - currentIndexPos);
+            return (0, pushedPos - currentPos);
         }
 
         public void RemovePlaceholder()
@@ -274,19 +283,19 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         public bool AddOrSwap(Vector2 worldMousePos, ColorPaletteLabel targetLabel)
         {
             int existsIndex = Labels.IndexOf(targetLabel);
-            Debug.Log($"target={targetLabel.value}({targetLabel.GetHashCode()}); Labels={string.Join(", ", Labels.Select(l => $"{l.value}({l.GetHashCode()})"))}; existsIndex={existsIndex}");
+            // Debug.Log($"target={targetLabel.value}({targetLabel.GetHashCode()}); Labels={string.Join(", ", Labels.Select(l => $"{l.value}({l.GetHashCode()})"))}; existsIndex={existsIndex}");
             int insertIndex = GetDragIndex(worldMousePos, targetLabel).index;
 
             if (insertIndex == -1)
             {
-                Debug.Log("no index, skip");
+                // Debug.Log("no index, skip");
                 return false;
             }
 
             bool isNew = existsIndex == -1;
             if (isNew)  // is new
             {
-                Debug.Log($"insert new {targetLabel.value}@{insertIndex}; arraySize={_arrayProp.arraySize}");
+                // Debug.Log($"insert new {targetLabel.value}@{insertIndex}; arraySize={_arrayProp.arraySize}");
                 // ReSharper disable once ExtractCommonBranchingCode
                 _arrayProp.InsertArrayElementAtIndex(insertIndex);
                 _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue = targetLabel.value;
@@ -313,7 +322,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                     return false;
                 }
 
-                Debug.Log($"swap {existsIndex} <-> {insertIndex} ({GetHashCode()})");
+                // Debug.Log($"swap {existsIndex} <-> {insertIndex} ({GetHashCode()})");
                 _arrayProp.MoveArrayElement(existsIndex, insertIndex);
                 // (_arrayProp.GetArrayElementAtIndex(existsIndex).stringValue,
                 //         _arrayProp.GetArrayElementAtIndex(insertIndex).stringValue) =
@@ -372,7 +381,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 .Append(typeAhead.worldBound.position)
                 .ToArray();
 
-            Debug.Log($"_worldPos={string.Join(", ", _worldPos)}");
+            // Debug.Log($"_worldPos={string.Join(", ", _worldPos)}");
         }
     }
 }

@@ -1,6 +1,8 @@
 #if UNITY_2021_3_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using SaintsField.Editor.Core;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
@@ -19,13 +21,13 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public readonly CleanableTextInput CleanableTextInput;
         public readonly UnityEvent PopClosedEvent = new UnityEvent();
-        private readonly VisualElement _pop;
+        protected readonly VisualElement Pop;
 
         public CleanableTextInputTypeAhead(): this(null){}
 
         public CleanableTextInputTypeAhead(VisualElement root)
         {
-            _pop = CreatePop();
+            Pop = CreatePop();
 
             CleanableTextInput = new CleanableTextInput();
             CleanableTextInput.TextField.RegisterCallback<FocusInEvent>(_ =>
@@ -110,7 +112,7 @@ namespace SaintsField.Editor.UIToolkitElements
                         int index = GetHighlightedIndex();
                         if (index is -1 or 0)
                         {
-                            var last = _buttonItems[count - 1];
+                            ButtonItem last = _buttonItems[count - 1];
                             _highlightLabel = last.LabelText;
                         }
                         else
@@ -145,14 +147,14 @@ namespace SaintsField.Editor.UIToolkitElements
                 }
             });
 
-            _pop.RegisterCallback<MouseEnterEvent>(_ => _hoverOptions = true);
-            _pop.RegisterCallback<MouseLeaveEvent>(_ =>
+            Pop.RegisterCallback<MouseEnterEvent>(_ => _hoverOptions = true);
+            Pop.RegisterCallback<MouseLeaveEvent>(_ =>
             {
                 _hoverOptions = false;
                 if (!_focused)
                 {
                     // Debug.Log("_pop.RemoveFromHierarchy");
-                    _pop.RemoveFromHierarchy();
+                    Pop.RemoveFromHierarchy();
                     PopClosedEvent.Invoke();
                 }
             });
@@ -175,34 +177,46 @@ namespace SaintsField.Editor.UIToolkitElements
             if (!_hoverOptions)
             {
                 // Debug.Log("_pop.RemoveFromHierarchy _cleanableTextInput.BlurEvent");
-                _pop.RemoveFromHierarchy();
+                Pop.RemoveFromHierarchy();
                 PopClosedEvent.Invoke();
             }
         }
 
         private void SetupTypeAhead(VisualElement root)
         {
+            FillOptions();
             PosTypeAhead(root);
 
-            FillOptions();
-
             // Debug.Log("_pop Add");
-            root.Add(_pop);
+            root.Add(Pop);
         }
 
-        private void PosTypeAhead(VisualElement root)
+        protected virtual void PosTypeAhead(VisualElement root)
         {
             Vector2 worldAnchor = new Vector2(CleanableTextInput.worldBound.xMin, CleanableTextInput.worldBound.yMax);
-            Vector2 localAnchor = (root.contentContainer ?? root).WorldToLocal(worldAnchor);
-            if (_pop.style.top != localAnchor.y)
+            VisualElement targetElement = root.contentContainer ?? root;
+            Vector2 localAnchor = (targetElement).WorldToLocal(worldAnchor);
+            if (Pop.style.top != localAnchor.y)
             {
-                _pop.style.top = localAnchor.y;
+                Pop.style.top = localAnchor.y;
             }
 
-            if (_pop.style.left != localAnchor.x)
+            if (Pop.style.left != localAnchor.x)
             {
-                _pop.style.left = localAnchor.x;
+                Pop.style.left = localAnchor.x;
             }
+
+            // float popHeight;
+            // if (double.IsNaN(_pop.resolvedStyle.height))
+            // {
+            //     popHeight = _curOptions.Count * SaintsPropertyDrawer.SingleLineHeight + 4;
+            // }
+            // else
+            // {
+            //     popHeight = _pop.resolvedStyle.height;
+            // }
+            //
+            // targetElement.style.minHeight = popHeight + Mathf.Abs(localAnchor.y);
         }
 
         private readonly List<ButtonItem> _buttonItems = new List<ButtonItem>();
@@ -213,17 +227,19 @@ namespace SaintsField.Editor.UIToolkitElements
             return _buttonItems.FindIndex(each => each.LabelText == _highlightLabel);
         }
 
-        protected abstract IEnumerable<string> GetOptions();
+        protected abstract IReadOnlyList<string> GetOptions();
+
+        protected IReadOnlyList<string> CurOptions = Array.Empty<string>();
 
         private void FillOptions()
         {
-            IEnumerable<string> options = GetOptions();
+            CurOptions = GetOptions();
                 // .Where(label => Search(searchLowerPieces, label.ToLower()));
 
-            _pop.Clear();
+            Pop.Clear();
             _buttonItems.Clear();
             HashSet<string> alreadyOptions = new HashSet<string>();
-            foreach (string option in options)
+            foreach (string option in CurOptions)
             {
                 // ReSharper disable once InvertIf
                 if(alreadyOptions.Add(option))
@@ -238,7 +254,7 @@ namespace SaintsField.Editor.UIToolkitElements
                     {
                         item.SetHighlighted(true);
                     }
-                    _pop.Add(item);
+                    Pop.Add(item);
                     _buttonItems.Add(item);
                 }
             }

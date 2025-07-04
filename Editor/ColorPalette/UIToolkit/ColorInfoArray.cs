@@ -35,43 +35,10 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 CleanableLabelInputTypeAhead = cleanableLabelInputTypeAhead;
             }
 
-            public const string ColorInfoContainerName = "color-info-container";
+            private const string ColorInfoContainerName = "color-info-container";
 
             public static Container CreateContainer(SerializedProperty colorInfoLabelsProp, CleanableLabelInputTypeAhead cleanableLabelInputTypeAhead)
             {
-                // VisualTreeAsset containerTree = Util.LoadResource<VisualTreeAsset>("UIToolkit/ColorPalette/Container.uxml");
-                //
-                // TemplateContainer root = containerTree.CloneTree();
-                // root.name = ColorInfoContainerName;
-                //
-                // VisualElement containerRoot = root.Q<VisualElement>("container-root");
-                //
-                // VisualElement colorContainer = containerRoot.Q<VisualElement>("color-container");
-                //
-                // VisualElement moveButton = colorContainer.Q<VisualElement>("move");
-                //
-                // ColorField colorField = colorContainer.Q<ColorField>("color");
-                // // colorField.BindProperty(colorInfoColorProp);
-                //
-                // Button deleteButton = colorContainer.Q<Button>("delete");
-                //
-                // ColorPaletteLabels colorPaletteLabels = new ColorPaletteLabels(containerRoot, colorInfoLabelsProp);
-                // colorPaletteLabels.Add(cleanableTextInputTypeAhead);
-                // containerRoot.Add(colorPaletteLabels);
-                // // delete.clicked += () =>
-                // // {
-                // //     prop.DeleteArrayElementAtIndex(thisIndex);
-                // //     prop.serializedObject.ApplyModifiedProperties();
-                // // };
-                //
-                // // SerializedProperty colorInfoLabelsProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels));
-                //
-                // // ColorPaletteLabels colorPaletteLabels = new ColorPaletteLabels(containerRoot, colorInfoLabelsProp);
-                // // allColorPaletteLabels.Add(colorPaletteLabels);
-                // // containerRoot.Add(colorPaletteLabels);
-                // // colorPaletteLabels.Add(new CleanableTextInputTypeAhead(colorInfoLabelsProp, rootScoller, prop));
-                //
-                // return new Container(root, containerRoot, moveButton, colorField, deleteButton, colorPaletteLabels, cleanableTextInputTypeAhead);
                 Container result = CreateEmpty();
 
                 ColorPaletteLabels colorPaletteLabels = new ColorPaletteLabels(result.ContainerRoot, colorInfoLabelsProp);
@@ -102,16 +69,16 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             }
         }
 
-        public readonly VisualElement Root;
-        public readonly ScrollView RootScoller;
-        public readonly SerializedProperty ColorInfoArrayProp;
+        private readonly ScrollView _rootScoller;
+        private readonly SerializedProperty _colorInfoArrayProp;
 
-        public ColorInfoArray(): this(null, null, null){}
-        public ColorInfoArray(VisualElement root, ScrollView rootScoller, SerializedProperty colorInfoArrayProp)
+        // ReSharper disable once UnusedMember.Global
+        public ColorInfoArray(): this(null, null){}
+
+        public ColorInfoArray(ScrollView rootScoller, SerializedProperty colorInfoArrayProp)
         {
-            Root = root;
-            RootScoller = rootScoller;
-            ColorInfoArrayProp = colorInfoArrayProp;
+            _rootScoller = rootScoller;
+            _colorInfoArrayProp = colorInfoArrayProp;
             this.TrackPropertyValue(colorInfoArrayProp, OnTrackPropertyValue);
             Rebuild();
         }
@@ -137,16 +104,16 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
         private void Rebuild()
         {
-            Debug.Log($"ColorInfoArray rebuild: {ColorInfoArrayProp.arraySize}");
+            // Debug.Log($"ColorInfoArray rebuild: {_colorInfoArrayProp.arraySize}");
             Clear();
             _allContainers.Clear();
 
-            for (int i = 0; i < ColorInfoArrayProp.arraySize; i++)
+            for (int i = 0; i < _colorInfoArrayProp.arraySize; i++)
             {
                 int thisIndex = i;
-                SerializedProperty colorInfoProp = ColorInfoArrayProp.GetArrayElementAtIndex(thisIndex);
+                SerializedProperty colorInfoProp = _colorInfoArrayProp.GetArrayElementAtIndex(thisIndex);
                 SerializedProperty colorInfoLabelsProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels));
-                CleanableLabelInputTypeAhead cleanableLabelInputTypeAhead = new CleanableLabelInputTypeAhead(colorInfoLabelsProp, RootScoller, ColorInfoArrayProp);
+                CleanableLabelInputTypeAhead cleanableLabelInputTypeAhead = new CleanableLabelInputTypeAhead(colorInfoLabelsProp, _rootScoller, _colorInfoArrayProp);
                 Container container = Container.CreateContainer(colorInfoLabelsProp, cleanableLabelInputTypeAhead);
 
                 SerializedProperty colorInfoColorProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.color));
@@ -154,8 +121,8 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
                 container.DeleteButton.clicked += () =>
                 {
-                    ColorInfoArrayProp.DeleteArrayElementAtIndex(thisIndex);
-                    ColorInfoArrayProp.serializedObject.ApplyModifiedProperties();
+                    _colorInfoArrayProp.DeleteArrayElementAtIndex(thisIndex);
+                    _colorInfoArrayProp.serializedObject.ApplyModifiedProperties();
                 };
 
                 Add(container.Root);
@@ -177,7 +144,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             _lastGhost.style.visibility = Visibility.Hidden;
             Add(_lastGhost);
 
-            _arraySize = ColorInfoArrayProp.arraySize;
+            _arraySize = _colorInfoArrayProp.arraySize;
         }
 
         private Rect[] _worldBounds;
@@ -354,25 +321,17 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             {
                 index -= 1;
             }
-            if (index >= ColorInfoArrayProp.arraySize)
+            if (index >= _colorInfoArrayProp.arraySize)
             {
-                index = ColorInfoArrayProp.arraySize - 1;
+                index = _colorInfoArrayProp.arraySize - 1;
             }
 
             if (index < 0)
             {
                 index = 0;
             }
-            ColorInfoArrayProp.MoveArrayElement(currentIndex, index);
-            ColorInfoArrayProp.serializedObject.ApplyModifiedProperties();
-            // int minIndex = Mathf.Min(currentIndex, index);
-            // int maxIndex = Mathf.Max(currentIndex, index);
-            // ColorInfoArrayProp.MoveArrayElement(minIndex, maxIndex);
-            // ColorInfoArrayProp.serializedObject.ApplyModifiedProperties();
-            // ColorInfoArrayProp.serializedObject.Update();
-            // ColorInfoArrayProp.MoveArrayElement(maxIndex, minIndex);
-            // ColorInfoArrayProp.serializedObject.ApplyModifiedProperties();
-            // ColorInfoArrayProp.serializedObject.Update();
+            _colorInfoArrayProp.MoveArrayElement(currentIndex, index);
+            _colorInfoArrayProp.serializedObject.ApplyModifiedProperties();
 
             Rebuild();
         }

@@ -32,7 +32,7 @@ namespace SaintsField.Editor.ColorPalette
 //         }
 // #endif
 
-        [GetScriptableObject, NoLabel, OnValueChanged(nameof(ColorPaletteArrayChanged))]
+        [GetScriptableObject(EXP.NoAutoResignToNull), NoLabel, OnValueChanged(nameof(ColorPaletteArrayChanged))]
         public ColorPaletteArray colorPaletteArray;
 
         private SerializedObject _so;
@@ -58,6 +58,7 @@ namespace SaintsField.Editor.ColorPalette
         public void ColorPaletteArrayChanged(ColorPaletteArray cpa)
         {
             _so?.ApplyModifiedProperties();
+            _so?.Dispose();
             _so = new SerializedObject(cpa);
             EditorRelinkRootUIToolkit();
         }
@@ -70,7 +71,10 @@ namespace SaintsField.Editor.ColorPalette
 
         public override void OnEditorEnable()
         {
-            _so?.Update();
+            if (colorPaletteArray)
+            {
+                ColorPaletteArrayChanged(colorPaletteArray);
+            }
         }
 
         // private readonly List<ColorPaletteLabels> _colorPaletteLabels = new List<ColorPaletteLabels>();
@@ -107,7 +111,7 @@ namespace SaintsField.Editor.ColorPalette
             // foreach (ColorPaletteArray.ColorInfo colorInfo in colorPaletteArray)
 
             SerializedProperty colorInfoArrayProp = _so.FindProperty(nameof(ColorPaletteArray.colorInfoArray));
-            ColorInfoArray result = new ColorInfoArray(rootVisualElement, rootScoller, colorInfoArrayProp)
+            ColorInfoArray result = new ColorInfoArray(rootScoller, colorInfoArrayProp)
             {
                 style =
                 {
