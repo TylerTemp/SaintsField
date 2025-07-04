@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
@@ -18,6 +19,7 @@ namespace SaintsField.Editor.UIToolkitElements
         private bool _focused;
 
         public readonly CleanableTextInput CleanableTextInput;
+        public readonly UnityEvent PopClosedEvent = new UnityEvent();
         private readonly VisualElement _pop;
 
         public CleanableTextInputTypeAhead(): this(null){}
@@ -39,7 +41,7 @@ namespace SaintsField.Editor.UIToolkitElements
             CleanableTextInput.TextField.RegisterValueChangedCallback(e =>
             {
                 _highlightLabel = "";
-                FillOptions(e.newValue, root);
+                FillOptions();
             });
 
             CleanableTextInput.TextField.RegisterCallback<KeyDownEvent>(e =>
@@ -150,8 +152,9 @@ namespace SaintsField.Editor.UIToolkitElements
                 _hoverOptions = false;
                 if (!_focused)
                 {
-                    Debug.Log("_pop.RemoveFromHierarchy");
+                    // Debug.Log("_pop.RemoveFromHierarchy");
                     _pop.RemoveFromHierarchy();
+                    PopClosedEvent.Invoke();
                 }
             });
 
@@ -172,8 +175,9 @@ namespace SaintsField.Editor.UIToolkitElements
 
             if (!_hoverOptions)
             {
-                Debug.Log("_pop.RemoveFromHierarchy _cleanableTextInput.BlurEvent");
+                // Debug.Log("_pop.RemoveFromHierarchy _cleanableTextInput.BlurEvent");
                 _pop.RemoveFromHierarchy();
+                PopClosedEvent.Invoke();
             }
         }
 
@@ -181,9 +185,9 @@ namespace SaintsField.Editor.UIToolkitElements
         {
             PosTypeAhead(root);
 
-            FillOptions(CleanableTextInput.TextField.value, root);
+            FillOptions();
 
-            Debug.Log("_pop Add");
+            // Debug.Log("_pop Add");
             root.Add(_pop);
         }
 
@@ -212,11 +216,8 @@ namespace SaintsField.Editor.UIToolkitElements
 
         protected abstract IEnumerable<string> GetOptions();
 
-        private void FillOptions(string search, VisualElement root)
+        private void FillOptions()
         {
-            string[] searchLowerPieces = search.ToLower().Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-
             IEnumerable<string> options = GetOptions();
                 // .Where(label => Search(searchLowerPieces, label.ToLower()));
 
@@ -244,11 +245,11 @@ namespace SaintsField.Editor.UIToolkitElements
             }
         }
 
-        private static IEnumerable<string> GetLabels(SerializedProperty colorInfoLabelsProp)
-        {
-            return Enumerable.Range(0, colorInfoLabelsProp.arraySize)
-                .Select(i => colorInfoLabelsProp.GetArrayElementAtIndex(i).stringValue);
-        }
+        // private static IEnumerable<string> GetLabels(SerializedProperty colorInfoLabelsProp)
+        // {
+        //     return Enumerable.Range(0, colorInfoLabelsProp.arraySize)
+        //         .Select(i => colorInfoLabelsProp.GetArrayElementAtIndex(i).stringValue);
+        // }
 
         protected abstract bool OnInputOptionReturn(string value);
         protected abstract bool OnInputOptionTypeAhead(string value);

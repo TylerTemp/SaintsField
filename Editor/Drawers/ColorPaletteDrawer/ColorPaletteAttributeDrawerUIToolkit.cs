@@ -137,10 +137,12 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 .RegisterCallback<ClickEvent>(_ => belowRoot.style.display = belowRoot.style.display == DisplayStyle.None? DisplayStyle.Flex: DisplayStyle.None);
 
             SearchTypeAhead searchTypeAhead = container.Q<SearchTypeAhead>(name: TypeAheadName(property, index));
+            searchTypeAhead.PopClosedEvent.AddListener(() => belowRoot.style.minHeight = StyleKeyword.Null);
             searchTypeAhead.GetOptionsFunc = () =>
             {
                 if (!EnsureColorPaletteArray())
                 {
+                    belowRoot.style.minHeight = StyleKeyword.Null;
                     return Array.Empty<string>();
                 }
 
@@ -159,16 +161,18 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     };
                 }
 
-                return _colorPaletteArray
+                string[] r = _colorPaletteArray
                     .SelectMany(each => each.labels)
                     .OrderBy(each => each.ToLower())
                     .Concat(_colorPaletteArray.Select(each => $"#{ColorUtility.ToHtmlStringRGBA(each.color)}"))
-                    .Where(each =>
-                    {
-                        // Debug.Log($"each={each}; searchLower={string.Join(' ', searchLower)}; r={CleanableTextInputTypeAhead.Search(searchLower, each)}");
-                        return CleanableTextInputTypeAhead.Search(searchLower, each.ToLower());
-                    })
-                    .Distinct();
+                    .Where(each => CleanableTextInputTypeAhead.Search(searchLower, each.ToLower()))
+                    .Distinct()
+                    .ToArray();
+
+                belowRoot.style.minHeight = r.Length * SingleLineHeight;
+                // belowRoot.style.backgroundColor = Color.green;
+
+                return r;
             };
             searchTypeAhead.OnInputOptionTypeAheadFunc = value =>
             {
