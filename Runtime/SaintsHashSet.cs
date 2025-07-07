@@ -68,10 +68,12 @@ namespace SaintsField
             HashSet = new HashSet<T>();
         }
 
+#if UNITY_2021_2_OR_NEWER
         public SaintsHashSet(int capacity)
         {
             HashSet = new HashSet<T>(capacity);
         }
+#endif
 
         public SaintsHashSet(IEqualityComparer<T> comparer)
         {
@@ -106,10 +108,13 @@ namespace SaintsField
         }
 
         // protected HashSet(SerializationInfo info, StreamingContext context) => HashSet.m_siInfo = info;
+#if UNITY_2021_2_OR_NEWER
         public SaintsHashSet(int capacity, IEqualityComparer<T> comparer)
         {
             HashSet = new HashSet<T>(capacity, comparer);
         }
+#endif
+
         #endregion
     }
 }

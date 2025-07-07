@@ -36,6 +36,7 @@ namespace SaintsField
         }
 
         public SaintsArray(IEnumerable<T> ie) => value = ie.ToArray();
+        public SaintsArray(int capacity) => value = new T[capacity];
 
         #region IReadOnlyList
         public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)value).GetEnumerator();
