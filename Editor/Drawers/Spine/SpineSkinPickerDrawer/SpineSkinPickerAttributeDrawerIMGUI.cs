@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
 
         private static readonly Dictionary<string, CachedImGui> _cachedImGui = new Dictionary<string, CachedImGui>();
 
-        private CachedImGui EnsureCache(SerializedProperty property)
+        private static CachedImGui EnsureCache(SerializedProperty property)
         {
             string key = SerializedUtils.GetUniqueId(property);
             // ReSharper disable once InvertIf

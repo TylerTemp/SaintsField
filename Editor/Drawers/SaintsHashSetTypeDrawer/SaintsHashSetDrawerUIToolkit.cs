@@ -14,7 +14,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2022_2_OR_NEWER
 namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 {
     public partial class SaintsHashSetDrawer
@@ -352,9 +352,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             UIToolkitUtils.AddContextualMenuManipulator(foldout, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             foldout.RegisterValueChangedCallback(newValue => property.isExpanded = newValue.newValue);
 
-            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-
-            Type rawType = arrayIndex == -1 ? info.FieldType : ReflectUtils.GetElementType(info.FieldType);
+            Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) == -1 ? info.FieldType : ReflectUtils.GetElementType(info.FieldType);
             Debug.Assert(rawType != null, $"Failed to get element type from {property.propertyPath}");
             // Debug.Log(info.FieldType);
             string propNameCompact = GetPropName(rawType);

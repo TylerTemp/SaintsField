@@ -1590,14 +1590,22 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 case FilterComparerString filterComparerString:
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                    Debug.Log($"FilterMatch {eachResource.Resource} -> {filterComparerString}");
+                    Debug.Log($"FilterMatch {eachResource.Resource}(GetType={eachResource.Resource?.GetType()}) -> {filterComparerString}");
 #endif
                     if (eachResource.Resource is string s)
                     {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                        Debug.Log($"FilterMatch {s} -> {filterComparerString}");
+                        Debug.Log($"FilterMatch str {s} -> {filterComparerString}");
 #endif
                         return filterComparerString.CompareToString(s);
+                    }
+
+                    if (eachResource.Resource is bool b)
+                    {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+                        Debug.Log($"FilterMatch bool {b} -> {filterComparerString}");
+#endif
+                        return filterComparerString.CompareToBool(b);
                     }
 
                     return false;
