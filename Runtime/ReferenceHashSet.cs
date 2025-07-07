@@ -12,7 +12,7 @@ namespace SaintsField
         [Serializable]
         public class SaintsWrap : BaseWrap<T>
         {
-            [SerializeReference] public T value;
+            [SerializeReference, SaintsRow(inline: true), ReferencePicker] public T value;
             public override T Value { get => value; set => this.value = value; }
 
 #if UNITY_EDITOR

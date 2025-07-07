@@ -573,7 +573,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 },
             };
 
-            listView.makeHeader = () =>
+            Func<ToolbarSearchField> makeHeader = () =>
             {
                 ToolbarSearchField wrapSearch = new ToolbarSearchField
                 {
@@ -616,6 +616,13 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 }, TrickleDown.TrickleDown);
                 return wrapSearch;
             };
+
+#if UNITY_6000_0_OR_NEWER
+            listView.makeHeader = makeHeader;
+#else
+            listView.parent?.Insert(listView.parent.IndexOf(listView), makeHeader());
+#endif
+
             listView.makeItem = () => new VisualElement();
             listView.bindItem = (element, elementIndex) =>
             {
