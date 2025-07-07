@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
@@ -11,7 +12,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         public class InterfaceDictionary<TKey, TValue> : SaintsDictionaryBase<TKey, TValue>
         {
             [Serializable]
-            public class SaintsWrap<T> : Wrap<T>
+            public class SaintsWrap<T> : BaseWrap<T>
             {
                 [SerializeReference, SaintsRow(inline: true), ReferencePicker(hideLabel: true)] public T value;
 

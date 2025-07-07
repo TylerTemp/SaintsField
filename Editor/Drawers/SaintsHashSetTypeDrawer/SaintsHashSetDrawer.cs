@@ -113,5 +113,26 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             return accProp;
         }
 
+        private static IEnumerable<int> Search(SerializedProperty wrapProp, string searchText)
+        {
+            int size = wrapProp.arraySize;
+
+            bool searchEmpty = string.IsNullOrEmpty(searchText);
+
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (searchEmpty)
+            {
+                for (int index = 0; index < size; index++)
+                {
+                    yield return index;
+                }
+                yield break;
+            }
+
+            foreach (int index in SerializedUtils.SearchArrayProperty(wrapProp, searchText))
+            {
+                yield return index;
+            }
+        }
     }
 }

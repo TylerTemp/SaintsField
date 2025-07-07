@@ -1,18 +1,18 @@
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-// using System.Runtime.Serialization;
 using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
 {
     [Serializable]
-    public class SaintsHashSet<T>: SaintsHashSetBase<T>
+    public class ReferenceHashSet<T>: SaintsHashSetBase<T>
     {
         [Serializable]
         public class SaintsWrap : BaseWrap<T>
         {
-            [SerializeField] public T value;
+            [SerializeReference] public T value;
             public override T Value { get => value; set => this.value = value; }
 
 #if UNITY_EDITOR
@@ -63,33 +63,33 @@ namespace SaintsField
 
         #region Constructor
 
-        public SaintsHashSet()
+        public ReferenceHashSet()
         {
             HashSet = new HashSet<T>();
         }
 
-        public SaintsHashSet(int capacity)
+        public ReferenceHashSet(int capacity)
         {
             HashSet = new HashSet<T>(capacity);
         }
 
-        public SaintsHashSet(IEqualityComparer<T> comparer)
+        public ReferenceHashSet(IEqualityComparer<T> comparer)
         {
             HashSet = new HashSet<T>(comparer);
         }
 
-        public SaintsHashSet(IEnumerable<T> collection)
+        public ReferenceHashSet(IEnumerable<T> collection)
         {
             HashSet = new HashSet<T>(collection);
         }
 
-        public SaintsHashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer)
+        public ReferenceHashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer)
         {
             switch (collection)
             {
                 case null:
                     throw new ArgumentNullException(nameof(collection));
-                case SaintsHashSet<T> saintsSet:
+                case ReferenceHashSet<T> saintsSet:
                     HashSet = new HashSet<T>(saintsSet.HashSet, comparer);
                     return;
                 case HashSet<T> objSet:
@@ -106,10 +106,11 @@ namespace SaintsField
         }
 
         // protected HashSet(SerializationInfo info, StreamingContext context) => HashSet.m_siInfo = info;
-        public SaintsHashSet(int capacity, IEqualityComparer<T> comparer)
+        public ReferenceHashSet(int capacity, IEqualityComparer<T> comparer)
         {
             HashSet = new HashSet<T>(capacity, comparer);
         }
         #endregion
     }
 }
+#endif

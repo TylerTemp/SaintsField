@@ -6,6 +6,7 @@ using System.Linq;
 // #endif
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsDictExamples
@@ -17,7 +18,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
         {
             [Serializable]
-            public class SaintsWrap<T> : Wrap<T>
+            public class SaintsWrap<T> : BaseWrap<T>
             {
                 [SerializeField] public T value;
                 public override T Value { get => value; set => this.value = value; }

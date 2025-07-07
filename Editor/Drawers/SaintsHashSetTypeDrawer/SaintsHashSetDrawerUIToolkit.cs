@@ -94,7 +94,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             };
             root.Add(totalCount);
 
-            MultiColumnListView multiColumnListView = new MultiColumnListView
+            ListView multiColumnListView = new ListView
             {
                 // showBoundCollectionSize = true,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
@@ -336,7 +336,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             public int TotalPage = 1;
             public int NumberOfItemsPerPage;
 
-            public readonly Image LoadingImage;
+            // public Image LoadingImage;
         }
 
         private AsyncSearchItems _asyncSearchItems;
@@ -346,6 +346,8 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            SaintsHashSetAttribute saintsHashSetAttribute = saintsAttribute as SaintsHashSetAttribute;
+
             Foldout foldout = container.Q<Foldout>(name: NameFoldout(property));
             UIToolkitUtils.AddContextualMenuManipulator(foldout, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             foldout.RegisterValueChangedCallback(newValue => property.isExpanded = newValue.newValue);
@@ -409,7 +411,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
             List<int> itemIndexToPropertyIndex = Enumerable.Range(0, wrapProp.arraySize).ToList();
 
-            MultiColumnListView multiColumnListView = container.Q<MultiColumnListView>(name: NameListView(property));
+            ListView listView = container.Q<ListView>(name: NameListView(property));
 
             #region Paging & Search
 
@@ -459,8 +461,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     _asyncSearchItems.Finished = false;
                     _asyncSearchItems.HitTargetIndexes.Clear();
                     _asyncSearchItems.SourceGenerator?.Dispose();
-                    _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp,
-                        _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
+                    _asyncSearchItems.SourceGenerator = Search(wrapProp, _asyncSearchItems.SearchText).GetEnumerator();
 
                     // Debug.Log("size changed, tail call refresh list");
                     // ReSharper disable once TailRecursiveCall
@@ -514,8 +515,8 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 // Debug.Log(multiColumnListView.itemsSource);
                 // Debug.Log(itemIndexToPropertyIndex);
 
-                bool needRebuild = multiColumnListView.itemsSource == null
-                                   || !multiColumnListView.itemsSource.Cast<int>().SequenceEqual(itemIndexToPropertyIndex);
+                bool needRebuild = listView.itemsSource == null
+                                   || !listView.itemsSource.Cast<int>().SequenceEqual(itemIndexToPropertyIndex);
                 // if (multiColumnListView.itemsSource != null)
                 // {
                 //     Debug.Log(string.Join(", ", multiColumnListView.itemsSource.Cast<int>()));
@@ -525,8 +526,8 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 if (needRebuild)
                 {
                     // Debug.Log("rebuild list view");
-                    multiColumnListView.itemsSource = itemIndexToPropertyIndex.ToList();
-                    multiColumnListView.Rebuild();
+                    listView.itemsSource = itemIndexToPropertyIndex.ToList();
+                    listView.Rebuild();
                     pagePreButton.SetEnabled(prePageIndex > 0);
                     pageField.SetValueWithoutNotify(prePageIndex + 1);
                     pageLabel.text = $"/ {preTotalPage}";
@@ -543,7 +544,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 RefreshList();
             });
 
-            Image keyLoadingImage = new Image
+            Image loadingImage = new Image
             {
                 image = Util.LoadResource<Texture2D>("refresh.png"),
                 pickingMode = PickingMode.Ignore,
@@ -574,237 +575,105 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 },
             };
 
-            multiColumnListView.columns.Add(new Column
+            listView.makeHeader = () =>
             {
-                name = "Keys",
-                // title = "Keys",
-                stretchable = true,
-                makeHeader = () =>
+                ToolbarSearchField wrapSearch = new ToolbarSearchField
                 {
-                    VisualElement header = new VisualElement();
-                    string keyLabel = GetKeyLabel(saintsDictionaryAttribute);
-                    if(!string.IsNullOrEmpty(keyLabel))
+                    style =
                     {
-                        header.Add(new Label(keyLabel));
+                        marginRight = 3,
+                        display = saintsHashSetAttribute?.Searchable ?? true
+                            ? DisplayStyle.Flex
+                            : DisplayStyle.None,
+                        width = Length.Percent(97f),
+                    },
+                };
+
+                TextField searchTextField = wrapSearch.Q<TextField>();
+                searchTextField.style.position = Position.Relative;
+
+                searchTextField.Add(loadingImage);
+                UIToolkitUtils.KeepRotate(loadingImage);
+                loadingImage.RegisterCallback<AttachToPanelEvent>(_ =>
+                    loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage)));
+                // _asyncSearchItems.LoadingImage = loadingImage;
+
+                wrapSearch.RegisterValueChangedCallback(evt =>
+                {
+                    _asyncSearchItems.SearchText = evt.newValue;
+                    _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTime;
+                    _asyncSearchItems.Started = false;
+                    _asyncSearchItems.Finished = false;
+                    _asyncSearchItems.HitTargetIndexes.Clear();
+                    _asyncSearchItems.SourceGenerator = Search(wrapProp, _asyncSearchItems.SearchText).GetEnumerator();
+                    RefreshList();
+                });
+
+                wrapSearch.RegisterCallback<KeyDownEvent>(evt =>
+                {
+                    if (evt.keyCode == KeyCode.Return)
+                    {
+                        _asyncSearchItems.DebounceSearchTime = 0f;
                     }
-                    ToolbarSearchField keySearch = new ToolbarSearchField
-                    {
-                        style =
-                        {
-                            marginRight = 3,
-                            display = saintsDictionaryAttribute?.Searchable ?? true
-                                ? DisplayStyle.Flex
-                                : DisplayStyle.None,
-                            width = Length.Percent(97f),
-                        },
-                    };
+                }, TrickleDown.TrickleDown);
+                return wrapSearch;
+            };
+            listView.makeItem = () => new VisualElement();
+            listView.bindItem = (element, elementIndex) =>
+            {
+                int propIndex = itemIndexToPropertyIndex[elementIndex];
+                SerializedProperty elementProp = wrapProp.GetArrayElementAtIndex(propIndex);
 
-                    TextField searchTextField = keySearch.Q<TextField>();
-                    searchTextField.style.position = Position.Relative;
+                elementProp.isExpanded = true;
+                element.Clear();
 
-                    searchTextField.Add(keyLoadingImage);
-                    UIToolkitUtils.KeepRotate(keyLoadingImage);
-                    keyLoadingImage.RegisterCallback<AttachToPanelEvent>(_ => keyLoadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(keyLoadingImage)));
-
-                    header.Add(keySearch);
-                    keySearch.RegisterValueChangedCallback(evt =>
-                    {
-                        _asyncSearchItems.KeySearchText = evt.newValue;
-                        _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTime;
-                        _asyncSearchItems.Started = false;
-                        _asyncSearchItems.Finished = false;
-                        _asyncSearchItems.HitTargetIndexes.Clear();
-                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
-                        _asyncSearchItems.LoadingImages.Add(keyLoadingImage);
-                        RefreshList();
-                    });
-
-                    keySearch.RegisterCallback<KeyDownEvent>(evt =>
-                    {
-                        if (evt.keyCode == KeyCode.Return)
-                        {
-                            _asyncSearchItems.DebounceSearchTime = 0f;
-                        }
-                    }, TrickleDown.TrickleDown);
-                    return header;
-                },
-                makeCell = () => new VisualElement(),
-                bindCell = (element, elementIndex) =>
+                VisualElement wrapContainer = new VisualElement
                 {
-                    int propIndex = itemIndexToPropertyIndex[elementIndex];
-                    SerializedProperty elementProp = keysProp.GetArrayElementAtIndex(propIndex);
-
-                    elementProp.isExpanded = true;
-                    element.Clear();
-
-                    VisualElement keyContainer = new VisualElement
+                    style =
                     {
-                        style =
-                        {
-                            marginRight = 3,
-                        },
-                    };
-                    element.Add(keyContainer);
+                        marginRight = 3,
+                    },
+                };
+                element.Add(wrapContainer);
 
-                    VisualElement resultElement = CreateCellElement(wrapField, wrapType, elementProp, this, this, wrapParent);
-                    keyContainer.Add(resultElement);
+                VisualElement resultElement =
+                    CreateCellElement(wrapField, wrapType, elementProp, this, this, wrapParent);
+                wrapContainer.Add(resultElement);
 
-                    keyContainer.TrackPropertyValue(keysProp, _ =>
-                    {
-                        RefreshConflict();
-                    });
-
+                wrapContainer.TrackPropertyValue(wrapProp, _ =>
+                {
                     RefreshConflict();
-                    return;
+                });
 
-                    void RefreshConflict()
+                RefreshConflict();
+                return;
+
+                void RefreshConflict()
+                {
+                    if (propIndex >= wrapProp.arraySize)
                     {
-                        if (propIndex >= keysProp.arraySize)
+                        return;
+                    }
+
+                    IEnumerable allKeyList = wrapField.GetValue(wrapParent) as IEnumerable;
+                    Debug.Assert(allKeyList != null, $"list {wrapField.Name} is null");
+                    (object value, int index)[] indexedValue = allKeyList.Cast<object>().WithIndex().ToArray();
+                    object thisKey = indexedValue[propIndex].value;
+                    // Debug.Log($"checking with {thisKey}");
+                    foreach ((object existKey, int _) in indexedValue.Where(each => each.index != propIndex))
+                    {
+                        // Debug.Log($"{existKey}/{thisKey}");
+                        // ReSharper disable once InvertIf
+                        if (Util.GetIsEqual(existKey, thisKey))
                         {
+                            wrapContainer.style.backgroundColor = WarningColor;
                             return;
                         }
-//
-//                         (string curFieldError, int _, object curFieldValue) = Util.GetValue(property, info, parent);
-//                         // Debug.Log(curFieldValue);
-//                         if (curFieldError != "")
-//                         {
-// #if SAINTSFIELD_DEBUG
-//                             Debug.LogError(curFieldError);
-// #endif
-//                             return;
-//                         }
-
-                        IEnumerable allKeyList = wrapField.GetValue(wrapParent) as IEnumerable;
-                        Debug.Assert(allKeyList != null, $"key list {wrapField.Name} is null");
-                        (object value, int index)[] indexedValue = allKeyList.Cast<object>().WithIndex().ToArray();
-                        object thisKey = indexedValue[propIndex].value;
-                        // Debug.Log($"checking with {thisKey}");
-                        foreach ((object existKey, int _) in indexedValue.Where(each => each.index != propIndex))
-                        {
-                            // Debug.Log($"{existKey}/{thisKey}");
-                            // ReSharper disable once InvertIf
-                            if (Util.GetIsEqual(existKey, thisKey))
-                            {
-                                keyContainer.style.backgroundColor = WarningColor;
-                                return;
-                            }
-                        }
-
-                        keyContainer.style.backgroundColor = Color.clear;
-                    }
-                },
-            });
-
-            multiColumnListView.columns.Add(new Column
-            {
-                name = "Values",
-                // title = "Values",
-                stretchable = true,
-                makeHeader = () =>
-                {
-                    VisualElement header = new VisualElement();
-
-                    string valueLabel = GetValueLabel(saintsDictionaryAttribute);
-
-                    if(!string.IsNullOrEmpty(valueLabel))
-                    {
-                        header.Add(new Label(valueLabel));
                     }
 
-                    // header.Add(new Label("Values"));
-                    ToolbarSearchField valueSearch = new ToolbarSearchField
-                    {
-                        style =
-                        {
-                            marginRight = 3,
-                            display = saintsDictionaryAttribute?.Searchable ?? true
-                                ? DisplayStyle.Flex
-                                : DisplayStyle.None,
-                            width = Length.Percent(97f),
-                        },
-                    };
-
-                    TextField searchTextField = valueSearch.Q<TextField>();
-                    searchTextField.style.position = Position.Relative;
-
-                    searchTextField.Add(valueLoadingImage);
-                    UIToolkitUtils.KeepRotate(valueLoadingImage);
-                    valueLoadingImage.RegisterCallback<AttachToPanelEvent>(_ => valueLoadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(valueLoadingImage)));
-
-                    header.Add(valueSearch);
-                    valueSearch.RegisterValueChangedCallback(evt =>
-                    {
-                        // Debug.Log($"value search {evt.newValue}");
-                        _asyncSearchItems.ValueSearchText = evt.newValue;
-                        _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + DebounceTime;
-                        _asyncSearchItems.Started = false;
-                        _asyncSearchItems.Finished = false;
-                        _asyncSearchItems.HitTargetIndexes.Clear();
-                        _asyncSearchItems.SourceGenerator = Search(keysProp, valuesProp, _asyncSearchItems.KeySearchText, _asyncSearchItems.ValueSearchText).GetEnumerator();
-                        _asyncSearchItems.LoadingImages.Add(valueLoadingImage);
-                        RefreshList();
-                    });
-
-                    valueSearch.RegisterCallback<KeyDownEvent>(evt =>
-                    {
-                        if (evt.keyCode == KeyCode.Return)
-                        {
-                            _asyncSearchItems.DebounceSearchTime = 0f;
-                        }
-                    }, TrickleDown.TrickleDown);
-                    return header;
-                },
-                makeCell = () => new VisualElement(),
-                bindCell = (element, elementIndex) =>
-                {
-                    int propIndex = itemIndexToPropertyIndex[elementIndex];
-                    SerializedProperty elementProp = valuesProp.GetArrayElementAtIndex(propIndex);
-                    // IEnumerable valuesResult = valuesField.GetValue(valuesParent) as IEnumerable;
-                    // object valueResult = GetIndexAt(valuesResult, propIndex);
-                    elementProp.isExpanded = true;
-                    element.Clear();
-
-                    // Debug.Log($"elementProp={elementProp.propertyPath}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
-
-                    VisualElement resultElement = CreateCellElement(valuesField, valueType, elementProp, this, this, valuesParent);
-
-                    element.Add(resultElement);
-
-                    // if (!valueStructChecked)
-                    // {
-                    //     valueStructChecked = true;
-                    //     valueStructNeedFlatten = GetNeedFlatten(elementProp, ReflectUtils.GetElementType(valuesField.FieldType));
-                    // }
-                    //
-                    // VisualElement valueContainer = new VisualElement
-                    // {
-                    //     style =
-                    //     {
-                    //         marginRight = 3,
-                    //     },
-                    // };
-                    // element.Add(valueContainer);
-                    // if (valueStructNeedFlatten)
-                    // {
-                    //     foreach (SerializedProperty childProp in SerializedUtils.GetPropertyChildren(elementProp).Where(each => each != null))
-                    //     {
-                    //         valueContainer.Add(new Label(childProp.displayName));
-                    //         PropertyField propertyField = new PropertyField(childProp)
-                    //         {
-                    //             label = "",
-                    //         };
-                    //         propertyField.Bind(property.serializedObject);
-                    //         valueContainer.Add(propertyField);
-                    //     }
-                    // }
-                    // else
-                    // {
-                    //     PropertyField propertyField = new PropertyField(elementProp, "");
-                    //     propertyField.Bind(property.serializedObject);
-                    //     valueContainer.Add(propertyField);
-                    // }
-                },
-            });
+                    wrapContainer.style.backgroundColor = Color.clear;
+                }
+            };
 
             pagePreButton.clicked += () =>
             {
@@ -827,7 +696,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             Button addButton = container.Q<Button>(name: NameAddButton(property));
             addButton.clicked += () =>
             {
-                IncreaseArraySize(keysProp.arraySize + 1, keysProp, valuesProp);
+                IncreaseArraySize(wrapProp.arraySize + 1, wrapProp);
                 property.serializedObject.ApplyModifiedProperties();
                 _asyncSearchItems.DebounceSearchTime = 0;
                 // Debug.Log("Add button call refresh list");
@@ -842,14 +711,14 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 // var keysProp = property.FindPropertyRelative(propKeysName);
                 // var valuesProp = property.FindPropertyRelative(propValuesName);
 
-                List<int> selected = multiColumnListView.selectedIndices
+                List<int> selected = listView.selectedIndices
                     .Select(oriIndex => itemIndexToPropertyIndex[oriIndex])
                     .OrderByDescending(each => each)
                     .ToList();
 
                 if (selected.Count == 0)
                 {
-                    int curSize = keysProp.arraySize;
+                    int curSize = wrapProp.arraySize;
                     // Debug.Log($"curSize={curSize}");
                     if (curSize == 0)
                     {
@@ -860,7 +729,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
                 // Debug.Log($"delete {keysProp.propertyPath}/{keysProp.arraySize} key at {string.Join(",", selected)}");
 
-                DecreaseArraySize(selected, keysProp, valuesProp);
+                DecreaseArraySize(selected, wrapProp);
                 property.serializedObject.ApplyModifiedProperties();
                 // keysProp.serializedObject.ApplyModifiedProperties();
                 // valuesProp.serializedObject.ApplyModifiedProperties();
@@ -871,15 +740,15 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 // Debug.Log($"new size = {keysProp.arraySize}");
             };
 
-            multiColumnListView.TrackPropertyValue(keysProp, _ =>
+            listView.TrackPropertyValue(wrapProp, _ =>
             {
-                if (_asyncSearchItems.Size != keysProp.arraySize)
+                if (_asyncSearchItems.Size != wrapProp.arraySize)
                 {
                     RefreshList();
                 }
             });
 
-            multiColumnListView.itemIndexChanged += (first, second) =>
+            listView.itemIndexChanged += (first, second) =>
             {
                 // Debug.Log($"first={first}, second={second} | {string.Join(",", itemIndexToPropertyIndex)}");
                 int fromPropIndex = itemIndexToPropertyIndex[first];
@@ -887,8 +756,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
                 // Debug.Log($"array {fromPropIndex} <-> {toPropIndex}");
 
-                keysProp.MoveArrayElement(fromPropIndex, toPropIndex);
-                valuesProp.MoveArrayElement(fromPropIndex, toPropIndex);
+                wrapProp.MoveArrayElement(fromPropIndex, toPropIndex);
 
                 ListSwapValue(itemIndexToPropertyIndex, fromPropIndex, toPropIndex);
                 ListSwapValue(_asyncSearchItems.Started? _asyncSearchItems.HitTargetIndexes: _asyncSearchItems.CachedHitTargetIndexes, fromPropIndex, toPropIndex);
@@ -903,13 +771,13 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             // _asyncSearchItems.DebounceSearchTime = 0;
             RefreshList();
 
-            multiColumnListView.schedule.Execute(() =>
+            listView.schedule.Execute(() =>
             {
                 if (_asyncSearchItems.Finished)
                 {
-                    if(keyLoadingImage.style.visibility != Visibility.Hidden)
+                    if(loadingImage.style.visibility != Visibility.Hidden)
                     {
-                        keyLoadingImage.style.visibility = Visibility.Hidden;
+                        loadingImage.style.visibility = Visibility.Hidden;
                     }
                     if(valueLoadingImage.style.visibility != Visibility.Hidden)
                     {
@@ -920,9 +788,9 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
                 if (_asyncSearchItems.SourceGenerator == null)
                 {
-                    if(keyLoadingImage.style.visibility != Visibility.Hidden)
+                    if(loadingImage.style.visibility != Visibility.Hidden)
                     {
-                        keyLoadingImage.style.visibility = Visibility.Hidden;
+                        loadingImage.style.visibility = Visibility.Hidden;
                     }
                     if(valueLoadingImage.style.visibility != Visibility.Hidden)
                     {
@@ -931,14 +799,13 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     return;
                 }
 
-                bool emptySearch = string.IsNullOrEmpty(_asyncSearchItems.KeySearchText) &&
-                                   string.IsNullOrEmpty(_asyncSearchItems.ValueSearchText);
+                bool emptySearch = string.IsNullOrEmpty(_asyncSearchItems.SearchText);
 
                 if (!emptySearch && _asyncSearchItems.DebounceSearchTime > EditorApplication.timeSinceStartup)
                 {
-                    if(keyLoadingImage.style.visibility != Visibility.Hidden)
+                    if(loadingImage.style.visibility != Visibility.Hidden)
                     {
-                        keyLoadingImage.style.visibility = Visibility.Hidden;
+                        loadingImage.style.visibility = Visibility.Hidden;
                     }
                     if(valueLoadingImage.style.visibility != Visibility.Hidden)
                     {
@@ -956,19 +823,9 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     RefreshList();
                 }
 
-                if (_asyncSearchItems.LoadingImages.Count == 0)
+                if(loadingImage.style.visibility != Visibility.Visible)
                 {
-                    _asyncSearchItems.LoadingImages.Add(keyLoadingImage);
-                    _asyncSearchItems.LoadingImages.Add(valueLoadingImage);
-                }
-
-                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                foreach (Image loadingImage in _asyncSearchItems.LoadingImages)
-                {
-                    if(loadingImage.style.visibility != Visibility.Visible)
-                    {
-                        loadingImage.style.visibility = Visibility.Visible;
-                    }
+                    loadingImage.style.visibility = Visibility.Visible;
                 }
 
                 // Debug.Log($"start to search: {EditorApplication.timeSinceStartup - _asyncSearchItems.DebounceSearchTime}");
@@ -1004,15 +861,14 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
                         // Debug.Log($"search finished {_asyncSearchItems.HitTargetIndexes.Count}");
 
-                        if(keyLoadingImage.style.visibility != Visibility.Hidden)
+                        if(loadingImage.style.visibility != Visibility.Hidden)
                         {
-                            keyLoadingImage.style.visibility = Visibility.Hidden;
+                            loadingImage.style.visibility = Visibility.Hidden;
                         }
                         if(valueLoadingImage.style.visibility != Visibility.Hidden)
                         {
                             valueLoadingImage.style.visibility = Visibility.Hidden;
                         }
-                        _asyncSearchItems.LoadingImages.Clear();
                         needRefreshDisplay = true;
                         break;
                     }
