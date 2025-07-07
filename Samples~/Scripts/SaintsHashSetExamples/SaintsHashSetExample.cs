@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts.SaintsHashSetExamples
 {
     public class SaintsHashSetExample : MonoBehaviour
     {
-        // public SaintsHashSet<string> stringHashSet;
+        public SaintsHashSet<string> stringHashSet;
 
         [SaintsHashSet(numberOfItemsPerPage: 5)]
         public SaintsHashSet<int> integerHashSet = new SaintsHashSet<int>

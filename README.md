@@ -5956,12 +5956,12 @@ Compared to [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/
 *   It supports UI Toolkits too.
 *   Many SaintsField attributes can work together with this one, especially these auto getters, validators etc.
 
-### `SaintsHashSet<T>` / `ReferenceHashSet<T>` ###
+### `SaintsHashSet<>` / `ReferenceHashSet<>` ###
 
 > [!WARNING]
 > UI Toolkit only. (IMGUI will have only default drawer)
 
-A serializable `HashSet<T>` for normal type and `SerializedReference` type. Duplicated element will have a warning color.
+A serializable `HashSet<>` for normal type and `SerializedReference` type. Duplicated element will have a warning color.
 
 You can use `SaintsHashSet` attribute to control paging & searching
 
@@ -5988,6 +5988,8 @@ public interface IReference
 
 public ReferenceHashSet<IReference> refHashSet;
 ```
+
+[![video](https://github.com/user-attachments/assets/0ff1ce5a-6432-4aba-bfda-d71f5f56a54f)](https://github.com/user-attachments/assets/8e01cb94-b8bb-49fb-ac58-384ec3c9c2a4)
 
 ## Addressable ##
 
