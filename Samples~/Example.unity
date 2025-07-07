@@ -20116,14 +20116,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdfb44fa3bdc91a40a2a690af1c6d667, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  intHashSet:
+  integerHashSet:
     _saintsList:
+    - value: 1
     - value: 2
     - value: 3
-    - value: 5
-    - value: 1
     - value: 4
+    - value: 5
     - value: 6
+    - value: 7
+    - value: 8
+    - value: 9
+    - value: 0
 --- !u!4 &1294877703
 Transform:
   m_ObjectHideFlags: 0
@@ -20157,6 +20161,8 @@ MonoBehaviour:
         rid: 3043640761134351026
     - value:
         rid: 3043640761134351027
+    - value:
+        rid: 3043640765841670851
   references:
     version: 2
     RefIds:
@@ -20167,7 +20173,11 @@ MonoBehaviour:
     - rid: 3043640761134351027
       type: {class: ReferenceHashSetExample/ClassRef, ns: SaintsField.Samples.Scripts.SaintsHashSetExamples, asm: today.comes.saintsfield.Samples}
       data:
-        <Name>k__BackingField: 
+        <Name>k__BackingField: MyValue
+    - rid: 3043640765841670851
+      type: {class: ReferenceHashSetExample/ClassRef, ns: SaintsField.Samples.Scripts.SaintsHashSetExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        <Name>k__BackingField: MyThing
 --- !u!1 &1299589590
 GameObject:
   m_ObjectHideFlags: 0

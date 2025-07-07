@@ -37,7 +37,6 @@ namespace SaintsField.Samples.Scripts.SaintsHashSetExamples
                 return $"<StructRef: {Name}/>";
             }
         }
-
         public ReferenceHashSet<IReference> refHashSet;
 #endif
     }

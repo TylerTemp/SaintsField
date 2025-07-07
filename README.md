@@ -103,18 +103,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.20.0**
+**4.21.0**
 
-**Breaking Changes**: `ColorPalette` overhaul.
-
-NOTE: if you're using the previous `ColorPalette`, you WILL lose this palette data.
-
-`ColorPalette` now using a tag to mark every color. For UI Toolkit, it now also have a way much better UI for you to create palette with drag/drop support.
-
-This version removes the `group` idea. A color is only marked with many tags. In the feature version, it'll have main tags for you to easily grouping them.
-
-The search bar now also support `#RRGGBB` search. If you're using UI Toolkit, a nicely `TypeAhead` popup will show you the possible options.
-
+1.  UI Toolkit: Add `SaintsHashSet<T>` & `ReferenceHashSet<T>` data type as serializable `HashSet` [#251](https://github.com/TylerTemp/SaintsField/issues/251)
+2.  Saints XPath now can compare `[@{myProp} = false]` if `myProp` is a bool type
+3.  UI Toolkit: Fix `SaintsDictionary` paging button can not click
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -5962,6 +5955,39 @@ Compared to [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/
 
 *   It supports UI Toolkits too.
 *   Many SaintsField attributes can work together with this one, especially these auto getters, validators etc.
+
+### `SaintsHashSet<T>` / `ReferenceHashSet<T>` ###
+
+> [!WARNING]
+> UI Toolkit only. (IMGUI will have only default drawer)
+
+A serializable `HashSet<T>` for normal type and `SerializedReference` type. Duplicated element will have a warning color.
+
+You can use `SaintsHashSet` attribute to control paging & searching
+
+Parameters:
+
+*   `bool searchable = true`: `false` to disable the search function
+*   `int numberOfItemsPerPage = 0`: how many items per page. `0` for no paging
+
+```csharp
+public SaintsHashSet<string> stringHashSet;  // default
+
+[SaintsHashSet(numberOfItemsPerPage: 5)]  // paging control
+public SaintsHashSet<int> integerHashSet = new SaintsHashSet<int>
+{
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+};
+
+public interface IReference
+{
+    string Name { get; }
+}
+
+// ... implement of IReference omited here
+
+public ReferenceHashSet<IReference> refHashSet;
+```
 
 ## Addressable ##
 

@@ -461,9 +461,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             // string preKeySearch = "";
             // string preValueSearch = "";
-            int prePageIndex = 0;
+            // int prePageIndex = 0;
             // int preSize = 0;
-            int preTotalPage = 1;
+            // int preTotalPage = 1;
 
             void RefreshList()
             {
@@ -528,8 +528,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     //               || prePageIndex != curPageIndex;
 
                     // preNumberOfItemsPerPage = numberOfItemsPerPage;
-                    preTotalPage = totalPage;
-                    prePageIndex = curPageIndex;
+                    _asyncSearchItems.TotalPage = totalPage;
+                    _asyncSearchItems.PageIndex = curPageIndex;
                 }
                 else
                 {
@@ -552,10 +552,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     // Debug.Log("rebuild list view");
                     multiColumnListView.itemsSource = itemIndexToPropertyIndex.ToList();
                     multiColumnListView.Rebuild();
-                    pagePreButton.SetEnabled(prePageIndex > 0);
-                    pageField.SetValueWithoutNotify(prePageIndex + 1);
-                    pageLabel.text = $"/ {preTotalPage}";
-                    pageNextButton.SetEnabled(prePageIndex + 1 < preTotalPage);
+                    pagePreButton.SetEnabled(_asyncSearchItems.PageIndex > 0);
+                    pageField.SetValueWithoutNotify(_asyncSearchItems.PageIndex + 1);
+                    pageLabel.text = $"/ {_asyncSearchItems.TotalPage}";
+                    pageNextButton.SetEnabled(_asyncSearchItems.PageIndex + 1 < _asyncSearchItems.TotalPage);
                 }
             }
 

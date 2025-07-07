@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.21.0 ##
+
+1.  UI Toolkit: Add `SaintsHashSet<T>` & `ReferenceHashSet<T>` data type as serializable `HashSet` [#251](https://github.com/TylerTemp/SaintsField/issues/251)
+2.  Saints XPath now can compare `[@{myProp} = false]` if `myProp` is a bool type
+3.  UI Toolkit: Fix `SaintsDictionary` paging button can not click
+
 ## 4.20.1 ##
 
 Fix `ColorPalette` attribute arguments not working, fix its auto validatior.

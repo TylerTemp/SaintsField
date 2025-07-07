@@ -413,12 +413,8 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
             #region Paging & Search
 
-            SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
-
-            int initNumberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
-            List<int> initTargets = initNumberOfItemsPerPage <= 0
-                ? new List<int>(Enumerable.Range(0, wrapProp.arraySize))
-                : new List<int>(Enumerable.Range(0, wrapProp.arraySize).Take(initNumberOfItemsPerPage));
+            int initNumberOfItemsPerPage = saintsHashSetAttribute?.NumberOfItemsPerPage ?? -1;
+            List<int> initTargets = new List<int>(Enumerable.Range(0, wrapProp.arraySize));
 
             _asyncSearchItems = new AsyncSearchItems
             {
@@ -434,11 +430,13 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 NumberOfItemsPerPage = initNumberOfItemsPerPage,
             };
 
+            // Debug.Log($"init HitTargetIndexes={string.Join(", ", _asyncSearchItems.HitTargetIndexes)}");
+
             // string preKeySearch = "";
             // string preValueSearch = "";
-            int prePageIndex = 0;
+            // int prePageIndex = 0;
             // int preSize = 0;
-            int preTotalPage = 1;
+            // int preTotalPage = 1;
 
             void RefreshList()
             {
@@ -451,6 +449,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 // List<int> useIndexes = new List<int>(itemIndexToPropertyIndex);
                 // ReSharper disable once AccessToModifiedClosure
                 List<int> refreshedHitTargetIndexes = new List<int>(_asyncSearchItems.Started? _asyncSearchItems.HitTargetIndexes: _asyncSearchItems.CachedHitTargetIndexes);
+                // Debug.Log($"_asyncSearchItems.Started={_asyncSearchItems.Started}; refreshedHitTargetIndexes={string.Join(",", refreshedHitTargetIndexes)}");
                 if (nowArraySize != _asyncSearchItems.Size)
                 {
                     _asyncSearchItems.Size = nowArraySize;
@@ -493,6 +492,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     int endIndex = Mathf.Min((curPageIndex + 1) * numberOfItemsPerPage, refreshedHitTargetIndexes.Count);
                     itemIndexToPropertyIndex = refreshedHitTargetIndexes.GetRange(startIndex, endIndex - startIndex);
                     int totalPage = Mathf.Max(1, Mathf.CeilToInt(refreshedHitTargetIndexes.Count / (float)numberOfItemsPerPage));
+                    // Debug.Log($"{refreshedHitTargetIndexes.Count}/{numberOfItemsPerPage}={totalPage}");
 
                     // pageField.SetValueWithoutNotify(curPageIndex + 1);
 
@@ -502,8 +502,8 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     //               || prePageIndex != curPageIndex;
 
                     // preNumberOfItemsPerPage = numberOfItemsPerPage;
-                    preTotalPage = totalPage;
-                    prePageIndex = curPageIndex;
+                    _asyncSearchItems.TotalPage = totalPage;
+                    _asyncSearchItems.PageIndex = curPageIndex;
                 }
                 else
                 {
@@ -526,10 +526,10 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     // Debug.Log("rebuild list view");
                     listView.itemsSource = itemIndexToPropertyIndex.ToList();
                     listView.Rebuild();
-                    pagePreButton.SetEnabled(prePageIndex > 0);
-                    pageField.SetValueWithoutNotify(prePageIndex + 1);
-                    pageLabel.text = $"/ {preTotalPage}";
-                    pageNextButton.SetEnabled(prePageIndex + 1 < preTotalPage);
+                    pagePreButton.SetEnabled(_asyncSearchItems.PageIndex > 0);
+                    pageField.SetValueWithoutNotify(_asyncSearchItems.PageIndex + 1);
+                    pageLabel.text = $"/ {_asyncSearchItems.TotalPage}";
+                    pageNextButton.SetEnabled(_asyncSearchItems.PageIndex + 1 < _asyncSearchItems.TotalPage);
                 }
             }
 
@@ -688,6 +688,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             pageNextButton.clicked += () =>
             {
                 _asyncSearchItems.PageIndex = Mathf.Min(_asyncSearchItems.PageIndex + 1, _asyncSearchItems.TotalPage - 1);
+                // Debug.Log($"_asyncSearchItems.PageIndex={_asyncSearchItems.PageIndex}");
                 RefreshList();
             };
 
