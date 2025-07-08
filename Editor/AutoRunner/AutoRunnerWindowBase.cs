@@ -310,6 +310,8 @@ namespace SaintsField.Editor.AutoRunner
                         break;
                 }
 
+                Debug.Log(string.Join<Object>(", ", serializeObjects));
+
                 List<SerializedObject> serializedObjects = new List<SerializedObject>();
 
                 foreach (Object extra in serializeObjects)
@@ -330,14 +332,16 @@ namespace SaintsField.Editor.AutoRunner
                     }
                     serializedObjects.Add(so);
                     // extraSoIterations.Add((extraResource, new[] { so }));
-                    yield return new ProcessInfo
-                    {
-                        GroupTotal = sceneSoIterations.Count + folderSoIterations.Count + extraSoIterations.Count,
-                        GroupCurrent = 0,
-                        ProcessCount = 0,
-                        ProcessMessage = $"Processing asset {extraResource}",
-                    };
+                    // Debug.Log($"yield {so.targetObject}");
                 }
+
+                yield return new ProcessInfo
+                {
+                    GroupTotal = sceneSoIterations.Count + folderSoIterations.Count + extraSoIterations.Count,
+                    GroupCurrent = 0,
+                    ProcessCount = 0,
+                    ProcessMessage = $"Processing asset {extraResource}",
+                };
 
                 if (serializeObjects.Length > 0)
                 {

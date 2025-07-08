@@ -187,6 +187,7 @@ namespace SaintsField.Editor.AutoRunner
             // StartEditorCoroutine();
             foreach (ProcessInfo info in RunAutoRunners())
             {
+                // Debug.Log($"#AutoRunner# processing {info}");
                 if (!_isRunning)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
