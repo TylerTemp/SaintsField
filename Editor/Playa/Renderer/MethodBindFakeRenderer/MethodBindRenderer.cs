@@ -11,6 +11,7 @@ using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 {
@@ -33,7 +34,17 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 return;
             }
 
-            CheckMethodBindInternal(playaMethodBindAttribute, fieldWithInfo.MethodInfo, _serializedObject.targetObject, fieldWithInfo.Targets[0]).fixer?.Invoke();
+            Object targetObj;
+            try
+            {
+                targetObj = _serializedObject.targetObject;
+            }
+            catch (ArgumentNullException)
+            {
+                return;
+            }
+
+            CheckMethodBindInternal(playaMethodBindAttribute, fieldWithInfo.MethodInfo, targetObj, fieldWithInfo.Targets[0]).fixer?.Invoke();
         }
 
         private static (string error, Action fixer) CheckMethodBindInternal(IPlayaMethodBindAttribute playaMethodBindAttribute, MethodInfo methodInfo, UnityEngine.Object serializedTarget, object target)

@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             child.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
                 SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
-                HandleVisibility.SetOutView(SerializedUtils.GetUniqueId(property));
+                HandleVisibility.SetOutView(_positionHandleInfoUIToolkit.Id);
             });
             container.Add(child);
         }
