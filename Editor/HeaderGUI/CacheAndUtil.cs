@@ -46,32 +46,38 @@ namespace SaintsField.Editor.HeaderGUI
             return EditorStyles.iconButton;
 #else
 
-            return _iconButtonStyleFallback ??= new GUIStyle(GUI.skin.button)
+            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
+            if(_iconButtonStyleFallback == null)
             {
-                normal =
+                _iconButtonStyleFallback = new GUIStyle(GUI.skin.button)
                 {
-                    background = MakeTex(2, 2, Color.clear),
-                    scaledBackgrounds = new Texture2D[] { },
-                },
-                active =
-                {
-                    scaledBackgrounds = new Texture2D[] { },
-                },
-                hover =
-                {
-                    background = MakeTex(2, 2, EColor.EditorButtonHover.GetColor()),
-                    scaledBackgrounds = new Texture2D[] { },
-                },
-                onNormal =
-                {
-                    scaledBackgrounds = Array.Empty<Texture2D>(),
-                },
-                onActive =
-                {
-                    scaledBackgrounds = Array.Empty<Texture2D>(),
-                },
-                border = new RectOffset(0, 0, 0, 0),
-            };
+                    normal =
+                    {
+                        background = MakeTex(2, 2, Color.clear),
+                        scaledBackgrounds = new Texture2D[] { },
+                    },
+                    active =
+                    {
+                        scaledBackgrounds = new Texture2D[] { },
+                    },
+                    hover =
+                    {
+                        background = MakeTex(2, 2, EColor.EditorButtonHover.GetColor()),
+                        scaledBackgrounds = new Texture2D[] { },
+                    },
+                    onNormal =
+                    {
+                        scaledBackgrounds = Array.Empty<Texture2D>(),
+                    },
+                    onActive =
+                    {
+                        scaledBackgrounds = Array.Empty<Texture2D>(),
+                    },
+                    border = new RectOffset(0, 0, 0, 0),
+                };
+            }
+
+            return _iconButtonStyleFallback;
 #endif
 
         }
