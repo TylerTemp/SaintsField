@@ -312,13 +312,7 @@ namespace SaintsField.Editor.HeaderGUI
                 //     height = useRect.height - 2,
                 // };
 
-                GUIStyle btnStyle =
-#if UNITY_2021_3_OR_NEWER
-                        EditorStyles.iconButton
-#else
-                        EditorStyles.miniButton
-#endif
-                    ;
+                GUIStyle btnStyle = CacheAndUtil.GetIconButtonStyle();
 
                 if (GUI.Button(useRect, GUIContent.none, btnStyle))
                 {

@@ -680,7 +680,7 @@ namespace SaintsField.Editor.Core
 
         private Texture GetTexture2D(TextureCacheKey cacheKey, RichTextChunk curChunk, float height)
         {
-            if (_textureCache.TryGetValue(cacheKey, out Texture texture))
+            if (_textureCache.TryGetValue(cacheKey, out Texture texture) && texture != null)
             {
                 return texture;
             }
@@ -693,7 +693,7 @@ namespace SaintsField.Editor.Core
             );
             if (texture.width != 1 && texture.height != 1)
             {
-                _textureCache.Add(cacheKey, texture);
+                _textureCache[cacheKey] = texture;
             }
 
             return texture;
