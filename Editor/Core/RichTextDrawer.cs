@@ -639,12 +639,12 @@ namespace SaintsField.Editor.Core
                         IconPath = curChunk.Content,
                     };
 
-                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture))
+                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture) || texture == null)
                     {
                         texture = Util.LoadResource<Texture2D>(curChunk.Content);
                         if (texture.width != 1 && texture.height != 1)
                         {
-                            _textureCache.Add(cacheKey, texture);
+                            _textureCache[cacheKey] = texture;
                         }
                     }
 
