@@ -46,6 +46,7 @@ namespace SaintsField
         // this is dynamic color
         EditorSeparator,
         EditorEmphasized,
+        EditorButtonHover,
 #endif
     }
 
@@ -120,6 +121,8 @@ namespace SaintsField
                     return Colors.GetColorByName("editorseparator");
                 case EColor.EditorEmphasized:
                     return Colors.GetColorByName("editoremphasized");
+                case EColor.EditorButtonHover:
+                    return Colors.GetColorByName("editorbuttonhover");
 #endif
                 default:
                     return Color.white;
