@@ -4,9 +4,9 @@ using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
+namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
 {
-    public partial class SaintsDictionaryWrapDrawer
+    public partial class BaseWrapDrawer
     {
         protected override bool UseCreateFieldIMGUI => true;
 

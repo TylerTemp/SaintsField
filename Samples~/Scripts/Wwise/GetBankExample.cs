@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
 using AK.Wwise;
 using MaJiang.Utils;
 using SaintsField.Wwise;
-using UnityEngine;
 using Event = AK.Wwise.Event;
 
 namespace SaintsField.Samples.Scripts.Wwise

@@ -1,4 +1,7 @@
+// ReSharper disable once RedundantUsingDirective
 using System;
+// ReSharper disable once RedundantUsingDirective
+using UnityEditor;
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using UnityEngine;

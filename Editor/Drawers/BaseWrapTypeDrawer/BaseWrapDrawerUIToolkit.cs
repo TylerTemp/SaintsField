@@ -1,18 +1,16 @@
 #if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
+namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
 {
-    public partial class SaintsDictionaryWrapDrawer
+    public partial class BaseWrapDrawer
     {
         protected override bool UseCreateFieldUIToolKit => true;
 
@@ -58,6 +56,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary.DictionaryWrap
                     null,
                     parent
                 );
+            // ReSharper disable once InvertIf
             if (r != null)
             {
                 r.style.width = new StyleLength(Length.Percent(100));

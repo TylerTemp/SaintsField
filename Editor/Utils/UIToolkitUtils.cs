@@ -470,7 +470,7 @@ namespace SaintsField.Editor.Utils
             // };
             // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
             // return (result, false);
-            // Debug.Log($"use {useDrawerType} for {property.propertyPath}");
+            // Debug.Log($"use {useDrawerType} for {property.propertyPath}, label={label}");
             PropertyDrawer propertyDrawer = SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, fieldInfo, useAttribute, label);
             // Debug.Log(saintsPropertyDrawer);
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
@@ -501,7 +501,7 @@ namespace SaintsField.Editor.Utils
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
             // We don't need to handle decorators either
-            PropertyField result = new PropertyField(property)
+            PropertyField result = new PropertyField(property, string.IsNullOrEmpty(label) ? "": label)
             {
                 style =
                 {

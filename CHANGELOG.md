@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.21.1 ##
+
+1.  Fix Header Drawers might read a disposed texture and give error [#255](https://github.com/TylerTemp/SaintsField/issues/255)
+2.  UI Toolkit: fix drawer still trying to access a disposed property in `Button`
+3.  UI Toolkit: fix `SaintsDictionary` can not hide a label if the target is drawn by an IMGUI component
+4.  Add `HeaderButtonGhost` support for Unity < 2021.3 [#257](https://github.com/TylerTemp/SaintsField/issues/257)
+
 ## 4.21.0 ##
 
 1.  UI Toolkit: Add `SaintsHashSet<T>` & `ReferenceHashSet<T>` data type as serializable `HashSet` [#251](https://github.com/TylerTemp/SaintsField/issues/251)
