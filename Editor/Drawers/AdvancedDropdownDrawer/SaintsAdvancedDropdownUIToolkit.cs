@@ -348,6 +348,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                 bool hasValueMatch = matchedValueOptions.Length > 0;
 
+                bool anyHasIcon = false;
+                List<Image> iconImages = new List<Image>(matchedValueOptions.Length);
+
                 scrollView.Clear();
                 foreach ((IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value) in matchedValueOptions)
                 {
@@ -373,9 +376,12 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}, value={value}");
 #endif
 
+                    Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
+                    iconImages.Add(itemIconImage);
                     if(!string.IsNullOrEmpty(icon))
                     {
-                        itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(icon);
+                        anyHasIcon = true;
+                        itemIconImage.image = Util.LoadResource<Texture2D>(icon);
                     }
 
                     if (curSelect)
@@ -448,9 +454,12 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                     itemContainer.Q<Label>("item-content").text = sb.ToString();
 
+                    Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
+                    iconImages.Add(itemIconImage);
                     if(!string.IsNullOrEmpty(pathStack.Target.icon))
                     {
-                        itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(pathStack.Target.icon);
+                        anyHasIcon = true;
+                        itemIconImage.image = Util.LoadResource<Texture2D>(pathStack.Target.icon);
                     }
 
                     // if (curSelect)
@@ -503,6 +512,13 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             unityTextAlign = TextAnchor.MiddleCenter,
                         },
                     });
+                }
+                else if (!anyHasIcon)
+                {
+                    foreach (Image iconImage in iconImages)
+                    {
+                        iconImage.style.display = DisplayStyle.None;
+                    }
                 }
             });
 
@@ -741,6 +757,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 ? "saintsfield-advanced-dropdown-anim-right"
                 : "saintsfield-advanced-dropdown-anim-left");
 
+            bool anyHasIcon = false;
+            List<Image> iconImages = new List<Image>(displayPage.Count);
+
             foreach ((IAdvancedDropdownList dropdownItem, int index) in displayPage.WithIndex())
             {
                 if (dropdownItem.isSeparator)
@@ -763,9 +782,12 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                 itemContainer.Q<Label>("item-content").text = dropdownItem.displayName;
 
+                Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
+                iconImages.Add(itemIconImage);
                 if(!string.IsNullOrEmpty(dropdownItem.icon))
                 {
-                    itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(dropdownItem.icon);
+                    itemIconImage.image = Util.LoadResource<Texture2D>(dropdownItem.icon);
+                    anyHasIcon = true;
                 }
                 List<AdvancedDropdownAttributeDrawer.SelectStack> prePageStack = pageStack.SkipLast(1).ToList();
                 _pagePreAction = pageStack.Count <= 1
@@ -861,6 +883,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 }
 
                 scrollContent.Add(elementItem);
+            }
+
+            if (!anyHasIcon)
+            {
+                foreach (Image iconImage in iconImages)
+                {
+                    iconImage.style.display = DisplayStyle.None;
+                }
             }
 
             scrollContent.RegisterCallback<GeometryChangedEvent>(GeoAnimIntoView);

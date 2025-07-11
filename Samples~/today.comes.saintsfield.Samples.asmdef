@@ -15,7 +15,8 @@
         "Unity.TextMeshPro",
         "Kybernetik.UltEvents",
         "AYellowpaper.SerializeInterfaces",
-        "com.inter-illusion.i2"
+        "com.inter-illusion.i2",
+        "today.comes.saintsfield.Runtime.TypeReference"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

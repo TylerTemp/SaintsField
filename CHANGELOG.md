@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.22.0 ##
+
+1.  Add `TypeReference` type to serialize a `System.Type`
+2.  UI Toolkit: Fix data type in SaintsField with attributes will render the attributes twice
+3.  UI Toolkit: `AdvancedDropdown` fix long text align, and now it hides the icon space if all items have no icon
+
 ## 4.21.1 ##
 
 1.  Fix Header Drawers might read a disposed texture and give error [#255](https://github.com/TylerTemp/SaintsField/issues/255)

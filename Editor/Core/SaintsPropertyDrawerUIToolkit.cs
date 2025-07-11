@@ -49,6 +49,7 @@ namespace SaintsField.Editor.Core
             $"{SerializedUtils.GetUniqueId(property)}--saints-field--container";
 
         protected virtual bool UseCreateFieldUIToolKit => false;
+        public bool SaintsSubRenderer = false;
 
         // public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
         public IReadOnlyList<PropertyAttribute> AppendPropertyAttributes = null;
@@ -87,15 +88,22 @@ namespace SaintsField.Editor.Core
 
             (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
             PropertyAttribute[] allAttributes;
-            if (OverridePropertyAttributes != null)
+            if (SaintsSubRenderer)
             {
-                allAttributes = OverridePropertyAttributes.ToArray();
+                allAttributes = attribute == null? Array.Empty<PropertyAttribute>(): new []{attribute};
             }
             else
             {
-                allAttributes = AppendPropertyAttributes == null
-                    ? allAttributesRaw
-                    : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
+                if (OverridePropertyAttributes != null)
+                {
+                    allAttributes = OverridePropertyAttributes.ToArray();
+                }
+                else
+                {
+                    allAttributes = AppendPropertyAttributes == null
+                        ? allAttributesRaw
+                        : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
+                }
             }
 
             ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
@@ -631,7 +639,7 @@ namespace SaintsField.Editor.Core
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property, allAttributes);
 
-            // Debug.Log($"attrOrNull={attrOrNull}; drawerType={drawerType}; allAttribute={string.Join(", ", allAttributes)}");
+            // Debug.Log($"{GetType().Name}: attrOrNull={attrOrNull}; drawerType={drawerType}; allAttribute={string.Join(", ", allAttributes)}");
 
             if (drawerType == null)
             {
@@ -649,7 +657,9 @@ namespace SaintsField.Editor.Core
             PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);
             if (typeDrawer is SaintsPropertyDrawer spd)
             {
+                // Debug.Log($"{GetType().Name}: fall to SaintsPropertyDrawer={spd}; allAttribute={string.Join(", ", allAttributes)}");
                 spd.InHorizontalLayout = InHorizontalLayout;
+                spd.SaintsSubRenderer = true;
             }
 
             VisualElement element = DrawUsingDrawerInstance(passedPreferredLabel, drawerType, typeDrawer, property, info,
@@ -1089,14 +1099,16 @@ namespace SaintsField.Editor.Core
                 // Debug.Log(string.Join(",", PropertyAttributeToPropertyDrawers.Keys));
 
                 // ReSharper disable once UseIndexFromEndExpression
-                VisualElement topRoot = parentRoots[parentRoots.Count - 1];
+                if(parentRoots.Count > 0)
+                {
+                    VisualElement topRoot = parentRoots[parentRoots.Count - 1];
 
-                // PropertyField thisPropField = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass);
+                    // PropertyField thisPropField = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass);
 
-                // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
-                // Debug.Log($"container={container.Count}");
+                    // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
+                    // Debug.Log($"container={container.Count}");
 
-                // thisPropField.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/UnityLabelTransparent.uss"));
+                    // thisPropField.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/UnityLabelTransparent.uss"));
 
 //                 // really... this delay is not predictable
 //                 containerElement.schedule.Execute(() =>
@@ -1115,8 +1127,9 @@ namespace SaintsField.Editor.Core
 //
 //                 });
 
-                topRoot.Clear();
-                topRoot.Add(deepestContainer);
+                    topRoot.Clear();
+                    topRoot.Add(deepestContainer);
+                }
 
                 // thisPropField.Bind(property.serializedObject);
                 // fallbackField.Unbind();

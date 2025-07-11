@@ -5992,6 +5992,114 @@ public ReferenceHashSet<IReference> refHashSet;
 
 [![video](https://github.com/user-attachments/assets/0ff1ce5a-6432-4aba-bfda-d71f5f56a54f)](https://github.com/user-attachments/assets/8e01cb94-b8bb-49fb-ac58-384ec3c9c2a4)
 
+### `TypeReference` ###
+
+Serialize a `System.Type`
+
+By default, it searchs the current assembly and referenced assembly and shows all visible (public) types.
+
+You can add an extra `[TypeReference]` to control the behavior.
+
+**Parameters**:
+
+*   `EType eType = EType.Current`: Options. See below
+*   `Type[] superTypes = null`: A list of type/interface, the option list types are inhirent from these types. The type in the list is also included in list.
+
+EType:
+
+```csharp
+[Flags]
+public enum EType
+{
+    /// <summary>
+    /// Current assembly
+    /// </summary>
+    CurrentOnly = 1,
+    /// <summary>
+    ///  Current referenced assemblies.
+    /// </summary>
+    CurrentReferenced = 1 << 1,
+
+    /// <summary>
+    /// Current & referenced assemblies.
+    /// </summary>
+    Current = CurrentOnly | CurrentReferenced,
+
+    /// <summary>
+    /// Include "mscorlib" assembly.
+    /// </summary>
+    MsCorLib = 1 << 2,
+    /// <summary>
+    /// Include "System" assembly.
+    /// </summary>
+    System = 1 << 3,
+    /// <summary>
+    /// Include "System.Core" assembly.
+    /// </summary>
+    SystemCore = 1 << 4,
+    /// <summary>
+    /// Anything except "mscorlib", "System", "System.Core" assemblies.
+    /// </summary>
+    NonEssential = 1 << 5,
+    /// <summary>
+    /// All assemblies.
+    /// </summary>
+    AllAssembly = MsCorLib | System | SystemCore | NonEssential,
+
+    /// <summary>
+    /// Allow non-public types.
+    /// </summary>
+    AllowInternal = 1 << 6,
+
+    /// <summary>
+    /// Group the list by the assmbly short name.
+    /// </summary>
+    GroupAssmbly = 1 << 7,
+    /// <summary>
+    /// Group the list by the type namespace.
+    /// </summary>
+    GroupNameSpace = 1 << 8,
+}
+```
+
+Please note: if you have many type options, a big list might be slow.
+
+Example:
+
+```csharp
+using SaintsField;
+
+// default using current & referenced assembly
+public TypeReference typeReference;
+
+// current assembly, and group it
+[TypeReference(EType.CurrentOnly | EType.GroupAssmbly | EType.GroupNameSpace)]
+[BelowButton(nameof(TestCreate))]
+public TypeReference typeReference2;
+
+private void TestCreate(TypeReference tr)
+{
+    // you can also use `tr.Type`
+    object t = Activator.CreateInstance(tr);
+    Debug.Log(t);
+}
+
+// all assembly with non-public types, and group it
+[TypeReference(EType.AllAssembly | EType.AllowInternal | EType.GroupAssmbly)]
+public TypeReference typeReference3;
+
+public interface IMyTypeRef {}
+private struct MyTypeStruct: IMyTypeRef{}
+private class MyTypeClass : IMyTypeRef{}
+
+// Only types that implement IMyTypeRef
+[TypeReference(EType.AllAssembly | EType.AllowInternal, superTypes: new[]{typeof(IMyTypeRef)})]
+public TypeReference typeReferenceOf;
+```
+[![](https://github.com/user-attachments/assets/a11c8c68-019b-4b13-abde-f8c21ed2fd15)](https://github.com/user-attachments/assets/edac2a97-b9e1-4e8e-aa7f-567f25a50528)
+
+This feature is heavy inspired by [ClassTypeReference-for-Unity](https://github.com/SolidAlloy/ClassTypeReference-for-Unity), please go give them a star!
+
 ## Addressable ##
 
 These tools are for [Unity Addressable](https://docs.unity3d.com/Packages/com.unity.addressables@latest). It's there only if you have `Addressable` installed.

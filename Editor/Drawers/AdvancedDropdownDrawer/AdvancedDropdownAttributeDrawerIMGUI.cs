@@ -60,15 +60,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(display), FocusType.Keyboard))
             {
-#pragma warning disable CS0219
-                float minHeight = AdvancedDropdownAttribute.MinHeight;
-#pragma warning restore CS0219
-                float itemHeight = AdvancedDropdownAttribute.ItemHeight > 0
-                    ? AdvancedDropdownAttribute.ItemHeight
-                    : EditorGUIUtility.singleLineHeight;
-#pragma warning disable CS0219
-                float titleHeight = AdvancedDropdownAttribute.TitleHeight;
-#pragma warning restore CS0219
+                // float minHeight = AdvancedDropdownAttribute.MinHeight;
+                // float itemHeight = AdvancedDropdownAttribute.ItemHeight > 0
+                //     ? AdvancedDropdownAttribute.ItemHeight
+                //     : EditorGUIUtility.singleLineHeight;
+                // float titleHeight = AdvancedDropdownAttribute.TitleHeight;
                 // Vector2 size;
                 // if (minHeight < 0)
                 // {

@@ -21,18 +21,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             public string ChangedValue;
         }
 
-        private static readonly Dictionary<string, CachedImGui> _cachedImGui = new Dictionary<string, CachedImGui>();
+        private static readonly Dictionary<string, CachedImGui> CachedImGuiDict = new Dictionary<string, CachedImGui>();
 
         private static CachedImGui EnsureCache(SerializedProperty property)
         {
             string key = SerializedUtils.GetUniqueId(property);
             // ReSharper disable once InvertIf
-            if(!_cachedImGui.TryGetValue(key, out CachedImGui cachedImGui))
+            if(!CachedImGuiDict.TryGetValue(key, out CachedImGui cachedImGui))
             {
-                _cachedImGui[key] = cachedImGui = new CachedImGui();
+                CachedImGuiDict[key] = cachedImGui = new CachedImGui();
                 NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
-                    _cachedImGui.Remove(key);
+                    CachedImGuiDict.Remove(key);
                 });
             }
 
