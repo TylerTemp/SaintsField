@@ -132,7 +132,7 @@ namespace SaintsField
                 : type;
 
             string typeName = type.Name;
-            if (typeName.Contains('`'))
+            if (typeName.Contains("`"))
             {
                 // ReSharper disable once ReplaceSubstringWithRangeIndexer
                 typeName = typeName.Substring(0, typeName.IndexOf('`'));
