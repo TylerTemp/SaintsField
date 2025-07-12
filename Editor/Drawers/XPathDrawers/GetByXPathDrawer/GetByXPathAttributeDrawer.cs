@@ -567,6 +567,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
             // ReSharper disable once UseNegatedPatternInIsExpression
+            // ReSharper disable once InvertIf
             if (!(inspectingGo is null))
             {
                 Object prefabHandle = PrefabUtility.GetPrefabInstanceHandle(inspectingGo);

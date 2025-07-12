@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -165,6 +165,7 @@ GameObject:
   - component: {fileID: 1697117599}
   - component: {fileID: 1697117600}
   - component: {fileID: 1697117601}
+  - component: {fileID: 1697117603}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -209,7 +210,7 @@ MonoBehaviour:
     stringV: sv
     prefab: {fileID: 4866937864601617533, guid: e64b01eb61f25f94cbcd42e39080ccdd, type: 3}
     sceneObj: {fileID: 824025883}
-  b: f0
+  b: 0284000000530061006d0070006c00650073002e004500760065006e00740073002e005300650072006900610054006500730074002b0053006500720043006f006e007400610069006e00650072002c00200074006f006400610079002e0063006f006d00650073002e007300610069006e00740073006600690065006c0064002e00530061006d0070006c00650073002e004500760065006e00740073002c002000560065007200730069006f006e003d0030002e0030002e0030002e0030002c002000430075006c0074007500720065003d006e00650075007400720061006c002c0020005000750062006c00690063004b006500790054006f006b0065006e003d006e0075006c006c0002000000730076004a00000047006c006f00620061006c004f0062006a00650063007400490064005f00560031002d0031002d00650036003400620030003100650062003600310066003200350066003900340063006200630064003400320065003300390030003800300063006300640064002d0034003800360036003900330037003800360034003600300031003600310037003500330033002d0030004000000047006c006f00620061006c004f0062006a00650063007400490064005f00560031002d0032002d00390036003500610062003300390062006400380037003300320064003100340061003900630062003500660031003200340030003100660038003800340063002d003800320034003000320035003800380033002d003000
 --- !u!114 &1697117601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,14 +240,67 @@ MonoBehaviour:
         m_CallState: 2
   saintsEvent:
     _persistentCalls:
-    - _isStatic: 0
-      _target: {fileID: 1697117598}
+    - callState: 1
+      _methodName: SimpleMethod
+      _isStatic: 0
+      _target: {fileID: 1697117601}
       _staticType:
         _typeNameAndAssembly: 
         _monoScriptGuid: 
-      _methodName: SimpleMethod
       _persistentArguments: []
-      callState: 0
+    - callState: 1
+      _methodName: StaticMethod
+      _isStatic: 1
+      _target: {fileID: 1697117601}
+      _staticType:
+        _typeNameAndAssembly: Samples.Events.EventExample, today.comes.saintsfield.Samples.Events
+        _monoScriptGuid: cc9d47b142db44944936bf07994a1370
+      _persistentArguments: []
+--- !u!114 &1697117603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1697117598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a40848f156d09749a6dbf7b64f43992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  saintsEvent1Int:
+    _persistentCalls:
+    - callState: 1
+      _methodName: M1IntD
+      _isStatic: 0
+      _target: {fileID: 1697117603}
+      _staticType:
+        _typeNameAndAssembly: 
+        _monoScriptGuid: 
+      _persistentArguments:
+      - invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: 
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeBinaryData: 
+    - callState: 1
+      _methodName: M1IntS
+      _isStatic: 0
+      _target: {fileID: 1697117603}
+      _staticType:
+        _typeNameAndAssembly: 
+        _monoScriptGuid: 
+      _persistentArguments:
+      - invokedParameterIndex: -1
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.Int32, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeBinaryData: 0259000000530079007300740065006d002e0049006e007400330032002c0020006d00730063006f0072006c00690062002c002000560065007200730069006f006e003d0034002e0030002e0030002e0030002c002000430075006c0074007500720065003d006e00650075007400720061006c002c0020005000750062006c00690063004b006500790054006f006b0065006e003d00620037003700610035006300350036003100390033003400650030003800390002590000
+  range1Int: 8
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

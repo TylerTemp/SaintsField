@@ -144,6 +144,8 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
     *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
     *   `Assets/Editor Default Resources/`, then fallback to built-in editor resources by name (using [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html))
 
+    You can also use Unity Editor's built-in icons. See [UnityEditorIcons](https://github.com/nukadelic/UnityEditorIcons). e.g. `<icon=d_AudioListener Icon/>`
+
     for `color` it supports:
 
     *   Standard [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) colors:
@@ -2452,7 +2454,7 @@ Showcase:
 
 ```csharp
 // get the main camera from scene
-[GetByXPath("scene:://[@Tag = MainCamera][]")] public Camera mainCamera;
+[GetByXPath("scene:://[@Tag = MainCamera]")] public Camera mainCamera;
 
 // only allow the user to pick from the target folder, which the `Hero` script returns `isAvaliable` as true
 [GetByXPath(EXP.JustPicker, "assets::/Art/Heros/*.prefab[@{GetComponent(Hero).isAvaliable}]")]

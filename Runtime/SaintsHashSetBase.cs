@@ -240,6 +240,7 @@ namespace SaintsField
         }
 
         int IReadOnlyCollection<T>.Count => HashSet.Count;
+        public int Count => HashSet.Count;
         #endregion
     }
 }
