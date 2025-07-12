@@ -164,6 +164,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1697117599}
   - component: {fileID: 1697117600}
+  - component: {fileID: 1697117601}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -208,7 +209,44 @@ MonoBehaviour:
     stringV: sv
     prefab: {fileID: 4866937864601617533, guid: e64b01eb61f25f94cbcd42e39080ccdd, type: 3}
     sceneObj: {fileID: 824025883}
-  b: "\x02\0"
+  b: f0
+--- !u!114 &1697117601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1697117598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc9d47b142db44944936bf07994a1370, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rawEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  saintsEvent:
+    _persistentCalls:
+    - _isStatic: 0
+      _target: {fileID: 1697117598}
+      _staticType:
+        _typeNameAndAssembly: 
+        _monoScriptGuid: 
+      _methodName: SimpleMethod
+      _persistentArguments: []
+      callState: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

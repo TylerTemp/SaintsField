@@ -1,14 +1,36 @@
 using System;
+using UnityEngine;
 
-namespace SaintsField.Runtime.Events
+// ReSharper disable once CheckNamespace
+namespace SaintsField.Events
 {
     [Serializable]
-    public class PersistentArgument
+    public class PersistentArgument: ISerializationCallbackReceiver
     {
-        public bool isUnityObject;
-        public UnityEngine.Object unityObject;
+        public bool isUnityObject;  // true=unityObject; false=serializeBinaryData(SerializeObject)
 
-        public byte[] serializeBinaryData;
+        public TypeReference typeReference;
+
+        public UnityEngine.Object unityObject;
+        public byte[] serializeBinaryData = Array.Empty<byte>();
         public object SerializeObject;
+
+        public void OnBeforeSerialize()
+        {
+            if (!isUnityObject)
+            {
+                serializeBinaryData = SerializationUtil.ToBinaryType(SerializeObject);
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if(!isUnityObject)
+            {
+                SerializeObject = SerializationUtil.FromBinaryType(typeReference.Type, serializeBinaryData);
+            }
+        }
+
+        public Type GetArgumentType() => isUnityObject ? unityObject?.GetType() : typeReference.Type;
     }
 }
