@@ -83,7 +83,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                     rawTitle = result;
                 }
 
-                if(!CacheAndUtil.ParsedXmlCache.TryGetValue(rawTitle, out titleChunks))
+                if(rawTitle.Contains("<field") || !CacheAndUtil.ParsedXmlCache.TryGetValue(rawTitle, out titleChunks))
                 {
                     // RichTextDrawer richTextDrawer = CacheAndUtil.GetCachedRichTextDrawer();
                     CacheAndUtil.ParsedXmlCache[rawTitle] = titleChunks =

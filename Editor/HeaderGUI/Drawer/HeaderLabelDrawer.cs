@@ -60,7 +60,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
 
         public static (bool used, HeaderUsed headerUsed) Draw(object target, HeaderArea headerArea, HeaderLabelAttribute headerLabelAttribute, DrawHeaderGUI.RenderTargetInfo renderTargetInfo)
         {
-            string rawLabel = "";
+            string rawLabel;
             string labelName = GetLabelName(target, renderTargetInfo);
 
             if (string.IsNullOrEmpty(headerLabelAttribute.Label))
@@ -150,7 +150,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                 return (false, default);
             }
 
-            if(!ParsedXmlCache.TryGetValue(rawLabel, out IReadOnlyList<RichTextDrawer.RichTextChunk> labelChunks))
+            if(rawLabel.Contains("<field") || !ParsedXmlCache.TryGetValue(rawLabel, out IReadOnlyList<RichTextDrawer.RichTextChunk> labelChunks))
             {
                 ParsedXmlCache[rawLabel] = labelChunks =
                     RichTextDrawer.ParseRichXml(rawLabel, labelName, null, renderTargetInfo.MemberInfo, target).ToArray();
