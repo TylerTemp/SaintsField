@@ -13,7 +13,8 @@
         "GUID:8b6bbe69048c4f84dbb927d80daf7d97",
         "GUID:55b98396b7628454da7ce17a99ac5e67",
         "GUID:2b74eef957a741043a2d4a395f1efca6",
-        "GUID:4088d7a88942d3946a9372aea28cbc8c"
+        "GUID:4088d7a88942d3946a9372aea28cbc8c",
+        "GUID:0a1d2219eb05a8f4aa17c55213c96832"
     ],
     "includePlatforms": [
         "Editor"
@@ -59,6 +60,11 @@
             "name": "com.unity.nuget.newtonsoft-json",
             "expression": "",
             "define": "SAINTSFIELD_NEWTONSOFT_JSON"
+        },
+        {
+            "name": "com.unity.serialization",
+            "expression": "",
+            "define": "SAINTSFIELD_SERIALIZATION"
         }
     ],
     "noEngineReferences": false

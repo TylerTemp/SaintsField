@@ -163,8 +163,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1697117599}
-  - component: {fileID: 1697117600}
-  - component: {fileID: 1697117601}
   - component: {fileID: 1697117603}
   m_Layer: 0
   m_Name: GameObject
@@ -188,7 +186,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1697117600
+--- !u!114 &1697117603
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -197,33 +195,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1697117598}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e34af44fc0aa2f42bddbf8909ce3253, type: 3}
+  m_Script: {fileID: 11500000, guid: 2a40848f156d09749a6dbf7b64f43992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sc:
-    stringV: sv
-    prefab: {fileID: 4866937864601617533, guid: e64b01eb61f25f94cbcd42e39080ccdd, type: 3}
-    sceneObj: {fileID: 824025883}
-  s: "{\n    \"stringV\": \"sv\",\n    \"prefab\": \"GlobalObjectId_V1-1-e64b01eb61f25f94cbcd42e39080ccdd-4866937864601617533-0\",\n   
-    \"sceneObj\": \"GlobalObjectId_V1-2-965ab39bd8732d14a9cb5f12401f884c-824025883-0\"\n}"
-  des:
-    stringV: sv
-    prefab: {fileID: 4866937864601617533, guid: e64b01eb61f25f94cbcd42e39080ccdd, type: 3}
-    sceneObj: {fileID: 824025883}
-  b: 0284000000530061006d0070006c00650073002e004500760065006e00740073002e005300650072006900610054006500730074002b0053006500720043006f006e007400610069006e00650072002c00200074006f006400610079002e0063006f006d00650073002e007300610069006e00740073006600690065006c0064002e00530061006d0070006c00650073002e004500760065006e00740073002c002000560065007200730069006f006e003d0030002e0030002e0030002e0030002c002000430075006c0074007500720065003d006e00650075007400720061006c002c0020005000750062006c00690063004b006500790054006f006b0065006e003d006e0075006c006c0002000000730076004a00000047006c006f00620061006c004f0062006a00650063007400490064005f00560031002d0031002d00650036003400620030003100650062003600310066003200350066003900340063006200630064003400320065003300390030003800300063006300640064002d0034003800360036003900330037003800360034003600300031003600310037003500330033002d0030004000000047006c006f00620061006c004f0062006a00650063007400490064005f00560031002d0032002d00390036003500610062003300390062006400380037003300320064003100340061003900630062003500660031003200340030003100660038003800340063002d003800320034003000320035003800380033002d003000
---- !u!114 &1697117601
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1697117598}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc9d47b142db44944936bf07994a1370, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rawEvent:
+  unityEventCallState: 0
+  unityEvent1Int:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
@@ -238,41 +214,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  saintsEvent:
-    _persistentCalls:
-    - callState: 1
-      _methodName: SimpleMethod
-      _isStatic: 0
-      _target: {fileID: 1697117601}
-      _staticType:
-        _typeNameAndAssembly: 
-        _monoScriptGuid: 
-      _persistentArguments: []
-    - callState: 1
-      _methodName: StaticMethod
-      _isStatic: 1
-      _target: {fileID: 1697117601}
-      _staticType:
-        _typeNameAndAssembly: Samples.Events.EventExample, today.comes.saintsfield.Samples.Events
-        _monoScriptGuid: cc9d47b142db44944936bf07994a1370
-      _persistentArguments: []
---- !u!114 &1697117603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1697117598}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a40848f156d09749a6dbf7b64f43992, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
   saintsEvent1Int:
     _persistentCalls:
     - callState: 1
       _methodName: M1IntD
-      _isStatic: 0
+      _isStatic: 1
       _target: {fileID: 1697117603}
       _staticType:
         _typeNameAndAssembly: 
@@ -285,10 +231,10 @@ MonoBehaviour:
           _monoScriptGuid: 
         unityObject: {fileID: 0}
         serializeBinaryData: 
-    - callState: 1
+    - callState: 2
       _methodName: M1IntS
       _isStatic: 0
-      _target: {fileID: 1697117603}
+      _target: {fileID: 824025883}
       _staticType:
         _typeNameAndAssembly: 
         _monoScriptGuid: 

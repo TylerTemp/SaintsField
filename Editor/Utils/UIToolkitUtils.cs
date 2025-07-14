@@ -206,44 +206,55 @@ namespace SaintsField.Editor.Utils
             label.style.display = DisplayStyle.Flex;
         }
 
+        private static VisualTreeAsset _dropdownButtonTree;
+
         public static DropdownButtonField MakeDropdownButtonUIToolkit(string label)
         {
-            Button button = new Button
+            if (_dropdownButtonTree == null)
             {
-                style =
-                {
-                    height = EditorGUIUtility.singleLineHeight,
-                    flexGrow = 1,
-                    flexShrink = 1,
+                _dropdownButtonTree = Util.LoadResource<VisualTreeAsset>("UIToolkit/DropdownButton.uxml");
+            }
 
-                    paddingRight = 2,
-                    marginRight = 0,
-                    marginLeft = 0,
-                    alignItems = Align.FlexStart,
-                    unityTextAlign = TextAnchor.MiddleLeft,
-                },
-                // name = NameButtonField(property),
-                // userData = metaInfo.SelectedIndex == -1
-                //     ? null
-                //     : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item2,
-            };
+            TemplateContainer dropdownElement = _dropdownButtonTree.CloneTree();
+            Button button = dropdownElement.Q<Button>();
+            // Button button = new Button
+            // {
+            //     style =
+            //     {
+            //         height = EditorGUIUtility.singleLineHeight,
+            //         flexGrow = 1,
+            //         flexShrink = 1,
+            //
+            //         paddingRight = 2,
+            //         marginRight = 0,
+            //         marginLeft = 0,
+            //         alignItems = Align.FlexStart,
+            //         unityTextAlign = TextAnchor.MiddleLeft,
+            //     },
+            //     // name = NameButtonField(property),
+            //     // userData = metaInfo.SelectedIndex == -1
+            //     //     ? null
+            //     //     : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item2,
+            // };
 
-            Label buttonLabel = new Label
-            {
-                style =
-                {
-                    flexGrow = 1,
-                    flexShrink = 1,
-                    // paddingRight = 20,
-                    // textOverflow = TextOverflow.Ellipsis,
-                    // unityOverflowClipBox = OverflowClipBox.PaddingBox,
-                    overflow = Overflow.Hidden,
-                    marginRight = 15,
-                    unityTextAlign = TextAnchor.MiddleLeft,
-                },
-            };
+            Label buttonLabel = button.Q<Label>();
 
-            button.Add(buttonLabel);
+            // Label buttonLabel = new Label
+            // {
+            //     style =
+            //     {
+            //         flexGrow = 1,
+            //         flexShrink = 1,
+            //         // paddingRight = 20,
+            //         // textOverflow = TextOverflow.Ellipsis,
+            //         // unityOverflowClipBox = OverflowClipBox.PaddingBox,
+            //         overflow = Overflow.Hidden,
+            //         marginRight = 15,
+            //         unityTextAlign = TextAnchor.MiddleLeft,
+            //     },
+            // };
+
+            // button.Add(buttonLabel);
 
             DropdownButtonField dropdownButtonField = new DropdownButtonField(label, button, buttonLabel)
             {
@@ -257,19 +268,19 @@ namespace SaintsField.Editor.Utils
             // dropdownButtonField.AddToClassList("unity-base-field__aligned");
             dropdownButtonField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
 
-            dropdownButtonField.Add(new Image
-            {
-                image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
-                scaleMode = ScaleMode.ScaleToFit,
-                style =
-                {
-                    maxWidth = 12,
-                    maxHeight = EditorGUIUtility.singleLineHeight,
-                    position = Position.Absolute,
-                    right = 4,
-                },
-                pickingMode = PickingMode.Ignore,
-            });
+            // dropdownButtonField.Add(new Image
+            // {
+            //     image = Util.LoadResource<Texture2D>("classic-dropdown.png"),
+            //     scaleMode = ScaleMode.ScaleToFit,
+            //     style =
+            //     {
+            //         maxWidth = 12,
+            //         maxHeight = EditorGUIUtility.singleLineHeight,
+            //         position = Position.Absolute,
+            //         right = 4,
+            //     },
+            //     pickingMode = PickingMode.Ignore,
+            // });
 
             return dropdownButtonField;
         }
