@@ -1,10 +1,11 @@
 # Changelog
 
-## WIP ##
+## 4.22.1 ##
 
-1.  Fix `<field />` not get updated in `ComponentHeader`
+1.  Fix `<field />` not get updated in `ComponentHeader`  [#266](https://github.com/TylerTemp/SaintsField/issues/266)
 2.  Fix `EnumToogleButtons` expanded button not get disabled with `DisableIf`/`EnableIf`/`ReadOnly`
 3.  Add support for Unity's [`InspectorNameAttribute`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/InspectorNameAttribute.html) for `enum` type
+4.  IMGUI: fix `Table` foldout clicking on label didn't expand the field [#265](https://github.com/TylerTemp/SaintsField/issues/265)
 
 ## 4.22.0 ##
 
