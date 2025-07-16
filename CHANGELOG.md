@@ -1,5 +1,11 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix `<field />` not get updated in `ComponentHeader`
+2.  Fix `EnumToogleButtons` expanded button not get disabled with `DisableIf`/`EnableIf`/`ReadOnly`
+3.  Add support for Unity's [`InspectorNameAttribute`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/InspectorNameAttribute.html) for `enum` type
+
 ## 4.22.0 ##
 
 1.  Add `TypeReference` type to serialize a `System.Type`

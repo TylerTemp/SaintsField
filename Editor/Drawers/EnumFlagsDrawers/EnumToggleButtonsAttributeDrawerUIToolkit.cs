@@ -339,6 +339,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
                 FillButtonText(inlineToggleButton, bitValueToName.Value, property, info, parent);
                 inlineToggleButton.AddToClassList(ClassToggleBitButton(property));
+                inlineToggleButton.AddToClassList(ClassAllowDisable);
                 fieldContainer.Add(inlineToggleButton);
             }
 

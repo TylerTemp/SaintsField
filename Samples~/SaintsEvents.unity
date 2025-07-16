@@ -219,9 +219,9 @@ MonoBehaviour:
     - callState: 1
       _methodName: M1IntD
       _isStatic: 1
-      _target: {fileID: 1697117603}
+      _target: {fileID: 1697117599}
       _staticType:
-        _typeNameAndAssembly: 
+        _typeNameAndAssembly: UnityEngine.Transform, UnityEngine.CoreModule
         _monoScriptGuid: 
       _persistentArguments:
       - invokedParameterIndex: 0
@@ -236,7 +236,7 @@ MonoBehaviour:
       _isStatic: 0
       _target: {fileID: 824025883}
       _staticType:
-        _typeNameAndAssembly: 
+        _typeNameAndAssembly: UnityEngine.GameObject, UnityEngine.CoreModule
         _monoScriptGuid: 
       _persistentArguments:
       - invokedParameterIndex: -1
@@ -246,7 +246,7 @@ MonoBehaviour:
           _monoScriptGuid: 
         unityObject: {fileID: 0}
         serializeBinaryData: 0259000000530079007300740065006d002e0049006e007400330032002c0020006d00730063006f0072006c00690062002c002000560065007200730069006f006e003d0034002e0030002e0030002e0030002c002000430075006c0074007500720065003d006e00650075007400720061006c002c0020005000750062006c00690063004b006500790054006f006b0065006e003d00620037003700610035006300350036003100390033003400650030003800390002590000
-  range1Int: 8
+  range1Int: 6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -237,6 +237,8 @@ namespace SaintsField.Editor.Utils
             //     //     : metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item2,
             // };
 
+            button.style.flexGrow = 1;
+
             Label buttonLabel = button.Q<Label>();
 
             // Label buttonLabel = new Label
