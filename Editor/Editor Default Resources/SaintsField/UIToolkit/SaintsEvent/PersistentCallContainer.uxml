@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:Template name="DropdownButton" src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/DropdownButton.uxml?fileID=9197481963319205126&amp;guid=5b3989db140d9844cae8395164fffb9d&amp;type=3#DropdownButton" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+            <SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements.UnityEventCallStateSelector name="UnityEventCallStateSelector" style="width: 20px;" />
+            <SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements.CallbackTypeButton />
+            <uie:ObjectField style="flex-grow: 1; flex-shrink: 1; border-top-left-radius: 3px; border-top-right-radius: 0; border-bottom-right-radius: 0; border-bottom-left-radius: 3px;" />
+            <ui:Instance template="DropdownButton" name="TypeDropdownButton" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:Instance template="DropdownButton" name="MethodDropdownButton" style="flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>

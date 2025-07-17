@@ -103,12 +103,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.21.1**
+**4.22.1**
 
-1.  Fix Header Drawers might read a disposed texture and give error [#255](https://github.com/TylerTemp/SaintsField/issues/255)
-2.  UI Toolkit: fix drawer still trying to access a disposed property in `Button`
-3.  UI Toolkit: fix `SaintsDictionary` can not hide a label if the target is drawn by an IMGUI component
-4.  Add `HeaderButtonGhost` support for Unity < 2021.3 [#257](https://github.com/TylerTemp/SaintsField/issues/257)
+1.  Fix `<field />` not get updated in `ComponentHeader`  [#266](https://github.com/TylerTemp/SaintsField/issues/266)
+2.  Fix `EnumToogleButtons` expanded button not get disabled with `DisableIf`/`EnableIf`/`ReadOnly`
+3.  Add support for Unity's [`InspectorNameAttribute`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/InspectorNameAttribute.html) for `enum` type
+4.  IMGUI: fix `Table` foldout clicking on label didn't expand the field [#265](https://github.com/TylerTemp/SaintsField/issues/265)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -143,6 +143,8 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
     *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
     *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
     *   `Assets/Editor Default Resources/`, then fallback to built-in editor resources by name (using [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html))
+
+    You can also use Unity Editor's built-in icons. See [UnityEditorIcons](https://github.com/nukadelic/UnityEditorIcons). e.g. `<icon=d_AudioListener Icon/>`
 
     for `color` it supports:
 
@@ -2452,7 +2454,7 @@ Showcase:
 
 ```csharp
 // get the main camera from scene
-[GetByXPath("scene:://[@Tag = MainCamera][]")] public Camera mainCamera;
+[GetByXPath("scene:://[@Tag = MainCamera]")] public Camera mainCamera;
 
 // only allow the user to pick from the target folder, which the `Hero` script returns `isAvaliable` as true
 [GetByXPath(EXP.JustPicker, "assets::/Art/Heros/*.prefab[@{GetComponent(Hero).isAvaliable}]")]

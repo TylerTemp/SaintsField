@@ -8,7 +8,8 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections.LowLevel.Unsafe.NotBurstCompatible;
 using Unity.Serialization.Binary;
 
-namespace SaintsField.Runtime.Events
+// ReSharper disable once CheckNamespace
+namespace SaintsField.Events
 {
     public static class SerializationUtil
     {
@@ -77,7 +78,7 @@ namespace SaintsField.Runtime.Events
         }
 
 
-        public static unsafe byte[] ToBinaryType(Type type, object obj, IReadOnlyList<IBinaryAdapter> adapters = null)
+        public static unsafe byte[] ToBinaryType(object obj, IReadOnlyList<IBinaryAdapter> adapters = null)
         {
             UnsafeAppendBuffer buffer = new UnsafeAppendBuffer(16, 8, Allocator.Temp);
             try

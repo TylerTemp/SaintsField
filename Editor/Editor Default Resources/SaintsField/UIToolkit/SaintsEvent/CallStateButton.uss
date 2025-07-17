@@ -1,0 +1,7 @@
+.call-state-button-both {
+    color: rgb(0, 255, 0);
+}
+
+.call-state-button-runtime {
+    color: rgb(0, 255, 255);
+}

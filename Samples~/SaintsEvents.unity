@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -163,7 +163,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1697117599}
-  - component: {fileID: 1697117600}
+  - component: {fileID: 1697117603}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -186,7 +186,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1697117600
+--- !u!114 &1697117603
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -195,20 +195,58 @@ MonoBehaviour:
   m_GameObject: {fileID: 1697117598}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e34af44fc0aa2f42bddbf8909ce3253, type: 3}
+  m_Script: {fileID: 11500000, guid: 2a40848f156d09749a6dbf7b64f43992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sc:
-    stringV: sv
-    prefab: {fileID: 4866937864601617533, guid: e64b01eb61f25f94cbcd42e39080ccdd, type: 3}
-    sceneObj: {fileID: 824025883}
-  s: "{\n    \"stringV\": \"sv\",\n    \"prefab\": \"GlobalObjectId_V1-1-e64b01eb61f25f94cbcd42e39080ccdd-4866937864601617533-0\",\n   
-    \"sceneObj\": \"GlobalObjectId_V1-2-965ab39bd8732d14a9cb5f12401f884c-824025883-0\"\n}"
-  des:
-    stringV: sv
-    prefab: {fileID: 4866937864601617533, guid: e64b01eb61f25f94cbcd42e39080ccdd, type: 3}
-    sceneObj: {fileID: 824025883}
-  b: "\x02\0"
+  unityEventCallState: 0
+  unityEvent1Int:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  saintsEvent1Int:
+    _persistentCalls:
+    - callState: 1
+      _methodName: M1IntD
+      _isStatic: 1
+      _target: {fileID: 1697117599}
+      _staticType:
+        _typeNameAndAssembly: UnityEngine.Transform, UnityEngine.CoreModule
+        _monoScriptGuid: 
+      _persistentArguments:
+      - invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: 
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeBinaryData: 
+    - callState: 2
+      _methodName: M1IntS
+      _isStatic: 0
+      _target: {fileID: 824025883}
+      _staticType:
+        _typeNameAndAssembly: UnityEngine.GameObject, UnityEngine.CoreModule
+        _monoScriptGuid: 
+      _persistentArguments:
+      - invokedParameterIndex: -1
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.Int32, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeBinaryData: 0259000000530079007300740065006d002e0049006e007400330032002c0020006d00730063006f0072006c00690062002c002000560065007200730069006f006e003d0034002e0030002e0030002e0030002c002000430075006c0074007500720065003d006e00650075007400720061006c002c0020005000750062006c00690063004b006500790054006f006b0065006e003d00620037003700610035006300350036003100390033003400650030003800390002590000
+  range1Int: 6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

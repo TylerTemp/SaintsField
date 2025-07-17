@@ -1,0 +1,3 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Button text="I" parse-escape-sequences="true" display-tooltip-when-elided="true" style="width: 20px; margin-left: 0; border-top-left-radius: 0; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 0; height: 20px; -unity-font-style: bold;" />
+</ui:UXML>

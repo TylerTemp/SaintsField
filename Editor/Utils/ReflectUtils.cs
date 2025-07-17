@@ -507,11 +507,19 @@ namespace SaintsField.Editor.Utils
         {
             string enumFieldName = Enum.GetName(enumType, enumValue);
             FieldInfo fieldInfo = enumType.GetField(enumFieldName);
-            RichLabelAttribute[] attributes = ReflectCache.GetCustomAttributes<RichLabelAttribute>(fieldInfo);
-            if (attributes.Length > 0)
+            PropertyAttribute[] attributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(fieldInfo);
+
+            foreach (PropertyAttribute attribute in attributes)
             {
-                return (true, attributes[0].RichTextXml);
+                switch (attribute)
+                {
+                    case RichLabelAttribute r:
+                        return (true, r.RichTextXml);
+                    case InspectorNameAttribute i:
+                        return (true, i.displayName);
+                }
             }
+
             return (false, enumFieldName);
         }
     }

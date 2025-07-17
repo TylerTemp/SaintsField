@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
 
         private static IReadOnlyList<Assembly> _allAssemblies;
 
-        private static IEnumerable<Assembly> GetAssembly(EType eTypeFilter, object parent)
+        public static IEnumerable<Assembly> GetAssembly(EType eTypeFilter, object parent)
         {
             if (eTypeFilter.HasFlagFast(EType.CurrentOnly))
             {
@@ -64,7 +64,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
         // private IReadOnlyList<Assembly> _cachedAsssemblies;
         // private readonly Dictionary<Assembly, Type[]> _cachedAsssembliesTypes = new Dictionary<Assembly, Type[]>();
 
-        private static void FillAsssembliesTypes(IEnumerable<Assembly> assemblies, Dictionary<Assembly, Type[]> toFill)
+        public static void FillAsssembliesTypes(IEnumerable<Assembly> assemblies, Dictionary<Assembly, Type[]> toFill)
         {
             foreach (Assembly assembly in assemblies)
             {
@@ -182,7 +182,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 ? $"{loadedType.Name}:{loadedType.Namespace}({TypeReference.GetShortAssemblyName(loadedType)})"
                 : $"{loadedType.Name} <color={GrayHtmlColor}>{loadedType.Namespace}({TypeReference.GetShortAssemblyName(loadedType)})</color>";
 
-        private static string FormatPath(Type loadedType, EType eType, bool imGui)
+        public static string FormatPath(Type loadedType, EType eType, bool imGui)
         {
             string ass = TypeReference.GetShortAssemblyName(loadedType);
             string nameSpace = loadedType.Namespace;
