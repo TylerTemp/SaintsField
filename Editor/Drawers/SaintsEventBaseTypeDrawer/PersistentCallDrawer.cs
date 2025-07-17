@@ -1,3 +1,4 @@
+#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -106,3 +107,4 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         }
     }
 }
+#endif
