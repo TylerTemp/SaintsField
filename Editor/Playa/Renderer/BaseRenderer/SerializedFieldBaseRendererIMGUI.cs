@@ -98,8 +98,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 arraySize = FieldWithInfo.SerializedProperty.arraySize;
             }
 
-            bool arraySizechanged = CheckArraySizeAttribute(preCheckResult);
-            if (arraySizechanged)
+            bool arraySizeChanged = CheckArraySizeAttribute(preCheckResult);
+            if (arraySizeChanged)
             {
                 FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
             }
@@ -114,7 +114,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 SerializedFieldRenderPositionTargetIMGUI(position, preCheckResult);
 
                 if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
-                   (arraySizechanged || arraySize != FieldWithInfo.SerializedProperty.arraySize))
+                   (arraySizeChanged || arraySize != FieldWithInfo.SerializedProperty.arraySize))
                 {
                     FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
                     InvokeArraySizeCallback(onArraySizeChangedAttribute.Callback,

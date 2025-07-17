@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SERIALIZATION
+#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE
 using SaintsField.Editor.Core;
 using SaintsField.Events;
 using UnityEditor;
