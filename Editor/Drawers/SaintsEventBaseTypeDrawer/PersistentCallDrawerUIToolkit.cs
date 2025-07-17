@@ -8,7 +8,6 @@ using SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements;
 using SaintsField.Editor.Drawers.TypeReferenceTypeDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -97,6 +96,33 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             {
                 GroupName = groupName;
                 Types = types;
+            }
+        }
+
+        private readonly struct MethodSelect: IEquatable<MethodSelect>
+        {
+            public readonly Type Type;
+            public readonly MethodInfo MethodInfo;
+
+            public MethodSelect(Type type, MethodInfo methodInfo)
+            {
+                Type = type;
+                MethodInfo = methodInfo;
+            }
+
+            public bool Equals(MethodSelect other)
+            {
+                return Equals(MethodInfo, other.MethodInfo);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is MethodSelect other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return Util.CombineHashCode(Type, MethodInfo);
             }
         }
 
@@ -193,7 +219,11 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             VisualElement methodDropdownButtonField = root.Q<VisualElement>("MethodDropdownButton");
             Label methodDropdownButtonLabel = methodDropdownButtonField.Q<Label>();
             methodDropdownButtonLabel.text = propMethodName.stringValue;
-            methodDropdownButtonLabel.TrackPropertyValue(propMethodName, sp => methodDropdownButtonLabel.text = sp.stringValue);
+
+            GetMethodLabel(property);
+
+            methodDropdownButtonLabel.TrackPropertyValue(property, GetMethodLabel);
+            SerializedProperty propPersistentArguments = property.FindPropertyRelative(PropNamePersistentArguments);
             methodDropdownButtonField.Q<Button>().clicked += () =>
             {
                 bool isStatic = isStaticProperty.boolValue;
@@ -207,23 +237,48 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     return;
                 }
 
+                (bool isValidMethodInfo, IReadOnlyList<Type> methonParamTypes, Type returnType) = GetMethodParamsType(property);
+                MethodSelect selectedMethod = default;
+
                 const BindingFlags instanceFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
                 const BindingFlags staticFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
                 BindingFlags bf = isStatic ? staticFlags : instanceFlags;
-                List<MethodInfo> methodInfos = new List<MethodInfo>();
-                HashSet<string> methodNames = new HashSet<string>();
+                List<MethodSelect> methodSelects = new List<MethodSelect>();
                 foreach (Type subType in ReflectUtils.GetSelfAndBaseTypesFromType(type))
                 {
                     foreach (MethodInfo methodInfo in subType.GetMethods(bf))
                     {
-                        if(methodNames.Add(methodInfo.Name))
+                        if (methodInfo.IsGenericMethod)  // this is not supported, so far...
                         {
-                            methodInfos.Add(methodInfo);
+                            continue;
+                        }
+
+                        if (methodInfo.DeclaringType != subType)
+                        {
+                            continue;
+                        }
+
+                        MethodSelect methodSelect = new MethodSelect(subType, methodInfo);
+                        // ReSharper disable once InvertIf
+                        if(!methodSelects.Contains(methodSelect))
+                        {
+                            methodSelects.Add(methodSelect);
+
+                            // ReSharper disable once InvertIf
+                            if (isValidMethodInfo)
+                            {
+                                if (methodInfo.Name == propMethodName.stringValue &&
+                                    methodInfo.ReturnType == returnType &&
+                                    methodInfo.GetParameters().Select(p => p.ParameterType).SequenceEqual(methonParamTypes))
+                                {
+                                    selectedMethod = methodSelect;
+                                }
+                            }
                         }
                     }
                 }
 
-                AdvancedDropdownMetaInfo meta = GetMethodDropdownMeta(propMethodName.stringValue, methodInfos);
+                AdvancedDropdownMetaInfo meta = GetMethodDropdownMeta(selectedMethod, methodSelects, false);
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(methodDropdownButtonField.worldBound);
                 SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
                     meta,
@@ -232,16 +287,46 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     false,
                     (_, curItem) =>
                     {
-                        MethodInfo mi = (MethodInfo)curItem;
-                        propMethodName.stringValue = mi == null ? "" : mi.Name;
+                        MethodSelect mi = (MethodSelect)curItem;
+                        if (mi.MethodInfo == null)
+                        {
+                            propMethodName.stringValue = "";
+                            propPersistentArguments.arraySize = 0;
+                        }
+                        else
+                        {
+                            propMethodName.stringValue = mi.MethodInfo.Name;
+                            property.FindPropertyRelative(PropNameReturnTypeNameAndAssmbly).stringValue =
+                                TypeReference.GetTypeNameAndAssembly(mi.MethodInfo.ReturnType);
+                            ParameterInfo[] methodParams = mi.MethodInfo.GetParameters();
+                            propPersistentArguments.arraySize = methodParams.Length;
+                            for (int i = 0; i < methodParams.Length; i++)
+                            {
+                                SerializedProperty persistentArgument = propPersistentArguments.GetArrayElementAtIndex(i);
+                                ParameterInfo param = methodParams[i];
+                                persistentArgument.FindPropertyRelative(PropNamePersistentArgumentIsOptional).boolValue =
+                                    param.IsOptional;
+                                persistentArgument.FindPropertyRelative(PropNamePersistentArgumentNameAndAssmbly)
+                                    .stringValue = TypeReference.GetTypeNameAndAssembly(param.ParameterType);
+                            }
+
+                        }
+
                         property.serializedObject.ApplyModifiedProperties();
                     }
                 );
                 UnityEditor.PopupWindow.Show(worldBound, sa);
             };
+            return;
             // UnityEventCallStateSelector callStateSelector = container.Q<UnityEventCallStateSelector>();
             // SerializedProperty callStateProperty = property.FindPropertyRelative(PropNameCallState());
             // callStateSelector.Bind(callStateProperty.serializedObject);
+
+            void GetMethodLabel(SerializedProperty prop)
+            {
+                (bool isValidMethodInfo, IReadOnlyList<Type> methonParamTypes, Type returnType) = GetMethodParamsType(prop);
+                methodDropdownButtonLabel.text = isValidMethodInfo ? StringifyMethod(propMethodName.stringValue, methonParamTypes, returnType) : "-";
+            }
         }
 
         private static string FormatTypeNameAndAssmbleLabel(string name)

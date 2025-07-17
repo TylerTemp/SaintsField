@@ -219,9 +219,9 @@ MonoBehaviour:
     - callState: 1
       _methodName: M1IntD
       _isStatic: 1
-      _target: {fileID: 1697117599}
+      _target: {fileID: 1697117603}
       _staticType:
-        _typeNameAndAssembly: UnityEngine.Transform, UnityEngine.CoreModule
+        _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
         _monoScriptGuid: 
       _persistentArguments:
       - invokedParameterIndex: 0

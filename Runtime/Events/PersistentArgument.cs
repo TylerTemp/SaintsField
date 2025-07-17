@@ -1,5 +1,4 @@
 using System;
-// using SaintsField.Playa;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -8,11 +7,15 @@ namespace SaintsField.Events
     [Serializable]
     public class PersistentArgument: ISerializationCallbackReceiver
     {
+        public bool isOptional;
+
+        public bool useOptionalDefault;
+
         public int invokedParameterIndex = -1;  // -1=serialized; otherwise use dynamic invoked parameter index
 
         public bool isUnityObject;  // true=unityObject; false=serializeBinaryData(SerializeObject)
 
-        public TypeReference typeReference;
+        public TypeReference typeReference = new TypeReference();
 
         public UnityEngine.Object unityObject;
         public byte[] serializeBinaryData = Array.Empty<byte>();

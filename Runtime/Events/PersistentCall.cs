@@ -21,6 +21,8 @@ namespace SaintsField.Events
 
         [SerializeField] private PersistentArgument[] _persistentArguments;
 
+        [SerializeField] private TypeReference _returnType;
+
         public void Invoke(object[] args)
         {
             if (callState == UnityEventCallState.Off)
