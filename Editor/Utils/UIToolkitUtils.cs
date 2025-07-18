@@ -1,6 +1,4 @@
-﻿
-
-using SaintsField.Interfaces;
+﻿using SaintsField.Interfaces;
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using UnityEditor.UIElements;
@@ -652,6 +650,7 @@ namespace SaintsField.Editor.Utils
                                 unbindItem = (element, _) =>
                                 {
                                     element.Clear();
+                                    Unbind(element, property.serializedObject);
                                     // Debug.Log(element);
                                     // Debug.Log(i);
                                 },

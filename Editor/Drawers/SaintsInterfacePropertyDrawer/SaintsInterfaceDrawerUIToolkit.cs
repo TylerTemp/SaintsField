@@ -3,16 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Utils;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -26,8 +23,6 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             {
             }
         }
-
-
 
         private SaintsObjectPickerWindowUIToolkit _objectPickerWindowUIToolkit;
         private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
@@ -258,11 +253,11 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             }).Every(1);
 
-            saintsInterfaceField.RegisterCallback<AttachToPanelEvent>(e =>
+            saintsInterfaceField.RegisterCallback<AttachToPanelEvent>(_ =>
             {
                 SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshResults);
             });
-            saintsInterfaceField.RegisterCallback<DetachFromPanelEvent>(e =>
+            saintsInterfaceField.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
                 SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults);
             });

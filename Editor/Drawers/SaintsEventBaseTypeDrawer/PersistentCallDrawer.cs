@@ -125,7 +125,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             return $"{methodName}({string.Join(", ", methodParams.Select(StringifyType))}){(returnType == typeof(void)? "": $" => {StringifyType(returnType)}")}";
         }
 
-        private static string StringifyType(Type type)
+        public static string StringifyType(Type type)
         {
             if (type == typeof(string))
             {

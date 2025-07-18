@@ -198,7 +198,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a40848f156d09749a6dbf7b64f43992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unityEventCallState: 0
   unityEvent1Int:
     m_PersistentCalls:
       m_Calls:
@@ -217,35 +216,124 @@ MonoBehaviour:
   saintsEvent1Int:
     _persistentCalls:
     - callState: 1
-      _methodName: M1IntD
+      _methodName: InvokeRepeating
+      _isStatic: 0
+      _target: {fileID: 1697117603}
+      _staticType:
+        _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
+        _monoScriptGuid: 
+      _persistentArguments:
+      - name: methodName
+        valueType: 0
+        isOptional: 0
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.String, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeBinaryData: 
+      - name: time
+        valueType: 1
+        isOptional: 0
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.Single, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeBinaryData: 
+      - name: repeatRate
+        valueType: 0
+        isOptional: 0
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.Single, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeBinaryData: 
+      _returnType:
+        _typeNameAndAssembly: System.Void, mscorlib
+        _monoScriptGuid: 
+    - callState: 2
+      _methodName: FindWithTag
+      _isStatic: 1
+      _target: {fileID: 824025883}
+      _staticType:
+        _typeNameAndAssembly: UnityEngine.GameObject, UnityEngine.CoreModule
+        _monoScriptGuid: 
+      _persistentArguments:
+      - name: tag
+        valueType: 0
+        isOptional: 0
+        invokedParameterIndex: -1
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.String, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeBinaryData: 
+      _returnType:
+        _typeNameAndAssembly: UnityEngine.GameObject, UnityEngine.CoreModule
+        _monoScriptGuid: 
+  saintsEvent2IntString:
+    _persistentCalls:
+    - callState: 2
+      _methodName: op_Implicit
       _isStatic: 1
       _target: {fileID: 1697117603}
       _staticType:
         _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
         _monoScriptGuid: 
       _persistentArguments:
-      - invokedParameterIndex: 0
+      - name: exists
+        valueType: 0
+        isOptional: 0
+        invokedParameterIndex: 0
         isUnityObject: 0
         typeReference:
-          _typeNameAndAssembly: 
+          _typeNameAndAssembly: UnityEngine.Object, UnityEngine.CoreModule
           _monoScriptGuid: 
         unityObject: {fileID: 0}
         serializeBinaryData: 
+      _returnType:
+        _typeNameAndAssembly: System.Boolean, mscorlib
+        _monoScriptGuid: 
     - callState: 2
-      _methodName: M1IntS
+      _methodName: 
       _isStatic: 0
-      _target: {fileID: 824025883}
+      _target: {fileID: 0}
       _staticType:
-        _typeNameAndAssembly: UnityEngine.GameObject, UnityEngine.CoreModule
+        _typeNameAndAssembly: 
+        _monoScriptGuid: 
+      _persistentArguments: []
+      _returnType:
+        _typeNameAndAssembly: 
+        _monoScriptGuid: 
+  saintsEvent1SrAr:
+  - _persistentCalls:
+    - callState: 2
+      _methodName: OverrideTest
+      _isStatic: 0
+      _target: {fileID: 1697117603}
+      _staticType:
+        _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
         _monoScriptGuid: 
       _persistentArguments:
-      - invokedParameterIndex: -1
+      - name: s
+        valueType: 0
+        isOptional: 0
+        invokedParameterIndex: 0
         isUnityObject: 0
         typeReference:
-          _typeNameAndAssembly: System.Int32, mscorlib
+          _typeNameAndAssembly: System.String, mscorlib
           _monoScriptGuid: 
         unityObject: {fileID: 0}
-        serializeBinaryData: 0259000000530079007300740065006d002e0049006e007400330032002c0020006d00730063006f0072006c00690062002c002000560065007200730069006f006e003d0034002e0030002e0030002e0030002c002000430075006c0074007500720065003d006e00650075007400720061006c002c0020005000750062006c00690063004b006500790054006f006b0065006e003d00620037003700610035006300350036003100390033003400650030003800390002590000
+        serializeBinaryData: 
+      _returnType:
+        _typeNameAndAssembly: System.Void, mscorlib
+        _monoScriptGuid: 
   range1Int: 6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

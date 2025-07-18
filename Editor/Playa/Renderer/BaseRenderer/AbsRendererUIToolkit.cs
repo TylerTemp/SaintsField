@@ -1714,14 +1714,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                     return (WrapVisualElement(textField), true);
                 }
-
-                // UIToolkitUtils.DropdownButtonField dropdownButton = MakeTypeDropdown(label, valueType, null,
-                //     selectedType =>
-                //     {
-                //
-                //     });
-                // dropdownButton.ButtonElement.text = "null";
-                // return dropdownButton;
             }
 
             const string objFieldName = "saintsfield-objectfield";
@@ -2236,7 +2228,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return element;
         }
 
-        private static string GetDropdownTypeLabel(Type type)
+        public static string GetDropdownTypeLabel(Type type)
         {
             return type == null
                 ? "null"

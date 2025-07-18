@@ -1,8 +1,5 @@
 #if UNITY_2021_3_OR_NEWER
-using System;
 using SaintsField.Editor.Utils;
-using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
@@ -10,6 +7,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
 #if UNITY_6000_0_OR_NEWER
     [UxmlElement]
 #endif
+    // ReSharper disable once PartialTypeWithSinglePart
     public partial class CallbackTypeButton: BindableElement, INotifyValueChanged<bool>
     {
         public new class UxmlTraits : BindableElement.UxmlTraits { }

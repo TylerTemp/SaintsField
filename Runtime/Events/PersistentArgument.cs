@@ -7,13 +7,21 @@ namespace SaintsField.Events
     [Serializable]
     public class PersistentArgument: ISerializationCallbackReceiver
     {
+        public string name;
+
+        [Serializable]
+        public enum ValueType
+        {
+            Dynamic,
+            Serialized,
+            OptionalDefault,
+        }
+
+        public ValueType valueType;
+
         public bool isOptional;
-
-        public bool useOptionalDefault;
-
         public int invokedParameterIndex = -1;  // -1=serialized; otherwise use dynamic invoked parameter index
-
-        public bool isUnityObject;  // true=unityObject; false=serializeBinaryData(SerializeObject)
+        public bool isUnityObject;
 
         public TypeReference typeReference = new TypeReference();
 
@@ -21,37 +29,27 @@ namespace SaintsField.Events
         public byte[] serializeBinaryData = Array.Empty<byte>();
         public object SerializeObject;
 
-        // [Button]
-        // private void Ser43()
-        // {
-        //     SerializeObject = 43;
-        //     serializeBinaryData = SerializationUtil.ToBinaryType(SerializeObject);
-        //     typeReference = new TypeReference(typeof(Int32));
-        // }
-
         public void OnBeforeSerialize()
         {
-            if (invokedParameterIndex != -1)
-            {
-                return;
-            }
-
-            if (!isUnityObject)
-            {
-                serializeBinaryData = SerializationUtil.ToBinaryType(SerializeObject);
-            }
+            serializeBinaryData = SerializeObject == null
+                ? Array.Empty<byte>()
+                : SerializationUtil.ToBinaryType(SerializeObject);
         }
 
         public void OnAfterDeserialize()
         {
-            if (invokedParameterIndex != -1)
+            if (serializeBinaryData.Length > 0)
             {
-                return;
-            }
-
-            if(!isUnityObject && typeReference.Type != null)
-            {
-                SerializeObject = SerializationUtil.FromBinaryType(typeReference.Type, serializeBinaryData);
+                try
+                {
+                    SerializeObject = SerializationUtil.FromBinaryType(typeReference.Type, serializeBinaryData);
+                }
+                catch (ArgumentException e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(e);
+#endif
+                }
             }
         }
 

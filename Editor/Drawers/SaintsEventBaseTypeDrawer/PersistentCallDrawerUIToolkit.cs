@@ -8,6 +8,7 @@ using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements;
 using SaintsField.Editor.Drawers.TypeReferenceTypeDrawer;
 using SaintsField.Editor.Utils;
+using SaintsField.Events;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -53,6 +54,46 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             VisualElement dropdownButtonField = element.Q<VisualElement>("TypeDropdownButton");
             dropdownButtonField.style.width = new StyleLength(Length.Percent(100));
+
+            SerializedProperty propPersistentArguments = property.FindPropertyRelative(PropNamePersistentArguments);
+            ListView argumentListView = new ListView
+            {
+                showBoundCollectionSize = false,
+                reorderable = false,
+                selectionType = SelectionType.None,
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                reorderMode = ListViewReorderMode.Animated,
+                bindingPath = propPersistentArguments.propertyPath,
+                showAlternatingRowBackgrounds = AlternatingRowBackground.All,
+
+                makeItem = () => new PropertyField(),
+                bindItem = (e, i) =>
+                {
+                    SerializedProperty itemProp = propPersistentArguments.GetArrayElementAtIndex(i);
+                    ((PropertyField)e).BindProperty(itemProp);
+                },
+                unbindItem = (e, _) =>
+                {
+                    PropertyField propField = (PropertyField)e;
+                    UIToolkitUtils.Unbind(propField, propPersistentArguments.serializedObject);
+                },
+                style =
+                {
+                    display = propPersistentArguments.arraySize == 0 ? DisplayStyle.None : DisplayStyle.Flex
+                },
+            };
+            argumentListView.BindProperty(propPersistentArguments);
+            argumentListView.bindingPath = propPersistentArguments.propertyPath;
+            argumentListView.Bind(propPersistentArguments.serializedObject);
+            argumentListView.TrackPropertyValue(propPersistentArguments, p =>
+            {
+                DisplayStyle display = p.arraySize == 0 ? DisplayStyle.None : DisplayStyle.Flex;
+                if (argumentListView.style.display != display)
+                {
+                    argumentListView.style.display = display;
+                }
+            });
+            element.Add(argumentListView);
 
             return element;
         }
@@ -309,6 +350,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                                     param.IsOptional;
                                 persistentArgument.FindPropertyRelative(PropNamePersistentArgumentNameAndAssmbly)
                                     .stringValue = TypeReference.GetTypeNameAndAssembly(param.ParameterType);
+                                persistentArgument.FindPropertyRelative(nameof(PersistentArgument.name)).stringValue = param.Name;
                             }
 
                         }

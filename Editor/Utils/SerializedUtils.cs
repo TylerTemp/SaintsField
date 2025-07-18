@@ -56,6 +56,11 @@ namespace SaintsField.Editor.Utils
                 FieldInfo = null;
                 PropertyInfo = propertyInfo;
             }
+
+            public override string ToString()
+            {
+                return IsField ? FieldInfo.ToString() : PropertyInfo.ToString();
+            }
         }
 
         public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParent(SerializedProperty property)
@@ -68,11 +73,17 @@ namespace SaintsField.Editor.Utils
                 propPaths = propPathSegments;
             }
 
+            return GetFieldInfoAndDirectParentByPathSegments(property, propPaths);
+        }
+
+        public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParentByPathSegments(
+            SerializedProperty property, IEnumerable<string> pathSegments)
+        {
             object sourceObj = property.serializedObject.targetObject;
             FieldOrProp fieldOrProp = default;
 
             bool preNameIsArray = false;
-            foreach (string propSegName in propPaths)
+            foreach (string propSegName in pathSegments)
             {
                 // Debug.Log($"check key {propSegName}");
                 if(propSegName == "Array")
@@ -125,7 +136,10 @@ namespace SaintsField.Editor.Utils
                     return (default, null);
                 }
                 // ;
-                if (!(fieldOrProp.FieldInfo is null) || !(fieldOrProp.PropertyInfo is null))
+                // ReSharper disable once UseNegatedPatternInIsExpression
+                if (!(fieldOrProp.FieldInfo is null)
+                    // ReSharper disable once UseNegatedPatternInIsExpression
+                    || !(fieldOrProp.PropertyInfo is null))
                 {
                     sourceObj = fieldOrProp.IsField
                         // ReSharper disable once PossibleNullReferenceException
