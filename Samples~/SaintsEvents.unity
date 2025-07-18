@@ -216,40 +216,20 @@ MonoBehaviour:
   saintsEvent1Int:
     _persistentCalls:
     - callState: 1
-      _methodName: InvokeRepeating
+      _methodName: OverrideTest
       _isStatic: 0
       _target: {fileID: 1697117603}
       _staticType:
         _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
         _monoScriptGuid: 
       _persistentArguments:
-      - name: methodName
+      - name: cls
         valueType: 0
         isOptional: 0
         invokedParameterIndex: 0
         isUnityObject: 0
         typeReference:
-          _typeNameAndAssembly: System.String, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeBinaryData: 
-      - name: time
-        valueType: 0
-        isOptional: 0
-        invokedParameterIndex: 0
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.Single, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeBinaryData: 
-      - name: repeatRate
-        valueType: 0
-        isOptional: 0
-        invokedParameterIndex: 0
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.Single, mscorlib
+          _typeNameAndAssembly: Samples.Events.Event1Example+ClassObj, today.comes.saintsfield.Samples.Events
           _monoScriptGuid: 
         unityObject: {fileID: 0}
         serializeBinaryData: 

@@ -191,28 +191,29 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             VisualElement serializedValueEditor = serializedValue.Q<VisualElement>("persistent-argument-value-serialized-value-editor");
             object serializedObj = null;
-            Type serializedFieldType = null;
+            string typeName = serializeValueTypeProp.stringValue;
+            Type serializedFieldType = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);;
             SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
-            if (serializeBinaryDataProp.arraySize > 0)
+            if (serializeBinaryDataProp.arraySize > 0 && serializedFieldType != null)
             {
-                string typeName = serializeValueTypeProp.stringValue;
-                serializedFieldType = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
-                if(serializedFieldType != null)
+                byte[] serializeBinaryData = Enumerable.Range(0, serializeBinaryDataProp.arraySize)
+                    .Select(i => (byte)serializeBinaryDataProp.GetArrayElementAtIndex(i).intValue)
+                    .ToArray();
+                try
                 {
-                    byte[] serializeBinaryData = Enumerable.Range(0, serializeBinaryDataProp.arraySize)
-                        .Select(i => (byte)serializeBinaryDataProp.GetArrayElementAtIndex(i).intValue)
-                        .ToArray();
-                    try
-                    {
-                        serializedObj = SerializationUtil.FromBinaryType(serializedFieldType, serializeBinaryData);
-                    }
-                    catch (ArgumentException e)
-                    {
-                        Debug.LogError(e);
-                        serializedObj = Activator.CreateInstance(serializedFieldType, true);
-                    }
+                    serializedObj = SerializationUtil.FromBinaryType(serializedFieldType, serializeBinaryData);
+                }
+                catch (ArgumentException e)
+                {
+                    Debug.LogError(e);
+                    serializedObj = ActivatorCreateInstance(serializedFieldType);
                 }
             }
+            else if(serializedFieldType != null)
+            {
+                serializedObj = ActivatorCreateInstance(serializedFieldType);
+            }
+
             serializedValueEditor.userData = new SerializedValuePayload
             {
                 Type = serializedFieldType,
@@ -290,6 +291,16 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
                 dropdownButtonLabel.text = curType;
             }
+        }
+
+        private static object ActivatorCreateInstance(Type serializedFieldType)
+        {
+            if (serializedFieldType == typeof(string))
+            {
+                return string.Empty;
+            }
+
+            return Activator.CreateInstance(serializedFieldType, true);
         }
     }
 }
