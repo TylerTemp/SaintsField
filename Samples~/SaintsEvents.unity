@@ -234,7 +234,7 @@ MonoBehaviour:
         unityObject: {fileID: 0}
         serializeBinaryData: 
       - name: time
-        valueType: 1
+        valueType: 0
         isOptional: 0
         invokedParameterIndex: 0
         isUnityObject: 0

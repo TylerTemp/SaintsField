@@ -12,6 +12,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="persistent-argument-value-serialized-value" style="flex-grow: 1;">
                 <ui:Instance template="DropdownButton" name="DropdownButton" />
+                <ui:VisualElement name="persistent-argument-value-serialized-value-editor" style="flex-grow: 1;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

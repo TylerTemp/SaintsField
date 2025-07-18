@@ -221,10 +221,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public bool IsFullFilled;
         }
 
-        private static Color reColor = EColor.EditorSeparator.GetColor();
+        private static readonly Color ReColor = EColor.EditorSeparator.GetColor();
 
         // before set: useful for struct editing that C# will messup and change the value of the reference you have
-        protected static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
+        public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render start {label}/{valueType}/{value}");
@@ -263,7 +263,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (setterOrNull == null)
                 {
@@ -295,7 +295,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -340,7 +340,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -385,7 +385,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -429,7 +429,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -474,7 +474,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 // element.labelElement.style.borderRightColor = EColor.EditorEmphasized.GetColor();
                 // element.labelElement.style.borderRightWidth = 1;
@@ -522,7 +522,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -601,7 +601,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -643,7 +643,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -723,7 +723,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -763,7 +763,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -803,7 +803,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
 
                 if (inHorizontalLayout)
@@ -846,7 +846,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
 
                 if (inHorizontalLayout)
@@ -910,7 +910,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -958,7 +958,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1007,7 +1007,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1055,7 +1055,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1103,7 +1103,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1155,7 +1155,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1198,7 +1198,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1246,7 +1246,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1294,7 +1294,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1339,7 +1339,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 EnumField element = new EnumField(label, (Enum)value);
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 // ReSharper disable once PossibleNullReferenceException
                 typeof(EnumField).GetField("m_EnumType", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(element, valueType);
@@ -1396,7 +1396,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1437,7 +1437,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1479,7 +1479,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -1688,7 +1688,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                     if (labelGrayColor)
                     {
-                        labelButtonField.labelElement.style.color = reColor;
+                        labelButtonField.labelElement.style.color = ReColor;
                     }
                     labelButtonField.AddToClassList(LabelButtonField.alignedFieldUssClassName);
                     return (labelButtonField, true);
@@ -1703,7 +1703,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     };
                     if (labelGrayColor)
                     {
-                        textField.labelElement.style.color = reColor;
+                        textField.labelElement.style.color = ReColor;
                     }
 
                     if(_nullUss is null)  // bypass life circle
@@ -1744,7 +1744,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    genFoldout.style.color = reColor;
+                    genFoldout.style.color = ReColor;
                 }
                 genFoldout.AddToClassList("saintsfield-general");
 
@@ -2022,7 +2022,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                         if (labelGrayColor)
                         {
-                            r.labelElement.style.color = reColor;
+                            r.labelElement.style.color = ReColor;
                         }
                     }
                 }
@@ -2122,7 +2122,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                         if (labelGrayColor)
                         {
-                            r.labelElement.style.color = reColor;
+                            r.labelElement.style.color = ReColor;
                         }
                     }
                 }

@@ -1,3 +1,4 @@
+#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE
+
 namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 {
     public partial class PersistentArgumentDrawer
@@ -42,6 +43,13 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             serializedObjectField.BindProperty(property.FindPropertyRelative(nameof(PersistentArgument.unityObject)));
 
             return element;
+        }
+
+        private class SerializedValuePayload
+        {
+            public Type Type;
+            public object Value;
+            public VisualElement RenderElement;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -119,15 +127,6 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             Label serializedValueDropdownButtonLabel = serializedValueDropdownButton.Q<Label>();
             SerializedProperty serializeValueTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly");
-            void SerializedValueDropdownButtonLabelDisplay(SerializedProperty p)
-            {
-                string typeName = p.stringValue;
-                Type type = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
-                string typeNameAndAssembly = type == null
-                    ? "?"
-                    : $"{PersistentCallDrawer.StringifyType(type)} <color=#808080>({type.Namespace})</color>";
-                serializedValueDropdownButtonLabel.text = typeNameAndAssembly;
-            }
             SerializedValueDropdownButtonLabelDisplay(serializeValueTypeProp);
             serializedValueDropdownButtonLabel.TrackPropertyValue(serializeValueTypeProp, SerializedValueDropdownButtonLabelDisplay);
 
@@ -189,8 +188,81 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     }
                 ));
             };
+
+            VisualElement serializedValueEditor = serializedValue.Q<VisualElement>("persistent-argument-value-serialized-value-editor");
+            object serializedObj = null;
+            Type serializedFieldType = null;
+            SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
+            if (serializeBinaryDataProp.arraySize > 0)
+            {
+                string typeName = serializeValueTypeProp.stringValue;
+                serializedFieldType = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
+                if(serializedFieldType != null)
+                {
+                    byte[] serializeBinaryData = Enumerable.Range(0, serializeBinaryDataProp.arraySize)
+                        .Select(i => (byte)serializeBinaryDataProp.GetArrayElementAtIndex(i).intValue)
+                        .ToArray();
+                    try
+                    {
+                        serializedObj = SerializationUtil.FromBinaryType(serializedFieldType, serializeBinaryData);
+                    }
+                    catch (ArgumentException e)
+                    {
+                        Debug.LogError(e);
+                        serializedObj = Activator.CreateInstance(serializedFieldType, true);
+                    }
+                }
+            }
+            serializedValueEditor.userData = new SerializedValuePayload
+            {
+                Type = serializedFieldType,
+                Value = serializedObj,
+                RenderElement = null,
+            };
+
+            void SerializedValueEditorRepaint()
+            {
+                SerializedValuePayload sp = (SerializedValuePayload)serializedValueEditor.userData;
+                Debug.Assert(sp != null);
+
+                if (sp.Type == null || sp.Value == null)
+                {
+                    serializedValueEditor.Clear();
+                    sp.RenderElement = null;
+                    return;
+                }
+
+                SerializedValuePayload payload = (SerializedValuePayload)serializedValueEditor.userData;
+
+                (VisualElement result, bool isNestedField) = AbsRenderer.UIToolkitValueEdit(
+                    payload.RenderElement, "", sp.Type, sp.Value, null, Debug.Log, false, true);
+
+                if (result != null)
+                {
+                    serializedValueEditor.Add(result);
+                    sp.RenderElement = result;
+                }
+            }
+
+            SerializedValueEditorRepaint();
+
+            serializedValueEditor.TrackPropertyValue(serializeValueTypeProp, typeProp =>
+            {
+
+            });
+
             return;
 
+
+            void SerializedValueDropdownButtonLabelDisplay(SerializedProperty p)
+            {
+                string typeName = p.stringValue;
+                Type type = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
+                string typeNameAndAssembly = type == null
+                    ? "?"
+                    : $"{PersistentCallDrawer.StringifyType(type)} <color=#808080>({type.Namespace})</color>";
+                serializedValueDropdownButtonLabel.text = typeNameAndAssembly;
+            }
 
             void TrackLabelDisplay(SerializedProperty p)
             {
