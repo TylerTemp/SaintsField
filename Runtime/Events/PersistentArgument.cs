@@ -10,14 +10,14 @@ namespace SaintsField.Events
         public string name;
 
         [Serializable]
-        public enum ValueType
+        public enum CallType
         {
             Dynamic,
             Serialized,
             OptionalDefault,
         }
 
-        public ValueType valueType;
+        public CallType callType;
 
         public bool isOptional;
         public int invokedParameterIndex = -1;  // -1=serialized; otherwise use dynamic invoked parameter index
@@ -26,29 +26,50 @@ namespace SaintsField.Events
         public TypeReference typeReference = new TypeReference();
 
         public UnityEngine.Object unityObject;
+        public bool serializedAsJson;
         public byte[] serializeBinaryData = Array.Empty<byte>();
+        public string serializeJsonData = "";
         public object SerializeObject;
 
         public void OnBeforeSerialize()
         {
-            serializeBinaryData = SerializeObject == null
-                ? Array.Empty<byte>()
-                : SerializationUtil.ToBinaryType(SerializeObject);
+            // serializeBinaryData = SerializeObject == null
+            //     ? Array.Empty<byte>()
+            //     : SerializationUtil.ToBinaryType(SerializeObject);
         }
 
         public void OnAfterDeserialize()
         {
-            if (serializeBinaryData.Length > 0)
+            if (serializedAsJson)
             {
-                try
+                if (!string.IsNullOrEmpty(serializeJsonData))
                 {
-                    SerializeObject = SerializationUtil.FromBinaryType(typeReference.Type, serializeBinaryData);
-                }
-                catch (ArgumentException e)
-                {
+                    try
+                    {
+                        SerializeObject = SerializationUtil.FromJsonType(typeReference.Type, serializeJsonData);
+                    }
+                    catch (Exception e)
+                    {
 #if SAINTSFIELD_DEBUG
-                    Debug.LogWarning(e);
+                        Debug.LogWarning(e);
 #endif
+                    }
+                }
+            }
+            else
+            {
+                if (serializeBinaryData.Length > 0)
+                {
+                    try
+                    {
+                        SerializeObject = SerializationUtil.FromBinaryType(typeReference.Type, serializeBinaryData);
+                    }
+                    catch (Exception e)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(e);
+#endif
+                    }
                 }
             }
         }

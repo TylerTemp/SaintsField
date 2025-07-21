@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE
+#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE && UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -399,7 +399,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             return sb.ToString();
         }
 
-        private IReadOnlyList<TypeDropdownInfo> GetUObjExpandTypes(Object uObj) => GetUObjExpand(uObj)
+        private static IReadOnlyList<TypeDropdownInfo> GetUObjExpandTypes(Object uObj) => GetUObjExpand(uObj)
             .Select(expandedObj =>
             {
                 Type assType = expandedObj.GetType();

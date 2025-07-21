@@ -198,21 +198,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a40848f156d09749a6dbf7b64f43992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unityEvent1Int:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   saintsEvent1Int:
     _persistentCalls:
     - callState: 1
@@ -224,7 +209,7 @@ MonoBehaviour:
         _monoScriptGuid: 
       _persistentArguments:
       - name: cls
-        valueType: 0
+        callType: 1
         isOptional: 0
         invokedParameterIndex: 0
         isUnityObject: 0
@@ -232,89 +217,13 @@ MonoBehaviour:
           _typeNameAndAssembly: Samples.Events.Event1Example+ClassObj, today.comes.saintsfield.Samples.Events
           _monoScriptGuid: 
         unityObject: {fileID: 0}
+        serializedAsJson: 0
         serializeBinaryData: 
+        serializeJsonData: 
       _returnType:
         _typeNameAndAssembly: System.Void, mscorlib
         _monoScriptGuid: 
-    - callState: 2
-      _methodName: FindWithTag
-      _isStatic: 1
-      _target: {fileID: 824025883}
-      _staticType:
-        _typeNameAndAssembly: UnityEngine.GameObject, UnityEngine.CoreModule
-        _monoScriptGuid: 
-      _persistentArguments:
-      - name: tag
-        valueType: 0
-        isOptional: 0
-        invokedParameterIndex: -1
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.String, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeBinaryData: 
-      _returnType:
-        _typeNameAndAssembly: UnityEngine.GameObject, UnityEngine.CoreModule
-        _monoScriptGuid: 
-  saintsEvent2IntString:
-    _persistentCalls:
-    - callState: 2
-      _methodName: op_Implicit
-      _isStatic: 1
-      _target: {fileID: 1697117603}
-      _staticType:
-        _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
-        _monoScriptGuid: 
-      _persistentArguments:
-      - name: exists
-        valueType: 0
-        isOptional: 0
-        invokedParameterIndex: 0
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: UnityEngine.Object, UnityEngine.CoreModule
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeBinaryData: 
-      _returnType:
-        _typeNameAndAssembly: System.Boolean, mscorlib
-        _monoScriptGuid: 
-    - callState: 2
-      _methodName: 
-      _isStatic: 0
-      _target: {fileID: 0}
-      _staticType:
-        _typeNameAndAssembly: 
-        _monoScriptGuid: 
-      _persistentArguments: []
-      _returnType:
-        _typeNameAndAssembly: 
-        _monoScriptGuid: 
-  saintsEvent1SrAr:
-  - _persistentCalls:
-    - callState: 2
-      _methodName: OverrideTest
-      _isStatic: 0
-      _target: {fileID: 1697117603}
-      _staticType:
-        _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
-        _monoScriptGuid: 
-      _persistentArguments:
-      - name: s
-        valueType: 0
-        isOptional: 0
-        invokedParameterIndex: 0
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.String, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeBinaryData: 
-      _returnType:
-        _typeNameAndAssembly: System.Void, mscorlib
-        _monoScriptGuid: 
-  range1Int: 6
+  range1Int1: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

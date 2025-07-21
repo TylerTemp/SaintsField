@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE
+#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE && UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +36,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             ParamTypeButton paramTypeButton = element.Q<ParamTypeButton>();
             paramTypeButton.IsOptionalProp = property.FindPropertyRelative(nameof(PersistentArgument.isOptional));
-            paramTypeButton.BindProperty(property.FindPropertyRelative(nameof(PersistentArgument.valueType)));
+            paramTypeButton.BindProperty(property.FindPropertyRelative(nameof(PersistentArgument.callType)));
 
             VisualElement serialized = element.Q<VisualElement>("persistent-argument-value-serialized-unity-object");
             ObjectField serializedObjectField = serialized.Q<ObjectField>();
@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             // Debug.Log(string.Join(".", property.propertyPath.Split('.').SkipLast(6)));
             string[] splited = property.propertyPath.Split('.').SkipLast(6).ToArray();
             bool selfInsideArray = false;
-            if (splited[splited.Length - 1].EndsWith("]"))
+            if (splited[^1].EndsWith("]"))
             {
                 splited = splited.SkipLast(2).ToArray();
                 selfInsideArray = true;
@@ -81,7 +81,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             }
             Type[] eventParamTypes = rawType.GetGenericArguments();
 
-            SerializedProperty valueTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.valueType));
+            SerializedProperty valueTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.callType));
 
             VisualElement valueDynamic = container.Q<VisualElement>("persistent-argument-value-dynamic");
             VisualElement dropdownButton = valueDynamic.Q<VisualElement>("DropdownButton");
@@ -100,9 +100,9 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     genericDropdownMenu.AddItem(labelText, invokedParameterIndexProp.intValue == eventParamIndex, () =>
                     {
                         invokedParameterIndexProp.intValue = thisIndex;
-                        if (valueTypeProp.intValue != (int)PersistentArgument.ValueType.Dynamic)
+                        if (valueTypeProp.intValue != (int)PersistentArgument.CallType.Dynamic)
                         {
-                            valueTypeProp.intValue = (int)PersistentArgument.ValueType.Dynamic;
+                            valueTypeProp.intValue = (int)PersistentArgument.CallType.Dynamic;
                         }
                         property.serializedObject.ApplyModifiedProperties();
                     });
@@ -118,8 +118,17 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             };
 
             // serialized
-            // VisualElement serialized = container.Q<VisualElement>("persistent-argument-value-serialized-unity-objet");
-            // ObjectField serializedObjectField = serialized.Q<ObjectField>();
+            VisualElement serializedObject = container.Q<VisualElement>("persistent-argument-value-serialized-unity-object");
+            ObjectField serializedObjectField = serializedObject.Q<ObjectField>();
+            serializedObjectField.RegisterValueChangedCallback(evt =>
+            {
+                // ReSharper disable once InvertIf
+                if (evt.newValue != null)
+                {
+                    property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue = true;
+                    property.serializedObject.ApplyModifiedProperties();
+                }
+            });
 
             // value
             VisualElement serializedValue = container.Q<VisualElement>("persistent-argument-value-serialized-value");
@@ -127,6 +136,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             Label serializedValueDropdownButtonLabel = serializedValueDropdownButton.Q<Label>();
             SerializedProperty serializeValueTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly");
+            SerializedProperty serializedAsJsonProp = property.FindPropertyRelative(nameof(PersistentArgument.serializedAsJson));
             SerializedValueDropdownButtonLabelDisplay(serializeValueTypeProp);
             serializedValueDropdownButtonLabel.TrackPropertyValue(serializeValueTypeProp, SerializedValueDropdownButtonLabelDisplay);
 
@@ -190,70 +200,286 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             };
 
             VisualElement serializedValueEditor = serializedValue.Q<VisualElement>("persistent-argument-value-serialized-value-editor");
-            object serializedObj = null;
-            string typeName = serializeValueTypeProp.stringValue;
-            Type serializedFieldType = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);;
-            SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
-            if (serializeBinaryDataProp.arraySize > 0 && serializedFieldType != null)
+
+            SerializedValueEditorReInit();
+            SerializedValueEditorRepaint();
+
+            serializedValueEditor.TrackPropertyValue(serializeValueTypeProp, _ =>
             {
-                byte[] serializeBinaryData = Enumerable.Range(0, serializeBinaryDataProp.arraySize)
-                    .Select(i => (byte)serializeBinaryDataProp.GetArrayElementAtIndex(i).intValue)
-                    .ToArray();
-                try
+                if (SerializedValueEditorReInit())
                 {
-                    serializedObj = SerializationUtil.FromBinaryType(serializedFieldType, serializeBinaryData);
+                    SerializedValueEditorRepaint();
                 }
-                catch (ArgumentException e)
+            });
+
+            // persistent-argument-value-default
+            VisualElement persistentArgumentValueDefault = container.Q<VisualElement>("persistent-argument-value-default");
+            string callPropPath = string.Join(".",  property.propertyPath.Split('.').SkipLast(3));
+            int persistentArgumentIndex = SerializedUtils.PropertyPathIndex(callPropPath);
+            SerializedProperty persistentCallProp = property.serializedObject.FindProperty(callPropPath);
+            SerializedProperty persistentArgumentsProp =
+                persistentCallProp.FindPropertyRelative("_persistentArguments");
+            void UpdateDefaultParamValueDisplay(SerializedProperty p)
+            {
+                if (valueTypeProp.intValue != (int)PersistentArgument.CallType.OptionalDefault)
                 {
-                    Debug.LogError(e);
-                    serializedObj = ActivatorCreateInstance(serializedFieldType);
-                }
-            }
-            else if(serializedFieldType != null)
-            {
-                serializedObj = ActivatorCreateInstance(serializedFieldType);
-            }
-
-            serializedValueEditor.userData = new SerializedValuePayload
-            {
-                Type = serializedFieldType,
-                Value = serializedObj,
-                RenderElement = null,
-            };
-
-            void SerializedValueEditorRepaint()
-            {
-                SerializedValuePayload sp = (SerializedValuePayload)serializedValueEditor.userData;
-                Debug.Assert(sp != null);
-
-                if (sp.Type == null || sp.Value == null)
-                {
-                    serializedValueEditor.Clear();
-                    sp.RenderElement = null;
+                    persistentArgumentValueDefault.Clear();
                     return;
                 }
 
-                SerializedValuePayload payload = (SerializedValuePayload)serializedValueEditor.userData;
-
-                (VisualElement result, bool isNestedField) = AbsRenderer.UIToolkitValueEdit(
-                    payload.RenderElement, "", sp.Type, sp.Value, null, Debug.Log, false, true);
-
-                if (result != null)
+                List<Type> argumentTypes = new List<Type>();
+                for (int argumentIndex = 0; argumentIndex < persistentArgumentsProp.arraySize; argumentIndex++)
                 {
-                    serializedValueEditor.Add(result);
-                    sp.RenderElement = result;
+                    SerializedProperty argumentProp = persistentArgumentsProp.GetArrayElementAtIndex(argumentIndex);
+                    string argumentTypeStr = argumentProp
+                        .FindPropertyRelative(nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly")
+                        .stringValue;
+                    Type argumentType = string.IsNullOrEmpty(argumentTypeStr) ? null : Type.GetType(argumentTypeStr);
+                    if (argumentType == null)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning($"failed to load {argumentTypeStr}@{argumentIndex}: {property.propertyPath}");
+#endif
+                        return;
+                    }
+                    argumentTypes.Add(argumentType);
+                }
+
+                (MethodInfo methodInfo, object _) = PersistentCall.GetMethod(
+                    persistentCallProp.FindPropertyRelative("_isStatic").boolValue,
+                    Type.GetType(persistentCallProp.FindPropertyRelative("_staticType._typeNameAndAssembly").stringValue),
+                    persistentCallProp.FindPropertyRelative("_target").objectReferenceValue,
+                    persistentCallProp.FindPropertyRelative("_methodName").stringValue,
+                    argumentTypes.ToArray()
+                );
+
+                if (methodInfo == null)
+                {
+                    persistentArgumentValueDefault.Clear();
+                    persistentArgumentValueDefault.Add(new HelpBox("Failed to obtain method info", HelpBoxMessageType.Error));
+                    return;
+                }
+
+                ParameterInfo[] methodParams = methodInfo.GetParameters();
+                if(persistentArgumentIndex >= methodParams.Length)
+                {
+                    persistentArgumentValueDefault.Clear();
+                    persistentArgumentValueDefault.Add(new HelpBox($"Persistent argument index {persistentArgumentIndex} is out of range for method {methodInfo.Name} with {methodParams.Length} parameters", HelpBoxMessageType.Error));
+                    return;
+                }
+
+                ParameterInfo methodParam = methodParams[persistentArgumentIndex];
+                if (!methodParam.IsOptional)
+                {
+                    persistentArgumentValueDefault.Clear();
+                    persistentArgumentValueDefault.Add(new HelpBox($"method {methodInfo.Name} {methodParam.Name}@{persistentArgumentIndex} is not optional", HelpBoxMessageType.Error));
+                    return;
+                }
+
+                object paramDefaultValue = methodParam.DefaultValue;
+                string paramDefaultDisplay = paramDefaultValue == null ? "[Null]" : paramDefaultValue.ToString();
+                Label paramDefaultLabel = persistentArgumentValueDefault.Q<Label>();
+                if (paramDefaultLabel == null)
+                {
+                    persistentArgumentValueDefault.Add(paramDefaultLabel = new Label());
+                }
+                if(paramDefaultLabel.text != paramDefaultDisplay)
+                {
+                    paramDefaultLabel.text = paramDefaultDisplay;
                 }
             }
 
-            SerializedValueEditorRepaint();
+            UpdateDefaultParamValueDisplay(persistentCallProp);
+            persistentArgumentValueDefault.TrackPropertyValue(persistentCallProp, UpdateDefaultParamValueDisplay);
 
-            serializedValueEditor.TrackPropertyValue(serializeValueTypeProp, typeProp =>
+            VisualElement persistentArgumentValueEditor = container.Q<VisualElement>("persistent-argument-value-editor");
+            SerializedProperty persistentArgumentCallType = property.FindPropertyRelative(nameof(PersistentArgument.callType));
+            void UpdatePersistentArgumentValueEditorDisplay(SerializedProperty p)
             {
+                if (p.intValue == (int)PersistentArgument.CallType.Dynamic)
+                {
+                    Debug.Log("display valueDynamic");
+                    valueDynamic.style.display = DisplayStyle.Flex;
+                    serializedObject.style.display = DisplayStyle.None;
+                    serializedValue.style.display = DisplayStyle.None;
+                }
+                else if (p.intValue == (int)PersistentArgument.CallType.Serialized)
+                {
+                    valueDynamic.style.display = DisplayStyle.None;
+                    if (property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue)
+                    {
+                        Debug.Log("display serializedObject");
+                        serializedObject.style.display = DisplayStyle.Flex;
+                        serializedValue.style.display = DisplayStyle.None;
+                    }
+                    else
+                    {
+                        Debug.Log("display serializedValue");
+                        serializedObject.style.display = DisplayStyle.None;
+                        serializedValue.style.display = DisplayStyle.Flex;
+                    }
+                }
+                else if (p.intValue == (int)PersistentArgument.CallType.OptionalDefault)
+                {
+                    Debug.Log("display default value");
+                    valueDynamic.style.display = DisplayStyle.None;
+                    serializedObject.style.display = DisplayStyle.None;
+                    serializedValue.style.display = DisplayStyle.None;
+                }
+            }
 
-            });
+            UpdatePersistentArgumentValueEditorDisplay(persistentArgumentCallType);
+            persistentArgumentValueEditor.TrackPropertyValue(persistentArgumentCallType, UpdatePersistentArgumentValueEditorDisplay);
 
             return;
 
+            void SerializedValueEditorRepaint()
+            {
+                // SerializedValuePayload sp = (SerializedValuePayload)serializedValueEditor.userData;
+                // Debug.Assert(sp != null);
+                SerializedValuePayload payload = (SerializedValuePayload)serializedValueEditor.userData;
+
+                if (payload.Type == null || payload.Value == null)
+                {
+                    serializedValueEditor.Clear();
+                    payload.RenderElement = null;
+                    return;
+                }
+
+                (VisualElement result, bool isNestedField) = AbsRenderer.UIToolkitValueEdit(
+                    payload.RenderElement, payload.Type.Name, payload.Type, payload.Value, null, newValue =>
+                    {
+                        Debug.Log($"Update Value {newValue}");
+
+
+                        // Debug.Log(jsonC);
+
+                        SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
+                        SerializedProperty serializeJsonDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeJsonData));
+                        byte[] binData = Array.Empty<byte>();
+                        string jsonData = "";
+                        bool useJson = false;
+                        try
+                        {
+                            binData = SerializationUtil.ToBinaryType(newValue);
+                            object _ = SerializationUtil.FromBinaryType(payload.Type, binData);
+                        }
+                        catch (Exception)
+                        {
+                            useJson = true;
+                            jsonData = SerializationUtil.ToJsonType(newValue);
+                            // Debug.Log(jsonV);
+                            // object jsonC = SerializationUtil.FromJsonType(payload.Type, jsonV);
+                        }
+
+                        if (useJson)
+                        {
+                            serializedAsJsonProp.boolValue = true;
+                            serializeJsonDataProp.stringValue = jsonData;
+                            serializeBinaryDataProp.arraySize = 0;
+                        }
+                        else
+                        {
+                            serializedAsJsonProp.boolValue = false;
+                            serializeJsonDataProp.stringValue = string.Empty;
+                            serializeBinaryDataProp.arraySize = binData.Length;
+                            for (int binIndex = 0; binIndex < binData.Length; binIndex++)
+                            {
+                                serializeBinaryDataProp.GetArrayElementAtIndex(binIndex).intValue = binData[binIndex];
+                            }
+                        }
+
+                        property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue = false;
+
+                        serializeBinaryDataProp.serializedObject.ApplyModifiedProperties();
+                    }, false, true);
+
+                if (result != null)
+                {
+                    if (isNestedField)
+                    {
+                        result.schedule.Execute(() => result.Q<Foldout>().value = true);
+                    }
+                    else
+                    {
+                        result.Q<Label>().style.display = DisplayStyle.None;
+                    }
+
+                    serializedValueEditor.Clear();
+                    serializedValueEditor.Add(result);
+                    payload.RenderElement = result;
+                }
+            }
+
+            bool SerializedValueEditorReInit()
+            {
+                object serializedObj = null;
+                string typeName = serializeValueTypeProp.stringValue;
+                Type serializedFieldType = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
+                if (serializedValueEditor.userData != null)
+                {
+                    SerializedValuePayload oldPayload = (SerializedValuePayload)serializedValueEditor.userData;
+                    if (oldPayload.Type == serializedFieldType)
+                    {
+                        return false;
+                    }
+                }
+
+                SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
+                SerializedProperty serializeJsonDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeJsonData));
+                // Debug.Log($"serializeBinaryDataProp.arraySize={serializeBinaryDataProp.arraySize}");
+                if (serializedAsJsonProp.boolValue)
+                {
+                    string jsonV = serializeJsonDataProp.stringValue;
+                    if (!string.IsNullOrEmpty(jsonV))
+                    {
+                        try
+                        {
+                            serializedObj = SerializationUtil.FromJsonType(serializedFieldType, jsonV);
+                        }
+                        catch (ArgumentException e)
+                        {
+                            Debug.LogError(e);
+                            serializedObj = ActivatorCreateInstance(serializedFieldType);
+                        }
+                    }
+                    else if(serializedFieldType != null)
+                    {
+                        serializedObj = ActivatorCreateInstance(serializedFieldType);
+                    }
+                }
+                else
+                {
+                    if (serializeBinaryDataProp.arraySize > 0 && serializedFieldType != null)
+                    {
+                        byte[] serializeBinaryData = Enumerable.Range(0, serializeBinaryDataProp.arraySize)
+                            .Select(i => (byte)serializeBinaryDataProp.GetArrayElementAtIndex(i).intValue)
+                            .ToArray();
+                        try
+                        {
+                            serializedObj = SerializationUtil.FromBinaryType(serializedFieldType, serializeBinaryData);
+                        }
+                        catch (ArgumentException e)
+                        {
+                            Debug.LogError(e);
+                            serializedObj = ActivatorCreateInstance(serializedFieldType);
+                        }
+                    }
+                    else if (serializedFieldType != null)
+                    {
+                        serializedObj = ActivatorCreateInstance(serializedFieldType);
+                    }
+                }
+
+                serializedValueEditor.userData = new SerializedValuePayload
+                {
+                    Type = serializedFieldType,
+                    Value = serializedObj,
+                    RenderElement = null,
+                };
+
+                return true;
+            }
 
             void SerializedValueDropdownButtonLabelDisplay(SerializedProperty p)
             {
@@ -276,12 +502,6 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 label.text = $"{property.FindPropertyRelative(nameof(PersistentArgument.name)).stringValue}{argTypeName}";
             }
 
-            // Type fieldType = SerializedUtils.PropertyPathIndex(property.propertyPath) >= 0
-            //     ? ReflectUtils.GetElementType(info.FieldType)
-            //     : info.FieldType;
-            //
-            // Debug.Log(fieldType);
-            // Debug.Log(property.propertyPath);
             void SetDynamicButtonLabel(SerializedProperty prop)
             {
                 int curIndex = prop.intValue;

@@ -49,14 +49,14 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
             {
                 GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
 
-                genericDropdownMenu.AddItem("<color=#00ffffff><b>D</b>ynamic</color>", value == (int) PersistentArgument.ValueType.Dynamic, () => value = (int) PersistentArgument.ValueType.Dynamic);
-                genericDropdownMenu.AddItem("<color=#00ff00><b>S</b>erialized</color>", value == (int) PersistentArgument.ValueType.Serialized, () => value = (int) PersistentArgument.ValueType.Serialized);
+                genericDropdownMenu.AddItem("<color=#00ffffff><b>D</b>ynamic</color>", value == (int) PersistentArgument.CallType.Dynamic, () => value = (int) PersistentArgument.CallType.Dynamic);
+                genericDropdownMenu.AddItem("<color=#00ff00><b>S</b>erialized</color>", value == (int) PersistentArgument.CallType.Serialized, () => value = (int) PersistentArgument.CallType.Serialized);
 
                 genericDropdownMenu.AddSeparator("");
-                const string defaultLabel = "<b>U</b>se Default";
+                const string defaultLabel = "<color=#ffffff><b>U</b></color>se Default";
                 if (IsOptionalProp.boolValue)
                 {
-                    genericDropdownMenu.AddItem(defaultLabel, value == (int) PersistentArgument.ValueType.OptionalDefault, () => value = (int) PersistentArgument.ValueType.OptionalDefault);
+                    genericDropdownMenu.AddItem(defaultLabel, value == (int) PersistentArgument.CallType.OptionalDefault, () => value = (int) PersistentArgument.CallType.OptionalDefault);
                 }
                 else
                 {
@@ -73,15 +73,15 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
             };
         }
 
-        private PersistentArgument.ValueType _curValue;
+        private PersistentArgument.CallType _curValue;
 
         public void SetValueWithoutNotify(int newValue)
         {
-            _curValue = (PersistentArgument.ValueType)newValue;
+            _curValue = (PersistentArgument.CallType)newValue;
             // _button.text = newValue.ToString();
             switch (_curValue)
             {
-                case PersistentArgument.ValueType.Dynamic:
+                case PersistentArgument.CallType.Dynamic:
                 {
                     _button.text = "D";
                     _button.style.backgroundImage = StyleKeyword.None;
@@ -89,7 +89,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
                     _button.RemoveFromClassList(ClassBoth);
                 }
                     break;
-                case PersistentArgument.ValueType.Serialized:
+                case PersistentArgument.CallType.Serialized:
                 {
                     _button.text = "S";
                     _button.style.backgroundImage = StyleKeyword.None;
@@ -97,7 +97,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
                     _button.RemoveFromClassList(ClassRuntime);
                 }
                     break;
-                case PersistentArgument.ValueType.OptionalDefault:
+                case PersistentArgument.CallType.OptionalDefault:
                 {
                     _button.text = "";
                     _button.style.backgroundImage = _styleBackground;
@@ -122,7 +122,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
 
                 _firstSet = true;
 
-                PersistentArgument.ValueType previous = _curValue;
+                PersistentArgument.CallType previous = _curValue;
                 SetValueWithoutNotify(value);
 
                 using ChangeEvent<int> evt = ChangeEvent<int>.GetPooled((int)previous, value);

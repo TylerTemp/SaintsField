@@ -36,7 +36,14 @@ namespace SaintsField
 
         public Type Type
         {
-            get => _type;
+            get
+            {
+                if (_type == null && !string.IsNullOrEmpty(_typeNameAndAssembly))
+                {
+                    _type = Type.GetType(_typeNameAndAssembly);
+                }
+                return _type;
+            }
             set
             {
                 // ReSharper disable once MergeIntoPattern

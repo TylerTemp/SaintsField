@@ -7,6 +7,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections.LowLevel.Unsafe.NotBurstCompatible;
 using Unity.Serialization.Binary;
+using Unity.Serialization.Json;
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField.Events
@@ -42,7 +43,7 @@ namespace SaintsField.Events
                 UnsafeAppendBuffer.Reader bufferReader = new UnsafeAppendBuffer.Reader(ptr, serializedBytes.Length);
                 BinarySerializationParameters parameters = new BinarySerializationParameters { UserDefinedAdapters = adapters?.ToList() };
 
-                MethodInfo method = typeof(Unity.Serialization.Binary.BinarySerialization)
+                MethodInfo method = typeof(BinarySerialization)
                     .GetMethod("FromBinary", BindingFlags.Public | BindingFlags.Static);
                 MethodInfo generic = method!.MakeGenericMethod(type);
 
@@ -50,7 +51,7 @@ namespace SaintsField.Events
                     "CallFromBinary",
                     typeof(object),
                     new[] { typeof(IntPtr), typeof(BinarySerializationParameters) },
-                    typeof(Unity.Serialization.Binary.BinarySerialization).Module,
+                    typeof(BinarySerialization).Module,
                     skipVisibility: true);
 
                 ILGenerator il = dynamicMethod.GetILGenerator();
@@ -77,7 +78,6 @@ namespace SaintsField.Events
             }
         }
 
-
         public static unsafe byte[] ToBinaryType(object obj, IReadOnlyList<IBinaryAdapter> adapters = null)
         {
             UnsafeAppendBuffer buffer = new UnsafeAppendBuffer(16, 8, Allocator.Temp);
@@ -96,6 +96,20 @@ namespace SaintsField.Events
                 buffer.Dispose();
                 throw;
             }
+        }
+
+        public static object FromJsonType(Type type, string jsonString, JsonSerializationParameters adapters = default)
+        {
+            return typeof(JsonSerialization)
+                .GetMethod("FromJson", new[] { typeof(string), typeof(JsonSerializationParameters) })!
+                .MakeGenericMethod(type)
+                .Invoke(null, new object[] { jsonString, adapters });
+        }
+
+
+        public static string ToJsonType(object obj, JsonSerializationParameters parameters = default)
+        {
+            return JsonSerialization.ToJson(obj, parameters);
         }
     }
 }

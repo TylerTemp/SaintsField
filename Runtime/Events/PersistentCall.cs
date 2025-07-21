@@ -88,12 +88,9 @@ namespace SaintsField.Events
                 }
             }
 
-            const BindingFlags flagsStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
-            const BindingFlags flagsInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
-            BindingFlags flags = _isStatic ? flagsStatic : flagsInstance;
-
-            MethodInfo method = targetType.GetMethod(_methodName, flags, null, CallingConventions.Any, argumentTypes, null);
-            if (method == null)
+            (MethodInfo methodInfo, object invokeTarget) = GetMethod(_isStatic, _staticType.Type, _target, _methodName, argumentTypes);
+            // MethodInfo method = targetType.GetMethod(_methodName, flags, null, CallingConventions.Any, argumentTypes, null);
+            if (methodInfo == null)
             {
 #if SAINTSFIELD_DEBUG
                 Debug.Log($"PersistentCall: method {_methodName} on {targetType} is null.");
@@ -101,9 +98,38 @@ namespace SaintsField.Events
                 return;
             }
 
+            methodInfo.Invoke(invokeTarget, argumentValues);
+        }
+
+        public static (MethodInfo methodInfo, object invokeTarget) GetMethod(bool isStatic, Type staticType, Object target, string methodName, Type[] argumentTypes)
+        {
+            Type targetType = isStatic ? staticType : target?.GetType();
+            if (targetType == null)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.Log("PersistentCall: targetType is null.");
+#endif
+                return (null, null);
+            }
+
+
+            const BindingFlags flagsStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+            const BindingFlags flagsInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+            BindingFlags flags = isStatic ? flagsStatic : flagsInstance;
+
+            MethodInfo method = targetType.GetMethod(methodName, flags, null, CallingConventions.Any, argumentTypes, null);
+            if (method == null)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.Log($"PersistentCall: method {methodName} on {targetType} is null.");
+#endif
+                return (null, null);
+            }
+
             // bool methodReturnVoid = method.ReturnType == typeof(void);
-            object methodTarget = _isStatic ? null : _target;
-            method.Invoke(methodTarget, argumentValues);
+            object methodTarget = isStatic ? null : target;
+            return (method, methodTarget);
+            // method.Invoke(methodTarget, argumentValues);
         }
     }
 }
