@@ -1164,7 +1164,7 @@ namespace SaintsField.Editor.Core
                 Debug.Log($"remove old tracker main: {trackerMain}");
 #endif
                 trackerMain.RemoveFromHierarchy();
-                UIToolkitUtils.Unbind(trackerMain, property.serializedObject);
+                UIToolkitUtils.Unbind(trackerMain);
             }
             // if (trackerMain == null)
             {
@@ -1280,7 +1280,7 @@ namespace SaintsField.Editor.Core
 #endif
                     // continue;
                     subTracker.RemoveFromHierarchy();
-                    UIToolkitUtils.Unbind(subTracker, watchSubProperty.serializedObject);
+                    UIToolkitUtils.Unbind(subTracker);
                 }
 
                 subTracker = new VisualElement

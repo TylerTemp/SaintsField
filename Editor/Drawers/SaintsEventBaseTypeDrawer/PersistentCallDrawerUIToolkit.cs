@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 unbindItem = (e, _) =>
                 {
                     PropertyField propField = (PropertyField)e;
-                    UIToolkitUtils.Unbind(propField, propPersistentArguments.serializedObject);
+                    UIToolkitUtils.Unbind(propField);
                 },
                 style =
                 {
@@ -367,6 +367,11 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             void GetMethodLabel(SerializedProperty prop)
             {
+                if (string.IsNullOrEmpty(propMethodName.stringValue))
+                {
+                    methodDropdownButtonLabel.text = "-";
+                    return;
+                }
                 (bool isValidMethodInfo, IReadOnlyList<Type> methonParamTypes, Type returnType) = GetMethodParamsType(prop);
                 methodDropdownButtonLabel.text = isValidMethodInfo ? StringifyMethod(propMethodName.stringValue, methonParamTypes, returnType) : "-";
             }

@@ -221,6 +221,10 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 persistentCallProp.FindPropertyRelative("_persistentArguments");
             void UpdateDefaultParamValueDisplay(SerializedProperty p)
             {
+                if (!SerializedUtils.IsOk(valueTypeProp))  // Unity, just, please, fix your shit
+                {
+                    return;
+                }
                 if (valueTypeProp.intValue != (int)PersistentArgument.CallType.OptionalDefault)
                 {
                     persistentArgumentValueDefault.Clear();
@@ -245,13 +249,13 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     argumentTypes.Add(argumentType);
                 }
 
-                (MethodInfo methodInfo, object _) = PersistentCall.GetMethod(
+                MethodInfo methodInfo = PersistentCall.GetMethod(
                     persistentCallProp.FindPropertyRelative("_isStatic").boolValue,
                     Type.GetType(persistentCallProp.FindPropertyRelative("_staticType._typeNameAndAssembly").stringValue),
                     persistentCallProp.FindPropertyRelative("_target").objectReferenceValue,
                     persistentCallProp.FindPropertyRelative("_methodName").stringValue,
                     argumentTypes.ToArray()
-                );
+                ).MethodInfo;
 
                 if (methodInfo == null)
                 {
@@ -291,6 +295,8 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             UpdateDefaultParamValueDisplay(persistentCallProp);
             persistentArgumentValueDefault.TrackPropertyValue(persistentCallProp, UpdateDefaultParamValueDisplay);
+            // This does not fix Unity's shit:
+            // persistentArgumentValueDefault.RegisterCallback<DetachFromPanelEvent>(_ => UIToolkitUtils.Unbind(persistentArgumentValueDefault));
 
             VisualElement persistentArgumentValueEditor = container.Q<VisualElement>("persistent-argument-value-editor");
             SerializedProperty persistentArgumentCallType = property.FindPropertyRelative(nameof(PersistentArgument.callType));
@@ -362,7 +368,11 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         try
                         {
                             binData = SerializationUtil.ToBinaryType(newValue);
-                            object _ = SerializationUtil.FromBinaryType(payload.Type, binData);
+                            object rest = SerializationUtil.FromBinaryType(payload.Type, binData);
+                            if (rest != newValue)
+                            {
+                                throw new Exception("WTF Unity");
+                            }
                         }
                         catch (Exception)
                         {

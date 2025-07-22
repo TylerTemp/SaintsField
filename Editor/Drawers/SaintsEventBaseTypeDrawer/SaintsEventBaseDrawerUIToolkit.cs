@@ -105,7 +105,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 unbindItem = (element, _) =>
                 {
                     PropertyField propField = (PropertyField)element;
-                    UIToolkitUtils.Unbind(propField, persistentCallProp.serializedObject);
+                    UIToolkitUtils.Unbind(propField);
                 },
             };
 

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -9,7 +11,7 @@ using Object = UnityEngine.Object;
 namespace SaintsField.Events
 {
     [Serializable]
-    public class PersistentCall
+    public class PersistentCall: ISerializationCallbackReceiver
     {
         [SerializeField] public UnityEventCallState callState = UnityEventCallState.RuntimeOnly;
         [SerializeField] private string _methodName;
@@ -22,6 +24,9 @@ namespace SaintsField.Events
         [SerializeField] private PersistentArgument[] _persistentArguments;
 
         [SerializeField] private TypeReference _returnType;
+
+        private bool _methodCached;
+        private MethodCache _methodCache;
 
         public void Invoke(object[] args)
         {
@@ -59,37 +64,58 @@ namespace SaintsField.Events
 
             Type[] argumentTypes = new Type[_persistentArguments.Length];
             object[] argumentValues = new object[_persistentArguments.Length];
+            List<int> defaultFillIndices = new List<int>(_persistentArguments.Length);
             for (int i = 0; i < _persistentArguments.Length; i++)
             {
                 PersistentArgument persistentArgument = _persistentArguments[i];
-                if (persistentArgument.invokedParameterIndex == -1)  // use serialized value
-                {
-                    Type argumentType = argumentTypes[i] = persistentArgument.typeReference.Type;
-                    if (argumentType == null)
-                    {
-#if SAINTSFIELD_DEBUG
-                        Debug.Log($"PersistentCall: persistentArguments[{i}] type is null.");
-#endif
-                        return;
-                    }
-                    argumentValues[i] = persistentArgument.GetArgumentValue();
-                }
-                else
-                {
-                    if (persistentArgument.invokedParameterIndex < 0 ||
-                        persistentArgument.invokedParameterIndex >= args.Length)
-                    {
-                        return;
-                    }
 
-                    object dynamicInvoked = args[persistentArgument.invokedParameterIndex];
-                    argumentTypes[i] = dynamicInvoked.GetType();
-                    argumentValues[i] = dynamicInvoked;
+                switch (persistentArgument.callType)
+                {
+                    case PersistentArgument.CallType.Dynamic:
+                    {
+                        if (persistentArgument.invokedParameterIndex < 0 ||
+                            persistentArgument.invokedParameterIndex >= args.Length)
+                        {
+                            return;
+                        }
+                        argumentValues[i] = args[persistentArgument.invokedParameterIndex];
+                    }
+                        break;
+                    case PersistentArgument.CallType.Serialized:
+                    {
+                        argumentValues[i] = persistentArgument.isUnityObject
+                            ? persistentArgument.unityObject
+                            : persistentArgument.SerializeObject;
+                    }
+                        break;
+                    case PersistentArgument.CallType.OptionalDefault:
+                    {
+                        defaultFillIndices.Add(i);
+                    }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(persistentArgument.callType), persistentArgument.callType, null);
                 }
+
+                argumentTypes[i] = persistentArgument.typeReference.Type;
             }
 
-            (MethodInfo methodInfo, object invokeTarget) = GetMethod(_isStatic, _staticType.Type, _target, _methodName, argumentTypes);
+            Debug.Log($"argumentTypes={string.Join<Type>(", ", argumentTypes)}");
+
+            MethodCache methodCache;
+            if (_methodCached)
+            {
+                Debug.Log("use cached method");
+                methodCache = _methodCache;
+            }
+            else
+            {
+                Debug.Log("fetch method");
+                methodCache = _methodCache = GetMethod(_isStatic, _staticType.Type, _target, _methodName, argumentTypes);
+                _methodCached = true;
+            }
             // MethodInfo method = targetType.GetMethod(_methodName, flags, null, CallingConventions.Any, argumentTypes, null);
+            MethodInfo methodInfo = methodCache.MethodInfo;
             if (methodInfo == null)
             {
 #if SAINTSFIELD_DEBUG
@@ -98,10 +124,40 @@ namespace SaintsField.Events
                 return;
             }
 
+            ParameterInfo[] methodParams = methodInfo.GetParameters();
+            foreach (int defaultFillIndex in defaultFillIndices)
+            {
+                if (defaultFillIndex >= methodParams.Length)
+                {
+                    return;
+                }
+                ParameterInfo param = methodParams[defaultFillIndex];
+                if (!param.IsOptional)
+                {
+                    return;
+                }
+
+                argumentValues[defaultFillIndex] = param.DefaultValue;
+            }
+
+            object invokeTarget = methodCache.InvokeTarget;
+            Debug.Log($"find method {methodInfo.Name} {string.Join(",", methodParams.Select(each => $"{each.Name}({each.ParameterType})"))} => {methodInfo.ReturnType}");
             methodInfo.Invoke(invokeTarget, argumentValues);
         }
 
-        public static (MethodInfo methodInfo, object invokeTarget) GetMethod(bool isStatic, Type staticType, Object target, string methodName, Type[] argumentTypes)
+        public readonly struct MethodCache
+        {
+            public readonly MethodInfo MethodInfo;
+            public readonly object InvokeTarget;
+
+            public MethodCache(MethodInfo methodInfo, object invokeTarget)
+            {
+                MethodInfo = methodInfo;
+                InvokeTarget = invokeTarget;
+            }
+        }
+
+        public static MethodCache GetMethod(bool isStatic, Type staticType, Object target, string methodName, Type[] argumentTypes)
         {
             Type targetType = isStatic ? staticType : target?.GetType();
             if (targetType == null)
@@ -109,7 +165,7 @@ namespace SaintsField.Events
 #if SAINTSFIELD_DEBUG
                 Debug.Log("PersistentCall: targetType is null.");
 #endif
-                return (null, null);
+                return new MethodCache(null, null);
             }
 
 
@@ -123,13 +179,22 @@ namespace SaintsField.Events
 #if SAINTSFIELD_DEBUG
                 Debug.Log($"PersistentCall: method {methodName} on {targetType} is null.");
 #endif
-                return (null, null);
+                return new MethodCache(null, null);
             }
 
             // bool methodReturnVoid = method.ReturnType == typeof(void);
             object methodTarget = isStatic ? null : target;
-            return (method, methodTarget);
+            return new MethodCache(method, methodTarget);
             // method.Invoke(methodTarget, argumentValues);
+        }
+
+        public void OnBeforeSerialize()
+        {
+        }
+
+        public void OnAfterDeserialize()
+        {
+            _methodCached = false;
         }
     }
 }

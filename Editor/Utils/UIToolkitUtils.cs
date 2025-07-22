@@ -650,7 +650,7 @@ namespace SaintsField.Editor.Utils
                                 unbindItem = (element, _) =>
                                 {
                                     element.Clear();
-                                    Unbind(element, property.serializedObject);
+                                    Unbind(element);
                                     // Debug.Log(element);
                                     // Debug.Log(i);
                                 },
@@ -2035,7 +2035,7 @@ namespace SaintsField.Editor.Utils
         /// Thanks to [@Zallist](https://github.com/Zallist) in [#239](https://github.com/TylerTemp/SaintsField/issues/239)
         /// </summary>
         // ReSharper disable once UnusedParameter.Global
-        public static void Unbind(VisualElement element, SerializedObject serializedObject)
+        public static void Unbind(VisualElement element)
         {
 #if UNITY_2021_3_OR_NEWER
             element.Unbind();
