@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE && UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if SAINTSFIELD_SERIALIZATION && !SAINTSFIELD_SERIALIZATION_DISABLED && UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,11 +43,11 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             callStateSelector.style.flexShrink = 0;
 
             CallbackTypeButton callbackTypeButton = element.Q<CallbackTypeButton>();
-            SerializedProperty callbackTypeProperty = property.FindPropertyRelative(PropNameIsStatic);
+            SerializedProperty callbackTypeProperty = property.FindPropertyRelative(nameof(PersistentCall.isStatic));
             callbackTypeButton.BindProperty(callbackTypeProperty);
             callbackTypeButton.style.flexShrink = 0;
 
-            SerializedProperty targetProperty = property.FindPropertyRelative(PropNameTarget);
+            SerializedProperty targetProperty = property.FindPropertyRelative(nameof(PersistentCall.target));
             ObjectField of = element.Q<ObjectField>();
             of.BindProperty(targetProperty);
             of.style.width = new StyleLength(Length.Percent(100));
@@ -55,7 +55,8 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             VisualElement dropdownButtonField = element.Q<VisualElement>("TypeDropdownButton");
             dropdownButtonField.style.width = new StyleLength(Length.Percent(100));
 
-            SerializedProperty propPersistentArguments = property.FindPropertyRelative(PropNamePersistentArguments);
+            SerializedProperty propPersistentArguments = property.FindPropertyRelative(nameof(PersistentCall.persistentArguments));
+            Debug.Assert(propPersistentArguments != null);
             ListView argumentListView = new ListView
             {
                 showBoundCollectionSize = false,
@@ -171,14 +172,17 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            TypeReferenceAttribute typeReferenceAttribute =
+                allAttributes.OfType<TypeReferenceAttribute>().FirstOrDefault();
+
             VisualElement root = container.Q<TemplateContainer>(NameRoot(property));
-            SerializedProperty targetProperty = property.FindPropertyRelative(PropNameTarget);
+            SerializedProperty targetProperty = property.FindPropertyRelative(nameof(PersistentCall.target));
 
             VisualElement typeDropdownButtonField = root.Q<VisualElement>("TypeDropdownButton");
-            SerializedProperty isStaticProperty = property.FindPropertyRelative(PropNameIsStatic);
+            SerializedProperty isStaticProperty = property.FindPropertyRelative(nameof(PersistentCall.isStatic));
             Label typeDropdownButtonLabel = typeDropdownButtonField.Q<Label>();
 
-            SerializedProperty propTypeAndAss = property.FindPropertyRelative(PropNameTypeNameAndAssmble);
+            SerializedProperty propTypeAndAss = property.FindPropertyRelative(nameof(PersistentCall.staticType) + SubPropNameTypeNameAndAssmble);
             typeDropdownButtonLabel.text = FormatTypeNameAndAssmbleLabel(propTypeAndAss.stringValue);
             typeDropdownButtonLabel.TrackPropertyValue(propTypeAndAss, sp => typeDropdownButtonLabel.text = FormatTypeNameAndAssmbleLabel(sp.stringValue));
             typeDropdownButtonLabel.text = propTypeAndAss.stringValue;
@@ -193,11 +197,12 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     if (staticRefType is null)
                     {
                         Dictionary<string, List<TypeDropdownInfo>> assToGroup = new Dictionary<string, List<TypeDropdownInfo>>();
-                        IEnumerable<Assembly> allAss = TypeReferenceDrawer.GetAssembly(EType.AllAssembly, null);
+                        IEnumerable<Assembly> allAss = TypeReferenceDrawer.GetAssembly(typeReferenceAttribute, property.serializedObject);
                         TypeReferenceDrawer.FillAsssembliesTypes(allAss, ToFill);
                         foreach ((Assembly ass, Type[] assTypes) in ToFill)
                         {
                             string assName = TypeReference.GetShortAssemblyName(ass);
+                            // Debug.Log(assName);
                             // IReadOnlyList<(string dropPath, Type type)> types = assTypes
                             //     .Select(each => (TypeReferenceDrawer.FormatPath(each, 0, false), each)).ToArray();
                             // typeDropdownGroups.Add(new TypeDropdownGroup(assName, types));
@@ -257,7 +262,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 UnityEditor.PopupWindow.Show(worldBound, sa);
             };
 
-            SerializedProperty propMethodName = property.FindPropertyRelative(PropMethodName);
+            SerializedProperty propMethodName = property.FindPropertyRelative(nameof(PersistentCall.methodName));
             VisualElement methodDropdownButtonField = root.Q<VisualElement>("MethodDropdownButton");
             Label methodDropdownButtonLabel = methodDropdownButtonField.Q<Label>();
             methodDropdownButtonLabel.text = propMethodName.stringValue;
@@ -265,7 +270,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             GetMethodLabel(property);
 
             methodDropdownButtonLabel.TrackPropertyValue(property, GetMethodLabel);
-            SerializedProperty propPersistentArguments = property.FindPropertyRelative(PropNamePersistentArguments);
+            SerializedProperty propPersistentArguments = property.FindPropertyRelative(nameof(PersistentCall.persistentArguments));
             methodDropdownButtonField.Q<Button>().clicked += () =>
             {
                 bool isStatic = isStaticProperty.boolValue;
@@ -338,7 +343,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         else
                         {
                             propMethodName.stringValue = mi.MethodInfo.Name;
-                            property.FindPropertyRelative(PropNameReturnTypeNameAndAssmbly).stringValue =
+                            property.FindPropertyRelative(nameof(PersistentCall.returnType) + SubPropNameTypeNameAndAssmble).stringValue =
                                 TypeReference.GetTypeNameAndAssembly(mi.MethodInfo.ReturnType);
                             ParameterInfo[] methodParams = mi.MethodInfo.GetParameters();
                             propPersistentArguments.arraySize = methodParams.Length;
@@ -346,9 +351,9 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                             {
                                 SerializedProperty persistentArgument = propPersistentArguments.GetArrayElementAtIndex(i);
                                 ParameterInfo param = methodParams[i];
-                                persistentArgument.FindPropertyRelative(PropNamePersistentArgumentIsOptional).boolValue =
+                                persistentArgument.FindPropertyRelative(nameof(PersistentArgument.isOptional)).boolValue =
                                     param.IsOptional;
-                                persistentArgument.FindPropertyRelative(PropNamePersistentArgumentNameAndAssmbly)
+                                persistentArgument.FindPropertyRelative(nameof(PersistentArgument.typeReference) + SubPropNameTypeNameAndAssmble)
                                     .stringValue = TypeReference.GetTypeNameAndAssembly(param.ParameterType);
                                 persistentArgument.FindPropertyRelative(nameof(PersistentArgument.name)).stringValue = param.Name;
                             }

@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE
+#if SAINTSFIELD_SERIALIZATION && !SAINTSFIELD_SERIALIZATION_DISABLED
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,15 +17,16 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
     public partial class PersistentCallDrawer: SaintsPropertyDrawer
     {
         private static string PropNameCallState() => nameof(PersistentCall.callState);
-        private const string PropNameIsStatic = "_isStatic";
-        private const string PropNameTarget = "_target";
-        private const string PropNameTypeNameAndAssmble = "_staticType._typeNameAndAssembly";
-        private const string PropMethodName = "_methodName";
-        private const string PropNamePersistentArguments = "_persistentArguments";
-        private const string PropNamePersistentArgumentsTypeReferenceNameAndAssmbly = nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly";
-        private const string PropNameReturnTypeNameAndAssmbly = "_returnType._typeNameAndAssembly";
-        private const string PropNamePersistentArgumentIsOptional = nameof(PersistentArgument.isOptional);
-        private const string PropNamePersistentArgumentNameAndAssmbly = nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly";
+        // private const string PropNameIsStatic = "_isStatic";
+        // private const string PropNameTarget = "_target";
+        // private const string PropNameTypeNameAndAssmble = "_staticType._typeNameAndAssembly";
+        private const string SubPropNameTypeNameAndAssmble = "._typeNameAndAssembly";
+        // private const string PropMethodName = "_methodName";
+        // private const string PropNamePersistentArguments = "_persistentArguments";
+        // private const string PropNamePersistentArgumentsTypeReferenceNameAndAssmbly = nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly";
+        // private const string PropNameReturnTypeNameAndAssmbly = "_returnType._typeNameAndAssembly";
+        // private const string PropNamePersistentArgumentIsOptional = nameof(PersistentArgument.isOptional);
+        // private const string PropNamePersistentArgumentNameAndAssmbly = nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly";
 
         private static AdvancedDropdownMetaInfo GetTypeDropdownMeta(Type curType, List<TypeDropdownGroup> typeDropdownGroups)
         {
@@ -171,12 +172,12 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         private static (bool isValidMethodInfo, IReadOnlyList<Type> paramTypes, Type returnType) GetMethodParamsType(SerializedProperty property)
         {
             SerializedProperty propPersistentArgumentsArray =
-                property.FindPropertyRelative(PropNamePersistentArguments);
+                property.FindPropertyRelative(nameof(PersistentCall.persistentArguments));
             List<Type> persistentArgumentTypes = new List<Type>();
             for (int index = 0; index < propPersistentArgumentsArray.arraySize; index++)
             {
                 SerializedProperty eachPropParam = propPersistentArgumentsArray.GetArrayElementAtIndex(index);
-                string typeName = eachPropParam.FindPropertyRelative(PropNamePersistentArgumentsTypeReferenceNameAndAssmbly).stringValue;
+                string typeName = eachPropParam.FindPropertyRelative(nameof(PersistentArgument.typeReference) + SubPropNameTypeNameAndAssmble).stringValue;
                 if (string.IsNullOrEmpty(typeName))
                 {
                     return (false, Array.Empty<Type>(), null);
@@ -191,7 +192,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 persistentArgumentTypes.Add(persistentArgumentType);
             }
 
-            SerializedProperty returnTypeProp = property.FindPropertyRelative(PropNameReturnTypeNameAndAssmbly);
+            SerializedProperty returnTypeProp = property.FindPropertyRelative(nameof(PersistentCall.returnType) + SubPropNameTypeNameAndAssmble);
             Type returnType = Type.GetType(returnTypeProp.stringValue);
 
             if (returnType == null)

@@ -15,8 +15,7 @@
     "autoReferenced": true,
     "defineConstraints": [
         "!SAINTSFIELD_SERIALIZATION_DISABLE",
-        "SAINTSFIELD_SERIALIZATION",
-        "SAINTSFIELD_SERIALIZATION_ENABLE"
+        "SAINTSFIELD_SERIALIZATION"
     ],
     "versionDefines": [
         {

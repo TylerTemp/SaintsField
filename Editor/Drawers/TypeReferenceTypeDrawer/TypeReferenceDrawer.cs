@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(TypeReference), true)]
-    [CustomPropertyDrawer(typeof(TypeReferenceAttribute), true)]
+    // [CustomPropertyDrawer(typeof(TypeReferenceAttribute), true)]
     public partial class TypeReferenceDrawer: SaintsPropertyDrawer
     {
         private const string PropNameTypeNameAndAssembly = "_typeNameAndAssembly";
@@ -21,8 +21,42 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
 
         private static IReadOnlyList<Assembly> _allAssemblies;
 
-        public static IEnumerable<Assembly> GetAssembly(EType eTypeFilter, object parent)
+        public static IEnumerable<Assembly> GetAssemblyOfName(IReadOnlyList<string> names)
         {
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (_allAssemblies == null)
+            {
+                _allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            }
+
+            foreach (Assembly assembly in _allAssemblies)
+            {
+                string assemblyName = assembly.GetName().Name;
+                if (names.Contains(assemblyName))
+                {
+                    yield return assembly;
+                }
+            }
+        }
+
+        public static IEnumerable<Assembly> GetAssembly(TypeReferenceAttribute typeReferenceAttribute, object parent)
+        {
+            // EType.Current
+            if (typeReferenceAttribute != null && typeReferenceAttribute.OnlyAssemblies != null)
+            {
+                foreach (Assembly assembly in GetAssemblyOfName(typeReferenceAttribute.OnlyAssemblies))
+                {
+                    string assemblyName = assembly.GetName().Name;
+                    if (typeReferenceAttribute.OnlyAssemblies.Contains(assemblyName))
+                    {
+                        yield return assembly;
+                    }
+                }
+                yield break;
+            }
+
+            EType eTypeFilter = typeReferenceAttribute?.EType ?? EType.Current;
+
             if (eTypeFilter.HasFlagFast(EType.CurrentOnly))
             {
                 yield return parent.GetType().Assembly;
@@ -59,6 +93,15 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                     }
                 }
             }
+
+            // ReSharper disable once InvertIf
+            if (typeReferenceAttribute?.ExtraAssemblies != null)
+            {
+                foreach (Assembly assembly in GetAssemblyOfName(typeReferenceAttribute.ExtraAssemblies))
+                {
+                    yield return assembly;
+                }
+            }
         }
 
         // private IReadOnlyList<Assembly> _cachedAsssemblies;
@@ -92,7 +135,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (cachedAsssemblies == null)
             {
-                cachedAsssemblies = GetAssembly(eTypeFilter, parent).ToArray();
+                cachedAsssemblies = GetAssembly(typeRefAttr, parent).ToArray();
             }
 
             bool allowInternal = eTypeFilter.HasFlagFast(EType.AllowInternal);
@@ -254,6 +297,19 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             monoScriptGuidProp.stringValue = TypeReference.EditorGetMonoGuid(curType);
             property.serializedObject.ApplyModifiedProperties();
             return new TypeReference(curType);
+        }
+
+        private static TypeReferenceAttribute GetTypeReferenceAttribute(IEnumerable<PropertyAttribute> allAttributes)
+        {
+            foreach (PropertyAttribute attr in allAttributes)
+            {
+                if(attr is TypeReferenceAttribute typeReferenceAttribute)
+                {
+                    return typeReferenceAttribute;
+                }
+            }
+
+            return null;
         }
     }
 }

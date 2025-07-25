@@ -26,8 +26,8 @@ namespace SaintsField.Events
         public TypeReference typeReference = new TypeReference();
 
         public UnityEngine.Object unityObject;
-        public bool serializedAsJson;
-        public byte[] serializeBinaryData = Array.Empty<byte>();
+        // public bool serializedAsJson;
+        // public byte[] serializeBinaryData = Array.Empty<byte>();
         public string serializeJsonData = "";
         public object SerializeObject;
 
@@ -40,8 +40,8 @@ namespace SaintsField.Events
 
         public void OnAfterDeserialize()
         {
-            if (serializedAsJson)
-            {
+            // if (serializedAsJson)
+            // {
                 if (!string.IsNullOrEmpty(serializeJsonData))
                 {
                     try
@@ -55,23 +55,23 @@ namespace SaintsField.Events
 #endif
                     }
                 }
-            }
-            else
-            {
-                if (serializeBinaryData.Length > 0)
-                {
-                    try
-                    {
-                        SerializeObject = SerializationUtil.FromBinaryType(typeReference.Type, serializeBinaryData);
-                    }
-                    catch (Exception e)
-                    {
-#if SAINTSFIELD_DEBUG
-                        Debug.LogWarning(e);
-#endif
-                    }
-                }
-            }
+//             }
+//             else
+//             {
+//                 if (serializeBinaryData.Length > 0)
+//                 {
+//                     try
+//                     {
+//                         SerializeObject = SerializationUtil.FromBinaryType(typeReference.Type, serializeBinaryData);
+//                     }
+//                     catch (Exception e)
+//                     {
+// #if SAINTSFIELD_DEBUG
+//                         Debug.LogWarning(e);
+// #endif
+//                     }
+//                 }
+//             }
         }
 
         public Type GetArgumentType() => isUnityObject ? unityObject?.GetType() : typeReference.Type;

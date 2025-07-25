@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             UIToolkitUtils.DropdownButtonField dropdown = container.Q<UIToolkitUtils.DropdownButtonField>(NameTypeReferenceField(property));
             UIToolkitUtils.AddContextualMenuManipulator(dropdown.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
-            TypeReferenceAttribute typeReferenceAttribute = saintsAttribute as TypeReferenceAttribute;
+            TypeReferenceAttribute typeReferenceAttribute = GetTypeReferenceAttribute(allAttributes);
 
             dropdown.ButtonElement.clicked += () =>
             {
@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(dropdown.worldBound);
                 worldBound.height = SingleLineHeight;
 
-                _cachedAsssemblies ??= GetAssembly(typeReferenceAttribute?.EType ?? EType.Current, parent).ToArray();
+                _cachedAsssemblies ??= GetAssembly(typeReferenceAttribute, parent).ToArray();
                 FillAsssembliesTypes(_cachedAsssemblies, _cachedAsssembliesTypes);
                 AdvancedDropdownMetaInfo metaInfo = GetDropdownMetaInfo(type, typeReferenceAttribute, _cachedAsssemblies, _cachedAsssembliesTypes, false, parent);
 

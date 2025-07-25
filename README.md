@@ -103,12 +103,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.22.1**
+**4.22.2**
 
-1.  Fix `<field />` not get updated in `ComponentHeader`  [#266](https://github.com/TylerTemp/SaintsField/issues/266)
-2.  Fix `EnumToogleButtons` expanded button not get disabled with `DisableIf`/`EnableIf`/`ReadOnly`
-3.  Add support for Unity's [`InspectorNameAttribute`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/InspectorNameAttribute.html) for `enum` type
-4.  IMGUI: fix `Table` foldout clicking on label didn't expand the field [#265](https://github.com/TylerTemp/SaintsField/issues/265)
+1.  UI Toolkit: Fix `Table` re-order function not working [#272](https://github.com/TylerTemp/SaintsField/issues/272)
+2.  `TypeReference` add `string[] onlyAssemblies = null` and `string[] extraAssemblies = null`
+3.  **Experimenal**: UI Toolkit: Add `SaintsEvent` types:
+    *   Not documented
+    *   Requires [Unity Serialization](https://docs.unity3d.com/Packages/com.unity.serialization@3.0/manual/index.html) installed
+    *   Don't use it in a production env. It still needs some work
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -5998,6 +6000,10 @@ public ReferenceHashSet<IReference> refHashSet;
 
 Serialize a `System.Type`
 
+> [!WARNING]
+> This function saves the target's domain and type name. Which means if you change the name, the data will be lost.
+> Carefully think about it before you using it.
+
 By default, it searchs the current assembly and referenced assembly and shows all visible (public) types.
 
 You can add an extra `[TypeReference]` to control the behavior.
@@ -6006,6 +6012,8 @@ You can add an extra `[TypeReference]` to control the behavior.
 
 *   `EType eType = EType.Current`: Options. See below
 *   `Type[] superTypes = null`: A list of type/interface, the option list types are inhirent from these types. The type in the list is also included in list.
+*   `string[] onlyAssemblies = null`: only use these assembly names
+*   `string[] extraAssemblies = null`: extrally add these assemblies to the result list.
 
 EType:
 
@@ -6064,7 +6072,7 @@ public enum EType
 }
 ```
 
-Please note: if you have many type options, a big list might be slow.
+Please note: if you have many type options, the big dropdown list might be SLOW.
 
 Example:
 

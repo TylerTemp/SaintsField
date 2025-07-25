@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE && UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if SAINTSFIELD_SERIALIZATION && !SAINTSFIELD_SERIALIZATION_DISABLED && UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -144,9 +144,16 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             int index = persistentCallProp.arraySize;
             persistentCallProp.arraySize = index + 1;
             SerializedProperty persistentCallElement = persistentCallProp.GetArrayElementAtIndex(index);
-            persistentCallElement.FindPropertyRelative("_isStatic").boolValue = isStatic;
+            persistentCallElement.FindPropertyRelative(nameof(PersistentCall.isStatic)).boolValue = isStatic;
             persistentCallElement.FindPropertyRelative(nameof(PersistentCall.callState)).intValue =
                 (int)UnityEventCallState.RuntimeOnly;
+            persistentCallElement.FindPropertyRelative(nameof(PersistentCall.methodName)).stringValue = "";
+            persistentCallElement.FindPropertyRelative(nameof(PersistentCall.target)).objectReferenceValue = null;
+            persistentCallElement.FindPropertyRelative(nameof(PersistentCall.persistentArguments)).arraySize = 0;
+            persistentCallElement.FindPropertyRelative(nameof(PersistentCall.staticType) + SubPropNameTypeNameAndAssmble).stringValue = "";
+            persistentCallElement.FindPropertyRelative(nameof(PersistentCall.staticType) + SubPropMonoScriptGuid).stringValue = "";
+            persistentCallElement.FindPropertyRelative(nameof(PersistentCall.returnType) + SubPropNameTypeNameAndAssmble).stringValue = "";
+            persistentCallElement.FindPropertyRelative(nameof(PersistentCall.returnType) + SubPropMonoScriptGuid).stringValue = "";
             persistentCallElement.serializedObject.ApplyModifiedProperties();
         }
     }

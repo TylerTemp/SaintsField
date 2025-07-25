@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE
+#if SAINTSFIELD_SERIALIZATION && !SAINTSFIELD_SERIALIZATION_DISABLED
 using SaintsField.Editor.Core;
 using SaintsField.Events;
 using UnityEditor;
@@ -13,6 +13,8 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
     public partial class SaintsEventBaseDrawer: SaintsPropertyDrawer
     {
         private const string PropNamePersistentCalls = "_persistentCalls";
+        private const string SubPropNameTypeNameAndAssmble = "._typeNameAndAssembly";
+        private const string SubPropMonoScriptGuid = "._monoScriptGuid";
     }
 }
 #endif

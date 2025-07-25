@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -261,13 +261,13 @@ MonoBehaviour:
   saintsEvent1Int:
     _persistentCalls:
     - callState: 1
-      _methodName: OverrideTest
-      _isStatic: 0
-      _target: {fileID: 1697117603}
-      _staticType:
+      methodName: OverrideTest
+      isStatic: 0
+      target: {fileID: 1697117603}
+      staticType:
         _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
         _monoScriptGuid: 
-      _persistentArguments:
+      persistentArguments:
       - name: s
         callType: 1
         isOptional: 1
@@ -277,11 +277,20 @@ MonoBehaviour:
           _typeNameAndAssembly: System.String, mscorlib
           _monoScriptGuid: 
         unityObject: {fileID: 0}
-        serializedAsJson: 1
-        serializeBinaryData: 
-        serializeJsonData: '"Lets x"'
-      _returnType:
+        serializeJsonData: '"fdsfdsfds"'
+      returnType:
         _typeNameAndAssembly: System.Void, mscorlib
+        _monoScriptGuid: 
+    - callState: 2
+      methodName: 
+      isStatic: 1
+      target: {fileID: 0}
+      staticType:
+        _typeNameAndAssembly: 
+        _monoScriptGuid: 
+      persistentArguments: []
+      returnType:
+        _typeNameAndAssembly: 
         _monoScriptGuid: 
   range1Int1: 0
 --- !u!1660057539 &9223372036854775807

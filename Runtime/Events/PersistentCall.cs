@@ -5,6 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 // ReSharper disable once CheckNamespace
@@ -14,16 +15,16 @@ namespace SaintsField.Events
     public class PersistentCall: ISerializationCallbackReceiver
     {
         [SerializeField] public UnityEventCallState callState = UnityEventCallState.RuntimeOnly;
-        [SerializeField] private string _methodName;
+        [SerializeField] public string methodName;
 
-        [SerializeField] private bool _isStatic;
-        [SerializeField, DisableIf(nameof(_isStatic))] private Object _target;
-        [SerializeField, EnableIf(nameof(_isStatic)), TypeReference(EType.AllAssembly | EType.AllowInternal)]
-        private TypeReference _staticType;
+        [SerializeField] public bool isStatic;
+        [SerializeField, DisableIf(nameof(isStatic))] public Object target;
+        [SerializeField, EnableIf(nameof(isStatic)), TypeReference(EType.AllAssembly | EType.AllowInternal)]
+        public TypeReference staticType;
 
-        [SerializeField] private PersistentArgument[] _persistentArguments;
+        [SerializeField] public PersistentArgument[] persistentArguments;
 
-        [SerializeField] private TypeReference _returnType;
+        [SerializeField] public TypeReference returnType;
 
         private bool _methodCached;
         private MethodCache _methodCache;
@@ -35,7 +36,7 @@ namespace SaintsField.Events
                 return;
             }
 
-            if (string.IsNullOrEmpty(_methodName))
+            if (string.IsNullOrEmpty(methodName))
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogWarning("PersistentCall: Method name is empty or null.");
@@ -53,7 +54,7 @@ namespace SaintsField.Events
             }
 #endif
 
-            Type targetType = _isStatic ? _staticType.Type : _target?.GetType();
+            Type targetType = isStatic ? staticType.Type : target?.GetType();
             if (targetType == null)
             {
 #if SAINTSFIELD_DEBUG
@@ -62,12 +63,12 @@ namespace SaintsField.Events
                 return;
             }
 
-            Type[] argumentTypes = new Type[_persistentArguments.Length];
-            object[] argumentValues = new object[_persistentArguments.Length];
-            List<int> defaultFillIndices = new List<int>(_persistentArguments.Length);
-            for (int i = 0; i < _persistentArguments.Length; i++)
+            Type[] argumentTypes = new Type[persistentArguments.Length];
+            object[] argumentValues = new object[persistentArguments.Length];
+            List<int> defaultFillIndices = new List<int>(persistentArguments.Length);
+            for (int i = 0; i < persistentArguments.Length; i++)
             {
-                PersistentArgument persistentArgument = _persistentArguments[i];
+                PersistentArgument persistentArgument = persistentArguments[i];
 
                 switch (persistentArgument.callType)
                 {
@@ -100,18 +101,18 @@ namespace SaintsField.Events
                 argumentTypes[i] = persistentArgument.typeReference.Type;
             }
 
-            Debug.Log($"argumentTypes={string.Join<Type>(", ", argumentTypes)}");
+            // Debug.Log($"argumentTypes={string.Join<Type>(", ", argumentTypes)}");
 
             MethodCache methodCache;
             if (_methodCached)
             {
-                Debug.Log("use cached method");
+                // Debug.Log("use cached method");
                 methodCache = _methodCache;
             }
             else
             {
-                Debug.Log("fetch method");
-                methodCache = _methodCache = GetMethod(_isStatic, _staticType.Type, _target, _methodName, argumentTypes);
+                // Debug.Log("fetch method");
+                methodCache = _methodCache = GetMethod(isStatic, staticType.Type, target, methodName, argumentTypes);
                 _methodCached = true;
             }
             // MethodInfo method = targetType.GetMethod(_methodName, flags, null, CallingConventions.Any, argumentTypes, null);
@@ -119,7 +120,7 @@ namespace SaintsField.Events
             if (methodInfo == null)
             {
 #if SAINTSFIELD_DEBUG
-                Debug.Log($"PersistentCall: method {_methodName} on {targetType} is null.");
+                Debug.Log($"PersistentCall: method {methodName} on {targetType} is null.");
 #endif
                 return;
             }
@@ -141,7 +142,7 @@ namespace SaintsField.Events
             }
 
             object invokeTarget = methodCache.InvokeTarget;
-            Debug.Log($"find method {methodInfo.Name} {string.Join(",", methodParams.Select(each => $"{each.Name}({each.ParameterType})"))} => {methodInfo.ReturnType}");
+            // Debug.Log($"find method {methodInfo.Name} {string.Join(",", methodParams.Select(each => $"{each.Name}({each.ParameterType})"))} => {methodInfo.ReturnType}");
             methodInfo.Invoke(invokeTarget, argumentValues);
         }
 

@@ -22,8 +22,8 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             public bool Changed;
             public TypeReference ChangedValue;
 
-            public IReadOnlyList<Assembly> _cachedAsssemblies;
-            public readonly Dictionary<Assembly, Type[]> _cachedAsssembliesTypes = new Dictionary<Assembly, Type[]>();
+            public IReadOnlyList<Assembly> CachedAsssemblies;
+            public readonly Dictionary<Assembly, Type[]> CachedAsssembliesTypes = new Dictionary<Assembly, Type[]>();
         }
 
         private static readonly Dictionary<string, CachedImGui> CachedImGuiDict = new Dictionary<string, CachedImGui>();
@@ -60,18 +60,19 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 onGUIPayload.SetValue(cache.ChangedValue);
             }
 
-            TypeReferenceAttribute typeReferenceAttribute = saintsAttribute as TypeReferenceAttribute;
+            TypeReferenceAttribute typeReferenceAttribute = GetTypeReferenceAttribute(allAttributes);
 
-            if (cache._cachedAsssemblies == null)
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (cache.CachedAsssemblies == null)
             {
-                cache._cachedAsssemblies = GetAssembly(typeReferenceAttribute?.EType ?? EType.Current, parent).ToArray();
+                cache.CachedAsssemblies = GetAssembly(typeReferenceAttribute, parent).ToArray();
             }
-            FillAsssembliesTypes(cache._cachedAsssemblies, cache._cachedAsssembliesTypes);
+            FillAsssembliesTypes(cache.CachedAsssemblies, cache.CachedAsssembliesTypes);
 
             (string error, Type type) = GetSelectedType(property);
             cache.Error = error;
 
-            AdvancedDropdownMetaInfo metaInfo = GetDropdownMetaInfo(type, typeReferenceAttribute, cache._cachedAsssemblies, cache._cachedAsssembliesTypes, true, parent);
+            AdvancedDropdownMetaInfo metaInfo = GetDropdownMetaInfo(type, typeReferenceAttribute, cache.CachedAsssemblies, cache.CachedAsssembliesTypes, true, parent);
 
             #region Dropdown
 

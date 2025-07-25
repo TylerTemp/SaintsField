@@ -9,18 +9,22 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class TypeReferenceAttribute: PropertyAttribute, ISaintsAttribute
+    public class TypeReferenceAttribute: PropertyAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
-        public string GroupBy => "__LABEL_FIELD__";
+        // public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
+        // public string GroupBy => "__LABEL_FIELD__";
 
         public readonly EType EType;
         public readonly IReadOnlyList<Type> SuperTypes;
+        public readonly IReadOnlyList<string> OnlyAssemblies;
+        public readonly IReadOnlyList<string> ExtraAssemblies;
 
-        public TypeReferenceAttribute(EType eType = EType.Current, Type[] superTypes = null)
+        public TypeReferenceAttribute(EType eType = EType.Current, Type[] superTypes = null, string[] onlyAssemblies = null, string[] extraAssemblies = null)
         {
             EType = eType;
             SuperTypes = superTypes;
+            OnlyAssemblies = onlyAssemblies;
+            ExtraAssemblies = extraAssemblies;
         }
     }
 }

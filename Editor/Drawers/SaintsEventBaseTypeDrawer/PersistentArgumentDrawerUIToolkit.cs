@@ -1,4 +1,4 @@
-#if SAINTSFIELD_SERIALIZATION && SAINTSFIELD_SERIALIZATION_ENABLE && UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if SAINTSFIELD_SERIALIZATION && !SAINTSFIELD_SERIALIZATION_DISABLED && UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -136,7 +136,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             Label serializedValueDropdownButtonLabel = serializedValueDropdownButton.Q<Label>();
             SerializedProperty serializeValueTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly");
-            SerializedProperty serializedAsJsonProp = property.FindPropertyRelative(nameof(PersistentArgument.serializedAsJson));
+            // SerializedProperty serializedAsJsonProp = property.FindPropertyRelative(nameof(PersistentArgument.serializedAsJson));
             SerializedValueDropdownButtonLabelDisplay(serializeValueTypeProp);
             serializedValueDropdownButtonLabel.TrackPropertyValue(serializeValueTypeProp, SerializedValueDropdownButtonLabelDisplay);
 
@@ -304,7 +304,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             {
                 if (p.intValue == (int)PersistentArgument.CallType.Dynamic)
                 {
-                    Debug.Log("display valueDynamic");
+                    // Debug.Log("display valueDynamic");
                     valueDynamic.style.display = DisplayStyle.Flex;
                     serializedObject.style.display = DisplayStyle.None;
                     serializedValue.style.display = DisplayStyle.None;
@@ -314,20 +314,20 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     valueDynamic.style.display = DisplayStyle.None;
                     if (property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue)
                     {
-                        Debug.Log("display serializedObject");
+                        // Debug.Log("display serializedObject");
                         serializedObject.style.display = DisplayStyle.Flex;
                         serializedValue.style.display = DisplayStyle.None;
                     }
                     else
                     {
-                        Debug.Log("display serializedValue");
+                        // Debug.Log("display serializedValue");
                         serializedObject.style.display = DisplayStyle.None;
                         serializedValue.style.display = DisplayStyle.Flex;
                     }
                 }
                 else if (p.intValue == (int)PersistentArgument.CallType.OptionalDefault)
                 {
-                    Debug.Log("display default value");
+                    // Debug.Log("display default value");
                     valueDynamic.style.display = DisplayStyle.None;
                     serializedObject.style.display = DisplayStyle.None;
                     serializedValue.style.display = DisplayStyle.None;
@@ -355,53 +355,54 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 (VisualElement result, bool isNestedField) = AbsRenderer.UIToolkitValueEdit(
                     payload.RenderElement, payload.Type.Name, payload.Type, payload.Value, null, newValue =>
                     {
-                        Debug.Log($"Update Value {newValue}");
+                        // Debug.Log($"Update Value {newValue}");
 
 
                         // Debug.Log(jsonC);
 
-                        SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
+                        // SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
                         SerializedProperty serializeJsonDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeJsonData));
-                        byte[] binData = Array.Empty<byte>();
-                        string jsonData = "";
-                        bool useJson = false;
-                        try
-                        {
-                            binData = SerializationUtil.ToBinaryType(newValue);
-                            object rest = SerializationUtil.FromBinaryType(payload.Type, binData);
-                            if (rest != newValue)
-                            {
-                                throw new Exception("WTF Unity");
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            useJson = true;
-                            jsonData = SerializationUtil.ToJsonType(newValue);
-                            // Debug.Log(jsonV);
-                            // object jsonC = SerializationUtil.FromJsonType(payload.Type, jsonV);
-                        }
+                        // byte[] binData = Array.Empty<byte>();
+                        // string jsonData = "";
+                        // bool useJson = false;
+                        // try
+                        // {
+                        //     binData = SerializationUtil.ToBinaryType(newValue);
+                        //     object rest = SerializationUtil.FromBinaryType(payload.Type, binData);
+                        //     if (rest != newValue)
+                        //     {
+                        //         throw new Exception("WTF Unity");
+                        //     }
+                        // }
+                        // catch (Exception)
+                        // {
+                        //     useJson = true;
+                        //     jsonData = SerializationUtil.ToJsonType(newValue);
+                        //     // Debug.Log(jsonV);
+                        //     // object jsonC = SerializationUtil.FromJsonType(payload.Type, jsonV);
+                        // }
+                        string jsonData = SerializationUtil.ToJsonType(newValue);
 
-                        if (useJson)
+                        // if (useJson)
                         {
-                            serializedAsJsonProp.boolValue = true;
+                            // serializedAsJsonProp.boolValue = true;
                             serializeJsonDataProp.stringValue = jsonData;
-                            serializeBinaryDataProp.arraySize = 0;
+                            // serializeBinaryDataProp.arraySize = 0;
                         }
-                        else
-                        {
-                            serializedAsJsonProp.boolValue = false;
-                            serializeJsonDataProp.stringValue = string.Empty;
-                            serializeBinaryDataProp.arraySize = binData.Length;
-                            for (int binIndex = 0; binIndex < binData.Length; binIndex++)
-                            {
-                                serializeBinaryDataProp.GetArrayElementAtIndex(binIndex).intValue = binData[binIndex];
-                            }
-                        }
+                        // else
+                        // {
+                        //     serializedAsJsonProp.boolValue = false;
+                        //     serializeJsonDataProp.stringValue = string.Empty;
+                        //     serializeBinaryDataProp.arraySize = binData.Length;
+                        //     for (int binIndex = 0; binIndex < binData.Length; binIndex++)
+                        //     {
+                        //         serializeBinaryDataProp.GetArrayElementAtIndex(binIndex).intValue = binData[binIndex];
+                        //     }
+                        // }
 
                         property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue = false;
 
-                        serializeBinaryDataProp.serializedObject.ApplyModifiedProperties();
+                        property.serializedObject.ApplyModifiedProperties();
                     }, false, true);
 
                 if (result != null)
@@ -435,10 +436,10 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     }
                 }
 
-                SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
+                // SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
                 SerializedProperty serializeJsonDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeJsonData));
                 // Debug.Log($"serializeBinaryDataProp.arraySize={serializeBinaryDataProp.arraySize}");
-                if (serializedAsJsonProp.boolValue)
+                // if (serializedAsJsonProp.boolValue)
                 {
                     string jsonV = serializeJsonDataProp.stringValue;
                     if (!string.IsNullOrEmpty(jsonV))
@@ -458,28 +459,28 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         serializedObj = ActivatorCreateInstance(serializedFieldType);
                     }
                 }
-                else
-                {
-                    if (serializeBinaryDataProp.arraySize > 0 && serializedFieldType != null)
-                    {
-                        byte[] serializeBinaryData = Enumerable.Range(0, serializeBinaryDataProp.arraySize)
-                            .Select(i => (byte)serializeBinaryDataProp.GetArrayElementAtIndex(i).intValue)
-                            .ToArray();
-                        try
-                        {
-                            serializedObj = SerializationUtil.FromBinaryType(serializedFieldType, serializeBinaryData);
-                        }
-                        catch (ArgumentException e)
-                        {
-                            Debug.LogError(e);
-                            serializedObj = ActivatorCreateInstance(serializedFieldType);
-                        }
-                    }
-                    else if (serializedFieldType != null)
-                    {
-                        serializedObj = ActivatorCreateInstance(serializedFieldType);
-                    }
-                }
+                // else
+                // {
+                //     if (serializeBinaryDataProp.arraySize > 0 && serializedFieldType != null)
+                //     {
+                //         byte[] serializeBinaryData = Enumerable.Range(0, serializeBinaryDataProp.arraySize)
+                //             .Select(i => (byte)serializeBinaryDataProp.GetArrayElementAtIndex(i).intValue)
+                //             .ToArray();
+                //         try
+                //         {
+                //             serializedObj = SerializationUtil.FromBinaryType(serializedFieldType, serializeBinaryData);
+                //         }
+                //         catch (ArgumentException e)
+                //         {
+                //             Debug.LogError(e);
+                //             serializedObj = ActivatorCreateInstance(serializedFieldType);
+                //         }
+                //     }
+                //     else if (serializedFieldType != null)
+                //     {
+                //         serializedObj = ActivatorCreateInstance(serializedFieldType);
+                //     }
+                // }
 
                 serializedValueEditor.userData = new SerializedValuePayload
                 {
