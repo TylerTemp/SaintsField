@@ -559,7 +559,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
@@ -681,7 +681,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 };
                 if (labelGrayColor)
                 {
-                    element.labelElement.style.color = reColor;
+                    element.labelElement.style.color = ReColor;
                 }
                 if (inHorizontalLayout)
                 {
