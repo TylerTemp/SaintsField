@@ -107,7 +107,7 @@ namespace: `SaintsField`
 
 1.  UI Toolkit: Fix `Table` re-order function not working [#272](https://github.com/TylerTemp/SaintsField/issues/272)
 2.  `TypeReference` add `string[] onlyAssemblies = null` and `string[] extraAssemblies = null`
-3.  **Experimenal**: UI Toolkit: Add `SaintsEvent` types:
+3.  **Experimental**: UI Toolkit: Add `SaintsEvent` types:
     *   Not documented
     *   Requires [Unity Serialization](https://docs.unity3d.com/Packages/com.unity.serialization@3.0/manual/index.html) installed
     *   Don't use it in a production env. It still needs some work
