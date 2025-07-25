@@ -13123,6 +13123,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1743019391}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &689768759
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 689768760}
+  - component: {fileID: 689768761}
+  m_Layer: 0
+  m_Name: Issue272TableReOrder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &689768760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 689768759}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &689768761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 689768759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b403da2b815f5be4daa57366ff965f73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _levelsOrderAndCost:
+  - level: 0
+    missionsToUnlock:
+    - 1
+  - level: 1
+    missionsToUnlock:
+    - 2
 --- !u!1 &691523130
 GameObject:
   m_ObjectHideFlags: 0
@@ -17235,6 +17286,7 @@ MonoBehaviour:
   myMaskDisabledLabel: 0
   enumNormal: 2
   enumExpand: 5
+  labelField: 0
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0
@@ -22470,6 +22522,7 @@ Transform:
   - {fileID: 883682259}
   - {fileID: 1395485385}
   - {fileID: 2023712052}
+  - {fileID: 689768760}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1490458620
@@ -26219,7 +26272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _parent: {fileID: 0}
-  _parentOverride: {fileID: 557706425}
+  _parentOverride: {fileID: 0}
 --- !u!114 &1795386407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26232,8 +26285,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9549775aa0e269c4b9371b8bf93c13b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _parent: {fileID: 1403177251}
-  _parentOverride: {fileID: 1403177251}
+  _parent: {fileID: 0}
+  _parentOverride: {fileID: 0}
 --- !u!1 &1798165821
 GameObject:
   m_ObjectHideFlags: 0
@@ -33947,7 +34000,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a093aa869baa8a4ea0c4a1bb9764b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _xPathFilterBoolFalse: {fileID: 0}
+  _xPathFilterBoolFalse: {fileID: 11400000, guid: eef8a2e928293ac45bd456b85cc76367, type: 2}
 --- !u!1 &2043659985
 GameObject:
   m_ObjectHideFlags: 0
