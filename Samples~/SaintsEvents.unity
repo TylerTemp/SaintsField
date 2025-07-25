@@ -268,29 +268,20 @@ MonoBehaviour:
         _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
         _monoScriptGuid: 
       persistentArguments:
-      - name: s
+      - name: cls
         callType: 1
-        isOptional: 1
+        isOptional: 0
         invokedParameterIndex: 0
         isUnityObject: 0
         typeReference:
-          _typeNameAndAssembly: System.String, mscorlib
+          _typeNameAndAssembly: Samples.Events.Event1Example+ClassObj, today.comes.saintsfield.Samples.Events
           _monoScriptGuid: 
         unityObject: {fileID: 0}
-        serializeJsonData: '"fdsfdsfds"'
+        serializeJsonData: "{\n    \"$type\": \"Samples.Events.Event1Example+ClassObj,
+          today.comes.saintsfield.Samples.Events\",\n    \"MyInt\": 321321,\n   
+          \"MyStr\": null\n}"
       returnType:
         _typeNameAndAssembly: System.Void, mscorlib
-        _monoScriptGuid: 
-    - callState: 2
-      methodName: 
-      isStatic: 1
-      target: {fileID: 0}
-      staticType:
-        _typeNameAndAssembly: 
-        _monoScriptGuid: 
-      persistentArguments: []
-      returnType:
-        _typeNameAndAssembly: 
         _monoScriptGuid: 
   range1Int1: 0
 --- !u!1660057539 &9223372036854775807

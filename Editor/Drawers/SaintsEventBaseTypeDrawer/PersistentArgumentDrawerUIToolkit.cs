@@ -345,8 +345,9 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 // Debug.Assert(sp != null);
                 SerializedValuePayload payload = (SerializedValuePayload)serializedValueEditor.userData;
 
-                if (payload.Type == null || payload.Value == null)
+                if (payload.Type == null)
                 {
+                    // Debug.Log($"payload null: {payload.Type}/{payload.Value}");
                     serializedValueEditor.Clear();
                     payload.RenderElement = null;
                     return;
@@ -357,8 +358,8 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     {
                         // Debug.Log($"Update Value {newValue}");
 
-
                         // Debug.Log(jsonC);
+                        payload.Value = newValue;
 
                         // SerializedProperty serializeBinaryDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeBinaryData));
                         SerializedProperty serializeJsonDataProp = property.FindPropertyRelative(nameof(PersistentArgument.serializeJsonData));
@@ -401,8 +402,10 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         // }
 
                         property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue = false;
-
                         property.serializedObject.ApplyModifiedProperties();
+                        // Debug.Log($"re-render SerializedValueEditorRepaint");
+                        SerializedValueEditorRepaint();
+
                     }, false, true);
 
                 if (result != null)
