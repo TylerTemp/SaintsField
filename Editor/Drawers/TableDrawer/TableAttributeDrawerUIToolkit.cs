@@ -583,6 +583,20 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 }
             });
 
+            multiColumnListView.itemIndexChanged += (first, second) =>
+            {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.Log($"drag {first}({first}) -> {second}({second}) for {arrayProp.propertyPath}({arrayProp.arraySize})");
+// #endif
+
+                arrayProp.MoveArrayElement(first, second);
+                arrayProp.serializedObject.ApplyModifiedProperties();
+                multiColumnListView.itemsSource = Enumerable
+                    .Range(0, arrayProp.arraySize)
+                    .Select(arrayProp.GetArrayElementAtIndex)
+                    .ToList();
+            };
+
             // bool focused = false;
             // multiColumnListView.RegisterCallback<FocusOutEvent>(_ => focused = false);
             // multiColumnListView.RegisterCallback<FocusInEvent>(_ => focused = true);

@@ -13168,12 +13168,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _levelsOrderAndCost:
-  - level: 0
-    missionsToUnlock:
-    - 1
   - level: 1
     missionsToUnlock:
-    - 2
+    - 1
+  - level: 0
+    missionsToUnlock:
+    - 0
 --- !u!1 &691523130
 GameObject:
   m_ObjectHideFlags: 0
