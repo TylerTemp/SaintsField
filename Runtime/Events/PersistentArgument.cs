@@ -1,4 +1,5 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -29,7 +30,23 @@ namespace SaintsField.Events
         // public bool serializedAsJson;
         // public byte[] serializeBinaryData = Array.Empty<byte>();
         public string serializeJsonData = "";
-        public object SerializeObject;
+
+        private object _serializedObject;
+
+        public object SerializeObject
+        {
+            get
+            {
+                TryLoad();
+                return _serializedObject;
+            }
+            set
+            {
+                _serializedObject = value;
+                serializeJsonData = SerializationUtil.ToJsonType(value);
+            }
+
+        }
 
         public void OnBeforeSerialize()
         {
@@ -42,19 +59,7 @@ namespace SaintsField.Events
         {
             // if (serializedAsJson)
             // {
-                if (!string.IsNullOrEmpty(serializeJsonData))
-                {
-                    try
-                    {
-                        SerializeObject = SerializationUtil.FromJsonType(typeReference.Type, serializeJsonData);
-                    }
-                    catch (Exception e)
-                    {
-#if SAINTSFIELD_DEBUG
-                        Debug.LogWarning(e);
-#endif
-                    }
-                }
+
 //             }
 //             else
 //             {
@@ -72,7 +77,35 @@ namespace SaintsField.Events
 //                     }
 //                 }
 //             }
+#if !UNITY_EDITOR
+            TryLoad();
+#endif
         }
+
+        private bool _tryLoaded;
+
+        private void TryLoad()
+        {
+            if (_tryLoaded)
+            {
+                return;
+            }
+
+            _tryLoaded = true;
+
+            if (!string.IsNullOrEmpty(serializeJsonData))
+            {
+                try
+                {
+                    _serializedObject = SerializationUtil.FromJsonType(typeReference.Type, serializeJsonData);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                }
+            }
+        }
+
 
         public Type GetArgumentType() => isUnityObject ? unityObject?.GetType() : typeReference.Type;
         public object GetArgumentValue() => isUnityObject ? unityObject : SerializeObject;
