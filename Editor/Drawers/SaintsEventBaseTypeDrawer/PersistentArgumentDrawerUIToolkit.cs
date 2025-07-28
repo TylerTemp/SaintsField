@@ -241,11 +241,13 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             // persistent-argument-value-default
             VisualElement persistentArgumentValueDefault = container.Q<VisualElement>("persistent-argument-value-default");
+            Label persistentArgumentValueDefaultLabel = persistentArgumentValueDefault.Q<Label>();
+            HelpBox persistentArgumentValueDefaultHelpBox = persistentArgumentValueDefault.Q<HelpBox>();
             string callPropPath = string.Join(".",  property.propertyPath.Split('.').SkipLast(3));
-            int persistentArgumentIndex = SerializedUtils.PropertyPathIndex(callPropPath);
+            int persistentArgumentIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             SerializedProperty persistentCallProp = property.serializedObject.FindProperty(callPropPath);
             SerializedProperty persistentArgumentsProp =
-                persistentCallProp.FindPropertyRelative("_persistentArguments");
+                persistentCallProp.FindPropertyRelative(nameof(PersistentCall.persistentArguments));
             void UpdateDefaultParamValueDisplay(SerializedProperty p)
             {
                 if (!SerializedUtils.IsOk(valueTypeProp))  // Unity, just, please, fix your shit
@@ -254,7 +256,14 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 }
                 if (valueTypeProp.intValue != (int)PersistentArgument.CallType.OptionalDefault)
                 {
-                    persistentArgumentValueDefault.Clear();
+                    if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.None;
+                    }
+                    if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultLabel.style.display = DisplayStyle.None;
+                    }
                     return;
                 }
 
@@ -277,46 +286,88 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 }
 
                 MethodInfo methodInfo = PersistentCall.GetMethod(
-                    persistentCallProp.FindPropertyRelative("_isStatic").boolValue,
-                    Type.GetType(persistentCallProp.FindPropertyRelative("_staticType._typeNameAndAssembly").stringValue),
-                    persistentCallProp.FindPropertyRelative("_target").objectReferenceValue,
-                    persistentCallProp.FindPropertyRelative("_methodName").stringValue,
+                    // persistentCallProp.FindPropertyRelative("_isStatic").boolValue,
+                    persistentCallProp.FindPropertyRelative(nameof(PersistentCall.isStatic)).boolValue,
+                    // Type.GetType(persistentCallProp.FindPropertyRelative("_staticType._typeNameAndAssembly").stringValue),
+                    Type.GetType(persistentCallProp.FindPropertyRelative(nameof(PersistentCall.staticType) + "._typeNameAndAssembly").stringValue),
+                    // persistentCallProp.FindPropertyRelative("_target").objectReferenceValue,
+                    persistentCallProp.FindPropertyRelative(nameof(PersistentCall.target)).objectReferenceValue,
+                    // persistentCallProp.FindPropertyRelative("_methodName").stringValue,
+                    persistentCallProp.FindPropertyRelative(nameof(PersistentCall.methodName)).stringValue,
                     argumentTypes.ToArray()
                 ).MethodInfo;
 
                 if (methodInfo == null)
                 {
-                    persistentArgumentValueDefault.Clear();
-                    persistentArgumentValueDefault.Add(new HelpBox("Failed to obtain method info", HelpBoxMessageType.Error));
+                    // persistentArgumentValueDefault.Clear();
+                    // persistentArgumentValueDefault.Add(new HelpBox("Failed to obtain method info", HelpBoxMessageType.Error));
+                    if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.Flex)
+                    {
+                        persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.Flex;
+                    }
+                    if (persistentArgumentValueDefaultHelpBox.text != "Failed to obtain method info")
+                    {
+                        persistentArgumentValueDefaultHelpBox.text = "Failed to obtain method info";
+                    }
+                    if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultLabel.style.display = DisplayStyle.None;
+                    }
                     return;
                 }
 
                 ParameterInfo[] methodParams = methodInfo.GetParameters();
                 if(persistentArgumentIndex >= methodParams.Length)
                 {
-                    persistentArgumentValueDefault.Clear();
-                    persistentArgumentValueDefault.Add(new HelpBox($"Persistent argument index {persistentArgumentIndex} is out of range for method {methodInfo.Name} with {methodParams.Length} parameters", HelpBoxMessageType.Error));
+                    if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.Flex)
+                    {
+                        persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.Flex;
+                    }
+                    if (persistentArgumentValueDefaultHelpBox.text != $"Persistent argument index {persistentArgumentIndex} is out of range for method {methodInfo.Name} with {methodParams.Length} parameters")
+                    {
+                        persistentArgumentValueDefaultHelpBox.text = $"Persistent argument index {persistentArgumentIndex} is out of range for method {methodInfo.Name} with {methodParams.Length} parameters";
+                    }
+                    if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultLabel.style.display = DisplayStyle.None;
+                    }
                     return;
                 }
 
                 ParameterInfo methodParam = methodParams[persistentArgumentIndex];
                 if (!methodParam.IsOptional)
                 {
-                    persistentArgumentValueDefault.Clear();
-                    persistentArgumentValueDefault.Add(new HelpBox($"method {methodInfo.Name} {methodParam.Name}@{persistentArgumentIndex} is not optional", HelpBoxMessageType.Error));
+                    // persistentArgumentValueDefault.Clear();
+                    // persistentArgumentValueDefault.Add(new HelpBox($"method {methodInfo.Name} {methodParam.Name}@{persistentArgumentIndex} is not optional", HelpBoxMessageType.Error));
+                    if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.Flex)
+                    {
+                        persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.Flex;
+                    }
+                    if (persistentArgumentValueDefaultHelpBox.text != $"method {methodInfo.Name} {methodParam.Name}@{persistentArgumentIndex} is not optional")
+                    {
+                        persistentArgumentValueDefaultHelpBox.text = $"method {methodInfo.Name} {methodParam.Name}@{persistentArgumentIndex} is not optional";
+                    }
+                    if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultLabel.style.display = DisplayStyle.None;
+                    }
                     return;
                 }
 
                 object paramDefaultValue = methodParam.DefaultValue;
+                // Debug.Log($"get paramDefaultValue={paramDefaultValue}");
                 string paramDefaultDisplay = paramDefaultValue == null ? "[Null]" : paramDefaultValue.ToString();
-                Label paramDefaultLabel = persistentArgumentValueDefault.Q<Label>();
-                if (paramDefaultLabel == null)
+                if(persistentArgumentValueDefaultLabel.text != paramDefaultDisplay)
                 {
-                    persistentArgumentValueDefault.Add(paramDefaultLabel = new Label());
+                    persistentArgumentValueDefaultLabel.text = paramDefaultDisplay;
                 }
-                if(paramDefaultLabel.text != paramDefaultDisplay)
+                if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.None)
                 {
-                    paramDefaultLabel.text = paramDefaultDisplay;
+                    persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.None;
+                }
+                if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.Flex)
+                {
+                    persistentArgumentValueDefaultLabel.style.display = DisplayStyle.Flex;
                 }
             }
 

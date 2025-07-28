@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -162,67 +162,6 @@ MonoBehaviour:
         _typeNameAndAssembly: Samples.Events.EventNames, today.comes.saintsfield.Samples.Events
         _monoScriptGuid: 
       persistentArguments:
-      - name: i
-        callType: 0
-        isOptional: 0
-        invokedParameterIndex: 0
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.Int32, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeJsonData: 
-      - name: s
-        callType: 0
-        isOptional: 0
-        invokedParameterIndex: 1
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.String, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeJsonData: 
-      - name: d
-        callType: 0
-        isOptional: 0
-        invokedParameterIndex: 2
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.Decimal, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeJsonData: 
-      returnType:
-        _typeNameAndAssembly: System.Void, mscorlib
-        _monoScriptGuid: 
-    - callState: 2
-      methodName: Callback
-      isStatic: 1
-      target: {fileID: 481940489}
-      staticType:
-        _typeNameAndAssembly: Samples.Events.EventNames, today.comes.saintsfield.Samples.Events
-        _monoScriptGuid: 
-      persistentArguments:
-      - name: i
-        callType: 1
-        isOptional: 0
-        invokedParameterIndex: 0
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.Int32, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeJsonData: 
-      - name: s
-        callType: 0
-        isOptional: 0
-        invokedParameterIndex: 0
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.String, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeJsonData: 
       - name: d
         callType: 1
         isOptional: 0
@@ -230,6 +169,68 @@ MonoBehaviour:
         isUnityObject: 0
         typeReference:
           _typeNameAndAssembly: Samples.Events.EventNames+MyClass, today.comes.saintsfield.Samples.Events
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: "{\n    \"$type\": \"Samples.Events.EventNames+MyClass,
+          today.comes.saintsfield.Samples.Events\",\n    \"N\": 23\n}"
+      - name: s
+        callType: 0
+        isOptional: 0
+        invokedParameterIndex: 2
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.String, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      - name: i
+        callType: 2
+        isOptional: 1
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.Int32, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      returnType:
+        _typeNameAndAssembly: System.Void, mscorlib
+        _monoScriptGuid: 
+    - callState: 1
+      methodName: SCallback
+      isStatic: 1
+      target: {fileID: 481940489}
+      staticType:
+        _typeNameAndAssembly: Samples.Events.EventNames, today.comes.saintsfield.Samples.Events
+        _monoScriptGuid: 
+      persistentArguments:
+      - name: d
+        callType: 0
+        isOptional: 0
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: Samples.Events.EventNames+MyClass, today.comes.saintsfield.Samples.Events
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      - name: s
+        callType: 0
+        isOptional: 0
+        invokedParameterIndex: 2
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.String, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      - name: i
+        callType: 0
+        isOptional: 1
+        invokedParameterIndex: 1
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.Int32, mscorlib
           _monoScriptGuid: 
         unityObject: {fileID: 0}
         serializeJsonData: 
@@ -293,7 +294,7 @@ GameObject:
   - component: {fileID: 841318130}
   - component: {fileID: 841318131}
   m_Layer: 0
-  m_Name: GameObject_1
+  m_Name: Event0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -329,48 +330,15 @@ MonoBehaviour:
   sEvent:
     _persistentCalls:
     - callState: 2
-      methodName: Equals
-      isStatic: 1
-      target: {fileID: 0}
+      methodName: CallMe
+      isStatic: 0
+      target: {fileID: 841318131}
       staticType:
-        _typeNameAndAssembly: Interop+User32, mscorlib
-        _monoScriptGuid: 
-      persistentArguments:
-      - name: objA
-        callType: 1
-        isOptional: 0
-        invokedParameterIndex: 0
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.Object, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeJsonData: 
-      - name: objB
-        callType: 1
-        isOptional: 0
-        invokedParameterIndex: 0
-        isUnityObject: 0
-        typeReference:
-          _typeNameAndAssembly: System.Object, mscorlib
-          _monoScriptGuid: 
-        unityObject: {fileID: 0}
-        serializeJsonData: 
-      returnType:
-        _typeNameAndAssembly: System.Boolean, mscorlib
-        _monoScriptGuid: 
-  sEvents:
-  - _persistentCalls:
-    - callState: 2
-      methodName: 
-      isStatic: 1
-      target: {fileID: 0}
-      staticType:
-        _typeNameAndAssembly: 
+        _typeNameAndAssembly: Samples.Events.EventAssExample, today.comes.saintsfield.Samples.Events
         _monoScriptGuid: 
       persistentArguments: []
       returnType:
-        _typeNameAndAssembly: 
+        _typeNameAndAssembly: System.Void, mscorlib
         _monoScriptGuid: 
 --- !u!1 &1569779506
 GameObject:
@@ -440,7 +408,7 @@ GameObject:
   - component: {fileID: 1697117599}
   - component: {fileID: 1697117603}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Event1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -488,7 +456,7 @@ MonoBehaviour:
       persistentArguments:
       - name: i
         callType: 0
-        isOptional: 1
+        isOptional: 0
         invokedParameterIndex: 0
         isUnityObject: 0
         typeReference:

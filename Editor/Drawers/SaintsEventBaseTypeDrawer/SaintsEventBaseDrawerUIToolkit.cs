@@ -137,6 +137,10 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 makeItem = () => new PropertyField(),
                 bindItem = (element, i) =>
                 {
+                    if (i >= persistentCallProp.arraySize)
+                    {
+                        return;
+                    }
                     SerializedProperty itemProp = persistentCallProp.GetArrayElementAtIndex(i);
                     ((PropertyField)element).BindProperty(itemProp);
                 },
@@ -174,6 +178,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 }
 
                 persistentCallProp.serializedObject.ApplyModifiedProperties();
+                listView.Rebuild();
             };
         }
 

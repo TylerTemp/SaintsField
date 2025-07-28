@@ -103,14 +103,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.22.2**
+**4.23.0**
 
-1.  UI Toolkit: Fix `Table` re-order function not working [#272](https://github.com/TylerTemp/SaintsField/issues/272)
-2.  `TypeReference` add `string[] onlyAssemblies = null` and `string[] extraAssemblies = null`
-3.  **Experimental**: UI Toolkit: Add `SaintsEvent` types:
-    *   Not documented
-    *   Requires [Unity Serialization](https://docs.unity3d.com/Packages/com.unity.serialization@3.0/manual/index.html) installed
-    *   Don't use it in a production env. It still needs some work
+Introduce `SaintsEvent`.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -6002,7 +5997,7 @@ Serialize a `System.Type`
 
 > [!WARNING]
 > This function saves the target's domain and type name. Which means if you change the name, the data will be lost.
-> Carefully think about it before you using it.
+> Carefully think about it before using it.
 
 By default, it searchs the current assembly and referenced assembly and shows all visible (public) types.
 
@@ -6109,6 +6104,104 @@ public TypeReference typeReferenceOf;
 [![](https://github.com/user-attachments/assets/a11c8c68-019b-4b13-abde-f8c21ed2fd15)](https://github.com/user-attachments/assets/edac2a97-b9e1-4e8e-aa7f-567f25a50528)
 
 This feature is heavy inspired by [ClassTypeReference-for-Unity](https://github.com/SolidAlloy/ClassTypeReference-for-Unity), please go give them a star!
+
+### `SaintsEvent` ###
+
+`SaintsEvent` is an alternative to Unity's `UnityEvent`. It's inspired by [UltEvents](https://assetstore.unity.com/packages/tools/gui/ultevents-111307) & [ExtEvents](https://github.com/SolidAlloy/ExtEvents)
+
+You need to install [Unity Serialization](https://docs.unity3d.com/Packages/com.unity.serialization@3.1/manual/index.html) to use this type.
+
+Features:
+
+*   Support any serializable parameter type (Unity Object or Non Unity Object)
+*   Support up to 4 serialized parameters (UnityEvent: 0-1)
+*   Support static method (UnityEvent: Only Unity Object's instance method)
+*   Support non-public methods (UnityEvent: Only public methods)
+
+Here are some features that is supported by other plugins:
+
+*   IMGUI is not supported yet, while `UltEvents` & `ExtEvents` does
+*   Chained call (use one callback's result as another one's input) is not supported and will not be added, while `UltEvents` does
+*   Renamed type is partly supported. If a renamed type is a `MonoBehavior`, then rename works as expected. But IDE rename. However, `ExtEvent` will try to find a general type's rename
+*   Implicit conversions for arguments is not supported, while `ExtEvents` does
+*   Performance optimization is limited to first-time cache, while `ExtEvents` using code generator to make the runtime much more fast. So in general, speed comparison is (fast to slow) `UnityEvent` - `ExtEvent` - `SaintsEvent` - `UltEvent`
+
+I'm not sure if I want to back-port the IMGUI support yet. If you really love this feature, please open an [issue](https://github.com/TylerTemp/SaintsField/issues) or [discussions](https://github.com/TylerTemp/SaintsField/discussions)
+
+> [!WARNING]
+> This component is quite heavy and might not be stable for using (compare to others), and I understand a callback can be very wildly used in project.
+> To avoid breaking changes, you may consider using it after some iteration of this component so it'll be more stable to use.
+
+**Basics**:
+
+```csharp
+using SaintsField.Events;
+
+public SaintsEvent sEvent;
+```
+
+![image](https://github.com/user-attachments/assets/7a5b87b2-a999-494f-9795-d38bbed6fca1)
+
+
+Here, `+s` to add a static callback, `+i` for an instance's callback, `-` to remove a callback.
+
+`R` is a switch to change to `Off`, `Editor & Runtime` or `Runtime Only`, which is the same as `UnityEvent`.
+
+![image](https://github.com/user-attachments/assets/4104704b-a323-4e1a-9a2d-7b0df2099576)
+
+`S` is a switch to change mode between "static callback" and "instance callback".
+
+Then, the object picker is to decide which type you want to limit:
+
+*   For static callback, it'll use the object's type you pick here. use `None` if your target is not any Unity Object (e.g. just a helper class)
+*   For instance callback, it'll use the object as the instance
+
+The next dropdown is depending on the mode:
+
+*   For static mode with no target, you need to select a type
+    ![](https://github.com/user-attachments/assets/885fee95-b7ef-476d-9aa1-1ad8a86eeab4)
+*   For static mode with target, or instance mode, you need to select a component on that target
+    ![](https://github.com/user-attachments/assets/4da3a5c2-76e4-4ad9-89f6-a42fbc258705)
+
+The dropdown below is where you pick your actual callback:
+
+![](https://github.com/user-attachments/assets/815ba613-dcd1-45de-9273-daa5061bf392)
+
+Finally, if your function has parameters, you need to check how each parameter is processed. Let's using another example:
+
+```csharp
+using SaintsField.Events;
+
+public class MyClass
+{
+    public int N;
+    public override string ToString()
+    {
+        return $"<MyClass N={N}/>";
+    }
+}
+
+public SaintsEvent<MyClass, int, string> withName;
+
+public void Callback(MyClass d, string s, int i = -1)
+{
+    Debug.Log($"Callback: i={i}, s={s}, d={d}");
+}
+```
+
+![](https://github.com/user-attachments/assets/458e891a-5381-49d4-b2f4-ec1f40a63c71)
+
+In the picture
+*   `S` is serialized, which allows you to pick a subclass (if any) and fill public fields.
+*   `D` is dynamic, which allows you to bind its value to the event's value. In this example, it's binded to `T2 (string)` in `SaintsEvent<MyClass, int, string>`
+*   `X` is default, which uses function parameter's default value. In this example, `int i = -1`, so use `-1`
+
+> [!WARNING]
+> ATM it will not check if the parameter type can accpet the coresponding value type. Please check it by yourself carefully.
+
+**Runtime**
+
+In runtime, you can use `SaintsEvent.Invoke()`, `SaintsEvent.AddListener(callback)` and `SaintsEvent.RemoveListener(callback)` just like `UnityEvent`.
 
 ## Addressable ##
 

@@ -84,6 +84,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
                 case PersistentArgument.CallType.Dynamic:
                 {
                     _button.text = "D";
+                    _button.tooltip = "Dynamic";
                     _button.style.backgroundImage = StyleKeyword.None;
                     _button.AddToClassList(ClassRuntime);
                     _button.RemoveFromClassList(ClassBoth);
@@ -92,6 +93,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
                 case PersistentArgument.CallType.Serialized:
                 {
                     _button.text = "S";
+                    _button.tooltip = "Serialized";
                     _button.style.backgroundImage = StyleKeyword.None;
                     _button.AddToClassList(ClassBoth);
                     _button.RemoveFromClassList(ClassRuntime);
@@ -100,6 +102,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
                 case PersistentArgument.CallType.OptionalDefault:
                 {
                     _button.text = "";
+                    _button.tooltip = "Use Default";
                     _button.style.backgroundImage = _styleBackground;
                 }
                     break;
