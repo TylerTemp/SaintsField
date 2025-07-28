@@ -72,12 +72,14 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
                 case UnityEventCallState.Off:
                 {
                     _button.text = "";
+                    _button.tooltip = "Off";
                     _button.style.backgroundImage = _styleBackground;
                 }
                     break;
                 case UnityEventCallState.EditorAndRuntime:
                 {
                     _button.text = "E";
+                    _button.tooltip = "Editor & Runtime";
                     _button.style.backgroundImage = StyleKeyword.None;
                     _button.AddToClassList(ClassBoth);
                     _button.RemoveFromClassList(ClassRuntime);
@@ -86,6 +88,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
                 case UnityEventCallState.RuntimeOnly:
                 {
                     _button.text = "R";
+                    _button.tooltip = "Runtime Only";
                     _button.style.backgroundImage = StyleKeyword.None;
                     _button.AddToClassList(ClassRuntime);
                     _button.RemoveFromClassList(ClassBoth);

@@ -58,7 +58,7 @@ namespace SaintsField.Events
             if (targetType == null)
             {
 #if SAINTSFIELD_DEBUG
-                Debug.Log("PersistentCall: targetType is null.");
+                Debug.LogWarning("PersistentCall: targetType is null.");
 #endif
                 return;
             }

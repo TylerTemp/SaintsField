@@ -292,57 +292,59 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             SerializedProperty propPersistentArguments = property.FindPropertyRelative(nameof(PersistentCall.persistentArguments));
             methodDropdownButtonField.Q<Button>().clicked += () =>
             {
-                bool isStatic = isStaticProperty.boolValue;
-                Object uObj = targetProperty.objectReferenceValue;
-                string typeNameAndAss = propTypeAndAss.stringValue;
+                // bool isStatic = isStaticProperty.boolValue;
+                // Object uObj = targetProperty.objectReferenceValue;
+                // string typeNameAndAss = propTypeAndAss.stringValue;
+                //
+                // Type type = uObj == null ? Type.GetType(typeNameAndAss) : uObj.GetType();
+                //
+                // if (type == null)
+                // {
+                //     return;
+                // }
+                //
+                // (bool isValidMethodInfo, IReadOnlyList<Type> methonParamTypes, Type returnType) = GetMethodParamsType(property);
+                // MethodSelect selectedMethod = default;
+                //
+                // const BindingFlags instanceFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+                // const BindingFlags staticFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+                // BindingFlags bf = isStatic ? staticFlags : instanceFlags;
+                // List<MethodSelect> methodSelects = new List<MethodSelect>();
+                // foreach (Type subType in ReflectUtils.GetSelfAndBaseTypesFromType(type))
+                // {
+                //     foreach (MethodInfo methodInfo in subType.GetMethods(bf))
+                //     {
+                //         if (methodInfo.IsGenericMethod)  // this is not supported, so far...
+                //         {
+                //             continue;
+                //         }
+                //
+                //         if (methodInfo.DeclaringType != subType)
+                //         {
+                //             continue;
+                //         }
+                //
+                //         MethodSelect methodSelect = new MethodSelect(subType, methodInfo);
+                //         // ReSharper disable once InvertIf
+                //         if(!methodSelects.Contains(methodSelect))
+                //         {
+                //             methodSelects.Add(methodSelect);
+                //
+                //             // ReSharper disable once InvertIf
+                //             if (isValidMethodInfo)
+                //             {
+                //                 if (methodInfo.Name == propMethodName.stringValue &&
+                //                     methodInfo.ReturnType == returnType &&
+                //                     methodInfo.GetParameters().Select(p => p.ParameterType).SequenceEqual(methonParamTypes))
+                //                 {
+                //                     selectedMethod = methodSelect;
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
 
-                Type type = uObj == null ? Type.GetType(typeNameAndAss) : uObj.GetType();
-
-                if (type == null)
-                {
-                    return;
-                }
-
-                (bool isValidMethodInfo, IReadOnlyList<Type> methonParamTypes, Type returnType) = GetMethodParamsType(property);
-                MethodSelect selectedMethod = default;
-
-                const BindingFlags instanceFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-                const BindingFlags staticFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
-                BindingFlags bf = isStatic ? staticFlags : instanceFlags;
-                List<MethodSelect> methodSelects = new List<MethodSelect>();
-                foreach (Type subType in ReflectUtils.GetSelfAndBaseTypesFromType(type))
-                {
-                    foreach (MethodInfo methodInfo in subType.GetMethods(bf))
-                    {
-                        if (methodInfo.IsGenericMethod)  // this is not supported, so far...
-                        {
-                            continue;
-                        }
-
-                        if (methodInfo.DeclaringType != subType)
-                        {
-                            continue;
-                        }
-
-                        MethodSelect methodSelect = new MethodSelect(subType, methodInfo);
-                        // ReSharper disable once InvertIf
-                        if(!methodSelects.Contains(methodSelect))
-                        {
-                            methodSelects.Add(methodSelect);
-
-                            // ReSharper disable once InvertIf
-                            if (isValidMethodInfo)
-                            {
-                                if (methodInfo.Name == propMethodName.stringValue &&
-                                    methodInfo.ReturnType == returnType &&
-                                    methodInfo.GetParameters().Select(p => p.ParameterType).SequenceEqual(methonParamTypes))
-                                {
-                                    selectedMethod = methodSelect;
-                                }
-                            }
-                        }
-                    }
-                }
+                (MethodSelect selectedMethod, IReadOnlyList<MethodSelect> methodSelects) = GetMethods(property, isStaticProperty, targetProperty, propTypeAndAss, propMethodName);
 
                 AdvancedDropdownMetaInfo meta = GetMethodDropdownMeta(selectedMethod, methodSelects, false);
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(methodDropdownButtonField.worldBound);
@@ -397,8 +399,81 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     return;
                 }
                 (bool isValidMethodInfo, IReadOnlyList<Type> methonParamTypes, Type returnType) = GetMethodParamsType(prop);
-                methodDropdownButtonLabel.text = isValidMethodInfo ? StringifyMethod(propMethodName.stringValue, methonParamTypes, returnType) : "-";
+                if (isValidMethodInfo)
+                {
+                    string useText =
+                        StringifyMethod(propMethodName.stringValue, methonParamTypes, returnType);
+                    (MethodSelect selectedMethod, IReadOnlyList<MethodSelect> _) = GetMethods(property, isStaticProperty, targetProperty, propTypeAndAss, propMethodName);
+                    if (selectedMethod.MethodInfo == null)
+                    {
+                        useText = $"<color=red>?</color> <color=#808080>{useText}</color>";
+                    }
+
+                    methodDropdownButtonLabel.text = useText;
+                }
+                else
+                {
+                    methodDropdownButtonLabel.text = "-";
+                }
             }
+        }
+
+        private (MethodSelect methodSelected, IReadOnlyList<MethodSelect> methodInfos) GetMethods(SerializedProperty property, SerializedProperty isStaticProperty, SerializedProperty targetProperty, SerializedProperty propTypeAndAss,
+            SerializedProperty propMethodName)
+        {
+            bool isStatic = isStaticProperty.boolValue;
+            Object uObj = targetProperty.objectReferenceValue;
+            string typeNameAndAss = propTypeAndAss.stringValue;
+
+            Type type = uObj == null ? Type.GetType(typeNameAndAss) : uObj.GetType();
+
+            if (type == null)
+            {
+                return (default, Array.Empty<MethodSelect>());
+            }
+
+            (bool isValidMethodInfo, IReadOnlyList<Type> methonParamTypes, Type returnType) = GetMethodParamsType(property);
+            MethodSelect selectedMethod = default;
+
+            const BindingFlags instanceFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+            const BindingFlags staticFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+            BindingFlags bf = isStatic ? staticFlags : instanceFlags;
+            List<MethodSelect> methodSelects = new List<MethodSelect>();
+            foreach (Type subType in ReflectUtils.GetSelfAndBaseTypesFromType(type))
+            {
+                foreach (MethodInfo methodInfo in subType.GetMethods(bf))
+                {
+                    if (methodInfo.IsGenericMethod)  // this is not supported, so far...
+                    {
+                        continue;
+                    }
+
+                    if (methodInfo.DeclaringType != subType)
+                    {
+                        continue;
+                    }
+
+                    MethodSelect methodSelect = new MethodSelect(subType, methodInfo);
+                    // ReSharper disable once InvertIf
+                    if(!methodSelects.Contains(methodSelect))
+                    {
+                        methodSelects.Add(methodSelect);
+
+                        // ReSharper disable once InvertIf
+                        if (isValidMethodInfo)
+                        {
+                            if (methodInfo.Name == propMethodName.stringValue &&
+                                methodInfo.ReturnType == returnType &&
+                                methodInfo.GetParameters().Select(p => p.ParameterType).SequenceEqual(methonParamTypes))
+                            {
+                                selectedMethod = methodSelect;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return (selectedMethod, methodSelects);
         }
 
         private static string FormatTypeNameAndAssmbleLabel(string name)

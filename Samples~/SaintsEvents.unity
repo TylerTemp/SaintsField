@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   withName:
     _persistentCalls:
-    - callState: 2
+    - callState: 1
       methodName: Callback
       isStatic: 0
       target: {fileID: 481940489}
@@ -189,6 +189,47 @@ MonoBehaviour:
         isUnityObject: 0
         typeReference:
           _typeNameAndAssembly: System.Decimal, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      returnType:
+        _typeNameAndAssembly: System.Void, mscorlib
+        _monoScriptGuid: 
+    - callState: 2
+      methodName: Callback
+      isStatic: 1
+      target: {fileID: 481940489}
+      staticType:
+        _typeNameAndAssembly: Samples.Events.EventNames, today.comes.saintsfield.Samples.Events
+        _monoScriptGuid: 
+      persistentArguments:
+      - name: i
+        callType: 1
+        isOptional: 0
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.Int32, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      - name: s
+        callType: 0
+        isOptional: 0
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.String, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      - name: d
+        callType: 1
+        isOptional: 0
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: Samples.Events.EventNames+MyClass, today.comes.saintsfield.Samples.Events
           _monoScriptGuid: 
         unityObject: {fileID: 0}
         serializeJsonData: 

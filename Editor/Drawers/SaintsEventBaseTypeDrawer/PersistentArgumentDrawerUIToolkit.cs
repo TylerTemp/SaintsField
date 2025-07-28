@@ -225,6 +225,19 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     SerializedValueEditorRepaint();
                 }
             });
+            VisualElement callTypeTracker = new VisualElement();
+            callTypeTracker.TrackPropertyValue(property.FindPropertyRelative(nameof(PersistentArgument.callType)), ct =>
+            {
+                PersistentArgument.CallType callType = (PersistentArgument.CallType)ct.intValue;
+                if (callType == PersistentArgument.CallType.Serialized)
+                {
+                    if (SerializedValueEditorReInit())
+                    {
+                        SerializedValueEditorRepaint();
+                    }
+                }
+            });
+            container.Add(callTypeTracker);
 
             // persistent-argument-value-default
             VisualElement persistentArgumentValueDefault = container.Q<VisualElement>("persistent-argument-value-default");
