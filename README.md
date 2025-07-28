@@ -105,7 +105,7 @@ namespace: `SaintsField`
 
 **4.23.0**
 
-Introduce `SaintsEvent`.
+Introduce `SaintsEvent`. `SaintsEvent` is an alternative to Unity's `UnityEvent`. It's inspired by [UltEvents](https://assetstore.unity.com/packages/tools/gui/ultevents-111307) & [ExtEvents](https://github.com/SolidAlloy/ExtEvents)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

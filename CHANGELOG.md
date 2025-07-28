@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.23.0 ##
+
+Introduce `SaintsEvent`. `SaintsEvent` is an alternative to Unity's `UnityEvent`. It's inspired by [UltEvents](https://assetstore.unity.com/packages/tools/gui/ultevents-111307) & [ExtEvents](https://github.com/SolidAlloy/ExtEvents)
+
 ## 4.22.2 ##
 
 1.  UI Toolkit: Fix `Table` re-order function not working [#272](https://github.com/TylerTemp/SaintsField/issues/272)
