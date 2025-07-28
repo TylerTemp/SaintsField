@@ -123,50 +123,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
         private static string StringifyMethod(string methodName, IEnumerable<Type> methodParams, Type returnType)
         {
-            return $"{methodName}({string.Join(", ", methodParams.Select(StringifyType))}){(returnType == typeof(void)? "": $" => {StringifyType(returnType)}")}";
-        }
-
-        public static string StringifyType(Type type)
-        {
-            if (type == typeof(string))
-            {
-                return "string";
-            }
-
-            if (type == typeof(int))
-            {
-                return "int";
-            }
-
-            if (type == typeof(long))
-            {
-                return "long";
-            }
-
-            if (type == typeof(float))
-            {
-                return "float";
-            }
-
-            if (type == typeof(double))
-            {
-                return "double";
-            }
-
-            if (type == typeof(bool))
-            {
-                return "bool";
-            }
-
-            if (type == typeof(object))
-            {
-                return "object";
-            }
-
-            string s = type.ToString();
-            return s.StartsWith("UnityEngine.")
-                ? s["UnityEngine.".Length..]
-                : s;
+            return $"{methodName}({string.Join(", ", methodParams.Select(SaintsEventUtils.StringifyType))}){(returnType == typeof(void)? "": $" => {SaintsEventUtils.StringifyType(returnType)}")}";
         }
 
         private static (bool isValidMethodInfo, IReadOnlyList<Type> paramTypes, Type returnType) GetMethodParamsType(SerializedProperty property)

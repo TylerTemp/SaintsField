@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Events;
 using SaintsField.Interfaces;
@@ -19,7 +20,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         protected override bool UseCreateFieldUIToolKit => true;
 
         private static string NameSaintsEventView(SerializedProperty property) => $"{property.propertyPath}__SaintsEventBase";
-        private static string NameListView(SerializedProperty property) => $"{property.propertyPath}__SaintsEventBase_ListView";
+        // private static string NameListView(SerializedProperty property) => $"{property.propertyPath}__SaintsEventBase_ListView";
 
         public class SaintsEventView : VisualElement
         {
@@ -52,7 +53,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 Add(element);
             }
 
-            public void SetLabel(string label)
+            private void SetLabel(string label)
             {
                 if (string.IsNullOrEmpty(label))
                 {
@@ -74,10 +75,47 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            return new SaintsEventView(GetPreferredLabel(property))
+            IReadOnlyList<Type> genericTypes = GetTypes(property);
+            string rawPreferredLabel = GetPreferredLabel(property);
+            string useLabel;
+            if (string.IsNullOrEmpty(rawPreferredLabel))
+            {
+                useLabel = null;
+            }
+            else if(genericTypes.Count == 0)
+            {
+                useLabel = rawPreferredLabel;
+            }
+            else
+            {
+                useLabel = $"{rawPreferredLabel} ({string.Join(", ", genericTypes.Select(SaintsEventUtils.StringifyType))})";
+            }
+
+            return new SaintsEventView(useLabel)
             {
                 name = NameSaintsEventView(property),
             };
+        }
+
+        private Type[] _cachedEventParamTypes;
+
+        private IReadOnlyList<Type> GetTypes(SerializedProperty property)
+        {
+            if (_cachedEventParamTypes != null)
+            {
+                return _cachedEventParamTypes;
+            }
+
+            int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            (SerializedUtils.FieldOrProp rootFieldOrProp, object _) = SerializedUtils.GetFieldInfoAndDirectParent(property);
+            Type rawType = rootFieldOrProp.IsField
+                ? rootFieldOrProp.FieldInfo.FieldType
+                : rootFieldOrProp.PropertyInfo.PropertyType;
+            if (propIndex >= 0)
+            {
+                rawType = ReflectUtils.GetElementType(rawType);
+            }
+            return _cachedEventParamTypes = rawType.GetGenericArguments();
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -155,6 +193,26 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             persistentCallElement.FindPropertyRelative(nameof(PersistentCall.returnType) + SubPropNameTypeNameAndAssmble).stringValue = "";
             persistentCallElement.FindPropertyRelative(nameof(PersistentCall.returnType) + SubPropMonoScriptGuid).stringValue = "";
             persistentCallElement.serializedObject.ApplyModifiedProperties();
+        }
+
+        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            VisualElement container, string labelOrNull, IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried,
+            RichTextDrawer richTextDrawer)
+        {
+            SaintsEventView saintsEventView = container.Q<SaintsEventView>(NameSaintsEventView(property));
+            IReadOnlyList<RichTextDrawer.RichTextChunk> useChunks = richTextChunks;
+            if (useChunks is { Count: > 0 })
+            {
+                IReadOnlyList<Type> types = GetTypes(property);
+                if (types.Count > 0)
+                {
+                    useChunks = useChunks.Append(new RichTextDrawer.RichTextChunk
+                    {
+                        Content = $" ({string.Join(", ", types.Select(SaintsEventUtils.StringifyType))})",
+                    }).ToList();
+                }
+            }
+            UIToolkitUtils.SetLabel(saintsEventView.Label, useChunks, richTextDrawer);
         }
     }
 }

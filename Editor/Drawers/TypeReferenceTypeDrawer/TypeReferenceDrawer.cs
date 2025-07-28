@@ -41,11 +41,18 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
 
         public static IEnumerable<Assembly> GetAssembly(TypeReferenceAttribute typeReferenceAttribute, object parent)
         {
+            HashSet<Assembly> yieldAss = new HashSet<Assembly>();
             // EType.Current
+            // ReSharper disable once MergeIntoPattern
+            // ReSharper disable once MergeSequentialChecks
             if (typeReferenceAttribute != null && typeReferenceAttribute.OnlyAssemblies != null)
             {
                 foreach (Assembly assembly in GetAssemblyOfName(typeReferenceAttribute.OnlyAssemblies))
                 {
+                    if (!yieldAss.Add(assembly))
+                    {
+                        continue;
+                    }
                     string assemblyName = assembly.GetName().Name;
                     if (typeReferenceAttribute.OnlyAssemblies.Contains(assemblyName))
                     {
@@ -59,14 +66,22 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
 
             if (eTypeFilter.HasFlagFast(EType.CurrentOnly))
             {
-                yield return parent.GetType().Assembly;
+                Assembly parentAss = parent.GetType().Assembly;
+                if (yieldAss.Add(parentAss))
+                {
+                    yield return parentAss;
+                }
             }
 
             if (eTypeFilter.HasFlagFast(EType.CurrentReferenced))
             {
-                foreach (AssemblyName assembly in parent.GetType().Assembly.GetReferencedAssemblies())
+                foreach (AssemblyName assemblyName in parent.GetType().Assembly.GetReferencedAssemblies())
                 {
-                    yield return Assembly.Load(assembly);
+                    Assembly ass = Assembly.Load(assemblyName);
+                    if (yieldAss.Add(ass))
+                    {
+                        yield return ass;
+                    }
                 }
             }
 
@@ -89,7 +104,10 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                         || assemblyName == "System.Core" && eTypeFullSearchFilter.HasFlagFast(EType.SystemCore)
                         || eTypeFullSearchFilter.HasFlagFast(EType.NonEssential))
                     {
-                        yield return assembly;
+                        if (yieldAss.Add(assembly))
+                        {
+                            yield return assembly;
+                        }
                     }
                 }
             }
@@ -99,7 +117,10 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             {
                 foreach (Assembly assembly in GetAssemblyOfName(typeReferenceAttribute.ExtraAssemblies))
                 {
-                    yield return assembly;
+                    if (yieldAss.Add(assembly))
+                    {
+                        yield return assembly;
+                    }
                 }
             }
         }

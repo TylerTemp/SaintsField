@@ -172,8 +172,27 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            TypeReferenceAttribute typeReferenceAttribute =
-                allAttributes.OfType<TypeReferenceAttribute>().FirstOrDefault();
+            // Debug.Log(property.propertyPath);
+            string[] splited = property.propertyPath.Split('.').SkipLast(3).ToArray();
+            // bool selfInsideArray = false;
+            if (splited[^1].EndsWith("]"))
+            {
+                splited = splited.SkipLast(2).ToArray();
+                // selfInsideArray = true;
+            }
+            (SerializedUtils.FieldOrProp rootFieldOrProp, object _) = SerializedUtils.GetFieldInfoAndDirectParentByPathSegments(property, splited);
+            MemberInfo rootMemberInfo = rootFieldOrProp.IsField
+                ? rootFieldOrProp.FieldInfo
+                : rootFieldOrProp.PropertyInfo;
+            // if (selfInsideArray)
+            // {
+            //     rawType = ReflectUtils.GetElementType(rawType);
+            // }
+
+            // Debug.Log(rawType);
+
+            TypeReferenceAttribute typeReferenceAttribute = ReflectCache.GetCustomAttributes<TypeReferenceAttribute>(rootMemberInfo)
+                .FirstOrDefault();
 
             VisualElement root = container.Q<TemplateContainer>(NameRoot(property));
             SerializedProperty targetProperty = property.FindPropertyRelative(nameof(PersistentCall.target));

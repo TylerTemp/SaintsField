@@ -95,7 +95,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 for (int eventParamIndex = 0; eventParamIndex < eventParamTypes.Length; eventParamIndex++)
                 {
                     Type type = eventParamTypes[eventParamIndex];
-                    string labelText = $"Args[{eventParamIndex}] <color=#808080>({PersistentCallDrawer.StringifyType(type)})</color>";
+                    string labelText = $"Args[{eventParamIndex}] <color=#808080>({SaintsEventUtils.StringifyType(type)})</color>";
                     int thisIndex = eventParamIndex;
                     genericDropdownMenu.AddItem(labelText, invokedParameterIndexProp.intValue == eventParamIndex, () =>
                     {
@@ -427,6 +427,13 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             bool SerializedValueEditorReInit()
             {
+                SerializedProperty callTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.callType));
+                if (callTypeProp.intValue != (int)PersistentArgument.CallType.Serialized)
+                {
+                    serializedValueEditor.userData = new SerializedValuePayload();
+                    return false;
+                }
+
                 object serializedObj = null;
                 string typeName = serializeValueTypeProp.stringValue;
                 Type serializedFieldType = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
@@ -454,6 +461,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         catch (ArgumentException e)
                         {
                             Debug.LogError(e);
+                            Debug.LogError(jsonV);
                             serializedObj = ActivatorCreateInstance(serializedFieldType);
                         }
                     }
@@ -501,7 +509,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 Type type = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
                 string typeNameAndAssembly = type == null
                     ? "?"
-                    : $"{PersistentCallDrawer.StringifyType(type)} <color=#808080>({type.Namespace})</color>";
+                    : $"{SaintsEventUtils.StringifyType(type)} <color=#808080>({type.Namespace})</color>";
                 serializedValueDropdownButtonLabel.text = typeNameAndAssembly;
             }
 
@@ -512,7 +520,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 Type argType = string.IsNullOrEmpty(argTypeStr) ? null : Type.GetType(argTypeStr);
                 string argTypeName = argType == null
                     ? ""
-                    : $" <color=#808080>({PersistentCallDrawer.StringifyType(argType)})</color>";
+                    : $" <color=#808080>({SaintsEventUtils.StringifyType(argType)})</color>";
                 label.text = $"{property.FindPropertyRelative(nameof(PersistentArgument.name)).stringValue}{argTypeName}";
             }
 
@@ -521,7 +529,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 int curIndex = prop.intValue;
                 string curType = curIndex < 0 || curIndex >= eventParamTypes.Length
                     ? "?"
-                    : $"Args[{curIndex}] <color=#808080>({PersistentCallDrawer.StringifyType(eventParamTypes[curIndex])})</color>";
+                    : $"Args[{curIndex}] <color=#808080>({SaintsEventUtils.StringifyType(eventParamTypes[curIndex])})</color>";
 
                 dropdownButtonLabel.text = curType;
             }
