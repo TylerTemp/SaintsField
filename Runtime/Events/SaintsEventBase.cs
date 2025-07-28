@@ -16,15 +16,16 @@ namespace SaintsField.Events
 
         internal void AddCall(BaseInvokableCall call)
         {
-            if(!RuntimeCalls.Contains(call))
-            {
-                RuntimeCalls.Add(call);
-            }
+            RuntimeCalls.Add(call);
         }
 
         protected void RemoveListener(object targetObj, MethodInfo method)
         {
-            RuntimeCalls.RemoveAll(each => each.Find(targetObj, method));
+            int index = RuntimeCalls.FindIndex(each => each.Find(targetObj, method));
+            if (index != -1)
+            {
+                RuntimeCalls.RemoveAt(index);
+            }
         }
 
         public void RemoveAllListeners()
