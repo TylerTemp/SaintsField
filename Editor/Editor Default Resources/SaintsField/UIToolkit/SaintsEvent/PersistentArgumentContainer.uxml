@@ -14,9 +14,9 @@
                 <ui:Instance template="DropdownButton" name="DropdownButton" style="display: none;" />
                 <ui:VisualElement name="persistent-argument-value-serialized-value-editor" style="flex-grow: 1;" />
             </ui:VisualElement>
-            <ui:VisualElement name="persistent-argument-value-default" style="flex-grow: 1;">
-                <ui:Instance template="DropdownButton" name="DropdownButton" style="display: none;" />
-                <ui:VisualElement name="persistent-argument-value-serialized-value-editor" style="flex-grow: 1;" />
+            <ui:VisualElement name="persistent-argument-value-default" style="flex-grow: 1; justify-content: center;">
+                <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" />
+                <ui:HelpBox message-type="Error" style="flex-grow: 1;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -123,6 +123,135 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &481940488
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 481940490}
+  - component: {fileID: 481940489}
+  m_Layer: 0
+  m_Name: EventNames
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &481940489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 481940488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb4750d61525d3d43bd622dada6f0767, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  withName:
+    _persistentCalls:
+    - callState: 1
+      methodName: Callback
+      isStatic: 0
+      target: {fileID: 481940489}
+      staticType:
+        _typeNameAndAssembly: Samples.Events.EventNames, today.comes.saintsfield.Samples.Events
+        _monoScriptGuid: 
+      persistentArguments:
+      - name: d
+        callType: 1
+        isOptional: 0
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: Samples.Events.EventNames+MyClass, today.comes.saintsfield.Samples.Events
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: "{\n    \"$type\": \"Samples.Events.EventNames+MyClass,
+          today.comes.saintsfield.Samples.Events\",\n    \"N\": 23\n}"
+      - name: s
+        callType: 0
+        isOptional: 0
+        invokedParameterIndex: 2
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.String, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      - name: i
+        callType: 2
+        isOptional: 1
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.Int32, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      returnType:
+        _typeNameAndAssembly: System.Void, mscorlib
+        _monoScriptGuid: 
+    - callState: 1
+      methodName: SCallback
+      isStatic: 1
+      target: {fileID: 481940489}
+      staticType:
+        _typeNameAndAssembly: Samples.Events.EventNames, today.comes.saintsfield.Samples.Events
+        _monoScriptGuid: 
+      persistentArguments:
+      - name: d
+        callType: 0
+        isOptional: 0
+        invokedParameterIndex: 0
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: Samples.Events.EventNames+MyClass, today.comes.saintsfield.Samples.Events
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      - name: s
+        callType: 0
+        isOptional: 0
+        invokedParameterIndex: 2
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.String, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      - name: i
+        callType: 0
+        isOptional: 1
+        invokedParameterIndex: 1
+        isUnityObject: 0
+        typeReference:
+          _typeNameAndAssembly: System.Int32, mscorlib
+          _monoScriptGuid: 
+        unityObject: {fileID: 0}
+        serializeJsonData: 
+      returnType:
+        _typeNameAndAssembly: System.Void, mscorlib
+        _monoScriptGuid: 
+--- !u!4 &481940490
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 481940488}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &824025883
 GameObject:
   m_ObjectHideFlags: 0
@@ -154,6 +283,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &841318129
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 841318130}
+  - component: {fileID: 841318131}
+  m_Layer: 0
+  m_Name: Event0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &841318130
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841318129}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &841318131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841318129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fae4eec963bbb6468ed15014d9ab533, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sEvent:
+    _persistentCalls:
+    - callState: 2
+      methodName: CallMe
+      isStatic: 0
+      target: {fileID: 841318131}
+      staticType:
+        _typeNameAndAssembly: Samples.Events.EventAssExample, today.comes.saintsfield.Samples.Events
+        _monoScriptGuid: 
+      persistentArguments: []
+      returnType:
+        _typeNameAndAssembly: System.Void, mscorlib
+        _monoScriptGuid: 
 --- !u!1 &1569779506
 GameObject:
   m_ObjectHideFlags: 0
@@ -222,7 +408,7 @@ GameObject:
   - component: {fileID: 1697117599}
   - component: {fileID: 1697117603}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Event1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -268,13 +454,13 @@ MonoBehaviour:
         _typeNameAndAssembly: Samples.Events.Event1Example, today.comes.saintsfield.Samples.Events
         _monoScriptGuid: 
       persistentArguments:
-      - name: cls
-        callType: 1
+      - name: i
+        callType: 0
         isOptional: 0
         invokedParameterIndex: 0
         isUnityObject: 0
         typeReference:
-          _typeNameAndAssembly: Samples.Events.Event1Example+ClassObj, today.comes.saintsfield.Samples.Events
+          _typeNameAndAssembly: System.Int32, mscorlib
           _monoScriptGuid: 
         unityObject: {fileID: 0}
         serializeJsonData: "{\n    \"$type\": \"Samples.Events.Event1Example+ClassObj,
@@ -283,7 +469,7 @@ MonoBehaviour:
       returnType:
         _typeNameAndAssembly: System.Void, mscorlib
         _monoScriptGuid: 
-  range1Int1: 0
+  range1Int1: 4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -291,3 +477,5 @@ SceneRoots:
   - {fileID: 1697117599}
   - {fileID: 824025884}
   - {fileID: 1569779508}
+  - {fileID: 841318130}
+  - {fileID: 481940490}

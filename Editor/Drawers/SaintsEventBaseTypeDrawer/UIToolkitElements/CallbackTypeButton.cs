@@ -35,10 +35,25 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
         public void SetValueWithoutNotify(bool newValue)
         {
             _curValue = newValue;
-            string newText = newValue ? "<color=#ffa500>S</color>" : "I";
+            string newText;
+            string tooltipText;
+            if (newValue)
+            {
+                newText = "<color=#ffa500>S</color>";
+                tooltipText = "Static";
+            }
+            else
+            {
+                newText = "I";
+                tooltipText = "Instance";
+            }
             if (_button.text != newText)
             {
                 _button.text = newText;
+            }
+            if(_button.tooltip != tooltipText)
+            {
+                _button.tooltip = tooltipText;
             }
         }
 

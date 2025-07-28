@@ -61,9 +61,6 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             label.TrackPropertyValue(property, TrackLabelDisplay);
 
             // dynamic
-
-            // Debug.Log(property.propertyPath);
-            // Debug.Log(string.Join(".", property.propertyPath.Split('.').SkipLast(6)));
             string[] splited = property.propertyPath.Split('.').SkipLast(6).ToArray();
             bool selfInsideArray = false;
             if (splited[^1].EndsWith("]"))
@@ -72,14 +69,27 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 selfInsideArray = true;
             }
             (SerializedUtils.FieldOrProp rootFieldOrProp, object _) = SerializedUtils.GetFieldInfoAndDirectParentByPathSegments(property, splited);
-            Type rawType = rootFieldOrProp.IsField
-                ? rootFieldOrProp.FieldInfo.FieldType
-                : rootFieldOrProp.PropertyInfo.PropertyType;
+            Type rawType;
+            MemberInfo rawMemberInfo;
+            if (rootFieldOrProp.IsField)
+            {
+                rawType = rootFieldOrProp.FieldInfo.FieldType;
+                rawMemberInfo = rootFieldOrProp.FieldInfo;
+            }
+            else
+            {
+                rawType = rootFieldOrProp.PropertyInfo.PropertyType;
+                rawMemberInfo = rootFieldOrProp.PropertyInfo;
+            }
             if (selfInsideArray)
             {
                 rawType = ReflectUtils.GetElementType(rawType);
             }
             Type[] eventParamTypes = rawType.GetGenericArguments();
+            SaintsEventArgsAttribute saintsEventArgsAttribute = ReflectCache
+                .GetCustomAttributes<SaintsEventArgsAttribute>(rawMemberInfo)
+                .FirstOrDefault();
+            IReadOnlyList<string> eventArgNames = saintsEventArgsAttribute?.ArgNames ?? Array.Empty<string>();
 
             SerializedProperty valueTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.callType));
 
@@ -94,8 +104,12 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
                 for (int eventParamIndex = 0; eventParamIndex < eventParamTypes.Length; eventParamIndex++)
                 {
+                    string useName = eventArgNames.Count > eventParamIndex
+                        ? eventArgNames[eventParamIndex]
+                        : "Arg";
+
                     Type type = eventParamTypes[eventParamIndex];
-                    string labelText = $"Args[{eventParamIndex}] <color=#808080>({PersistentCallDrawer.StringifyType(type)})</color>";
+                    string labelText = $"<color=#808080>[{eventParamIndex}]</color> {useName} <color=#808080>({SaintsEventUtils.StringifyType(type)})</color>";
                     int thisIndex = eventParamIndex;
                     genericDropdownMenu.AddItem(labelText, invokedParameterIndexProp.intValue == eventParamIndex, () =>
                     {
@@ -211,14 +225,29 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     SerializedValueEditorRepaint();
                 }
             });
+            VisualElement callTypeTracker = new VisualElement();
+            callTypeTracker.TrackPropertyValue(property.FindPropertyRelative(nameof(PersistentArgument.callType)), ct =>
+            {
+                PersistentArgument.CallType callType = (PersistentArgument.CallType)ct.intValue;
+                if (callType == PersistentArgument.CallType.Serialized)
+                {
+                    if (SerializedValueEditorReInit())
+                    {
+                        SerializedValueEditorRepaint();
+                    }
+                }
+            });
+            container.Add(callTypeTracker);
 
             // persistent-argument-value-default
             VisualElement persistentArgumentValueDefault = container.Q<VisualElement>("persistent-argument-value-default");
+            Label persistentArgumentValueDefaultLabel = persistentArgumentValueDefault.Q<Label>();
+            HelpBox persistentArgumentValueDefaultHelpBox = persistentArgumentValueDefault.Q<HelpBox>();
             string callPropPath = string.Join(".",  property.propertyPath.Split('.').SkipLast(3));
-            int persistentArgumentIndex = SerializedUtils.PropertyPathIndex(callPropPath);
+            int persistentArgumentIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             SerializedProperty persistentCallProp = property.serializedObject.FindProperty(callPropPath);
             SerializedProperty persistentArgumentsProp =
-                persistentCallProp.FindPropertyRelative("_persistentArguments");
+                persistentCallProp.FindPropertyRelative(nameof(PersistentCall.persistentArguments));
             void UpdateDefaultParamValueDisplay(SerializedProperty p)
             {
                 if (!SerializedUtils.IsOk(valueTypeProp))  // Unity, just, please, fix your shit
@@ -227,7 +256,14 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 }
                 if (valueTypeProp.intValue != (int)PersistentArgument.CallType.OptionalDefault)
                 {
-                    persistentArgumentValueDefault.Clear();
+                    if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.None;
+                    }
+                    if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultLabel.style.display = DisplayStyle.None;
+                    }
                     return;
                 }
 
@@ -250,46 +286,88 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 }
 
                 MethodInfo methodInfo = PersistentCall.GetMethod(
-                    persistentCallProp.FindPropertyRelative("_isStatic").boolValue,
-                    Type.GetType(persistentCallProp.FindPropertyRelative("_staticType._typeNameAndAssembly").stringValue),
-                    persistentCallProp.FindPropertyRelative("_target").objectReferenceValue,
-                    persistentCallProp.FindPropertyRelative("_methodName").stringValue,
+                    // persistentCallProp.FindPropertyRelative("_isStatic").boolValue,
+                    persistentCallProp.FindPropertyRelative(nameof(PersistentCall.isStatic)).boolValue,
+                    // Type.GetType(persistentCallProp.FindPropertyRelative("_staticType._typeNameAndAssembly").stringValue),
+                    Type.GetType(persistentCallProp.FindPropertyRelative(nameof(PersistentCall.staticType) + "._typeNameAndAssembly").stringValue),
+                    // persistentCallProp.FindPropertyRelative("_target").objectReferenceValue,
+                    persistentCallProp.FindPropertyRelative(nameof(PersistentCall.target)).objectReferenceValue,
+                    // persistentCallProp.FindPropertyRelative("_methodName").stringValue,
+                    persistentCallProp.FindPropertyRelative(nameof(PersistentCall.methodName)).stringValue,
                     argumentTypes.ToArray()
                 ).MethodInfo;
 
                 if (methodInfo == null)
                 {
-                    persistentArgumentValueDefault.Clear();
-                    persistentArgumentValueDefault.Add(new HelpBox("Failed to obtain method info", HelpBoxMessageType.Error));
+                    // persistentArgumentValueDefault.Clear();
+                    // persistentArgumentValueDefault.Add(new HelpBox("Failed to obtain method info", HelpBoxMessageType.Error));
+                    if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.Flex)
+                    {
+                        persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.Flex;
+                    }
+                    if (persistentArgumentValueDefaultHelpBox.text != "Failed to obtain method info")
+                    {
+                        persistentArgumentValueDefaultHelpBox.text = "Failed to obtain method info";
+                    }
+                    if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultLabel.style.display = DisplayStyle.None;
+                    }
                     return;
                 }
 
                 ParameterInfo[] methodParams = methodInfo.GetParameters();
                 if(persistentArgumentIndex >= methodParams.Length)
                 {
-                    persistentArgumentValueDefault.Clear();
-                    persistentArgumentValueDefault.Add(new HelpBox($"Persistent argument index {persistentArgumentIndex} is out of range for method {methodInfo.Name} with {methodParams.Length} parameters", HelpBoxMessageType.Error));
+                    if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.Flex)
+                    {
+                        persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.Flex;
+                    }
+                    if (persistentArgumentValueDefaultHelpBox.text != $"Persistent argument index {persistentArgumentIndex} is out of range for method {methodInfo.Name} with {methodParams.Length} parameters")
+                    {
+                        persistentArgumentValueDefaultHelpBox.text = $"Persistent argument index {persistentArgumentIndex} is out of range for method {methodInfo.Name} with {methodParams.Length} parameters";
+                    }
+                    if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultLabel.style.display = DisplayStyle.None;
+                    }
                     return;
                 }
 
                 ParameterInfo methodParam = methodParams[persistentArgumentIndex];
                 if (!methodParam.IsOptional)
                 {
-                    persistentArgumentValueDefault.Clear();
-                    persistentArgumentValueDefault.Add(new HelpBox($"method {methodInfo.Name} {methodParam.Name}@{persistentArgumentIndex} is not optional", HelpBoxMessageType.Error));
+                    // persistentArgumentValueDefault.Clear();
+                    // persistentArgumentValueDefault.Add(new HelpBox($"method {methodInfo.Name} {methodParam.Name}@{persistentArgumentIndex} is not optional", HelpBoxMessageType.Error));
+                    if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.Flex)
+                    {
+                        persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.Flex;
+                    }
+                    if (persistentArgumentValueDefaultHelpBox.text != $"method {methodInfo.Name} {methodParam.Name}@{persistentArgumentIndex} is not optional")
+                    {
+                        persistentArgumentValueDefaultHelpBox.text = $"method {methodInfo.Name} {methodParam.Name}@{persistentArgumentIndex} is not optional";
+                    }
+                    if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.None)
+                    {
+                        persistentArgumentValueDefaultLabel.style.display = DisplayStyle.None;
+                    }
                     return;
                 }
 
                 object paramDefaultValue = methodParam.DefaultValue;
+                // Debug.Log($"get paramDefaultValue={paramDefaultValue}");
                 string paramDefaultDisplay = paramDefaultValue == null ? "[Null]" : paramDefaultValue.ToString();
-                Label paramDefaultLabel = persistentArgumentValueDefault.Q<Label>();
-                if (paramDefaultLabel == null)
+                if(persistentArgumentValueDefaultLabel.text != paramDefaultDisplay)
                 {
-                    persistentArgumentValueDefault.Add(paramDefaultLabel = new Label());
+                    persistentArgumentValueDefaultLabel.text = paramDefaultDisplay;
                 }
-                if(paramDefaultLabel.text != paramDefaultDisplay)
+                if(persistentArgumentValueDefaultHelpBox.style.display != DisplayStyle.None)
                 {
-                    paramDefaultLabel.text = paramDefaultDisplay;
+                    persistentArgumentValueDefaultHelpBox.style.display = DisplayStyle.None;
+                }
+                if(persistentArgumentValueDefaultLabel.style.display != DisplayStyle.Flex)
+                {
+                    persistentArgumentValueDefaultLabel.style.display = DisplayStyle.Flex;
                 }
             }
 
@@ -300,44 +378,50 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             VisualElement persistentArgumentValueEditor = container.Q<VisualElement>("persistent-argument-value-editor");
             SerializedProperty persistentArgumentCallType = property.FindPropertyRelative(nameof(PersistentArgument.callType));
-            void UpdatePersistentArgumentValueEditorDisplay(SerializedProperty p)
-            {
-                if (p.intValue == (int)PersistentArgument.CallType.Dynamic)
-                {
-                    // Debug.Log("display valueDynamic");
-                    valueDynamic.style.display = DisplayStyle.Flex;
-                    serializedObject.style.display = DisplayStyle.None;
-                    serializedValue.style.display = DisplayStyle.None;
-                }
-                else if (p.intValue == (int)PersistentArgument.CallType.Serialized)
-                {
-                    valueDynamic.style.display = DisplayStyle.None;
-                    if (property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue)
-                    {
-                        // Debug.Log("display serializedObject");
-                        serializedObject.style.display = DisplayStyle.Flex;
-                        serializedValue.style.display = DisplayStyle.None;
-                    }
-                    else
-                    {
-                        // Debug.Log("display serializedValue");
-                        serializedObject.style.display = DisplayStyle.None;
-                        serializedValue.style.display = DisplayStyle.Flex;
-                    }
-                }
-                else if (p.intValue == (int)PersistentArgument.CallType.OptionalDefault)
-                {
-                    // Debug.Log("display default value");
-                    valueDynamic.style.display = DisplayStyle.None;
-                    serializedObject.style.display = DisplayStyle.None;
-                    serializedValue.style.display = DisplayStyle.None;
-                }
-            }
 
             UpdatePersistentArgumentValueEditorDisplay(persistentArgumentCallType);
             persistentArgumentValueEditor.TrackPropertyValue(persistentArgumentCallType, UpdatePersistentArgumentValueEditorDisplay);
 
             return;
+
+            void UpdatePersistentArgumentValueEditorDisplay(SerializedProperty p)
+            {
+                switch ((PersistentArgument.CallType)p.intValue)
+                {
+                    case PersistentArgument.CallType.Dynamic:
+                        // Debug.Log("display valueDynamic");
+                        valueDynamic.style.display = DisplayStyle.Flex;
+                        serializedObject.style.display = DisplayStyle.None;
+                        serializedValue.style.display = DisplayStyle.None;
+                        break;
+                    case PersistentArgument.CallType.Serialized:
+                    {
+                        valueDynamic.style.display = DisplayStyle.None;
+                        if (property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue)
+                        {
+                            // Debug.Log("display serializedObject");
+                            serializedObject.style.display = DisplayStyle.Flex;
+                            serializedValue.style.display = DisplayStyle.None;
+                        }
+                        else
+                        {
+                            // Debug.Log("display serializedValue");
+                            serializedObject.style.display = DisplayStyle.None;
+                            serializedValue.style.display = DisplayStyle.Flex;
+                        }
+
+                        break;
+                    }
+                    case PersistentArgument.CallType.OptionalDefault:
+                        // Debug.Log("display default value");
+                        valueDynamic.style.display = DisplayStyle.None;
+                        serializedObject.style.display = DisplayStyle.None;
+                        serializedValue.style.display = DisplayStyle.None;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(p.intValue), p.intValue, null);
+                }
+            }
 
             void SerializedValueEditorRepaint()
             {
@@ -427,6 +511,13 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             bool SerializedValueEditorReInit()
             {
+                SerializedProperty callTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.callType));
+                if (callTypeProp.intValue != (int)PersistentArgument.CallType.Serialized)
+                {
+                    serializedValueEditor.userData = new SerializedValuePayload();
+                    return false;
+                }
+
                 object serializedObj = null;
                 string typeName = serializeValueTypeProp.stringValue;
                 Type serializedFieldType = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
@@ -454,6 +545,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         catch (ArgumentException e)
                         {
                             Debug.LogError(e);
+                            Debug.LogError(jsonV);
                             serializedObj = ActivatorCreateInstance(serializedFieldType);
                         }
                     }
@@ -501,7 +593,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 Type type = string.IsNullOrEmpty(typeName) ? null : Type.GetType(typeName);
                 string typeNameAndAssembly = type == null
                     ? "?"
-                    : $"{PersistentCallDrawer.StringifyType(type)} <color=#808080>({type.Namespace})</color>";
+                    : $"{SaintsEventUtils.StringifyType(type)} <color=#808080>({type.Namespace})</color>";
                 serializedValueDropdownButtonLabel.text = typeNameAndAssembly;
             }
 
@@ -512,16 +604,27 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 Type argType = string.IsNullOrEmpty(argTypeStr) ? null : Type.GetType(argTypeStr);
                 string argTypeName = argType == null
                     ? ""
-                    : $" <color=#808080>({PersistentCallDrawer.StringifyType(argType)})</color>";
+                    : $" <color=#808080>({SaintsEventUtils.StringifyType(argType)})</color>";
                 label.text = $"{property.FindPropertyRelative(nameof(PersistentArgument.name)).stringValue}{argTypeName}";
             }
 
             void SetDynamicButtonLabel(SerializedProperty prop)
             {
                 int curIndex = prop.intValue;
-                string curType = curIndex < 0 || curIndex >= eventParamTypes.Length
-                    ? "?"
-                    : $"Args[{curIndex}] <color=#808080>({PersistentCallDrawer.StringifyType(eventParamTypes[curIndex])})</color>";
+                string curType;
+                if (curIndex < 0 || curIndex >= eventParamTypes.Length)
+                {
+                    curType = "?";
+                }
+                else
+                {
+                    string useName = eventArgNames.Count > curIndex
+                        ? eventArgNames[curIndex]
+                        : "Arg";
+
+                    curType =
+                        $"<color=#808080>[{curIndex}]</color> {useName} <color=#808080>({SaintsEventUtils.StringifyType(eventParamTypes[curIndex])})</color>";
+                }
 
                 dropdownButtonLabel.text = curType;
             }
