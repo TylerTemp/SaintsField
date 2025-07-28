@@ -43,7 +43,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             string s = type.ToString();
             return s.StartsWith("UnityEngine.")
-                ? s["UnityEngine.".Length..]
+                ? s.Substring("UnityEngine.".Length)
                 : s;
         }
     }
