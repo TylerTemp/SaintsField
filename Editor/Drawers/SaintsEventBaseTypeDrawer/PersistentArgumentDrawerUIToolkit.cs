@@ -61,9 +61,6 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             label.TrackPropertyValue(property, TrackLabelDisplay);
 
             // dynamic
-
-            // Debug.Log(property.propertyPath);
-            // Debug.Log(string.Join(".", property.propertyPath.Split('.').SkipLast(6)));
             string[] splited = property.propertyPath.Split('.').SkipLast(6).ToArray();
             bool selfInsideArray = false;
             if (splited[^1].EndsWith("]"))
@@ -72,14 +69,27 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 selfInsideArray = true;
             }
             (SerializedUtils.FieldOrProp rootFieldOrProp, object _) = SerializedUtils.GetFieldInfoAndDirectParentByPathSegments(property, splited);
-            Type rawType = rootFieldOrProp.IsField
-                ? rootFieldOrProp.FieldInfo.FieldType
-                : rootFieldOrProp.PropertyInfo.PropertyType;
+            Type rawType;
+            MemberInfo rawMemberInfo;
+            if (rootFieldOrProp.IsField)
+            {
+                rawType = rootFieldOrProp.FieldInfo.FieldType;
+                rawMemberInfo = rootFieldOrProp.FieldInfo;
+            }
+            else
+            {
+                rawType = rootFieldOrProp.PropertyInfo.PropertyType;
+                rawMemberInfo = rootFieldOrProp.PropertyInfo;
+            }
             if (selfInsideArray)
             {
                 rawType = ReflectUtils.GetElementType(rawType);
             }
             Type[] eventParamTypes = rawType.GetGenericArguments();
+            SaintsEventArgsAttribute saintsEventArgsAttribute = ReflectCache
+                .GetCustomAttributes<SaintsEventArgsAttribute>(rawMemberInfo)
+                .FirstOrDefault();
+            IReadOnlyList<string> eventArgNames = saintsEventArgsAttribute?.ArgNames ?? Array.Empty<string>();
 
             SerializedProperty valueTypeProp = property.FindPropertyRelative(nameof(PersistentArgument.callType));
 
@@ -94,8 +104,12 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
                 for (int eventParamIndex = 0; eventParamIndex < eventParamTypes.Length; eventParamIndex++)
                 {
+                    string useName = eventArgNames.Count > eventParamIndex
+                        ? eventArgNames[eventParamIndex]
+                        : "Arg";
+
                     Type type = eventParamTypes[eventParamIndex];
-                    string labelText = $"Args[{eventParamIndex}] <color=#808080>({SaintsEventUtils.StringifyType(type)})</color>";
+                    string labelText = $"<color=#808080>[{eventParamIndex}]</color> {useName} <color=#808080>({SaintsEventUtils.StringifyType(type)})</color>";
                     int thisIndex = eventParamIndex;
                     genericDropdownMenu.AddItem(labelText, invokedParameterIndexProp.intValue == eventParamIndex, () =>
                     {
@@ -300,44 +314,50 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             VisualElement persistentArgumentValueEditor = container.Q<VisualElement>("persistent-argument-value-editor");
             SerializedProperty persistentArgumentCallType = property.FindPropertyRelative(nameof(PersistentArgument.callType));
-            void UpdatePersistentArgumentValueEditorDisplay(SerializedProperty p)
-            {
-                if (p.intValue == (int)PersistentArgument.CallType.Dynamic)
-                {
-                    // Debug.Log("display valueDynamic");
-                    valueDynamic.style.display = DisplayStyle.Flex;
-                    serializedObject.style.display = DisplayStyle.None;
-                    serializedValue.style.display = DisplayStyle.None;
-                }
-                else if (p.intValue == (int)PersistentArgument.CallType.Serialized)
-                {
-                    valueDynamic.style.display = DisplayStyle.None;
-                    if (property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue)
-                    {
-                        // Debug.Log("display serializedObject");
-                        serializedObject.style.display = DisplayStyle.Flex;
-                        serializedValue.style.display = DisplayStyle.None;
-                    }
-                    else
-                    {
-                        // Debug.Log("display serializedValue");
-                        serializedObject.style.display = DisplayStyle.None;
-                        serializedValue.style.display = DisplayStyle.Flex;
-                    }
-                }
-                else if (p.intValue == (int)PersistentArgument.CallType.OptionalDefault)
-                {
-                    // Debug.Log("display default value");
-                    valueDynamic.style.display = DisplayStyle.None;
-                    serializedObject.style.display = DisplayStyle.None;
-                    serializedValue.style.display = DisplayStyle.None;
-                }
-            }
 
             UpdatePersistentArgumentValueEditorDisplay(persistentArgumentCallType);
             persistentArgumentValueEditor.TrackPropertyValue(persistentArgumentCallType, UpdatePersistentArgumentValueEditorDisplay);
 
             return;
+
+            void UpdatePersistentArgumentValueEditorDisplay(SerializedProperty p)
+            {
+                switch ((PersistentArgument.CallType)p.intValue)
+                {
+                    case PersistentArgument.CallType.Dynamic:
+                        // Debug.Log("display valueDynamic");
+                        valueDynamic.style.display = DisplayStyle.Flex;
+                        serializedObject.style.display = DisplayStyle.None;
+                        serializedValue.style.display = DisplayStyle.None;
+                        break;
+                    case PersistentArgument.CallType.Serialized:
+                    {
+                        valueDynamic.style.display = DisplayStyle.None;
+                        if (property.FindPropertyRelative(nameof(PersistentArgument.isUnityObject)).boolValue)
+                        {
+                            // Debug.Log("display serializedObject");
+                            serializedObject.style.display = DisplayStyle.Flex;
+                            serializedValue.style.display = DisplayStyle.None;
+                        }
+                        else
+                        {
+                            // Debug.Log("display serializedValue");
+                            serializedObject.style.display = DisplayStyle.None;
+                            serializedValue.style.display = DisplayStyle.Flex;
+                        }
+
+                        break;
+                    }
+                    case PersistentArgument.CallType.OptionalDefault:
+                        // Debug.Log("display default value");
+                        valueDynamic.style.display = DisplayStyle.None;
+                        serializedObject.style.display = DisplayStyle.None;
+                        serializedValue.style.display = DisplayStyle.None;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(p.intValue), p.intValue, null);
+                }
+            }
 
             void SerializedValueEditorRepaint()
             {
@@ -527,9 +547,20 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             void SetDynamicButtonLabel(SerializedProperty prop)
             {
                 int curIndex = prop.intValue;
-                string curType = curIndex < 0 || curIndex >= eventParamTypes.Length
-                    ? "?"
-                    : $"Args[{curIndex}] <color=#808080>({SaintsEventUtils.StringifyType(eventParamTypes[curIndex])})</color>";
+                string curType;
+                if (curIndex < 0 || curIndex >= eventParamTypes.Length)
+                {
+                    curType = "?";
+                }
+                else
+                {
+                    string useName = eventArgNames.Count > curIndex
+                        ? eventArgNames[curIndex]
+                        : "Arg";
+
+                    curType =
+                        $"<color=#808080>[{curIndex}]</color> {useName} <color=#808080>({SaintsEventUtils.StringifyType(eventParamTypes[curIndex])})</color>";
+                }
 
                 dropdownButtonLabel.text = curType;
             }
