@@ -6167,7 +6167,7 @@ The dropdown below is where you pick your actual callback:
 
 ![](https://github.com/user-attachments/assets/815ba613-dcd1-45de-9273-daa5061bf392)
 
-Finally, if your function has parameters, you need to check how each parameter is processed. Let's using another example:
+Finally, if your function has parameters, you need to check how each parameter is processed. Lets using another example:
 
 ```csharp
 using SaintsField.Events;
@@ -6197,7 +6197,7 @@ In the picture
 *   `X` is default, which uses function parameter's default value. In this example, `int i = -1`, so use `-1`
 
 > [!WARNING]
-> ATM it will not check if the parameter type can accpet the coresponding value type. Please check it by yourself carefully.
+> ATM it will not check if the parameter type can accept the corresponding value type. Please check it by yourself carefully.
 
 **Runtime**
 
