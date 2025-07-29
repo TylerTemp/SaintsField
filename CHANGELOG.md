@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.24.0 ##
+
+Add `OptionsDropdown` and `PairsDropdown`
+
 ## 4.23.0 ##
 
 Introduce `SaintsEvent`. `SaintsEvent` is an alternative to Unity's `UnityEvent`. It's inspired by [UltEvents](https://assetstore.unity.com/packages/tools/gui/ultevents-111307) & [ExtEvents](https://github.com/SolidAlloy/ExtEvents)

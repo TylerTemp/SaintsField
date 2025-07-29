@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
@@ -15,8 +16,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
     [CustomPropertyDrawer(typeof(AdvancedDropdownAttribute), true)]
     public partial class AdvancedDropdownAttributeDrawer: SaintsPropertyDrawer
     {
-
-
         public struct SelectStack : IEquatable<SelectStack>
         {
             // ReSharper disable InconsistentNaming
@@ -51,7 +50,29 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
             string error;
             IAdvancedDropdownList dropdownListValue = null;
-            if (funcName is null)
+            if (advancedDropdownAttribute.BehaveMode == AdvancedDropdownAttribute.Mode.Options)
+            {
+                AdvancedDropdownList<object> optionsDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                foreach (object value in advancedDropdownAttribute.Options)
+                {
+                    optionsDropdown.Add(RuntimeUtil.IsNull(value)? "[Null]": value.ToString(), value);
+                }
+
+                error = "";
+                dropdownListValue = optionsDropdown;
+            }
+            else if (advancedDropdownAttribute.BehaveMode == AdvancedDropdownAttribute.Mode.Tuples)
+            {
+                AdvancedDropdownList<object> tuplesDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                foreach ((string path, object value) in advancedDropdownAttribute.Tuples)
+                {
+                    tuplesDropdown.Add(path, value);
+                }
+
+                error = "";
+                dropdownListValue = tuplesDropdown;
+            }
+            else if (funcName is null)
             {
                 Type elementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
                 if(elementType.IsEnum)

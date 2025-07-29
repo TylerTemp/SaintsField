@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
@@ -22,7 +24,19 @@ namespace SaintsField
         public const float SepHeight = DefaultSepHeight;
         public const float MinHeight = -1f;
         public const bool UseTotalItemCount = false;
-        public readonly EUnique EUnique;
+        public EUnique EUnique;
+
+        public enum Mode
+        {
+            Default,
+            Options,
+            Tuples,
+        }
+
+        public virtual Mode BehaveMode => Mode.Default;
+
+        public IReadOnlyList<object> Options;
+        public IReadOnlyList<(string path, object value)> Tuples;
 
         // public AdvancedDropdownAttribute(string funcName)
         // {

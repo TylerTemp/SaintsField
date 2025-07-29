@@ -103,9 +103,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.23.0**
+**4.24.0**
 
-Introduce `SaintsEvent`. `SaintsEvent` is an alternative to Unity's `UnityEvent`. It's inspired by [UltEvents](https://assetstore.unity.com/packages/tools/gui/ultevents-111307) & [ExtEvents](https://github.com/SolidAlloy/ExtEvents)
+Add `OptionsDropdown` and `PairsDropdown`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4308,6 +4308,47 @@ Also, using on a type like `Color` to pick a pre-defined static value:
 ```
 
 ![image](https://github.com/user-attachments/assets/404d4cd6-b4bf-4521-b633-2dd745ec4de1)
+
+#### `OptionsDropdown` / `PairsDropdown` ####
+
+Like `AdvancedDropdown`, but allows you to quickly set some const expression value
+
+Useful when you don't want the entire enum
+
+```csharp
+use SaintsField;
+
+[OptionsDropdown(0.5f, 1f, 1.5f, 2f, 2.5f, 3f)]
+public float floatOpt;
+
+[OptionsDropdown(EUnique.Disable, "Left", "Right", "Top", "Bottom", "Center")]
+public string[] stringOpt;
+```
+
+![](https://github.com/user-attachments/assets/a26d89c6-5be7-4d66-8782-a927585b01dd)
+
+```csharp
+use SaintsField;
+
+[PairsDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
+public int intOpt;
+
+public enum Direction
+{
+    None,
+    Left,
+    Right,
+    Up,
+    Down,
+    Center,
+}
+
+// useful if you don't want the entire enum
+[PairsDropdown(EUnique.Disable, "<-", Direction.Left, "->", Direction.Right, "↑", Direction.Up, "↓", Direction.Down)]
+public Direction[] direOpt;
+```
+
+![](https://github.com/user-attachments/assets/01501513-d00d-4320-94e9-6c76a81a3c2a)
 
 #### `EnumToggleButtons` ####
 
