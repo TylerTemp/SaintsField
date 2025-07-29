@@ -6122,7 +6122,7 @@ Here are some features that is supported by other plugins:
 
 *   IMGUI is not supported yet, while `UltEvents` & `ExtEvents` does
 *   Chained call (use one callback's result as another one's input) is not supported and will not be added, while `UltEvents` does
-*   Renamed type is partly supported. If a renamed type is a `MonoBehavior`, then rename works as expected. But IDE rename. However, `ExtEvent` will try to find a general type's rename
+*   Renamed type is partly supported. If a renamed type is a `MonoBehavior`, then rename works as expected. However, `ExtEvent` will try to find a general type's rename
 *   Implicit conversions for arguments is not supported, while `ExtEvents` does
 *   Performance optimization is limited to first-time cache, while `ExtEvents` using code generator to make the runtime much more fast. So in general, speed comparison is (fast to slow) `UnityEvent` - `ExtEvent` - `SaintsEvent` - `UltEvent`
 
@@ -6201,7 +6201,33 @@ In the picture
 
 **Runtime**
 
-In runtime, you can use `SaintsEvent.Invoke()`, `SaintsEvent.AddListener(callback)` and `SaintsEvent.RemoveListener(callback)` just like `UnityEvent`.
+In runtime, you can use `SaintsEvent.Invoke()`, `SaintsEvent.AddListener(callback)` and `SaintsEvent.RemoveListener(callback)`, `SaintsEvent.RemoveAllListeners()` just like `UnityEvent`.
+
+**Config**
+
+For a better naming, use `SaintsEventArgs` to rename the event generic parameters.
+
+```csharp
+using SaintsField.Events;
+
+[SaintsEventArgs("Custom", "Number", "Text")]
+public SaintsEvent<MyClass, int, string> withName;
+```
+
+![](https://github.com/user-attachments/assets/7826c5a6-8173-4dc0-a634-1707557fd0ac)
+
+For static mode, you can also use `TypeReference` to filter the types you want.
+
+```csharp
+using SaintsField;
+using SaintsField.Events;
+
+[TypeReference(onlyAssemblies: new []{"mscorlib"})]  // we only want types from mscorlib
+public SaintsEvent sEvent;
+
+[TypeReference(EType.CurrentOnly)]  // we only want types from current assembly
+public SaintsEvent sEvent2;
+```
 
 ## Addressable ##
 
