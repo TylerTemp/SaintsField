@@ -83,6 +83,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             FillElement(root, property, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder);
 
+            // ReSharper disable once InvertIf
             if (property.propertyType == SerializedPropertyType.ManagedReference)
             {
                 string propPath = property.propertyPath;
@@ -206,20 +207,20 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                  }
              }
 
-             // this... fixed by adding Bind()... wtf...
-             foreach (ISaintsRenderer saintsRenderer in renderer)
-             {
-                 saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
-                 saintsRenderer.SetSerializedProperty(property);
-                 VisualElement rendererElement = saintsRenderer.CreateVisualElement();
-                 if (rendererElement != null)
-                 {
-                     // Debug.Log($"add: {saintsRenderer}");
-                     bodyElement.Add(rendererElement);
-                 }
-             }
+            // this... fixed by adding Bind()... wtf...
+            foreach (ISaintsRenderer saintsRenderer in renderer)
+            {
+                saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
+                saintsRenderer.SetSerializedProperty(property);
+                VisualElement rendererElement = saintsRenderer.CreateVisualElement();
+                if (rendererElement != null)
+                {
+                    // Debug.Log($"add: {saintsRenderer}");
+                    bodyElement.Add(rendererElement);
+                }
+            }
 
-             root.Add(bodyElement);
+            root.Add(bodyElement);
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(doTweenPlayRecorder));
             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));

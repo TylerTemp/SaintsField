@@ -1,4 +1,5 @@
-﻿using SaintsField.Interfaces;
+﻿using System.Collections;
+using SaintsField.Interfaces;
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using UnityEditor.UIElements;
@@ -1975,41 +1976,39 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-
-        public static void AddContextualMenuManipulator(VisualElement ele, SerializedProperty property, Action onValueChangedCallback)
-        {
-            ele.AddManipulator(new ContextualMenuManipulator(evt =>
-            {
-                evt.menu.AppendAction("Copy Property Path", _ => EditorGUIUtility.systemCopyBuffer = property.propertyPath);
-
-                bool spearator = false;
-                if (ClipboardHelper.CanCopySerializedProperty(property.propertyType))
-                {
-                    spearator = true;
-                    evt.menu.AppendSeparator();
-                    evt.menu.AppendAction("Copy", _ => ClipboardHelper.DoCopySerializedProperty(property));
-                }
-
-                (bool hasReflectionPaste, bool hasValuePaste) = ClipboardHelper.CanPasteSerializedProperty(property.propertyType);
-
-                // ReSharper disable once InvertIf
-                if (hasReflectionPaste)
-                {
-                    if (!spearator)
-                    {
-                        evt.menu.AppendSeparator();
-                    }
-
-                    evt.menu.AppendAction("Paste", _ =>
-                    {
-                        ClipboardHelper.DoPasteSerializedProperty(property);
-                        property.serializedObject.ApplyModifiedProperties();
-                        onValueChangedCallback.Invoke();
-                    }, hasValuePaste? DropdownMenuAction.Status.Normal: DropdownMenuAction.Status.Disabled);
-                }
-            }));
-        }
-
+        // public static void AddContextualMenuManipulator(VisualElement ele, SerializedProperty property, Action onValueChangedCallback)
+        // {
+        //     ele.AddManipulator(new ContextualMenuManipulator(evt =>
+        //     {
+        //         evt.menu.AppendAction("Copy Property Path", _ => EditorGUIUtility.systemCopyBuffer = property.propertyPath);
+        //
+        //         bool spearator = false;
+        //         if (ClipboardHelper.CanCopySerializedProperty(property.propertyType))
+        //         {
+        //             spearator = true;
+        //             evt.menu.AppendSeparator();
+        //             evt.menu.AppendAction("Copy", _ => ClipboardHelper.DoCopySerializedProperty(property));
+        //         }
+        //
+        //         (bool hasReflectionPaste, bool hasValuePaste) = ClipboardHelper.CanPasteSerializedProperty(property.propertyType);
+        //
+        //         // ReSharper disable once InvertIf
+        //         if (hasReflectionPaste)
+        //         {
+        //             if (!spearator)
+        //             {
+        //                 evt.menu.AppendSeparator();
+        //             }
+        //
+        //             evt.menu.AppendAction("Paste", _ =>
+        //             {
+        //                 ClipboardHelper.DoPasteSerializedProperty(property);
+        //                 property.serializedObject.ApplyModifiedProperties();
+        //                 onValueChangedCallback.Invoke();
+        //             }, hasValuePaste? DropdownMenuAction.Status.Normal: DropdownMenuAction.Status.Disabled);
+        //         }
+        //     }));
+        // }
 
         public class DropdownButtonField : BaseField<string>
         {
@@ -2120,6 +2119,406 @@ namespace SaintsField.Editor.Utils
 //             Debug.Log("unbindMethod!");
 #endif
         }
+
+        #region ContextMenu
+
+        private static bool _fillPropertyContextMenuDelegateLoaded;
+        private delegate GenericMenu FillPropertyContextMenuDelegate(SerializedProperty property, SerializedProperty linkedProperty = null, GenericMenu menu = null, VisualElement element = null);
+        private static FillPropertyContextMenuDelegate _fillPropertyContextMenu;
+
+//         private static FillPropertyContextMenuDelegate PopulateInternalUnityFunctions()
+//         {
+//             if (_fillPropertyContextMenuDelegateLoaded)
+//             {
+//                 return _fillPropertyContextMenu;
+//             }
+//
+//             _fillPropertyContextMenuDelegateLoaded = true;
+//             try
+//             {
+//                 _fillPropertyContextMenu = typeof(EditorGUI)
+//                     .GetMethod("FillPropertyContextMenu", BindingFlags.NonPublic | BindingFlags.Static)
+//                     ?.CreateDelegate(typeof(FillPropertyContextMenuDelegate)) as FillPropertyContextMenuDelegate;
+//             }
+//             catch (Exception ex)
+//             {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.LogException(ex);
+// #endif
+//             }
+//
+//             return _fillPropertyContextMenu;
+//         }
+        // [UnityEditor.InitializeOnLoadMethod]
+        private static FillPropertyContextMenuDelegate PopulateInternalUnityFunctions()
+        {
+            if (_fillPropertyContextMenuDelegateLoaded)
+            {
+                return _fillPropertyContextMenu;
+            }
+
+            _fillPropertyContextMenuDelegateLoaded = true;
+            MethodInfo method = typeof(EditorGUI)
+                .GetMethod("FillPropertyContextMenu", BindingFlags.NonPublic | BindingFlags.Static);
+            if (method == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                _fillPropertyContextMenu = method.CreateDelegate(typeof(FillPropertyContextMenuDelegate)) as FillPropertyContextMenuDelegate;
+            }
+            catch (Exception ex)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogException(ex);
+#endif
+            }
+            return _fillPropertyContextMenu;
+        }
+
+        // Recursively gathers all visible VisualElements under a mouse event
+        private static List<VisualElement> GetElementsUnderPointer(IMouseEvent evt, VisualElement root)
+        {
+            List<VisualElement> elements = new List<VisualElement>();
+
+            Traverse(evt, root, elements);
+            return elements;
+        }
+
+        private static void Traverse(IMouseEvent evt, VisualElement element, List<VisualElement> elements)
+        {
+            if (!element.visible || element.resolvedStyle.display == DisplayStyle.None)
+            {
+                return;
+            }
+
+            if (element.worldBound.Contains(evt.mousePosition))
+            {
+                elements.Add(element);
+            }
+
+            foreach (VisualElement child in element.Children())
+            {
+                Traverse(evt, child, elements);
+            }
+        }
+
+        // Regex for validating Unity property paths (e.g. "foo.bar[0].baz")
+        // Allows nested fields and indexed arrays/lists
+        private static readonly System.Text.RegularExpressions.Regex ValidPropertyName =
+            new System.Text.RegularExpressions.Regex(@"
+(                              # Capture the entire property path
+  (?:                          # First segment, doesn't have a period or array stuff
+    [a-zA-Z_]                  # First character must be a letter or underscore
+    [a-zA-Z0-9_`<>$]*          # Followed by letters, digits, underscore, backtick, angle brackets, or dollar sign
+  )
+  (?:                          # Non-capturing group for nested parts
+    \.                         # A literal dot for nested fields
+    [a-zA-Z_]                  # Next field name must start with letter or underscore
+    [a-zA-Z0-9_`<>$]*          # Followed by valid characters as above
+    |                          # OR
+    \[                         # Opening square bracket for array/list index
+    (?:\d+)                    # One or more digits
+    \]                         # Closing square bracket
+  )*                           # Zero or more nested fields or indices
+)",
+                System.Text.RegularExpressions.RegexOptions.Compiled |
+                System.Text.RegularExpressions.RegexOptions.IgnorePatternWhitespace);
+
+        // Internal class for converting Unity's legacy GenericMenu to UI Toolkit's DropdownMenu
+        private static class GenericMenuDynamicConverter
+        {
+            // Reflection targets inside GenericMenu and its nested MenuItem class
+            private static readonly PropertyInfo ItemsProperty;
+            private static readonly FieldInfo ContentField;
+            private static readonly FieldInfo SeparatorField;
+            private static readonly FieldInfo FuncField;
+            private static readonly FieldInfo Func2Field;
+            private static readonly FieldInfo UserDataField;
+            private static readonly FieldInfo OnField;
+
+            // Initializes field/property accessors via reflection
+            static GenericMenuDynamicConverter()
+            {
+                Type menuItemType = typeof(GenericMenu).GetNestedType("MenuItem", BindingFlags.NonPublic);
+                ItemsProperty = typeof(GenericMenu).GetProperty("menuItems", BindingFlags.Instance | BindingFlags.NonPublic);
+                ContentField = menuItemType.GetField("content", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                SeparatorField = menuItemType.GetField("separator", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                FuncField = menuItemType.GetField("func", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                Func2Field = menuItemType.GetField("func2", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                UserDataField = menuItemType.GetField("userData", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                OnField = menuItemType.GetField("on", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            }
+
+            // Caches status callback functions for dropdown items
+            private static readonly Dictionary<DropdownMenuAction.Status, Func<DropdownMenuAction, DropdownMenuAction.Status>> StatusCallbacksCache =
+                new Dictionary<DropdownMenuAction.Status, Func<DropdownMenuAction, DropdownMenuAction.Status>>
+            {
+                { DropdownMenuAction.Status.Normal, DropdownMenuAction.AlwaysEnabled },
+                { DropdownMenuAction.Status.Disabled, DropdownMenuAction.AlwaysDisabled },
+            };
+
+            // Converts a GenericMenu to a DropdownMenu
+            public static bool ConvertGenericMenuToDropdownMenu(GenericMenu menu, DropdownMenu dropdownMenu = null)
+            {
+                DropdownMenu resultDropdownMenu = dropdownMenu ?? new DropdownMenu();
+                if (ItemsProperty.GetValue(menu) is not IList menuItems)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError("menuItems is null");
+#endif
+                    return false;
+                }
+
+                foreach (object item in menuItems)
+                {
+                    GUIContent content = (GUIContent)ContentField.GetValue(item);
+                    bool isSeparator = (bool)SeparatorField.GetValue(item);
+                    GenericMenu.MenuFunction func = FuncField.GetValue(item) as GenericMenu.MenuFunction;
+                    GenericMenu.MenuFunction2 func2 = Func2Field.GetValue(item) as GenericMenu.MenuFunction2;
+                    object userData = UserDataField.GetValue(item);
+                    bool isOn = (bool)OnField.GetValue(item);
+
+                    if (isSeparator)
+                    {
+                        resultDropdownMenu.AppendSeparator(content.text);
+                    }
+                    else
+                    {
+                        Func<DropdownMenuAction, DropdownMenuAction.Status> statusCallback = MenuItemToActionStatusCallback(func, func2, isOn);
+
+                        if (func != null)
+                        {
+                            resultDropdownMenu.AppendAction(content.text, _ => func(), statusCallback);
+                        }
+                        else if (func2 != null)
+                        {
+                            resultDropdownMenu.AppendAction(content.text, action => func2(action.userData),
+                                statusCallback, userData);
+                        }
+                        else
+                        {
+                            resultDropdownMenu.AppendAction(content.text, null, statusCallback);
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            // Produces the appropriate dropdown menu status callback based on enabled/checked state
+            private static Func<DropdownMenuAction, DropdownMenuAction.Status> MenuItemToActionStatusCallback(GenericMenu.MenuFunction func, GenericMenu.MenuFunction2 func2, bool isOn)
+            {
+                DropdownMenuAction.Status status = DropdownMenuAction.Status.None;
+
+                if (func != null || func2 != null)
+                    status |= DropdownMenuAction.Status.Normal;
+                else
+                    status |= DropdownMenuAction.Status.Disabled;
+
+                if (isOn)
+                    status |= DropdownMenuAction.Status.Checked;
+
+                if (!StatusCallbacksCache.TryGetValue(status, out Func<DropdownMenuAction, DropdownMenuAction.Status> callback))
+                {
+                    StatusCallbacksCache[status] = callback = _ => status;
+                }
+
+                return callback;
+            }
+        }
+
+
+        /// <summary>
+        /// Thanks to [@Zallist](https://github.com/Zallist) in [#254](https://github.com/TylerTemp/SaintsField/issues/254)
+        /// </summary>
+        public static void AddContextualMenuManipulator(VisualElement ele, SerializedProperty property, Action onValueChangedCallback)
+        {
+            ele.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                FillPropertyContextMenuDelegate fillPropertyContextMenu = PopulateInternalUnityFunctions();
+                if(fillPropertyContextMenu != null)
+                {
+                    try
+                    {
+                        PopulateContextMenuUsingFillPropertyContextMenu(evt, ele, property);
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogException(ex);
+#endif
+                    }
+                }
+
+                evt.menu.AppendAction("Copy Property Path", _ => EditorGUIUtility.systemCopyBuffer = property.propertyPath);
+
+                bool spearator = false;
+                if (ClipboardHelper.CanCopySerializedProperty(property.propertyType))
+                {
+                    spearator = true;
+                    evt.menu.AppendSeparator();
+                    evt.menu.AppendAction("Copy", _ => ClipboardHelper.DoCopySerializedProperty(property));
+                }
+
+                (bool hasReflectionPaste, bool hasValuePaste) = ClipboardHelper.CanPasteSerializedProperty(property.propertyType);
+
+                // ReSharper disable once InvertIf
+                if (hasReflectionPaste)
+                {
+                    if (!spearator)
+                    {
+                        evt.menu.AppendSeparator();
+                    }
+
+                    evt.menu.AppendAction("Paste", _ =>
+                    {
+                        ClipboardHelper.DoPasteSerializedProperty(property);
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback.Invoke();
+                    }, hasValuePaste? DropdownMenuAction.Status.Normal: DropdownMenuAction.Status.Disabled);
+                }
+            }));
+        }
+
+        // Populate context menu using unity's own fill function
+        private static void PopulateContextMenuUsingFillPropertyContextMenu(ContextualMenuPopulateEvent evt, VisualElement root, SerializedProperty property)
+        {
+            List<VisualElement> elements = GetElementsUnderPointer(evt, root);
+
+            for (int revIndex = elements.Count - 1; revIndex >= 0; revIndex--)
+            {
+                VisualElement underElement = elements[revIndex];
+
+                // Check for direct SerializedProperty reference in userData
+                if (underElement.userData is SerializedProperty mySerializedProperty)
+                {
+                    // Debug.Log("Populate1");
+                    Populate(mySerializedProperty, underElement, evt, root);
+                    return;
+                }
+
+                // Traverse up the element tree to find SerializedProperty in userData
+                if (underElement.FindAncestorUserData() is SerializedProperty ancestorSerializedProperty)
+                {
+                    // Debug.Log("Populate2");
+                    Populate(ancestorSerializedProperty, underElement, evt, root);
+                    return;
+                }
+
+                // Resolve property via binding path if available
+                if (underElement is IBindable bindableElement && !string.IsNullOrEmpty(bindableElement.bindingPath))
+                {
+                    SerializedProperty relativeProperty = property.serializedObject.FindProperty(bindableElement.bindingPath);
+
+                    if (relativeProperty != null)
+                    {
+                        // Debug.Log("Populate3");
+                        Populate(relativeProperty, underElement, evt, root);
+                        return;
+                    }
+                }
+
+                // Guess property by parsing name for valid property path substrings
+                if (!string.IsNullOrEmpty(underElement.name) && underElement.name.Contains(property.propertyPath))
+                {
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                    string elementName = underElement.name.Substring(underElement.name.IndexOf(property.propertyPath, StringComparison.Ordinal));
+
+                    System.Text.RegularExpressions.Match propertyNameMatch = ValidPropertyName.Match(elementName);
+
+                    if (propertyNameMatch.Success)
+                    {
+                        string propertyPath = propertyNameMatch.Groups[1].Value;
+                        SerializedProperty relativeProperty = property.serializedObject.FindProperty(propertyPath);
+
+                        if (relativeProperty != null)
+                        {
+                            // Debug.Log("Populate4");
+                            Populate(relativeProperty, underElement, evt, root);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Fallback: show menu for the original property
+            // Debug.Log("Populate Fallback");
+            Populate(property, root, evt, root);
+        }
+
+        private static void Populate(SerializedProperty property, VisualElement underElement, ContextualMenuPopulateEvent evt, VisualElement root)
+        {
+            // var guiEnabled = GUI.enabled;
+            // Event currentEvent = Event.current;
+            GenericMenu menu = null;
+
+            FillPropertyContextMenuDelegate fillPropertyContextMenu = PopulateInternalUnityFunctions();
+            if(fillPropertyContextMenu != null)
+            {
+                using (new EventCurrentScoop(evt.imguiEvent))
+                using (new GUIEnabledScoop(underElement.enabledInHierarchy))
+                {
+                    try
+                    {
+                        // Temporarily set up GUI context to match the event
+                        // Event.current = evt.imguiEvent;
+                        // GUI.enabled = element.enabledInHierarchy;
+
+                        menu = PopulateInternalUnityFunctions()?.Invoke(property, null, null, root);
+                    }
+                    catch (Exception e)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogError(e);
+#endif
+                    }
+                    // finally
+                    // {
+                    //     // GUI.enabled = guiEnabled;
+                    //     // Event.current = currentEvent;
+                    // }
+                }
+            }
+
+            if(menu != null)
+            {
+                // DropdownMenu uiToolkitMenu = null;
+                bool converted = false;
+                try
+                {
+                    // Convert legacy menu to new UI Toolkit dropdown menu
+                    converted = GenericMenuDynamicConverter.ConvertGenericMenuToDropdownMenu(menu, evt.menu);
+                }
+                catch (Exception ex)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogException(ex);
+#endif
+                    evt.StopImmediatePropagation();
+
+                    // Fallback to native IMGUI context menu
+                    menu.ShowAsContext();
+                }
+
+                // ReSharper disable once InvertIf
+                if (!converted)
+                {
+                    evt.StopImmediatePropagation();
+                    menu.ShowAsContext();
+                }
+
+                // Debug.Log(uiToolkitMenu);
+                // evt.menu = uiToolkitMenu;
+            }
+        }
+
+
+
+        #endregion
     }
 #endif
 }

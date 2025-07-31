@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -77,6 +78,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
+            dropdownButton.BindProperty(property);
 
             UIToolkitUtils.AddContextualMenuManipulator(dropdownButton.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
