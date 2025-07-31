@@ -6202,8 +6202,10 @@ Then, the object picker is to decide which type you want to limit:
 The next dropdown is depending on the mode:
 
 *   For static mode with no target, you need to select a type
+
     ![](https://github.com/user-attachments/assets/885fee95-b7ef-476d-9aa1-1ad8a86eeab4)
 *   For static mode with target, or instance mode, you need to select a component on that target
+
     ![](https://github.com/user-attachments/assets/4da3a5c2-76e4-4ad9-89f6-a42fbc258705)
 
 The dropdown below is where you pick your actual callback:
