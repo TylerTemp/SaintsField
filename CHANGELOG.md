@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.24.1 ##
+
+1.  UI Toolkit: Attempting to inherit the existing Unity context menu in nested classes when right-click on a field [#254](https://github.com/TylerTemp/SaintsField/issues/254)
+2.  UI Toolkit: Fix `AdvancedDropdown` can not show the changed indicator (blue line on left) in prefab when edited. This also fixes enum dropdown if you have `SaintsEditor` enabled
+3.  UI Toolkit: Fix `ResiableTextArea` label did not have a right-click context menu
+
 ## 4.24.0 ##
 
 Add `OptionsDropdown` and `PairsDropdown`
