@@ -103,7 +103,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.24.1**
+**4.24.2**
 
 1.  UI Toolkit: Attempting to inherit the existing Unity context menu in nested classes when right-click on a field [#254](https://github.com/TylerTemp/SaintsField/issues/254)
 2.  UI Toolkit: Fix `AdvancedDropdown` can not show the changed indicator (blue line on left) in prefab when edited. This also fixes enum dropdown if you have `SaintsEditor` enabled
