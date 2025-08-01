@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.UIToolkitElements;
 
 namespace SaintsField.Editor.Drawers.InputAxisDrawer
@@ -23,3 +24,4 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
         }
     }
 }
+#endif

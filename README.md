@@ -105,7 +105,7 @@ namespace: `SaintsField`
 
 **4.24.3**
 
-1.  Fix `enum` of `byte` type gives error on picker
+1.  Fix `enum` of `byte` type gives error on picker [#278](https://github.com/TylerTemp/SaintsField/issues/278)
 2.  Add blue indicator for prefab modification in:
     *   `Layer`
     *   `Scene`
