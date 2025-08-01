@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
             FieldInfo info, object parent)
         {
-            string[] scenes = GetTrimedScenePath(((SceneAttribute)saintsAttribute).FullPath);
+            string[] scenes = SceneUtils.GetTrimedScenePath(((SceneAttribute)saintsAttribute).FullPath).ToArray();
 
             // const string optionName = "Edit Scenes In Build...";
             // string[] sceneOptions = scenes
@@ -155,15 +155,6 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(display), FocusType.Keyboard))
             {
-#pragma warning disable CS0219
-                float minHeight = AdvancedDropdownAttribute.MinHeight;
-#pragma warning restore CS0219
-                float itemHeight = AdvancedDropdownAttribute.ItemHeight > 0
-                    ? AdvancedDropdownAttribute.ItemHeight
-                    : EditorGUIUtility.singleLineHeight;
-#pragma warning disable CS0219
-                float titleHeight = AdvancedDropdownAttribute.TitleHeight;
-#pragma warning restore CS0219
                 Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(metaInfo.DropdownListValue, position.width);
 
                 // OnGUIPayload targetPayload = onGUIPayload;
@@ -177,7 +168,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                         int index = (int)curItem;
                         if (index == -1)
                         {
-                            OpenBuildSettings();
+                            SceneUtils.OpenBuildSettings();
                             return;
                         }
 

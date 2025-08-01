@@ -1,26 +1,21 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
-#if SAINTSFIELD_NEWTONSOFT_JSON
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-#endif
 
 namespace SaintsField.Editor.Drawers.LayerDrawer
 {
     public partial class LayerAttributeDrawer
     {
-        private static string NameLayer(SerializedProperty property) => $"{property.propertyPath}__Layer";
+        // private static string NameLayer(SerializedProperty property) => $"{property.propertyPath}__Layer";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Layer_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
@@ -33,15 +28,15 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    LayerIntDropdown layerIntDropdown = new LayerIntDropdown();
-                    layerIntDropdown.BindProperty(property);
-                    return new LayerIntField(GetPreferredLabel(property), layerIntDropdown);
+                    LayerIntDropdownElement intDropdownElement = new LayerIntDropdownElement();
+                    intDropdownElement.BindProperty(property);
+                    return new IntDropdownField(GetPreferredLabel(property), intDropdownElement);
                 }
                 case SerializedPropertyType.String:
                 {
-                    LayerStringDropdown layerStringDropdown = new LayerStringDropdown();
-                    layerStringDropdown.BindProperty(property);
-                    return new LayerStringField(GetPreferredLabel(property), layerStringDropdown);
+                    LayerStringDropdownElement layerStringStringDropdown = new LayerStringDropdownElement();
+                    layerStringStringDropdown.BindProperty(property);
+                    return new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
                 }
                 default:
                     return new VisualElement();
@@ -88,15 +83,15 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    LayerIntField layerIntField = container.Q<LayerIntField>();
-                    AddContextualMenuManipulator(layerIntField, property, onValueChangedCallback, info, parent);
+                    IntDropdownField intDropdownField = container.Q<IntDropdownField>();
+                    AddContextualMenuManipulator(intDropdownField, property, onValueChangedCallback, info, parent);
 
-                    layerIntField.Button.clicked += () => MakeDropdown(property, layerIntField, onValueChangedCallback, info, parent);
+                    intDropdownField.Button.clicked += () => MakeDropdown(property, intDropdownField, onValueChangedCallback, info, parent);
                 }
                     break;
                 case SerializedPropertyType.String:
                 {
-                    LayerStringField layerStringField = container.Q<LayerStringField>();
+                    StringDropdownField layerStringField = container.Q<StringDropdownField>();
                     AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
 
                     layerStringField.Button.clicked += () => MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
@@ -392,9 +387,10 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             AdvancedDropdownList<LayerUtils.LayerInfo> dropdown = new AdvancedDropdownList<LayerUtils.LayerInfo>();
             if (isString)
             {
-                dropdown.Add("[None]", new LayerUtils.LayerInfo(string.Empty, -1));
+                dropdown.Add("[Empty String]", new LayerUtils.LayerInfo(string.Empty, -1));
+                dropdown.AddSeparator();
             }
-            dropdown.AddSeparator();
+
             bool hasSelected = false;
             LayerUtils.LayerInfo selected = new LayerUtils.LayerInfo("", -9999);
             foreach (LayerUtils.LayerInfo layerInfo in LayerUtils.GetAllLayers())
@@ -410,7 +406,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             }
 
             dropdown.AddSeparator();
-            dropdown.Add("Edit Layers...", new LayerUtils.LayerInfo("", -2));
+            dropdown.Add("Edit Layers...", new LayerUtils.LayerInfo("", -2), false, "d_editicon.sml");
 
             AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
             {
@@ -426,7 +422,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 root.worldBound.width,
                 maxHeight,
                 false,
-                (newDisplay, curItem) =>
+                (_, curItem) =>
                 {
                     LayerUtils.LayerInfo layerInfo = (LayerUtils.LayerInfo)curItem;
                     switch (layerInfo.Value)
@@ -474,54 +470,54 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             UnityEditor.PopupWindow.Show(worldBound, sa);
         }
 
-        private static bool RefreshHelpBox(SerializedProperty property, HelpBox helpBox)
+        private static void RefreshHelpBox(SerializedProperty property, HelpBox helpBox)
         {
             string errorMessage = GetErrorMessage(property);
-            bool noError = string.IsNullOrEmpty(errorMessage);
+            // bool noError = string.IsNullOrEmpty(errorMessage);
             if (helpBox.text == errorMessage)
             {
-                return noError;
+                return;
             }
 
             helpBox.text = errorMessage;
             helpBox.style.display = string.IsNullOrEmpty(errorMessage)? DisplayStyle.None: DisplayStyle.Flex;
-            return noError;
+            // return;
         }
 
-        private static (bool found, LayerUtils.LayerInfo info) FindLayerFromCopy()
-        {
-            IReadOnlyList<LayerUtils.LayerInfo> allLayers = LayerUtils.GetAllLayers();
-
-            string pasteName = EditorGUIUtility.systemCopyBuffer;
-
-            foreach (LayerUtils.LayerInfo layerInfo in allLayers)
-            {
-                if(layerInfo.Name == pasteName)
-                {
-                    return (true, layerInfo);
-                }
-            }
-#if SAINTSFIELD_NEWTONSOFT_JSON
-            int intValue;
-            try
-            {
-                intValue = JsonConvert.DeserializeObject<int>(pasteName);
-            }
-            catch (Exception)
-            {
-                return (false, default);
-            }
-
-            foreach (LayerUtils.LayerInfo layerInfo in allLayers)
-            {
-                if (layerInfo.Value == intValue)
-                {
-                    return (true, layerInfo);
-                }
-            }
-#endif
-            return (false, default);
-        }
+//         private static (bool found, LayerUtils.LayerInfo info) FindLayerFromCopy()
+//         {
+//             IReadOnlyList<LayerUtils.LayerInfo> allLayers = LayerUtils.GetAllLayers();
+//
+//             string pasteName = EditorGUIUtility.systemCopyBuffer;
+//
+//             foreach (LayerUtils.LayerInfo layerInfo in allLayers)
+//             {
+//                 if(layerInfo.Name == pasteName)
+//                 {
+//                     return (true, layerInfo);
+//                 }
+//             }
+// #if SAINTSFIELD_NEWTONSOFT_JSON
+//             int intValue;
+//             try
+//             {
+//                 intValue = JsonConvert.DeserializeObject<int>(pasteName);
+//             }
+//             catch (Exception)
+//             {
+//                 return (false, default);
+//             }
+//
+//             foreach (LayerUtils.LayerInfo layerInfo in allLayers)
+//             {
+//                 if (layerInfo.Value == intValue)
+//                 {
+//                     return (true, layerInfo);
+//                 }
+//             }
+// #endif
+//             return (false, default);
+//         }
 
     }
 }
