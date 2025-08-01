@@ -1,21 +1,22 @@
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.UIToolkitElements;
-using UnityEngine;
+using UnityEditorInternal;
 
-namespace SaintsField.Editor.Drawers.SortingLayerDrawer
+namespace SaintsField.Editor.Drawers.TagDrawer
 {
-    public class SortingLayerStringElement: StringDropdownElement
+    public class TagElement: StringDropdownElement
     {
         public override void SetValueWithoutNotify(string newValue)
         {
             CachedValue = newValue;
 
-            foreach (SortingLayer layer in SortingLayer.layers)
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (string tags in InternalEditorUtility.tags)
             {
                 // ReSharper disable once InvertIf
-                if (layer.name == newValue)
+                if (tags == newValue)
                 {
-                    Label.text = $"{layer.name} <color=#808080>({layer.id})</color>";
+                    Label.text = newValue;
                     return;
                 }
             }

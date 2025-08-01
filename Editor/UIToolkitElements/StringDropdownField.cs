@@ -8,7 +8,7 @@ namespace SaintsField.Editor.UIToolkitElements
     {
         protected readonly Label Label;
 
-        protected string Value = null;
+        protected string CachedValue = null;
 
         public readonly Button Button;
 
@@ -30,10 +30,10 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public string value
         {
-            get => Value;
+            get => CachedValue;
             set
             {
-                if (Value == value)
+                if (CachedValue == value)
                 {
                     return;
                 }
