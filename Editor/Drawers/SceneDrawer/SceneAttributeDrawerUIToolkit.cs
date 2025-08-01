@@ -243,29 +243,6 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
             UnityEditor.PopupWindow.Show(worldBound, sa);
         }
-
-
-        // private static (int index, string displayName) GetSelected(SerializedProperty property, SceneAttribute sceneAttribute)
-        // {
-        //     string[] scenes = SceneUtils.GetTrimedScenePath(sceneAttribute.FullPath).ToArray();
-        //     if (property.propertyType == SerializedPropertyType.String)
-        //     {
-        //         string scene = property.stringValue;
-        //         int index = Array.IndexOf(scenes, scene);
-        //         return (index, index == -1 ? scene : $"{index}: {scene}");
-        //     }
-        //     else
-        //     {
-        //         int index = property.intValue;
-        //         if (index >= scenes.Length)
-        //         {
-        //             return (-1, $"{index}: ?");
-        //         }
-        //
-        //         string scene = scenes[index];
-        //         return (index, $"{index}: {scene}");
-        //     }
-        // }
     }
 }
 #endif

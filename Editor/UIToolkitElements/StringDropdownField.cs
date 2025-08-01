@@ -8,7 +8,7 @@ namespace SaintsField.Editor.UIToolkitElements
     {
         protected readonly Label Label;
 
-        protected string Value = "";
+        protected string Value = null;
 
         public readonly Button Button;
 

@@ -1,7 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.UIToolkitElements;
-using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.SceneDrawer
 {
@@ -28,7 +27,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 }
             }
 
-            Label.text = $"<color=red>?</color> ({newValue})";
+            Label.text = $"<color=red>?</color> {(string.IsNullOrEmpty(newValue)? "": $"({newValue})")}";
         }
     }
 }

@@ -12,5 +12,8 @@ namespace SaintsField.Samples.Scripts
         [Scene] public int sceneInt;
         [Scene] public string sceneString;
         [Scene(fullPath: true)] public string sceneFullPathString;
+
+        [SortingLayer] public string sortingLayerString;
+        [SortingLayer] public int sortingLayerInt;
     }
 }
