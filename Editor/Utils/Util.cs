@@ -275,7 +275,8 @@ namespace SaintsField.Editor.Utils
                             property.intValue = (int)newValueUInt;
                             break;
                         default:
-                            property.intValue = (int)newValue;
+                            // property.intValue = (int)newValue;
+                            property.intValue = Convert.ToInt32(newValue);
                             break;
                     }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_SET_VALUE

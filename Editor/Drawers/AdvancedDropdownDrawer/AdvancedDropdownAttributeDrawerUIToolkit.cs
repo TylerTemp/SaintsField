@@ -79,14 +79,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
 
-            try
-            {
-                dropdownButton.BindProperty(property);
-            }
-            catch(IndexOutOfRangeException)
-            {
-                // wtf Unity...
-            }
+            // try
+            // {
+            //     dropdownButton.BindProperty(property);
+            // }
+            // catch(IndexOutOfRangeException)
+            // {
+            //     // wtf Unity...
+            // }
 
             UIToolkitUtils.AddContextualMenuManipulator(dropdownButton.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
