@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
     public partial class ShaderParamAttributeDrawer
     {
-        private static string DropdownButtonName(SerializedProperty property) => $"{property.propertyPath}__ShaderParam_DropdownButton";
+        // private static string DropdownButtonName(SerializedProperty property) => $"{property.propertyPath}__ShaderParam_DropdownButton";
         private static string HelpBoxName(SerializedProperty property) => $"{property.propertyPath}__ShaderParam_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
@@ -39,9 +39,9 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 }
                 case SerializedPropertyType.String:
                 {
-                    ShaderParamStringElement layerStringStringDropdown = new ShaderParamStringElement(shaderParamAttribute.PropertyType);
-                    layerStringStringDropdown.BindProperty(property);
-                    return new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
+                    ShaderParamStringElement shaderParamStringElement = new ShaderParamStringElement(shaderParamAttribute.PropertyType);
+                    shaderParamStringElement.BindProperty(property);
+                    return new StringDropdownField(GetPreferredLabel(property), shaderParamStringElement);
                 }
                 default:
                     return new VisualElement();
@@ -87,6 +87,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
             ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
 
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Integer:

@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.24.3 ##
+
+1.  Fix `enum` of `byte` type gives error on picker
+2.  Add blue indicator for prefab modification in:
+    *   `Layer`
+    *   `Scene`
+    *   `SortingLayer`
+    *   `Tag`
+    *   `InputAxis`
+    *   `ShaderParam`
+    *   `ShaderKeyword`
+
 ## 4.24.2 ##
 
 1.  UI Toolkit: Attempting to inherit the existing Unity context menu in nested classes when right-click on a field [#254](https://github.com/TylerTemp/SaintsField/issues/254)
