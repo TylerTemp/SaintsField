@@ -25,5 +25,9 @@ namespace SaintsField.Samples.Scripts
         [ShaderParam(ShaderPropertyType.Color)] public int shaderParamInt;
 
         [ShaderKeyword] public string shaderKeyword;
+
+        [Rate(0, 5)] public int rate05;
+        [Rate(1, 5)] public int rate15;
+        [Rate(3, 5)] public int rate35;
     }
 }
