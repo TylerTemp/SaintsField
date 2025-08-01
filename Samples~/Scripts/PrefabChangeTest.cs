@@ -17,5 +17,7 @@ namespace SaintsField.Samples.Scripts
         [SortingLayer] public int sortingLayerInt;
 
         [Tag] public string tagString;
+
+        [InputAxis] public string inputAxisString;
     }
 }

@@ -35823,6 +35823,10 @@ PrefabInstance:
       value: _Preload
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: inputAxisString
+      value: Mouse ScrollWheel
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: sortingLayerInt
       value: 5
       objectReference: {fileID: 0}
