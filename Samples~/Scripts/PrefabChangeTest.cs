@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace SaintsField.Samples.Scripts
 {
@@ -19,5 +20,8 @@ namespace SaintsField.Samples.Scripts
         [Tag] public string tagString;
 
         [InputAxis] public string inputAxisString;
+
+        [ShaderParam] public string shaderParamString;
+        [ShaderParam(ShaderPropertyType.Color)] public int shaderParamInt;
     }
 }

@@ -5,9 +5,12 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.SceneDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -23,10 +26,26 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
-            dropdownButton.name = DropdownButtonName(property);
-            dropdownButton.AddToClassList(ClassAllowDisable);
-            return dropdownButton;
+            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute) saintsAttribute;
+
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Integer:
+                {
+                    ShaderParamIntElement intDropdownElement = new ShaderParamIntElement(shaderParamAttribute.PropertyType);
+                    intDropdownElement.BindProperty(property);
+                    return new IntDropdownField(GetPreferredLabel(property), intDropdownElement);
+                }
+                case SerializedPropertyType.String:
+                {
+                    ShaderParamStringElement layerStringStringDropdown = new ShaderParamStringElement(shaderParamAttribute.PropertyType);
+                    layerStringStringDropdown.BindProperty(property);
+                    return new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
+                }
+                default:
+                    return new VisualElement();
+            }
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -34,171 +53,286 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            return new HelpBox("", HelpBoxMessageType.Error)
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (property.propertyType)
             {
-                style =
-                {
-                    display = DisplayStyle.None,
-                    flexGrow = 1,
-                },
-                name = HelpBoxName(property),
-            };
+                case SerializedPropertyType.Integer:
+                case SerializedPropertyType.String:
+                    return new HelpBox("", HelpBoxMessageType.Error)
+                    {
+                        style =
+                        {
+                            display = DisplayStyle.None,
+                            flexGrow = 1,
+                        },
+                        name = HelpBoxName(property),
+                    };
+                default:
+                    return new HelpBox($"Type {property.propertyType} is not int or string.", HelpBoxMessageType.Error)
+                    {
+                        style =
+                        {
+                            flexGrow = 1,
+                        },
+                    };
+            }
         }
+
+        private Shader _currentShader;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
+            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
 
-            string typeMismatchError = GetTypeMismatchError(property);
-            if (typeMismatchError != "")
+            switch (property.propertyType)
             {
-                if(helpBox.text != typeMismatchError)
+                case SerializedPropertyType.Integer:
                 {
-                    helpBox.text = typeMismatchError;
-                    helpBox.style.display = DisplayStyle.Flex;
+                    IntDropdownField intDropdownField = container.Q<IntDropdownField>();
+                    AddContextualMenuManipulator(helpBox, shaderParamAttribute, intDropdownField, property, onValueChangedCallback, info, parent);
+
+                    intDropdownField.Button.clicked += () => MakeDropdown(property, shaderParamAttribute, helpBox, intDropdownField, onValueChangedCallback, info, parent);
                 }
-                return;
+                    break;
+                case SerializedPropertyType.String:
+                {
+                    StringDropdownField stringDropdownField = container.Q<StringDropdownField>();
+                    AddContextualMenuManipulator(helpBox, shaderParamAttribute, stringDropdownField, property, onValueChangedCallback, info, parent);
+
+                    stringDropdownField.Button.clicked += () => MakeDropdown(property, shaderParamAttribute, helpBox,stringDropdownField, onValueChangedCallback, info, parent);
+                }
+                    break;
+                default:
+                    return;
             }
 
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute) saintsAttribute;
+        }
 
-            UpdateDisplay(container, shaderParamAttribute, property, info, parent);
+        private void AddContextualMenuManipulator(HelpBox helpBox, ShaderParamAttribute shaderParamAttribute, VisualElement root, SerializedProperty property,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            UIToolkitUtils.AddContextualMenuManipulator(root, property,
+                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
-            UIToolkitUtils.AddContextualMenuManipulator(dropdownButton.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
-            dropdownButton.ButtonElement.clicked += () =>
+            bool isString = property.propertyType == SerializedPropertyType.String;
+            root.AddManipulator(new ContextualMenuManipulator(evt =>
             {
-                (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
-                if (error != "")
+                string clipboardText = EditorGUIUtility.systemCopyBuffer;
+                if (string.IsNullOrEmpty(clipboardText))
                 {
-#if SAINTSFIELD_DEBUG
-                    Debug.LogError(error);
-#endif
-                    UpdateDisplay(container, shaderParamAttribute, property, info, parent);
                     return;
                 }
 
-                ShaderInfo[] shaderInfos = GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
-                (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, shaderInfos);
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(foundShaderInfo, selectedShaderInfo, shaderInfos, false);
-
-                float maxHeight = Screen.currentResolution.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
-                Rect worldBound = dropdownButton.worldBound;
-                if (maxHeight < 100)
+                (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
+                UpdateHelpBox(helpBox, error);
+                if (error != "")
                 {
-                    worldBound.y -= 100 + worldBound.height;
-                    maxHeight = 100;
+                    return;
                 }
 
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
-                    dropdownMetaInfo,
-                    dropdownButton.worldBound.width,
-                    maxHeight,
-                    false,
-                    (_, curItem) =>
-                    {
-                        ShaderInfo shaderInfo = (ShaderInfo) curItem;
-                        // ReSharper disable once ConvertIfStatementToSwitchStatement
-                        if (property.propertyType == SerializedPropertyType.String)
-                        {
-                            property.stringValue = shaderInfo.PropertyName;
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback(shaderInfo.PropertyName);
-                        }
-                        else if (property.propertyType == SerializedPropertyType.Integer)
-                        {
-                            property.intValue = shaderInfo.PropertyID;
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback(shaderInfo.PropertyID);
-                        }
-                    }
-                ));
-            };
-        }
-
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
-        {
-            // Debug.Log(newValue);
-            UpdateDisplay(container, (ShaderParamAttribute) saintsAttribute, property, info, parent);
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            VisualElement container, string labelOrNull, IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried,
-            RichTextDrawer richTextDrawer)
-        {
-            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
-            UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
-        }
-
-        private static void UpdateDisplay(VisualElement container, ShaderParamAttribute shaderParamAttribute, SerializedProperty property, FieldInfo info, object parent)
-        {
-            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(DropdownButtonName(property));
-            HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
-
-            (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
-            if (error != "")
-            {
-                // dropdownButton.SetEnabled(false);
-
-                // ReSharper disable once InvertIf
-                if(helpBox.text != error)
+                if (shader != _currentShader)
                 {
-                    helpBox.text = error;
-                    helpBox.style.display = DisplayStyle.Flex;
+                    _currentShader = shader;
+                    if (isString)
+                    {
+                        root.Q<ShaderParamStringElement>().BindShader(shader);
+                    }
+                    else
+                    {
+                        root.Q<ShaderParamIntElement>().BindShader(shader);
+                    }
                 }
 
-                return;
-            }
+                bool canBeInt = int.TryParse(clipboardText, out int clipboardInt);
 
-            (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, GetShaderInfo(shader, shaderParamAttribute.PropertyType));
-
-            if(!foundShaderInfo)
-            {
-                // dropdownButton.SetEnabled(true);
-                string notFoundError;
-                if (property.propertyType == SerializedPropertyType.String)
+                if (isString)
                 {
-                    string stringValue = property.stringValue;
-                    if (string.IsNullOrEmpty(stringValue))
+                    foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType))
                     {
-                        // ReSharper disable once InvertIf
-                        if(helpBox.style.display != DisplayStyle.None)
+                        if (shaderCustomInfo.PropertyName == clipboardText)
                         {
-                            helpBox.text = "";
-                            helpBox.style.display = DisplayStyle.None;
+                            evt.menu.AppendAction($"Paste \"{shaderCustomInfo.PropertyName}\"", _ =>
+                            {
+                                property.stringValue = shaderCustomInfo.PropertyName;
+                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyName);
+                                property.serializedObject.ApplyModifiedProperties();
+                                onValueChangedCallback.Invoke(shaderCustomInfo.PropertyName);
+                            });
+                            return;
                         }
-                        return;
                     }
-
-                    notFoundError = $"{stringValue} not found in shader";
                 }
                 else
                 {
-                    notFoundError = $"{property.intValue} not found in shader";
+                    foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType))
+                    {
+                        if (shaderCustomInfo.PropertyName == clipboardText
+                            || canBeInt && shaderCustomInfo.PropertyID == clipboardInt)
+                        {
+                            evt.menu.AppendAction($"Paste \"{shaderCustomInfo.PropertyName}\"({shaderCustomInfo.PropertyID})", _ =>
+                            {
+                                property.intValue = shaderCustomInfo.PropertyID;
+                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyID);
+                                property.serializedObject.ApplyModifiedProperties();
+                                onValueChangedCallback.Invoke(shaderCustomInfo.PropertyID);
+                            });
+                            return;
+                        }
+                    }
                 }
-                // ReSharper disable once InvertIf
-                if(helpBox.text != notFoundError)
-                {
-                    helpBox.text = notFoundError;
-                    helpBox.style.display = DisplayStyle.Flex;
-                }
+            }));
+        }
+
+        private static void UpdateHelpBox(HelpBox helpBox, string error)
+        {
+            if (helpBox.text == error)
+            {
                 return;
             }
 
-            if(helpBox.text != "")
+            if (string.IsNullOrEmpty(error))
             {
-                helpBox.text = "";
                 helpBox.style.display = DisplayStyle.None;
+                helpBox.text = "";
+            }
+            else
+            {
+                helpBox.text = error;
+                helpBox.style.display = DisplayStyle.Flex;
+            }
+        }
+
+        private void MakeDropdown(SerializedProperty property, ShaderParamAttribute shaderParamAttribute, HelpBox helpBox, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
+            UpdateHelpBox(helpBox, error);
+            if (error != "")
+            {
+                return;
             }
 
-            // dropdownButton.SetEnabled(true);
-            string label = selectedShaderInfo.ToString();
-            if (dropdownButton.ButtonLabelElement.text != label)
+            bool isString = property.propertyType == SerializedPropertyType.String;
+
+            if (_currentShader != shader)
             {
-                dropdownButton.ButtonLabelElement.text = label;
+                _currentShader = shader;
+                if (isString)
+                {
+                    root.Q<ShaderParamStringElement>().BindShader(shader);
+                }
+                else
+                {
+                    root.Q<ShaderParamIntElement>().BindShader(shader);
+                }
             }
+
+            AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo> dropdown = new AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo>();
+            if (isString)
+            {
+                dropdown.Add("[Empty String]", new ShaderParamUtils.ShaderCustomInfo("", "", default, -1));
+                dropdown.AddSeparator();
+            }
+
+            bool selected = false;
+            ShaderParamUtils.ShaderCustomInfo selectedInfo = default;
+            foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType))
+            {
+                // dropdown.Add(path, (path, index));
+                dropdown.Add(shaderCustomInfo.GetString(false), shaderCustomInfo);
+                // ReSharper disable once InvertIf
+                if (isString && shaderCustomInfo.PropertyName == property.stringValue
+                    || !isString && shaderCustomInfo.PropertyID == property.intValue)
+                {
+                    selected = true;
+                    selectedInfo = shaderCustomInfo;
+                }
+            }
+
+            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            {
+                CurValues = selected ? new object[] { selectedInfo } : Array.Empty<object>(),
+                DropdownListValue = dropdown,
+                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+            };
+
+            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
+                metaInfo,
+                root.worldBound.width,
+                maxHeight,
+                false,
+                (_, curItem) =>
+                {
+                    ShaderParamUtils.ShaderCustomInfo shaderCustomInfo = (ShaderParamUtils.ShaderCustomInfo)curItem;
+                    if (isString)
+                    {
+                        property.stringValue = shaderCustomInfo.PropertyName;
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyName);
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback.Invoke(shaderCustomInfo.PropertyName);
+                    }
+                    else
+                    {
+                        property.intValue = shaderCustomInfo.PropertyID;
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderCustomInfo.PropertyID);
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback.Invoke(shaderCustomInfo.PropertyID);
+                    }
+                }
+            );
+
+            UnityEditor.PopupWindow.Show(worldBound, sa);
+        }
+
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        {
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (parent == null)
+            {
+                return;
+            }
+
+            bool isString = property.propertyType == SerializedPropertyType.String;
+
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Integer:
+                case SerializedPropertyType.String:
+                {
+                    ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+                    HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
+
+                    (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
+                    UpdateHelpBox(helpBox, error);
+                    if (error != "")
+                    {
+                        return;
+                    }
+
+                    if (_currentShader != shader)
+                    {
+                        _currentShader = shader;
+                        if (isString) {
+                            container.Q<ShaderParamStringElement>().BindShader(shader);
+                        }
+                        else
+                        {
+                            container.Q<ShaderParamIntElement>().BindShader(shader);
+                        }
+                    }
+                }
+                    break;
+                default:
+                    return;
+            }
+
+
         }
     }
 }

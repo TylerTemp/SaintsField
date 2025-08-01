@@ -6,11 +6,8 @@ using System.Reflection;
 using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
@@ -30,66 +27,9 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             return "";
         }
 
-
-
-        private struct ShaderInfo
+        private static (bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo selectedShaderInfo) GetSelectedShaderInfo(SerializedProperty property, IEnumerable<ShaderParamUtils.ShaderCustomInfo> shaderInfos)
         {
-            public string PropertyName;
-            public string PropertyDescription;
-            public ShaderPropertyType PropertyType;
-            public int PropertyID;
-
-            public override string ToString()
-            {
-                // Debug.Log(ObjectNames.NicifyVariableName("_dstA"));
-                // Debug.Log($"{PropertyName.Replace("_", "")} -> {PropertyDescription?.Replace("_", "").Replace(" ", "")}");
-                string properyName;
-                if (string.Equals(PropertyName.Replace("_", ""), PropertyDescription?.Replace("_", "").Replace(" ", ""),
-                        StringComparison.CurrentCultureIgnoreCase))
-                {
-                    properyName = ObjectNames.NicifyVariableName(PropertyDescription);
-                }
-                else if (string.IsNullOrEmpty(PropertyDescription))
-                {
-                    properyName = PropertyName;
-                }
-                else
-                {
-                    properyName = $"{ObjectNames.NicifyVariableName(PropertyDescription)}: {PropertyName}";
-                }
-                return $"{properyName} [{PropertyType}]";
-            }
-        }
-
-        private static IEnumerable<ShaderInfo> GetShaderInfo(Shader shader, ShaderPropertyType? filterPropertyType)
-        {
-            for (int index = 0; index < shader.GetPropertyCount(); index++)
-            {
-                string propertyName = shader.GetPropertyName(index);
-                string propertyDescription = shader.GetPropertyDescription(index);
-                ShaderPropertyType propertyType = shader.GetPropertyType(index);
-
-                if(filterPropertyType != null && propertyType != (ShaderPropertyType)filterPropertyType)
-                {
-                    continue;
-                }
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SHADER_PARAM
-                Debug.Log($"#ShaderParam# Property Name: {propertyName}, Property Type: {propertyType}");
-#endif
-                yield return new ShaderInfo
-                {
-                    PropertyName = propertyName,
-                    PropertyDescription = propertyDescription,
-                    PropertyType = propertyType,
-                    PropertyID = Shader.PropertyToID(propertyName),
-                };
-            }
-        }
-
-        private static (bool foundShaderInfo, ShaderInfo selectedShaderInfo) GetSelectedShaderInfo(SerializedProperty property, IEnumerable<ShaderInfo> shaderInfos)
-        {
-            foreach (ShaderInfo shaderInfo in shaderInfos)
+            foreach (ShaderParamUtils.ShaderCustomInfo shaderInfo in shaderInfos)
             {
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
                 if (property.propertyType == SerializedPropertyType.String &&
@@ -108,16 +48,16 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             return (false, default);
         }
 
-        private static AdvancedDropdownMetaInfo GetMetaInfo(bool foundShaderInfo, ShaderInfo selectedShaderInfo, IEnumerable<ShaderInfo> shaderInfos, bool isImGui)
+        private static AdvancedDropdownMetaInfo GetMetaInfo(bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo selectedShaderInfo, IEnumerable<ShaderParamUtils.ShaderCustomInfo> shaderInfos, bool isImGui)
         {
-            AdvancedDropdownList<ShaderInfo> dropdownListValue =
-                new AdvancedDropdownList<ShaderInfo>(isImGui? "Shader Parameters": "");
+            AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo> dropdownListValue =
+                new AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo>(isImGui? "Shader Parameters": "");
 
             IReadOnlyList<object> curValues = foundShaderInfo
                 ? new[] { (object)selectedShaderInfo }
                 : Array.Empty<object>();
 
-            foreach (ShaderInfo shaderInfo in shaderInfos)
+            foreach (ShaderParamUtils.ShaderCustomInfo shaderInfo in shaderInfos)
             {
                 dropdownListValue.Add(shaderInfo.ToString(), shaderInfo);
             }
@@ -168,8 +108,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 };
             }
 
-            ShaderInfo[] shaderInfos = GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
-            (bool foundShaderInfo, ShaderInfo _) = GetSelectedShaderInfo(property, shaderInfos);
+            ShaderParamUtils.ShaderCustomInfo[] shaderInfos = ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
+            (bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo _) = GetSelectedShaderInfo(property, shaderInfos);
             if (!foundShaderInfo)
             {
                 return new AutoRunnerFixerResult

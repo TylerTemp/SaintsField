@@ -77,8 +77,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 return;
             }
 
-            ShaderInfo[] shaderInfos = GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
-            (bool foundShaderInfo, ShaderInfo selectedShaderInfo) = GetSelectedShaderInfo(property, GetShaderInfo(shader, shaderParamAttribute.PropertyType));
+            ShaderParamUtils.ShaderCustomInfo[] shaderInfos = ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
+            (bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo selectedShaderInfo) = GetSelectedShaderInfo(property, ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType));
 
             Rect dropdownButtonRect = EditorGUI.PrefixLabel(position, label);
             if(EditorGUI.DropdownButton(dropdownButtonRect, new GUIContent(foundShaderInfo? selectedShaderInfo.ToString(): "-"), FocusType.Keyboard))
@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     new AdvancedDropdownState(),
                     curItem =>
                     {
-                        ShaderInfo shaderInfo = (ShaderInfo) curItem;
+                        ShaderParamUtils.ShaderCustomInfo shaderInfo = (ShaderParamUtils.ShaderCustomInfo) curItem;
                         // ReSharper disable once ConvertIfStatementToSwitchStatement
                         if (property.propertyType == SerializedPropertyType.String)
                         {

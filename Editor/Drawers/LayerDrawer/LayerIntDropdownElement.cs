@@ -8,7 +8,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
     {
         public override void SetValueWithoutNotify(int newValue)
         {
-            Value = newValue;
+            CachedValue = newValue;
 
             foreach (LayerUtils.LayerInfo layerInfo in LayerUtils.GetAllLayers())
             {

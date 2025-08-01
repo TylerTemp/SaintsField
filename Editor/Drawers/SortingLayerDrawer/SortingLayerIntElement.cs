@@ -8,7 +8,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
     {
         public override void SetValueWithoutNotify(int newValue)
         {
-            Value = newValue;
+            CachedValue = newValue;
 
             foreach (SortingLayer layer in SortingLayer.layers)
             {

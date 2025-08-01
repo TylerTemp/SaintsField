@@ -8,7 +8,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
     {
         public override void SetValueWithoutNotify(int newValue)
         {
-            Value = newValue;
+            CachedValue = newValue;
 
             foreach ((string scenePath, int index) in SceneUtils.GetTrimedScenePath(false).WithIndex())
             {
