@@ -103,11 +103,17 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.24.2**
+**4.24.3**
 
-1.  UI Toolkit: Attempting to inherit the existing Unity context menu in nested classes when right-click on a field [#254](https://github.com/TylerTemp/SaintsField/issues/254)
-2.  UI Toolkit: Fix `AdvancedDropdown` can not show the changed indicator (blue line on left) in prefab when edited. This also fixes enum dropdown if you have `SaintsEditor` enabled
-3.  UI Toolkit: Fix `ResiableTextArea` label did not have a right-click context menu
+1.  Fix `enum` of `byte` type gives error on picker
+2.  Add blue indicator for prefab modification in:
+    *   `Layer`
+    *   `Scene`
+    *   `SortingLayer`
+    *   `Tag`
+    *   `InputAxis`
+    *   `ShaderParam`
+    *   `ShaderKeyword`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
