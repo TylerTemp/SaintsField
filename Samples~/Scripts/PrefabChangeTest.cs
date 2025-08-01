@@ -20,10 +20,11 @@ namespace SaintsField.Samples.Scripts
         [Tag] public string tagString;
 
         [InputAxis] public string inputAxisString;
-
+#if UNITY_2021_2_OR_NEWER
         [ShaderParam] public string shaderParamString;
         [ShaderParam(ShaderPropertyType.Color)] public int shaderParamInt;
 
         [ShaderKeyword] public string shaderKeyword;
+#endif
     }
 }
