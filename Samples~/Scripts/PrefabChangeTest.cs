@@ -41,5 +41,13 @@ namespace SaintsField.Samples.Scripts
 
         [AnimatorParam] public string animParamName;
         [AnimatorParam] public int animParamHash;
+
+        // Broken...
+        [AnimatorState] public string stateName;
+        [AnimatorState] public AnimatorStateBase  stateBase;
+        [AnimatorState] public AnimatorState state;
+
+        [CurveRange(EColor.Orange)]
+        public AnimationCurve curve1;
     }
 }

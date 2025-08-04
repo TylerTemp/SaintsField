@@ -14,6 +14,7 @@ namespace SaintsField.Editor.Drawers.Addressable
     public static class AddressableUtil
     {
         public const string ErrorNoSettings = "Addressable has no settings created yet.";
+
         public static void OpenGroupEditor() => EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
         public static void OpenLabelEditor()
         {
