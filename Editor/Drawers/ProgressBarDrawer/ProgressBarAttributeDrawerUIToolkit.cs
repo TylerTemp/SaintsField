@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -104,6 +105,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             progressBarField.AddToClassList(ProgressBarField.alignedFieldUssClassName);
 
             progressBarField.AddToClassList(ClassAllowDisable);
+            progressBarField.BindProperty(property);
 
             return progressBarField;
         }

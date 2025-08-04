@@ -225,6 +225,7 @@ namespace SaintsField.Editor.Drawers.RateDrawer
     {
         public RateField(string label, RateElement visualInput) : base(label, visualInput)
         {
+            AddToClassList(alignedFieldUssClassName);
         }
     }
 }

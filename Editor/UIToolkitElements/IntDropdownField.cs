@@ -1,4 +1,5 @@
 #if UNITY_2021_3_OR_NEWER
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEngine.UIElements;
 
@@ -55,6 +56,8 @@ namespace SaintsField.Editor.UIToolkitElements
         public IntDropdownField(string label, IntDropdownElement intDropdownElement) : base(label, intDropdownElement)
         {
             Button = intDropdownElement.Button;
+            AddToClassList(alignedFieldUssClassName);
+            AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
         }
     }
 }

@@ -50,6 +50,23 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             public float FreeMax;
         }
 
+        // Oh hell... I don't want to properly do this anymore
+        private class BindableV2IntField: BaseField<Vector2Int>
+        {
+            public BindableV2IntField(VisualElement visualInput) : base(null, visualInput)
+            {
+                style.marginLeft = style.marginRight = 0;
+            }
+        }
+
+        public class BindableV2Field : BaseField<Vector2>
+        {
+            public BindableV2Field(VisualElement visualInput) : base(null, visualInput)
+            {
+                style.marginLeft = style.marginRight = 0;
+            }
+        }
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
@@ -159,7 +176,20 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
             minMaxSliderField.AddToClassList(ClassAllowDisable);
 
-            return minMaxSliderField;
+            if (isInt)
+            {
+                BindableV2IntField wrapper = new BindableV2IntField(minMaxSliderField);
+                wrapper.BindProperty(property);
+                return wrapper;
+            }
+            else
+            {
+                BindableV2Field wrapper = new BindableV2Field(minMaxSliderField);
+                wrapper.BindProperty(property);
+                return wrapper;
+            }
+
+            // return minMaxSliderField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -560,6 +590,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             Action<object> onValueChangedCallback, MinMaxSliderAttribute sliderAttribute, VisualElement container,
             FieldInfo info, object parent)
         {
+            // ReSharper disable once InlineTemporaryVariable
             Vector2Int vector2IntValue = sliderValue;
 
             AdjustFreeRangeHighAndLow(sliderValue, property, sliderAttribute, container, info, parent);

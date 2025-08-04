@@ -5,8 +5,9 @@ namespace SaintsField.Samples.Scripts
 {
     public class PrefabChangeTest : MonoBehaviour
     {
+        public string justString;
         [ResizableTextArea] public string text;
-        [PropRange(0, 100)] public int intValue;
+        [PropRange(0, 100)] public int propRange;
         [Layer] public string layerString;
         [Layer] public int layerInt;
 
@@ -30,5 +31,15 @@ namespace SaintsField.Samples.Scripts
         [Rate(0, 5)] public int rate05;
         [Rate(1, 5)] public int rate15;
         [Rate(3, 5)] public int rate35;
+
+        [MinMaxSlider(0, 10)] public Vector2Int minMaxInt;
+        [MinMaxSlider(0, 10)] public Vector2 minMaxFloat;
+
+        [ProgressBar(10)] public int progressBarInt;
+        [ProgressBar(10)] public float progressBarFloat;
+
+
+        [AnimatorParam] public string animParamName;
+        [AnimatorParam] public int animParamHash;
     }
 }
