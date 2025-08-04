@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
-    public abstract class IntDropdownElement : BindableElement, INotifyValueChanged<int>
+    public abstract class IntDropdownElement: BindableElement, INotifyValueChanged<int>
     {
         protected readonly Label Label;
 

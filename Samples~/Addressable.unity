@@ -406,6 +406,10 @@ PrefabInstance:
       value: Assets/RawResources/CharacterSkills/PassiveSkills/Prefab/YeLi.prefab
       objectReference: {fileID: 0}
     - target: {fileID: 4438151812269061222, guid: 72f2e1e76d13cee4db172e734dc9f767, type: 3}
+      propertyPath: sceneKeySep
+      value: Assets/SaintsField/Samples/Example.unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 4438151812269061222, guid: 72f2e1e76d13cee4db172e734dc9f767, type: 3}
       propertyPath: addressableLabel
       value: Chapter3
       objectReference: {fileID: 0}

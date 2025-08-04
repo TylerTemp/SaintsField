@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/PropertyFieldHideSelector.uss?fileID=7433441132597879392&amp;guid=4d2b9a87d9e64199908e325e25ba0049&amp;type=3#PropertyFieldHideSelector" />
+    <ui:VisualElement style="flex-grow: 1; flex-direction: row; height: 20px; margin-top: 1px; margin-bottom: 1px;">
+        <uie:ObjectField type="UnityEditor.SceneAsset, UnityEditor.CoreModule" style="border-top-left-radius: 5px; border-top-right-radius: 0; border-bottom-right-radius: 0; border-bottom-left-radius: 5px; flex-grow: 1;" />
+        <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" style="background-image: url(&apos;project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/d_pick_uielements.png?fileID=2800000&amp;guid=9cacc81429021374fa61b5995e0ca7da&amp;type=3#d_pick_uielements&apos;); -unity-background-scale-mode: scale-to-fit; border-top-left-radius: 0; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; width: 18px;" />
+    </ui:VisualElement>
+</ui:UXML>
