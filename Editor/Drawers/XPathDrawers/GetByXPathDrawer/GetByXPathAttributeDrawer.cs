@@ -7,6 +7,7 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -27,6 +28,22 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     [CustomPropertyDrawer(typeof(FindComponentAttribute), true)]
     public partial class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
+        private static (bool hasRoot, GameObject prefabRoot) GetPrefabRoot()
+        {
+            PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            // ReSharper disable once InvertIf
+            if(prefabStage != null)
+            {
+                GameObject prefabRoot = prefabStage.prefabContentsRoot;
+                if (prefabRoot != null)
+                {
+                    return (true, prefabRoot);
+                }
+            }
+
+            return (false, null);
+        }
+
         private static bool PrefabCanSignCheck(Object signToObj, object signFrom)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression
