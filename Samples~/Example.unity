@@ -36128,7 +36128,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: resourcePath
-      value: Assets/ART/3DUI/Jiemian@JiemianA
+      value: Assets/ART/3DUI/UIBG
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: animParamHash
@@ -36203,6 +36203,14 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: TypeReference._monoScriptGuid
+      value: fa88ae97cb014113a58b2133637da902
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: typeReference._monoScriptGuid
+      value: 02b65c4d7a93bd1479ad46ffec4c176c
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: state.<stateName>k__BackingField
       value: SubNewState
       objectReference: {fileID: 0}
@@ -36215,12 +36223,20 @@ PrefabInstance:
       value: 2.42
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: TypeReference._typeNameAndAssembly
+      value: SaintsField.Samples.Scripts.AddComponentExample, today.comes.saintsfield.Samples
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[0].value
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[1].value
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: typeReference._typeNameAndAssembly
+      value: SaintsField.Samples.Scripts.ColorToggleTextExample, today.comes.saintsfield.Samples
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[0].inSlope
