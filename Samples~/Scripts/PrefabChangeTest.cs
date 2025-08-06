@@ -108,5 +108,7 @@ namespace SaintsField.Samples.Scripts
         public SaintsDictionary<int, string> saintsDict;
 
         public SaintsHashSet<int> saintsHashSet;
+
+        [Table] public MyS[] mySTable;
     }
 }
