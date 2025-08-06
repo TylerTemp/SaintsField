@@ -36099,6 +36099,10 @@ PrefabInstance:
       value: EditorOnly
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: justString
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: leftToggle
       value: 1
       objectReference: {fileID: 0}
@@ -36191,6 +36195,14 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: dm.<V>k__BackingField
+      value: 
+      objectReference: {fileID: 1271404094}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsArray.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: myDataArr.Array.data[0]
       value: fds
       objectReference: {fileID: 0}
@@ -36219,6 +36231,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsKeys.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: state.<stateSpeed>k__BackingField
       value: 2.42
       objectReference: {fileID: 0}
@@ -36237,6 +36253,10 @@ PrefabInstance:
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: typeReference._typeNameAndAssembly
       value: SaintsField.Samples.Scripts.ColorToggleTextExample, today.comes.saintsfield.Samples
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsValues.Array.size
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[0].inSlope
@@ -36282,6 +36302,22 @@ PrefabInstance:
       propertyPath: stateBase.<stateNameHash>k__BackingField
       value: -1198717087
       objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsArray.Array.data[0].value.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsKeys.Array.data[0].value
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsValues.Array.data[0].value
+      value: 33
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsArray.Array.data[0].value.Array.data[0]
+      value: 
+      objectReference: {fileID: 6004775636325262730}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: state.<subStateMachineNameChain>k__BackingField.Array.size
       value: 1

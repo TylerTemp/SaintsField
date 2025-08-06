@@ -100,5 +100,11 @@ namespace SaintsField.Samples.Scripts
         [SaintsRow(inline: true)] public MyS mySInline;
 
         public TypeReference typeReference;
+
+        public SaintsObjInterface<IDummy> dm;
+
+        public SaintsArray<GameObject>[] saintsArray;
+
+        public SaintsDictionary<int, string> saintsDict;
     }
 }
