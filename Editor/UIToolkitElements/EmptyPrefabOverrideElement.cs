@@ -28,8 +28,8 @@ namespace SaintsField.Editor.UIToolkitElements
                     width = 2,
                     // backgroundColor = Color.cyan,
                     backgroundColor = new Color(5/255f, 147/255f, 224/255f),
-                    top = 0,
-                    bottom = 0,
+                    top = 1,
+                    bottom = 1,
                     left = -15,
                 },
             };

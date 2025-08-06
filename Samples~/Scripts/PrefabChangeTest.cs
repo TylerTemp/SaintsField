@@ -106,5 +106,7 @@ namespace SaintsField.Samples.Scripts
         public SaintsArray<GameObject>[] saintsArray;
 
         public SaintsDictionary<int, string> saintsDict;
+
+        public SaintsHashSet<int> saintsHashSet;
     }
 }

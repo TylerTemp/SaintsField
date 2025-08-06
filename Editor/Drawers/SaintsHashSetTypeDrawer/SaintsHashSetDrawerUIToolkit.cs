@@ -7,6 +7,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -57,6 +58,21 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     position = Position.Relative,
                 },
             };
+
+            root.Add(new EmptyPrefabOverrideElement(property)
+            {
+                style =
+                {
+                    position = Position.Absolute,
+                    top = 0,
+                    bottom = 0,
+                    left = 0,
+                    right = 0,
+                    height = 18,
+                },
+                pickingMode = PickingMode.Ignore,
+            });
+
             VisualElement foldout = new Foldout
             {
                 text = GetPreferredLabel(property),

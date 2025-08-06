@@ -36267,6 +36267,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsHashSet._saintsList.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: state.<animationClip>k__BackingField
       value: 
       objectReference: {fileID: 7400000, guid: 76331895325d39644bfee2c64ed56780, type: 2}
@@ -36318,6 +36322,14 @@ PrefabInstance:
       propertyPath: saintsArray.Array.data[0].value.Array.data[0]
       value: 
       objectReference: {fileID: 6004775636325262730}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsHashSet._saintsList.Array.data[0].value
+      value: 123
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsHashSet._saintsList.Array.data[1].value
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: state.<subStateMachineNameChain>k__BackingField.Array.size
       value: 1
