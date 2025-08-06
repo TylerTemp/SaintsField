@@ -73,5 +73,12 @@ namespace SaintsField.Samples.Scripts
         [EnumToggleButtons] public EnumF enumF;
 
         [FlagsDropdown] public EnumF enumFDrop;
+
+        [LeftToggle] public bool leftToggle;
+
+        // broken
+        [ResourcePath(typeof(GameObject))] public string resourcePath;
+
+        [FieldType(typeof(SpriteRenderer))] public GameObject go;
     }
 }

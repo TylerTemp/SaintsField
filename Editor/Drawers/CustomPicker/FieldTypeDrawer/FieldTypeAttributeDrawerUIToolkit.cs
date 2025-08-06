@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
@@ -28,6 +29,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
         }
 
         private static string NameObjectField(SerializedProperty property) => $"{property.propertyPath}__FieldType_ObjectField";
+        private static string NameBinderField(SerializedProperty property) => $"{property.propertyPath}__FieldType_Binder";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__FieldType_HelpBox";
         private static string NameSelectorButton(SerializedProperty property) => $"{property.propertyPath}__FieldType_SelectorButton";
 
@@ -73,23 +75,45 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                 },
             };
 
-            objectField.Bind(property.serializedObject);
-            objectField.AddToClassList(BaseField<Object>.alignedFieldUssClassName);
+            // objectField.Bind(property.serializedObject);
+            // objectField.BindProperty(property);
+            objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
+            objectField.AddToClassList(ClassAllowDisable);
+
+            EmptyBinderField<Object> emptyBinder = new EmptyBinderField<Object>(objectField)
+            {
+                name = NameBinderField(property),
+            };
+            emptyBinder.BindProperty(property);
 
             if (customPicker)
             {
                 StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
                 objectField.styleSheets.Add(hideStyle);
+
+                Texture2D pickerImage = EditorGUIUtility.IconContent("d_pick_uielements").image as Texture2D;
                 Button selectorButton = new Button
                 {
-                    text = "●",
+                    // text = "●",
                     style =
                     {
                         position = Position.Absolute,
                         right = 0,
                         width = 18,
+                        height = 18,
                         marginLeft = 0,
                         marginRight = 0,
+                        borderTopLeftRadius = 0,
+                        borderBottomLeftRadius = 0,
+                        backgroundImage = pickerImage,
+#if UNITY_2022_2_OR_NEWER
+                        backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                        backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                        backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                        unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
                     },
                     name = NameSelectorButton(property),
                 };
@@ -97,9 +121,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                 objectField.Add(selectorButton);
             }
 
-            objectField.AddToClassList(ClassAllowDisable);
-
-            return objectField;
+            return emptyBinder;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -140,16 +162,26 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                 property.objectReferenceValue = result;
                 property.serializedObject.ApplyModifiedProperties();
                 onValueChangedCallback.Invoke(result);
+            });
 
-                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-                if (v.newValue != null && result == null)
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+
+            container.Q<VisualElement>(NameBinderField(property)).TrackPropertyValue(property, p =>
+            {
+                Object newValue = p.objectReferenceValue;
+                Object result = GetNewValue(p.objectReferenceValue, fieldType, requiredComp);
+                if (newValue != null && result == null)
                 {
                     helpBox.style.display = DisplayStyle.Flex;
-                    helpBox.text = $"{v.newValue} has no component {fieldType}";
+                    helpBox.text = $"{newValue} has no component {fieldType}";
                 }
                 else
                 {
                     helpBox.style.display = DisplayStyle.None;
+                    if (objectField.value != result)
+                    {
+                        objectField.SetValueWithoutNotify(result);
+                    }
                 }
             });
 

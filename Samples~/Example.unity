@@ -36035,6 +36035,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: go
+      value: 
+      objectReference: {fileID: 1457332497}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: text
       value: fds
       objectReference: {fileID: 0}
@@ -36083,6 +36087,10 @@ PrefabInstance:
       value: EditorOnly
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: leftToggle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: layerString
       value: Ignore Raycast
       objectReference: {fileID: 0}
@@ -36097,6 +36105,14 @@ PrefabInstance:
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: sceneString
       value: GameMap
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: assetsFolder
+      value: fdsfds
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: resourcePath
+      value: Assets/ART/Advertising/Anim/FaESiPanGuan@Pose
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: animParamHash
@@ -36129,6 +36145,10 @@ PrefabInstance:
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: inputAxisString
       value: Horizontal
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: resourcesFolder
+      value: fdsfds
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: sortingLayerInt
