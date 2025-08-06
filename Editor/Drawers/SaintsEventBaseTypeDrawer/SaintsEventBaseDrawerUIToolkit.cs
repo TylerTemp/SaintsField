@@ -122,6 +122,9 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             SaintsEventView saintsEventView = container.Q<SaintsEventView>(NameSaintsEventView(property));
+
+            UIToolkitUtils.AddContextualMenuManipulator(saintsEventView.Label, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
             SerializedProperty persistentCallProp = property.FindPropertyRelative(PropNamePersistentCalls);
             ListView listView = new ListView
             {
