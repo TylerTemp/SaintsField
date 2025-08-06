@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             if (inline)
             {
-                root = new VisualElement
+                root = new EmptyPrefabOverrideElement(property)
                 {
                     style =
                     {

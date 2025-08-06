@@ -97,5 +97,6 @@ namespace SaintsField.Samples.Scripts
         }
 
         [SaintsRow] public MyS myS;
+        [SaintsRow(inline: true)] public MyS mySInline;
     }
 }
