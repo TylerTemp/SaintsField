@@ -71,5 +71,7 @@ namespace SaintsField.Samples.Scripts
         }
 
         [EnumToggleButtons] public EnumF enumF;
+
+        [FlagsDropdown] public EnumF enumFDrop;
     }
 }

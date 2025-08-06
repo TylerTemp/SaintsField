@@ -3,9 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.SceneDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,6 +19,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__FlagsDropdown";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__FlagsDropdown_HelpBox";
 
+        private EnumFlagsMetaInfo _enumMeta;
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
@@ -23,17 +28,19 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             FieldInfo info,
             object parent)
         {
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            if (property.propertyType != SerializedPropertyType.Enum)
+            {
+                return new Label(GetPreferredLabel(property));
+            }
 
-            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
-            dropdownButton.style.flexGrow = 1;
-            dropdownButton.name = NameButton(property);
-            dropdownButton.userData = metaInfo;
-            dropdownButton.ButtonLabelElement.text = GetSelectedNames(metaInfo.BitValueToName, property.intValue);
-
-            dropdownButton.AddToClassList(ClassAllowDisable);
-
-            return dropdownButton;
+            _enumMeta = EnumFlagsUtil.GetMetaInfo(property, info);
+            FlagsDropdownElement intDropdownElement = new FlagsDropdownElement(_enumMeta);
+            intDropdownElement.BindProperty(property);
+            return new IntDropdownField(GetPreferredLabel(property), intDropdownElement)
+            {
+                name = NameButton(property),
+            };
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -41,6 +48,17 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
+            if (property.propertyType != SerializedPropertyType.Enum)
+            {
+                return new HelpBox($"Type {property.propertyType} is not a enum type", HelpBoxMessageType.Error)
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                };
+            }
+
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
@@ -57,53 +75,80 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
-            VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
-            EnumFlagsMetaInfo metaInfo = (EnumFlagsMetaInfo)dropdownButton.userData;
-
-            dropdownButton.ButtonElement.clicked += () =>
+            if (property.propertyType != SerializedPropertyType.Enum)
             {
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.intValue, metaInfo.AllCheckedInt, metaInfo.BitValueToName);
+                return;
+            }
 
-                // AdvancedDropdownAttributeDrawer.MetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent);
-                float maxHeight = Screen.currentResolution.height - root.worldBound.y - root.worldBound.height - 100;
-                Rect worldBound = root.worldBound;
-                if (maxHeight < 100)
+            IntDropdownField intDropdownField = container.Q<IntDropdownField>(NameButton(property));
+            AddContextualMenuManipulator(intDropdownField, property, onValueChangedCallback, info, parent);
+
+            intDropdownField.Button.clicked += () => MakeDropdown(property, intDropdownField, onValueChangedCallback, info, parent);
+        }
+
+        private void AddContextualMenuManipulator(VisualElement root, SerializedProperty property,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            UIToolkitUtils.AddContextualMenuManipulator(root, property,
+                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
+            root.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                string clipboardText = EditorGUIUtility.systemCopyBuffer;
+                if (string.IsNullOrEmpty(clipboardText))
                 {
-                    worldBound.y -= 100 + worldBound.height;
-                    maxHeight = 100;
+                    return;
                 }
 
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
-                    dropdownMetaInfo,
-                    root.worldBound.width,
-                    maxHeight,
-                    true,
-                    (_, curItem) =>
-                    {
-                        int selectedValue = (int)curItem;
-                        int newMask = selectedValue == 0
-                            ? 0
-                            : EnumFlagsUtil.ToggleBit(property.intValue, selectedValue);
-                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newMask);
-                        property.intValue = newMask;
-                        property.serializedObject.ApplyModifiedProperties();
-
-                        dropdownButton.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property)).ButtonLabelElement.text = GetSelectedNames(metaInfo.BitValueToName, newMask);
-                        dropdownButton.userData = curItem;
-                        onValueChangedCallback(curItem);
-                    }
-                ));
-
-                string curError = dropdownMetaInfo.Error;
-                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-                // ReSharper disable once InvertIf
-                if (helpBox.text != curError)
+                if (!int.TryParse(clipboardText, out int clipboardInt))
                 {
-                    helpBox.text = curError;
-                    helpBox.style.display = curError == ""? DisplayStyle.None : DisplayStyle.Flex;
+                    return;
                 }
-            };
+
+                if ((clipboardInt & _enumMeta.AllCheckedInt) != clipboardInt)
+                {
+                    return;
+                }
+
+                evt.menu.AppendAction($"Paste \"{clipboardInt}\"", _ =>
+                {
+                    property.intValue = clipboardInt;
+                    property.serializedObject.ApplyModifiedProperties();
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, clipboardInt);
+                    onValueChangedCallback.Invoke(clipboardInt);
+                });
+            }));
+        }
+
+        private void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.intValue, _enumMeta.AllCheckedInt, _enumMeta.BitValueToName);
+
+            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
+                metaInfo,
+                root.worldBound.width,
+                maxHeight,
+                true,
+                (_, curItem) =>
+                {
+                    int selectedValue = (int)curItem;
+                    int newMask = selectedValue == 0
+                        ? 0
+                        : EnumFlagsUtil.ToggleBit(property.intValue, selectedValue);
+                    property.intValue = newMask;
+                    property.serializedObject.ApplyModifiedProperties();
+                    onValueChangedCallback(curItem);
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newMask);
+                }
+            );
+
+            // DebugPopupExample.SaintsAdvancedDropdownUIToolkit = sa;
+            // var editorWindow = EditorWindow.GetWindow<DebugPopupExample>();
+            // editorWindow.Show();
+
+            UnityEditor.PopupWindow.Show(worldBound, sa);
         }
     }
 }

@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                     return new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
                 }
                 default:
-                    return new VisualElement();
+                    return new Label(GetPreferredLabel(property));
             }
         }
 
