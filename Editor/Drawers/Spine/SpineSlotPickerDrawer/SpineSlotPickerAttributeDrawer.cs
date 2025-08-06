@@ -19,8 +19,6 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
     [CustomPropertyDrawer(typeof(SpineSlotPickerAttribute), true)]
     public partial class SpineSlotPickerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
-        private const string IconPath = "Spine/icon-slot.png";
-
         private static string Validate(bool containsBoundingBoxes, string callback, SerializedProperty property, MemberInfo info, object parent)
         {
             if (string.IsNullOrEmpty(property.stringValue))
@@ -28,13 +26,13 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
                 return "";
             }
 
-            (string error, IReadOnlyList<SlotInfo> slots) = GetSlots(containsBoundingBoxes, callback, property, info, parent);
+            (string error, IReadOnlyList<SpineSlotUtils.SlotInfo> slots) = GetSlots(containsBoundingBoxes, callback, property, info, parent);
             if (error != "")
             {
                 return error;
             }
 
-            foreach (SlotInfo slotInfo in slots)
+            foreach (SpineSlotUtils.SlotInfo slotInfo in slots)
             {
                 if (slotInfo.SlotData.Name == property.stringValue)
                 {
@@ -47,14 +45,9 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             return $"{property.stringValue} is not a valid slot: {string.Join(", ", slots.Select(each => each.SlotData.Name))}";
         }
 
-        private struct SlotInfo
-        {
-            public SlotData SlotData;
-            public bool Disabled;
-            public string Label;
-        }
 
-        private static (string error, IReadOnlyList<SlotInfo> slots) GetSlots(bool containsBoundingBoxes, string callback, SerializedProperty property, MemberInfo info, object parent)
+
+        private static (string error, IReadOnlyList<SpineSlotUtils.SlotInfo> slots) GetSlots(bool containsBoundingBoxes, string callback, SerializedProperty property, MemberInfo info, object parent)
         {
             (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(callback, property, info, parent);
             if (error != "")
@@ -75,7 +68,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             }
 
             IEnumerable<SlotData> orderedSlots = skeletonData.Slots.Items.OrderBy(slotData => slotData.Name);
-            List<SlotInfo> slots = new List<SlotInfo>();
+            List<SpineSlotUtils.SlotInfo> slots = new List<SpineSlotUtils.SlotInfo>();
 
             foreach (SlotData slotData in orderedSlots) {
                 int slotIndex = slotData.Index;
@@ -92,12 +85,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
                         if (bbAttachment != null) {
                             string menuLabel = bbAttachment.IsWeighted() ? name + " (!)" : name;
                             // menu.AddItem(new GUIContent(menuLabel), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
-                            slots.Add(new SlotInfo
-                            {
-                                SlotData = slotData,
-                                Disabled = false,
-                                Label = menuLabel,
-                            });
+                            slots.Add(new SpineSlotUtils.SlotInfo(slotData, false, menuLabel));
                             hasBoundingBox = true;
                             break;
                         }
@@ -105,22 +93,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 
                     if (!hasBoundingBox)
                     {
-                        slots.Add(new SlotInfo
-                        {
-                            SlotData = slotData,
-                            Disabled = true,
-                            Label = name,
-                        });
+                        slots.Add(new SpineSlotUtils.SlotInfo(slotData, true, name));
                         // menu.AddDisabledItem(new GUIContent(name));
                     }
 
                 } else {
-                    slots.Add(new SlotInfo
-                    {
-                        SlotData = slotData,
-                        Disabled = false,
-                        Label = name,
-                    });
+                    slots.Add(new SpineSlotUtils.SlotInfo(slotData, false, name));
                     // menu.AddItem(new GUIContent(name), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
                 }
 
@@ -129,7 +107,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             return ("", slots);
         }
 
-        private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, IReadOnlyList<SlotInfo> slots, bool isImGui)
+        private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, IReadOnlyList<SpineSlotUtils.SlotInfo> slots, bool isImGui)
         {
             AdvancedDropdownList<SlotData> dropdownListValue =
                 new AdvancedDropdownList<SlotData>(isImGui? "Select Slot": "")
@@ -141,9 +119,9 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 
             List<object> curValues = new List<object>();
 
-            foreach (SlotInfo slotInfo in slots)
+            foreach (SpineSlotUtils.SlotInfo slotInfo in slots)
             {
-                dropdownListValue.Add(slotInfo.Label, slotInfo.SlotData, disabled: slotInfo.Disabled, icon: IconPath);
+                dropdownListValue.Add(slotInfo.Label, slotInfo.SlotData, disabled: slotInfo.Disabled, icon: SpineSlotUtils.IconPath);
                 if (slotInfo.SlotData.Name == curValue)
                 {
                     curValues.Add(slotInfo.SlotData);

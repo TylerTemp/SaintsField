@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Spine;
@@ -17,7 +19,9 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 {
     public partial class SpineSlotPickerAttributeDrawer
     {
-        private static string NameDropdownField(SerializedProperty property) => $"{property.propertyPath}__SpineSlot_SelectorButton";
+        private static string NameDropdownField(SerializedProperty property) =>
+            $"{property.propertyPath}__SpineSlot_SelectorButton";
+
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__SpineSlot_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
@@ -25,11 +29,17 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownField = UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
-            dropdownField.name = NameDropdownField(property);
-            SetDropdownLabel(dropdownField.ButtonLabelElement, property.stringValue);
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return new Label(GetPreferredLabel(property));
+            }
 
-            return dropdownField;
+            SpineSlotElement element = new SpineSlotElement();
+            element.BindProperty(property);
+            return new StringDropdownField(GetPreferredLabel(property), element)
+            {
+                name = NameDropdownField(property),
+            };
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -37,6 +47,17 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return new HelpBox($"Type {property.propertyType} is not a string type.", HelpBoxMessageType.Error)
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                };
+            }
+
             return new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
@@ -48,126 +69,88 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             };
         }
 
-        // private Texture2D _iconTexture2D;
+        private IReadOnlyList<SpineSlotUtils.SlotInfo> _cachedSlotInfos = new List<SpineSlotUtils.SlotInfo>();
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(name: NameDropdownField(property));
-
-            SpineSlotPickerAttribute spineSlotPickerAttribute = (SpineSlotPickerAttribute)saintsAttribute;
-
-            HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property));
-            ValidateUIToolkit(helpBox, spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property, info, parent);
-
-            dropdownField.TrackPropertyValue(property, _ =>
-            {
-                SetDropdownLabel(dropdownField.ButtonLabelElement, property.stringValue);
-                ValidateUIToolkit(helpBox, spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property, info, parent);
-            });
-
-            dropdownField.ButtonElement.clicked += () =>
-            {
-                (string error, IReadOnlyList<SlotInfo> slots) = GetSlots(spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property, info, parent);
-                if (error != "")
-                {
-                    UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), error);
-                }
-
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.stringValue, slots, false);
-
-                float maxHeight = Screen.currentResolution.height - dropdownField.worldBound.y - dropdownField.worldBound.height - 100;
-                // Rect worldBound = dropdownButton.worldBound;
-                Rect worldBound = dropdownField.worldBound;
-                if (maxHeight < 100)
-                {
-                    worldBound.y -= 100 + worldBound.height;
-                    maxHeight = 100;
-                }
-
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
-                    dropdownMetaInfo,
-                    worldBound.width,
-                    maxHeight,
-                    false,
-                    (_, curItem) =>
-                    {
-                        SlotData newValue = (SlotData)curItem;
-                        string newString = newValue?.Name;
-                        if (property.stringValue != newString)
-                        {
-                            property.stringValue = newString;
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback.Invoke(newString);
-                        }
-                    }
-                ));
-            };
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
-            IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
-        {
-            UIToolkitUtils.DropdownButtonField dropdownField =
-                container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-            UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
-        }
-
-        private static void ValidateUIToolkit(HelpBox helpBox, bool containsBoundingBoxes,  string callback, SerializedProperty property, MemberInfo info, object parent)
-        {
-            string error = Validate(containsBoundingBoxes, callback, property, info, parent);
-            UpdateHelpBox(helpBox, error);
-        }
-
-        private RichTextDrawer _textDrawer;
-
-        private void SetDropdownLabel(Label label, string value)
-        {
-            _textDrawer ??= new RichTextDrawer();
-
-            IEnumerable<RichTextDrawer.RichTextChunk> chunksOrNull;
-
-            if (string.IsNullOrEmpty(value))
-            {
-                chunksOrNull = new[]
-                {
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        IsIcon = false,
-                        Content = "-",
-                    },
-                };
-            }
-            else
-            {
-                chunksOrNull = new[]
-                {
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        IsIcon = true,
-                        Content = IconPath,
-                    },
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        IsIcon = false,
-                        Content = value,
-                    },
-                };
-            }
-
-            UIToolkitUtils.SetLabel(label, chunksOrNull, _textDrawer);
-        }
-
-        private static void UpdateHelpBox(HelpBox helpBox, string error)
-        {
-            if (helpBox.text == error)
+            if (property.propertyType != SerializedPropertyType.String)
             {
                 return;
             }
 
-            helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-            helpBox.text = error;
+            SpineSlotPickerAttribute spineSlotPickerAttribute = (SpineSlotPickerAttribute)saintsAttribute;
+
+            HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property));
+
+            StringDropdownField stringDropdownField = container.Q<StringDropdownField>(NameDropdownField(property));
+            SpineSlotElement element = stringDropdownField.Q<SpineSlotElement>();
+            UIToolkitUtils.AddContextualMenuManipulator(stringDropdownField, property,
+                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
+            stringDropdownField.Button.clicked += () => MakeDropdown(GetSlotInfosRefresh, property,
+                stringDropdownField, onValueChangedCallback, info, parent);
+
+            GetSlotInfosRefresh();
+
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(GetSlotInfosRefreshListener);
+            stringDropdownField.RegisterCallback<DetachFromPanelEvent>(_ =>
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(GetSlotInfosRefreshListener));
+            return;
+
+            IReadOnlyList<SpineSlotUtils.SlotInfo> GetSlotInfosRefresh()
+            {
+                (string error, IReadOnlyList<SpineSlotUtils.SlotInfo> slots) = GetSlots(
+                    spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property,
+                    info, parent);
+                if (helpBox.text != error)
+                {
+                    helpBox.text = error;
+                    helpBox.style.display = string.IsNullOrEmpty(error) ? DisplayStyle.None : DisplayStyle.Flex;
+                }
+
+                if (error == "")
+                {
+                    if (!slots.SequenceEqual(_cachedSlotInfos))
+                    {
+                        element.BindSlotInfos(_cachedSlotInfos = slots);
+                    }
+                }
+
+                return _cachedSlotInfos;
+            }
+
+            void GetSlotInfosRefreshListener() => GetSlotInfosRefresh();
+        }
+
+        private static void MakeDropdown(Func<IReadOnlyList<SpineSlotUtils.SlotInfo>> getSlotInfosRefresh, SerializedProperty property, StringDropdownField root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, getSlotInfosRefresh(), false);
+
+            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
+                metaInfo,
+                root.worldBound.width,
+                maxHeight,
+                true,
+                (_, curItem) =>
+                {
+                    SlotData newValue = (SlotData)curItem;
+                    string newString = newValue?.Name;
+                    // ReSharper disable once InvertIf
+                    if (property.stringValue != newString)
+                    {
+                        property.stringValue = newString;
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback.Invoke(newString);
+                    }
+                }
+            );
+
+            UnityEditor.PopupWindow.Show(worldBound, sa);
         }
     }
 }

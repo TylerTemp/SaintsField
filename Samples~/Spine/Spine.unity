@@ -711,6 +711,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6314497149558520088, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: animationName
+      value: Idle
+      objectReference: {fileID: 0}
+    - target: {fileID: 6314497149558520088, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: animationReference
+      value: 
+      objectReference: {fileID: 11400000, guid: a924776cd53f906479b59420d1a8e895, type: 2}
+    - target: {fileID: 6835433886103782019, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: skinPicked
+      value: Holiday
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

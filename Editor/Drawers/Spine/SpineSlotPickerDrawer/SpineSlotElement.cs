@@ -1,18 +1,18 @@
+using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
-using Spine;
 
-namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
+namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 {
-    public class SpineSkinElement: StringDropdownElement
+    public class SpineSlotElement: StringDropdownElement
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
-        private ExposedList<Skin> _skinList;
+        private IReadOnlyList<SpineSlotUtils.SlotInfo> _slotInfos;
 
-        public void BindSkinList(ExposedList<Skin> skins)
+        public void BindSlotInfos(IReadOnlyList<SpineSlotUtils.SlotInfo> cachedSlotInfos)
         {
-            _skinList = skins;
+            _slotInfos = cachedSlotInfos;
             RefreshDisplay();
         }
 
@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
 
         private void RefreshDisplay()
         {
-            if (_skinList == null)
+            if (_slotInfos == null)
             {
                 return;
             }
@@ -36,22 +36,22 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             }
 
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            foreach (Skin skin in _skinList)
+            foreach (SpineSlotUtils.SlotInfo slotInfo in _slotInfos)
             {
                 // ReSharper disable once InvertIf
-                if (skin.Name == CachedValue)
+                if (slotInfo.SlotData.Name == CachedValue)
                 {
                     UIToolkitUtils.SetLabel(Label, new[]
                     {
                         new RichTextDrawer.RichTextChunk
                         {
                             IsIcon = true,
-                            Content = SpineSkinUtils.IconPath,
+                            Content = SpineSlotUtils.IconPath,
                         },
                         new RichTextDrawer.RichTextChunk
                         {
                             IsIcon = false,
-                            Content = skin.Name,
+                            Content = slotInfo.SlotData.Name,
                         },
                     }, _richTextDrawer);
                     return;

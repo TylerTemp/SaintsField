@@ -55,10 +55,11 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
                 };
             }
 
-            return new HelpBox($"Type {property.propertyType} is not a string type.", HelpBoxMessageType.Error)
+            return new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
                 {
+                    display = DisplayStyle.None,
                     flexGrow = 1,
                 },
                 name = NameHelpBox(property),
@@ -87,6 +88,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             stringDropdownField.Button.clicked += () => MakeDropdown(GetSkinsRefresh, property,
                 stringDropdownField, onValueChangedCallback, info, parent);
 
+            GetSkinsRefresh();
+
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(GetSkinsRefreshListener);
+            stringDropdownField.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(GetSkinsRefreshListener));
+            return;
+
             ExposedList<Skin> GetSkinsRefresh()
             {
                 (string error, ExposedList<Skin> skins) = SpineSkinUtils.GetSkins(spineSkinPickerAttribute.SkeletonTarget, property, info, parent);
@@ -107,7 +114,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
                 return _cachedSkins;
             }
 
-            GetSkinsRefresh();
+            void GetSkinsRefreshListener() => GetSkinsRefresh();
         }
 
         private static void MakeDropdown(Func<ExposedList<Skin>> getSkinsRefresh, SerializedProperty property, StringDropdownField root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
