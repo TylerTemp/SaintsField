@@ -6427,6 +6427,8 @@ public int areaValue;
 
 [NavMeshArea]  // then you can use `NavMesh.GetAreaFromName(areaName)` to get areaValue
 public int areaName;
+
+[NavMeshArea] public string areaNameString;  // sting name
 ```
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)

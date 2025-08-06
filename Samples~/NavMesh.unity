@@ -132,8 +132,12 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 404938250836760400, guid: bae10653a1cc3f3419cdddd78409e929, type: 3}
+      propertyPath: areaMask
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 404938250836760400, guid: bae10653a1cc3f3419cdddd78409e929, type: 3}
       propertyPath: areaName
-      value: 4
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 404938250836760400, guid: bae10653a1cc3f3419cdddd78409e929, type: 3}
       propertyPath: areaValue
@@ -141,7 +145,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 404938250836760400, guid: bae10653a1cc3f3419cdddd78409e929, type: 3}
       propertyPath: areaSingleMask
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3177949388842764221, guid: bae10653a1cc3f3419cdddd78409e929, type: 3}
       propertyPath: m_Name

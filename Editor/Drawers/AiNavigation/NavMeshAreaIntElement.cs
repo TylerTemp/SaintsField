@@ -1,28 +1,46 @@
 #if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
-using SaintsField.AiNavigation;
+using System.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 
-namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
+namespace SaintsField.Editor.Drawers.AiNavigation
 {
     public class NavMeshAreaIntElement: IntDropdownElement
     {
-        private readonly NavMeshAreaAttribute _navMeshAreaAttribute;
+        private readonly bool _isMask;
 
-        public NavMeshAreaIntElement(NavMeshAreaAttribute attribute)
+        public NavMeshAreaIntElement(bool isMask)
         {
-            _navMeshAreaAttribute = attribute;
+            _isMask = isMask;
         }
 
         public override void SetValueWithoutNotify(int newValue)
         {
             CachedValue = newValue;
 
-            List<string> matched = new List<string>();
-            foreach (AiNavigationUtils.NavMeshArea area in AiNavigationUtils.GetNavMeshAreas())
+            AiNavigationUtils.NavMeshArea[] allAreas = AiNavigationUtils.GetNavMeshAreas().ToArray();
+
+            if (_isMask)
             {
-                if (_navMeshAreaAttribute.IsMask)
+                if (newValue == 0)
+                {
+                    Label.text = "<b>Noting</b>";
+                    return;
+                }
+
+                int allMask = allAreas.Aggregate(0, (current, area) => current | area.Mask);
+                if ((newValue & allMask) == allMask)
+                {
+                    Label.text = "<b>Everything</b>";
+                    return;
+                }
+            }
+
+            List<string> matched = new List<string>();
+            foreach (AiNavigationUtils.NavMeshArea area in allAreas)
+            {
+                if (_isMask)
                 {
                     if ((newValue & area.Mask) != 0)
                     {

@@ -19,8 +19,6 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
 {
     public partial class NavMeshAreaAttributeDrawer
     {
-        #region UI Toolkit
-
         private static string NameButtonField(SerializedProperty property) =>
             $"{property.propertyPath}__NavMeshArea_Button";
 
@@ -35,7 +33,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
                 case SerializedPropertyType.Integer:
                 {
                     NavMeshAreaAttribute navMeshAreaAttribute = (NavMeshAreaAttribute)saintsAttribute;
-                    NavMeshAreaIntElement element = new NavMeshAreaIntElement(navMeshAreaAttribute);
+                    NavMeshAreaIntElement element = new NavMeshAreaIntElement(navMeshAreaAttribute.IsMask);
                     element.BindProperty(property);
                     return new IntDropdownField(GetPreferredLabel(property), element)
                     {
@@ -110,7 +108,9 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
 
         private enum SpecialDropdownPick
         {
-            None,
+            Value,
+            Everything,
+            Nothing,
             EmptyString,
             OpenSettings,
         }
@@ -165,11 +165,46 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
                 dropdown.AddSeparator();
             }
 
+            AiNavigationUtils.NavMeshArea[] allAreas = AiNavigationUtils.GetNavMeshAreas().ToArray();
+
             List<DropdownItem> selectedItems = new List<DropdownItem>();
-            foreach (AiNavigationUtils.NavMeshArea area in AiNavigationUtils.GetNavMeshAreas())
+
+            if (navMeshAreaAttribute.IsMask)
+            {
+                int allMask = allAreas.Aggregate(0, (current, area) => current | area.Mask);
+                AiNavigationUtils.NavMeshArea allArea = new AiNavigationUtils.NavMeshArea
+                {
+                    Name = "[Everything]",
+                    Value = int.MaxValue,
+                    Mask = allMask,
+                };
+                DropdownItem allItem = new DropdownItem(allArea, SpecialDropdownPick.Everything);
+                dropdown.Add($"<color=yellow>Everything</color> <color=#808080>({allMask})</color>", allItem);
+                if ((property.intValue & allMask) == allMask)
+                {
+                    selectedItems.Add(allItem);
+                }
+
+                AiNavigationUtils.NavMeshArea noArea = new AiNavigationUtils.NavMeshArea
+                {
+                    Name = "[Nothing]",
+                    Value = int.MinValue,
+                    Mask = 0,
+                };
+                DropdownItem noItem = new DropdownItem(noArea, SpecialDropdownPick.Nothing);
+                dropdown.Add("<color=yellow>Nothing</color>", noItem);
+                if (property.intValue == 0)
+                {
+                    selectedItems.Add(noItem);
+                }
+
+                dropdown.AddSeparator();
+            }
+
+            foreach (AiNavigationUtils.NavMeshArea area in allAreas)
             {
                 // dropdown.Add(path, (path, index));
-                DropdownItem dropdownItem = new DropdownItem(area, SpecialDropdownPick.None);
+                DropdownItem dropdownItem = new DropdownItem(area, SpecialDropdownPick.Value);
                 string displayName;
                 if (isString)
                 {
@@ -228,7 +263,23 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
                             NavMeshEditorHelpers.OpenAreaSettings();
                         }
                             break;
-                        default:
+                        case SpecialDropdownPick.Everything:
+                        {
+                            property.intValue = curValue.Area.Mask;
+                            property.serializedObject.ApplyModifiedProperties();
+                            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curValue.Area.Mask);
+                            onValueChangedCallback.Invoke(curValue.Area.Mask);
+                        }
+                            break;
+                        case SpecialDropdownPick.Nothing:
+                        {
+                            property.intValue = 0;
+                            property.serializedObject.ApplyModifiedProperties();
+                            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, 0);
+                            onValueChangedCallback.Invoke(0);
+                        }
+                            break;
+                        case SpecialDropdownPick.Value:
                         {
                             if (isString)
                             {
@@ -253,13 +304,11 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
                             }
                         }
                             break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(curValue.Pick), curValue.Pick, null);
                     }
                 }
             );
-
-            // DebugPopupExample.SaintsAdvancedDropdownUIToolkit = sa;
-            // var editorWindow = EditorWindow.GetWindow<DebugPopupExample>();
-            // editorWindow.Show();
 
             UnityEditor.PopupWindow.Show(worldBound, sa);
         }
@@ -314,7 +363,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
 
                 string targetNames = matchedNames.Count == 1
                     ? $"\"{matchedNames[0]}\""
-                    : $"\"{matchedNames[0]}\"...";
+                    : $"\"{matchedNames[0]}\"...[{matchedNames.Count}]";
 
                 evt.menu.AppendAction($"Paste {targetNames} ({filteredMask})", _ =>
                 {
@@ -326,7 +375,6 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
             }));
         }
 
-        #endregion
     }
 }
 #endif
