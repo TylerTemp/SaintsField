@@ -30,6 +30,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     {
         private static (bool hasRoot, GameObject prefabRoot) GetPrefabRoot()
         {
+#if UNITY_2021_3_OR_NEWER
             PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
             // ReSharper disable once InvertIf
             if(prefabStage != null)
@@ -40,7 +41,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     return (true, prefabRoot);
                 }
             }
-
+#endif
             return (false, null);
         }
 
