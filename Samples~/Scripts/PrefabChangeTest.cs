@@ -88,5 +88,14 @@ namespace SaintsField.Samples.Scripts
         public string[] myDataArr;
 
         [AdvancedDropdown] public Vector3 v3;
+
+        [Serializable]
+        public struct MyS
+        {
+            public string s;
+            public int i;
+        }
+
+        [SaintsRow] public MyS myS;
     }
 }

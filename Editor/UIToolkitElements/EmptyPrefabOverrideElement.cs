@@ -20,6 +20,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
             _blueBar = new VisualElement
             {
+                pickingMode = PickingMode.Ignore,
                 style =
                 {
                     position = Position.Absolute,

@@ -36055,6 +36055,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: myS.i
+      value: 26
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: rate05
       value: 2
       objectReference: {fileID: 0}
@@ -36087,6 +36091,10 @@ PrefabInstance:
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: stateName
+      value: Idle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: tagString
       value: EditorOnly
       objectReference: {fileID: 0}
@@ -36116,7 +36124,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: resourcePath
-      value: Assets/ART/Advertising/Anim/FaESiPanGuan@Pose
+      value: Assets/ART/3DUI/Jiemian@JiemianA
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: animParamHash
@@ -36191,8 +36199,16 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: state.<stateName>k__BackingField
+      value: SubNewState
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[1].time
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: state.<stateSpeed>k__BackingField
+      value: 2.42
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[0].value
@@ -36211,6 +36227,18 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: state.<animationClip>k__BackingField
+      value: 
+      objectReference: {fileID: 7400000, guid: 76331895325d39644bfee2c64ed56780, type: 2}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: state.<stateNameHash>k__BackingField
+      value: -1075812047
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: stateBase.<stateName>k__BackingField
+      value: Sub2State
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[0].outSlope
       value: 0
       objectReference: {fileID: 0}
@@ -36219,12 +36247,40 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: stateBase.<stateSpeed>k__BackingField
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[0].tangentMode
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[1].tangentMode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: stateBase.<stateNameHash>k__BackingField
+      value: -1198717087
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: state.<subStateMachineNameChain>k__BackingField.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: state.<subStateMachineNameChain>k__BackingField.Array.data[0]
+      value: SubStateMachine2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: stateBase.<subStateMachineNameChain>k__BackingField.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: stateBase.<subStateMachineNameChain>k__BackingField.Array.data[0]
+      value: SubStateMachine1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: stateBase.<subStateMachineNameChain>k__BackingField.Array.data[1]
+      value: Sub1-2
       objectReference: {fileID: 0}
     - target: {fileID: 5324508032783815855, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: m_Name
