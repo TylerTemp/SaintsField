@@ -86,5 +86,7 @@ namespace SaintsField.Samples.Scripts
         // broken
         [ListDrawerSettings(searchable: true, numberOfItemsPerPage: 3)]
         public string[] myDataArr;
+
+        [AdvancedDropdown] public Vector3 v3;
     }
 }
