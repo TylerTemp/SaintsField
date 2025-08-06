@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -60,3 +61,4 @@ namespace SaintsField.Editor.UIToolkitElements
         }
     }
 }
+#endif
