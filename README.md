@@ -6555,6 +6555,8 @@ public SkeletonAnimation _spine;
 [SpineSlotPicker(nameof(_spine))] private string slotNameFromTarget;
 ```
 
+![](https://github.com/user-attachments/assets/a7d280c1-76c1-49ca-bc63-be97dc7fbc70)
+
 ### `SpineAttachmentPicker` ###
 
 Pick a spine attachment from a spine skeleton - skin - slot, into a string field.

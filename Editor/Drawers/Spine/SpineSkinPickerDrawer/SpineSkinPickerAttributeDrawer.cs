@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             AdvancedDropdownList<string> dropdownListValue =
                 new AdvancedDropdownList<string>(isImGui? "Select Skin": "")
                 {
-                    { "[Null]", "" },
+                    { "[Empty String]", "" },
                 };
 
             dropdownListValue.AddSeparator();

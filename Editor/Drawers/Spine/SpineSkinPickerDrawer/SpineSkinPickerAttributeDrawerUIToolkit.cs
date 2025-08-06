@@ -119,32 +119,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
 
         private static void MakeDropdown(Func<ExposedList<Skin>> getSkinsRefresh, SerializedProperty property, StringDropdownField root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            AdvancedDropdownList<string> dropdown = new AdvancedDropdownList<string>();
-
-            dropdown.Add("[Empty String]", "");
-            dropdown.AddSeparator();
-
-            string selected = null;
-            foreach (Skin skin in getSkinsRefresh())
-            {
-                dropdown.Add(skin.Name, skin.Name, false, SpineSkinUtils.IconPath);
-                if (property.stringValue == skin.Name)
-                {
-                    selected = skin.Name;
-                }
-            }
-
-            if (string.IsNullOrEmpty(property.stringValue))
-            {
-                selected = "";
-            }
-
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
-            {
-                CurValues = selected is null ? Array.Empty<object>(): new[]{selected},
-                DropdownListValue = dropdown,
-                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
-            };
+            AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, getSkinsRefresh(), false);
 
             (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 

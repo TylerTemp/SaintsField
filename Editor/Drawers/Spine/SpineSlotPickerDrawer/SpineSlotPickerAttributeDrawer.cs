@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             AdvancedDropdownList<SlotData> dropdownListValue =
                 new AdvancedDropdownList<SlotData>(isImGui? "Select Slot": "")
                 {
-                    { "[Null]", null },
+                    { "[Empty String]", null },
                 };
 
             dropdownListValue.AddSeparator();

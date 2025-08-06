@@ -663,9 +663,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 105871120352110135, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spineAttachment
+      value: White1
+      objectReference: {fileID: 0}
+    - target: {fileID: 105871120352110135, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: attachmentOriginal
+      value: White1
+      objectReference: {fileID: 0}
     - target: {fileID: 1303085664095575046, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
       propertyPath: m_Name
       value: Spine GameObject (skeleton)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329099849136555986, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spineSlotPicker
+      value: White1
       objectReference: {fileID: 0}
     - target: {fileID: 2151001047522572703, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
       propertyPath: m_Mesh

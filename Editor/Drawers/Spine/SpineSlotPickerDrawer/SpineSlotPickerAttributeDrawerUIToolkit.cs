@@ -139,7 +139,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
                 (_, curItem) =>
                 {
                     SlotData newValue = (SlotData)curItem;
-                    string newString = newValue?.Name;
+                    string newString = newValue?.Name ?? "";
                     // ReSharper disable once InvertIf
                     if (property.stringValue != newString)
                     {
