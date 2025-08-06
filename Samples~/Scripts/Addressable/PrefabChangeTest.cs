@@ -1,4 +1,6 @@
+#if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
 using SaintsField.Addressable;
+#endif
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.Addressable
