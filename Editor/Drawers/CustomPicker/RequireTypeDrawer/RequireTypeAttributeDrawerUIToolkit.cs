@@ -39,16 +39,29 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                 return null;
             }
 
+            Texture2D pickerImage = EditorGUIUtility.IconContent("d_pick_uielements").image as Texture2D;
             Button button = new Button
             {
-                text = "●",
+                // text = "●",
                 style =
                 {
                     // position = Position.Absolute,
                     // right = 0,
                     width = 18,
+                    height = 18,
                     marginLeft = 0,
                     marginRight = 0,
+                    borderTopLeftRadius = 0,
+                    borderBottomLeftRadius = 0,
+                    backgroundImage = pickerImage,
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                        unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
                 },
                 name = NameSelectorButton(property),
             };

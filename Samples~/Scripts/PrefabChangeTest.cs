@@ -1,10 +1,12 @@
 using System;
+using SaintsField.Playa;
+using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class PrefabChangeTest : MonoBehaviour
+    public class PrefabChangeTest : SaintsMonoBehaviour
     {
         public string justString;
         [ResizableTextArea] public string text;
@@ -80,5 +82,9 @@ namespace SaintsField.Samples.Scripts
         [ResourcePath(typeof(GameObject))] public string resourcePath;
 
         [FieldType(typeof(SpriteRenderer))] public GameObject go;
+
+        // broken
+        [ListDrawerSettings(searchable: true, numberOfItemsPerPage: 3)]
+        public string[] myDataArr;
     }
 }
