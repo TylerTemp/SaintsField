@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.24.5 ##
+
+UI Toolkit: Fix blue indicator for prefab modification not display in some property [#276](https://github.com/TylerTemp/SaintsField/issues/276)
+
 ## 4.24.4 ##
 
 1.  UI Toolkit: Add blue indicator for prefab modification in:

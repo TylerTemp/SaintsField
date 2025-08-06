@@ -103,23 +103,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.24.4**
+**4.24.5**
 
-1.  UI Toolkit: Add blue indicator for prefab modification in:
-    *   `AnimatorParam`
-    *   `AddressableLable AddressableAddress CurveRange`
-    *   `AddressableScene`
-    *   `NavMeshArea`
-    *   `NavMeshAreaMask`
-    *   `SpineSkin`
-    *   `SpineSlot`
-    *   `SpineAttachment`
-
-    Note: There are still some attributes that does not work with prefab's modification blue line. This is basiclly Unity's fault... Read more from [here](https://discussions.unity.com/t/writing-drawers-for-classes-with-properties-that-cant-be-bound/904711/2). There is solution that [should fix this](https://github.com/OscarAbraham/UITKEditorAid/tree/development), but that package seems not work (maybe my setup is wrong).
-    I'm still trying to make this work for these attributes/types, but it'll need some time: `AdvancedDropdown`, `Dropdown`, `SaintsArray`, `SaintsList`, `SaintsDictionary`, `SaintsInterface`, `SaintsHashSet`, `ReferenceHashSet`, `TypeReference`, `SaintsEvent`, `FlagsDropdown`, `EnumToggleButtons`, `ResourcePath`, `ResourceFolder`, `AssetFolder`
-
-2.  Fix: when editing a UI prefab, because Unity will add a "Context Canvas" above the root of the prefab, "Auto Getters" now will ignore that object.
-3.  UI Toolkit: Fix right click context menu for `Spine` related attributes.
+UI Toolkit: Fix blue indicator for prefab modification not display in some property [#276](https://github.com/TylerTemp/SaintsField/issues/276)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
