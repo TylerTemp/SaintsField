@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
     public partial class EnumToggleButtonsAttributeDrawer
     {
-        public class EnumFlagsField : BaseField<Enum>
+        public class EnumFlagsField : BaseField<int>
         {
             public EnumFlagsField(string label, VisualElement visualInput) : base(label, visualInput)
             {
@@ -218,6 +218,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             // Debug.Log(preferredLabel);
 
             EnumFlagsField enumFlagsField = new EnumFlagsField(GetPreferredLabel(property), fieldContainer);
+            enumFlagsField.BindProperty(property);
             enumFlagsField.labelElement.style.overflow = Overflow.Hidden;
             // enumFlagsField.style.flexGrow = 1;
             enumFlagsField.AddToClassList(BaseField<object>.alignedFieldUssClassName);

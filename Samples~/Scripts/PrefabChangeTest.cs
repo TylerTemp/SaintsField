@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -49,5 +50,26 @@ namespace SaintsField.Samples.Scripts
 
         [CurveRange(EColor.Orange)]
         public AnimationCurve curve1;
+
+        [Serializable]
+        public enum EnumT
+        {
+            First,
+            Second,
+            Third,
+        }
+
+        [EnumToggleButtons] public EnumT enumT;
+
+        [Serializable, Flags]
+        public enum EnumF
+        {
+            None,
+            First = 1,
+            Second = 1 << 1,
+            Third = 1 << 2,
+        }
+
+        [EnumToggleButtons] public EnumF enumF;
     }
 }
