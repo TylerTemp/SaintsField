@@ -1,0 +1,143 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &110703868591726480
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5856320085462234615}
+  - component: {fileID: 4273962849164014900}
+  m_Layer: 0
+  m_Name: ListDrawerSettingsCustomSearch
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5856320085462234615
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110703868591726480}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4689183844304859775}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4273962849164014900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110703868591726480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39897aebd7f11704b91c64ee064fb05f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weapons:
+  - weaponType: 0
+    description: Normal Damange
+  - weaponType: 1
+    description: Normal Damange
+  - weaponType: 2
+    description: High Damange
+--- !u!1 &2646421953151540534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4689183844304859775}
+  - component: {fileID: 5029888576848882080}
+  m_Layer: 0
+  m_Name: ListDrawerSettingsExample 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4689183844304859775
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2646421953151540534}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5856320085462234615}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5029888576848882080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2646421953151540534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f90df2a89545f924ca0bbcc891810432, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  above: 
+  myDataArr:
+  - myInt: 0
+    myString: 
+    myGameObject: {fileID: 0}
+    myStrings:
+    - ttt
+  - myInt: 1
+    myString: 
+    myGameObject: {fileID: 0}
+    myStrings: []
+  - myInt: 4
+    myString: 
+    myGameObject: {fileID: 0}
+    myStrings: []
+  - myInt: 5
+    myString: 
+    myGameObject: {fileID: 0}
+    myStrings: []
+  - myInt: 6
+    myString: 
+    myGameObject: {fileID: 0}
+    myStrings: []
+  - myInt: 7
+    myString: 
+    myGameObject: {fileID: 0}
+    myStrings: []
+  - myInt: 8
+    myString: 
+    myGameObject: {fileID: 0}
+    myStrings: []
+  - myInt: 9
+    myString: 
+    myGameObject: {fileID: 2646421953151540534}
+    myStrings: []
+  below: 
+  searchScriptable:
+  - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
+  - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
+  searchDelayScriptable:
+  - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
+  - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
