@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_iconSkin is null)
             {
-                _iconSkin = Util.LoadResource<Texture2D>(IconPath);
+                _iconSkin = Util.LoadResource<Texture2D>(SpineSkinUtils.IconPath);
             }
 
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(property.stringValue)
@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             {
                 SpineSkinPickerAttribute spineSkinPickerAttribute = (SpineSkinPickerAttribute) saintsAttribute;
 
-                (string error, ExposedList<Skin> skins) = GetSkins(spineSkinPickerAttribute.SkeletonTarget, property, info, parent);
+                (string error, ExposedList<Skin> skins) = SpineSkinUtils.GetSkins(spineSkinPickerAttribute.SkeletonTarget, property, info, parent);
                 if (error != "")
                 {
                     cached.Error = error;
