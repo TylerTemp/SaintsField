@@ -103,11 +103,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.24.1**
+**4.24.5**
 
-1.  UI Toolkit: Attempting to inherit the existing Unity context menu in nested classes when right-click on a field [#254](https://github.com/TylerTemp/SaintsField/issues/254)
-2.  UI Toolkit: Fix `AdvancedDropdown` can not show the changed indicator (blue line on left) in prefab when edited. This also fixes enum dropdown if you have `SaintsEditor` enabled
-3.  UI Toolkit: Fix `ResiableTextArea` label did not have a right-click context menu
+UI Toolkit: Fix blue indicator for prefab modification not display in some property [#276](https://github.com/TylerTemp/SaintsField/issues/276)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -6202,8 +6200,10 @@ Then, the object picker is to decide which type you want to limit:
 The next dropdown is depending on the mode:
 
 *   For static mode with no target, you need to select a type
+
     ![](https://github.com/user-attachments/assets/885fee95-b7ef-476d-9aa1-1ad8a86eeab4)
 *   For static mode with target, or instance mode, you need to select a component on that target
+
     ![](https://github.com/user-attachments/assets/4da3a5c2-76e4-4ad9-89f6-a42fbc258705)
 
 The dropdown below is where you pick your actual callback:
@@ -6419,6 +6419,8 @@ public int areaValue;
 
 [NavMeshArea]  // then you can use `NavMesh.GetAreaFromName(areaName)` to get areaValue
 public int areaName;
+
+[NavMeshArea] public string areaNameString;  // sting name
 ```
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
@@ -6544,6 +6546,8 @@ using SaintsField.Spine;
 public SkeletonAnimation _spine;
 [SpineSlotPicker(nameof(_spine))] private string slotNameFromTarget;
 ```
+
+![](https://github.com/user-attachments/assets/a7d280c1-76c1-49ca-bc63-be97dc7fbc70)
 
 ### `SpineAttachmentPicker` ###
 

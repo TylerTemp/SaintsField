@@ -440,6 +440,19 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             List<Component> componentsInParents = new List<Component>();
 
+            Transform prefabRootTrans = null;
+            (bool hasRoot, GameObject prefabRoot) = GetPrefabRoot();
+            if (hasRoot)
+            {
+                prefabRootTrans = prefabRoot.transform;
+            }
+
+            if (excludeSelf && hasRoot && ReferenceEquals(prefabRootTrans, transform))
+            {
+                // Debug.Log("Break in exclude self top");
+                return ("", false, Array.Empty<object>());
+            }
+
             Transform curCheckingTrans = excludeSelf
                 ? transform.parent
                 : transform;
@@ -449,7 +462,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 : int.MaxValue;
 
             bool isGameObject = type == typeof(GameObject);
+
+            // Debug.Log($"root {prefabRootTrans} {prefabRootTrans?.GetInstanceID()}");
+
             // List<string> checkingNames = new List<string>();
+            // Debug.Log($"start level {levelLimit}");
             while (curCheckingTrans != null && levelLimit > 0)
             {
                 if(!includeInactive && !curCheckingTrans.gameObject.activeSelf)
@@ -482,8 +499,15 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 //     : curCheckingTrans.GetComponent(type);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_GET_COMPONENT_IN_PARENTS
-                Debug.Log($"Search parent {levelLimit}, curCheckingTrans={curCheckingTrans}, componentInParent={componentInParent}");
+                Debug.Log($"Search parent {levelLimit}, curCheckingTrans={curCheckingTrans}, componentInParents={componentsInParents.Count}");
 #endif
+
+                if (hasRoot && ReferenceEquals(curCheckingTrans, prefabRootTrans))
+                {
+                    // Debug.Log($"break on {curCheckingTrans}");
+                    break;
+                }
+                // Debug.Log($"continue on {curCheckingTrans} {curCheckingTrans.GetInstanceID()}");
 
                 // if (componentInParent != null)
                 // {

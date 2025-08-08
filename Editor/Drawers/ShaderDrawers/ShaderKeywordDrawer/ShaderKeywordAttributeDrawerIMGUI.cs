@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
                 return;
             }
 
-            string[] shaderKeywords = GetShaderKeywords(shader).ToArray();
+            string[] shaderKeywords = ShaderKeywordUtils.GetShaderKeywords(shader).ToArray();
             int selectedIndex = Array.IndexOf(shaderKeywords, property.stringValue);
             Rect dropdownButtonRect = EditorGUI.PrefixLabel(position, label);
             // ReSharper disable once InvertIf

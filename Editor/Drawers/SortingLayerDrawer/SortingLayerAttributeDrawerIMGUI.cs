@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
             FieldInfo info, object parent)
         {
-            string[] layers = GetLayers();
+            string[] layers = SortingLayer.layers.Select(each => each.name).ToArray();
 
             int selectedIndex = property.propertyType == SerializedPropertyType.Integer
                 ? property.intValue
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                 {
                     if (newIndex >= layers.Length)
                     {
-                        OpenSortingLayerInspector();
+                        SortingLayerUtils.OpenSortingLayerInspector();
                         return;
                     }
 

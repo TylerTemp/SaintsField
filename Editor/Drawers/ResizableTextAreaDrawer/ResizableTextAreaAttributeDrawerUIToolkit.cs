@@ -73,6 +73,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             };
 
             UIToolkitUtils.AddContextualMenuManipulator(r.labelElement, property, () => Util.PropertyChangedCallback(property, info, null));
+            r.BindProperty(property);
 
             return r;
 

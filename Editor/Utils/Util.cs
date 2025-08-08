@@ -275,7 +275,8 @@ namespace SaintsField.Editor.Utils
                             property.intValue = (int)newValueUInt;
                             break;
                         default:
-                            property.intValue = (int)newValue;
+                            // property.intValue = (int)newValue;
+                            property.intValue = Convert.ToInt32(newValue);
                             break;
                     }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_SET_VALUE
@@ -437,7 +438,7 @@ namespace SaintsField.Editor.Utils
 #endif
             // ReSharper disable once InvertIf
 
-            bool equalCalledResult;
+            bool equalCalledResult = false;
 
             try
             {
@@ -450,7 +451,16 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
 #endif
-                equalCalledResult = itemValue == curValue;
+                try
+                {
+                    equalCalledResult = itemValue == curValue;
+                }
+                catch (Exception e2)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogException(e2);
+#endif
+                }
             }
 
             return equalCalledResult;

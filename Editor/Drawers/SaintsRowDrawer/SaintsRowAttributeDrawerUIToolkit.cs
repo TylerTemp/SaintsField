@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
@@ -34,6 +35,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         protected override bool UseCreateFieldUIToolKit => true;
 
         public const string SaintsRowClass = "saints-field--saintsrow";
+        private static string NameActualContaier(SerializedProperty property) => $"${property.propertyPath}__saintsrow";
 
 
         public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
@@ -49,16 +51,19 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             if (inline)
             {
-                root = new VisualElement
+                root = new EmptyPrefabOverrideElement(property)
                 {
                     style =
                     {
                         flexGrow = 1,
                     },
+                    name = NameActualContaier(property),
                 };
             }
             else
             {
+                VisualElement foldoutWrapper = new VisualElement();
+
                 Foldout foldout = new Foldout
                 {
                     text = label,
@@ -67,15 +72,82 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     {
                         flexGrow = 1,
                     },
+                    name = NameActualContaier(property),
                 };
                 foldout.RegisterValueChangedCallback(evt =>
                 {
                     property.isExpanded = evt.newValue;
                 });
 
+                foldoutWrapper.Add(foldout);
+                foldoutWrapper.Add(new EmptyPrefabOverrideElement(property)
+                {
+                    style =
+                    {
+                        position = Position.Absolute,
+                        top = 0,
+                        bottom = 0,
+                        left = 0,
+                        right = 0,
+                        height = 18,
+                    },
+                    pickingMode = PickingMode.Ignore,
+                });
+
+                // foldout.Add(new EmptyPrefabOverrideElement(property)
+                // {
+                //     style =
+                //     {
+                //         position = Position.Absolute,
+                //         top = -20,
+                //         bottom = 0,
+                //         left = -15,
+                //         right = 0,
+                //         height = 18,
+                //     },
+                //     pickingMode = PickingMode.Ignore,
+                // });
+
+                // Toggle toggle = foldout.Q<Toggle>();
+                // if (toggle != null)
+                // {
+                //     toggle.Add(
+                //         new EmptyPrefabOverrideElement(property)
+                //         {
+                //             style =
+                //             {
+                //                 position = Position.Absolute,
+                //                 top = 0,
+                //                 bottom = 0,
+                //                 left = 0,
+                //                 right = 0,
+                //             },
+                //             pickingMode = PickingMode.Ignore,
+                //         });
+                //     // Label toggleLabel = toggle.Q<Label>();
+                //     // if (toggleLabel != null)
+                //     // {
+                //     //     // EmptyPrefabOverrideElement emptyPrefabOverrideElement =
+                //     //     //     new EmptyPrefabOverrideElement(property)
+                //     //     //     {
+                //     //     //         style =
+                //     //     //         {
+                //     //     //             position = Position.Absolute,
+                //     //     //             top = 0,
+                //     //     //             bottom = 0,
+                //     //     //             left = 0,
+                //     //     //             right = 0,
+                //     //     //         },
+                //     //     //         pickingMode = PickingMode.Ignore,
+                //     //     //     };
+                //     //     // toggleLabel.Add(emptyPrefabOverrideElement);
+                //     // }
+                // }
+
                 UIToolkitUtils.AddContextualMenuManipulator(foldout, property, () => {});
 
-                root = foldout;
+                // root = foldout;
+                root = foldoutWrapper;
             }
 
             root.AddToClassList(SaintsRowClass);
@@ -220,7 +292,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 }
             }
 
-            root.Add(bodyElement);
+            VisualElement actualContainer = root.Q<VisualElement>(NameActualContaier(property));
+
+            actualContainer.Add(bodyElement);
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(doTweenPlayRecorder));
             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));

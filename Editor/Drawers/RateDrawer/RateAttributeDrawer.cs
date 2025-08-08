@@ -32,10 +32,7 @@ namespace SaintsField.Editor.Drawers.RateDrawer
         private GUIStyle _normalClear;
         private GUIStyle _normalFramed;
 
-        private static readonly Color ActiveColor = Color.yellow;
-        private static readonly Color WillActiveColor = new Color(228/255f, 1, 0, 0.7f);
-        private static readonly Color WillInactiveColor = new Color(100/255f, 100/255f, 0, 1f);
-        private static readonly Color InactiveColor = Color.grey;
+
 
         // private static Texture2D MakePixel(Color color)
         // {
@@ -46,8 +43,5 @@ namespace SaintsField.Editor.Drawers.RateDrawer
         //     return result;
         // }
 
-#if UNITY_2021_3_OR_NEWER
-
-#endif
     }
 }

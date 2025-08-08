@@ -262,6 +262,9 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults);
             });
 
+            UIToolkitUtils.AddContextualMenuManipulator(saintsInterfaceField, property,
+                () => {});
+
             return saintsInterfaceField;
         }
 

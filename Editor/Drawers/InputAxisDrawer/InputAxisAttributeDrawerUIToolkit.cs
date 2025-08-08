@@ -2,9 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,78 +16,144 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
 {
     public partial class InputAxisAttributeDrawer
     {
-
-        private static string NameButtonField(SerializedProperty property) => $"{property.propertyPath}__InputAxis";
-
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            IReadOnlyList<string> axisNames = GetAxisNames();
-            int selectedIndex = IndexOf(axisNames, property.stringValue);
-            string buttonLabel = selectedIndex == -1 ? "-" : axisNames[selectedIndex];
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return new VisualElement();
+            }
 
-            UIToolkitUtils.DropdownButtonField dropdownButton =
-                UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
+            InputAxisElement inputAxisElement = new InputAxisElement();
+            inputAxisElement.BindProperty(property);
+            return new StringDropdownField(GetPreferredLabel(property), inputAxisElement);
+        }
 
-            dropdownButton.style.flexGrow = 1;
-            dropdownButton.name = NameButtonField(property);
-            dropdownButton.ButtonLabelElement.text = buttonLabel;
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
+        {
+            if (property.propertyType == SerializedPropertyType.String)
+            {
+                return null;
+            }
 
-            dropdownButton.AddToClassList(ClassAllowDisable);
-
-            return dropdownButton;
+            return new HelpBox($"Type {property.propertyType} is not string.", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButtonField =
-                container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return;
+            }
 
-            UIToolkitUtils.AddContextualMenuManipulator(dropdownButtonField.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+            StringDropdownField layerStringField = container.Q<StringDropdownField>();
+            AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
 
-            dropdownButtonField.ButtonElement.clicked += () =>
-                ShowDropdown(property, container, onValueChangedCallback);
+            layerStringField.Button.clicked += () =>
+                MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
         }
 
-        private static void ShowDropdown(SerializedProperty property,
-            VisualElement container, Action<object> onChange)
+        private static void AddContextualMenuManipulator(VisualElement root, SerializedProperty property,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            IReadOnlyList<string> axisNames = GetAxisNames();
+            UIToolkitUtils.AddContextualMenuManipulator(root, property,
+                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
-            // Button button = container.Q<Button>(NameButtonField(property));
-            UIToolkitUtils.DropdownButtonField buttonLabel =
-                container.Q<UIToolkitUtils.DropdownButtonField>(NameButtonField(property));
-            GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-
-            int selectedIndex = IndexOf(axisNames, property.stringValue);
-
-            // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
-            for (int index = 0; index < axisNames.Count; index++)
+            root.AddManipulator(new ContextualMenuManipulator(evt =>
             {
-                int curIndex = index;
-
-                genericDropdownMenu.AddItem(axisNames[index], index == selectedIndex, () =>
+                string clipboardText = EditorGUIUtility.systemCopyBuffer;
+                if (string.IsNullOrEmpty(clipboardText))
                 {
-                    property.stringValue = axisNames[curIndex];
-                    onChange(axisNames[curIndex]);
-                    buttonLabel.ButtonLabelElement.text = axisNames[curIndex];
-                    property.serializedObject.ApplyModifiedProperties();
-                });
-            }
+                    return;
+                }
 
-            if (axisNames.Count > 0)
-            {
-                genericDropdownMenu.AddSeparator("");
-            }
-
-            genericDropdownMenu.AddItem("Open Input Manager...", false, OpenInputManager);
-
-            genericDropdownMenu.DropDown(buttonLabel.ButtonElement.worldBound, buttonLabel, true);
+                foreach (string axisName in InputAxisUtils.GetAxisNames())
+                {
+                    // ReSharper disable once InvertIf
+                    if (axisName == clipboardText)
+                    {
+                        evt.menu.AppendAction($"Paste \"{axisName}\"", _ =>
+                        {
+                            property.stringValue = axisName;
+                            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, axisName);
+                            property.serializedObject.ApplyModifiedProperties();
+                            onValueChangedCallback.Invoke(axisName);
+                        });
+                        return;
+                    }
+                }
+            }));
         }
+
+        private static void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            AdvancedDropdownList<string> dropdown = new AdvancedDropdownList<string>();
+            dropdown.Add("[Empty String]", string.Empty);
+            dropdown.AddSeparator();
+
+            string selectedName = null;
+            foreach (string axisName in InputAxisUtils.GetAxisNames())
+            {
+                dropdown.Add(axisName, axisName);
+                // ReSharper disable once InvertIf
+                if (axisName == property.stringValue)
+                {
+                    selectedName = axisName;
+                }
+            }
+
+            dropdown.AddSeparator();
+            dropdown.Add("Open Input Manager...", null, false, "d_editicon.sml");
+
+            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            {
+                CurValues = selectedName is null ? Array.Empty<object>(): new object[] { selectedName },
+                DropdownListValue = dropdown,
+                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+            };
+
+            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
+                metaInfo,
+                root.worldBound.width,
+                maxHeight,
+                false,
+                (_, curItem) =>
+                {
+                    string curValue = (string)curItem;
+                    if (curValue == null)
+                    {
+                        InputAxisUtils.OpenInputManager();
+                    }
+                    else
+                    {
+                        property.stringValue = curValue;
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
+                            parent, curValue);
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback.Invoke(curValue);
+                    }
+                }
+            );
+
+            UnityEditor.PopupWindow.Show(worldBound, sa);
+        }
+
 
     }
 }

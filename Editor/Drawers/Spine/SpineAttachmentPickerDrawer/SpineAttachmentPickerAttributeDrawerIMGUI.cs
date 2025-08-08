@@ -83,7 +83,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             {
                 SpineAttachmentPickerAttribute spineAttachmentPickerAttribute = (SpineAttachmentPickerAttribute) saintsAttribute;
 
-                AttachmentsResult attachmentsResult = GetAttachments(spineAttachmentPickerAttribute, property, info, parent);
+                SpineAttachmentUtils.AttachmentsResult attachmentsResult = GetAttachments(spineAttachmentPickerAttribute, property, info, parent);
                 if (attachmentsResult.Error != "")
                 {
                     cached.Error = attachmentsResult.Error;

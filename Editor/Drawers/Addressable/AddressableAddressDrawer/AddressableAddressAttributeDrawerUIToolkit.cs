@@ -5,11 +5,14 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Addressable;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,33 +30,49 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container1,
             FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownButtonField =
-                UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
-            dropdownButtonField.name = NameDropdownField(property);
-            dropdownButtonField.userData = Array.Empty<string>();
-            // ReSharper disable once MergeConditionalExpression
-            dropdownButtonField.ButtonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return new VisualElement();
+            }
 
-            dropdownButtonField.AddToClassList(ClassAllowDisable);
-            return dropdownButtonField;
+            AddressableAddressElement element = new AddressableAddressElement((AddressableAddressAttribute) saintsAttribute);
+            element.BindProperty(property);
+            return new StringDropdownField(GetPreferredLabel(property), element)
+            {
+                name = NameDropdownField(property),
+            };
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
+            if (property.propertyType != SerializedPropertyType.String)
             {
-                style =
+                return new HelpBox($"Type {property.propertyType} is not a string type", HelpBoxMessageType.Error)
                 {
-                    display = DisplayStyle.None,
-                    flexGrow = 1,
-                    flexShrink = 1,
-                },
-                name = NameHelpBox(property),
-            };
-            helpBoxElement.AddToClassList(ClassAllowDisable);
-            return helpBoxElement;
+                    style =
+                    {
+                        display = DisplayStyle.None,
+                        flexGrow = 1,
+                    },
+                };
+            }
+
+            if (AddressableAssetSettingsDefaultObject.Settings == null)
+            {
+                return new HelpBox("Addressable Settings not created.", HelpBoxMessageType.Error)
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 1,
+                    },
+                    name = NameHelpBox(property),
+                };
+            }
+
+            return null;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -61,83 +80,106 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownField =
-                container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-
-            AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
-            dropdownField.ButtonElement.clicked += () =>
-                ShowDropdown(property, addressableAddressAttribute, dropdownField, onValueChangedCallback);
-        }
-
-        private static void ShowDropdown(SerializedProperty property,
-            AddressableAddressAttribute addressableAddressAttribute, UIToolkitUtils.DropdownButtonField dropdownField,
-            Action<object> onValueChangedCallback)
-        {
-            (string _, IEnumerable<AddressableAssetEntry> entries) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
-            string[] keys = entries.Select(each => each.address).ToArray();
-
-            GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-            foreach (string key in keys)
+            if (property.propertyType != SerializedPropertyType.String)
             {
-                string thisKey = key;
-                genericDropdownMenu.AddItem(key, property.stringValue == thisKey, () =>
+                return;
+            }
+            StringDropdownField field = container.Q<StringDropdownField>(NameDropdownField(property));
+
+            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
+            field.Button.clicked += () => ShowDropdown(property, field, (AddressableAddressAttribute)saintsAttribute, onValueChangedCallback, info, parent);
+
+            // ReSharper disable once InvertIf
+            if (AddressableAssetSettingsDefaultObject.Settings == null)
+            {
+                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+
+                void CheckHelpBoxDisplay()
                 {
-                    // dropdownField.buttonLabelElement.text = thisKey;
-                    dropdownField.ButtonLabelElement.text = thisKey;
-                    property.stringValue = thisKey;
+                    if (AddressableAssetSettingsDefaultObject.Settings != null)
+                    {
+                        helpBox.style.display = DisplayStyle.None;
+                    }
+                }
+
+                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(CheckHelpBoxDisplay);
+                field.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CheckHelpBoxDisplay));
+            }
+        }
+
+        private static void ShowDropdown(SerializedProperty property, VisualElement root, AddressableAddressAttribute addressableAddressAttribute, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+            AdvancedDropdownList<string> dropdown = new AdvancedDropdownList<string>();
+
+            string selected = null;
+            if (settings == null)
+            {
+                dropdown.Add("Create Addressable Settings...", null);
+            }
+            else
+            {
+                (string _, IEnumerable<AddressableAssetEntry> entries) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
+                string[] keys = entries.Select(each => each.address).ToArray();
+
+                foreach (string key in keys)
+                {
+                    dropdown.Add(new AdvancedDropdownList<string>(key, key));
+                    if (property.stringValue == key)
+                    {
+                        selected = key;
+                    }
+                }
+
+                if (keys.Length > 0)
+                {
+                    dropdown.AddSeparator();
+                }
+
+                dropdown.Add("Edit Addresses...", null, false, "d_editicon.sml");
+            }
+
+            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            {
+                CurValues = selected is null
+                    ? Array.Empty<object>()
+                    : new object[] { selected },
+                DropdownListValue = dropdown,
+                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+            };
+
+            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
+                metaInfo,
+                root.worldBound.width,
+                maxHeight,
+                false,
+                (_, curItem) =>
+                {
+                    string newValue = (string)curItem;
+                    if (newValue is null)
+                    {
+                        if (settings == null)
+                        {
+                            AddressableAssetSettingsDefaultObject.GetSettings(true);
+                        }
+                        else
+                        {
+                            AddressableUtil.OpenGroupEditor();
+                        }
+                        return;
+                    }
+
+                    property.stringValue = newValue;
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newValue);
                     property.serializedObject.ApplyModifiedProperties();
-                    onValueChangedCallback.Invoke(thisKey);
-                });
-            }
+                    onValueChangedCallback.Invoke(newValue);
+                }
+            );
 
-            if (keys.Length > 0)
-            {
-                genericDropdownMenu.AddSeparator("");
-            }
-
-            genericDropdownMenu.AddItem("Edit Addressable Group...", false, AddressableUtil.OpenGroupEditor);
-
-            genericDropdownMenu.DropDown(dropdownField.ButtonElement.worldBound, dropdownField, true);
-        }
-
-        private static void UpdateHelpBox(HelpBox helpBox, string error)
-        {
-            if (helpBox.text == error)
-            {
-                return;
-            }
-
-            helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-            helpBox.text = error;
-        }
-
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
-        {
-            if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
-            {
-                UpdateHelpBox(container.Q<HelpBox>(name: NameHelpBox(property)), AddressableUtil.ErrorNoSettings);
-                return;
-            }
-
-            UIToolkitUtils.DropdownButtonField dropdownField =
-                container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-            if (dropdownField.ButtonLabelElement.text != property.stringValue)
-            {
-                // ReSharper disable once MergeConditionalExpression
-                dropdownField.ButtonLabelElement.text = property.stringValue == null ? "-" : property.stringValue;
-            }
-        }
-
-        protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
-            IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
-        {
-            UIToolkitUtils.DropdownButtonField dropdownField =
-                container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-            UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
+            UnityEditor.PopupWindow.Show(worldBound, sa);
         }
     }
 }

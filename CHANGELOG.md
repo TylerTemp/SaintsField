@@ -1,6 +1,40 @@
 # Changelog
 
-## 4.24.1 ##
+## 4.24.5 ##
+
+UI Toolkit: Fix blue indicator for prefab modification not display in some property [#276](https://github.com/TylerTemp/SaintsField/issues/276)
+
+## 4.24.4 ##
+
+1.  UI Toolkit: Add blue indicator for prefab modification in:
+    *   `AnimatorParam`
+    *   `AddressableLable AddressableAddress CurveRange`
+    *   `AddressableScene`
+    *   `NavMeshArea`
+    *   `NavMeshAreaMask`
+    *   `SpineSkin`
+    *   `SpineSlot`
+    *   `SpineAttachment`
+
+    Note: There are still some attributes that does not work with prefab's modification blue line. This is basiclly Unity's fault... Read more from [here](https://discussions.unity.com/t/writing-drawers-for-classes-with-properties-that-cant-be-bound/904711/2). There is solution that [should fix this](https://github.com/OscarAbraham/UITKEditorAid/tree/development), but that package seems not work (maybe my setup is wrong).
+    I'm still trying to make this work for these attributes/types, but it'll need some time: `AdvancedDropdown`, `Dropdown`, `SaintsArray`, `SaintsList`, `SaintsDictionary`, `SaintsInterface`, `SaintsHashSet`, `ReferenceHashSet`, `TypeReference`, `SaintsEvent`, `FlagsDropdown`, `EnumToggleButtons`, `ResourcePath`, `ResourceFolder`, `AssetFolder`
+
+2.  Fix: when editing a UI prefab, because Unity will add a "Context Canvas" above the root of the prefab, "Auto Getters" now will ignore that object.
+3.  UI Toolkit: Fix right click context menu for `Spine` related attributes.
+
+## 4.24.3 ##
+
+1.  Fix `enum` of `byte` type gives error on picker [#278](https://github.com/TylerTemp/SaintsField/issues/278)
+2.  Add blue indicator for prefab modification in:
+    *   `Layer`
+    *   `Scene`
+    *   `SortingLayer`
+    *   `Tag`
+    *   `InputAxis`
+    *   `ShaderParam`
+    *   `ShaderKeyword`
+
+## 4.24.2 ##
 
 1.  UI Toolkit: Attempting to inherit the existing Unity context menu in nested classes when right-click on a field [#254](https://github.com/TylerTemp/SaintsField/issues/254)
 2.  UI Toolkit: Fix `AdvancedDropdown` can not show the changed indicator (blue line on left) in prefab when edited. This also fixes enum dropdown if you have `SaintsEditor` enabled

@@ -27,21 +27,30 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
         private const string IconPath = "Spine/icon-path.png";
         private const string IconClipping = "Spine/icon-clipping.png";
 
-        public struct AttachmentInfo
+        public struct AttachmentInfo: IEquatable<AttachmentInfo>
         {
             public string Path;
             public string Name;
             public bool Disabled;
             public string Icon;
+
+            public bool Equals(AttachmentInfo other)
+            {
+                return Path == other.Path && Name == other.Name;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is AttachmentInfo other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Path, Name);
+            }
         }
 
-        public struct AttachmentsResult
-        {
-            public string Error;
-            public string TargetName;
 
-            public IReadOnlyList<AttachmentInfo> AttachmentInfos;
-        }
 
         private static string Validate(SpineAttachmentPickerAttribute spineAttachmentPickerAttribute, SerializedProperty property, MemberInfo info, object parent)
         {
@@ -50,7 +59,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                 return "";
             }
 
-            AttachmentsResult attachmentsResult = GetAttachments(spineAttachmentPickerAttribute, property, info, parent);
+            SpineAttachmentUtils.AttachmentsResult attachmentsResult = GetAttachments(spineAttachmentPickerAttribute, property, info, parent);
             if (attachmentsResult.Error != "")
             {
                 return attachmentsResult.Error;
@@ -82,35 +91,26 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             }
         }
 
-        private static AttachmentsResult GetAttachments(SpineAttachmentPickerAttribute spineAttachmentPickerAttribute, SerializedProperty property, MemberInfo info, object parent)
+        private static SpineAttachmentUtils.AttachmentsResult GetAttachments(SpineAttachmentPickerAttribute spineAttachmentPickerAttribute, SerializedProperty property, MemberInfo info, object parent)
         {
             (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(spineAttachmentPickerAttribute.SkeletonTarget, property, info, parent);
             if (error != "")
             {
-                return new AttachmentsResult
-                {
-                    Error = error,
-                };
+                return new SpineAttachmentUtils.AttachmentsResult(error, null, null);
             }
 
             if (skeletonDataAsset == null)
             {
-                return new AttachmentsResult
-                {
-                    Error =
-                        $"No SkeletonDataAsset found for {property.propertyPath}{(spineAttachmentPickerAttribute.SkeletonTarget == null ? " " : $" {spineAttachmentPickerAttribute.SkeletonTarget}")}",
-                };
+                return new SpineAttachmentUtils.AttachmentsResult($"No SkeletonDataAsset found for {property.propertyPath}{(spineAttachmentPickerAttribute.SkeletonTarget == null ? " " : $" {spineAttachmentPickerAttribute.SkeletonTarget}")}", null, null);
             }
 
             SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
 
             if (skeletonData == null)
             {
-                return new AttachmentsResult
-                {
-                    Error =
-                        $"No skeletonData found for {property.propertyPath}{(spineAttachmentPickerAttribute.SkeletonTarget == null ? " " : $" {spineAttachmentPickerAttribute.SkeletonTarget}")}",
-                };
+                return new SpineAttachmentUtils.AttachmentsResult(
+                    $"No skeletonData found for {property.propertyPath}{(spineAttachmentPickerAttribute.SkeletonTarget == null ? " " : $" {spineAttachmentPickerAttribute.SkeletonTarget}")}",
+                    null, null);
             }
 
             List<Skin> validSkins = new List<Skin>();
@@ -122,10 +122,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                     (string error, string result) skinFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SkinTarget, null, property, info, parent);
                     if (skinFilter.error != "")
                     {
-                        return new AttachmentsResult
-                        {
-                            Error = skinFilter.error,
-                        };
+                        return new SpineAttachmentUtils.AttachmentsResult(skinFilter.error, null, null);
                     }
                     currentSkinName = skinFilter.result;
                 }
@@ -159,10 +156,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                 (string error, string result) slotFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SlotTarget, null, property, info, parent);
                 if (slotFilter.error != "")
                 {
-                    return new AttachmentsResult
-                    {
-                        Error = slotFilter.error,
-                    };
+                    return new SpineAttachmentUtils.AttachmentsResult(slotFilter.error, null, null);
                 }
                 currentSlotName = slotFilter.result;
             }
@@ -239,12 +233,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                 }
             }
 
-            return new AttachmentsResult
-            {
-                Error = "",
-                TargetName = targetName,
-                AttachmentInfos = attachmentInfos,
-            };
+            return new SpineAttachmentUtils.AttachmentsResult(error, targetName, attachmentInfos);
         }
 
         private static string GetIconPathFromAttachment(Attachment attachment)
@@ -269,12 +258,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             }
         }
 
-        private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, AttachmentsResult attachmentsResult, bool subAsSep)
+        private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, SpineAttachmentUtils.AttachmentsResult attachmentsResult, bool subAsSep)
         {
             AdvancedDropdownList<string> dropdownListValue =
                 new AdvancedDropdownList<string>(attachmentsResult.TargetName)
                 {
-                    { "[Null]", "" },
+                    { "[Empty String]", "" },
                 };
 
             dropdownListValue.AddSeparator();

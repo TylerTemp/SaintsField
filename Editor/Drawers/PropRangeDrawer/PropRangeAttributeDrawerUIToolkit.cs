@@ -95,6 +95,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             {
                 name = NamePropRange(property),
             };
+            propRangeField.BindProperty(property);
 
             propRangeField.AddToClassList(ClassAllowDisable);
             propRangeField.labelElement.style.overflow = Overflow.Hidden;

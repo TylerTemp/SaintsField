@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -34,7 +35,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
             dropdownButton.AddToClassList(ClassAllowDisable);
 
-            return dropdownButton;
+            EmptyPrefabOverrideElement emptyPrefabOverrideElement = new EmptyPrefabOverrideElement(property);
+            emptyPrefabOverrideElement.Add(dropdownButton);
+
+            return emptyPrefabOverrideElement;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -78,7 +82,15 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
-            dropdownButton.BindProperty(property);
+
+            // try
+            // {
+            //     dropdownButton.BindProperty(property);
+            // }
+            // catch(IndexOutOfRangeException)
+            // {
+            //     // wtf Unity...
+            // }
 
             UIToolkitUtils.AddContextualMenuManipulator(dropdownButton.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 

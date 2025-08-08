@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
     [CustomPropertyDrawer(typeof(SpineSkinPickerAttribute), true)]
     public partial class SpineSkinPickerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
-        private const string IconPath = "Spine/icon-skin.png";
+
 
         private static string Validate(string callback, SerializedProperty property, MemberInfo info, object parent)
         {
@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
                 return "";
             }
 
-            (string error, ExposedList<Skin> skins) = GetSkins(callback, property, info, parent);
+            (string error, ExposedList<Skin> skins) = SpineSkinUtils.GetSkins(callback, property, info, parent);
             if (error != "")
             {
                 return error;
@@ -39,36 +39,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
                 : $"{property.stringValue} is not a valid skin: {string.Join(", ", skins)}";
         }
 
-        private static (string error, ExposedList<Skin> skins) GetSkins(string callback, SerializedProperty property, MemberInfo info, object parent)
-        {
-            (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(callback, property, info, parent);
-            if (error != "")
-            {
-                return (error, null);
-            }
-
-            if (skeletonDataAsset == null)
-            {
-                return ($"No SkeletonDataAsset found for {property.propertyPath}{(callback == null? " ": $" {callback}")}", null);
-            }
-
-            SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
-
-            if (skeletonData == null)
-            {
-                return ($"No skeletonData found for {property.propertyPath}{(callback == null? " ": $" {callback}")}", null);
-            }
-
-            ExposedList<Skin> skins = skeletonData.Skins;
-            return ("", skins);
-        }
-
         private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, ExposedList<Skin> skins, bool isImGui)
         {
             AdvancedDropdownList<string> dropdownListValue =
                 new AdvancedDropdownList<string>(isImGui? "Select Skin": "")
                 {
-                    { "[Null]", "" },
+                    { "[Empty String]", "" },
                 };
 
             dropdownListValue.AddSeparator();
@@ -77,7 +53,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
 
             foreach (Skin skin in skins)
             {
-                dropdownListValue.Add(skin.Name, skin.Name, icon: IconPath);
+                dropdownListValue.Add(skin.Name, skin.Name, icon: SpineSkinUtils.IconPath);
             }
 
             // if (curValues.Length == 0)

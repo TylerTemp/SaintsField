@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -376,7 +377,23 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     position = Position.Relative,
                 },
             };
+
             SerializedProperty property = FieldWithInfo.SerializedProperty;
+
+            root.Add(new EmptyPrefabOverrideElement(property)
+            {
+                style =
+                {
+                    position = Position.Absolute,
+                    top = 0,
+                    bottom = 0,
+                    left = 0,
+                    right = 0,
+                    height = 18,
+                },
+                pickingMode = PickingMode.Ignore,
+            });
+
             List<int> fullList = Enumerable.Range(0, property.arraySize).ToList();
             _asyncSearchItems = new AsyncSearchItems
             {

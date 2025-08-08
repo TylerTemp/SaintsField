@@ -61,15 +61,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
             };
         }
 
-        private static IEnumerable<string> GetShaderKeywords(Shader shader)
-        {
-            LocalKeywordSpace keywordSpace = shader.keywordSpace;
 
-            foreach (LocalKeyword localKeyword in keywordSpace.keywords)
-            {
-                yield return localKeyword.name;
-            }
-        }
 
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             SerializedProperty property, MemberInfo memberInfo, object parent)
@@ -97,7 +89,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
 
             string selectedShaderKeyword = property.stringValue;
 
-            if (GetShaderKeywords(shader).Any(shaderKeyword => selectedShaderKeyword == shaderKeyword))
+            if (ShaderKeywordUtils.GetShaderKeywords(shader).Any(shaderKeyword => selectedShaderKeyword == shaderKeyword))
             {
                 return null;
             }

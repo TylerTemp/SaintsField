@@ -207,14 +207,19 @@ namespace SaintsField.Editor.Utils
 
         private static VisualTreeAsset _dropdownButtonTree;
 
-        public static DropdownButtonField MakeDropdownButtonUIToolkit(string label)
+        public static TemplateContainer CloneDropdownButtonTree()
         {
             if (_dropdownButtonTree == null)
             {
                 _dropdownButtonTree = Util.LoadResource<VisualTreeAsset>("UIToolkit/DropdownButton.uxml");
             }
 
-            TemplateContainer dropdownElement = _dropdownButtonTree.CloneTree();
+            return _dropdownButtonTree.CloneTree();
+        }
+
+        public static DropdownButtonField MakeDropdownButtonUIToolkit(string label)
+        {
+            TemplateContainer dropdownElement = CloneDropdownButtonTree();
             Button button = dropdownElement.Q<Button>();
             // Button button = new Button
             // {

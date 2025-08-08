@@ -1347,6 +1347,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private static IEnumerable<ResourceInfo> GetGameObjectsAncestor(ResourceInfo resourceInfo, bool withSelf, bool insidePrefab)
         {
+            // Debug.Log(resourceInfo.Resource);
+
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (resourceInfo.Resource)
             {
@@ -1376,6 +1378,12 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 }
             }
 
+            (bool hasRoot, GameObject prefabRoot) = GetPrefabRoot();
+            if(hasRoot && ReferenceEquals(go, prefabRoot))
+            {
+                yield break;
+            }
+
             foreach (GameObject gameObject in GetRecursivelyParentGameObject(go))
             {
                 if (insidePrefab)
@@ -1399,10 +1407,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private static IEnumerable<GameObject> GetRecursivelyParentGameObject(GameObject go)
         {
+            (bool hasRoot, GameObject prefabRoot) = GetPrefabRoot();
+
             Transform cur = go.transform.parent;
             while (cur)
             {
                 yield return cur.gameObject;
+
+                if (hasRoot && ReferenceEquals(prefabRoot.transform, cur))
+                {
+                    yield break;
+                }
+
                 cur = cur.parent;
             }
         }
@@ -1412,13 +1428,24 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             switch (resourceInfo.Resource)
             {
                 case GameObject go:
+                {
+                    (bool hasRoot, GameObject prefabRoot) = GetPrefabRoot();
+                    if (hasRoot && ReferenceEquals(go, prefabRoot))
+                    {
+                        return null;
+                    }
+                }
                     return go.transform.parent;
                 case Component comp:
+                {
+                    (bool hasRoot, GameObject prefabRoot) = GetPrefabRoot();
+                    if (hasRoot && ReferenceEquals(comp, prefabRoot.transform))
+                    {
+                        return null;
+                    }
+                }
                     return comp.transform.parent;
                 default:
-                {
-
-                }
                     return null;
             }
         }
