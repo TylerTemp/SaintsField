@@ -44,13 +44,13 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        private static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj, bool isImGui)
+        public static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, PathedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj, bool isImGui)
         {
             string funcName = advancedDropdownAttribute.FuncName;
 
             string error;
             IAdvancedDropdownList dropdownListValue = null;
-            if (advancedDropdownAttribute.BehaveMode == AdvancedDropdownAttribute.Mode.Options)
+            if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Options)
             {
                 AdvancedDropdownList<object> optionsDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
                 foreach (object value in advancedDropdownAttribute.Options)
@@ -61,7 +61,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 error = "";
                 dropdownListValue = optionsDropdown;
             }
-            else if (advancedDropdownAttribute.BehaveMode == AdvancedDropdownAttribute.Mode.Tuples)
+            else if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Tuples)
             {
                 AdvancedDropdownList<object> tuplesDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
                 foreach ((string path, object value) in advancedDropdownAttribute.Tuples)
