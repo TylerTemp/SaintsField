@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using SaintsField.Playa;
 using UnityEngine;
 
 namespace SaintsField.Utils
@@ -537,6 +538,24 @@ namespace SaintsField.Utils
                 // Debug.Log(tagValue);
             }
             return (tagNameStrip, tagValue);
+        }
+
+        public static bool SimpleSearch(string sourceContent, IReadOnlyList<ListSearchToken> tokens)
+        {
+            foreach (ListSearchToken token in tokens)
+            {
+                if (token.Type == ListSearchType.Exclude && sourceContent.Contains(token.Token))
+                {
+                    return false;
+                }
+
+                if (token.Type == ListSearchType.Include && !sourceContent.Contains(token.Token))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

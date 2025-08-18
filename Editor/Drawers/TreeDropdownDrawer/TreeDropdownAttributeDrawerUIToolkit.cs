@@ -7,6 +7,7 @@ using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -44,17 +45,24 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
             // Debug.Log(string.Join(",", metaInfo.CurValues));
 
+            VisualElement root = new VisualElement();
+
+            CleanableTextInputFullWidth cleanableTextInput = new CleanableTextInputFullWidth(null);
+            root.Add(cleanableTextInput);
+
             TreeView treeView = new TreeView();
+            root.Add(treeView);
 
             HashSet<int> selectedIds = new HashSet<int>();
             HashSet<int> selectedValueIds = new HashSet<int>();
 
-            (List<TreeViewItemData<IAdvancedDropdownList>> nestedItems, int _, bool _) = MakeNestedItems(
+            List<TreeViewItemData<IAdvancedDropdownList>> nestedItems = MakeNestedItems(
+                Array.Empty<ListSearchToken>(),
                 metaInfo.DropdownListValue,
                 metaInfo.CurValues,
                 0,
                 selectedIds,
-                selectedValueIds);
+                selectedValueIds).ItemDatas;
 
             // List<TreeViewItemData<string>> items = new List<TreeViewItemData<string>>(10);
             // for (int i = 0; i < 10; i++)
@@ -87,8 +95,37 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             treeView.selectionType = SelectionType.Single;
             treeView.Rebuild();
 
-            treeView.SetSelectionById(selectedIds);
-            Debug.Log($"selectedIds={string.Join(",", selectedIds)}");
+            HashSet<int> initSelectedIds = new HashSet<int>(selectedIds);
+            HashSet<int> initSelectedValueIds = new HashSet<int>(selectedValueIds);
+
+            treeView.SetSelectionById(initSelectedIds);
+            Debug.Log($"selectedIds={string.Join(",", initSelectedIds)}");
+
+            cleanableTextInput.TextField.RegisterValueChangedCallback(evt =>
+            {
+                string searchText = evt.newValue.Trim();
+                selectedIds.Clear();
+                selectedValueIds.Clear();
+
+                if(string.IsNullOrEmpty(searchText))
+                {
+                    selectedIds.UnionWith(initSelectedIds);
+                    selectedValueIds.UnionWith(initSelectedValueIds);
+                    treeView.SetRootItems(nestedItems);
+                    treeView.Rebuild();
+                    return;
+                }
+
+                Debug.Log($"searchText={searchText}");
+                treeView.SetRootItems(MakeNestedItems(
+                    SerializedUtils.ParseSearch(searchText).ToArray(),
+                    metaInfo.DropdownListValue,
+                    metaInfo.CurValues,
+                    0,
+                    selectedIds,
+                    selectedValueIds).ItemDatas);
+                treeView.Rebuild();
+            });
 
             // Callback invoked when the user double clicks an item
             // treeView.itemsChosen += (selectedItems) =>
@@ -96,53 +133,138 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             //     Debug.Log("Items chosen: " + string.Join(", ", selectedItems));
             // };
 
+            double lastClickTime = double.MinValue;
+            double lastSelectTime = double.MinValue;
+            IReadOnlyList<object> selectedItems = null;
+
             // Callback invoked when the user changes the selection inside the TreeView
             treeView.selectedIndicesChanged += (selectedIndices) =>
             {
-                // bool valueSelected = false;
+                bool valueSelected = false;
+                List<object> curSelectedItems = new List<object>();
                 foreach (int index in selectedIndices)
                 {
                     IAdvancedDropdownList r = treeView.GetItemDataForIndex<IAdvancedDropdownList>(index);
+                    // ReSharper disable once InvertIf
                     if (r.Count == 0)
                     {
-                        // valueSelected = true;
-                        break;
+                        valueSelected = true;
+                        curSelectedItems.Add(r.value);
                     }
                 }
 
-                // if (!valueSelected)
-                // {
-                //     treeView.SetSelectionById(selectedIds);
-                // }
+                if (!valueSelected)
+                {
+                    selectedItems = null;
+                    lastSelectTime = double.MinValue;
+                    return;
+                }
+
+                // Debug.Log($"{string.Join(", ", selectedItems)}");
+                selectedItems = curSelectedItems;
+                lastSelectTime = EditorApplication.timeSinceStartup;
+                CheckClickTarget();
             };
 
-            return treeView;
+            treeView.RegisterCallback<MouseDownEvent>(_ =>
+            {
+                lastClickTime = EditorApplication.timeSinceStartup;
+                CheckClickTarget();
+            });
+
+            treeView.RegisterCallback<KeyUpEvent>(e =>
+            {
+                // Debug.Log(e.keyCode);
+                if (e.keyCode is KeyCode.Return or KeyCode.KeypadEnter && selectedItems != null)
+                {
+                    Debug.Log($"enter {string.Join(", ", selectedItems)}");
+                }
+            }, TrickleDown.TrickleDown);
+
+            void CheckClickTarget()
+            {
+                double diff = lastSelectTime - lastClickTime;
+                // Debug.Log(diff);
+                if (diff is > -0.01d and < 0.01d && selectedItems != null)
+                {
+                    Debug.Log($"click {string.Join(", ", selectedItems)}");
+                }
+            }
+
+            return root;
 
         }
 
-        private static (List<TreeViewItemData<IAdvancedDropdownList>> itemDatas, int resultId, bool hasSelect) MakeNestedItems(IAdvancedDropdownList dropdownLis,
+        public readonly struct MakeNestedItemResult
+        {
+            public readonly List<TreeViewItemData<IAdvancedDropdownList>> ItemDatas;
+            public readonly int ResultId;
+            public readonly bool HasSelect;
+            // public readonly bool IsEmptyNode;
+
+            public MakeNestedItemResult(List<TreeViewItemData<IAdvancedDropdownList>> itemDatas, int resultId, bool hasSelect)
+            {
+                ItemDatas = itemDatas;
+                ResultId = resultId;
+                HasSelect = hasSelect;
+                // IsEmptyNode = isEmptyNode;
+            }
+        }
+
+        private static MakeNestedItemResult MakeNestedItems(IReadOnlyList<ListSearchToken> searchTokens, IAdvancedDropdownList dropdownLis,
             IReadOnlyList<object> curValues, int accId, HashSet<int> selectedNestedIds, HashSet<int> selectedValueIds)
         {
             List<TreeViewItemData<IAdvancedDropdownList>> result = new List<TreeViewItemData<IAdvancedDropdownList>>(dropdownLis.Count);
 
             bool hasSelect = false;
             int incrId = accId;
+            bool isEmptyNode = true;
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (IAdvancedDropdownList dropdownItem in dropdownLis)
             {
+                bool isSearchMatched;
+                if (searchTokens.Count == 0)
+                {
+                    isSearchMatched = true;
+                }
+                else if (dropdownItem.isSeparator)
+                {
+                    isSearchMatched = searchTokens.Count == 0;
+                }
+                else if (dropdownItem.ChildCount() > 0)  // leaf node is always matched, unless the children are empty
+                {
+                    isSearchMatched = true;
+                }
+                else
+                {
+                    isSearchMatched = IsSearchMatched(dropdownItem.absolutePathFragments, searchTokens);
+                    Debug.Log($"matched for {string.Join('/', dropdownItem.absolutePathFragments)}");
+                }
+
+                if (!isSearchMatched)
+                {
+                    continue;
+                }
+
                 incrId += 1;
 
                 Debug.Log($"id={incrId} for {dropdownItem.displayName}");
 
-                (List<TreeViewItemData<IAdvancedDropdownList>> children, int resultId, bool childSelect) = MakeNestedItems(dropdownItem, curValues, incrId, selectedNestedIds, selectedValueIds);
+                // (List<TreeViewItemData<IAdvancedDropdownList>> children, int resultId, bool childSelect) = MakeNestedItems(dropdownItem, curValues, incrId, selectedNestedIds, selectedValueIds);
+                MakeNestedItemResult tailResult = MakeNestedItems(searchTokens, dropdownItem, curValues, incrId, selectedNestedIds, selectedValueIds);
+
+                if (dropdownItem.ChildCount() > 0 && tailResult.ItemDatas.Count == 0)
+                {
+                    continue;
+                }
 
                 result.Add(new TreeViewItemData<IAdvancedDropdownList>(
                     incrId,
                     dropdownItem,
-                    children));
+                    tailResult.ItemDatas));
 
                 bool selectedValue = (dropdownItem.Count == 0 && curValues.Contains(dropdownItem.value));
-                if (childSelect || selectedValue)
+                if (tailResult.HasSelect || selectedValue)
                 {
                     selectedNestedIds.Add(incrId);
                     hasSelect = true;
@@ -152,10 +274,39 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                 }
 
-                incrId = resultId;
+                incrId = tailResult.ResultId;
+                isEmptyNode = false;
             }
 
-            return (result, incrId, hasSelect);
+            return new MakeNestedItemResult(result, incrId, hasSelect);
+        }
+
+        private static bool IsSearchMatched(IReadOnlyList<string> sourceFragments, IReadOnlyList<ListSearchToken> searchTokens)
+        {
+            foreach (ListSearchToken token in searchTokens)
+            {
+                bool hasMatched = false;
+                foreach (string sourceContent in sourceFragments)
+                {
+                    if (token.Type == ListSearchType.Exclude && sourceContent.Contains(token.Token))
+                    {
+                        return false;
+                    }
+
+                    if (token.Type == ListSearchType.Include && sourceContent.Contains(token.Token))
+                    {
+                        hasMatched = true;
+                        break;
+                    }
+                }
+
+                if (!hasMatched)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

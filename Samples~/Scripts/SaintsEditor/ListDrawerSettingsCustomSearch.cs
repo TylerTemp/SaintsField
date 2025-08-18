@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
+using SaintsField.Utils;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
@@ -29,21 +30,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
                 { WeaponType.Sword , "刀剑 单手" },
                 { WeaponType.Hammer, "大锤 双手" },
             }[weapon.weaponType];
-
-            foreach (ListSearchToken token in tokens)
-            {
-                if (token.Type == ListSearchType.Exclude && searchName.Contains(token.Token))
-                {
-                    return false;
-                }
-
-                if (token.Type == ListSearchType.Include && !searchName.Contains(token.Token))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return RuntimeUtil.SimpleSearch(searchName, tokens);
         }
 
         [ListDrawerSettings(extraSearch: nameof(ExtraSearch))]
