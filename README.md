@@ -105,7 +105,9 @@ namespace: `SaintsField`
 
 **4.24.5**
 
-UI Toolkit: Fix blue indicator for prefab modification not display in some property [#276](https://github.com/TylerTemp/SaintsField/issues/276)
+1.  UI Toolkit: Improve `SaintsDictionary`, `Table`, `SaintsHashSet` UI to make it more like Unity's ListView
+2.  UI Toolkit: use `LeftToggle` when using bool in `SaintsDictionary`, `Table`, `SaintsHashSet`, and Horizontal Layout
+3.  UI Toolkit: fix Horizontal Layout broken label layout since 4.16.0
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

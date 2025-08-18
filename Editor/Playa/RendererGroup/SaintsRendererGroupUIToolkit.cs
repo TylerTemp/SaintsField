@@ -394,7 +394,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                 Debug.Log($"add item@{groupPath}->{groupId}: {renderer}");
 #endif
-                EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
+
+                bool inHorizontal = EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
+                renderer.InAnyHorizontalLayout = InAnyHorizontalLayout || inHorizontal;
 
                 VisualElement fieldElement = renderer.CreateVisualElement();
                 // ReSharper disable once InvertIf

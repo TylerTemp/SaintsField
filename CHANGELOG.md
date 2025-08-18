@@ -2,7 +2,9 @@
 
 ## 4.24.6 ##
 
-
+1.  UI Toolkit: Improve `SaintsDictionary`, `Table`, `SaintsHashSet` UI to make it more like Unity's ListView
+2.  UI Toolkit: use `LeftToggle` when using bool in `SaintsDictionary`, `Table`, `SaintsHashSet`, and Horizontal Layout
+3.  UI Toolkit: fix Horizontal Layout broken label layout since 4.16.0
 
 ## 4.24.5 ##
 
