@@ -7498,6 +7498,66 @@ MonoBehaviour:
     mySprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
     showImage: 
     escapedImage: 
+--- !u!1 &621351311
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 621351312}
+  - component: {fileID: 621351313}
+  m_Layer: 0
+  m_Name: TestLeftToggleH
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &621351312
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 621351311}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &621351313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 621351311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5220f2e7cd8d0874cb8936f895ca2f85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toggleDict:
+    _keys: 
+    _values: 
+    _saintsKeys:
+    - value: 0
+    - value: 1
+    _saintsValues:
+    - value: 1
+    - value: 0
+  toggleTable:
+  - b1: 0
+    b2: 0
+    b3: 0
+  - b1: 0
+    b2: 0
+    b3: 0
 --- !u!1 &622173741
 GameObject:
   m_ObjectHideFlags: 0
@@ -22532,6 +22592,7 @@ Transform:
   - {fileID: 1165363215}
   - {fileID: 1958928224}
   - {fileID: 527618959}
+  - {fileID: 621351312}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1490458620

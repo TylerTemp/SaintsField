@@ -8,6 +8,7 @@ using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.RendererGroup;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
@@ -101,15 +102,15 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             // }
 
             // controls
-            VisualElement controls = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    justifyContent = Justify.FlexEnd,
-                    // marginBottom = 4,
-                },
-            };
+            // VisualElement controls = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         flexDirection = FlexDirection.Row,
+            //         justifyContent = Justify.FlexEnd,
+            //         // marginBottom = 4,
+            //     },
+            // };
 
             MultiColumnListView multiColumnListView = new MultiColumnListView
             {
@@ -134,7 +135,10 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 isDelayed = true,
                 style =
                 {
-                    minWidth = 50,
+                    width = 50,
+                    alignSelf = Align.FlexEnd,
+                    marginRight = 3,
+                    marginTop = -18,
                 },
                 name = NameArraySize(property),
             };
@@ -152,45 +156,73 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 multiColumnListView.itemsSource = MakeSource(arrayProp);
                 multiColumnListView.Rebuild();
             });
-            controls.Add(arraySizeField);
 
-            Toolbar toolbar = new Toolbar();
-            ToolbarButton addButton = new ToolbarButton(() =>
+            root.Add(arraySizeField);
+
+            // controls.Add(arraySizeField);
+
+            ListViewFooterElement listViewFooter = new ListViewFooterElement
+            {
+                AddButton =
+                {
+                    name = NameAddButton(property),
+                },
+                RemoveButton =
+                {
+                    name =  NameRemoveButton(property),
+                },
+            };
+            listViewFooter.AddButton.clicked += () =>
             {
                 int oldValue = arrayProp.arraySize;
                 ChangeArraySize(oldValue + 1, arrayProp);
-            })
-            {
-                text = "+",
-                name = NameAddButton(property),
             };
+
+            // Toolbar toolbar = new Toolbar();
+            // ToolbarButton addButton = new ToolbarButton(() =>
+            // {
+            //     int oldValue = arrayProp.arraySize;
+            //     ChangeArraySize(oldValue + 1, arrayProp);
+            // })
+            // {
+            //     text = "+",
+            //     name = NameAddButton(property),
+            // };
             if (tableAttribute.HideAddButton)
             {
-                addButton.style.display = DisplayStyle.None;
+                // addButton.style.display = DisplayStyle.None;
+                listViewFooter.AddButton.style.display = DisplayStyle.None;
             }
-            toolbar.Add(addButton);
-            ToolbarButton removeButton = new ToolbarButton(() =>
+            // toolbar.Add(addButton);
+
+            listViewFooter.RemoveButton.clicked += () =>
             {
                 DeleteArrayElement(arrayProp, multiColumnListView.selectedIndices);
-            })
-            {
-                text = "-",
-                name = NameRemoveButton(property),
             };
+
+            // ToolbarButton removeButton = new ToolbarButton(() =>
+            // {
+            //     DeleteArrayElement(arrayProp, multiColumnListView.selectedIndices);
+            // })
+            // {
+            //     text = "-",
+            //     name = NameRemoveButton(property),
+            // };
             if (tableAttribute.HideRemoveButton)
             {
-                removeButton.style.display = DisplayStyle.None;
+                // removeButton.style.display = DisplayStyle.None;
+                listViewFooter.RemoveButton.style.display = DisplayStyle.None;
             }
-            toolbar.Add(removeButton);
+            // toolbar.Add(removeButton);
 
             if (tableAttribute.HideAddButton && tableAttribute.HideRemoveButton)
             {
                 arraySizeField.SetEnabled(false);
             }
 
-            controls.Add(toolbar);
+            // controls.Add(toolbar);
 
-            root.Add(controls);
+            // root.Add(toolbar);
 
             #region Headers
 
@@ -649,6 +681,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             });
 // #endif
 
+            root.Add(listViewFooter);
             // return root;
         }
 

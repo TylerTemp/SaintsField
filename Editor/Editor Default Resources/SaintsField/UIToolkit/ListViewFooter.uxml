@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="unity-list-view__footer" class="unity-list-view__footer">
+        <ui:Button text="+" parse-escape-sequences="true" display-tooltip-when-elided="true" name="saints-add-button" tooltip="Add Instance" />
+        <ui:Button text="-" parse-escape-sequences="true" display-tooltip-when-elided="true" name="saints-remove-button" tooltip="Remove" />
+    </ui:VisualElement>
+</ui:UXML>

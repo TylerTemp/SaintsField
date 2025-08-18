@@ -542,14 +542,16 @@ namespace SaintsField.Utils
 
         public static bool SimpleSearch(string sourceContent, IReadOnlyList<ListSearchToken> tokens)
         {
+            string sourceLow = sourceContent.ToLower();
             foreach (ListSearchToken token in tokens)
             {
-                if (token.Type == ListSearchType.Exclude && sourceContent.Contains(token.Token))
+                string tokenLow = token.Token.ToLower();
+                if (token.Type == ListSearchType.Exclude && sourceLow.Contains(tokenLow))
                 {
                     return false;
                 }
 
-                if (token.Type == ListSearchType.Include && !sourceContent.Contains(token.Token))
+                if (token.Type == ListSearchType.Include && !sourceLow.Contains(tokenLow))
                 {
                     return false;
                 }

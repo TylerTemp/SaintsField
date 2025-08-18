@@ -137,7 +137,6 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 {
                     flexDirection = FlexDirection.Row,
                     justifyContent = Justify.FlexEnd,
-                    marginRight = 5,
                 },
             };
 
@@ -265,30 +264,15 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             };
             footerButtons.Add(pageNextButton);
 
-            footerButtons.Add(new Button
-            {
-                text = "+",
-                style =
-                {
-                    marginLeft = 0,
-                    marginRight = 0,
-                },
-                name = NameAddButton(property),
-            });
-            footerButtons.Add(new Button
-            {
-                text = "-",
-                style =
-                {
-                    marginLeft = 0,
-                    marginRight = 0,
-                },
-                name = NameRemoveButton(property),
-            });
+            ListViewFooterElement footerAddRemove = new ListViewFooterElement();
+
+            footerButtons.Add(footerAddRemove);
+
+            footerAddRemove.AddButton.name = NameAddButton(property);
+            footerAddRemove.RemoveButton.name = NameRemoveButton(property);
 
             foldout.Add(footerButtons);
 
-            // root.Add(multiColumnListView);
             return root;
         }
 
