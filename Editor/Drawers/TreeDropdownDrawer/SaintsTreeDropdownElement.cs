@@ -17,7 +17,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 {
     public class SaintsTreeDropdownElement: VisualElement
     {
-        // public UnityEvent<object> OnValueSelected { get; } = new UnityEvent<object>();
+        public UnityEvent<object> OnValueSelected { get; } = new UnityEvent<object>();
+        public UnityEvent OnMeaningfulInteraction { get; } = new UnityEvent();
 
         public SaintsTreeDropdownElement(AdvancedDropdownMetaInfo metaInfo)
         {
@@ -25,6 +26,17 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             CleanableTextInputFullWidth cleanableTextInput = new CleanableTextInputFullWidth(null);
             Add(cleanableTextInput);
+
+            IEnumerable<VisualElement> treeRowElements = MakeNestedTreeRow(0, Array.Empty<ListSearchToken>(),
+                metaInfo.DropdownListValue,
+                metaInfo.CurValues);
+
+            VisualElement treeContainer = new VisualElement();
+            foreach (VisualElement treeRow in treeRowElements)
+            {
+                treeContainer.Add(treeRow);
+            }
+            Add(treeContainer);
 
             TreeView treeView = new TreeView();
             Add(treeView);
@@ -112,6 +124,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             double lastClickTime = double.MinValue;
             double lastSelectTime = double.MinValue;
             IReadOnlyList<object> selectedItems = null;
+            HashSet<object> initSelectedItems = new HashSet<object>(initSelectedIds.Select(each => treeView.GetItemDataForId<IAdvancedDropdownList>(each).value));
 
             // Callback invoked when the user changes the selection inside the TreeView
             treeView.selectedIndicesChanged += selectedIndices =>
@@ -151,9 +164,14 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             treeView.RegisterCallback<KeyUpEvent>(e =>
             {
                 // Debug.Log(e.keyCode);
-                if (e.keyCode is KeyCode.Return or KeyCode.KeypadEnter && selectedItems != null)
+                if (e.keyCode is KeyCode.Return or KeyCode.KeypadEnter)
                 {
-                    Debug.Log($"enter {string.Join(", ", selectedItems)}");
+                    if(selectedItems != null)
+                    {
+                        Debug.Log($"enter {string.Join(", ", selectedItems)}");
+                        CheckSelect();
+                    }
+                    OnMeaningfulInteraction.Invoke();
                 }
             }, TrickleDown.TrickleDown);
             return;
@@ -165,8 +183,107 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 if (diff is > -0.01d and < 0.01d && selectedItems != null)
                 {
                     Debug.Log($"click {string.Join(", ", selectedItems)}");
+                    CheckSelect();
+                    OnMeaningfulInteraction.Invoke();
                 }
             }
+
+            void CheckSelect()
+            {
+                foreach (object selectedItem in selectedItems)
+                {
+                    if (!initSelectedItems.Contains(selectedItem))
+                    {
+                        Debug.Log($"select {selectedItem}");
+                        OnValueSelected.Invoke(selectedItem);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private IReadOnlyList<VisualElement> MakeNestedTreeRow(int indent, IReadOnlyList<ListSearchToken> searchTokens, IAdvancedDropdownList dropdownLis, IReadOnlyList<object> curValues)
+        {
+            List<VisualElement> result = new List<VisualElement>(dropdownLis.Count);
+
+            bool hasMeaningfulChild = false;
+            // bool hasSelect = false;
+            // int incrId = accId;
+            // bool isEmptyNode = true;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (IAdvancedDropdownList dropdownItem in dropdownLis)
+            {
+                if (dropdownItem.isSeparator)
+                {
+                    result.Add(new TreeRowSepElement(indent));
+                    continue;
+                }
+
+                if (dropdownItem.ChildCount() == 0)  // value node
+                {
+                    hasMeaningfulChild = true;
+                    result.Add(new TreeRowValueElement(dropdownItem.displayName, indent, false));
+                    continue;
+                }
+
+                bool isSearchMatched;
+                if (searchTokens.Count == 0)
+                {
+                    isSearchMatched = true;
+                }
+                else if (dropdownItem.isSeparator)
+                {
+                    isSearchMatched = searchTokens.Count == 0;
+                }
+                else if (dropdownItem.ChildCount() > 0)  // leaf node is always matched, unless the children are empty
+                {
+                    isSearchMatched = true;
+                }
+                else
+                {
+                    isSearchMatched = IsSearchMatched(dropdownItem.absolutePathFragments, searchTokens);
+                    Debug.Log($"matched for {string.Join('/', dropdownItem.absolutePathFragments)}");
+                }
+
+                if (!isSearchMatched)
+                {
+                    continue;
+                }
+
+                // (List<TreeViewItemData<IAdvancedDropdownList>> children, int resultId, bool childSelect) = MakeNestedItems(dropdownItem, curValues, incrId, selectedNestedIds, selectedValueIds);
+                IReadOnlyList<VisualElement> tailResult = MakeNestedTreeRow(indent + 1, searchTokens, dropdownItem, curValues);
+
+                if (dropdownItem.ChildCount() > 0 && tailResult.Count == 0)
+                {
+                    continue;
+                }
+
+                hasMeaningfulChild = true;
+
+                var thisNode = new TreeRowFoldoutElement(dropdownItem.displayName, indent, true);
+                foreach (VisualElement childElement in tailResult)
+                {
+                    thisNode.AddContent(childElement);
+                }
+
+                result.Add(thisNode);
+
+                // bool selectedValue = (dropdownItem.Count == 0 && curValues.Contains(dropdownItem.value));
+                // if (tailResult.HasSelect || selectedValue)
+                // {
+                //     selectedNestedIds.Add(incrId);
+                //     hasSelect = true;
+                //     if (selectedValue)
+                //     {
+                //         selectedValueIds.Add(incrId);
+                //     }
+                // }
+
+                // incrId = tailResult.ResultId;
+                // isEmptyNode = false;
+            }
+
+            return hasMeaningfulChild ? result : Array.Empty<VisualElement>();
         }
 
         public readonly struct MakeNestedItemResult

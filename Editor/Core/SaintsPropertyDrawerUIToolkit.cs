@@ -794,7 +794,14 @@ namespace SaintsField.Editor.Core
 
                 IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
                 {
-                    property.serializedObject.Update();
+                    try
+                    {
+                        property.serializedObject.Update();
+                    }
+                    catch (Exception)
+                    {
+                        return;
+                    }
 
                     GUIContent label = imguiLabelHelper.NoLabel
                         ? GUIContent.none
