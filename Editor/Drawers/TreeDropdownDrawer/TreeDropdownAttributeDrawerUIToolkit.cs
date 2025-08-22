@@ -1,3 +1,4 @@
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,3 +49,4 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         }
     }
 }
+#endif
