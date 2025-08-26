@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
@@ -9,13 +10,21 @@ namespace SaintsField.Editor.UIToolkitElements
     [UxmlElement]
 #endif
     // ReSharper disable once ClassNeverInstantiated.Global
-    public partial class TreeRowValueElement: VisualElement
+    public partial class TreeRowValueElement: TreeRowAbsElement
     {
+        private bool _isOn;
         private static VisualTreeAsset _treeRowTemplate;
+
+        public Button MainButton;
+        public Button ToggleButton;
 
         public TreeRowValueElement(): this(null, 0, false)
         {
         }
+
+        private bool _innerButton;
+        private static Texture2D _checkedIcon;
+        private static Texture2D _uncheckedIcon;
 
         public TreeRowValueElement(string label, int indent, bool toggle)
         {
@@ -24,10 +33,34 @@ namespace SaintsField.Editor.UIToolkitElements
 
             treeRow.Q<VisualElement>("saintsfield-tree-row-foldout").RemoveFromHierarchy();
 
+            MainButton = treeRow.Q<Button>("saintsfield-tree-row");
+
+            MainButton.clicked += () =>
+            {
+                SetValueOn(!_isOn);
+                // Debug.Log("main clicked");
+            };
+
             Button toggleButton = treeRow.Q<Button>("saintsfield-tree-row-toggle");
+
+            if (!_checkedIcon)
+            {
+                _uncheckedIcon = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
+                _checkedIcon = Util.LoadResource<Texture2D>("checkbox-checked.png");
+            }
+
             if (!toggle)
             {
                 toggleButton.RemoveFromHierarchy();
+            }
+            else
+            {
+                ToggleButton = toggleButton;
+                toggleButton.clicked += () =>
+                {
+                    SetValueOn(!_isOn);
+                    // Debug.Log("toggle clicked");
+                };
             }
 
             Button root = treeRow.Q<Button>("saintsfield-tree-row");
@@ -41,7 +74,39 @@ namespace SaintsField.Editor.UIToolkitElements
             {
                 labelElement.text = label;
             }
+            RefreshIcon();
+
             Add(treeRow);
+        }
+
+        public override int HasValueCount => _isOn? 1: 0;
+
+        public void SetValueOn(bool isOn)
+        {
+            if (_isOn == isOn)
+            {
+                return;
+            }
+
+            _isOn = isOn;
+            OnHasValueCountChanged.Invoke(HasValueCount);
+            SetHighlight(_isOn);
+
+            RefreshIcon();
+        }
+
+        private void RefreshIcon()
+        {
+            if (ToggleButton is null)
+            {
+                return;
+            }
+
+            Texture2D background = _isOn ? _checkedIcon : _uncheckedIcon;
+            if (ToggleButton.style.backgroundImage != background)
+            {
+                ToggleButton.style.backgroundImage = background;
+            }
         }
     }
 }

@@ -3,8 +3,9 @@
     <Style src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/RightFoldoutRotate.uss?fileID=7433441132597879392&amp;guid=0a3ebc4f4793a5d48ba5bfc122a7eda4&amp;type=3#RightFoldoutRotate" />
     <ui:Button name="saintsfield-tree-row" class="saintsfield-tree-row-active">
         <ui:VisualElement name="saintsfield-tree-row-foldout" class="saintsfield-tree-row-button saints-right-foldout-rotate" style="background-image: url(&quot;project://database/Assets/Plugins/Demigiant/DemiLib/Core/Editor/Imgs/ico_foldout_closed.png?fileID=2800000&amp;guid=301c130dbb4bbba4e87072804939c861&amp;type=3#ico_foldout_closed&quot;);" />
-        <ui:Button name="saintsfield-tree-row-toggle" class="saintsfield-tree-row-button" style="background-image: url(&quot;project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/checkbox-checked.png?fileID=2800000&amp;guid=d7cf367f7861ae345aabc009f1ff32f7&amp;type=3#checkbox-checked&quot;);" />
-        <ui:Label name="saintsfield-tree-row-label" />
+        <ui:Button name="saintsfield-tree-row-toggle" class="saintsfield-tree-row-button" style="background-image: url(&quot;project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/checkbox-outline-blank.png?fileID=2800000&amp;guid=49e87dfab57d490419c09d9859ac93c1&amp;type=3#checkbox-outline-blank&quot;);" />
+        <ui:Button name="saintsfield-tree-row-toggle-checked-bg-holder" class="saintsfield-tree-row-button" style="background-image: url(&quot;project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/checkbox-checked.png?fileID=2800000&amp;guid=d7cf367f7861ae345aabc009f1ff32f7&amp;type=3#checkbox-checked&quot;); display: none;" />
+        <ui:Label name="saintsfield-tree-row-label" picking-mode="Ignore" />
     </ui:Button>
     <ui:VisualElement name="saintsfield-tree-row-content" style="flex-grow: 1;" />
 </ui:UXML>

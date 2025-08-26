@@ -9,7 +9,7 @@ namespace SaintsField.Editor.UIToolkitElements
 #if UNITY_6000_0_OR_NEWER
     [UxmlElement]
 #endif
-    public partial class TreeRowSepElement: VisualElement
+    public partial class TreeRowSepElement: TreeRowAbsElement
     {
         private static VisualTreeAsset _treeRowTemplate;
         public TreeRowSepElement(): this(0)
@@ -29,6 +29,8 @@ namespace SaintsField.Editor.UIToolkitElements
 
             Add(treeRow);
         }
+
+        public override int HasValueCount => 0;
     }
 }
 #endif
