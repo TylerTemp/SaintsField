@@ -27,25 +27,46 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             FieldInfo info,
             object parent)
         {
-            // AdvancedDropdownMetaInfo initMetaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false);
-            //
-            // UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
-            // dropdownButton.style.flexGrow = 1;
-            // dropdownButton.name = NameButton(property);
-            // dropdownButton.userData = initMetaInfo.CurValues;
-            // dropdownButton.ButtonLabelElement.text = GetMetaStackDisplay(initMetaInfo);
-            //
-            // dropdownButton.AddToClassList(ClassAllowDisable);
-            //
-            // EmptyPrefabOverrideElement emptyPrefabOverrideElement = new EmptyPrefabOverrideElement(property);
-            // emptyPrefabOverrideElement.Add(dropdownButton);
-            //
-            // return emptyPrefabOverrideElement;
+            AdvancedDropdownMetaInfo initMetaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
+
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
+            dropdownButton.style.flexGrow = 1;
+            dropdownButton.name = NameButton(property);
+            dropdownButton.userData = initMetaInfo.CurValues;
+            dropdownButton.ButtonLabelElement.text = AdvancedDropdownAttributeDrawer.GetMetaStackDisplay(initMetaInfo);
+
+            dropdownButton.AddToClassList(ClassAllowDisable);
+
+            EmptyPrefabOverrideElement emptyPrefabOverrideElement = new EmptyPrefabOverrideElement(property);
+            emptyPrefabOverrideElement.Add(dropdownButton);
+
+            return emptyPrefabOverrideElement;
 
 
+
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+        {
             AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
-            // Debug.Log(string.Join(",", metaInfo.CurValues));
-            return new SaintsTreeDropdownElement(metaInfo);
+            return new SaintsTreeDropdownElement(metaInfo)
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            UIToolkitUtils.DropdownButtonField dropdownButtonField = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
+            dropdownButtonField.ButtonElement.clicked += () =>
+            {
+
+            };
         }
     }
 }

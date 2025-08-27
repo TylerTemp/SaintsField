@@ -355,7 +355,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return newChildren;
         }
 
-        private static string GetMetaStackDisplay(AdvancedDropdownMetaInfo metaInfo)
+        public static string GetMetaStackDisplay(AdvancedDropdownMetaInfo metaInfo)
         {
             return metaInfo.SelectStacks.Count == 0
                 ? "-"

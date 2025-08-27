@@ -2,6 +2,7 @@
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
@@ -12,11 +13,14 @@ namespace SaintsField.Editor.UIToolkitElements
     // ReSharper disable once ClassNeverInstantiated.Global
     public partial class TreeRowValueElement: TreeRowAbsElement
     {
+        // new status on or off; is row click or not (row click need to close the dropdown)
+        public readonly UnityEvent<bool, bool> OnClickedEvent = new UnityEvent<bool, bool>();
+
         private bool _isOn;
         private static VisualTreeAsset _treeRowTemplate;
 
         public Button MainButton;
-        public Button ToggleButton;
+        private readonly Button _toggleButton;
 
         public TreeRowValueElement(): this(null, 0, false)
         {
@@ -38,7 +42,7 @@ namespace SaintsField.Editor.UIToolkitElements
             MainButton.clicked += () =>
             {
                 SetValueOn(!_isOn);
-                // Debug.Log("main clicked");
+                OnClickedEvent.Invoke(_isOn, true);
             };
 
             Button toggleButton = treeRow.Q<Button>("saintsfield-tree-row-toggle");
@@ -55,11 +59,11 @@ namespace SaintsField.Editor.UIToolkitElements
             }
             else
             {
-                ToggleButton = toggleButton;
+                _toggleButton = toggleButton;
                 toggleButton.clicked += () =>
                 {
                     SetValueOn(!_isOn);
-                    // Debug.Log("toggle clicked");
+                    OnClickedEvent.Invoke(_isOn, false);
                 };
             }
 
@@ -97,15 +101,15 @@ namespace SaintsField.Editor.UIToolkitElements
 
         private void RefreshIcon()
         {
-            if (ToggleButton is null)
+            if (_toggleButton is null)
             {
                 return;
             }
 
             Texture2D background = _isOn ? _checkedIcon : _uncheckedIcon;
-            if (ToggleButton.style.backgroundImage != background)
+            if (_toggleButton.style.backgroundImage != background)
             {
-                ToggleButton.style.backgroundImage = background;
+                _toggleButton.style.backgroundImage = background;
             }
         }
     }

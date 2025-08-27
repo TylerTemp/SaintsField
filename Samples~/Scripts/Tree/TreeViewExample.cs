@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.Tree
 
         private AdvancedDropdownList<int> Callback()
         {
-            return new AdvancedDropdownList<int>()
+            return new AdvancedDropdownList<int>
             {
                 { "1", 1 },
                 { "H/2", 2 },
