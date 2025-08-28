@@ -1,6 +1,9 @@
 #if UNITY_2021_3_OR_NEWER
+using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
@@ -21,6 +24,8 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public Button MainButton;
         private readonly Button _toggleButton;
+
+        private readonly string _labelLow;
 
         public TreeRowValueElement(): this(null, 0, false)
         {
@@ -76,6 +81,7 @@ namespace SaintsField.Editor.UIToolkitElements
             Label labelElement = treeRow.Q<Label>("saintsfield-tree-row-label");
             if (!string.IsNullOrEmpty(label))
             {
+                _labelLow = label.ToLower();
                 labelElement.text = label;
             }
             RefreshIcon();
@@ -111,6 +117,26 @@ namespace SaintsField.Editor.UIToolkitElements
             {
                 _toggleButton.style.backgroundImage = background;
             }
+        }
+
+        public override bool OnSearch(IReadOnlyList<ListSearchToken> searchTokens)
+        {
+            if (searchTokens.Count == 0)
+            {
+                SetDisplay(DisplayStyle.Flex);
+                return true;
+            }
+
+            if (_labelLow is null)
+            {
+                SetDisplay(DisplayStyle.None);
+                return false;
+            }
+
+            bool anyMatched = RuntimeUtil.SimpleSearch(_labelLow, searchTokens);
+
+            SetDisplay(anyMatched ? DisplayStyle.Flex : DisplayStyle.None);
+            return anyMatched;
         }
     }
 }

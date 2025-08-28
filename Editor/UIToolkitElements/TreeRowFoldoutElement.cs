@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -26,6 +29,8 @@ namespace SaintsField.Editor.UIToolkitElements
         {
         }
 
+        private readonly string _labelLow;
+
         public TreeRowFoldoutElement(string label, int indent, bool defaultExpanded)
         {
             _expand = defaultExpanded;
@@ -45,6 +50,7 @@ namespace SaintsField.Editor.UIToolkitElements
             Label labelElement = treeRow.Q<Label>("saintsfield-tree-row-label");
             if (!string.IsNullOrEmpty(label))
             {
+                _labelLow = label.ToLower();
                 labelElement.text = label;
             }
 
@@ -83,6 +89,11 @@ namespace SaintsField.Editor.UIToolkitElements
             }
 
             child.OnHasValueCountChanged.AddListener(_ => OnHasValueCountChanged.Invoke(HasValueCount));
+
+            if (child is not TreeRowSepElement)
+            {
+                child.Parent = this;
+            }
         }
 
         public void SetValueWithoutNotify(bool newValue)
@@ -121,6 +132,96 @@ namespace SaintsField.Editor.UIToolkitElements
         }
 
         public override int HasValueCount => _children.Sum(each => each.HasValueCount);
+
+        public override bool OnSearch(IReadOnlyList<ListSearchToken> searchTokens)
+        {
+            if (searchTokens.Count == 0)
+            {
+                SetDisplay(DisplayStyle.Flex);
+                return true;
+            }
+
+            if (_labelLow is null)
+            {
+                SetDisplay(DisplayStyle.None);
+                return false;
+            }
+
+            List<ListSearchToken> missedTokens = new List<ListSearchToken>(searchTokens.Count);
+
+            bool anyMatched = false;
+
+            foreach (ListSearchToken token in searchTokens)
+            {
+                string lowerToken = token.Token.ToLower();
+                if (token.Type == ListSearchType.Exclude && _labelLow.Contains(lowerToken))
+                {
+                    return false;
+                }
+
+                if (token.Type == ListSearchType.Include && _labelLow.Contains(lowerToken))
+                {
+                    anyMatched = true;
+                    continue;
+                }
+
+                missedTokens.Add(token);
+            }
+
+            // Debug.Log($"{_labelLow} anyMatched={anyMatched}: {string.Join(" ", missedTokens)}");
+
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (TreeRowAbsElement treeRowAbsElement in _children)
+            {
+                if (treeRowAbsElement.OnSearch(missedTokens))
+                {
+                    anyMatched = true;
+                }
+            }
+
+            SetDisplay(anyMatched ? DisplayStyle.Flex : DisplayStyle.None);
+            return anyMatched;
+        }
+
+        public override void MoveSlibling(TreeRowAbsElement self, bool up)
+        {
+            ITreeRowNavigate targetElement = null;
+            foreach ((TreeRowAbsElement checkElement, int index)  in _children.WithIndex())
+            {
+                if (ReferenceEquals(checkElement, self))
+                {
+                    if(up)
+                    {
+                        if(index > 0)
+                        {
+                            targetElement = _children[index - 1];
+                        }
+                        else if (Parent != null)
+                        {
+                            targetElement = Parent;
+                        }
+                    }
+                    else
+                    {
+                        if(index < _children.Count - 1)
+                        {
+                            targetElement = _children[index + 1];
+                        }
+                        else if (Parent != null)
+                        {
+                            Parent.MoveSlibling(this, false);
+                            return;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (targetElement != null)
+            {
+                targetElement.SetFocused();
+            }
+        }
     }
 }
 #endif

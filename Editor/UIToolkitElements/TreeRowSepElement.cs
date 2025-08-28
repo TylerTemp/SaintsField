@@ -1,6 +1,8 @@
 #if UNITY_2021_3_OR_NEWER
+using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using UnityEngine.UIElements;
 
 
@@ -31,6 +33,17 @@ namespace SaintsField.Editor.UIToolkitElements
         }
 
         public override int HasValueCount => 0;
+        public override bool OnSearch(IReadOnlyList<ListSearchToken> searchTokens)
+        {
+            bool shouldDisplay = searchTokens.Count == 0;
+            SetDisplay(shouldDisplay ? DisplayStyle.Flex : DisplayStyle.None);
+            return shouldDisplay;
+        }
+
+        public override void MoveSlibling(TreeRowAbsElement self, bool up)
+        {
+            throw new System.NotSupportedException();
+        }
     }
 }
 #endif

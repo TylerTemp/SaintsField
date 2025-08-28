@@ -8,7 +8,6 @@ using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
-using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
@@ -42,12 +41,13 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
             });
 
-            IEnumerable<VisualElement> treeRowElements = MakeNestedTreeRow(0, Array.Empty<ListSearchToken>(),
+            TreeRowAbsElement[] treeRowElements = MakeNestedTreeRow(0,
                 metaInfo.DropdownListValue,
-                curValues);
+                curValues)
+                .ToArray();
 
             VisualElement treeContainer = new VisualElement();
-            foreach (VisualElement treeRow in treeRowElements)
+            foreach (TreeRowAbsElement treeRow in treeRowElements)
             {
                 treeContainer.Add(treeRow);
             }
@@ -61,17 +61,14 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     ? Array.Empty<ListSearchToken>()
                     : SerializedUtils.ParseSearch(searchText).ToArray();
 
-                treeContainer.Clear();
-                foreach (TreeRowAbsElement treeRowAbsElement in MakeNestedTreeRow(0, searchTokens,
-                             metaInfo.DropdownListValue,
-                             curValues))
+                foreach (TreeRowAbsElement treeRowAbsElement in treeRowElements)
                 {
-                    treeContainer.Add(treeRowAbsElement);
+                    treeRowAbsElement.OnSearch(searchTokens);
                 }
             });
         }
 
-        private IReadOnlyList<TreeRowAbsElement> MakeNestedTreeRow(int indent, IReadOnlyList<ListSearchToken> searchTokens, IAdvancedDropdownList dropdownLis, ICollection<object> curValues)
+        private IReadOnlyList<TreeRowAbsElement> MakeNestedTreeRow(int indent, IAdvancedDropdownList dropdownLis, ICollection<object> curValues)
         {
             List<TreeRowAbsElement> result = new List<TreeRowAbsElement>(dropdownLis.Count);
 
@@ -88,30 +85,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     continue;
                 }
 
-                bool isSearchMatched;
-                if (searchTokens.Count == 0)
-                {
-                    isSearchMatched = true;
-                }
-                else if (dropdownItem.isSeparator)
-                {
-                    isSearchMatched = searchTokens.Count == 0;
-                }
-                else if (dropdownItem.ChildCount() > 0)  // leaf node is always matched, unless the children are empty
-                {
-                    isSearchMatched = true;
-                }
-                else
-                {
-                    isSearchMatched = IsSearchMatched(dropdownItem.absolutePathFragments, searchTokens);
-                    // Debug.Log($"matched for {string.Join('/', dropdownItem.absolutePathFragments)}");
-                }
-
-                if (!isSearchMatched)
-                {
-                    continue;
-                }
-
                 if (dropdownItem.ChildCount() == 0)  // value node
                 {
                     hasMeaningfulChild = true;
@@ -119,6 +92,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     if (curValues.Contains(dropdownItem.value))
                     {
                         valueElement.SetValueOn(true);
+                        valueElement.Focus();
                     }
 
                     object value = dropdownItem.value;
@@ -129,7 +103,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
 
                 // (List<TreeViewItemData<IAdvancedDropdownList>> children, int resultId, bool childSelect) = MakeNestedItems(dropdownItem, curValues, incrId, selectedNestedIds, selectedValueIds);
-                IReadOnlyList<TreeRowAbsElement> tailResult = MakeNestedTreeRow(indent + 1, searchTokens, dropdownItem, curValues);
+                IReadOnlyList<TreeRowAbsElement> tailResult = MakeNestedTreeRow(indent + 1, dropdownItem, curValues);
 
                 if (dropdownItem.ChildCount() > 0 && tailResult.Count == 0)
                 {
@@ -148,37 +122,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             }
 
             return hasMeaningfulChild ? result : Array.Empty<TreeRowAbsElement>();
-        }
-
-        private static bool IsSearchMatched(IReadOnlyList<string> sourceFragments, IReadOnlyList<ListSearchToken> searchTokens)
-        {
-            IReadOnlyList<string> sourceLow = sourceFragments.Select(each => each.ToLower()).ToArray();
-            foreach (ListSearchToken token in searchTokens)
-            {
-                string tokenLow = token.Token.ToLower();
-
-                bool hasMatched = false;
-                foreach (string sourceContent in sourceLow)
-                {
-                    if (token.Type == ListSearchType.Exclude && sourceContent.Contains(tokenLow))
-                    {
-                        return false;
-                    }
-
-                    if (token.Type == ListSearchType.Include && sourceContent.Contains(tokenLow))
-                    {
-                        hasMatched = true;
-                        break;
-                    }
-                }
-
-                if (!hasMatched)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }
