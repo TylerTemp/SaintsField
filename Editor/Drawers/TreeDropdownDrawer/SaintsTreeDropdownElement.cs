@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         private TreeRowAbsElement _currentFocus;
         private readonly bool _allowToggle;
 
-        private readonly List<TreeRowAbsElement> flatList;
+        private readonly IReadOnlyList<TreeRowAbsElement> _flatList;
 
         public SaintsTreeDropdownElement(AdvancedDropdownMetaInfo metaInfo, bool toggle)
         {
@@ -70,7 +70,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             {
                 focusable = true,
             };
-             flatList = new List<TreeRowAbsElement>();
+             List<TreeRowAbsElement> flatList = new List<TreeRowAbsElement>();
             foreach (TreeRowAbsElement treeRow in treeRowElements)
             {
                 treeContainer.Add(treeRow);
@@ -88,6 +88,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                 }
             }
+
+            _flatList = flatList;
 
             Add(treeContainer);
 
@@ -142,7 +144,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         {
                             _currentFocus = _currentFocus.Parent;
                             // Debug.Log($"currentFocus={_currentFocus}");
-                            foreach (TreeRowAbsElement treeRowAbsElement in flatList)
+                            foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
                             {
                                 treeRowAbsElement.SetNavigateHighlight(_currentFocus == treeRowAbsElement);
                             }
@@ -164,10 +166,10 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 TreeRowAbsElement toFocus = null;
                 if (_currentFocus != null)
                 {
-                    List<TreeRowAbsElement> prevList = new List<TreeRowAbsElement>(flatList.Count);
-                    for (int index = 0; index < flatList.Count; index++)
+                    List<TreeRowAbsElement> prevList = new List<TreeRowAbsElement>(_flatList.Count);
+                    for (int index = 0; index < _flatList.Count; index++)
                     {
-                        TreeRowAbsElement current = flatList[index];
+                        TreeRowAbsElement current = _flatList[index];
                         if (current == _currentFocus)
                         {
                             if (isUp)
@@ -181,15 +183,15 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                                 }
                                 else
                                 {
-                                    toFocus = flatList.LastOrDefault(each => each.Navigateable);
+                                    toFocus = _flatList.LastOrDefault(each => each.Navigateable);
                                 }
 
                                 // Debug.Log($"up to {toFocus}");
                             }
                             else
                             {
-                                toFocus = flatList.Skip(index + 1).FirstOrDefault(each => each.Navigateable)
-                                          ?? flatList.FirstOrDefault(each => each.Navigateable);
+                                toFocus = _flatList.Skip(index + 1).FirstOrDefault(each => each.Navigateable)
+                                          ?? _flatList.FirstOrDefault(each => each.Navigateable);
                             }
 
                             break;
@@ -203,8 +205,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 if (_currentFocus == null)
                 {
                     toFocus = isUp
-                        ? flatList.LastOrDefault(each => each.Navigateable)
-                        : flatList.FirstOrDefault(each => each.Navigateable);
+                        ? _flatList.LastOrDefault(each => each.Navigateable)
+                        : _flatList.FirstOrDefault(each => each.Navigateable);
                 }
 
                 if (toFocus != null)
@@ -213,7 +215,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
                     // Debug.Log($"currentFocus={_currentFocus}");
 
-                    foreach (TreeRowAbsElement treeRowAbsElement in flatList)
+                    foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
                     {
                         treeRowAbsElement.SetNavigateHighlight(toFocus == treeRowAbsElement);
                     }
@@ -248,7 +250,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         public int GetMaxHeight()
         {
             int result = 0;
-            foreach (TreeRowAbsElement treeRowAbsElement in flatList)
+            foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
             {
                 if (treeRowAbsElement is TreeRowSepElement)
                 {
