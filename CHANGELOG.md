@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.25.0 ##
+
+UI Toolkit: Add `TreeDropdown`, `FlagsTreeDropdown`, `OptionsTreeDropdown`, `PairsTreeDropdown`
+
 ## 4.24.6 ##
 
 1.  UI Toolkit: Improve `SaintsDictionary`, `Table`, `SaintsHashSet` UI to make it more like Unity's ListView

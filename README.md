@@ -4311,6 +4311,63 @@ Also, using on a type like `Color` to pick a pre-defined static value:
 
 ![image](https://github.com/user-attachments/assets/404d4cd6-b4bf-4521-b633-2dd745ec4de1)
 
+#### `TreeDropdown` ####
+
+A tree dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
+
+This is the same as `AdvancedDropdown`, except it uses a tree view to pick.
+
+> [!WARNING]
+> UI Toolkit only.
+
+**Arguments**
+
+*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
+    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
+    When omitted, it will try to find all the static values from the field type.
+*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
+*   AllowMultiple: No
+
+See `AdvancedDropdown` for more usage
+
+```csharp
+using SaintsField;
+
+[TreeDropdown(nameof(AdvDropdown))] public int drops;
+
+public AdvancedDropdownList<int> AdvDropdown()
+{
+    return new AdvancedDropdownList<int>
+    {
+        // a grouped value
+        new AdvancedDropdownList<int>("First Half")
+        {
+            // with icon
+            new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+            // no icon
+            new AdvancedDropdownList<int>("Tuesday", 2),
+        },
+        new AdvancedDropdownList<int>("Second Half")
+        {
+            new AdvancedDropdownList<int>("Wednesday")
+            {
+                new AdvancedDropdownList<int>("Morning", 3, icon: "star.png"),
+                new AdvancedDropdownList<int>("Afternoon", 8),
+            },
+            new AdvancedDropdownList<int>("Thursday", 4, true, icon: "star.png"),
+        },
+        // direct value
+        new AdvancedDropdownList<int>("Friday", 5, true),
+        AdvancedDropdownList<int>.Separator(),
+        new AdvancedDropdownList<int>("Saturday", 6, icon: "star.png"),
+        new AdvancedDropdownList<int>("Sunday", 7, icon: "star.png"),
+    };
+}
+```
+
+![](https://github.com/user-attachments/assets/fcfd2932-0850-43af-8a93-5c3d1979240a)
+
+
 #### `OptionsDropdown` / `PairsDropdown` ####
 
 Like `AdvancedDropdown`, but allows you to quickly set some const expression value
@@ -4351,6 +4408,44 @@ public Direction[] direOpt;
 ```
 
 ![](https://github.com/user-attachments/assets/01501513-d00d-4320-94e9-6c76a81a3c2a)
+
+#### `OptionsTreeDropdown` / `PairsTreeDropdown` ####
+
+Like `OptionsDropdown` / `PairsDropdown`, but in a tree view
+
+```csharp
+use SaintsField;
+
+[OptionsTreeDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
+public string[] treeOpt;
+```
+
+![](https://github.com/user-attachments/assets/443b95f6-7010-4fea-a62a-40eaed1e5c22)
+
+```csharp
+use SaintsField;
+
+public enum Direction
+{
+    None,
+    Left,
+    Right,
+    Up,
+    Down,
+    Center,
+}
+
+[PairsTreeDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
+public int treeIntOpt;
+
+// useful if you don't want the entire enum
+[PairsTreeDropdown(EUnique.Disable, "Hor/<-", Direction.Left, "Hor/->", Direction.Right, "Vert/↑", Direction.Up, "Vert/↓", Direction.Down)]
+public Direction[] treeDireOpt;
+```
+
+![](https://github.com/user-attachments/assets/d7aab70a-df72-4527-9cd4-16cb9e91ab9b)
+
+![](https://github.com/user-attachments/assets/63fb22dd-5aaa-4e7a-9b0b-ac15270316f7)
 
 #### `EnumToggleButtons` ####
 

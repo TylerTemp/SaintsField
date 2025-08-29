@@ -9,5 +9,8 @@ namespace SaintsField.Samples.Scripts
 
         [OptionsDropdown(EUnique.Disable, "Left", "Right", "Top", "Bottom", "Center")]
         public string[] stringOpt;
+
+        [OptionsTreeDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
+        public string[] treeOpt;
     }
 }

@@ -5,13 +5,16 @@ namespace SaintsField.Samples.Scripts
 {
     public class TreeDropdownExample: MonoBehaviour
     {
-        [TreeDropdown(nameof(AdvDropdown)), PostFieldButton(nameof(Reset), "R")] public int selectIt;
+        [
+            TreeDropdown(nameof(AdvDropdown)),
+            // PostFieldButton(nameof(Reset), "R"),
+        ] public int selectIt;
 
         private void Reset() => selectIt = 0;
 
         public AdvancedDropdownList<int> AdvDropdown()
         {
-            return new AdvancedDropdownList<int>("Days")
+            return new AdvancedDropdownList<int>
             {
                 // a grouped value
                 new AdvancedDropdownList<int>("First Half")

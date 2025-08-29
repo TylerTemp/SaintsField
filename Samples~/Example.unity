@@ -5116,6 +5116,10 @@ MonoBehaviour:
   - Bottom
   - Right
   - Center
+  treeOpt:
+  - Hor/Left
+  - Hor/Right
+  - Center
 --- !u!1 &393988620
 GameObject:
   m_ObjectHideFlags: 0
@@ -20786,6 +20790,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf65efdf8d51be24984a027285bdccc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectIt: 2
+  strTyp:
+    selectIt: 0
+  listEnum: 
+  flags: 0
 --- !u!4 &1338113063
 Transform:
   m_ObjectHideFlags: 0
@@ -23120,10 +23129,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 198a6b59033942d7ad6d96fa848cb09d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  place1: 9
-  place2: 45
-  place3: 19
-  place4: 33
   selectIt: 6
   strTyp:
     selectIt: 2
