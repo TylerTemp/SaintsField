@@ -38,6 +38,8 @@ namespace SaintsField.Editor.UIToolkitElements
         private static Texture2D _boxCheckedIcon;
         private static Texture2D _boxUncheckedIcon;
 
+        private RichTextDrawer _richTextDrawer = new RichTextDrawer();
+
         public TreeRowValueElement(object value, string label, int indent, bool toggle)
         {
             Value = value;
@@ -93,7 +95,8 @@ namespace SaintsField.Editor.UIToolkitElements
             if (!string.IsNullOrEmpty(label))
             {
                 _labelLow = label.ToLower();
-                labelElement.text = label;
+                UIToolkitUtils.SetLabel(labelElement, RichTextDrawer.ParseRichXml(label, "", null, null, null), _richTextDrawer);
+                // labelElement.text = label;
             }
             RefreshIcon();
 
@@ -169,7 +172,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public override bool Navigateable
         {
-            get => _shown && _shownAsChild;
+            get => _shown && _shownAsChild && enabledSelf;
             set => _shownAsChild = value;
         }
 

@@ -333,11 +333,16 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 if (dropdownItem.ChildCount() == 0)  // value node
                 {
                     hasMeaningfulChild = true;
-                    TreeRowValueElement valueElement = new TreeRowValueElement(dropdownItem.value, dropdownItem.displayName, indent, _allowToggle);
+                    TreeRowValueElement valueElement = new TreeRowValueElement(dropdownItem.value, string.IsNullOrEmpty(dropdownItem.icon)? dropdownItem.displayName: $"<icon={dropdownItem.icon}/>{dropdownItem.displayName}", indent, _allowToggle);
                     if (curValues.Contains(dropdownItem.value))
                     {
                         valueElement.SetValueOn(true);
                         _currentFocus ??= valueElement;
+                    }
+
+                    if (dropdownItem.disabled)
+                    {
+                        valueElement.SetEnabled(false);
                     }
 
                     object value = dropdownItem.value;

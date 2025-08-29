@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class AdvancedDropdownExample: MonoBehaviour
+    public class TreeDropdownExample: MonoBehaviour
     {
-        [AdvancedDropdown(nameof(AdvDropdown)), PostFieldButton(nameof(Reset), "R")] public int selectIt;
+        [TreeDropdown(nameof(AdvDropdown)), PostFieldButton(nameof(Reset), "R")] public int selectIt;
 
         private void Reset() => selectIt = 0;
 
@@ -45,7 +45,7 @@ namespace SaintsField.Samples.Scripts
             [OnValueChanged(nameof(ShowNewValue))]
             [AboveRichLabel(nameof(selectIt), true)]
             [RichLabel("<icon=star.png /><label />")]
-            [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
+            [TreeDropdown(nameof(AdvDropdown))] public int selectIt;
 
             public AdvancedDropdownList<int> AdvDropdown()
             {

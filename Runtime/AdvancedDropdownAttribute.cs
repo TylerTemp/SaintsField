@@ -9,7 +9,6 @@ namespace SaintsField
         public const float DefaultTitleHeight = 45f;
 
         public const float TitleHeight = DefaultTitleHeight;
-        public const float ItemHeight = -1f;
         public const float MinHeight = -1f;
 
         public AdvancedDropdownAttribute(string funcName = null, EUnique unique = EUnique.None) : base(funcName, unique)

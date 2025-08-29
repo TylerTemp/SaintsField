@@ -5,11 +5,11 @@ using System.Diagnostics;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class PairsDropdownAttribute: AdvancedDropdownAttribute
+    public class PairsTreeDropdown: TreeDropdownAttribute
     {
         public override Mode BehaveMode => Mode.Tuples;
 
-        public PairsDropdownAttribute(params object[] tuples)
+        public PairsTreeDropdown(params object[] tuples)
         {
             // Tuples = tuples;
             List<(string, object)> pairs = new List<(string, object)>();

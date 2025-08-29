@@ -18729,6 +18729,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   intOpt: 0
   direOpt: 010000000200000002000000
+  treeIntOpt: 3
+  treeDireOpt: 010000000200000003000000
 --- !u!4 &1150219408
 Transform:
   m_ObjectHideFlags: 0
@@ -18818,6 +18820,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flags: 12
+  tree: 15
 --- !u!4 &1157478913
 Transform:
   m_ObjectHideFlags: 0
@@ -20754,6 +20757,50 @@ MonoBehaviour:
   minValue: -5
   maxValue: 35
   fValue: 14.5
+--- !u!1 &1338113061
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1338113063}
+  - component: {fileID: 1338113062}
+  m_Layer: 0
+  m_Name: TreeDropdown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1338113062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1338113061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf65efdf8d51be24984a027285bdccc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1338113063
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1338113061}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1344263756
 GameObject:
   m_ObjectHideFlags: 0
@@ -36910,3 +36957,4 @@ SceneRoots:
   - {fileID: 1294877703}
   - {fileID: 17218375}
   - {fileID: 1491166548}
+  - {fileID: 1338113063}
