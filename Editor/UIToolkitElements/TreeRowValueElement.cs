@@ -19,13 +19,14 @@ namespace SaintsField.Editor.UIToolkitElements
         // new status on or off; is row click or not (row click need to close the dropdown)
         public readonly UnityEvent<bool, bool> OnClickedEvent = new UnityEvent<bool, bool>();
 
-        private bool _isOn;
+        public bool IsOn { get; private set; }
         private static VisualTreeAsset _treeRowTemplate;
 
-        public Button MainButton;
-        private readonly Button _toggleButton;
+        // public VisualElement MainButton;
+        private readonly VisualElement _toggleButton;
 
         private readonly string _labelLow;
+        private readonly bool IsToggle;
 
         public TreeRowValueElement(): this(null, 0, false)
         {
@@ -33,7 +34,8 @@ namespace SaintsField.Editor.UIToolkitElements
 
         private bool _innerButton;
         private static Texture2D _checkedIcon;
-        private static Texture2D _uncheckedIcon;
+        private static Texture2D _boxCheckedIcon;
+        private static Texture2D _boxUncheckedIcon;
 
         public TreeRowValueElement(string label, int indent, bool toggle)
         {
@@ -42,37 +44,44 @@ namespace SaintsField.Editor.UIToolkitElements
 
             treeRow.Q<VisualElement>("saintsfield-tree-row-foldout").RemoveFromHierarchy();
 
-            MainButton = treeRow.Q<Button>("saintsfield-tree-row");
+            VisualElement mainButton = treeRow.Q<VisualElement>("saintsfield-tree-row");
 
-            MainButton.clicked += () =>
-            {
-                SetValueOn(!_isOn);
-                OnClickedEvent.Invoke(_isOn, true);
-            };
+            // MainButton.clicked += () =>
+            // {
+            //     SetValueOn(!_isOn);
+            //     OnClickedEvent.Invoke(_isOn, true);
+            // };
+            mainButton.AddManipulator(new Clickable(_ => {
+                SetValueOn(!IsOn);
+                OnClickedEvent.Invoke(IsOn, true);
+            }));
 
-            Button toggleButton = treeRow.Q<Button>("saintsfield-tree-row-toggle");
+            VisualElement toggleButton = treeRow.Q<VisualElement>("saintsfield-tree-row-toggle");
 
             if (!_checkedIcon)
             {
-                _uncheckedIcon = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
-                _checkedIcon = Util.LoadResource<Texture2D>("checkbox-checked.png");
+                _checkedIcon = Util.LoadResource<Texture2D>("check.png");
+                _boxUncheckedIcon = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
+                _boxCheckedIcon = Util.LoadResource<Texture2D>("checkbox-checked.png");
             }
 
-            if (!toggle)
+            IsToggle = toggle;
+            _toggleButton = toggleButton;
+
+            if (toggle)
             {
-                toggleButton.RemoveFromHierarchy();
+                toggleButton.AddManipulator(new Clickable(_ =>
+                {
+                    SetValueOn(!IsOn);
+                    OnClickedEvent.Invoke(IsOn, false);
+                }));
             }
             else
             {
-                _toggleButton = toggleButton;
-                toggleButton.clicked += () =>
-                {
-                    SetValueOn(!_isOn);
-                    OnClickedEvent.Invoke(_isOn, false);
-                };
+                toggleButton.style.backgroundImage = _checkedIcon;
             }
 
-            Button root = treeRow.Q<Button>("saintsfield-tree-row");
+            VisualElement root = treeRow.Q<VisualElement>("saintsfield-tree-row");
             if (indent > 0)
             {
                 root.style.paddingLeft = indent * SaintsPropertyDrawer.IndentWidth;
@@ -89,54 +98,82 @@ namespace SaintsField.Editor.UIToolkitElements
             Add(treeRow);
         }
 
-        public override int HasValueCount => _isOn? 1: 0;
+        public override int HasValueCount => IsOn? 1: 0;
 
         public void SetValueOn(bool isOn)
         {
-            if (_isOn == isOn)
+            if (IsOn == isOn)
             {
                 return;
             }
 
-            _isOn = isOn;
+            IsOn = isOn;
             OnHasValueCountChanged.Invoke(HasValueCount);
-            SetHighlight(_isOn);
+            SetHighlight(IsOn);
 
             RefreshIcon();
         }
 
         private void RefreshIcon()
         {
-            if (_toggleButton is null)
-            {
-                return;
-            }
+            // if (_toggleButton is null)
+            // {
+            //     return;
+            // }
 
-            Texture2D background = _isOn ? _checkedIcon : _uncheckedIcon;
-            if (_toggleButton.style.backgroundImage != background)
+            if(IsToggle)
             {
-                _toggleButton.style.backgroundImage = background;
+                Texture2D background = IsOn ? _boxCheckedIcon : _boxUncheckedIcon;
+                if (_toggleButton.style.backgroundImage != background)
+                {
+                    _toggleButton.style.backgroundImage = background;
+                }
+            }
+            else
+            {
+                DisplayStyle display = IsOn ? DisplayStyle.Flex : DisplayStyle.None;
+                if (_toggleButton.style.display != display)
+                {
+                    _toggleButton.style.display = display;
+                }
             }
         }
+
+        private bool _shown = true;
+        private bool _shownAsChild = true;
 
         public override bool OnSearch(IReadOnlyList<ListSearchToken> searchTokens)
         {
             if (searchTokens.Count == 0)
             {
                 SetDisplay(DisplayStyle.Flex);
+                _shown = true;
                 return true;
             }
 
             if (_labelLow is null)
             {
                 SetDisplay(DisplayStyle.None);
+                _shown = false;
                 return false;
             }
 
             bool anyMatched = RuntimeUtil.SimpleSearch(_labelLow, searchTokens);
 
             SetDisplay(anyMatched ? DisplayStyle.Flex : DisplayStyle.None);
+            _shown = anyMatched;
             return anyMatched;
+        }
+
+        public override bool Navigateable
+        {
+            get => _shown && _shownAsChild;
+            set => _shownAsChild = value;
+        }
+
+        public override string ToString()
+        {
+            return $"<TreeRowValue label={_labelLow} nav={Navigateable}/>";
         }
     }
 }

@@ -32,6 +32,11 @@ namespace SaintsField.Editor.UIToolkitElements
             Add(treeRow);
         }
 
+        public override bool Navigateable
+        {
+            get => false;
+            set {}
+        }
         public override int HasValueCount => 0;
         public override bool OnSearch(IReadOnlyList<ListSearchToken> searchTokens)
         {
@@ -40,10 +45,11 @@ namespace SaintsField.Editor.UIToolkitElements
             return shouldDisplay;
         }
 
-        public override void MoveSlibling(TreeRowAbsElement self, bool up)
+        public override string ToString()
         {
-            throw new System.NotSupportedException();
+            return "<TreeRowSep />";
         }
+
     }
 }
 #endif

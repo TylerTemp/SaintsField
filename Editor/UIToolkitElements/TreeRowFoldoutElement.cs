@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEngine;
@@ -38,10 +36,13 @@ namespace SaintsField.Editor.UIToolkitElements
             _treeRowTemplate ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/TreeDropdown/TreeRow.uxml");
             VisualElement treeRow = _treeRowTemplate.CloneTree();
 
-            treeRow.Q<Button>("saintsfield-tree-row-toggle").RemoveFromHierarchy();
+            treeRow.Q<VisualElement>("saintsfield-tree-row-toggle").RemoveFromHierarchy();
 
-            Button root = treeRow.Q<Button>("saintsfield-tree-row");
-            root.clicked += () => value = !_expand;
+            VisualElement root = treeRow.Q<VisualElement>("saintsfield-tree-row");
+            // root.clicked += () => value = !_expand;
+            root.AddManipulator(new Clickable(_ => {
+                value = !_expand;
+            }));
             if (indent > 0)
             {
                 root.style.paddingLeft = indent * SaintsPropertyDrawer.IndentWidth;
@@ -72,6 +73,7 @@ namespace SaintsField.Editor.UIToolkitElements
         }
 
         private readonly List<TreeRowAbsElement> _children = new List<TreeRowAbsElement>();
+        public IReadOnlyList<TreeRowAbsElement> ContentChildren => _children;
 
         private int _addContentCount = 0;
 
@@ -90,10 +92,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
             child.OnHasValueCountChanged.AddListener(_ => OnHasValueCountChanged.Invoke(HasValueCount));
 
-            if (child is not TreeRowSepElement)
-            {
-                child.Parent = this;
-            }
+            child.Parent = this;
         }
 
         public void SetValueWithoutNotify(bool newValue)
@@ -109,6 +108,11 @@ namespace SaintsField.Editor.UIToolkitElements
             if (_conentElement.style.display != contentDisplay)
             {
                 _conentElement.style.display = contentDisplay;
+            }
+
+            foreach (TreeRowAbsElement contentChild in ContentChildren)
+            {
+                contentChild.Navigateable = _expand;
             }
         }
 
@@ -133,17 +137,21 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public override int HasValueCount => _children.Sum(each => each.HasValueCount);
 
+        private bool _shown = true;
+
         public override bool OnSearch(IReadOnlyList<ListSearchToken> searchTokens)
         {
             if (searchTokens.Count == 0)
             {
                 SetDisplay(DisplayStyle.Flex);
+                _shown = true;
                 return true;
             }
 
             if (_labelLow is null)
             {
                 SetDisplay(DisplayStyle.None);
+                _shown = false;
                 return false;
             }
 
@@ -180,48 +188,30 @@ namespace SaintsField.Editor.UIToolkitElements
             }
 
             SetDisplay(anyMatched ? DisplayStyle.Flex : DisplayStyle.None);
+            _shown = anyMatched;
             return anyMatched;
         }
 
-        public override void MoveSlibling(TreeRowAbsElement self, bool up)
+        private bool _showAsChild = true;
+
+        public override bool Navigateable
         {
-            ITreeRowNavigate targetElement = null;
-            foreach ((TreeRowAbsElement checkElement, int index)  in _children.WithIndex())
+            get => _shown && _showAsChild;
+            set
             {
-                if (ReferenceEquals(checkElement, self))
+                _showAsChild = value;
+                foreach (TreeRowAbsElement child in ContentChildren)
                 {
-                    if(up)
-                    {
-                        if(index > 0)
-                        {
-                            targetElement = _children[index - 1];
-                        }
-                        else if (Parent != null)
-                        {
-                            targetElement = Parent;
-                        }
-                    }
-                    else
-                    {
-                        if(index < _children.Count - 1)
-                        {
-                            targetElement = _children[index + 1];
-                        }
-                        else if (Parent != null)
-                        {
-                            Parent.MoveSlibling(this, false);
-                            return;
-                        }
-                    }
-                    break;
+                    child.Navigateable = _shown && value;
                 }
             }
-
-            if (targetElement != null)
-            {
-                targetElement.SetFocused();
-            }
         }
+
+        public override string ToString()
+        {
+            return $"<TreeRowFoldout label={_labelLow} nav={Navigateable}/>";
+        }
+
     }
 }
 #endif

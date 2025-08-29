@@ -6,7 +6,6 @@ using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -97,7 +96,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
             dropdownButton.ButtonElement.clicked += () =>
             {
-                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false);
+                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
 
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 

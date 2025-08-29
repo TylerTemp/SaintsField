@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,31 +6,38 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
-    public abstract class TreeRowAbsElement: VisualElement, ITreeRowNavigate
+    public abstract class TreeRowAbsElement: VisualElement
     {
+        public abstract bool Navigateable { get; set; }
+
         public abstract int HasValueCount { get; }
         public readonly UnityEvent<int> OnHasValueCountChanged = new UnityEvent<int>();
 
-        private VisualElement _highlightTarget;
+        private VisualElement _treeRowTarget;
+
+        private VisualElement GetTreeRow()
+        {
+            return _treeRowTarget ??= this.Q<VisualElement>("saintsfield-tree-row");
+        }
 
         protected void SetHighlight(bool active)
         {
-            _highlightTarget ??= this.Q<VisualElement>("saintsfield-tree-row");
-            Debug.Assert(_highlightTarget != null);
+            VisualElement target = GetTreeRow();
+            Debug.Assert(target != null);
 
             // bool active = count > 0;
             const string className = "saintsfield-tree-row-selected";
             if (active)
             {
-                if (!_highlightTarget.ClassListContains(className))
+                if (!target.ClassListContains(className))
                 {
                     // Debug.Log($"add selected {this}");
-                    _highlightTarget.AddToClassList(className);
+                    target.AddToClassList(className);
                 }
             }
             else
             {
-                _highlightTarget.RemoveFromClassList(className);
+                target.RemoveFromClassList(className);
             }
         }
 
@@ -45,13 +51,31 @@ namespace SaintsField.Editor.UIToolkitElements
             }
         }
 
-        public ITreeRowNavigate Parent { get; set; }
-        public abstract void MoveSlibling(TreeRowAbsElement self, bool up);
+        public TreeRowAbsElement Parent;
 
         public void SetFocused()
         {
-            Focus();
-            Debug.Log("TODO: format!");
+            const string className = "saintsfield-tree-row-keyboard-active";
+            VisualElement target = GetTreeRow();
+            if (!target.ClassListContains(className))
+            {
+                target.AddToClassList(className);
+            }
+        }
+
+        public void SetNavigateHighlight(bool highlight)
+        {
+            const string className = "saintsfield-tree-row-keyboard-active";
+            VisualElement target = GetTreeRow();
+            bool classListContains = target.ClassListContains(className);
+            if (highlight && !classListContains)
+            {
+                target.AddToClassList(className);
+            }
+            else if (!highlight && classListContains)
+            {
+                target.RemoveFromClassList(className);
+            }
         }
     }
 }

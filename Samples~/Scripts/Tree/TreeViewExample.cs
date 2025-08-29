@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.Tree
@@ -9,7 +10,7 @@ namespace SaintsField.Samples.Scripts.Tree
 
         private AdvancedDropdownList<int> Callback()
         {
-            return new AdvancedDropdownList<int>
+            AdvancedDropdownList<int> r = new AdvancedDropdownList<int>
             {
                 { "1", 1 },
                 { "H/2", 2 },
@@ -17,11 +18,19 @@ namespace SaintsField.Samples.Scripts.Tree
                 { "H/S/4", 4 },
                 { "H/S/5", 5 },
                 { "H/6", 6 },
+                AdvancedDropdownList<int>.Separator(),
                 { "B/7", 7 },
                 { "B/8", 8 },
                 { "9", 9 },
                 { "0", 0 },
             };
+
+            foreach (int i in Enumerable.Range(20, 1000))
+            {
+                r.Add($"{i}", i);
+            }
+
+            return r;
         }
 
         [PropRange(0, 10)] public int num;

@@ -1,4 +1,4 @@
-Button#saintsfield-tree-row {
+#saintsfield-tree-row {
     border-left-width: 0;
     border-right-width: 0;
     border-top-width: 0;
