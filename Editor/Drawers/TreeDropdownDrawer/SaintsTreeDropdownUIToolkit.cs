@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
         public override void OnOpen()
         {
-            _treeDropdownElement = CloneTree();
+            _treeDropdownElement = new SaintsTreeDropdownElement(_metaInfo, _allowUnSelect);
 
             _treeDropdownElement.OnClickedEvent.AddListener(OnClicked);
             // _treeDropdownElement.RegisterCallback<GeometryChangedEvent>(GeoUpdateWindowSize);
@@ -51,6 +51,17 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             scrollView.Add(_treeDropdownElement);
 
             _treeDropdownElement.ScrollToElementEvent.AddListener(scrollView.ScrollTo);
+
+            scrollView.RegisterCallback<AttachToPanelEvent>(_ =>
+            {
+                scrollView.schedule.Execute(() =>
+                {
+                    if (_treeDropdownElement.CurrentFocus != null)
+                    {
+                        scrollView.ScrollTo(_treeDropdownElement.CurrentFocus);
+                    }
+                });
+            });
 
             editorWindow.rootVisualElement.Add(scrollView);
         }
@@ -68,28 +79,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             }
         }
 
-        private SaintsTreeDropdownElement CloneTree()
-        {
-            return new SaintsTreeDropdownElement(_metaInfo, _allowUnSelect);
-        }
-
-
-        // // Yep, hack around...
-        // private void GeoUpdateWindowSize(GeometryChangedEvent evt)
-        // {
-        //     // var root = editorWindow.rootVisualElement;
-        //     // ScrollView scrollView = editorWindow.rootVisualElement.Q<ScrollView>();
-        //     // VisualElement contentContainer = scrollView.contentContainer;
-        //     // // var height = contentContainer.resolvedStyle.height;
-        //     //
-        //     // VisualElement toolbarSearchContainer = editorWindow.rootVisualElement.Q<VisualElement>("saintsfield-advanced-dropdown-search-container");
-        //     // ToolbarBreadcrumbs toolbarBreadcrumbs = editorWindow.rootVisualElement.Q<ToolbarBreadcrumbs>();
-        //     //
-        //     // float height = contentContainer.resolvedStyle.height + toolbarSearchContainer.resolvedStyle.height + toolbarBreadcrumbs.resolvedStyle.height + 8;
-        //     // float height = _treeDropdownElement.resolvedStyle.height;
-        //
-        //     // editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, Mathf.Min(height, _maxHeight));
-        // }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
         public override void OnClose()

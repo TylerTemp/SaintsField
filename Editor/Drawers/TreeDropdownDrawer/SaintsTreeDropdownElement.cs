@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
         public readonly UnityEvent<TreeRowAbsElement> ScrollToElementEvent = new UnityEvent<TreeRowAbsElement>();
 
-        private TreeRowAbsElement _currentFocus;
+        public TreeRowAbsElement CurrentFocus { get; private set; }
         private readonly bool _allowToggle;
 
         private readonly IReadOnlyList<TreeRowAbsElement> _flatList;
@@ -67,8 +67,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 curValues)
                 .ToArray();
 
-            _currentFocus = null;
-
             VisualElement treeContainer = new VisualElement
             {
                 focusable = true,
@@ -83,10 +81,10 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     switch (rowAbsElement)
                     {
                         case TreeRowValueElement tr:
-                            tr.OnClickedEvent.AddListener((_, _) => _currentFocus = tr);
+                            tr.OnClickedEvent.AddListener((_, _) => CurrentFocus = tr);
                             break;
                         case TreeRowFoldoutElement tf:
-                            tf.RegisterValueChangedCallback(_ => _currentFocus = tf);
+                            tf.RegisterValueChangedCallback(_ => CurrentFocus = tf);
                             break;
                     }
                 }
@@ -139,18 +137,18 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         break;
                     case NavigationMoveEvent.Direction.Left:
                     {
-                        switch (_currentFocus)
+                        switch (CurrentFocus)
                         {
                             case TreeRowFoldoutElement { value: true } foldoutElement:
                                 foldoutElement.value = false;
                                 break;
                             case { Parent: not null }:
                             {
-                                _currentFocus = _currentFocus.Parent;
+                                CurrentFocus = CurrentFocus.Parent;
                                 // Debug.Log($"currentFocus={_currentFocus}");
                                 foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
                                 {
-                                    treeRowAbsElement.SetNavigateHighlight(_currentFocus == treeRowAbsElement);
+                                    treeRowAbsElement.SetNavigateHighlight(CurrentFocus == treeRowAbsElement);
                                 }
 
                                 break;
@@ -161,7 +159,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                     case NavigationMoveEvent.Direction.Right:
                     {
-                        if (_currentFocus is TreeRowFoldoutElement { value: false } foldoutElement)
+                        if (CurrentFocus is TreeRowFoldoutElement { value: false } foldoutElement)
                         {
                             foldoutElement.value = true;
                         }
@@ -172,13 +170,13 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
 
                 TreeRowAbsElement toFocus = null;
-                if (_currentFocus != null)
+                if (CurrentFocus != null)
                 {
                     List<TreeRowAbsElement> prevList = new List<TreeRowAbsElement>(_flatList.Count);
                     for (int index = 0; index < _flatList.Count; index++)
                     {
                         TreeRowAbsElement current = _flatList[index];
-                        if (current == _currentFocus)
+                        if (current == CurrentFocus)
                         {
                             if (isUp)
                             {
@@ -210,7 +208,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                 }
 
-                if (_currentFocus == null)
+                if (CurrentFocus == null)
                 {
                     toFocus = isUp
                         ? _flatList.LastOrDefault(each => each.Navigateable)
@@ -219,7 +217,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
                 if (toFocus != null)
                 {
-                    _currentFocus = toFocus;
+                    CurrentFocus = toFocus;
 
                     // Debug.Log($"currentFocus={_currentFocus}");
 
@@ -228,13 +226,13 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         treeRowAbsElement.SetNavigateHighlight(toFocus == treeRowAbsElement);
                     }
 
-                    ScrollToElementEvent.Invoke(_currentFocus);
+                    ScrollToElementEvent.Invoke(CurrentFocus);
                 }
             }, TrickleDown.TrickleDown);
             RegisterCallback<KeyUpEvent>(e =>
             {
 
-                if (_currentFocus is null)
+                if (CurrentFocus is null)
                 {
                     return;
                 }
@@ -242,7 +240,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 // ReSharper disable once InvertIf
                 if (e.keyCode is KeyCode.Space or KeyCode.Return or KeyCode.KeypadEnter)
                 {
-                    switch (_currentFocus)
+                    switch (CurrentFocus)
                     {
                         case TreeRowFoldoutElement foldoutElement:
                             foldoutElement.value = !foldoutElement.value;
@@ -337,7 +335,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     if (curValues.Contains(dropdownItem.value))
                     {
                         valueElement.SetValueOn(true);
-                        _currentFocus ??= valueElement;
+                        CurrentFocus ??= valueElement;
                     }
 
                     if (dropdownItem.disabled)
