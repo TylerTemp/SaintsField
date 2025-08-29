@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Core
         protected const int LabelLeftSpace = 4;
         protected const int LabelBaseWidth = 120;
         public const int IndentWidth = 15;
-        public const float SingleLineHeight = 20f;
+        public const int SingleLineHeight = 20;
         // public const string EmptyRectLabel = "                ";
 
         // public static bool IsSubDrawer = false;

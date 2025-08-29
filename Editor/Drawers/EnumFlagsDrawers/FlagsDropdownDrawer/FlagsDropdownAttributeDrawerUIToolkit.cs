@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Drawers.SceneDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -12,7 +11,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
+namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
 {
     public partial class FlagsDropdownAttributeDrawer
     {
@@ -122,7 +121,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 
         private void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.intValue, _enumMeta.AllCheckedInt, _enumMeta.BitValueToName);
+            AdvancedDropdownMetaInfo metaInfo = EnumFlagsUtil.GetDropdownMetaInfo(property.intValue, _enumMeta.AllCheckedInt, _enumMeta.BitValueToName);
 
             (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 

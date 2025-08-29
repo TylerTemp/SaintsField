@@ -90,6 +90,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
                         onValueChangedCallback(curItem);
+                        return null;
                     }
                 );
 

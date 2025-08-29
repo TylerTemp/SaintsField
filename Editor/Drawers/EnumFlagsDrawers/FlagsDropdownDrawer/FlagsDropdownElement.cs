@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using SaintsField.Editor.UIToolkitElements;
 
 #if UNITY_2021_3_OR_NEWER
-namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
+namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
 {
     public class FlagsDropdownElement: IntDropdownElement
     {

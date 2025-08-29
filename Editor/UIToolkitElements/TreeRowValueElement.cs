@@ -26,9 +26,10 @@ namespace SaintsField.Editor.UIToolkitElements
         private readonly VisualElement _toggleButton;
 
         private readonly string _labelLow;
-        private readonly bool IsToggle;
+        private readonly bool _isToggle;
+        public readonly object Value;
 
-        public TreeRowValueElement(): this(null, 0, false)
+        public TreeRowValueElement(): this(null, null, 0, false)
         {
         }
 
@@ -37,8 +38,9 @@ namespace SaintsField.Editor.UIToolkitElements
         private static Texture2D _boxCheckedIcon;
         private static Texture2D _boxUncheckedIcon;
 
-        public TreeRowValueElement(string label, int indent, bool toggle)
+        public TreeRowValueElement(object value, string label, int indent, bool toggle)
         {
+            Value = value;
             _treeRowTemplate ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/TreeDropdown/TreeRow.uxml");
             VisualElement treeRow = _treeRowTemplate.CloneTree();
 
@@ -65,7 +67,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 _boxCheckedIcon = Util.LoadResource<Texture2D>("checkbox-checked.png");
             }
 
-            IsToggle = toggle;
+            _isToggle = toggle;
             _toggleButton = toggleButton;
 
             if (toggle)
@@ -121,7 +123,7 @@ namespace SaintsField.Editor.UIToolkitElements
             //     return;
             // }
 
-            if(IsToggle)
+            if(_isToggle)
             {
                 Texture2D background = IsOn ? _boxCheckedIcon : _boxUncheckedIcon;
                 if (_toggleButton.style.backgroundImage != background)

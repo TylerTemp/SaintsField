@@ -1,8 +1,8 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,12 +12,12 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
     {
         private readonly float _width;
         private readonly AdvancedDropdownMetaInfo _metaInfo;
-        private readonly Action<object, bool> _setValue;
+        private readonly Func<object, bool, IReadOnlyList<object>> _setValue;
 
         private readonly float _maxHeight;
         private readonly bool _allowUnSelect;
 
-        public SaintsTreeDropdownUIToolkit(AdvancedDropdownMetaInfo metaInfo, float width, float maxHeight, bool allowUnSelect, Action<object, bool> setValue)
+        public SaintsTreeDropdownUIToolkit(AdvancedDropdownMetaInfo metaInfo, float width, float maxHeight, bool allowUnSelect, Func<object, bool, IReadOnlyList<object>> setValue)
         {
             _width = width;
             _metaInfo = metaInfo;
@@ -49,15 +49,22 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             ScrollView scrollView = new ScrollView();
             scrollView.Add(_treeDropdownElement);
+
+            _treeDropdownElement.ScrollToElementEvent.AddListener(scrollView.ScrollTo);
+
             editorWindow.rootVisualElement.Add(scrollView);
         }
 
         private void OnClicked(object value, bool isOn, bool isPrimary)
         {
-            _setValue(value, isOn);
-            if (isPrimary)
+            IReadOnlyList<object> r = _setValue(value, isOn);
+            if (!_allowUnSelect || isPrimary)
             {
                 editorWindow.Close();
+            }
+            else
+            {
+                _treeDropdownElement.RefreshValues(r);
             }
         }
 

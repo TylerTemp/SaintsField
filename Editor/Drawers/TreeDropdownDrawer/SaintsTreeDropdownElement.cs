@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.DropdownBase;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
@@ -21,6 +22,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         // new status on or off;
         // is row click or not (row click need to close the dropdown)
         public readonly UnityEvent<object, bool, bool> OnClickedEvent = new UnityEvent<object, bool, bool>();
+
+        public readonly UnityEvent<TreeRowAbsElement> ScrollToElementEvent = new UnityEvent<TreeRowAbsElement>();
 
         private TreeRowAbsElement _currentFocus;
         private readonly bool _allowToggle;
@@ -136,19 +139,24 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         break;
                     case NavigationMoveEvent.Direction.Left:
                     {
-                        if (_currentFocus is TreeRowFoldoutElement { value: true } foldoutElement)
+                        switch (_currentFocus)
                         {
-                            foldoutElement.value = false;
-                        }
-                        else if(_currentFocus is { Parent: not null })
-                        {
-                            _currentFocus = _currentFocus.Parent;
-                            // Debug.Log($"currentFocus={_currentFocus}");
-                            foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
+                            case TreeRowFoldoutElement { value: true } foldoutElement:
+                                foldoutElement.value = false;
+                                break;
+                            case { Parent: not null }:
                             {
-                                treeRowAbsElement.SetNavigateHighlight(_currentFocus == treeRowAbsElement);
+                                _currentFocus = _currentFocus.Parent;
+                                // Debug.Log($"currentFocus={_currentFocus}");
+                                foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
+                                {
+                                    treeRowAbsElement.SetNavigateHighlight(_currentFocus == treeRowAbsElement);
+                                }
+
+                                break;
                             }
                         }
+
                         return;
                     }
                     case NavigationMoveEvent.Direction.Right:
@@ -219,6 +227,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     {
                         treeRowAbsElement.SetNavigateHighlight(toFocus == treeRowAbsElement);
                     }
+
+                    ScrollToElementEvent.Invoke(_currentFocus);
                 }
             }, TrickleDown.TrickleDown);
             RegisterCallback<KeyUpEvent>(e =>
@@ -249,7 +259,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
         public int GetMaxHeight()
         {
-            int result = 0;
+            int result = SaintsPropertyDrawer.SingleLineHeight + 2;  // search bar height + border
             foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
             {
                 if (treeRowAbsElement is TreeRowSepElement)
@@ -263,6 +273,22 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             }
 
             return result;
+        }
+
+        public void RefreshValues(IReadOnlyList<object> curValues)
+        {
+            foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
+            {
+                // ReSharper disable once InvertIf
+                if (treeRowAbsElement is TreeRowValueElement valueElement)
+                {
+                    bool shouldOn = curValues.Contains(valueElement.Value);
+                    if (valueElement.IsOn != shouldOn)
+                    {
+                        valueElement.SetValueOn(shouldOn);
+                    }
+                }
+            }
         }
 
         private static IEnumerable<TreeRowAbsElement> FlatTreeRow(TreeRowAbsElement treeRow)
@@ -307,7 +333,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 if (dropdownItem.ChildCount() == 0)  // value node
                 {
                     hasMeaningfulChild = true;
-                    TreeRowValueElement valueElement = new TreeRowValueElement(dropdownItem.displayName, indent, _allowToggle);
+                    TreeRowValueElement valueElement = new TreeRowValueElement(dropdownItem.value, dropdownItem.displayName, indent, _allowToggle);
                     if (curValues.Contains(dropdownItem.value))
                     {
                         valueElement.SetValueOn(true);

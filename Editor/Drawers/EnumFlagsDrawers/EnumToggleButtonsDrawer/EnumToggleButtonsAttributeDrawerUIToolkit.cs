@@ -10,8 +10,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-
-namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
+namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 {
     public partial class EnumToggleButtonsAttributeDrawer
     {

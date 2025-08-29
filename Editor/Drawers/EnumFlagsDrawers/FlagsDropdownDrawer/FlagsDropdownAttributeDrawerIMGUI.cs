@@ -10,7 +10,7 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
+namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
 {
     public partial class FlagsDropdownAttributeDrawer
     {
@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             FieldInfo info, object parent)
         {
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
-            AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.intValue, metaInfo.AllCheckedInt, metaInfo.BitValueToName);
+            AdvancedDropdownMetaInfo dropdownMetaInfo = EnumFlagsUtil.GetDropdownMetaInfo(property.intValue, metaInfo.AllCheckedInt, metaInfo.BitValueToName);
             _error = dropdownMetaInfo.Error;
 
             #region Dropdown
