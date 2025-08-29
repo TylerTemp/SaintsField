@@ -4413,6 +4413,9 @@ public Direction[] direOpt;
 
 Like `OptionsDropdown` / `PairsDropdown`, but in a tree view
 
+> [!WARNING]
+> UI Toolkit only.
+
 ```csharp
 use SaintsField;
 
