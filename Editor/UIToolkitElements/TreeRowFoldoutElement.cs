@@ -23,6 +23,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         private readonly VisualElement _conentElement;
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public TreeRowFoldoutElement(): this(null, 0, false)
         {
         }
@@ -75,7 +76,7 @@ namespace SaintsField.Editor.UIToolkitElements
         private readonly List<TreeRowAbsElement> _children = new List<TreeRowAbsElement>();
         public IReadOnlyList<TreeRowAbsElement> ContentChildren => _children;
 
-        private int _addContentCount = 0;
+        private int _addContentCount;
 
         public void AddContent(TreeRowAbsElement child)
         {
@@ -145,6 +146,10 @@ namespace SaintsField.Editor.UIToolkitElements
             {
                 SetDisplay(DisplayStyle.Flex);
                 _shown = true;
+                foreach (TreeRowAbsElement treeRowAbsElement in _children)
+                {
+                    treeRowAbsElement.OnSearch(searchTokens);
+                }
                 return true;
             }
 
@@ -152,6 +157,10 @@ namespace SaintsField.Editor.UIToolkitElements
             {
                 SetDisplay(DisplayStyle.None);
                 _shown = false;
+                foreach (TreeRowAbsElement treeRowAbsElement in _children)
+                {
+                    treeRowAbsElement.OnSearch(searchTokens);
+                }
                 return false;
             }
 

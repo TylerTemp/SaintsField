@@ -121,7 +121,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             // navigation
             RegisterCallback<NavigationMoveEvent>(e =>
             {
-                Debug.Log(e.direction);
+                // Debug.Log(e.direction);
                 bool isUp;
                 // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
                 switch (e.direction)
@@ -141,7 +141,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         else if(_currentFocus is { Parent: not null })
                         {
                             _currentFocus = _currentFocus.Parent;
-                            Debug.Log($"currentFocus={_currentFocus}");
+                            // Debug.Log($"currentFocus={_currentFocus}");
                             foreach (TreeRowAbsElement treeRowAbsElement in flatList)
                             {
                                 treeRowAbsElement.SetNavigateHighlight(_currentFocus == treeRowAbsElement);
@@ -211,14 +211,14 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 {
                     _currentFocus = toFocus;
 
-                    Debug.Log($"currentFocus={_currentFocus}");
+                    // Debug.Log($"currentFocus={_currentFocus}");
 
                     foreach (TreeRowAbsElement treeRowAbsElement in flatList)
                     {
                         treeRowAbsElement.SetNavigateHighlight(toFocus == treeRowAbsElement);
                     }
                 }
-            });
+            }, TrickleDown.TrickleDown);
             RegisterCallback<KeyUpEvent>(e =>
             {
 
