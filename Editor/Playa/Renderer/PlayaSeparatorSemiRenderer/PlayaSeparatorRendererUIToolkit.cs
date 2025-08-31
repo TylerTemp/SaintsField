@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
                         GetFriendlyName(FieldWithInfo),
                         FieldWithInfo.SerializedProperty,
                         FieldWithInfo.FieldInfo ?? (MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.MethodInfo,
-                        FieldWithInfo.Target);
+                        FieldWithInfo.Targets[0]);
                     foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(chunks))
                     {
                         // Debug.Log($"title add {rich}");

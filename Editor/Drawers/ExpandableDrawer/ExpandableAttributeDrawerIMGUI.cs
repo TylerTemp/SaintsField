@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
         }
     }
 
-    public partial class ExpandableAttributeDrawer: IMakeRenderer
+    public partial class ExpandableAttributeDrawer
     {
 
         private class ExpandableInfo
@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
             SerializedObject ser = new SerializedObject(serObject);
 
-            IReadOnlyList<ISaintsRenderer> renderers = SaintsEditor.Setup(Array.Empty<string>(), ser, makeRenderer, serObject);
+            IReadOnlyList<ISaintsRenderer> renderers = SaintsEditor.Setup(Array.Empty<string>(), ser, makeRenderer, new[]{serObject});
 
             // Debug.Log(serObject);
 
@@ -152,7 +152,8 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             return SaintsFieldConfigUtil.GetFoldoutSpaceImGui();
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
@@ -161,6 +162,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             ExpandableInfo serInfo = EnsureExpandableInfo(this, property, info, parent);
@@ -318,11 +320,6 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             }
 
             IdToInfo.Remove(key);
-        }
-
-        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
-        {
-            return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         }
     }
 }

@@ -11,10 +11,24 @@ namespace SaintsField
 
         public TInterface I => V as TInterface;
 
+        public SaintsInterface(TObject obj)
+        {
+            V = obj;
+        }
+
 #if UNITY_EDITOR
         // ReSharper disable once StaticMemberInGenericType
         public static readonly string EditorPropertyName = nameof(V);
         public virtual bool EditorCustomPicker => true;
+
+        /// <summary>
+        /// Set the actual value, must have implemented the `TInterface`
+        /// </summary>
+        /// <param name="obj">The value to sign</param>
+        public void EditorSetValue(TObject obj)
+        {
+            V = obj;
+        }
 #endif
 
         // public static implicit operator TInterface(SaintsInterface<TObject, TInterface> saintsInterface) => saintsInterface.I;

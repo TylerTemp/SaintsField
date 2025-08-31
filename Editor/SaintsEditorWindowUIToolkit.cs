@@ -11,7 +11,7 @@ namespace SaintsField.Editor
     public partial class SaintsEditorWindow
     {
         // [NonSerialized] private UnityEngine.Object _editorTargetUIToolkit;
-        public void CreateGUI()
+        public virtual void CreateGUI()
         {
             EditorRelinkRootUIToolkit();
             EditorApplication.playModeStateChanged += EditorOnPlayModeStateChangeUIToolkit;
@@ -48,22 +48,34 @@ namespace SaintsField.Editor
             EditorApplication.playModeStateChanged -= EditorOnPlayModeStateChangeUIToolkit;
         }
 
-        private void EditorRelinkRootUIToolkit()
+        private IVisualElementScheduledItem _editorOnUpdateInternalTask;
+
+        protected ScrollView EditorCreatInspectingTarget()
         {
-            VisualElement root = rootVisualElement;
-            root.Clear();
-            // UnityEngine.Object target = _editorTargetUIToolkit == null ? this : _editorTargetUIToolkit;
-            // UnityEngine.Object target = _editorTargetUIToolkit == null ? this : _editorTargetUIToolkit;
-            // Debug.Log(target);
             SaintsEditorWindowSpecialEditor editor = (SaintsEditorWindowSpecialEditor)UnityEditor.Editor.CreateEditor(EditorGetTargetInternal(), EditorDrawerType);
             editor.EditorShowMonoScript = EditorShowMonoScript;
-            InspectorElement element = new InspectorElement(editor);
+            InspectorElement element = new InspectorElement(editor)
+            {
+                style =
+                {
+                    width = Length.Percent(100),
+                    flexGrow = 0,
+                },
+            };
 
             ScrollView sv = new ScrollView();
             sv.Add(element);
-            root.Add(sv);
 
-            element.schedule.Execute(EditorOnUpdateInternal).Every(1);
+            _editorOnUpdateInternalTask?.Pause();
+            _editorOnUpdateInternalTask = sv.schedule.Execute(EditorOnUpdateInternal).Every(1);
+            return sv;
+        }
+
+        protected virtual void EditorRelinkRootUIToolkit()
+        {
+            VisualElement root = rootVisualElement;
+            root.Clear();
+            root.Add(EditorCreatInspectingTarget());
         }
     }
 }

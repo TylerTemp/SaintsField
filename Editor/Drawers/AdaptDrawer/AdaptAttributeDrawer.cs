@@ -5,7 +5,7 @@ using UnityEditor;
 namespace SaintsField.Editor.Drawers.AdaptDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(AdaptAttribute), true)]
     public partial class AdaptAttributeDrawer: SaintsPropertyDrawer

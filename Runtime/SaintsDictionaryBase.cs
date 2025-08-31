@@ -10,54 +10,21 @@ namespace SaintsField
     [Serializable]
     public abstract class SaintsDictionaryBase<TKey, TValue>: IDictionary, IDictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
-        [Serializable]
-        public struct Wrap<T> : IWrapProp, IEquatable<Wrap<T>>
-        {
-            [SerializeField] public T value;
+        protected abstract int SerializedKeysCount();
+        protected abstract void SerializedKeyAdd(TKey key);
+        protected abstract TKey SerializedKeyGetAt(int index);
+        protected abstract void SerializedKeysClear();
+        protected abstract int SerializedValuesCount();
+        protected abstract void SerializedValueAdd(TValue value);
+        protected abstract TValue SerializedValueGetAt(int index);
+        protected abstract void SerializedValuesClear();
 
-#if UNITY_EDITOR
-            // ReSharper disable once StaticMemberInGenericType
-            public static readonly string EditorPropertyName = nameof(value);
-#endif
-
-            public Wrap(T value)
-            {
-                this.value = value;
-            }
-
-            public bool Equals(Wrap<T> other)
-            {
-                return EqualityComparer<T>.Default.Equals(value, other.value);
-            }
-
-            public override bool Equals(object obj)
-            {
-                // ReSharper disable once Unity.BurstLoadingManagedType
-                return obj is Wrap<T> other && Equals(other);
-            }
-
-            public override int GetHashCode()
-            {
-                return EqualityComparer<T>.Default.GetHashCode(value);
-            }
-        }
-
-        protected abstract List<Wrap<TKey>> SerializedKeys { get; }
-        protected abstract List<Wrap<TValue>> SerializedValues { get; }
+        protected abstract void SerializedSetKeyValue(TKey tKey, TValue tValue);
+        protected abstract void SerializedRemoveKeyValue(TKey key);
 
         protected Dictionary<TKey, TValue> Dictionary = new Dictionary<TKey, TValue>();
         private ICollection _keys;
         private ICollection _values;
-
-        // [Conditional("UNITY_EDITOR")]
-        // private void EditorSyncDictionaryToBackingField()
-        // {
-        //     foreach (KeyValuePair<TKey, TValue> kvp in Dictionary)
-        //     {
-        //         SerializedKeys.Add(kvp.Key);
-        //         SerializedValues.Add(kvp.Value);
-        //     }
-        // }
 
         public void OnBeforeSerialize()
         {
@@ -66,21 +33,15 @@ namespace SaintsField
 
         protected virtual void OnBeforeSerializeProcesser()
         {
-            // Debug.Log($"OnBeforeSerialize keys={SerializedKeys.Count}, values={SerializedValues.Count}");
 #if UNITY_EDITOR
-            // if(SerializedKeys.Count != Dictionary.Count)
-            // {
-            //     EditorSyncDictionaryToBackingField();
-            // }
-
-            int keyCount = SerializedKeys.Count;
-            int valueCount = SerializedValues.Count;
+            int keyCount = SerializedKeysCount();
+            int valueCount = SerializedValuesCount();
             if (keyCount < valueCount)
             {
                 int addCount = valueCount - keyCount;
                 for (int i = 0; i < addCount; i++)
                 {
-                    SerializedKeys.Add(default);
+                    SerializedKeyAdd(default);
                 }
                 // Debug.Log($"Balance add {addCount} to keys");
             }
@@ -89,17 +50,17 @@ namespace SaintsField
                 int addCount = keyCount - valueCount;
                 for (int i = 0; i < addCount; i++)
                 {
-                    SerializedValues.Add(default);
+                    SerializedValueAdd(default);
                 }
                 // Debug.Log($"Balance add {addCount} to values");
             }
 #else
-            SerializedKeys.Clear();
-            SerializedValues.Clear();
+            SerializedKeysClear();
+            SerializedValuesClear();
             foreach (KeyValuePair<TKey, TValue> kvp in Dictionary)
             {
-                SerializedKeys.Add(new Wrap<TKey>(kvp.Key));
-                SerializedValues.Add(new Wrap<TValue>(kvp.Value));
+                SerializedKeyAdd(kvp.Key);
+                SerializedValueAdd(kvp.Value);
             }
 #endif
         }
@@ -113,18 +74,19 @@ namespace SaintsField
         {
             Dictionary.Clear();
 
-            for (int index = 0; index < SerializedKeys.Count; index++)
+            int keyCount = SerializedKeysCount();
+            for (int index = 0; index < keyCount; index++)
             {
-                Wrap<TKey> key = SerializedKeys[index];
-                Wrap<TValue> value = SerializedValues.Count > index ? SerializedValues[index] : default;
+                TKey key = SerializedKeyGetAt(index);
+                TValue value = SerializedValuesCount() > index ? SerializedValueGetAt(index) : default;
 #if UNITY_EDITOR
                 // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
-                if (!RuntimeUtil.IsNull(key.value) && !Dictionary.ContainsKey(key.value))
+                if (!RuntimeUtil.IsNull(key) && !Dictionary.ContainsKey(key))
                 {
-                    Dictionary.Add(key.value, value.value);
+                    Dictionary.Add(key, value);
                 }
 #else
-                Dictionary.Add(key.value, value.value);
+                Dictionary.Add(key, value);
 #endif
                 // Dictionary[_keys[index]] = _values[index];
             }
@@ -132,8 +94,8 @@ namespace SaintsField
 #if UNITY_EDITOR
             // do nothing
 #else
-            SerializedKeys.Clear();
-            SerializedValues.Clear();
+            SerializedKeysClear();
+            SerializedValuesClear();
 #endif
         }
 
@@ -141,8 +103,8 @@ namespace SaintsField
         {
             Dictionary.Add(key, value);
 #if UNITY_EDITOR
-            SerializedKeys.Add(new Wrap<TKey>(key));
-            SerializedValues.Add(new Wrap<TValue>(value));
+            SerializedKeyAdd(key);
+            SerializedValueAdd(value);
 #endif
         }
 
@@ -177,10 +139,7 @@ namespace SaintsField
 #if UNITY_EDITOR
             if(removed)
             {
-                Wrap<TKey> wrapKey = new Wrap<TKey>(tKey);
-                int keyIndex = SerializedKeys.IndexOf(wrapKey);
-                SerializedValues.RemoveAt(keyIndex);
-                SerializedKeys.RemoveAt(keyIndex);
+                SerializedRemoveKeyValue(tKey);
             }
 #endif
         }
@@ -200,8 +159,8 @@ namespace SaintsField
         public void Add(KeyValuePair<TKey, TValue> item)
         {
 #if UNITY_EDITOR
-            SerializedKeys.Add(new Wrap<TKey>(item.Key));
-            SerializedValues.Add(new Wrap<TValue>(item.Value));
+            SerializedKeyAdd(item.Key);
+            SerializedValueAdd(item.Value);
 #endif
             Dictionary.Add(item.Key, item.Value);
         }
@@ -219,8 +178,8 @@ namespace SaintsField
         public void Clear()
         {
 #if UNITY_EDITOR
-            SerializedKeys.Clear();
-            SerializedValues.Clear();
+            SerializedKeysClear();
+            SerializedValuesClear();
 #endif
             Dictionary.Clear();
         }
@@ -241,10 +200,7 @@ namespace SaintsField
 #if UNITY_EDITOR
             if(result)
             {
-                Wrap<TKey> wrapKey = new Wrap<TKey>(item.Key);
-                int keyIndex = SerializedKeys.IndexOf(wrapKey);
-                SerializedValues.RemoveAt(keyIndex);
-                SerializedKeys.RemoveAt(keyIndex);
+                SerializedRemoveKeyValue(item.Key);
             }
 #endif
             return result;
@@ -281,18 +237,7 @@ namespace SaintsField
                 TValue tValue = (TValue)value;
                 Dictionary[tKey] = tValue;
 #if UNITY_EDITOR
-                Wrap<TKey> wrapKey = new Wrap<TKey>(tKey);
-                int index = SerializedKeys.IndexOf(wrapKey);
-                Wrap<TValue> wrapValue = new Wrap<TValue>(tValue);
-                if (index >= 0)
-                {
-                    SerializedValues[index] = wrapValue;
-                }
-                else
-                {
-                    SerializedKeys.Add(wrapKey);
-                    SerializedValues.Add(wrapValue);
-                }
+                SerializedSetKeyValue(tKey, tValue);
 #endif
             }
         }
@@ -304,18 +249,32 @@ namespace SaintsField
             return Dictionary.ContainsKey(key);
         }
 
+        #region Dictionary Extension
+
+
+        public TValue GetValueOrDefault(TKey key)
+        {
+            if (TryGetValue(key, out TValue value))
+            {
+                return value;
+            }
+
+            return default;
+        }
+
+        public TValue GetValueOrDefault(TKey key, TValue defaultValue)
+        {
+            return TryGetValue(key, out TValue value)
+                ? value
+                : defaultValue;
+        }
+
         public bool Remove(TKey key)
         {
             if (Dictionary.Remove(key))
             {
 #if UNITY_EDITOR
-                Wrap<TKey> wrapKey = new Wrap<TKey>(key);
-                int index = SerializedKeys.IndexOf(wrapKey);
-                if (index >= 0)
-                {
-                    SerializedValues.RemoveAt(index);
-                    SerializedKeys.RemoveAt(index);
-                }
+                SerializedRemoveKeyValue(key);
 #endif
                 return true;
             }
@@ -332,13 +291,50 @@ namespace SaintsField
 
             Dictionary.Add(key, value);
 #if UNITY_EDITOR
-            Wrap<TKey> wrapKey = new Wrap<TKey>(key);
-            Wrap<TValue> wrapValue = new Wrap<TValue>(value);
-            SerializedKeys.Add(wrapKey);
-            SerializedValues.Add(wrapValue);
+            SerializedKeyAdd(key);
+            SerializedValueAdd(value);
 #endif
             return true;
         }
+
+        public TValue GetOrAddNonNull(TKey key, Func<TKey, TValue> valueFactory)
+        {
+            if (TryGetValue(key, out TValue value))
+            {
+                return value;
+            }
+
+            TValue createdValue = valueFactory.Invoke(key);
+            Add(key, createdValue);
+            return createdValue;
+        }
+
+        public TValue GetValueOrAdd(
+            TKey key,
+            Func<TKey, TValue> valueProvider)
+        {
+            if(TryGetValue(key, out TValue value))
+            {
+                return value;
+            }
+
+            TValue createdValue = valueProvider.Invoke(key);
+            Add(key, createdValue);
+            return createdValue;
+        }
+
+        // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Global
+        public bool TryRemove(TKey key, out TValue value)
+        {
+            if(TryGetValue(key, out TValue foundValue))
+            {
+                value = foundValue;
+                return Remove(key);
+            }
+            value = default;
+            return false;
+        }
+        #endregion
 
         public TValue this[TKey key]
         {
@@ -347,18 +343,7 @@ namespace SaintsField
             {
                 Dictionary[key] = value;
 #if UNITY_EDITOR
-                Wrap<TKey> wrapKey = new Wrap<TKey>(key);
-                Wrap<TValue> wrapValue = new Wrap<TValue>(value);
-                int index = SerializedKeys.IndexOf(wrapKey);
-                if (index >= 0)
-                {
-                    SerializedValues[index] = wrapValue;
-                }
-                else
-                {
-                    SerializedKeys.Add(wrapKey);
-                    SerializedValues.Add(wrapValue);
-                }
+                SerializedSetKeyValue(key, value);
 #endif
             }
         }

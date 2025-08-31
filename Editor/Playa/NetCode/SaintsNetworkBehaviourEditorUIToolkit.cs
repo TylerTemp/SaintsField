@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Playa.NetCode
                 .ToArray();
             // Debug.Log($"{string.Join(",", fields)}");
 
-            _renderers = SaintsEditor.Setup(netCodeFields, serializedObject, this, target);
+            _renderers = SaintsEditor.Setup(netCodeFields, serializedObject, this, targets);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
             foreach (ISaintsRenderer saintsRenderer in _renderers)

@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Playa
 
         // public IReadOnlyList<ISaintsLayoutBase> LayoutBases;
         public IReadOnlyList<IPlayaAttribute> PlayaAttributes;
-        public object Target;
+        public IReadOnlyList<object> Targets;
 
         public SaintsRenderType RenderType;
 

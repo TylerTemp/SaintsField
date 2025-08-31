@@ -172,7 +172,8 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
@@ -182,6 +183,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
             float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             float errorHeight = _errorMsg == "" ? 0 : ImGuiHelpBox.GetHeight(_errorMsg, width, MessageType.Error);

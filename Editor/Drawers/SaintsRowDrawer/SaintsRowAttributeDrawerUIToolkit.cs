@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -35,6 +35,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         protected override bool UseCreateFieldUIToolKit => true;
 
         public const string SaintsRowClass = "saints-field--saintsrow";
+        private static string NameActualContaier(SerializedProperty property) => $"${property.propertyPath}__saintsrow";
 
 
         public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
@@ -50,16 +51,19 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             if (inline)
             {
-                root = new VisualElement
+                root = new EmptyPrefabOverrideElement(property)
                 {
                     style =
                     {
                         flexGrow = 1,
                     },
+                    name = NameActualContaier(property),
                 };
             }
             else
             {
+                VisualElement foldoutWrapper = new VisualElement();
+
                 Foldout foldout = new Foldout
                 {
                     text = label,
@@ -68,15 +72,82 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     {
                         flexGrow = 1,
                     },
+                    name = NameActualContaier(property),
                 };
                 foldout.RegisterValueChangedCallback(evt =>
                 {
                     property.isExpanded = evt.newValue;
                 });
 
+                foldoutWrapper.Add(foldout);
+                foldoutWrapper.Add(new EmptyPrefabOverrideElement(property)
+                {
+                    style =
+                    {
+                        position = Position.Absolute,
+                        top = 0,
+                        bottom = 0,
+                        left = 0,
+                        right = 0,
+                        height = 18,
+                    },
+                    pickingMode = PickingMode.Ignore,
+                });
+
+                // foldout.Add(new EmptyPrefabOverrideElement(property)
+                // {
+                //     style =
+                //     {
+                //         position = Position.Absolute,
+                //         top = -20,
+                //         bottom = 0,
+                //         left = -15,
+                //         right = 0,
+                //         height = 18,
+                //     },
+                //     pickingMode = PickingMode.Ignore,
+                // });
+
+                // Toggle toggle = foldout.Q<Toggle>();
+                // if (toggle != null)
+                // {
+                //     toggle.Add(
+                //         new EmptyPrefabOverrideElement(property)
+                //         {
+                //             style =
+                //             {
+                //                 position = Position.Absolute,
+                //                 top = 0,
+                //                 bottom = 0,
+                //                 left = 0,
+                //                 right = 0,
+                //             },
+                //             pickingMode = PickingMode.Ignore,
+                //         });
+                //     // Label toggleLabel = toggle.Q<Label>();
+                //     // if (toggleLabel != null)
+                //     // {
+                //     //     // EmptyPrefabOverrideElement emptyPrefabOverrideElement =
+                //     //     //     new EmptyPrefabOverrideElement(property)
+                //     //     //     {
+                //     //     //         style =
+                //     //     //         {
+                //     //     //             position = Position.Absolute,
+                //     //     //             top = 0,
+                //     //     //             bottom = 0,
+                //     //     //             left = 0,
+                //     //     //             right = 0,
+                //     //     //         },
+                //     //     //         pickingMode = PickingMode.Ignore,
+                //     //     //     };
+                //     //     // toggleLabel.Add(emptyPrefabOverrideElement);
+                //     // }
+                // }
+
                 UIToolkitUtils.AddContextualMenuManipulator(foldout, property, () => {});
 
-                root = foldout;
+                // root = foldout;
+                root = foldoutWrapper;
             }
 
             root.AddToClassList(SaintsRowClass);
@@ -84,6 +155,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             FillElement(root, property, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder);
 
+            // ReSharper disable once InvertIf
             if (property.propertyType == SerializedPropertyType.ManagedReference)
             {
                 string propPath = property.propertyPath;
@@ -92,7 +164,17 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     {
                         long curId = (long) root.userData;
                         // ReSharper disable once InvertIf
-                        if (curId != property.managedReferenceId)
+                        long newId;
+                        try
+                        {
+                            newId = property.managedReferenceId;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            return;
+                        }
+                        // ReSharper disable once InvertIf
+                        if (curId != newId)
                         {
                             // Debug.Log($"{property.propertyPath} Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
                             root.userData = property.managedReferenceId;
@@ -133,6 +215,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
         private static void FillElement(VisualElement root, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
+            // Debug.Log($"{property.propertyPath}: {inHorizontalLayout}");
             object value = null;
             if (property.propertyType == SerializedPropertyType.ManagedReference)
             {
@@ -161,48 +244,6 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     else
                     {
                         value = getValue;
-
-                        // Debug.Log(value);
-                        if (value == null)
-                        {
-                            // foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
-                            // {
-                            //     // switch (subProp.)
-                            //     // {
-                            //     //
-                            //     // }
-                            // }
-
-                            // var p = new PropertyField(property);
-                            // root.Add(p);
-                            // return;
-
-                            // Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
-                            //     ? ReflectUtils.GetElementType(GetMemberType(info))
-                            //     : GetMemberType(info);
-                            //
-                            // // Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
-                            // // value = Activator.CreateInstance(rawType, true);
-                            // // Util.SignPropertyValue(property, info, parent, value);
-                            //
-                            // property.boxedValue = value = Activator.CreateInstance(rawType, true);
-                            // property.serializedObject.ApplyModifiedProperties();
-
-                            // return;
-                        }
-
-
-
-                        // if (value == null)
-                        // {
-                        //     Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
-                        //         ? ReflectUtils.GetElementType(GetMemberType(info))
-                        //         : GetMemberType(info);
-                        //
-                        //     Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
-                        //     value = Activator.CreateInstance(rawType, true);
-                        //     Util.SignPropertyValue(property, info, parent, value);
-                        // }
                     }
                 }
 
@@ -212,6 +253,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     return;
                 }
 
+                Debug.Assert(value != null);
                 // value = getValue;
             }
 
@@ -220,96 +262,43 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
                 .ToDictionary(each => each.name, each => each.property);
 
-            // SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)attribute;
-
             IReadOnlyList<ISaintsRenderer> renderer =
-                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, value);
-
-//             // Debug.Log($"{renderer.Count}");
-//
-//             // VisualElement bodyElement = SaintsEditor.CreateVisualElement(renderer);
-
+                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, new []{value});
 
              VisualElement bodyElement = new VisualElement();
-             // bodyElement.Add(new Label(property.displayName));
 
-             // // this works just fine
-             // foreach (KeyValuePair<string,SerializedProperty> kv in serializedFieldNames)
-             // {
-             //     Debug.Log($"{kv.Key} -> {kv.Value.propertyPath}");
-             //     // bodyElement.Add(new Label(kv.Key));
-             //     var prop = new PropertyField(kv.Value);
-             //     prop.Bind(property.serializedObject);
-             //     bodyElement.Add(prop);
-             // }
+             Type objectType = value.GetType();
+             IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
 
-             // this... fixed by adding Bind()... wtf...
-             foreach (ISaintsRenderer saintsRenderer in renderer)
+             foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(objectType, playaClassAttributes, property.serializedObject, new[]{value}))
              {
-                 saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
                  VisualElement rendererElement = saintsRenderer.CreateVisualElement();
                  if (rendererElement != null)
                  {
-                     // Debug.Log($"add: {saintsRenderer}");
                      bodyElement.Add(rendererElement);
                  }
              }
 
-             root.Add(bodyElement);
+            // this... fixed by adding Bind()... wtf...
+            foreach (ISaintsRenderer saintsRenderer in renderer)
+            {
+                saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
+                saintsRenderer.SetSerializedProperty(property);
+                VisualElement rendererElement = saintsRenderer.CreateVisualElement();
+                if (rendererElement != null)
+                {
+                    // Debug.Log($"add: {saintsRenderer}");
+                    bodyElement.Add(rendererElement);
+                }
+            }
 
-             // Foldout foldout = new Foldout
-             // {
-             //     value = true,
-             // };
-             // foldout.Add(bodyElement);
-             // root.Add(foldout);
-             //
-             // return;
+            VisualElement actualContainer = root.Q<VisualElement>(NameActualContaier(property));
 
-//             foreach (ISaintsRenderer saintsRenderer in renderer)
-//             {
-//                 VisualElement rendererElement = saintsRenderer.CreateVisualElement();
-//                 if (rendererElement != null)
-//                 {
-//                     Debug.Log($"add {saintsRenderer}: {rendererElement}");
-//                     bodyElement.Add(rendererElement);
-//                 }
-//             }
-//
+            actualContainer.Add(bodyElement);
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(doTweenPlayRecorder));
             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));
 #endif
-
-            // if (saintsRowAttribute?.Inline ?? false)
-            // {
-            //     root.Add(bodyElement);
-            //     return;
-            // }
-
-            // bodyElement.style.paddingLeft = SaintsPropertyDrawer.IndentWidth;
-
-            // Debug.Log(property.isExpanded);
-
-            // Foldout toggle = new Foldout
-            // {
-            //     text = property.displayName,
-            //     // value = property.isExpanded,
-            //     value = true,
-            // };
-            //
-            // // bodyElement.style.display = property.isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
-            // toggle.RegisterValueChangedCallback(evt =>
-            // {
-            //     property.isExpanded = evt.newValue;
-            //     // bodyElement.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
-            // });
-            //
-            // toggle.Add(bodyElement);
-            //
-            // root.Add(toggle);
-            // root.Add(bodyElement);
-
         }
     }
 }

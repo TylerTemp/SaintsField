@@ -248,6 +248,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
             public override bool Equals(object obj)
             {
+                // ReSharper disable once Unity.BurstLoadingManagedType
                 return obj is KeyStruct other && Equals(other);
             }
 
@@ -262,6 +263,39 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             }
         }
 
-        [ShowInInspector] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
+        [ShowInInspector, Ordered] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
+
+        [ShowInInspector, Ordered, PlayaInfoBox("If getter gives error, we display an error box")]
+        private int WrongGetter => throw new NotSupportedException("Expected Exception");
+
+        [ShowInInspector, Ordered, PlayaInfoBox("We don't handle if setter gives error")]
+        private int WrongSetter  // this will just give errors to console, we won't handle it.
+        {
+            get => 20;
+            set => throw new NotSupportedException("Expected Exception");
+        }
+
+        [ShowInInspector, Ordered, PlayaInfoBox("nested field can be error handled too")]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Local
+        private IEnumerator _ienumerator = new []{1, 2, 3}.GetEnumerator();
+
+        [LayoutStart("IEnumerator", ELayout.Horizontal)]
+        [Button, Ordered] private void MoveIt() => _ienumerator.MoveNext();
+        [LayoutTerminateHere]
+        [Button, Ordered] private void ReCreateIt() => _ienumerator = new []{1, 2, 3}.GetEnumerator();
+
+        private class NestChange
+        {
+            public int NestedValue;
+        }
+
+        // ReSharper disable once FieldCanBeMadeReadOnly.Local
+        [ShowInInspector, Ordered] private NestChange _nestChange = new NestChange();
+
+        [Button, Ordered]
+        private void ChangeNestedValue()
+        {
+            _nestChange.NestedValue = (_nestChange.NestedValue + 1) % 3;
+        }
     }
 }

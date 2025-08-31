@@ -16,7 +16,7 @@ using Animation = Spine.Animation;
 namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(SpineAnimationPickerAttribute), true)]
     public partial class SpineAnimationPickerAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer

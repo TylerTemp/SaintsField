@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Playa.NetCode
 
             try
             {
-                _renderers = SaintsEditor.Setup(IMGUIGetNetCodeVariableNames(), serializedObject, this, target);
+                _renderers = SaintsEditor.Setup(IMGUIGetNetCodeVariableNames(), serializedObject, this, targets);
             }
             catch (Exception)
             {
@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Playa.NetCode
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_renderers == null)
             {
-                _renderers = SaintsEditor.Setup(IMGUIGetNetCodeVariableNames(), serializedObject, this, target);
+                _renderers = SaintsEditor.Setup(IMGUIGetNetCodeVariableNames(), serializedObject, this, targets);
             }
             foreach (ISaintsRenderer renderer in _renderers)
             {

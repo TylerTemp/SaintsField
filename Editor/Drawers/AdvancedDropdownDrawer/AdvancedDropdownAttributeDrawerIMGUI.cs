@@ -60,15 +60,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(display), FocusType.Keyboard))
             {
-#pragma warning disable CS0219
-                float minHeight = AdvancedDropdownAttribute.MinHeight;
-#pragma warning restore CS0219
-                float itemHeight = AdvancedDropdownAttribute.ItemHeight > 0
-                    ? AdvancedDropdownAttribute.ItemHeight
-                    : EditorGUIUtility.singleLineHeight;
-#pragma warning disable CS0219
-                float titleHeight = AdvancedDropdownAttribute.TitleHeight;
-#pragma warning restore CS0219
+                // float minHeight = AdvancedDropdownAttribute.MinHeight;
+                // float itemHeight = AdvancedDropdownAttribute.ItemHeight > 0
+                //     ? AdvancedDropdownAttribute.ItemHeight
+                //     : EditorGUIUtility.singleLineHeight;
+                // float titleHeight = AdvancedDropdownAttribute.TitleHeight;
                 // Vector2 size;
                 // if (minHeight < 0)
                 // {
@@ -179,12 +175,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return result;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent) => _error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,

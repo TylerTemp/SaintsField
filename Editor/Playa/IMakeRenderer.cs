@@ -6,7 +6,7 @@ namespace SaintsField.Editor.Playa
 {
     public interface IMakeRenderer
     {
-        AbsRenderer MakeRenderer(SerializedObject serializedObject,
+        IEnumerable<AbsRenderer> MakeRenderer(SerializedObject serializedObject,
             SaintsFieldWithInfo fieldWithInfo);
     }
 }

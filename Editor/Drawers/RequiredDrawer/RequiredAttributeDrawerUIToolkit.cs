@@ -1,5 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -11,18 +13,28 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
 {
     public partial class RequiredAttributeDrawer
     {
-
         private static string NameRequiredBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__Required";
 
-
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            string typeError = ValidateType(property, info.FieldType);
+            if (allAttributes.Any(each => each is RequiredIfAttribute))
+            {
+                return null;
+            }
+
+            Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) < 0
+                ? info.FieldType
+                : ReflectUtils.GetElementType(info.FieldType);
+            string typeError = ValidateType(property, rawType);
+
+            HelpBoxMessageType helpBoxMessageType = ((RequiredAttribute) saintsAttribute).MessageType.GetUIToolkitMessageType();
 
             // Debug.Log(typeError);
-            HelpBox helpBox = new HelpBox(typeError, HelpBoxMessageType.Error)
+            HelpBox helpBox = new HelpBox(typeError, helpBoxMessageType)
             {
                 style =
                 {
@@ -42,8 +54,14 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
+            if (allAttributes.Any(each => each is RequiredAttribute))
+            {
+                return;
+            }
+
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             if (parent == null)
             {

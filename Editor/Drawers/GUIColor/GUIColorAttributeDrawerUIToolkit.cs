@@ -35,7 +35,9 @@ namespace SaintsField.Editor.Drawers.GUIColor
             container.schedule.Execute(() => UIToolkitUtils.ApplyColor(container, color)).StartingIn(150);
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             GUIColorAttribute guiColorAttribute = (GUIColorAttribute)saintsAttribute;

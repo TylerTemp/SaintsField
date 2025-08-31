@@ -62,7 +62,9 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             // return dropdownButton;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.Error)
@@ -111,16 +113,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
                     return;
                 }
 
-                // UpdateDisplay(container, spineAnimationPickerAttribute, property, info, parent);
-
-                float maxHeight = Screen.currentResolution.height - dropdownButton.worldBound.y - dropdownButton.worldBound.height - 100;
-                // Rect worldBound = dropdownButton.worldBound;
-                Rect worldBound = fieldContainer.worldBound;
-                if (maxHeight < 100)
-                {
-                    worldBound.y -= 100 + worldBound.height;
-                    maxHeight = 100;
-                }
+                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(fieldContainer.worldBound);
 
                 AdvancedDropdownMetaInfo dropdownMetaInfo = property.propertyType == SerializedPropertyType.String
                     ? GetMetaInfoString(property.stringValue, skeletonDataAsset)
@@ -170,7 +163,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
             if (error == "")
             {
                 SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
-                if (skeletonData != null)
+                if (skeletonData == null)
                 {
                     error = $"SkeletonData of {skeletonDataAsset} is null";
                 }

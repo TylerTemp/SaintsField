@@ -77,5 +77,18 @@ namespace SaintsField.Samples.Scripts
         }
 
         [EnumToggleButtons, DefaultExpand] public EnumExpand enumExpand;
+
+        [Serializable]
+        public enum EnumLabelField
+        {
+            [RichLabel("<color=red><label/></color>")]
+            None,
+            [RichLabel("<color=blue>1st</color> (<label/>)")]
+            First,
+            [InspectorName("<color=green>2nd</color> (<label/>)")]
+            Second,
+        }
+
+        [EnumToggleButtons, DefaultExpand] public EnumLabelField labelField;
     }
 }

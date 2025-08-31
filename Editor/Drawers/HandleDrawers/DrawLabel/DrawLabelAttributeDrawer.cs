@@ -4,11 +4,12 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(DrawLabelAttribute), true)]
     public partial class DrawLabelAttributeDrawer: SaintsPropertyDrawer
@@ -37,7 +38,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             if (!string.IsNullOrEmpty(labelInfo.Error))
             {
 #if SAINTSFIELD_DEBUG
-                Debug.LogError(labelInfo.Error);
+                Debug.LogWarning(labelInfo.Error);
 #endif
                 return;
             }

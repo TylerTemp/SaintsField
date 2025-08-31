@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -54,6 +56,11 @@ namespace SaintsField.Editor.Utils
                 FieldInfo = null;
                 PropertyInfo = propertyInfo;
             }
+
+            public override string ToString()
+            {
+                return IsField ? FieldInfo.ToString() : PropertyInfo.ToString();
+            }
         }
 
         public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParent(SerializedProperty property)
@@ -66,11 +73,17 @@ namespace SaintsField.Editor.Utils
                 propPaths = propPathSegments;
             }
 
+            return GetFieldInfoAndDirectParentByPathSegments(property, propPaths);
+        }
+
+        public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParentByPathSegments(
+            SerializedProperty property, IEnumerable<string> pathSegments)
+        {
             object sourceObj = property.serializedObject.targetObject;
             FieldOrProp fieldOrProp = default;
 
             bool preNameIsArray = false;
-            foreach (string propSegName in propPaths)
+            foreach (string propSegName in pathSegments)
             {
                 // Debug.Log($"check key {propSegName}");
                 if(propSegName == "Array")
@@ -123,7 +136,10 @@ namespace SaintsField.Editor.Utils
                     return (default, null);
                 }
                 // ;
-                if (!(fieldOrProp.FieldInfo is null) || !(fieldOrProp.PropertyInfo is null))
+                // ReSharper disable once UseNegatedPatternInIsExpression
+                if (!(fieldOrProp.FieldInfo is null)
+                    // ReSharper disable once UseNegatedPatternInIsExpression
+                    || !(fieldOrProp.PropertyInfo is null))
                 {
                     sourceObj = fieldOrProp.IsField
                         // ReSharper disable once PossibleNullReferenceException
@@ -209,6 +225,7 @@ namespace SaintsField.Editor.Utils
             // this does not work with interface type
             // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes(typeof(ISaintsAttribute)));
             // Debug.Log(fieldOrProp.FieldInfo.GetCustomAttributes());
+            // ReSharper disable once RedundantCast
             MemberInfo memberInfo = fieldOrProp.IsField ? (MemberInfo)fieldOrProp.FieldInfo : fieldOrProp.PropertyInfo;
             return (ReflectCache.GetCustomAttributes<T>(memberInfo), sourceObj);
         }
@@ -298,6 +315,10 @@ namespace SaintsField.Editor.Utils
             {
                 return false;
             }
+            catch (ArgumentNullException)
+            {
+                return false;
+            }
 
             return true;
         }
@@ -339,23 +360,46 @@ namespace SaintsField.Editor.Utils
             return search.Split(' ').Select(segment => new ListSearchToken(ListSearchType.Include, segment));
         }
 
+        // Note: This WILL contain -1 for the sake of async searching...
         public static IEnumerable<int> SearchArrayProperty(SerializedProperty property, string searchFull)
         {
             IReadOnlyList<ListSearchToken> searchTokens = ParseSearch(searchFull).ToArray();
-            for (int i = 0; i < property.arraySize; i++)
+            for (int arrayElementIndex = 0; arrayElementIndex < property.arraySize; arrayElementIndex++)
             {
-                SerializedProperty childProperty = property.GetArrayElementAtIndex(i);
-                if (searchTokens.All(search => SearchProp(childProperty, search.Token)))
+                SerializedProperty childProperty = property.GetArrayElementAtIndex(arrayElementIndex);
+                bool all = true;
+                HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                    .Select(_ => new HashSet<object>())
+                    .ToArray();
+                for (int tokenIndex = 0; tokenIndex < searchTokens.Count; tokenIndex++)
+                {
+                    ListSearchToken search = searchTokens[tokenIndex];
+                    HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+                    Debug.Log($"#Search# searching token@{tokenIndex}={search.Token} of property={property.name}@{arrayElementIndex} with seachedObjects={string.Join(",", searchedObjects)}");
+#endif
+                    if (!SearchProp(childProperty, search.Token, searchedObjects))
+                    {
+                        all = false;
+                        break;
+                    }
+                }
+
+                if (all)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                     Debug.Log($"found: {childProperty.propertyPath}");
 #endif
-                    yield return i;
+                    yield return arrayElementIndex;
+                }
+                else
+                {
+                    yield return -1;
                 }
             }
         }
 
-        public static bool SearchProp(SerializedProperty property, string token)
+        public static bool SearchProp(SerializedProperty property, string rawToken, HashSet<object> searchedObjects)
         {
             SerializedPropertyType propertyType;
             try
@@ -371,31 +415,47 @@ namespace SaintsField.Editor.Utils
                 return false;
             }
 
+            string token = rawToken.ToLower();
+
             // Debug.Log($"{property.propertyPath} is {propertyType}");
 
             switch (propertyType)
             {
                 case SerializedPropertyType.Integer:
-                    return property.intValue.ToString().Contains(token);
+                    return property.intValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.Boolean:
-                    return property.boolValue.ToString().Contains(token);
+                    return property.boolValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.Float:
                     // ReSharper disable once SpecifyACultureInStringConversionExplicitly
-                    return property.floatValue.ToString().Contains(token);
+                    return property.floatValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.String:
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
-                    Debug.Log($"{property.propertyPath}={property.stringValue} contains {search}={property.stringValue?.Contains(search)}");
-#endif
-                    return property.stringValue?.Contains(token) ?? false;
+                    return property.stringValue?.ToLower().Contains(token) ?? false;
                 case SerializedPropertyType.Color:
-                    return property.colorValue.ToString().Contains(token);
+                    return property.colorValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.ObjectReference:
+                    if (RuntimeUtil.IsNull(property.objectReferenceValue))
+                    {
+                        return false;
+                    }
+
                     // ReSharper disable once Unity.NoNullPropagation
                     if (property.objectReferenceValue is ScriptableObject so)
                     {
-                        return SearchSoProp(so, token);
+//                         if (!searchedObjects.Add(so))
+//                         {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+//                             Debug.Log($"#Search# Already searched {so.name} ({so.GetType()}) for {token}, skip");
+// #endif
+//                             return false;
+//                         }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+                        Debug.Log($"#Search# nested search {so.name} with searchedObjects={string.Join(",", searchedObjects)}");
+#endif
+
+                        return SearchSoProp(so, token, searchedObjects);
                     }
-                    return property.objectReferenceValue?.name.Contains(token) ?? false;
+                    return property.objectReferenceValue.name.ToLower().Contains(token);
                 case SerializedPropertyType.LayerMask:
                     return property.intValue.ToString().Contains(token);
                 case SerializedPropertyType.Enum:
@@ -404,45 +464,64 @@ namespace SaintsField.Editor.Utils
                     {
                         return false;
                     }
-                    return property.enumNames[property.enumValueIndex].Contains(token);
+                    return property.enumNames[property.enumValueIndex].ToLower().Contains(token);
                 case SerializedPropertyType.Vector2:
-                    return property.vector2Value.ToString().Contains(token);
+                    return property.vector2Value.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.Vector3:
-                    return property.vector3Value.ToString().Contains(token);
+                    return property.vector3Value.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.Vector4:
-                    return property.vector4Value.ToString().Contains(token);
+                    return property.vector4Value.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.Rect:
-                    return property.rectValue.ToString().Contains(token);
+                    return property.rectValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.ArraySize:
                     if (property.isArray)
                     {
-                        return property.arraySize.ToString().Contains(token);
+                        return property.arraySize.ToString().ToLower().Contains(token);
                     }
                     goto default;
                 case SerializedPropertyType.Character:
-                    return property.intValue.ToString().Contains(token);
+                    return property.intValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.AnimationCurve:
-                    return property.animationCurveValue.ToString().Contains(token);
+                    return property.animationCurveValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.Bounds:
-                    return property.boundsValue.ToString().Contains(token);
+                    return property.boundsValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.Quaternion:
-                    return property.quaternionValue.ToString().Contains(token);
+                    return property.quaternionValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.ExposedReference:
                     // ReSharper disable once Unity.NoNullPropagation
-                    return property.exposedReferenceValue?.name.Contains(token) ?? false;
+                    return property.exposedReferenceValue?.name.ToLower().Contains(token) ?? false;
                 case SerializedPropertyType.FixedBufferSize:
-                    return property.fixedBufferSize.ToString().Contains(token);
+                    return property.fixedBufferSize.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.Vector2Int:
-                    return property.vector2IntValue.ToString().Contains(token);
+                    return property.vector2IntValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.Vector3Int:
-                    return property.vector3IntValue.ToString().Contains(token);
+                    return property.vector3IntValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.RectInt:
-                    return property.rectIntValue.ToString().Contains(token);
+                    return property.rectIntValue.ToString().ToLower().Contains(token);
                 case SerializedPropertyType.BoundsInt:
-                    return property.boundsIntValue.ToString().Contains(token);
+                    return property.boundsIntValue.ToString().ToLower().Contains(token);
 #if UNITY_2019_3_OR_NEWER
                 case SerializedPropertyType.ManagedReference:
-                    return property.managedReferenceFullTypename.Contains(token);
+                    // if (property.managedReferenceFullTypename.Contains(token))
+                    // {
+                    //     return true;
+                    // }
+#if UNITY_2021_3_OR_NEWER
+                    if (!searchedObjects.Add(property.managedReferenceValue))
+                    {
+                        return false;
+                    }
+#endif
+
+                    foreach ((string _, SerializedProperty subProp)  in SaintsRowAttributeDrawer.GetSerializableFieldInfo(property))
+                    {
+                        if (SearchProp(subProp, token, searchedObjects))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
 #endif
                 case SerializedPropertyType.Generic:
                 {
@@ -453,16 +532,18 @@ namespace SaintsField.Editor.Utils
 #endif
                         for (int i = 0; i < property.arraySize; i++)
                         {
-                            if (SearchProp(property.GetArrayElementAtIndex(i), token))
+                            if (SearchProp(property.GetArrayElementAtIndex(i), token, searchedObjects))
+                            {
                                 return true;
+                            }
                         }
                         return false;
                     }
 
                     // ReSharper disable once LoopCanBeConvertedToQuery
-                    foreach (SerializedProperty child in SerializedUtils.GetPropertyChildren(property))
+                    foreach (SerializedProperty child in GetPropertyChildren(property))
                     {
-                        if(SearchProp(child, token))
+                        if(SearchProp(child, token, searchedObjects))
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                             Debug.Log($"found child: {child.propertyPath}");
@@ -482,15 +563,23 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private static bool SearchSoProp(ScriptableObject so, string search)
+        private static bool SearchSoProp(ScriptableObject so, string search, HashSet<object> searchedObjects)
         {
+            if (!searchedObjects.Add(so))
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+                Debug.Log($"#Search# skip {so.name} as already searched in searchedObjects={string.Join(",", searchedObjects)}");
+#endif
+                return false;
+            }
+
             // ReSharper disable once ConvertToUsingDeclaration
             using(SerializedObject serializedObject = new SerializedObject(so))
             {
                 SerializedProperty iterator = serializedObject.GetIterator();
                 while (iterator.NextVisible(true))
                 {
-                    if (SearchProp(iterator, search))
+                    if (SearchProp(iterator, search, searchedObjects))
                     {
                         return true;
                     }

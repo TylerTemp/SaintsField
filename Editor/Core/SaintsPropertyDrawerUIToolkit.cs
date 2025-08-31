@@ -9,13 +9,11 @@ using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 // #if SAINTSFIELD_OBVIOUS_SOAP
@@ -51,9 +49,11 @@ namespace SaintsField.Editor.Core
             $"{SerializedUtils.GetUniqueId(property)}--saints-field--container";
 
         protected virtual bool UseCreateFieldUIToolKit => false;
+        public bool SaintsSubRenderer = false;
 
         // public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
         public IReadOnlyList<PropertyAttribute> AppendPropertyAttributes = null;
+        public IReadOnlyList<PropertyAttribute> OverridePropertyAttributes = null;
 
         protected List<SaintsPropertyInfo> SaintsPropertyDrawers;
 
@@ -61,7 +61,7 @@ namespace SaintsField.Editor.Core
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-            Debug.Log($"Create property gui {property.propertyPath}/{property.displayName}/{this}");
+            Debug.Log($"Create property gui {property.propertyPath}/{this}/{GetHashCode()}");
 #endif
             if (!SerializedUtils.IsOk(property))
             {
@@ -87,9 +87,24 @@ namespace SaintsField.Editor.Core
             };
 
             (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
-            PropertyAttribute[] allAttributes = AppendPropertyAttributes == null
-                ? allAttributesRaw
-                : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
+            PropertyAttribute[] allAttributes;
+            if (SaintsSubRenderer)
+            {
+                allAttributes = attribute == null? Array.Empty<PropertyAttribute>(): new []{attribute};
+            }
+            else
+            {
+                if (OverridePropertyAttributes != null)
+                {
+                    allAttributes = OverridePropertyAttributes.ToArray();
+                }
+                else
+                {
+                    allAttributes = AppendPropertyAttributes == null
+                        ? allAttributesRaw
+                        : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
+                }
+            }
 
             ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
             // Debug.Assert(iSaintsAttributes.Length > 0, property.propertyPath);
@@ -560,7 +575,7 @@ namespace SaintsField.Editor.Core
                 {
                     // belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel, eachAttribute);
                     VisualElement creatBelow = saintsPropertyInfo.Drawer.CreateBelowUIToolkit(property,
-                        saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, containerElement, fieldInfo, parent);
+                        saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, allAttributes, containerElement, fieldInfo, parent);
                     if(creatBelow != null)
                     {
                         groupByContainer.Add(creatBelow);
@@ -622,7 +637,9 @@ namespace SaintsField.Editor.Core
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
-            (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
+            (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property, allAttributes);
+
+            // Debug.Log($"{GetType().Name}: attrOrNull={attrOrNull}; drawerType={drawerType}; allAttribute={string.Join(", ", allAttributes)}");
 
             if (drawerType == null)
             {
@@ -638,8 +655,14 @@ namespace SaintsField.Editor.Core
             // return PropertyFieldFallbackUIToolkit(property);
 
             PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);
+            if (typeDrawer is SaintsPropertyDrawer spd)
+            {
+                // Debug.Log($"{GetType().Name}: fall to SaintsPropertyDrawer={spd}; allAttribute={string.Join(", ", allAttributes)}");
+                spd.InHorizontalLayout = InHorizontalLayout;
+                spd.SaintsSubRenderer = true;
+            }
 
-            VisualElement element = DrawUsingDrawerInstance(drawerType, typeDrawer, property, info,
+            VisualElement element = DrawUsingDrawerInstance(passedPreferredLabel, drawerType, typeDrawer, property, info,
                 saintsPropertyDrawers, containerElement);
             // ReSharper disable once InvertIf
             if (element != null)
@@ -651,7 +674,7 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
+        private static VisualElement DrawUsingDrawerInstance(string passedLabel, Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
         {
             Debug.Assert(drawerType != null);
             if (drawerInstance == null)
@@ -664,7 +687,7 @@ namespace SaintsField.Editor.Core
             if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType == typeof(PropertyDrawer))  // null: old Unity || did not override
             {
 #if UNITY_6000_0_OR_NEWER
-                return PropertyFieldFallbackUIToolkit(property);
+                return PropertyFieldFallbackUIToolkit(property, passedLabel);
 #else
 
                 Action<object> onValueChangedCallback = null;
@@ -685,6 +708,8 @@ namespace SaintsField.Editor.Core
                             onValueChangedCallback,
                             value);
                     }
+
+                    SaintsEditorApplicationChanged.OnAnyEvent.Invoke();
                 };
 
                 // This breaks: AYellowPaper SerializedDictionary
@@ -765,11 +790,18 @@ namespace SaintsField.Editor.Core
 
 
                 // This works fine with: AYellowPaper.SerializedDictionary, Wwise.Event, I2Language.LocalizedString
-                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
+                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(passedLabel);
 
                 IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
                 {
-                    property.serializedObject.Update();
+                    try
+                    {
+                        property.serializedObject.Update();
+                    }
+                    catch (Exception)
+                    {
+                        return;
+                    }
 
                     GUIContent label = imguiLabelHelper.NoLabel
                         ? GUIContent.none
@@ -805,8 +837,11 @@ namespace SaintsField.Editor.Core
                         using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
                         {
                             // Debug.Log($"Fall {property.propertyPath}");
+                            // This works with Wwise.Bank/Event in list; not work with AYellowPaper.SerializedDictionary
                             // EditorGUILayout.PropertyField(property, label, true);
                             // Debug.Log($"Fall Done {property.propertyPath}");
+
+                            // This not work with Wwise.Bank/Event in list; But for other situation it works just fine
                             float height = drawerInstance.GetPropertyHeight(property, label);
                             Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
                             drawerInstance.OnGUI(rect, property, label);
@@ -871,7 +906,7 @@ namespace SaintsField.Editor.Core
             IReadOnlyList<PropertyAttribute> allAttributes, bool manuallyWatch)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-            Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute.GetType().Name))}");
+            Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute?.GetType().Name))}");
 #endif
             try
             {
@@ -905,6 +940,7 @@ namespace SaintsField.Editor.Core
                         onValueChangedCallback,
                         obj);
                 }
+                SaintsEditorApplicationChanged.OnAnyEvent.Invoke();
             };
 
             PropertyField fallbackField = containerElement.Q<PropertyField>(name: UIToolkitFallbackName(property));
@@ -987,6 +1023,11 @@ namespace SaintsField.Editor.Core
                 {
                     containerElement.TrackPropertyValue(property, _ =>
                     {
+                        if (!SerializedUtils.IsOk(property))
+                        {
+                            return;
+                        }
+
                         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                         if (noCacheParent == null)
                         {
@@ -1065,14 +1106,16 @@ namespace SaintsField.Editor.Core
                 // Debug.Log(string.Join(",", PropertyAttributeToPropertyDrawers.Keys));
 
                 // ReSharper disable once UseIndexFromEndExpression
-                VisualElement topRoot = parentRoots[parentRoots.Count - 1];
+                if(parentRoots.Count > 0)
+                {
+                    VisualElement topRoot = parentRoots[parentRoots.Count - 1];
 
-                // PropertyField thisPropField = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass);
+                    // PropertyField thisPropField = containerElement.Q<PropertyField>(className: SaintsFieldFallbackClass);
 
-                // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
-                // Debug.Log($"container={container.Count}");
+                    // var container = thisPropField.Query<VisualElement>(className: "unity-decorator-drawers-container").ToList();
+                    // Debug.Log($"container={container.Count}");
 
-                // thisPropField.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/UnityLabelTransparent.uss"));
+                    // thisPropField.styleSheets.Add(Util.LoadResource<StyleSheet>("UIToolkit/UnityLabelTransparent.uss"));
 
 //                 // really... this delay is not predictable
 //                 containerElement.schedule.Execute(() =>
@@ -1091,8 +1134,9 @@ namespace SaintsField.Editor.Core
 //
 //                 });
 
-                topRoot.Clear();
-                topRoot.Add(deepestContainer);
+                    topRoot.Clear();
+                    topRoot.Add(deepestContainer);
+                }
 
                 // thisPropField.Bind(property.serializedObject);
                 // fallbackField.Unbind();
@@ -1127,6 +1171,7 @@ namespace SaintsField.Editor.Core
                 Debug.Log($"remove old tracker main: {trackerMain}");
 #endif
                 trackerMain.RemoveFromHierarchy();
+                UIToolkitUtils.Unbind(trackerMain);
             }
             // if (trackerMain == null)
             {
@@ -1242,6 +1287,7 @@ namespace SaintsField.Editor.Core
 #endif
                     // continue;
                     subTracker.RemoveFromHierarchy();
+                    UIToolkitUtils.Unbind(subTracker);
                 }
 
                 subTracker = new VisualElement
@@ -1323,12 +1369,15 @@ namespace SaintsField.Editor.Core
             // }
 
             // containerElement.schedule.Execute(() => OnUpdateUiToolKitInternal(property, containerElement, parent, saintsPropertyDrawers));
-            OnUpdateUiToolKitInternal(property, containerElement, saintsPropertyDrawers, onValueChangedCallback, fieldInfo);
+            OnUpdateUiToolKitInternal(property, allAttributes, containerElement, saintsPropertyDrawers, onValueChangedCallback, fieldInfo);
         }
 
-        private static void OnUpdateUiToolKitInternal(SerializedProperty property, VisualElement container,
+        private static void OnUpdateUiToolKitInternal(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container,
             // ReSharper disable once ParameterTypeCanBeEnumerable.Local
-            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, Action<object> onValueChangedCallback,
+            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers,
+            Action<object> onValueChangedCallback,
             FieldInfo info
         )
         {
@@ -1356,17 +1405,17 @@ namespace SaintsField.Editor.Core
 
             foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
             {
-                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, container, onValueChangedCallback, info);
+                saintsPropertyInfo.Drawer.OnUpdateUIToolkit(property, saintsPropertyInfo.Attribute, saintsPropertyInfo.Index, allAttributes, container, onValueChangedCallback, info);
             }
 
             // Debug.Log($"container={container}/parent={container.parent}");
 
-            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(SaintsFieldConfig.UpdateLoopDefaultMs);
+            container.parent.schedule.Execute(() => OnUpdateUiToolKitInternal(property, allAttributes, container, saintsPropertyDrawers, onValueChangedCallback, info)).StartingIn(SaintsFieldConfig.UpdateLoopDefaultMs);
         }
 
         private static StyleSheet GetNoDecoratorUss()
         {
-            if (_noDecoratorDrawer == null)
+            if (!_noDecoratorDrawer)
             {
                 _noDecoratorDrawer = Util.LoadResource<StyleSheet>(UIToolkitUtils.NoDecoratorDrawerUssFile);
             }
@@ -1374,10 +1423,10 @@ namespace SaintsField.Editor.Core
             return _noDecoratorDrawer;
         }
 
-        protected static PropertyField PropertyFieldFallbackUIToolkit(SerializedProperty property)
+        protected static PropertyField PropertyFieldFallbackUIToolkit(SerializedProperty property, string label)
         {
             // PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
-            PropertyField propertyField = new PropertyField(property)
+            PropertyField propertyField = new PropertyField(property, label)
             {
                 style =
                 {
@@ -1484,7 +1533,8 @@ namespace SaintsField.Editor.Core
         #region Callbacks
 
         protected virtual VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             return null;
         }
@@ -1540,6 +1590,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
         }

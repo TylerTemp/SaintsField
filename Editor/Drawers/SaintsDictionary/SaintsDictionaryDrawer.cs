@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.SaintsDictionary
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.ValuePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SaintsDictionaryBase<,>), true)]
     [CustomPropertyDrawer(typeof(SaintsDictionaryAttribute), true)]
@@ -65,24 +66,94 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 _valuesPropName = ReflectUtils.GetIWrapPropName(rawType, "EditorPropValues");
             }
 
+            Debug.Assert(_keysPropName != null, $"Failed to find keys property name for {rawType}. Do you froget to define a `static string EditorPropKeys` (nameof(YourPropKeyList))?");
+            Debug.Assert(_valuesPropName != null, $"Failed to find values property name for {rawType}. Do you froget to define a `static string EditorPropValues` (nameof(YourPropValueList))?");
+
             return (_keysPropName, _valuesPropName);
         }
 
-        private static List<int> Search(SerializedProperty keysProp, SerializedProperty valuesProp, string keySearch, string valueSearch)
+        private static IEnumerable<int> Search(SerializedProperty keysProp, SerializedProperty valuesProp, string keySearch, string valueSearch)
         {
             int size = keysProp.arraySize;
 
-            List<int> results = string.IsNullOrEmpty(keySearch)
-                ? Enumerable.Range(0, size).ToList()
-                : SerializedUtils.SearchArrayProperty(keysProp, keySearch).ToList();
-            // int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
-            if (string.IsNullOrEmpty(valueSearch))
+            bool keySearchEmpty = string.IsNullOrEmpty(keySearch);
+            bool valueSearchEmpty = string.IsNullOrEmpty(valueSearch);
+
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (keySearchEmpty && valueSearchEmpty)
             {
-                return results;
+                for (int index = 0; index < size; index++)
+                {
+                    yield return index;
+                }
+                yield break;
             }
 
-            int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
-            return results.Where(each => valueResults.Contains(each)).ToList();
+            if (keySearchEmpty)
+            {
+                foreach (int index in SerializedUtils.SearchArrayProperty(valuesProp, valueSearch))
+                {
+                    yield return index;
+                }
+
+                yield break;
+            }
+
+
+
+            IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(valueSearch).ToArray();
+            foreach (int index in SerializedUtils.SearchArrayProperty(keysProp, keySearch))
+            {
+                if (index == -1)
+                {
+                    yield return -1;
+                }
+                else
+                {
+                    SerializedProperty valueProp = valuesProp.GetArrayElementAtIndex(index);
+                    HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                        .Select(_ => new HashSet<object>())
+                        .ToArray();
+                    bool all = true;
+                    for (int tokenIndex = 0; tokenIndex < searchTokens.Count; tokenIndex++)
+                    {
+                        ListSearchToken search = searchTokens[tokenIndex];
+                        HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
+                        // ReSharper disable once InvertIf
+                        if (!SerializedUtils.SearchProp(valueProp, search.Token, searchedObjects))
+                        {
+                            all = false;
+                            break;
+                        }
+                    }
+
+                    if (all)
+                    {
+                        yield return index;
+                    }
+                    else
+                    {
+                        yield return -1;
+                    }
+                }
+            }
+            //
+            // IEnumerable<int> results = string.IsNullOrEmpty(keySearch)
+            //     ? Enumerable.Range(0, size)
+            //     : SerializedUtils.SearchArrayProperty(keysProp, keySearch);
+            // // int[] valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch).ToArray();
+            // if (string.IsNullOrEmpty(valueSearch))
+            // {
+            //     return results;
+            // }
+            //
+            // Debug.Log("Search value");
+            //
+            // IEnumerable<int> valueResults = SerializedUtils.SearchArrayProperty(valuesProp, valueSearch);
+            //
+            // Debug.Log("Filter value");
+            //
+            // return results.Where(each => each != -1 && valueResults.Contains(each));
         }
 
         private static string GetKeyLabel(SaintsDictionaryAttribute saintsDictionaryAttribute) => saintsDictionaryAttribute is null

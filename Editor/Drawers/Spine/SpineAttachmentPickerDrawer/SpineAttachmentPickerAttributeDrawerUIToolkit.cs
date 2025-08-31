@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Spine;
@@ -24,16 +25,35 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            UIToolkitUtils.DropdownButtonField dropdownField = UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
-            dropdownField.name = NameDropdownField(property);
-            SetDropdownLabel(dropdownField.ButtonLabelElement, property.stringValue);
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return new Label(GetPreferredLabel(property));
+            }
 
-            return dropdownField;
+            SpineAttachmentElement element = new SpineAttachmentElement();
+            element.BindProperty(property);
+            return new StringDropdownField(GetPreferredLabel(property), element)
+            {
+                name = NameDropdownField(property),
+            };
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return new HelpBox($"Type {property.propertyType} is not a string type.", HelpBoxMessageType.Error)
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                };
+            }
+
             return new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
@@ -45,63 +65,89 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             };
         }
 
-        // private Texture2D _iconTexture2D;
+        private SpineAttachmentUtils.AttachmentsResult _cachedAttachmentsResult;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            SpineAttachmentPickerAttribute spineAttachmentPickerAttribute = (SpineAttachmentPickerAttribute) saintsAttribute;
+            if (property.propertyType != SerializedPropertyType.String)
+            {
+                return;
+            }
 
-            UIToolkitUtils.DropdownButtonField dropdownField = container.Q<UIToolkitUtils.DropdownButtonField>(name: NameDropdownField(property));
-            Debug.Assert(dropdownField != null);
-
-            SpineAttachmentPickerAttribute spineSkinPickerAttribute = (SpineAttachmentPickerAttribute)saintsAttribute;
-
+            SpineAttachmentPickerAttribute spineAttachmentPickerAttribute = (SpineAttachmentPickerAttribute)saintsAttribute;
             HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property));
-            ValidateUIToolkit(helpBox, spineSkinPickerAttribute, property, info, parent);
 
-            dropdownField.TrackPropertyValue(property, _ =>
-            {
-                SetDropdownLabel(dropdownField.ButtonLabelElement, property.stringValue);
-                ValidateUIToolkit(helpBox, spineSkinPickerAttribute, property, info, parent);
-            });
+            StringDropdownField stringDropdownField = container.Q<StringDropdownField>(NameDropdownField(property));
+            SpineAttachmentElement element = stringDropdownField.Q<SpineAttachmentElement>();
+            UIToolkitUtils.AddContextualMenuManipulator(stringDropdownField, property,
+                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
-            dropdownField.ButtonElement.clicked += () =>
+            stringDropdownField.Button.clicked += () => MakeDropdown(GetAttachmentRefresh, spineAttachmentPickerAttribute, property,
+                stringDropdownField, onValueChangedCallback, info, parent);
+
+            GetAttachmentRefresh();
+
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(GetSlotInfosRefreshListener);
+            stringDropdownField.RegisterCallback<DetachFromPanelEvent>(_ =>
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(GetSlotInfosRefreshListener));
+            return;
+
+            SpineAttachmentUtils.AttachmentsResult GetAttachmentRefresh()
             {
-                AttachmentsResult attachmentsResult = GetAttachments(spineSkinPickerAttribute, property, info, parent);
-                if (attachmentsResult.Error != "")
+                SpineAttachmentUtils.AttachmentsResult attachmentsResult = GetAttachments(spineAttachmentPickerAttribute, property, info, parent);
+                if (helpBox.text != attachmentsResult.Error)
                 {
-                    UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), attachmentsResult.Error);
+                    helpBox.text = attachmentsResult.Error;
+                    helpBox.style.display = string.IsNullOrEmpty(attachmentsResult.Error) ? DisplayStyle.None : DisplayStyle.Flex;
                 }
 
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(property.stringValue, attachmentsResult, spineAttachmentPickerAttribute.SepAsSub);
-
-                float maxHeight = Screen.currentResolution.height - dropdownField.worldBound.y - dropdownField.worldBound.height - 100;
-                // Rect worldBound = dropdownButton.worldBound;
-                Rect worldBound = dropdownField.worldBound;
-                if (maxHeight < 100)
+                if (attachmentsResult.Error == "")
                 {
-                    worldBound.y -= 100 + worldBound.height;
-                    maxHeight = 100;
-                }
-
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
-                    dropdownMetaInfo,
-                    worldBound.width,
-                    maxHeight,
-                    false,
-                    (_, curItem) =>
+                    if (!_cachedAttachmentsResult.Equals(attachmentsResult))
                     {
-                        string newValue = (string)curItem;
-                        if (property.stringValue != newValue)
-                        {
-                            property.stringValue = newValue;
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback.Invoke(newValue);
-                        }
+                        element.BindAttachments(_cachedAttachmentsResult = attachmentsResult);
                     }
-                ));
-            };
+                }
+
+                return _cachedAttachmentsResult;
+            }
+
+            void GetSlotInfosRefreshListener() => GetAttachmentRefresh();
+        }
+
+        private static void MakeDropdown(Func<SpineAttachmentUtils.AttachmentsResult> getAttachmentRefresh, SpineAttachmentPickerAttribute spineAttachmentPickerAttribute, SerializedProperty property, StringDropdownField root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            SpineAttachmentUtils.AttachmentsResult attachmentsResult = getAttachmentRefresh();
+
+            if (attachmentsResult.Error != "")
+            {
+                return;
+            }
+
+            AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, getAttachmentRefresh(), spineAttachmentPickerAttribute.SepAsSub);
+            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
+                metaInfo,
+                root.worldBound.width,
+                maxHeight,
+                true,
+                (_, curItem) =>
+                {
+                    string newValue = (string)curItem;
+                    // ReSharper disable once InvertIf
+                    if (property.stringValue != newValue)
+                    {
+                        property.stringValue = newValue;
+                        property.serializedObject.ApplyModifiedProperties();
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newValue);
+                        onValueChangedCallback.Invoke(newValue);
+                    }
+                }
+            );
+
+            UnityEditor.PopupWindow.Show(worldBound, sa);
         }
 
         protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
@@ -111,62 +157,6 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             UIToolkitUtils.DropdownButtonField dropdownField =
                 container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
             UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
-        }
-
-        private static void ValidateUIToolkit(HelpBox helpBox, SpineAttachmentPickerAttribute spineAttachmentPickerAttribute, SerializedProperty property, MemberInfo info, object parent)
-        {
-            string error = Validate(spineAttachmentPickerAttribute, property, info, parent);
-            UpdateHelpBox(helpBox, error);
-        }
-
-        private RichTextDrawer _textDrawer;
-
-        private void SetDropdownLabel(Label label, string value)
-        {
-            _textDrawer ??= new RichTextDrawer();
-
-            IEnumerable<RichTextDrawer.RichTextChunk> chunksOrNull;
-
-            if (string.IsNullOrEmpty(value))
-            {
-                chunksOrNull = new[]
-                {
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        IsIcon = false,
-                        Content = "-",
-                    },
-                };
-            }
-            else
-            {
-                chunksOrNull = new[]
-                {
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        IsIcon = true,
-                        Content = IconAttachment,
-                    },
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        IsIcon = false,
-                        Content = value,
-                    },
-                };
-            }
-
-            UIToolkitUtils.SetLabel(label, chunksOrNull, _textDrawer);
-        }
-
-        private static void UpdateHelpBox(HelpBox helpBox, string error)
-        {
-            if (helpBox.text == error)
-            {
-                return;
-            }
-
-            helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-            helpBox.text = error;
         }
     }
 }

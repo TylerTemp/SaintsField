@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Core
         protected const int LabelLeftSpace = 4;
         protected const int LabelBaseWidth = 120;
         public const int IndentWidth = 15;
-        public const float SingleLineHeight = 20f;
+        public const int SingleLineHeight = 20;
         // public const string EmptyRectLabel = "                ";
 
         // public static bool IsSubDrawer = false;
@@ -387,10 +387,10 @@ namespace SaintsField.Editor.Core
             // ReSharper enable InconsistentNaming
         }
 
-        private static (Attribute attributeInstance, Type attributeDrawerType) GetOtherAttributeDrawerType(MemberInfo fieldInfo)
+        private static (Attribute attributeInstance, Type attributeDrawerType) GetOtherAttributeDrawerType(IEnumerable<Attribute> allAttributes)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression
-            foreach (Attribute fieldAttribute in ReflectCache.GetCustomAttributes(fieldInfo))
+            foreach (Attribute fieldAttribute in allAttributes)
             {
                 if (fieldAttribute is ISaintsAttribute)
                     continue;
@@ -492,9 +492,9 @@ namespace SaintsField.Editor.Core
                 else
                 {
                     matched = propertyAttributeToPropertyDrawer.Key.IsAssignableFrom(fieldType);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                        Debug.Log($"{propertyAttributeToPropertyDrawer.Key}/{matched}/{string.Join(",", propertyAttributeToPropertyDrawer.Value.Select(each => each.DrawerType))}");
-#endif
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+//                         Debug.Log($"{propertyAttributeToPropertyDrawer.Key}/{matched}/{string.Join(",", propertyAttributeToPropertyDrawer.Value.Select(each => each.DrawerType))}");
+// #endif
                     if (!matched && propertyAttributeToPropertyDrawer.Key.IsGenericType)
                     {
                         matched = ReflectUtils.IsSubclassOfRawGeneric(propertyAttributeToPropertyDrawer.Key, fieldType);
@@ -628,13 +628,13 @@ namespace SaintsField.Editor.Core
             return _cachedDrawer[saintsAttributeWithIndex] = GetOrCreateSaintsDrawerByAttr(saintsAttributeWithIndex.SaintsAttribute);
         }
 
-        public static (Attribute attrOrNull, Type drawerType) GetFallbackDrawerType(MemberInfo info, SerializedProperty property)
+        public static (Attribute attrOrNull, Type drawerType) GetFallbackDrawerType(MemberInfo info, SerializedProperty property, IEnumerable<Attribute> allAttributes)
         {
             EnsureAndGetTypeToDrawers();
 
             // check if any property has drawer. If so, just use PropertyField
-            // if not, check if it has custom drawer. if it exists, then try use that custom drawer
-            (Attribute attr, Type attributeDrawerType) = GetOtherAttributeDrawerType(info);
+            // if not, check if it has custom drawer. if it exists, then try to use that custom drawer
+            (Attribute attr, Type attributeDrawerType) = GetOtherAttributeDrawerType(allAttributes);
             if (attributeDrawerType != null)
             {
                 return (attr, attributeDrawerType);
@@ -754,7 +754,7 @@ namespace SaintsField.Editor.Core
 #endif
         }
 
-        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        public IEnumerable<AbsRenderer> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         }

@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 namespace SaintsField.Editor.Drawers
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(GameObjectActiveAttribute), true)]
     public class GameObjectActiveAttributeDrawer: DecToggleAttributeDrawer
@@ -79,7 +79,8 @@ namespace SaintsField.Editor.Drawers
             return true;
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
@@ -88,6 +89,7 @@ namespace SaintsField.Editor.Drawers
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
@@ -153,8 +155,8 @@ namespace SaintsField.Editor.Drawers
 
         private struct Payload
         {
-            public bool isActive;
-            public bool isNull;
+            public bool IsActive;
+            public bool IsNull;
         }
 
         protected override VisualElement CreatePostFieldUIToolkit(SerializedProperty property,
@@ -175,8 +177,8 @@ namespace SaintsField.Editor.Drawers
                 name = NameButton(property, index),
                 userData = new Payload
                 {
-                    isActive = true,
-                    isNull = false,
+                    IsActive = true,
+                    IsNull = false,
                 },
             };
 
@@ -238,12 +240,13 @@ namespace SaintsField.Editor.Drawers
 
                 Undo.RecordObject(go, $"GameObjectActive: {property.propertyPath}");
                 go.SetActive(!go.activeSelf);
-                OnUpdateUIToolkit(property, saintsAttribute, index, container, onValueChangedCallback, info);
+                OnUpdateUIToolkit(property, saintsAttribute, index, allAttributes, container, onValueChangedCallback, info);
             };
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
@@ -268,13 +271,13 @@ namespace SaintsField.Editor.Drawers
 
             bool hasChange = false;
 
-            if (payload.isNull != goIsNull)
+            if (payload.IsNull != goIsNull)
             {
                 hasChange = true;
                 button.SetEnabled(!goIsNull);
             }
 
-            if (payload.isActive != goActive)
+            if (payload.IsActive != goActive)
             {
                 hasChange = true;
                 container.Q<Image>(NameButtonLabelActive(property, index)).style.display = goActive ? DisplayStyle.Flex : DisplayStyle.None;
@@ -285,8 +288,8 @@ namespace SaintsField.Editor.Drawers
             {
                 button.userData = new Payload
                 {
-                    isActive = goActive,
-                    isNull = goIsNull,
+                    IsActive = goActive,
+                    IsNull = goIsNull,
                 };
             }
         }

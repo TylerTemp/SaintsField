@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -43,7 +44,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             Index,
         }
 
-        private (MethodInfo, ParamType) GetSearchMethodInfo(Type targetType, Type elementType, string methodName)
+        private static (MethodInfo, ParamType) GetSearchMethodInfo(Type targetType, Type elementType, string methodName)
         {
             foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypesFromType(targetType))
             {
@@ -91,8 +92,23 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             return (null, default);
         }
 
+        private class AsyncSearchItems
+        {
+            public bool Started;
+            public bool Finished;
+            public IEnumerator<IReadOnlyList<int>> SourceGenerator;
+            public List<int> FullSources;
+            public string SearchText;
+            public double DebounceSearchTime;
+            public List<int> CachedFullSources;
+        }
+
+        private AsyncSearchItems _asyncSearchItems;
+
         private (VisualElement root, Button addButton, Button removeButton) MakeListDrawerSettingsField(ListDrawerSettingsAttribute listDrawerSettingsAttribute, ArraySizeAttribute arraySizeAttribute)
         {
+
+
             Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ??
                                                            FieldWithInfo.PropertyInfo.PropertyType);
 
@@ -105,122 +121,251 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             if (!string.IsNullOrEmpty(extraSearchCallback))
             {
-                extraSearchMethod = GetSearchMethodInfo(FieldWithInfo.Target.GetType(), elementType, extraSearchCallback);
+                extraSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, extraSearchCallback);
             }
 
             if (!string.IsNullOrEmpty(overrideSearchCallback))
             {
-                overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Target.GetType(), elementType, overrideSearchCallback);
+                overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, overrideSearchCallback);
             }
 
-            IEnumerable<int> SearchCallback (SerializedProperty arrayProperty, string search)
+            IEnumerable<IReadOnlyList<int>> SearchCallback(SerializedProperty arrayProperty, string search)
             {
-                if (string.IsNullOrEmpty(search))
-                {
-                    foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
-                    {
-                        yield return fullIndex;
-                    }
-
-                    yield break;
-                }
+                const int batchLimit = 10;
 
                 IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(search).ToList();
 
                 if (overrideSearchMethod.methodInfo != null)
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"#Search# use override search method");
+#endif
                     if (overrideSearchMethod.paramType == ParamType.Index)
                     {
+                        List<int> batchResults = new List<int>();
+                        int batchCount = 0;
                         foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
                         {
-                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Target,
+                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0],
                                     new object[] { fullIndex, searchTokens }))
                             {
-                                yield return fullIndex;
+                                // yield return fullIndex;
+                                batchResults.Add(fullIndex);
                             }
+
+                            batchCount++;
+
+                            // ReSharper disable once InvertIf
+                            if (batchCount / batchLimit >= 1)
+                            {
+                                yield return batchResults.ToArray();
+                                batchCount = 0;
+                                batchResults.Clear();
+                            }
+                        }
+
+                        if (batchResults.Count > 0)
+                        {
+                            yield return batchResults;
                         }
 
                         yield break;
                     }
 
-                    IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
-
-                    int curIndex = 0;
-
-                    foreach (object rawValue in rawValueList)
                     {
-                        object[] methodParams = overrideSearchMethod.paramType == ParamType.Target
-                            ? new[] { rawValue, searchTokens }
-                            : new[] { rawValue, curIndex, searchTokens };
+                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Targets[0]);
 
-                        if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
+                        int curIndex = 0;
+
+                        List<int> batchResults = new List<int>();
+                        int batchCount = 0;
+
+                        foreach (object rawValue in rawValueList)
                         {
-                            yield return curIndex;
+                            object[] methodParams = overrideSearchMethod.paramType == ParamType.Target
+                                ? new[] { rawValue, searchTokens }
+                                : new[] { rawValue, curIndex, searchTokens };
+
+                            if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0], methodParams))
+                            {
+                                batchResults.Add(curIndex);
+                            }
+
+                            curIndex++;
+
+                            batchCount++;
+                            if (batchCount / batchLimit >= 1)
+                            {
+                                yield return batchResults.ToArray();
+                                batchCount = 0;
+                                batchResults.Clear();
+                            }
                         }
 
-                        curIndex++;
+                        if (batchResults.Count > 0)
+                        {
+                            yield return batchResults;
+                        }
+
+                        yield break;
                     }
-                    yield break;
                 }
 
                 if (extraSearchMethod.methodInfo != null)
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"#Search# use extra search method");
+#endif
                     if (extraSearchMethod.paramType == ParamType.Index)
                     {
+                        List<int> batchResults = new List<int>();
+                        int batchCount = 0;
+
                         foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
                         {
-                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Target,
+                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0],
                                     new object[] { fullIndex, searchTokens }))
                             {
-                                yield return fullIndex;
+                                // yield return fullIndex;
+                                batchResults.Add(fullIndex);
                             }
                             else
                             {
                                 SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(fullIndex);
-                                if (searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
+                                HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                                    .Select(_ => new HashSet<object>())
+                                    .ToArray();
+                                bool all = true;
+                                for (int index = 0; index < searchTokens.Count; index++)
                                 {
-                                    yield return fullIndex;
+                                    ListSearchToken token = searchTokens[index];
+                                    HashSet<object> searchedObject = searchedObjectsArray[index];
+                                    // ReSharper disable once InvertIf
+                                    if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObject))
+                                    {
+                                        all = false;
+                                        break;
+                                    }
+                                }
+
+                                if (all)
+                                {
+                                    // yield return fullIndex;
+                                    batchResults.Add(fullIndex);
                                 }
                             }
+
+                            batchCount++;
+                            if (batchCount / batchLimit >= 1)
+                            {
+                                yield return batchResults.ToArray();
+                                batchCount = 0;
+                                batchResults.Clear();
+                            }
+                        }
+
+                        if (batchResults.Count > 0)
+                        {
+                            yield return batchResults;
                         }
 
                         yield break;
                     }
 
-                    IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Target);
-
-                    int curIndex = 0;
-
-                    foreach (object rawValue in rawValueList)
                     {
-                        // Debug.Log($"pass rawValue {rawValue}/{curIndex}");
-                        object[] methodParams = extraSearchMethod.paramType == ParamType.Target
-                            ? new[] { rawValue, searchTokens }
-                            : new[] { rawValue, curIndex, searchTokens };
+                        IEnumerable rawValueList = (IEnumerable)FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Targets[0]);
 
-                        if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Target, methodParams))
+                        int curIndex = 0;
+
+                        List<int> batchResults = new List<int>();
+                        int batchCount = 0;
+                        foreach (object rawValue in rawValueList)
                         {
-                            // Debug.Log($"yield {curIndex}/{rawValue} in extra search");
-                            yield return curIndex;
-                        }
-                        else
-                        {
-                            SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(curIndex);
-                            if(searchTokens.All(token => SerializedUtils.SearchProp(itemProp, token.Token)))
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                            Debug.Log($"#Search# pass rawValue {rawValue}/{curIndex}");
+#endif
+                            object[] methodParams = extraSearchMethod.paramType == ParamType.Target
+                                ? new[] { rawValue, searchTokens }
+                                : new[] { rawValue, curIndex, searchTokens };
+
+                            if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0], methodParams))
                             {
-                                yield return curIndex;
+                                // Debug.Log($"yield {curIndex}/{rawValue} in extra search");
+                                // yield return curIndex;
+                                batchResults.Add(curIndex);
+                            }
+                            else
+                            {
+                                SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(curIndex);
+                                HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                                    .Select(_ => new HashSet<object>())
+                                    .ToArray();
+
+                                bool all = true;
+                                for (int index = 0; index < searchTokens.Count; index++)
+                                {
+                                    ListSearchToken token = searchTokens[index];
+                                    HashSet<object> searchedObjects = searchedObjectsArray[index];
+                                    if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObjects))
+                                    {
+                                        all = false;
+                                        break;
+                                    }
+                                }
+
+                                if (all)
+                                {
+                                    // yield return curIndex;
+                                    batchResults.Add(curIndex);
+                                }
+                            }
+
+                            curIndex++;
+
+                            batchCount++;
+                            if (batchCount / batchLimit >= 1)
+                            {
+                                yield return batchResults.ToArray();
+                                batchCount = 0;
+                                batchResults.Clear();
                             }
                         }
 
-                        curIndex++;
-                    }
+                        if (batchResults.Count > 0)
+                        {
+                            yield return batchResults;
+                        }
 
-                    yield break;
+                        yield break;
+                    }
                 }
 
-                foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search))
                 {
-                    yield return i;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"#Search# use default search method");
+#endif
+                    List<int> batchResults = new List<int>();
+                    int batchCount = 0;
+                    foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search))
+                    {
+                        if(i != -1)
+                        {
+                            batchResults.Add(i);
+                        }
+
+                        batchCount++;
+                        if (batchCount / batchLimit >= 1)
+                        {
+                            yield return batchResults.ToArray();
+                            batchCount = 0;
+                            batchResults.Clear();
+                        }
+                    }
+
+                    if (batchResults.Count > 0)
+                    {
+                        yield return batchResults;
+                    }
                 }
             }
 
@@ -232,7 +377,34 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     position = Position.Relative,
                 },
             };
+
             SerializedProperty property = FieldWithInfo.SerializedProperty;
+
+            root.Add(new EmptyPrefabOverrideElement(property)
+            {
+                style =
+                {
+                    position = Position.Absolute,
+                    top = 0,
+                    bottom = 0,
+                    left = 0,
+                    right = 0,
+                    height = 18,
+                },
+                pickingMode = PickingMode.Ignore,
+            });
+
+            List<int> fullList = Enumerable.Range(0, property.arraySize).ToList();
+            _asyncSearchItems = new AsyncSearchItems
+            {
+                Started = true,
+                Finished = true,
+                SourceGenerator = Enumerable.Empty<IReadOnlyList<int>>().GetEnumerator(),
+                FullSources = fullList,
+                CachedFullSources = new List<int>(fullList),
+                SearchText = "",
+                DebounceSearchTime = double.MaxValue,
+            };
 
             // int numberOfItemsPerPage = 0;
             int curPageIndex = 0;
@@ -273,7 +445,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     this,
                     this,
                     null,
-                    FieldWithInfo.Target
+                    FieldWithInfo.Targets[0]
                 );
                 // Debug.Log($"draw list item {prop.propertyPath}: {resultField}");
                 // PropertyField propertyField = (PropertyField)propertyFieldRaw;
@@ -375,15 +547,41 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     flexShrink = 1,
                 },
             };
-            if(listDrawerSettingsAttribute.Delayed)
+
+            searchField.RegisterCallback<KeyDownEvent>(evt =>
             {
-                TextField text = searchField.Q<TextField>();
-                if (text != null)
+                // ReSharper disable once InvertIf
+                if (evt.keyCode == KeyCode.Return)
                 {
-                    text.isDelayed = true;
+                    if (!_asyncSearchItems.Started && _asyncSearchItems.SourceGenerator != null &&
+                        _asyncSearchItems.DebounceSearchTime > EditorApplication.timeSinceStartup)
+                    {
+                        _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup - 1;
+                    }
                 }
-            }
-            // searchContainer.Add(searchField);
+            }, TrickleDown.TrickleDown);
+
+            TextField searchTextField = searchField.Q<TextField>();
+            searchTextField.style.position = Position.Relative;
+            Image loadingImage = new Image
+            {
+                image = Util.LoadResource<Texture2D>("refresh.png"),
+                pickingMode = PickingMode.Ignore,
+                tintColor = EColor.Gray.GetColor(),
+                style =
+                {
+                    position = Position.Absolute,
+                    right = 0,
+                    top = 1,
+                    width = 12,
+                    height = 12,
+                    visibility = Visibility.Hidden,
+                },
+            };
+            searchTextField.Add(loadingImage);
+            UIToolkitUtils.KeepRotate(loadingImage);
+            loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage));
+
             preContent.Add(searchField);
 
             #endregion
@@ -500,8 +698,48 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             void UpdatePage(int newPageIndex, int numberOfItemsPerPage)
             {
-                List<int> resultIndexes = SearchCallback(property, searchField.value).ToList();
-                // Debug.Log($"get indexes {string.Join(", ", resultIndexes)}");
+                string searchText = searchField.value;
+                List<int> resultIndexes;
+                if (string.IsNullOrWhiteSpace(searchText))
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"#Search# Empty search");
+#endif
+                    resultIndexes = Enumerable.Range(0, property.arraySize).ToList();
+                    _asyncSearchItems.Started = true;
+                    _asyncSearchItems.Finished = true;
+                    _asyncSearchItems.CachedFullSources = new List<int>(resultIndexes);
+                    _asyncSearchItems.FullSources = new List<int>(resultIndexes);
+                    _asyncSearchItems.SearchText = "";
+                    _asyncSearchItems.SourceGenerator = null;
+                }
+                else if (_asyncSearchItems.SearchText == searchText)
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"#Search# Cached search {_asyncSearchItems.SearchText}, started={_asyncSearchItems.Started}, finished={_asyncSearchItems.Finished}");
+#endif
+                    resultIndexes = _asyncSearchItems.FullSources;
+                }
+                else
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"#Search# New search {searchText}");
+#endif
+                    _asyncSearchItems.SearchText = searchText;
+                    _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + 0.6f;
+                    _asyncSearchItems.Started = false;
+                    _asyncSearchItems.Finished = false;
+                    _asyncSearchItems.FullSources.Clear();
+                    if (_asyncSearchItems.SourceGenerator != null)
+                    {
+                        _asyncSearchItems.SourceGenerator.Dispose();
+                        _asyncSearchItems.SourceGenerator = null;
+                    }
+                    _asyncSearchItems.SourceGenerator = SearchCallback(property, searchText).GetEnumerator();
+
+                    resultIndexes = _asyncSearchItems.CachedFullSources;
+                }
+
                 PagingInfo pagingInfo = GetPagingInfo(newPageIndex, resultIndexes, numberOfItemsPerPage);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
@@ -524,9 +762,13 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"set items: {string.Join(", ", curPageItems)}, itemIndexToPropertyIndex={string.Join(",", itemIndexToPropertyIndex)}");
 #endif
-                listView.itemsSource = curPageItems;
+                if(!listView.itemsSource.Cast<int>().SequenceEqual(curPageItems))
+                {
+                    listView.itemsSource = curPageItems;
+                    listView.Rebuild();
+                }
                 // Debug.Log("rebuild listView");
-                listView.Rebuild();
+
                 // UpdateAddRemoveButtons();
             }
 
@@ -589,7 +831,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 int max = -1;
                 if (arraySizeAttribute != null)
                 {
-                    (string error, bool dynamic, int min, int max) getArraySize = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, property, FieldWithInfo.FieldInfo, FieldWithInfo.Target);
+                    (string error, bool dynamic, int min, int max) getArraySize = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute, property, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
                     if(getArraySize.error == "")
                     {
                         min = getArraySize.min;
@@ -818,6 +1060,62 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             foldoutContent.Insert(0, preContent);
 
+            listView.schedule.Execute(() =>
+            {
+                if(!_asyncSearchItems.Started && EditorApplication.timeSinceStartup > _asyncSearchItems.DebounceSearchTime)
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"#Search# Debounce reached, start {_asyncSearchItems.SearchText}");
+#endif
+                    _asyncSearchItems.Started = true;
+                    Debug.Assert(_asyncSearchItems.SourceGenerator != null);
+                }
+
+                if (_asyncSearchItems.Started && !_asyncSearchItems.Finished)
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"#Search# Continue search {_asyncSearchItems.SearchText}");
+#endif
+                    if (loadingImage.style.visibility != Visibility.Visible)
+                    {
+                        loadingImage.style.visibility = Visibility.Visible;
+                        UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                    }
+
+                    if (_asyncSearchItems.SourceGenerator.MoveNext())
+                    {
+                        IReadOnlyList<int> currentValue = _asyncSearchItems.SourceGenerator.Current;
+
+                        // ReSharper disable once MergeIntoPattern
+                        if(currentValue != null && currentValue.Count > 0)
+                        {
+                            _asyncSearchItems.FullSources.AddRange(currentValue);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                            Debug.Log($"#Search# add search results {string.Join(", ", currentValue)}");
+#endif
+                            UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                        }
+                    }
+                    else
+                    {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                        Debug.Log($"#Search# end search {_asyncSearchItems.SearchText}");
+#endif
+                        _asyncSearchItems.Finished = true;
+                        _asyncSearchItems.SourceGenerator.Dispose();
+                        _asyncSearchItems.SourceGenerator = null;
+                    }
+                }
+
+                if (_asyncSearchItems.Finished && loadingImage.style.visibility != Visibility.Hidden)
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"#Search# disable loader image {_asyncSearchItems.SearchText}");
+#endif
+                    loadingImage.style.visibility = Visibility.Hidden;
+                }
+            }).Every(1);
+
             // UpdateAddRemoveButtons();
             root.Add(listView);
 
@@ -826,7 +1124,22 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 root.Add(numberOfItemsTotalField);
             }
 
+            OnSearchFieldUIToolkit.AddListener(Search);
+            root.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
+
             return (root, listViewAddButton, listViewRemoveButton);
+
+            void Search(string search)
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(FieldWithInfo.SerializedProperty.displayName, search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                if (root.style.display != display)
+                {
+                    root.style.display = display;
+                }
+            }
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)

@@ -61,7 +61,7 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
             Object target = SerializedUtils.GetSerObject(_fieldWithInfo.SerializedProperty,
-                _fieldWithInfo.FieldInfo, _fieldWithInfo.Target);
+                _fieldWithInfo.FieldInfo, _fieldWithInfo.Targets[0]);
 
             // Debug.Log(target);
 

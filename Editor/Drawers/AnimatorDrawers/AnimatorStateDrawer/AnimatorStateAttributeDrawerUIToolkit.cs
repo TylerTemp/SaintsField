@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Animate;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -33,15 +34,15 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
         private static string NameSubStateMachineNameChain(SerializedProperty property) =>
             $"{property.propertyPath}__AnimatorState_SubStateMachineNameChain";
 
-        private static readonly Type[] InterfaceTypes = {
-            // typeof(IAnimationClip),
-            typeof(ILayerIndex),
-            typeof(IStateNameHash),
-            typeof(IStateName),
-            typeof(IStateSpeed),
-            typeof(IStateTag),
-            typeof(ISubStateMachineNameChain),
-        };
+        // private static readonly Type[] InterfaceTypes = {
+        //     // typeof(IAnimationClip),
+        //     typeof(ILayerIndex),
+        //     typeof(IStateNameHash),
+        //     typeof(IStateName),
+        //     typeof(IStateSpeed),
+        //     typeof(IStateTag),
+        //     typeof(ISubStateMachineNameChain),
+        // };
 
         // [InitializeOnLoadMethod]
         // private static void AddSaintsPropertyInfoInjectAnimatorState()
@@ -193,11 +194,15 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 
             root.AddToClassList(ClassAllowDisable);
 
-            return root;
+            EmptyPrefabOverrideElement emptyPrefabOverrideElement =
+                new EmptyPrefabOverrideElement(property);
+            emptyPrefabOverrideElement.Add(root);
+            return emptyPrefabOverrideElement;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -222,6 +227,14 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
         {
             UIToolkitUtils.DropdownButtonField dropdownButton =
                 container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
+
+            UIToolkitUtils.AddContextualMenuManipulator(dropdownButton, property,
+                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
+            Foldout foldout = container.Q<Foldout>(NameFoldout(property));
+            UIToolkitUtils.AddContextualMenuManipulator(foldout, property,
+                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+
             dropdownButton.ButtonElement.clicked += () =>
                 ShowDropdown(property, saintsAttribute, container, info, parent, onValueChangedCallback);
 
@@ -304,6 +317,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
@@ -321,6 +335,38 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
             {
                 helpBox.text = metaInfo.Error;
                 helpBox.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+            }
+
+            TextField subStateMachineNameChainTextField =
+                container.Q<TextField>(name: NameSubStateMachineNameChain(property));
+            // ReSharper disable once InvertIf
+            if (subStateMachineNameChainTextField != null)
+            {
+                SerializedProperty chain = property.FindPropertyRelative("subStateMachineNameChain");
+                // ReSharper disable once InvertIf
+                if (chain != null)
+                {
+                    string chainText = string.Join(" > ", Enumerable
+                            .Range(0, chain.arraySize)
+                            .Select(each => chain.GetArrayElementAtIndex(each).stringValue));
+                    if (subStateMachineNameChainTextField.value != chainText)
+                    {
+                        subStateMachineNameChainTextField.value = chainText;
+                    }
+                }
+            }
+
+            int curIndex = property.propertyType == SerializedPropertyType.String
+                ? Util.ListIndexOfAction(metaInfo.AnimatorStates,
+                    eachInfo => eachInfo.state.name == property.stringValue)
+                : Util.ListIndexOfAction(metaInfo.AnimatorStates,
+                    eachStateInfo => EqualAnimatorState(eachStateInfo, property));
+            string buttonLabel = curIndex == -1 ? "-" : FormatStateLabel(metaInfo.AnimatorStates[curIndex], "/");
+            UIToolkitUtils.DropdownButtonField dropdownButton =
+                container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
+            if (dropdownButton.ButtonLabelElement.text != buttonLabel)
+            {
+                dropdownButton.ButtonLabelElement.text = buttonLabel;
             }
         }
 

@@ -44,7 +44,8 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBoxElement = new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -84,19 +85,8 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                     ? property.stringValue
                     : property.FindPropertyRelative("mTerm").stringValue;
                 AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(curValue, false);
-                Rect worldBound = new Rect(objectField.worldBound)
-                {
-                    width = objectField.worldBound.width + selectorButton.worldBound.width,
-                };
-                float maxHeight = Screen.currentResolution.height - worldBound.y - worldBound.height - 100;
-                // Debug.Log(worldBound);
-                if (maxHeight < 100)
-                {
-                    // worldBound.x -= 400;
-                    worldBound.y -= 100 + worldBound.height;
-                    // Debug.Log(worldBound);
-                    maxHeight = 100;
-                }
+
+                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(objectField.worldBound);
 
                 UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
                     metaInfo,

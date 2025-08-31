@@ -5,7 +5,7 @@ using UnityEditor;
 namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(AddressableLabelAttribute), true)]
     public partial class AddressableLabelAttributeDrawer: SaintsPropertyDrawer

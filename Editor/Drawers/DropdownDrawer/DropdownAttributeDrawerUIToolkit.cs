@@ -41,6 +41,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
@@ -72,6 +73,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
@@ -146,7 +148,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 // FIXED: can not get correct index
                 int selectedIndex = metaInfo.SelectedIndex;
                 // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
-                for (var index = 0; index < metaInfo.DropdownListValue.Count; index++)
+                for (int index = 0; index < metaInfo.DropdownListValue.Count; index++)
                 {
                     // int curIndex = index;
                     (string curName, object curItem, bool disabled, bool curIsSeparator) =

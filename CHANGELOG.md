@@ -1,5 +1,290 @@
 # Changelog
 
+## 4.25.1 ##
+
+UI Toolkit: fix `TextArea` inside list/array not serialized [#286](https://github.com/TylerTemp/SaintsField/issues/286)
+
+## 4.25.0 ##
+
+UI Toolkit: Add `TreeDropdown`, `FlagsTreeDropdown`, `OptionsTreeDropdown`, `PairsTreeDropdown`
+
+## 4.24.6 ##
+
+1.  UI Toolkit: Improve `SaintsDictionary`, `Table`, `SaintsHashSet` UI to make it more like Unity's ListView
+2.  UI Toolkit: use `LeftToggle` when using bool in `SaintsDictionary`, `Table`, `SaintsHashSet`, and Horizontal Layout
+3.  UI Toolkit: fix Horizontal Layout broken label layout since 4.16.0
+
+## 4.24.5 ##
+
+UI Toolkit: Fix blue indicator for prefab modification not display in some property [#276](https://github.com/TylerTemp/SaintsField/issues/276)
+
+## 4.24.4 ##
+
+1.  UI Toolkit: Add blue indicator for prefab modification in:
+    *   `AnimatorParam`
+    *   `AddressableLable AddressableAddress CurveRange`
+    *   `AddressableScene`
+    *   `NavMeshArea`
+    *   `NavMeshAreaMask`
+    *   `SpineSkin`
+    *   `SpineSlot`
+    *   `SpineAttachment`
+
+    Note: There are still some attributes that does not work with prefab's modification blue line. This is basiclly Unity's fault... Read more from [here](https://discussions.unity.com/t/writing-drawers-for-classes-with-properties-that-cant-be-bound/904711/2). There is solution that [should fix this](https://github.com/OscarAbraham/UITKEditorAid/tree/development), but that package seems not work (maybe my setup is wrong).
+    I'm still trying to make this work for these attributes/types, but it'll need some time: `AdvancedDropdown`, `Dropdown`, `SaintsArray`, `SaintsList`, `SaintsDictionary`, `SaintsInterface`, `SaintsHashSet`, `ReferenceHashSet`, `TypeReference`, `SaintsEvent`, `FlagsDropdown`, `EnumToggleButtons`, `ResourcePath`, `ResourceFolder`, `AssetFolder`
+
+2.  Fix: when editing a UI prefab, because Unity will add a "Context Canvas" above the root of the prefab, "Auto Getters" now will ignore that object.
+3.  UI Toolkit: Fix right click context menu for `Spine` related attributes.
+
+## 4.24.3 ##
+
+1.  Fix `enum` of `byte` type gives error on picker [#278](https://github.com/TylerTemp/SaintsField/issues/278)
+2.  Add blue indicator for prefab modification in:
+    *   `Layer`
+    *   `Scene`
+    *   `SortingLayer`
+    *   `Tag`
+    *   `InputAxis`
+    *   `ShaderParam`
+    *   `ShaderKeyword`
+
+## 4.24.2 ##
+
+1.  UI Toolkit: Attempting to inherit the existing Unity context menu in nested classes when right-click on a field [#254](https://github.com/TylerTemp/SaintsField/issues/254)
+2.  UI Toolkit: Fix `AdvancedDropdown` can not show the changed indicator (blue line on left) in prefab when edited. This also fixes enum dropdown if you have `SaintsEditor` enabled
+3.  UI Toolkit: Fix `ResiableTextArea` label did not have a right-click context menu
+
+## 4.24.0 ##
+
+Add `OptionsDropdown` and `PairsDropdown`
+
+## 4.23.0 ##
+
+Introduce `SaintsEvent`. `SaintsEvent` is an alternative to Unity's `UnityEvent`. It's inspired by [UltEvents](https://assetstore.unity.com/packages/tools/gui/ultevents-111307) & [ExtEvents](https://github.com/SolidAlloy/ExtEvents)
+
+## 4.22.2 ##
+
+1.  UI Toolkit: Fix `Table` re-order function not working [#272](https://github.com/TylerTemp/SaintsField/issues/272)
+2.  `TypeReference` add `string[] onlyAssemblies = null` and `string[] extraAssemblies = null`
+3.  **Experimental**: UI Toolkit: Add `SaintsEvent` types:
+    *   Not documented
+    *   Requires [Unity Serialization](https://docs.unity3d.com/Packages/com.unity.serialization@3.0/manual/index.html) installed
+    *   Don't use it in a production env. It still needs some work
+
+## 4.22.1 ##
+
+1.  Fix `<field />` not get updated in `ComponentHeader`  [#266](https://github.com/TylerTemp/SaintsField/issues/266)
+2.  Fix `EnumToogleButtons` expanded button not get disabled with `DisableIf`/`EnableIf`/`ReadOnly`
+3.  Add support for Unity's [`InspectorNameAttribute`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/InspectorNameAttribute.html) for `enum` type
+4.  IMGUI: fix `Table` foldout clicking on label didn't expand the field [#265](https://github.com/TylerTemp/SaintsField/issues/265)
+
+## 4.22.0 ##
+
+1.  Add `TypeReference` type to serialize a `System.Type`
+2.  UI Toolkit: Fix data type in SaintsField with attributes will render the attributes twice
+3.  UI Toolkit: `AdvancedDropdown` fix long text align, and now it hides the icon space if all items have no icon
+
+## 4.21.1 ##
+
+1.  Fix Header Drawers might read a disposed texture and give error [#255](https://github.com/TylerTemp/SaintsField/issues/255)
+2.  UI Toolkit: fix drawer still trying to access a disposed property in `Button`
+3.  UI Toolkit: fix `SaintsDictionary` can not hide a label if the target is drawn by an IMGUI component
+4.  Add `HeaderButtonGhost` support for Unity < 2021.3 [#257](https://github.com/TylerTemp/SaintsField/issues/257)
+
+## 4.21.0 ##
+
+1.  UI Toolkit: Add `SaintsHashSet<T>` & `ReferenceHashSet<T>` data type as serializable `HashSet` [#251](https://github.com/TylerTemp/SaintsField/issues/251)
+2.  Saints XPath now can compare `[@{myProp} = false]` if `myProp` is a bool type
+3.  UI Toolkit: Fix `SaintsDictionary` paging button can not click
+
+## 4.20.1 ##
+
+Fix `ColorPalette` attribute arguments not working, fix its auto validatior.
+
+## 4.20.0 ##
+
+**Breaking Changes**: `ColorPalette` overhaul.
+
+NOTE: if you're using the previous `ColorPalette`, you WILL lose this palette data.
+
+`ColorPalette` now using a tag to mark every color. For UI Toolkit, it now also have a way much better UI for you to create palette with drag/drop support.
+
+This version removes the `group` idea. A color is only marked with many tags. In the feature version, it'll have main tags for you to easily grouping them.
+
+The search bar now also support `#RRGGBB` search. If you're using UI Toolkit, a nicely `TypeAhead` popup will show you the possible options.
+
+## 4.19.1 ##
+
+1.  Fix search function got `StackOverflow` when a target contains a looped-reference. [#250](https://github.com/TylerTemp/SaintsField/issues/250)
+2.  Add `<index/>`, `<index=D4/>` tag for rich label. If the property is in a list/array, the coresponding index value will be used for this tag
+3.  Add `{0:formatControl}` support for `<index/>` and `<field/>` tag like a Unity's standard `string.Format`. You can now even do weird shit like: `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
+
+## 4.19.0 ##
+
+1.  You can now use `$:ClassName.CallbackName` or `$:ClassName.FieldName` to call a static/const value/method in most place like `ShowIf/HideIf`, `EnableIf/DisableIf`, `RequiredIf`, `BelowImage/AboveImage` etc.
+2.  When a callback returns a `null` result, `AboveImage`, `BelowImage` now shows nothing, instead of giving an error notice.
+
+## 4.18.1 ##
+
+1.  `Handles` displays now can be toggled using right click context menu [#217](https://github.com/TylerTemp/SaintsField/issues/217)
+2.  Fix some handles not displayed on list
+3.  Add `dotted` for line, arrow type of handles
+4.  Add `alpha` for handles' `eColor` color control
+5.  Improved `ArrowHandleCap` with better scaling
+
+## 4.18.0 ##
+
+1.  Add `RequiredIf` for conditional required field; `EMode` supported
+2.  Add Auto Validator for `OnEvent` & `OnButtonClick`
+3.  Fix `Button` of `IEnumerator` won't hide the loading icon even the coroutine is done
+4.  Fix Auto Validator won't check sub object of a prefab
+
+## 4.17.0 ##
+
+1.  Add `EMode.InstanceInScene`, `EMode.InstanceInPrefab`, `EMode.Regular`, `EMode.Variant`, `EMode.NonPrefabInstance` which can be used for `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, and `Playa*` version of them.
+
+    *   `EMode.InstanceInScene`: target is a prefab placed in a scene
+    *   `EMode.InstanceInPrefab`: target is inside a prefab (but is not the top root of that prefab)
+    *   `EMode.Regular`: target is at the top root of the prefab
+    *   `EMode.Variant`: target is at the top root of the prefab, and is also a variant prefab
+    *   `EMode.NonPrefabInstance`: target is not a prefab (but can be inside a prefab)
+    *   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
+    *   `EMode.PrefabAsset` = `Variant | Regular`
+
+2.  Provide a workaround solution for [#240](https://github.com/TylerTemp/SaintsField/issues/240), for editing a field inside a serializable struct.
+
+## 4.16.5 ##
+
+If you have multiple targets selected, `AboveButton`, `BelowButton`, `PostFieldButton` can be triggered on all selected targets.
+
+## 4.16.4 ##
+
+1.  `ListDrawerSetting`, `Table`, `SaintsDictionary` search now support `SerializeReference` field search, and is case-insensitive.
+2.  UI Toolkit: `SaintsDictionary` now support debounce search
+
+## 4.16.3 ##
+
+Fix project failed to compile due to code changed in SaintsDictionary
+
+## 4.16.2 ##
+
+
+1.  UI Toolkit: If you have multiple targets selected, `Button` can be triggered on all the targets. (NOTE: this does not work on `AboveButton`, `BelowButton`, `PostFieldButton` yet)
+2.  Change the logic of `SaintsDictionary` to allow inherent
+3.  Add constructor method for `SaintsList` & `SaintsArray` so they can be used more like a native array/list
+
+## 4.16.1 ##
+
+1.  UI Toolkit: `Searchable` now can search a field when you input a field name from code. In previous version it need to match the display name
+2.  UI Toolkit: if you're using Unity 6k+, we now `Unbind` the element to stop the property tracking [#239](https://github.com/TylerTemp/SaintsField/issues/239)
+3.  Fix `OnValueChanged` callback does not work when the target field is an `Enum` and the callback receives the corresponding type of `Enum`
+
+## 4.16.0 ##
+
+UI Toolkit: Add `Searchable` to search field name for MonoBehavior (Component) or ScriptableObject
+
+## 4.15.1 ##
+
+1.  UI Toolkit: fix `ShowInInspector` setting a list to `null` gave an error
+2.  UI Toolkit: `ShowInInspector` now fold the struct/class by default. This is to avoid a looped references stack overflow rendering. The data will only be filled the first time you expand it.
+
+    Some genius decide to use loop-referenced data in the game save data type. I can not tell them not to do so. No cap frfr.
+
+## 4.15.0 ##
+
+1.  UI Toolkit + IMGUI: Add `SceneViewPicker` to pick an object from the scene view into a field [#231](https://github.com/TylerTemp/SaintsField/issues/231)
+2.  Improve the compatibility with Odin Inspector. Now most attributes can be used together with Odin Inspector.
+
+## 4.14.0 ##
+
+UI Toolkit: Add `TableHeaders` & `TableHeadersHide` to default show/hide table columns
+
+## 4.13.5 ##
+
+1.  UI Toolkit: fix unity might give an error when removing an element from list
+2.  IMGUI: add right click context menu support for `Table` [#211](https://github.com/TylerTemp/SaintsField/issues/211)
+3.  UI Toolkit: fix auto validator UI logic; add validation if an animator state has any `StateMachineBehaviour` scripts
+4.  Auto Validator add button for quick adding Addressable scenes and assets
+
+## 4.13.4 ##
+
+1.  UI Toolkit: fix default item in object picker might give an error
+2.  Fix `AdvancedDropdown` can not property handle rich tags because `/` is used as path separator
+
+## 4.13.3 ##
+
+1.  UI Toolkit: Fix `GetWwise` can not find `State`, `Switch`
+2.  UI Toolkit: Fix `GetWwise` can not work with `IWrapProp` (`SaintsDictionary`)
+3.  UI Toolkit: Fix some label issue when fallback to IMGUI drawer
+4.  Change the behavior of auto getters when `ResignToNull` is on: it'll not try to reduce the size of the array
+5.  UI Toolkit: Fix duplicated `ReferencePicker` when user already uses one [#237](https://github.com/TylerTemp/SaintsField/issues/237)
+
+## 4.13.2 ##
+
+Fix the way to get IMGUI fallback drawer height. This inflects both IMGUI, and UI Toolkit falling-back to IMGUI
+
+## 4.13.1 ##
+
+1.  UI Toolkit: fix `SaintsDictionary` enum dropdown didn't display the correct selected value [#236](https://github.com/TylerTemp/SaintsField/issues/236)
+2.  Fix auto getter order checking issue in auto validator
+3.  Auto validator now only check prefab & `ScriptableObject` for assets
+4.  Add `Add Scenes In Build` & `Add All Assets` buttons in auto validator window for quick checking
+5.  UI Toolkit: fix `bool` type display in horizontal layout
+
+## 4.13.0 ##
+
+1.  UI Toolkit: Add `GetWwise` to automatically get a Wwise object
+2.  Fix a false array detection in SaintsEditor
+
+## 4.12.0 ##
+
+1.  Add `PlayaAboveRichLabel`/`PlayaBelowRichLabel` to draw a rich label above/below a field/method/property (including array/list)
+2.  UI Toolkit: Allow `PlayaAboveRichLabel` & `PlayaInfoBox` be applied to a class/struct definition
+
+## 4.11.0 ##
+
+1.  Add `HeaderLabel` to draw a label in component header
+2.  `Required` now check truly value for `I2.LocalizedString`
+3.  Add customize `Required` message type [#234](https://github.com/TylerTemp/SaintsField/issues/234)
+4.  Add `AddressableSubAssetRequired` to validate `subAsset` in types like `Addressable.AssetReferenceSprite`
+
+## 4.10.0 ##
+
+1.  Add `Component Header` related attributes. Now you can draw buttons, icons etc on the component header. [#154](https://github.com/TylerTemp/SaintsField/issues/154)
+2.  UI Toolkit: `MinMaxSlider` friendly error if been used on wrong type [#232](https://github.com/TylerTemp/SaintsField/issues/232)
+3.  UI Toolkit: `ShowInInspector` now shows an error box if the target attributes raises an error in its getter
+4.  UI Toolkit: `ShowInInspector` now always update the sub-field value display if the target (e.g. a class) has sub-fields/properties
+5.  UI Toolkit: if you have `SaintsEditor` enabled, a bare `[SerializedReference]` will automatically use `ReferencePicker` + `SaintsRow` drawer
+
+## 4.9.0 ##
+
+1.  UI Toolkit: if you have `SaintsEditor` enabled, `enum` will automatically use `AdvancedDropdown` drawer
+2.  UI Toolkit: if you have `SaintsEditor` enabled, `enum` with `[Flags]` will automatically use `FlagsDropdown` drawer
+3.  UI Toolkit: now you can use keyboard (up/down/left/right arrow, return key) to select an `AdvancedDropdown`
+4.  UI Toolkit: fix custom picker when you have search in block view, arrow key gives error if the currently selected item is not in loaded results
+5.  UI Toolkit: fix custom picker show placeholder information when the selected item has not appeared in loading results yet
+6.  UI Toolkit: fix custom picker showing results that does not match the search when you start typing before the loading process finished
+7.  UI Toolkit: fix `AdvancedDropdown` layout issue that an item can overlap a bit with the search box
+8.  UI Toolkit: fix `AdvancedDropdown` didn't show the selected group when you backward a page
+9.  If you use a low version of `.NET` which does not support `B`, `B8` formatting string, `RichLabel` can now property format it like `<field=B/>`, `<field=B16/>`
+
+## 4.8.0 ##
+
+1.  UI Toolkit: Add `TableHide` to exclude a field/column from `Table` [#225](https://github.com/TylerTemp/SaintsField/issues/225)
+2.  Fix the error check in SpineAnimationPickerAttributeDrawerUIToolkit:UpdateDisplay for SkeletonData being null is backwards [#229](https://github.com/TylerTemp/SaintsField/issues/229)
+3.  Fix (SpineAnimationPicker) skeletonTarget callbacks do not check for null prefabs or null instances [#230](https://github.com/TylerTemp/SaintsField/issues/230)
+
+## 4.7.5 ##
+
+1.  UI Toolkit: `ListDrawerSettings` now allow async search to avoid blocking the editor thread.
+2.  Add constructor and Editor setter for `SaintsInterface` [#228](https://github.com/TylerTemp/SaintsField/issues/228)
+
+## 4.7.4 ##
+
+1.  UI Toolkit: Fix ReadOnly does not work with 3rd party & Unity default drawer [#227](https://github.com/TylerTemp/SaintsField/issues/227)
+2.  UI Toolkit: Fix ReferencePicker dropdown appears in the wrong place [#226](https://github.com/TylerTemp/SaintsField/issues/226)
+3.  UI Toolkit: Fix duplicated label shown in Table on every column [#224](https://github.com/TylerTemp/SaintsField/issues/224)
+
 ## 4.7.3 ##
 
 1.  UI Toolkit: `FieldType`, `ResourcePath`, `RequireType` now use the new object picker for an async and fast experience

@@ -1,7 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class SaintsScriptableObject : ScriptableObject
+namespace SaintsField.Samples.Scripts.SaintsEditor
 {
+    public class SaintsScriptableObject : ScriptableObject
+    {
+    }
 }

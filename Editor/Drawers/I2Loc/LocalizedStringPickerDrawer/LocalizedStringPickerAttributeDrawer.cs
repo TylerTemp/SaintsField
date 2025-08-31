@@ -9,7 +9,7 @@ using UnityEditor;
 namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(LocalizedStringPickerAttribute), true)]
     public partial class LocalizedStringPickerAttributeDrawer: SaintsPropertyDrawer

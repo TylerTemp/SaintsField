@@ -3,6 +3,8 @@
 [![unity_version](https://github.com/TylerTemp/SaintsField/assets/6391063/c01626a1-9329-4c26-be31-372f8704df1d)](https://unity.com/download)
 [![license_mit](https://github.com/TylerTemp/SaintsField/assets/6391063/a093811a-5dbc-46ad-939e-a9e207ae5bfb)](https://github.com/TylerTemp/SaintsField/blob/master/LICENSE)
 [![openupm](https://img.shields.io/npm/v/today.comes.saintsfield?label=OpenUPM&registry_uri=https://package.openupm.com)](https://openupm.com/packages/today.comes.saintsfield/)
+[![Percentage of issues still open](https://isitmaintained.com/badge/open/TylerTemp/SaintsField.svg)](http://isitmaintained.com/project/TylerTemp/SaintsField "Percentage of issues still open")
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/TylerTemp/SaintsField.svg)](http://isitmaintained.com/project/TylerTemp/SaintsField "Average time to resolve an issue")
 [![openupm](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Downloads&query=%24.downloads&suffix=%2Fmonth&url=https%3A%2F%2Fpackage.openupm.com%2Fdownloads%2Fpoint%2Flast-month%2Ftoday.comes.saintsfield)](https://openupm.com/packages/today.comes.saintsfield/)
 [![repo-stars](https://img.shields.io/github/stars/TylerTemp/SaintsField)](https://github.com/TylerTemp/SaintsField/)
 
@@ -32,6 +34,10 @@ Unity: 2019.1 or higher
 >
 > IMGUI will only be focused on issues and small features. Big features like editing in `ShowInInspector` will not be supported in IMGUI.
 
+> [!NOTE]
+> If you want some specific feature been backport from UI Toolkit to IMGUI, open [an issue](https://github.com/TylerTemp/SaintsField/issues) or [discussion](https://github.com/TylerTemp/SaintsField/discussions) to request for it (not guaranteed tho)
+
+
 ### Installation ###
 
 *   Using [Unity Asset Store](https://assetstore.unity.com/packages/slug/269741)
@@ -54,6 +60,17 @@ Unity: 2019.1 or higher
         }
     }
     ```
+
+*   Using git upm (Unity UI):
+
+    1. `Window` - `Package Manager`
+    2. Click `+` button, `Add package from git URL`
+    3. Enter the following URL:
+
+    ```
+    https://github.com/TylerTemp/SaintsField.git
+    ```
+
 
 *   Using a `unitypackage`:
 
@@ -86,10 +103,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.7.3**
+**4.25.1**
 
-1.  UI Toolkit: `FieldType`, `ResourcePath`, `RequireType` now use the new object picker for an async and fast experience
-2.  UI Toolkit: fix native decorator header with no other attributes does not draw [#223](https://github.com/TylerTemp/SaintsField/issues/223)
+UI Toolkit: fix `TextArea` inside list/array not serialized [#286](https://github.com/TylerTemp/SaintsField/issues/286)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -109,6 +125,12 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
     *   `<field />`, `<field.subField/>`, `<field.subField=formatControl />` read the value from the field first, if tag has sub-field, continue to read, then use `string.Format` if there is a `formatControl`. See the example below.
     *   `<container.Type />` for the class/struct name of the container of the field
     *   `<container.Type.BaseType />` for the class/struct name of the field's container's parent
+    *   `<index />`, `<index=formatControl />` for the index if the target is an array/list
+
+    Note about format control:
+
+    *   If the format contains `{}`, it will be used like a `string.Format`. E.g. `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
+    *   Otherwise, it will be re-written to `{0:formatControl}`. E.g. `<index=D4/>` will be interpreted like `string.Format("{0:D4}", index)`.
 
     `null` means no label
 
@@ -118,6 +140,8 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
     *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
     *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
     *   `Assets/Editor Default Resources/`, then fallback to built-in editor resources by name (using [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html))
+
+    You can also use Unity Editor's built-in icons. See [UnityEditorIcons](https://github.com/nukadelic/UnityEditorIcons). e.g. `<icon=d_AudioListener Icon/>`
 
     for `color` it supports:
 
@@ -187,7 +211,7 @@ private MyStruct _myStructWorkAround;
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/5e865350-6eeb-4f2a-8305-c7d8b8720eac)](https://github.com/TylerTemp/SaintsField/assets/6391063/25f6c7cc-ee7e-444e-b078-007dd6df499e)
 
-Here is an example of using on a array:
+Here is an example of using on an array:
 
 ```csharp
 using SaintsField;
@@ -234,6 +258,15 @@ public class SubField : MonoBehaviour
 ```
 
 [![video](https://github.com/user-attachments/assets/dc65d897-fcbf-4a40-b4aa-d99a8a4975a7)](https://github.com/user-attachments/assets/a6d93600-500b-4a0e-bf2d-9f2e8fb8bc32)
+
+Example of quoted fancy formatting:
+
+```csharp
+[RichLabel("<field=\">><color=yellow>{0}</color><<\"/> <index=\"[<color=blue>>></color>{0}<color=blue><<</color>]\"/>")]
+public string[] sindices;
+```
+
+![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
 
 #### `AboveRichLabel` / `BelowRichLabel` ####
 
@@ -364,6 +397,61 @@ private string MethodLabel(string[] values)
 
 ![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
 
+#### `PlayaAboveRichLabel` /  `PlayaBelowRichLabel` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Just like `AboveRichLabel` / `BelowRichLabel` but it can be applied on a top of an array/list, a property or a method
+
+For `AboveRichLabel`, it can also be applied on a class/struct.
+
+Parameters:
+
+*   `string content` the content to show. If it starts with `$`, then a callback/propery/field value is used. When a callback gives null or empty string, the label will be hidden.
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+
+[PlayaAboveRichLabel("<color=gray>-- Above --")]
+[PlayaAboveRichLabel("$" + nameof(dynamicContent))]
+[PlayaBelowRichLabel("$" + nameof(dynamicContent))]
+[PlayaBelowRichLabel("<color=gray>-- Below --")]
+public string[] s;
+
+[Space(20)]
+public string dynamicContent;
+```
+
+![Image](https://github.com/user-attachments/assets/5c29a43b-7276-488a-98fa-da133e77edc4)
+
+Example of using on a class/struct like a data comment:
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+
+[PlayaAboveRichLabel("<color=gray>This is a class message")]
+[PlayaAboveRichLabel("$" + nameof(dynamicContent))]
+public class ClassPlayaAboveRichLabelExample : MonoBehaviour
+{
+    [ResizableTextArea]
+    public string dynamicContent;
+
+    [Serializable]
+    [PlayaAboveRichLabel("<color=gray>--This is a struct message--")]
+    public struct MyStruct
+    {
+        public string structString;
+    }
+
+    public MyStruct myStruct;
+}
+```
+
+![Image](https://github.com/user-attachments/assets/de9e6bf2-5e7b-4a4a-92f5-66801984544e)
+
 #### `InfoBox`/`BelowInfoBox` ####
 
 Draw an info box above/below the field.
@@ -434,7 +522,9 @@ private string DynamicMessage() => _content ? "False" : "True";
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-This is like `InfoBox`, but it can be applied to array/list/button etc.
+This is like `InfoBox`, but it can be applied to array/list/method etc.
+
+For `PlayaInfoBox`, it can also be directly applied on a class/struct definition.
 
 *   `string content`
 
@@ -499,6 +589,31 @@ public void Method()
 ```
 
 ![image](https://github.com/user-attachments/assets/81d82ee4-4f8d-4ae3-bae5-dcb13d3af7c5)
+
+Example of using on a class/struct definition like a data comment:
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+
+[PlayaInfoBox("This is a class message", EMessageType.None)]
+[PlayaInfoBox("$" + nameof(dynamicContent))]
+public class ClassInfoBoxExample : MonoBehaviour  // The info box will show in inspector wherever you attach this component
+{
+    public string dynamicContent;
+
+    [Serializable]
+    [PlayaInfoBox("This is a struct message")]
+    public struct MyStruct  // The info box will show at first row wherever you use this struct
+    {
+        public string structString;
+    }
+
+    public MyStruct myStruct;
+}
+```
+
+![Image](https://github.com/user-attachments/assets/70a8613e-e17f-4463-8653-a6500b9e757f)
 
 #### `Separator` / `BelowSeparator` ####
 
@@ -893,7 +1008,7 @@ public LayerMask myLayerMask;
 
 #### `Scene` ####
 
-A dropdown selector for a scene in the build list, plus a "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
+A dropdown selector for a scene in the build list, plus "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
 
 **Parameters**:
 
@@ -913,7 +1028,7 @@ using SaintsField;
 
 #### `SortingLayer` ####
 
-A dropdown selector for sorting layer, plus a "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
+A dropdown selector for sorting layer, plus an "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
 
 *   AllowMultiple: No
 
@@ -942,7 +1057,7 @@ using SaintsField;
 
 #### `InputAxis` ####
 
-A string dropdown selector for an input axis, plus a "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
+A string dropdown selector for an input axis, plus an "Open Input Manager..." option to directly open "Input Manager" tab from "Project Settings" window where you can change input axes.
 
 *   AllowMultiple: No
 
@@ -1139,7 +1254,7 @@ Known issues:
 
     For more information about why this is impossible under IMGUI, see [Issue 25](https://github.com/TylerTemp/SaintsField/issues/25)
 
-2.  IMGUI: the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside of the rect will make the target non-interactable.
+2.  IMGUI: the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside the rect will make the target non-interactable.
     But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect on top leve, but not on array/list level... so you may see different outcomes on different Unity version.
 
     If you see unexpected space or overlap between foldout and label, use `Window` - `Saints` - `Create or Edit SaintsField Config` to change the config.
@@ -1252,7 +1367,7 @@ public IRefInterface myInterface;
 
 #### `SaintsRow` ####
 
-`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
+`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc. (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
 
 This attribute does NOT need `SaintsEditor` enabled. It's an out-of-box tool.
 
@@ -1388,9 +1503,14 @@ Parameters:
 
 *   `bool searchable = false`: allow search in the list/array
 *   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
-*   `bool delayedSearch = false`: when `true`, delay the search until you hit enter or blur the search field
+*   [IMGUI] `bool delayedSearch = false`: when `true`, delay the search until you hit enter or blur the search field
 *   `string extraSearch = null`: set a callback function to use your custom search. If not match, use the default search.
 *   `string overrideSearch = null`: set a callback function as a custom search. When present, ignore `extraSearch` and default search.
+
+`delayedSearch` only works for IMGUI. For UI Toolkit, it already has a debounced search, which means:
+
+*   When input anything, it'll wait for 0.6 seconds for next input, then perform the actual searching
+*   You can always use `Enter` to search immediately
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -1412,6 +1532,12 @@ public MyData[] myDataArr;
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/08c6da9a-e613-4e94-8933-3d7a92f7cb33)
 
 The first input is where you can search. The next input can adjust how many items per page. The last part is the paging.
+
+**Async Search**
+
+In UI Toolkit you can also see the async searching which does not block the editor when searching in a BIG list:
+
+[![video](https://github.com/user-attachments/assets/f76a68c5-fc27-4ecd-ab4b-eebec37f882d)](https://github.com/user-attachments/assets/3b4a1fd7-c5fb-4ed5-98ed-66645abb5512)
 
 **Custom Search**
 
@@ -1570,6 +1696,117 @@ public MyValueStruct[] myStructs;
 ```
 
 ![image](https://github.com/user-attachments/assets/01190ea1-97b7-4654-84ea-1ca4388739a9)
+
+**`TableHide`**
+
+> [!NOTE]
+> This feature is UI Toolkit only
+
+You can use `TableHide` attribute to exclude some column from the table. It'll hide the column by default, and you can still toggle it in header - right click menu
+
+```csharp
+[Serializable]
+public struct MyStruct
+{
+    // Hide a single row
+    [TableHide] public int hideMeInTable;
+
+    // Hide a grouped column
+    [TableColumn("HideGroup"), TableHide]
+    public int hideMeGroup1;
+
+    [TableColumn("HideGroup")]
+    [ShowInInspector] private const int HideMeGroup2 = 2;
+
+}
+
+[Table]
+public List<MyStruct> myStructs;
+```
+
+[![video](https://github.com/user-attachments/assets/2bf6480a-65f7-4dfc-bf96-bfee9497428e)](https://github.com/user-attachments/assets/66fa7d10-427c-4f8c-b23f-f4bb29faa9f6)
+
+**`TableHeaders`/`TableHeadersHide`**
+
+> [!NOTE]
+> This feature is UI Toolkit only
+
+You can use `TableHeaders` to default show some columns for the table, or `TableHeadersHide` to hide them.
+
+Note: this does not remove the header, but hide it by default. You can still toggle it in header - right click menu.
+
+Thus, it'll only affect the appearance when the table is rendered, and will NOT dynamicly update it, unless you select away and back, as it will trigger the re-paint process.
+
+**Parameters**:
+
+*   `string headers...`: the headers to show/hide.
+
+    If it starts with `$`, a callback/property/field value is used. The target must return a string, or `IEnumerable<string>`
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public struct TableHeaderStruct
+{
+    public int i1;
+
+    [TableColumn("Custom Header")] public int i2;
+    [TableColumn("Custom Header")] [Button] private void D() {}
+
+    public string str1;
+    public string str2;
+
+    [TableColumn("String")] public string str3;
+    [TableColumn("String")] public string str4;
+
+    public string str5;
+    public string str6;
+}
+
+[Table]
+[TableHeaders(  // what should be shown by default
+    nameof(TableHeaderStruct.i1),  // directly name
+    "Custom Header",  // directly custom name
+    "$" + nameof(showTableHeader),  // callback of a single name
+    "$" + nameof(ShowTableHeaders))  // callback of mutiple names
+]
+public TableHeaderStruct[] tableStruct;
+
+[Table]
+[TableHeadersHide(  // what should be hidden by default
+        nameof(TableHeaderStruct.i1),  // directly name
+        "Custom Header",  // directly custom name
+        "$" + nameof(showTableHeader),  // callback of a single name
+        "$" + nameof(ShowTableHeaders))  // callback of mutiple names
+]
+public TableHeaderStruct[] tableHideStruct;
+
+[Space]
+public string showTableHeader = nameof(TableHeaderStruct.str2);
+
+protected virtual IEnumerable<string> ShowTableHeaders() => new[]
+{
+    nameof(TableHeaderStruct.str5),
+    nameof(TableHeaderStruct.str6),
+};
+```
+
+Then you can inherent or change field to make the table display differently
+
+```csharp
+public class TableHeadersExampleInh : TableHeadersExample
+{
+    protected override IEnumerable<string> ShowTableHeaders() => new[]
+    {
+        "String",
+    };
+}
+```
+
+Results:
+
+![image](https://github.com/user-attachments/assets/c33a6875-bebd-4998-bfec-97575ac781ec)
 
 #### `ShowInInspector` ####
 
@@ -1921,7 +2158,7 @@ to get more useful info from the state, you can use `AnimatorStateBase`/`Animato
 *   `string stateName` actual state name
 *   `float stateSpeed` the `Speed` parameter of the state
 *   `string stateTag` the `Tag` of the state
-*   `string[] subStateMachineNameChain` the sub-state machine hierarchy name list of the state
+*   `string[] subStateMachineNameChain` the substate machine hierarchy name list of the state
 
 `AnimatorState` added the following attribute(s):
 
@@ -2214,7 +2451,7 @@ Showcase:
 
 ```csharp
 // get the main camera from scene
-[GetByXPath("scene:://[@Tag = MainCamera][]")] public Camera mainCamera;
+[GetByXPath("scene:://[@Tag = MainCamera]")] public Camera mainCamera;
 
 // only allow the user to pick from the target folder, which the `Hero` script returns `isAvaliable` as true
 [GetByXPath(EXP.JustPicker, "assets::/Art/Heros/*.prefab[@{GetComponent(Hero).isAvaliable}]")]
@@ -2292,7 +2529,7 @@ Automatically sign a component to a field by a given path.
     Options are:
 
     *   `EGetComp.ForceResign`: when the target changed (e.g. you delete/create one), automatically resign the new correct component.
-    *   `EGetComp.NoResignButton`: do not display a resign button when the target mismatches.
+    *   `EGetComp.NoResignButton`: do not display a re-sign button when the target mismatches.
 
 *   `string paths...`
 
@@ -2300,7 +2537,7 @@ Automatically sign a component to a field by a given path.
 
 *   AllowMultiple: Yes. But not necessary.
 
-The `path` is a bit like html's `XPath` but with less functions:
+The `path` is a bit like html's `XPath` but with less function:
 
 | Path            | Meaning                                                        |
 |-----------------|----------------------------------------------------------------|
@@ -2484,13 +2721,15 @@ Arguments:
 
 For callback (functions, fields, properties):
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
-    callbacks or attributes for the condition.
+    callbacks or attributes for the condition. For more information, see `Callback` section
 
 *   AllowMultiple: Yes
 
@@ -2516,6 +2755,14 @@ using SaintsField;
 private bool ShouldBeDisabled  // change the logic here
 {
     return true;
+}
+
+// This also works on static/const callbacks using `$:`
+[DisableIf("$:" + nameof(Util) + "." + nameof(_shouldDisable))] public int disableThis;
+// you can put this under another file like `Util.cs`
+public static class Util
+{
+    [ShowInIspector] private static bool _shouldDisable;
 }
 ```
 
@@ -2612,7 +2859,7 @@ public bool boolVal;
 [EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditAndBool;
 ```
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 #### `PlayaEnableIf`/`PlayaDisableIf` ####
 
@@ -2651,7 +2898,7 @@ using SaintsField.Playa;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 #### `ShowIf` / `HideIf` ####
 
@@ -2659,13 +2906,15 @@ Show or hide the field based on a condition. . Supports callbacks (function/fiel
 
 Arguments:
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
-    callbacks or attributes for the condition.
+    callbacks or attributes for the condition. For more information, see `Callback` section.
 
 *   AllowMultiple: Yes
 
@@ -2696,6 +2945,14 @@ public int showMe;
 public bool ShouldShow()  // change the logic here
 {
     return true;
+}
+
+// This also works on static/const callbacks using `$:`
+[HideIf("$:" + nameof(Util) + "." + nameof(_shouldHide))] public int hideMe;
+// you can put this under another file like `Util.cs`
+public static class Util
+{
+    [ShowInIspector] private static bool _shouldHide;
 }
 ```
 
@@ -2805,7 +3062,7 @@ public bool boolValue;
 [HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
 ```
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 
 #### `PlayaShowIf`/`PlayaHideIf` ####
@@ -2860,7 +3117,7 @@ public bool boolValue;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/eb07de01-3210-4f4b-be58-b5fadd899f1a)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 #### `Required` ####
 
@@ -2874,10 +3131,13 @@ This will check if the field value is a `truly` value, which means:
 
 If you have addressable installed, using `Required` on addressable's `AssetReference` will check if the target asset is valid
 
+If you have `RequiredIf`, `Required` will work as a config privider instead. See `RequiredIf` section for more information.
+
 Parameters:
 
 *   `string errorMessage = null` Error message. Default is `{label} is required`
-*   AllowMultiple: No
+*   `EMessageType messageType = EMessageType.Error` Custom message type.
+*   Allow Multiple: No
 
 ```csharp
 using SaintsField;
@@ -2900,6 +3160,85 @@ public MyStruct myStruct;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/04d29948-bd1c-4448-9148-ef1103f3feab)
 
+```csharp
+[Required(messageType: EMessageType.Info)]
+public GameObject empty2;
+```
+
+![Image](https://github.com/user-attachments/assets/7c099777-11f8-4d4c-8adf-8f03ce217f00)
+
+#### `RequiredIf` ####
+
+Like `Required`, but only required if the condition is a `truly` result.
+
+Parameters:
+
+Arguments:
+
+*   (Optional) `EMode editorMode`
+
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
+
+*   `object by...`
+
+    callbacks or attributes for the condition.
+
+*   Allow Multiple: Yes
+
+You can use multiple `RequiredIf`. The field will be required if **ALL** condition is true (`and` operation)
+
+For multiple `RequiredIf`: The field will be required if **ANY** condition is true (`or` operation)
+
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
+
+You can use `Required` to change the notice message & icon. See the example below
+
+```csharp
+using SaintsField;
+
+[Separator("Depende on other field or callback")]
+public GameObject go;
+[RequiredIf(nameof(go))]  // if a field is a dependence of another field
+public GameObject requiredIfGo;
+
+public int intValue;
+[RequiredIf(nameof(intValue) + ">=", 0)]
+public GameObject requiredIfPositive;  // if meet some condition; callback is also supported.
+
+[Separator("EMode condition")]
+
+[RequiredIf(EMode.InstanceInScene)]
+public GameObject sceneObj;  // if it's a prefab in a scene
+
+[Separator("Suggestion")]
+
+// use as a notice
+public Transform hand;
+[RequiredIf(nameof(hand))]
+[Required("It's suggested to set this field if 'hand' is set", EMessageType.Info)]  // this is now a config provider
+public GameObject suggestedIfHand;
+
+[Separator("And")]
+
+// You can also chain multiple conditions as "and" operation
+public GameObject andCondition;
+[RequiredIf(EMode.InstanceInScene, nameof(andCondition))]
+public GameObject instanceInSceneAndCondition;  // if it's a prefab in a scene and 'andCondition' is set
+
+[Separator("Or")]
+
+// You can also chain multiple RequiredIf as "or" operation
+public GameObject orCondition;
+public int orValue;
+[RequiredIf(nameof(orCondition))]
+[RequiredIf(nameof(orValue) + ">=", 0)]
+public GameObject requiredOr;  // if it's a prefab in a scene and 'andCondition' is set
+```
+
+[![video](https://github.com/user-attachments/assets/1dbd5e3b-1fcd-4b79-a1e5-d990628794db)](https://github.com/user-attachments/assets/9ffd8fef-60dd-482d-b644-ec97cae76451)
+
 #### `ValidateInput` ####
 
 Validate the input of the field when the value changes.
@@ -2910,7 +3249,7 @@ Validate the input of the field when the value changes.
 
     1.  If the function accepts no arguments, then no argument will be passed
     2.  If the function accepts required arguments, the first required argument will receive the field's value. If there is another required argument and the field is inside a list/array, the index will be passed.
-    3.  If the function only has optional arguments, it will try to pass the field's value and index if possible. Otherwise the default value of the parameter will be passed.
+    3.  If the function only has optional arguments, it will try to pass the field's value and index if possible, otherwise the default value of the parameter will be passed.
 
     **Return**:
 
@@ -3155,7 +3494,7 @@ private void EditorButton()
 
 A layout decorator to group fields.
 
-*   `string groupBy` the grouping key. Use `/` to separate different groups and create sub groups.
+*   `string groupBy` the grouping key. Use `/` to separate different groups and create subgroups.
 *   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
 *   `bool keepGrouping=false`: See `LayoutStart` below
 *   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
@@ -3167,7 +3506,7 @@ Options are:
 *   `Horizontal`
 *   `Background` draw a background color for the whole group
 *   `Title` show the title
-*   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw an separator between title and the rest of the content.
+*   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw a separator between title and the rest of the content.
     On `UI Toolkit` it will draw a background color for the title.
 *   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
 *   `Collapse` Same as `Foldout` but is collapsed by default.
@@ -3178,10 +3517,10 @@ Options are:
 
 **Known Issue**
 
-`Horizental` style is buggy, for the following reasons:
+About `Horizental` style:
 
 1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
-2.  On UI Toolkit the label will be put into a new line above. It'll have some issue for struct/class but I'm working on it.
+2.  On UI Toolkit the label will be put into a new line above
 
 ![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
 
@@ -3560,9 +3899,11 @@ Disable or enable an entire layout group. These attributes will work on the firs
 
 Arguments:
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter), it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
@@ -3578,7 +3919,7 @@ For `LayoutEnableIf`: The layout group will be enabled if **ANY** condition is t
 
 For multiple attributes: The layout group will be disabled if **ANY** condition is true (`or` operation)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 ```csharp
 using SaintsField.Playa;
@@ -3618,9 +3959,11 @@ Show or hide an entire layout group. These attributes will work on the first lay
 
 Arguments:
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default (omitting this parameter), it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
@@ -3665,374 +4008,6 @@ public string layoutEnd;
 
 [![video](https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca)](https://github.com/user-attachments/assets/fac5fce5-6458-4853-893c-23fa50f84872)
 
-### Handles ###
-
-Handles is drawn in the scene view instead of inspector.
-
-#### `DrawLabel` ####
-
-Draw a text in the view scene where the field object is. The decorated field need to be either a `GameObject`/`Component` or a `Vector3`/`Vector2`.
-
-This is useful if you want to track an object's state (e.g. a character's basic states) in the scene.
-
-Parameters:
-
-*   [Optional] `EColor eColor`: color of the label. Default is white.
-*   `string content = null`: the label text to show. Starting with `$` to make it an attribute/callback. `null` means using the field's name.
-*   `string space = "this"`: when using on a `Vector3` or `Vector2`, `"this"` means using current object as the space container, null means world space, otherwise use the space from this callback/field value.
-*   `string color = null`: use a html color if this starts with `#`, otherwise use a callback/field value as the color.
-
-```csharp
-using SaintsField;
-
-[DrawLabel("Test"), GetComponent]
-public GameObject thisObj;
-
-[Serializable]
-public enum MonsterState
-{
-    Idle,
-    Attacking,
-    Dead,
-}
-
-public MonsterState monsterState;
-
-[DrawLabel(EColor.Yellow ,"$" + nameof(monsterState))] public GameObject child;
-```
-
-![draw-label](https://github.com/user-attachments/assets/4f1ec6e7-fed9-4889-9920-d2d2a9b8c0a9)
-
-
-#### `PositionHandle` ####
-
-Draw and use a position handle in the scene. If The decorated field is a `GameObject`/`Component`, the handle will just it's position. If the field is a `Vector3`/`Vector2`, the handle will write the world/local position to the field.
-
-Parameters:
-
-*   `string space="this"`:the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value. Only works for `Vector3`/`Vector2` type.
-
-Example of using it with vector types + `DrawLabel`:
-
-```csharp
-using SaintsField;
-
-[PositionHandle(space: null), DrawLabel(nameof(worldPos3), space: null)] public Vector3 worldPos3;
-[PositionHandle(space: null), DrawLabel(nameof(worldPos2), space: null)] public Vector2 worldPos2;
-
-[PositionHandle, DrawLabel(nameof(localPos3))] public Vector3 localPos3;
-[PositionHandle, DrawLabel(nameof(localPos2))] public Vector2 localPos2;
-```
-
-[![video](https://github.com/user-attachments/assets/16a85513-ad65-4da7-9fec-a3388af9ff43)](https://github.com/user-attachments/assets/b74cf98d-c83d-4eb3-ba8d-4baeb8f49e1d)
-
-Example of using with objects:
-
-```csharp
-using SaintsField;
-
-[PositionHandle, DrawLabel("$" + nameof(LabelName)), GetComponentInChildren(excludeSelf: true)]
-public MeshRenderer[] meshChildren;
-
-private string LabelName(MeshRenderer target, int index) => $"{target.name}[{index}]";
-```
-
-[![video](https://github.com/user-attachments/assets/e8971069-182e-4ea6-b23a-4dc93fc05457)](https://github.com/user-attachments/assets/358001c8-f433-40e9-8a61-2fc63f9998c6)
-
-#### `DrawLine` ####
-
-Draw a line between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
-
-Parameters:
-
-*   `string start = null`: where does the line start. `null` for the current field.
-*   `int startIndex = 0`: when `start` is not `null`, and the start is a list/array, specify the index of the start.
-*   `string startSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `string end = null`: where does the line end. `null` for the current field.
-*   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
-*   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `EColor color = EColor.White`: the color of the line.
-*   `float colorAlpha = 1f`: the alpha of the color.
-
-And also `DrawLineFrom`, `DrawLineTo` as a shortcut to connect current field with another:
-
-*   `string target = null`: target point of the line from current field
-*   `int targetIndex = 0`: if the target is a list/array, specify the index of the target.
-*   `string targetSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `string space = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `EColor color = EColor.White`: the color of the line.
-*   `float colorAlpha = 1f`: the alpha of the color.
-
-```csharp
-using SaintsField;
-
-[SerializeField, GetComponent, DrawLabel("Entrance"),
- // connect this to worldPos[0]
- DrawLineTo(target: nameof(localPos), targetIndex: 0, targetSpace: Space.Self),
-] private GameObject entrance;
-
-[
-    // connect every element in the list
-    DrawLine(color: EColor.Green, endSpace: Space.Self),
-    // connect every element to the `centerPoint`
-    DrawLineTo(target: nameof(centerPoint), color: EColor.Red, colorAlpha: 0.4f),
-
-    DrawLabel("$" + nameof(PosIndexLabel)),
-]
-public Vector3[] localPos;
-
-[DrawLabel("Center")] public Vector3 centerPoint;
-
-[DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true),
- // connect worldPos[0] to this
- DrawLineFrom(target: nameof(localPos), targetIndex: -1, targetSpace: Space.Self),
-] public Transform exit;
-
-private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
-```
-
-![image](https://github.com/user-attachments/assets/cdfca17a-1a11-4517-a6ff-8f7e90ec4e8a)
-
-#### `SaintsArrow` ####
-
-Note: this feature requires [`SaintsDraw` 4.0.5](https://github.com/TylerTemp/SaintsDraw) installed
-
-Draw an arrow between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
-
-Parameters:
-
-*   `string start = null`: where does the arrow start. `null` for the current field.
-*   `int startIndex = 0`: when `start` is not `null`, and the start is a list/array, specify the index of the start.
-*   `string startSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `string end = null`: where does the arrow end. `null` for the current field.
-*   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
-*   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `EColor color = EColor.White`: the color of the arrow.
-*   `float colorAlpha = 1f`: the alpha of the color.
-*   `float headLength = 0.5f`: the length of the arrow head.
-*   `float headAngle = 20.0f`: the angle of the arrow head.
-
-Specially
-1.  using on an array/list without specifying `start` and `end` will arrow-connect the element from first to last.
-2.  `startIndex` & `endIndex` can be negative, which means to count from the end. `-1` means the last element.
-
-A complex showcase:
-
-```csharp
-using SaintsField;
-
-[SerializeField, GetComponent, DrawLabel("Entrance"),
- // connect this to worldPos[0]
- SaintsArrow(end: nameof(worldPos), endIndex: 0, endSpace: Space.Self),
-] private GameObject entrance;
-
-[
-    // connect every element in the list
-    SaintsArrow(color: EColor.Green, startSpace: Space.Self, headLength: 0.1f),
-    // connect every element to the `centerPoint`
-    SaintsArrow(start: nameof(centerPoint), color: EColor.Red, startSpace: Space.Self, endSpace: Space.Self, headLength: 0.1f, colorAlpha: 0.4f),
-
-    PositionHandle,
-    DrawLabel("$" + nameof(PosIndexLabel)),
-]
-public Vector3[] worldPos;
-
-[DrawLabel("Center"), PositionHandle] public Vector3 centerPoint;
-
-[DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true), PositionHandle,
- // connect worldPos[0] to this
- SaintsArrow(start: nameof(worldPos), startIndex: -1, startSpace: Space.Self),
-] public Transform exit;
-
-private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
-```
-
-[![video](https://github.com/user-attachments/assets/39003fcf-bc20-40e8-947c-c14829d9d357)](https://github.com/user-attachments/assets/44982e29-edc6-4c3e-892e-228b134d0bb2)
-
-#### `ArrowHandleCap` ####
-
-Like `SaintsArrow` but using Unity's default `ArrowHandleCap` to draw. (No dependency required)
-
-Draw an arrow between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
-
-Note: Unity's arrow handle does not allow much controlling. You might see a giant arrow depending on your scaling.
-
-Parameters:
-
-*   `string start = null`: where does the arrow start. `null` for the current field.
-*   `int startIndex = 0`: when `start` is not `null`, and the start is a list/array, specify the index of the start.
-*   `Space startSpace = Space.World`: if the start is a `Vector3`/`Vector2`, should it be in world space or local space.
-*   `string end = null`: where does the arrow end. `null` for the current field.
-*   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
-*   `Space endSpace = Space.World`: if the end is a `Vector3`/`Vector2`, should it be in world space or local space.
-*   `EColor color = EColor.White`: the color of the arrow.
-*   `float colorAlpha = 1f`: the alpha of the color.
-
-Specially
-1.  using on an array/list without specifying `start` and `end` will arrow-connect the element from first to last.
-2.  `startIndex` & `endIndex` can be negative, which means to count from the end. `-1` means the last element.
-
-Example:
-
-```csharp
-using SaintsField;
-
-[SerializeField, GetComponent, DrawLabel("Entrance"),
- // connect this to worldPos[0]
- ArrowHandleCap(end: nameof(worldPos), endIndex: 0),
-] private GameObject entrance;
-
-[
-    // connect every element in the list
-    ArrowHandleCap(eColor: EColor.Green),
-    // connect every element to the `centerPoint`
-    ArrowHandleCap(end: nameof(centerPoint), eColor: EColor.Red),
-
-    PositionHandle,
-    DrawLabel("$" + nameof(PosIndexLabel)),
-]
-public Vector3[] worldPos;
-
-[DrawLabel("Center"),
- PositionHandle
-] public Vector3 centerPoint;
-
-[DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true),
- PositionHandle,
- // connect worldPos[0] to this
- ArrowHandleCap(start: nameof(worldPos), startIndex: -1),
-] public Transform exit;
-
-private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
-```
-
-![image](https://github.com/user-attachments/assets/ebb83a0b-2f1d-49c9-9897-9e900db4e471)
-
-#### `DrawWireDisc` ####
-
-Like Unity's [`DrawWireDisc`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Handles.DrawWireDisc.html)， this attributes allows you to draw a disc in the scene.
-
-The field can be a `GameObject`, a `Component`, a `Vector2`(2D game), a `Vector3` (3D game), or a number.
-
-You can specify which parent you want the circle be, the rotate/offset/facing of the circle, and color of course.
-
-Parameters:
-
-*   `float radius = 1f`: radis of the disk. If the target field is a number, use the field's value instead
-*   `string radisCallback = null`: use a callback or a field value as the radius. If the target field is a number, use the field's value instead
-*   `string space = "this"`: the containing space of the disc. `this` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `float norX = 0f, float norY = 0f, float norZ = 1f`: `Vector3` direction for the `normal` (facing) of the disc. It's facing forward by default
-*   `string norCallback = null`: use a callback or a field value as the normal direction, the value must be a `Vector3`
-*   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: `Vector3` position offset for the disc related to the `space`
-*   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
-*   `float rotX = 0f, float rotY = 0f, float rotZ = 0f`: rotation of the disc related to `space`
-*   `string rotCallback = null`: use a callback or a field value as the rotation. The value must be a `Quaternion`
-*   `EColor eColor = EColor.White`: line color of the disc
-*   `string color = null`: If it's starting with `#`, use a html color for the line. Otherwise, use a callback or a field value as the color. The value must be a `Color`
-
-```csharp
-using SaintsField;
-
-// Draw a circle for my character
-[DrawWireDisc(radis: 0.2f, EColor.Yellow)] public MyCharacter character2D;
-
-// Draw a circle on the ground for my character (disc facing upward)
-// the hight from center to the ground is 0.5f
-[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -0.5f)] public MyCharacter character3D;
-
-// Make a struct to let it follow
-[Serializable]
-public struct PlayerWeapon
-{
-    [PositionHandle(Space.Self)]
-    [DrawWireDisc]
-    public Vector3 firePointOffset;
-
-    // your other fields
-}
-```
-
-[![video](https://github.com/user-attachments/assets/0627d463-5f29-4cba-ac2c-b8a7b1f1106a)](https://github.com/user-attachments/assets/37e48f8a-906b-407c-8d95-6faa5210517c)
-
-A simple example to show debugging a player's alert/idle range:
-
-```csharp
-[GetComponent]
-[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -1f, color: nameof(curColor), radisCallback: nameof(curRadius))]
-[DrawLabel(EColor.Brown, "$" + nameof(curStatus))]
-public Transform player;
-
-[Range(1f, 1.5f)] public float initRadius;
-[Range(1f, 1.5f)] public float alertRadius;
-
-[AdvancedDropdown] public Color initColor;
-[AdvancedDropdown] public Color alertColor;
-
-public Transform enemy;
-
-[InputAxis] public string horizontalAxis;
-[InputAxis] public string verticalAxis;
-
-[ShowInInspector]
-private Color curColor;
-
-[ShowInInspector] private float curRadius = 0.5f;
-[ShowInInspector] private string curStatus = "Idle";
-
-private void Awake()
-{
-    curColor = initColor;
-    curRadius = initRadius;
-}
-
-public void Update()
-{
-    Vector3 playerPos = player.position;
-    Vector3 enemyPos = enemy.position;
-
-    float distance = Vector3.Distance(playerPos, enemyPos);
-
-    float nowRadius = distance < alertRadius ? alertRadius : initRadius;
-    Color nowColor = distance < alertRadius ? alertColor : initColor;
-    curStatus = distance < alertRadius ? "Alert" : "Idle";
-
-    curRadius = Mathf.Lerp(curRadius, nowRadius, Time.deltaTime * 10);
-    curColor = Color.Lerp(curColor, nowColor, Time.deltaTime * 10);
-
-    float horizontal = Input.GetAxis(horizontalAxis);
-    float vertical = Input.GetAxis(verticalAxis);
-
-    Vector3 move = new Vector3(horizontal, 0, vertical);
-    player.Translate(move * Time.deltaTime * 3);
-}
-```
-
-[![video](https://github.com/user-attachments/assets/ce94f758-7a72-442e-9ced-a972cd0783a9)](https://github.com/user-attachments/assets/2d12f926-bc66-4c41-8dfd-92bdf81ba55d)
-
-#### `SphereHandleCap` ####
-
-Draw a sphere in the scene like Unity's [`SphereHandleCap`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Handles.SphereHandleCap.html).
-
-**Parameters**:
-
-*   `float radius = 1f`: radius of the sphere. If the target field is a number, use the field's value instead
-*   `string radiusCallback = null`: use a callback or a field value as the radius
-*   `string space = "this"`: the containing space of the sphere. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: `Vector3` position offset for the sphere related to the `space`
-*   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
-*   `EColor eColor = EColor.White`: color of the sphere
-*   `string color = null`: If it's starting with `#`, use a html color for the sphere. Otherwise, use a callback or a field value as the color. The value must be a `Color`
-
-```csharp
-[DrawLine]  // also draw the lines
-[SphereHandleCap(color: "#FF000099", radius: 0.1f)]
-public Vector3[] localPos;
-
-[SphereHandleCap(radius: 0.1f)]
-public GameObject[] objPos;  // use obj's position
-```
-
-![image](https://github.com/user-attachments/assets/4f31ad1e-1818-409c-91ae-48f4e766a8fb)
 
 ### Miscellaneous ###
 
@@ -4046,7 +4021,7 @@ If you want a searchable dropdown, see `AdvancedDropdown`.
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
 *   `bool slashAsSub=true` treat `/` as a sub item.
 
-    Note: In `IMGUI`, this just replace `/` to Unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit overlap with nearby characters.
+    Note: In `IMGUI`, this just replace `/` to Unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit of overlap with nearby characters.
 
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
@@ -4165,13 +4140,13 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 
 2.  UI Toolkit:
 
-    The group indicator uses `ToolbarBreadcrumbs`. Sometimes you can see text get wrapped into lines. This is because Unity's UI Toolkit has some layout issue, that it can not has the same layout even with same elements+style+boundary size.
+    The group indicator uses `ToolbarBreadcrumbs`. Sometimes you can see text get wrapped into lines. This is because Unity's UI Toolkit has some layout issue, that it can not have the same layout even with same elements+style+boundary size.
 
     This issue is not fixable unless Unity fixes it. This issue might be different on different Unity (UI Toolkit) version.
 
 **Arguments**
 
-*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc).
+*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
     When omitted, it will try to find all the static values from the field type.
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
@@ -4180,11 +4155,11 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 **`AdvancedDropdownList<T>`**
 
 *   `string displayName` item name to display
-*   `T value` or `IEnumerable<AdvancedDropdownList<T>> children`: value means it's a value item. Otherwise it's a group of items, which the values are specified by `children`
+*   `T value` or `IEnumerable<AdvancedDropdownList<T>> children`: value means it's a value item. Otherwise, it's a group of items, which the values are specified by `children`
 *   `bool disabled = false` if item is disabled
 *   `string icon = null` the icon for the item.
 
-    Note: setting an icon for a parent group will result an weird issue on it's sub page's title and block the items. This is not fixable unless Unity decide to fix it.
+    Note: setting an icon for a parent group will result a weird issue on its subpage's title and block the items. This is not fixable unless Unity decide to fix it.
 
 *   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
 
@@ -4333,6 +4308,145 @@ Also, using on a type like `Color` to pick a pre-defined static value:
 ```
 
 ![image](https://github.com/user-attachments/assets/404d4cd6-b4bf-4521-b633-2dd745ec4de1)
+
+#### `TreeDropdown` ####
+
+A tree dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
+
+This is the same as `AdvancedDropdown`, except it uses a tree view to pick.
+
+> [!WARNING]
+> UI Toolkit only.
+
+**Arguments**
+
+*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
+    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
+    When omitted, it will try to find all the static values from the field type.
+*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
+*   AllowMultiple: No
+
+See `AdvancedDropdown` for more usage
+
+```csharp
+using SaintsField;
+
+[TreeDropdown(nameof(AdvDropdown))] public int drops;
+
+public AdvancedDropdownList<int> AdvDropdown()
+{
+    return new AdvancedDropdownList<int>
+    {
+        // a grouped value
+        new AdvancedDropdownList<int>("First Half")
+        {
+            // with icon
+            new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+            // no icon
+            new AdvancedDropdownList<int>("Tuesday", 2),
+        },
+        new AdvancedDropdownList<int>("Second Half")
+        {
+            new AdvancedDropdownList<int>("Wednesday")
+            {
+                new AdvancedDropdownList<int>("Morning", 3, icon: "star.png"),
+                new AdvancedDropdownList<int>("Afternoon", 8),
+            },
+            new AdvancedDropdownList<int>("Thursday", 4, true, icon: "star.png"),
+        },
+        // direct value
+        new AdvancedDropdownList<int>("Friday", 5, true),
+        AdvancedDropdownList<int>.Separator(),
+        new AdvancedDropdownList<int>("Saturday", 6, icon: "star.png"),
+        new AdvancedDropdownList<int>("Sunday", 7, icon: "star.png"),
+    };
+}
+```
+
+![](https://github.com/user-attachments/assets/fcfd2932-0850-43af-8a93-5c3d1979240a)
+
+
+#### `OptionsDropdown` / `PairsDropdown` ####
+
+Like `AdvancedDropdown`, but allows you to quickly set some const expression value
+
+Useful when you don't want the entire enum
+
+```csharp
+use SaintsField;
+
+[OptionsDropdown(0.5f, 1f, 1.5f, 2f, 2.5f, 3f)]
+public float floatOpt;
+
+[OptionsDropdown(EUnique.Disable, "Left", "Right", "Top", "Bottom", "Center")]
+public string[] stringOpt;
+```
+
+![](https://github.com/user-attachments/assets/a26d89c6-5be7-4d66-8782-a927585b01dd)
+
+```csharp
+use SaintsField;
+
+[PairsDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
+public int intOpt;
+
+public enum Direction
+{
+    None,
+    Left,
+    Right,
+    Up,
+    Down,
+    Center,
+}
+
+// useful if you don't want the entire enum
+[PairsDropdown(EUnique.Disable, "<-", Direction.Left, "->", Direction.Right, "↑", Direction.Up, "↓", Direction.Down)]
+public Direction[] direOpt;
+```
+
+![](https://github.com/user-attachments/assets/01501513-d00d-4320-94e9-6c76a81a3c2a)
+
+#### `OptionsTreeDropdown` / `PairsTreeDropdown` ####
+
+Like `OptionsDropdown` / `PairsDropdown`, but in a tree view
+
+> [!WARNING]
+> UI Toolkit only.
+
+```csharp
+use SaintsField;
+
+[OptionsTreeDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
+public string[] treeOpt;
+```
+
+![](https://github.com/user-attachments/assets/443b95f6-7010-4fea-a62a-40eaed1e5c22)
+
+```csharp
+use SaintsField;
+
+public enum Direction
+{
+    None,
+    Left,
+    Right,
+    Up,
+    Down,
+    Center,
+}
+
+[PairsTreeDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
+public int treeIntOpt;
+
+// useful if you don't want the entire enum
+[PairsTreeDropdown(EUnique.Disable, "Hor/<-", Direction.Left, "Hor/->", Direction.Right, "Vert/↑", Direction.Up, "Vert/↓", Direction.Down)]
+public Direction[] treeDireOpt;
+```
+
+![](https://github.com/user-attachments/assets/d7aab70a-df72-4527-9cd4-16cb9e91ab9b)
+
+![](https://github.com/user-attachments/assets/63fb22dd-5aaa-4e7a-9b0b-ac15270316f7)
 
 #### `EnumToggleButtons` ####
 
@@ -4498,7 +4612,7 @@ Parameters:
 
 *   `bool customPicker=true`: use a custom object pick that only display objects which meet the requirements
 *   `Type compType`: the type of the component. It can be a component, or an object like `GameObject`, `Sprite`. The field will be this type. It can NOT be an interface
-*   `params Type[] requiredTypes`: a list of required components or interfaces you want. Only objects with all of the types can be signed.
+*   `params Type[] requiredTypes`: a list of required components or interfaces you want. Only objects with all the types can be signed.
 *   AllowMultiple: No
 
 **Known Issue**: IMGUI, manually sign a null object by using Unity's default pick will sign an empty string instead of null. Use custom pick to avoid this inconsistency.
@@ -4731,7 +4845,6 @@ public string alignField;
 
 ![show_image](https://github.com/TylerTemp/SaintsField/assets/6391063/8fb6397f-12a7-4eaf-9e2b-65f563c89f97)
 
-
 #### `ParticlePlay` ####
 
 A button to play a particle system of the field value, or the one on the field value.
@@ -4755,7 +4868,6 @@ Note: because of the limitation from Unity, it can NOT detect if a `ParticleSyst
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/18ab2c32-9be9-49f5-9a3a-058fa4c3c7bd)](https://github.com/TylerTemp/SaintsField/assets/6391063/2473df2b-39fc-47bc-829e-eeb65c411131)
-
 
 #### `ButtonAddOnClick` ####
 
@@ -4909,20 +5021,857 @@ public class CustomEventExample : SaintsMonoBehaviour
 
 A simple color palette tool to select a color from a list of colors.
 
+Use `Window` - `Saints` - `Color Palette` to manage the color palette.
+
 **Parameters**:
 
-*   `string[] names`: the display name of the palette. If null, it'll use all the palette in the project. If it starts with `$`, then a property/callback will be invoked,
-    which should either returns a string for the display name, or the `SaintsField.ColorPalette` instance.
+*   `string[] names`: the tags of the palette. If null, it'll use all the palette in the project. If it starts with `$`, then a property/callback will be invoked,
+    which should returns a string (or a collection of string) for the tags.
 *   Allow Multiple: No
 
 ```csharp
 [ColorPalette] public Color allPalette;
-[ColorPalette("TestPalette")] public Color fromOnePalette;
 ```
 
-[![video](https://github.com/user-attachments/assets/737e1f93-5860-433c-8add-09b4128f4854)](https://github.com/user-attachments/assets/47f0aebd-aa61-49a9-b4e6-fd1bf3ce31f8)
+[![video](https://github.com/user-attachments/assets/7cec6366-e731-4cd1-9d13-a6b0f0f2fa1c)](https://github.com/user-attachments/assets/e5b93ec2-ab77-47d9-9e3b-15f87fd5cecd)
 
-You can add/modify/remove color palette in the `Window/Saints/Color Palette` menu.
+`Window` - `Saints` - `Color Palette`:
+
+[![video](https://github.com/user-attachments/assets/526bb4e9-990b-4d7a-8bba-6293e880ee78)](https://github.com/user-attachments/assets/30c2613c-c8c5-4a3e-b188-fb03e8b06ee7)
+
+[![video](https://github.com/user-attachments/assets/f58da949-7d2a-4a52-b2d7-237d7747e88a)](https://github.com/user-attachments/assets/cbbe5269-09f3-49c1-ac02-5ea49d256d9d)
+
+#### `Searchable` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+> [!NOTE]
+> This is UI Toolkit only
+
+This allows you to search for a field in a `MonoBehavior` (`Component`) or `ScriptableObject`. This is useful is you have a big list of fields.
+
+It will draw a search icon in the header. Once clicked, you can input the field name you want to search.
+
+You can also use `Ctrl` + `F` (`Command` + `F` on macOS) to open the search bar.
+
+Note: this only search the field name. It does not search the nested fields, and it does not check with the `RichLabel`, `PlayaRichLabel`.
+
+```csharp
+using SaintsField.Playa;
+
+[Searchable]
+public class SearchableMono : SaintsMonoBehaviour
+{
+    public string myString;
+    public int myInt;
+    [ShowInInspector] private string MyInspectorString => "Non Ser Prop";
+    [ShowInInspector] private string otherInspectorString = "Non Ser Field";
+    public string otherString;
+    public int otherInt;
+
+    [ListDrawerSettings(searchable: true)]
+    public string[] myArray;
+
+    [Serializable]
+    public struct MyStruct
+    {
+        public string MyStructString;
+    }
+
+    [Table] public MyStruct[] myTable;
+}
+```
+
+[![video](https://github.com/user-attachments/assets/b8273285-d24e-441d-9ceb-f277685372f3)](https://github.com/user-attachments/assets/5a6b9aae-481d-4898-9cbe-6634c51cb3e4)
+
+## Handles ##
+
+`Handles` is drawn in the scene view instead of inspector.
+
+When using handles (except `SceneViewPicker` and `DrawLabel`), you can use right click to show/hide some handles.
+
+![image](https://github.com/user-attachments/assets/d86350c6-bd97-43d0-a7ef-1c959cd22364)
+
+### `SceneViewPicker` ###
+
+Allow you to pick a target from a scene view, then sign it into your field.
+
+Once clicked the picking icon, use left mouse to choose a target. Once a popup is displayed, choose the target you want.
+
+If you just want the closest one, just click, then click again (because the closest one is always at the position of your cursor)
+
+Usage:
+
+*   Left Mouse: pick; when popup is displayed, click away to close the popup
+*   Middle Mouse: cancel
+
+```csharp
+using SaintsField;
+
+[SceneViewPicker] public Collider myCollider;
+// works with SaintsInterface
+[SceneViewPicker] public SaintsObjInterface<IInterface1> interf;
+
+// a notice will diplay if no target is found
+[SceneViewPicker] public NoThisInScene noSuch;
+// works for list elements too
+[SceneViewPicker] public Object[] anything;
+```
+
+[![video](https://github.com/user-attachments/assets/2f51ce8f-145e-4216-bd00-30ca1081ab4d)](https://github.com/user-attachments/assets/b994cc62-ad92-419e-9b6e-5029d662b601)
+
+This feature is heavily inspired by [Scene-View-Picker](https://github.com/RoyTheunissen/Scene-View-Picker)! If you like this feature, please consider go give them a star!
+
+Because Scene-View-Picker does not [provide API for script calling](https://github.com/RoyTheunissen/Scene-View-Picker/issues/4), I have to completely re-write the logic for in SaintsField instead of depended on it.
+
+### `DrawLabel` ###
+
+Draw a text in the view scene where the field object is. The decorated field need to be either a `GameObject`/`Component` or a `Vector3`/`Vector2`.
+
+This is useful if you want to track an object's state (e.g. a character's basic states) in the scene.
+
+Parameters:
+
+*   [Optional] `EColor eColor`: color of the label. Default is white.
+*   `string content = null`: the label text to show. Starting with `$` to make it an attribute/callback. `null` means using the field's name.
+*   `string space = "this"`: when using on a `Vector3` or `Vector2`, `"this"` means using current object as the space container, null means world space, otherwise use the space from this callback/field value.
+*   `string color = null`: use a html color if this starts with `#`, otherwise use a callback/field value as the color.
+
+```csharp
+using SaintsField;
+
+[DrawLabel("Test"), GetComponent]
+public GameObject thisObj;
+
+[Serializable]
+public enum MonsterState
+{
+    Idle,
+    Attacking,
+    Dead,
+}
+
+public MonsterState monsterState;
+
+[DrawLabel(EColor.Yellow ,"$" + nameof(monsterState))] public GameObject child;
+```
+
+![draw-label](https://github.com/user-attachments/assets/4f1ec6e7-fed9-4889-9920-d2d2a9b8c0a9)
+
+
+### `PositionHandle` ###
+
+Draw and use a position handle in the scene. If The decorated field is a `GameObject`/`Component`, the handle will just it's position. If the field is a `Vector3`/`Vector2`, the handle will write the world/local position to the field.
+
+Parameters:
+
+*   `string space="this"`:the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value. Only works for `Vector3`/`Vector2` type.
+
+You can use right click to show/hide handles.
+
+Example of using it with vector types + `DrawLabel`:
+
+```csharp
+using SaintsField;
+
+[PositionHandle(space: null), DrawLabel(nameof(worldPos3), space: null)] public Vector3 worldPos3;
+[PositionHandle(space: null), DrawLabel(nameof(worldPos2), space: null)] public Vector2 worldPos2;
+
+[PositionHandle, DrawLabel(nameof(localPos3))] public Vector3 localPos3;
+[PositionHandle, DrawLabel(nameof(localPos2))] public Vector2 localPos2;
+```
+
+[![video](https://github.com/user-attachments/assets/16a85513-ad65-4da7-9fec-a3388af9ff43)](https://github.com/user-attachments/assets/b74cf98d-c83d-4eb3-ba8d-4baeb8f49e1d)
+
+Example of using with objects:
+
+```csharp
+using SaintsField;
+
+[PositionHandle, DrawLabel("$" + nameof(LabelName)), GetComponentInChildren(excludeSelf: true)]
+public MeshRenderer[] meshChildren;
+
+private string LabelName(MeshRenderer target, int index) => $"{target.name}[{index}]";
+```
+
+[![video](https://github.com/user-attachments/assets/e8971069-182e-4ea6-b23a-4dc93fc05457)](https://github.com/user-attachments/assets/358001c8-f433-40e9-8a61-2fc63f9998c6)
+
+### `DrawLine` ###
+
+Draw a line between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
+
+You can use right click to show/hide handles.
+
+Parameters:
+
+*   `string start = null`: where does the line start. `null` for the current field.
+*   `int startIndex = 0`: when `start` is not `null`, and the start is a list/array, specify the index of the start.
+*   `string startSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `string end = null`: where does the line end. `null` for the current field.
+*   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
+*   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
+
+And also `DrawLineFrom`, `DrawLineTo` as a shortcut to connect current field with another:
+
+*   `string target = null`: target point of the line from current field
+*   `int targetIndex = 0`: if the target is a list/array, specify the index of the target.
+*   `string targetSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `string space = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
+
+```csharp
+using SaintsField;
+
+[SerializeField, GetComponent, DrawLabel("Entrance"),
+ // connect this to worldPos[0]
+ DrawLineTo(target: nameof(localPos), targetIndex: 0, targetSpace: Space.Self),
+] private GameObject entrance;
+
+[
+    // connect every element in the list
+    DrawLine(color: EColor.Green, endSpace: Space.Self),
+    // connect every element to the `centerPoint`
+    DrawLineTo(target: nameof(centerPoint), color: EColor.Red, colorAlpha: 0.4f),
+
+    DrawLabel("$" + nameof(PosIndexLabel)),
+]
+public Vector3[] localPos;
+
+[DrawLabel("Center")] public Vector3 centerPoint;
+
+[DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true),
+ // connect worldPos[0] to this
+ DrawLineFrom(target: nameof(localPos), targetIndex: -1, targetSpace: Space.Self),
+] public Transform exit;
+
+private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
+```
+
+![image](https://github.com/user-attachments/assets/cdfca17a-1a11-4517-a6ff-8f7e90ec4e8a)
+
+### `SaintsArrow` ###
+
+Note: this feature requires [`SaintsDraw` 4.0.5](https://github.com/TylerTemp/SaintsDraw) installed
+
+Draw an arrow between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
+
+Parameters:
+
+*   `string start = null`: where does the arrow start. `null` for the current field.
+*   `int startIndex = 0`: when `start` is not `null`, and the start is a list/array, specify the index of the start.
+*   `string startSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `string end = null`: where does the arrow end. `null` for the current field.
+*   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
+*   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
+*   `float headLength = 0.5f`: the length of the arrow head.
+*   `float headAngle = 20.0f`: the angle of the arrow head.
+
+Specially
+1.  using on an array/list without specifying `start` and `end` will arrow-connect the element from first to last.
+2.  `startIndex` & `endIndex` can be negative, which means to count from the end. `-1` means the last element.
+
+A complex showcase:
+
+```csharp
+using SaintsField;
+
+[SerializeField, GetComponent, DrawLabel("Entrance"),
+ // connect this to worldPos[0]
+ SaintsArrow(end: nameof(worldPos), endIndex: 0, endSpace: Space.Self),
+] private GameObject entrance;
+
+[
+    // connect every element in the list
+    SaintsArrow(color: EColor.Green, startSpace: Space.Self, headLength: 0.1f),
+    // connect every element to the `centerPoint`
+    SaintsArrow(start: nameof(centerPoint), color: EColor.Red, startSpace: Space.Self, endSpace: Space.Self, headLength: 0.1f, colorAlpha: 0.4f),
+
+    PositionHandle,
+    DrawLabel("$" + nameof(PosIndexLabel)),
+]
+public Vector3[] worldPos;
+
+[DrawLabel("Center"), PositionHandle] public Vector3 centerPoint;
+
+[DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true), PositionHandle,
+ // connect worldPos[0] to this
+ SaintsArrow(start: nameof(worldPos), startIndex: -1, startSpace: Space.Self),
+] public Transform exit;
+
+private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
+```
+
+[![video](https://github.com/user-attachments/assets/39003fcf-bc20-40e8-947c-c14829d9d357)](https://github.com/user-attachments/assets/44982e29-edc6-4c3e-892e-228b134d0bb2)
+
+### `ArrowHandleCap` ###
+
+Like `SaintsArrow` but using Unity's default `ArrowHandleCap` to draw. (No dependency required)
+
+Draw an arrow between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
+
+Parameters:
+
+*   `string start = null`: where does the arrow start. `null` for the current field.
+*   `int startIndex = 0`: when `start` is not `null`, and the start is a list/array, specify the index of the start.
+*   `Space startSpace = Space.World`: if the start is a `Vector3`/`Vector2`, should it be in world space or local space.
+*   `string end = null`: where does the arrow end. `null` for the current field.
+*   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
+*   `Space endSpace = Space.World`: if the end is a `Vector3`/`Vector2`, should it be in world space or local space.
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
+
+Specially
+1.  using on an array/list without specifying `start` and `end` will arrow-connect the element from first to last.
+2.  `startIndex` & `endIndex` can be negative, which means to count from the end. `-1` means the last element.
+
+Example:
+
+```csharp
+using SaintsField;
+
+[SerializeField, GetComponent, DrawLabel("Entrance"),
+ // connect this to worldPos[0]
+ ArrowHandleCap(end: nameof(worldPos), endIndex: 0),
+] private GameObject entrance;
+
+[
+    // connect every element in the list
+    ArrowHandleCap(eColor: EColor.Green),
+    // connect every element to the `centerPoint`
+    ArrowHandleCap(end: nameof(centerPoint), eColor: EColor.Red),
+
+    PositionHandle,
+    DrawLabel("$" + nameof(PosIndexLabel)),
+]
+public Vector3[] worldPos;
+
+[DrawLabel("Center"),
+ PositionHandle
+] public Vector3 centerPoint;
+
+[DrawLabel("Exit"), GetComponentInChildren(excludeSelf: true),
+ PositionHandle,
+ // connect worldPos[0] to this
+ ArrowHandleCap(start: nameof(worldPos), startIndex: -1),
+] public Transform exit;
+
+private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
+```
+
+![image](https://github.com/user-attachments/assets/e78c94c0-803b-436d-b8ff-ba319aefbe93)
+
+### `DrawWireDisc` ###
+
+Like Unity's [`DrawWireDisc`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Handles.DrawWireDisc.html)， this attributes allows you to draw a disc in the scene.
+
+The field can be a `GameObject`, a `Component`, a `Vector2`(2D game), a `Vector3` (3D game), or a number.
+
+You can specify which parent you want the circle be, the rotate/offset/facing of the circle, and color of course.
+
+Parameters:
+
+*   `float radius = 1f`: radis of the disk. If the target field is a number, use the field's value instead
+*   `string radisCallback = null`: use a callback or a field value as the radius. If the target field is a number, use the field's value instead
+*   `string space = "this"`: the containing space of the disc. `this` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `float norX = 0f, float norY = 0f, float norZ = 1f`: `Vector3` direction for the `normal` (facing) of the disc. It's facing forward by default
+*   `string norCallback = null`: use a callback or a field value as the normal direction, the value must be a `Vector3`
+*   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: `Vector3` position offset for the disc related to the `space`
+*   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
+*   `float rotX = 0f, float rotY = 0f, float rotZ = 0f`: rotation of the disc related to `space`
+*   `string rotCallback = null`: use a callback or a field value as the rotation. The value must be a `Quaternion`
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+
+```csharp
+using SaintsField;
+
+// Draw a circle for my character
+[DrawWireDisc(radis: 0.2f, EColor.Yellow)] public MyCharacter character2D;
+
+// Draw a circle on the ground for my character (disc facing upward)
+// the hight from center to the ground is 0.5f
+[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -0.5f)] public MyCharacter character3D;
+
+// Make a struct to let it follow
+[Serializable]
+public struct PlayerWeapon
+{
+    [PositionHandle(Space.Self)]
+    [DrawWireDisc]
+    public Vector3 firePointOffset;
+
+    // your other fields
+}
+```
+
+[![video](https://github.com/user-attachments/assets/0627d463-5f29-4cba-ac2c-b8a7b1f1106a)](https://github.com/user-attachments/assets/37e48f8a-906b-407c-8d95-6faa5210517c)
+
+A simple example to show debugging a player's alert/idle range:
+
+```csharp
+[GetComponent]
+[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -1f, color: nameof(curColor), radisCallback: nameof(curRadius))]
+[DrawLabel(EColor.Brown, "$" + nameof(curStatus))]
+public Transform player;
+
+[Range(1f, 1.5f)] public float initRadius;
+[Range(1f, 1.5f)] public float alertRadius;
+
+[AdvancedDropdown] public Color initColor;
+[AdvancedDropdown] public Color alertColor;
+
+public Transform enemy;
+
+[InputAxis] public string horizontalAxis;
+[InputAxis] public string verticalAxis;
+
+[ShowInInspector]
+private Color curColor;
+
+[ShowInInspector] private float curRadius = 0.5f;
+[ShowInInspector] private string curStatus = "Idle";
+
+private void Awake()
+{
+    curColor = initColor;
+    curRadius = initRadius;
+}
+
+public void Update()
+{
+    Vector3 playerPos = player.position;
+    Vector3 enemyPos = enemy.position;
+
+    float distance = Vector3.Distance(playerPos, enemyPos);
+
+    float nowRadius = distance < alertRadius ? alertRadius : initRadius;
+    Color nowColor = distance < alertRadius ? alertColor : initColor;
+    curStatus = distance < alertRadius ? "Alert" : "Idle";
+
+    curRadius = Mathf.Lerp(curRadius, nowRadius, Time.deltaTime * 10);
+    curColor = Color.Lerp(curColor, nowColor, Time.deltaTime * 10);
+
+    float horizontal = Input.GetAxis(horizontalAxis);
+    float vertical = Input.GetAxis(verticalAxis);
+
+    Vector3 move = new Vector3(horizontal, 0, vertical);
+    player.Translate(move * Time.deltaTime * 3);
+}
+```
+
+[![video](https://github.com/user-attachments/assets/ce94f758-7a72-442e-9ced-a972cd0783a9)](https://github.com/user-attachments/assets/2d12f926-bc66-4c41-8dfd-92bdf81ba55d)
+
+### `SphereHandleCap` ###
+
+Draw a sphere in the scene like Unity's [`SphereHandleCap`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Handles.SphereHandleCap.html).
+
+**Parameters**:
+
+*   `float radius = 1f`: radius of the sphere. If the target field is a number, use the field's value instead
+*   `string radiusCallback = null`: use a callback or a field value as the radius
+*   `string space = "this"`: the containing space of the sphere. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
+*   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: `Vector3` position offset for the sphere related to the `space`
+*   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+
+```csharp
+[DrawLine]  // also draw the lines
+[SphereHandleCap(color: "#FF000099", radius: 0.1f)]
+public Vector3[] localPos;
+
+[SphereHandleCap(radius: 0.1f)]
+public GameObject[] objPos;  // use obj's position
+```
+
+![image](https://github.com/user-attachments/assets/4f31ad1e-1818-409c-91ae-48f4e766a8fb)
+
+## Component Header ##
+
+Component Header allows you to draw extra stuffs on a component like this:
+
+![image](https://github.com/user-attachments/assets/18385c3d-bc65-4761-a1be-a406a731d963)
+
+This component can work if `SaintsEditor` is enabled, or work stand-alone.
+
+To work as stand-alone, go `window` - `Saints` - `Enable Stand-Alone Header GUI Support`
+
+### `HeaderButton` / `HeaderLeftButton` ###
+
+Draw a button in the component header. Method which returns an `IEnumerator` will start a coroutine
+
+Arguments:
+
+*   `string label = null`: label of the button. `null` means using function name. If starts with `$`, then a dynamic label will be created to use a field/property/callback as label. Dynamic label when returning null or empty string will hide the button. Rich Label supported.
+*   `string toolTip = null`: tool tip for the button.
+
+```csharp
+using SaintsField;
+using SaintsField.ComponentHeader;
+
+[HeaderLeftButton]
+public void L1()
+{
+}
+
+[HeaderLeftButton("<color=brown><icon=star.png/>")]
+public void OnClickL2()
+{
+}
+
+[HeaderButton]
+public void R1()
+{
+    Debug.Log("R1");
+}
+
+[HeaderButton("<color=lime><icon=star.png/></color>+1", "Add a star")]
+public void StartAdd()
+{
+    rate = (rate + 1) % 6;
+}
+
+[HeaderButton("<color=gray><icon=star.png/></color>-1", "Remove a star")]
+public void StartRemove()
+{
+    rate = (rate - 1 + 6) % 6;
+    // Debug.Log("OnClickR2");
+}
+
+[Rate(1, 5)] public int rate;
+```
+
+[![video](https://github.com/user-attachments/assets/ec0bce22-3359-4aee-b029-f42e68d6ae0f)](https://github.com/user-attachments/assets/d116e764-a537-47b3-a746-29474db8de21)
+
+### `HeaderGhostButton` / `HeaderGhostLeftButton` ###
+
+Draw a button in the component header, without frame and background color.
+
+This is useful for icon buttons.
+
+Method which returns an `IEnumerator` will start a coroutine
+
+Arguments:
+
+*   `string label = null`: label of the button. `null` means using function name. If starts with `$`, then a dynamic label will be created to use a field/property/callback as label. Dynamic label when returning null or empty string will hide the button. Rich Label supported.
+*   `string toolTip = null`: tool tip for the button.
+
+```csharp
+using SaintsField;
+using SaintsField.ComponentHeader;
+
+[HeaderGhostLeftButton("<icon=pencil.png/>")]
+public void Edit()
+{
+}
+
+[HeaderGhostButton("<icon=refresh.png/>", "Play")]
+public void Play()
+{
+}
+
+[HeaderGhostButton("<color=gray><icon=save.png/>", "Pause")]
+public void Pause()
+{
+}
+
+[HeaderGhostButton("<color=gray><icon=trash.png/>", "Resume")]
+public void Resume()
+{
+}
+```
+
+![image](https://github.com/user-attachments/assets/fa1d081b-cf71-45be-b78c-92973c0b2a50)
+
+A more complex example of dynamic buttons:
+
+```csharp
+using SaintsField;
+using SaintsField.ComponentHeader;
+
+private string _editButtonIcon = "<icon=pencil.png/>";
+private bool _editing;
+
+[HeaderGhostButton("$" + nameof(_editButtonIcon), "Edit")]
+private void StartEdit()
+{
+    _editing = true;
+    _editButtonIcon = "";
+
+    _saveLabel = "<color=brown><icon=save.png/>";
+}
+
+[HeaderGhostButton("$" + nameof(_saveLabel), "Save")]
+private IEnumerator Click()
+{
+    _editing = false;
+    _saveLabel = "<color=gray><icon=save.png/>";
+    foreach (int i in Enumerable.Range(0, 200))
+    {
+        // Debug.Log($"saving {i}");
+        yield return null;
+    }
+    _saveLabel = "<color=lime><icon=check.png/>";
+    foreach (int i in Enumerable.Range(0, 200))
+    {
+        // Debug.Log($"checked {i}");
+        yield return null;
+    }
+    _saveLabel = "";
+
+    _editButtonIcon = "<icon=pencil.png/>";
+}
+
+private string _saveLabel = "";
+
+[EnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public string nickName;
+[EnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public string password;
+[EnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public int age;
+
+private void OnChanged() => _saveLabel = "<color=lime><icon=save.png/>";
+```
+
+[![video](https://github.com/user-attachments/assets/510d5964-fab5-4df8-8681-0b86c833d676)](https://github.com/user-attachments/assets/6720a80c-a8d5-42d8-ba91-503874c68af0)
+
+### `HeaderLabel` / `HeaderLeftLabel` ###
+
+Draw a label in the component header. This can be used on a method, property, field, or a Component class.
+
+```csharp
+using SaintsField;
+using SaintsField.ComponentHeader;
+
+[HeaderLeftLabel("Fixed Text")]
+[HeaderLabel]  // dynamic text
+public string label;  // also works if it's a private (non-serialized) type
+```
+
+![Image](https://github.com/user-attachments/assets/0eb849f3-0325-4799-b41e-af3b5c15d940)
+
+Can be used on a component class:
+
+```csharp
+using SaintsField;
+using SaintsField.ComponentHeader;
+
+[HeaderLabel("$" + nameof(value))]
+[HeaderLeftLabel("dynamic:")]
+public class HeaderLabelClassSaExample : MonoBehaviour
+{
+    public string value;
+}
+```
+
+![Image](https://github.com/user-attachments/assets/165cdb74-4d44-48ba-8c9f-8a9f6557b1e9)
+
+### `HeaderDraw` / `HeaderLeftDraw` ###
+
+Allow you to manually draw items on the component headers
+
+Parameters:
+
+*   `string groupBy = null`: group the header items virtically by this name. If `null`, it will not share space with anyone.
+
+Signature:
+
+The method must have this signaure:
+
+```csharp
+HeaderUsed FuncName(HeaderArea headerArea)
+```
+
+`SaintsField.ComponentHeader.HeaderArea` has the following fields:
+
+```csharp
+/// <summary>
+/// Rect.y for drwaing
+/// </summary>
+public readonly float Y;
+/// <summary>
+/// Rect.height for drawing
+/// </summary>
+public readonly float Height;
+/// <summary>
+/// the x value where the title (component name) started
+/// </summary>
+public readonly float TitleStartX;
+/// <summary>
+/// the x value where the title (component name) ended
+/// </summary>
+public readonly float TitleEndX;
+/// <summary>
+/// the x value where the empty space start. You may want to start draw here
+/// </summary>
+public readonly float SpaceStartX;
+/// <summary>
+/// the x value where the empty space ends. When drawing from right, you need to backward drawing starts here
+/// </summary>
+public readonly float SpaceEndX;
+
+/// <summary>
+/// The x drawing position. It's recommend to use this as your start drawing point, as SaintsField will
+/// change this value accordingly everytime an item is drawn.
+/// </summary>
+public readonly float GroupStartX;
+/// <summary>
+/// When using `GroupBy`, you can see the vertical rect which already used by others in this group
+/// </summary>
+public readonly IReadOnlyList<Rect> GroupUsedRect;
+
+public float TitleWidth => TitleEndX - TitleStartX;
+public float SpaceWidth => SpaceEndX - SpaceStartX;
+
+/// <summary>
+/// A quick way to make a rect
+/// </summary>
+/// <param name="x">where to start</param>
+/// <param name="width">width of the rect</param>
+/// <returns>rect space you want to draw</returns>
+public Rect MakeXWidthRect(float x, float width) => new Rect(x, Y, width, Height);
+```
+
+After you draw your item, use `return new HeaderUsed(useRect);` to tell the space you've used.
+
+A simple example of progress bar
+
+```csharp
+using SaintsField;
+using SaintsField.ComponentHeader;
+
+#if UNITY_EDITOR
+[HeaderDraw]
+private HeaderUsed HeaderDrawRight1G1(HeaderArea headerArea)
+{
+    // this is drawing from right to left, so we need to backward the rect space
+    Rect useRect = new Rect(headerArea.MakeXWidthRect(headerArea.GroupStartX - 100, 100))
+    {
+        y = headerArea.Y + 2,
+        height = headerArea.Height - 4,
+    };
+    Rect progressRect = new Rect(useRect)
+    {
+        width = range1 * useRect.width,
+    };
+
+    EditorGUI.DrawRect(useRect, Color.gray);
+    EditorGUI.DrawRect(progressRect, Color.red);
+
+    return new HeaderUsed(useRect);
+}
+#endif
+
+[Range(0f, 1f)] public float range1;
+```
+
+[![video](https://github.com/user-attachments/assets/f2a08b20-8dde-4fa0-aa5f-c7c402f62c6c)](https://github.com/user-attachments/assets/8f437f21-a4e8-4d8a-9116-090eaef5ac60)
+
+A more complex example:
+
+```csharp
+using SaintsField;
+using SaintsField.ComponentHeader;
+
+#if UNITY_EDITOR
+private bool _started;
+
+[HeaderGhostButton("<icon=play.png/>")]
+private IEnumerator BeforeBotton()
+{
+    _started = true;
+    while (_started)
+    {
+        range1 = (range1 + 0.01f) % 1;
+        range2 = (range2 + 0.03f) % 1;
+        range3 = (range3 + 0.02f) % 1;
+        yield return null;
+    }
+}
+
+[HeaderDraw("group1")]
+private HeaderUsed HeaderDrawRight1G1(HeaderArea headerArea)
+{
+    Rect useRect = new Rect(headerArea.MakeXWidthRect(headerArea.GroupStartX - 40, 40))
+    {
+        height = headerArea.Height / 3,
+    };
+    Rect progressRect = new Rect(useRect)
+    {
+        width = range1 * useRect.width,
+    };
+
+    EditorGUI.DrawRect(useRect, Color.gray);
+    EditorGUI.DrawRect(progressRect, Color.red);
+
+    return new HeaderUsed(useRect);
+}
+
+[HeaderDraw("group1")]
+private HeaderUsed HeaderDrawRight1G2(HeaderArea headerArea)
+{
+    Rect useRect = new Rect(headerArea.MakeXWidthRect(headerArea.GroupStartX - 40, 40))
+    {
+        y = headerArea.Y + headerArea.Height / 3,
+        height = headerArea.Height / 3,
+    };
+    Rect progressRect = new Rect(useRect)
+    {
+        width = range2 * useRect.width,
+    };
+
+    EditorGUI.DrawRect(useRect, Color.gray);
+    EditorGUI.DrawRect(progressRect, Color.yellow);
+
+    return new HeaderUsed(useRect);
+}
+
+[HeaderDraw("group1")]
+private HeaderUsed HeaderDrawRight1G3(HeaderArea headerArea)
+{
+    Rect useRect = new Rect(headerArea.MakeXWidthRect(headerArea.GroupStartX - 40, 40))
+    {
+        y = headerArea.Y + headerArea.Height / 3 * 2,
+        height = headerArea.Height / 3,
+    };
+    Rect progressRect = new Rect(useRect)
+    {
+        width = range3 * useRect.width,
+    };
+
+    EditorGUI.DrawRect(useRect, Color.gray);
+    EditorGUI.DrawRect(progressRect, Color.cyan);
+
+    return new HeaderUsed(useRect);
+}
+
+[HeaderGhostButton("<icon=pause.png/>")]
+private void AfterBotton()
+{
+    _started = false;
+}
+#endif
+
+[Range(0f, 1f)] public float range1;
+[Range(0f, 1f)] public float range2;
+[Range(0f, 1f)] public float range3;
+```
+
+[![video](https://github.com/user-attachments/assets/2eac324f-aadb-47dd-97a2-ff0c563bb906)](https://github.com/user-attachments/assets/23fdafd2-27a8-4412-b56e-43d09989609d)
 
 ## Data Types ##
 
@@ -5086,36 +6035,17 @@ public SaintsDictionary<int, MyStruct> basicType;
 
 ![image](https://github.com/user-attachments/assets/c2dad54d-bfa6-4c52-acee-e2aa74898d71)
 
-At last, use auto getters so it can auto-fetch some values:
-
-(Note: ATM you still need to click the plus button once to make the array filling)
+You can also inherit `SaintsDictionaryBase<TKey, TValue>` to create your own custom dictionary.
 
 > [!WARNING]
-> Custom Dictionary is still under some test and need some API changes. Please avoid inherent a custom dictionary, but use `SaintsDictionary` directly.
+> Custom Dictionary is still under some test and need some API changes. Please avoid inherit a custom dictionary, but use `SaintsDictionary` directly.
+> If you still need it, please fork this project, use the forked one, and carefully exam the project when you upgrade, as it might break your inherence.
 
-```csharp
-suing SaintsField;
+See [DictInterface](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/IssueAndTesting/Issue/Issue241DictInterface.cs) as an example of making an `SerializedReference` dictionary.
 
-[Serializable]
-public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
-{
-    [SerializeField]
-    private List<Wrap<int>> _keys = new List<Wrap<int>>();
+![Image](https://github.com/user-attachments/assets/7b252440-c11d-4bd0-b206-4808cd4c3c01)
 
-    [SerializeField]
-    // [GetComponentInChildren]
-    private List<Wrap<MyStruct>> _values = new List<Wrap<MyStruct>>();
-
-#if UNITY_EDITOR
-    private static string EditorPropKeys => nameof(_intKeys);
-    private static string EditorPropValues => nameof(_objValues);
-#endif
-    protected override List<Wrap<int>> SerializedKeys => _intKeys;  // NOTE: need this `Wrap`
-    protected override List<Wrap<GameObject>> SerializedValues => _objValues;
-}
-
-public ValueFillerDict decValueFillerDict;
-```
+See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/SaintsDictExamples/SaintsDictFillerExample.cs) as an example of making dictionary with auto getters.
 
 [![video](https://github.com/user-attachments/assets/ce2efb49-2723-4e43-a3a7-9969f229f591)](https://github.com/user-attachments/assets/38dcb22c-d30f-40d4-bd6b-420aa1b41588)
 
@@ -5164,6 +6094,281 @@ Compared to [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/
 
 *   It supports UI Toolkits too.
 *   Many SaintsField attributes can work together with this one, especially these auto getters, validators etc.
+
+### `SaintsHashSet<>` / `ReferenceHashSet<>` ###
+
+> [!WARNING]
+> UI Toolkit only. (IMGUI will have only default drawer)
+
+A serializable `HashSet<>` for normal type and `SerializedReference` type. Duplicated element will have a warning color.
+
+You can use `SaintsHashSet` attribute to control paging & searching
+
+Parameters:
+
+*   `bool searchable = true`: `false` to disable the search function
+*   `int numberOfItemsPerPage = 0`: how many items per page. `0` for no paging
+
+```csharp
+public SaintsHashSet<string> stringHashSet;  // default
+
+[SaintsHashSet(numberOfItemsPerPage: 5)]  // paging control
+public SaintsHashSet<int> integerHashSet = new SaintsHashSet<int>
+{
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+};
+
+public interface IReference
+{
+    string Name { get; }
+}
+
+// ... implement of IReference omited here
+
+public ReferenceHashSet<IReference> refHashSet;
+```
+
+[![video](https://github.com/user-attachments/assets/0ff1ce5a-6432-4aba-bfda-d71f5f56a54f)](https://github.com/user-attachments/assets/8e01cb94-b8bb-49fb-ac58-384ec3c9c2a4)
+
+### `TypeReference` ###
+
+Serialize a `System.Type`
+
+> [!WARNING]
+> This function saves the target's domain and type name. Which means if you change the name, the data will be lost.
+> Carefully think about it before using it.
+
+By default, it searchs the current assembly and referenced assembly and shows all visible (public) types.
+
+You can add an extra `[TypeReference]` to control the behavior.
+
+**Parameters**:
+
+*   `EType eType = EType.Current`: Options. See below
+*   `Type[] superTypes = null`: A list of type/interface, the option list types are inhirent from these types. The type in the list is also included in list.
+*   `string[] onlyAssemblies = null`: only use these assembly names
+*   `string[] extraAssemblies = null`: extrally add these assemblies to the result list.
+
+EType:
+
+```csharp
+[Flags]
+public enum EType
+{
+    /// <summary>
+    /// Current assembly
+    /// </summary>
+    CurrentOnly = 1,
+    /// <summary>
+    ///  Current referenced assemblies.
+    /// </summary>
+    CurrentReferenced = 1 << 1,
+
+    /// <summary>
+    /// Current & referenced assemblies.
+    /// </summary>
+    Current = CurrentOnly | CurrentReferenced,
+
+    /// <summary>
+    /// Include "mscorlib" assembly.
+    /// </summary>
+    MsCorLib = 1 << 2,
+    /// <summary>
+    /// Include "System" assembly.
+    /// </summary>
+    System = 1 << 3,
+    /// <summary>
+    /// Include "System.Core" assembly.
+    /// </summary>
+    SystemCore = 1 << 4,
+    /// <summary>
+    /// Anything except "mscorlib", "System", "System.Core" assemblies.
+    /// </summary>
+    NonEssential = 1 << 5,
+    /// <summary>
+    /// All assemblies.
+    /// </summary>
+    AllAssembly = MsCorLib | System | SystemCore | NonEssential,
+
+    /// <summary>
+    /// Allow non-public types.
+    /// </summary>
+    AllowInternal = 1 << 6,
+
+    /// <summary>
+    /// Group the list by the assmbly short name.
+    /// </summary>
+    GroupAssmbly = 1 << 7,
+    /// <summary>
+    /// Group the list by the type namespace.
+    /// </summary>
+    GroupNameSpace = 1 << 8,
+}
+```
+
+Please note: if you have many type options, the big dropdown list might be SLOW.
+
+Example:
+
+```csharp
+using SaintsField;
+
+// default using current & referenced assembly
+public TypeReference typeReference;
+
+// current assembly, and group it
+[TypeReference(EType.CurrentOnly | EType.GroupAssmbly | EType.GroupNameSpace)]
+[BelowButton(nameof(TestCreate))]
+public TypeReference typeReference2;
+
+private void TestCreate(TypeReference tr)
+{
+    // you can also use `tr.Type`
+    object t = Activator.CreateInstance(tr);
+    Debug.Log(t);
+}
+
+// all assembly with non-public types, and group it
+[TypeReference(EType.AllAssembly | EType.AllowInternal | EType.GroupAssmbly)]
+public TypeReference typeReference3;
+
+public interface IMyTypeRef {}
+private struct MyTypeStruct: IMyTypeRef{}
+private class MyTypeClass : IMyTypeRef{}
+
+// Only types that implement IMyTypeRef
+[TypeReference(EType.AllAssembly | EType.AllowInternal, superTypes: new[]{typeof(IMyTypeRef)})]
+public TypeReference typeReferenceOf;
+```
+[![](https://github.com/user-attachments/assets/a11c8c68-019b-4b13-abde-f8c21ed2fd15)](https://github.com/user-attachments/assets/edac2a97-b9e1-4e8e-aa7f-567f25a50528)
+
+This feature is heavy inspired by [ClassTypeReference-for-Unity](https://github.com/SolidAlloy/ClassTypeReference-for-Unity), please go give them a star!
+
+### `SaintsEvent` ###
+
+`SaintsEvent` is an alternative to Unity's `UnityEvent`. It's inspired by [UltEvents](https://assetstore.unity.com/packages/tools/gui/ultevents-111307) & [ExtEvents](https://github.com/SolidAlloy/ExtEvents)
+
+You need to install [Unity Serialization](https://docs.unity3d.com/Packages/com.unity.serialization@3.1/manual/index.html) to use this type.
+
+Features:
+
+*   Support any serializable parameter type (Unity Object or Non Unity Object)
+*   Support up to 4 serialized parameters (UnityEvent: 0-1)
+*   Support static method (UnityEvent: Only Unity Object's instance method)
+*   Support non-public methods (UnityEvent: Only public methods)
+
+Here are some features that is supported by other plugins:
+
+*   IMGUI is not supported yet, while `UltEvents` & `ExtEvents` does
+*   Chained call (use one callback's result as another one's input) is not supported and will not be added, while `UltEvents` does
+*   Renamed type is partly supported. If a renamed type is a `MonoBehavior`, then rename works as expected. However, `ExtEvent` will try to find a general type's rename
+*   Implicit conversions for arguments is not supported, while `ExtEvents` does
+*   Performance optimization is limited to first-time cache, while `ExtEvents` using code generator to make the runtime much more fast. So in general, speed comparison is (fast to slow) `UnityEvent` - `ExtEvent` - `SaintsEvent` - `UltEvent`
+
+I'm not sure if I want to back-port the IMGUI support yet. If you really love this feature, please open an [issue](https://github.com/TylerTemp/SaintsField/issues) or [discussions](https://github.com/TylerTemp/SaintsField/discussions)
+
+> [!WARNING]
+> This component is quite heavy and might not be stable for using (compare to others), and I understand a callback can be very wildly used in project.
+> To avoid breaking changes, you may consider using it after some iteration of this component so it'll be more stable to use.
+
+**Basics**:
+
+```csharp
+using SaintsField.Events;
+
+public SaintsEvent sEvent;
+```
+
+![image](https://github.com/user-attachments/assets/7a5b87b2-a999-494f-9795-d38bbed6fca1)
+
+
+Here, `+s` to add a static callback, `+i` for an instance's callback, `-` to remove a callback.
+
+`R` is a switch to change to `Off`, `Editor & Runtime` or `Runtime Only`, which is the same as `UnityEvent`.
+
+![image](https://github.com/user-attachments/assets/4104704b-a323-4e1a-9a2d-7b0df2099576)
+
+`S` is a switch to change mode between "static callback" and "instance callback".
+
+Then, the object picker is to decide which type you want to limit:
+
+*   For static callback, it'll use the object's type you pick here. use `None` if your target is not any Unity Object (e.g. just a helper class)
+*   For instance callback, it'll use the object as the instance
+
+The next dropdown is depending on the mode:
+
+*   For static mode with no target, you need to select a type
+
+    ![](https://github.com/user-attachments/assets/885fee95-b7ef-476d-9aa1-1ad8a86eeab4)
+*   For static mode with target, or instance mode, you need to select a component on that target
+
+    ![](https://github.com/user-attachments/assets/4da3a5c2-76e4-4ad9-89f6-a42fbc258705)
+
+The dropdown below is where you pick your actual callback:
+
+![](https://github.com/user-attachments/assets/815ba613-dcd1-45de-9273-daa5061bf392)
+
+Finally, if your function has parameters, you need to check how each parameter is processed. Lets using another example:
+
+```csharp
+using SaintsField.Events;
+
+public class MyClass
+{
+    public int N;
+    public override string ToString()
+    {
+        return $"<MyClass N={N}/>";
+    }
+}
+
+public SaintsEvent<MyClass, int, string> withName;
+
+public void Callback(MyClass d, string s, int i = -1)
+{
+    Debug.Log($"Callback: i={i}, s={s}, d={d}");
+}
+```
+
+![](https://github.com/user-attachments/assets/458e891a-5381-49d4-b2f4-ec1f40a63c71)
+
+In the picture
+*   `S` is serialized, which allows you to pick a subclass (if any) and fill public fields.
+*   `D` is dynamic, which allows you to bind its value to the event's value. In this example, it's binded to `T2 (string)` in `SaintsEvent<MyClass, int, string>`
+*   `X` is default, which uses function parameter's default value. In this example, `int i = -1`, so use `-1`
+
+> [!WARNING]
+> ATM it will not check if the parameter type can accept the corresponding value type. Please check it by yourself carefully.
+
+**Runtime**
+
+In runtime, you can use `SaintsEvent.Invoke()`, `SaintsEvent.AddListener(callback)` and `SaintsEvent.RemoveListener(callback)`, `SaintsEvent.RemoveAllListeners()` just like `UnityEvent`.
+
+**Config**
+
+For a better naming, use `SaintsEventArgs` to rename the event generic parameters.
+
+```csharp
+using SaintsField.Events;
+
+[SaintsEventArgs("Custom", "Number", "Text")]
+public SaintsEvent<MyClass, int, string> withName;
+```
+
+![](https://github.com/user-attachments/assets/7826c5a6-8173-4dc0-a634-1707557fd0ac)
+
+For static mode, you can also use `TypeReference` to filter the types you want.
+
+```csharp
+using SaintsField;
+using SaintsField.Events;
+
+[TypeReference(onlyAssemblies: new []{"mscorlib"})]  // we only want types from mscorlib
+public SaintsEvent sEvent;
+
+[TypeReference(EType.CurrentOnly)]  // we only want types from current assembly
+public SaintsEvent sEvent2;
+```
 
 ## Addressable ##
 
@@ -5260,6 +6465,15 @@ A picker to select an addressable scene into a string field.
 
 [![video](https://github.com/user-attachments/assets/743def95-8b60-4453-9b1d-1a2f263165a1)](https://github.com/user-attachments/assets/e2718c8d-6372-4e16-bbdc-3b5fb331ce5e)
 
+### `AddressableSubAssetRequired` ##
+
+Validate if a sub-asset is signed in type like `Addressable.AssetReferenceSprite`
+
+```csharp
+[AddressableSubAssetRequired] public AssetReferenceSprite sprite2;
+[AddressableSubAssetRequired("Please pick a sub asset", EMessageType.Warning)] public AssetReferenceSprite sprite3;
+```
+
 ## AI Navigation ##
 
 These tools are for [Unity AI Navigation](https://docs.unity3d.com/Packages/com.unity.ai.navigation@2.0/manual/) (`NavMesh`). It's there only if you have `AI Navigation` installed.
@@ -5303,6 +6517,8 @@ public int areaValue;
 
 [NavMeshArea]  // then you can use `NavMesh.GetAreaFromName(areaName)` to get areaValue
 public int areaName;
+
+[NavMeshArea] public string areaNameString;  // sting name
 ```
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
@@ -5428,6 +6644,8 @@ using SaintsField.Spine;
 public SkeletonAnimation _spine;
 [SpineSlotPicker(nameof(_spine))] private string slotNameFromTarget;
 ```
+
+![](https://github.com/user-attachments/assets/a7d280c1-76c1-49ca-bc63-be97dc7fbc70)
 
 ### `SpineAttachmentPicker` ###
 
@@ -5565,6 +6783,39 @@ public Sequence DoNotIncludeMe() => DOTween.Sequence();    // this will NOT be a
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/db6b60b5-0d1d-43e2-9ab9-b2c7912d7e8d)
 
+## Wwise ##
+
+Wwise itself already has very nice drawer. SaintsField only provide some utility to make it easier to use.
+
+If you can't see the wwise related attributes, please add marco `SAINTSFIELD_WWISE` to enable it.
+
+If you face compatibility issue because of API changes in Wwise, please add marco `SAINTSFIELD_WWISE_DISABLE` to disable it.
+
+### `GetWwise` ###
+
+> [!NOTE]
+> This feature is UI Toolkit only
+
+Like the auto getters, this can auto-sign a wwise object (a state, a switch, a soundBank etc.) to a field.
+
+```csharp
+using SaintsField.Wwise;
+
+[GetWwise("BGM*")]  // Get a soundBank starts with `BGM`
+public Bank bank;
+
+[GetWwise("*BGM*")]  // Get all events contains `BGM`
+public Event[] events;
+
+[GetWwise]  // Get the first rtpc found
+public RTPC rtpc;
+
+[GetWwise("*/BGM/Stop*")]  // Get events that's under any work unit, under BGM folder, and starts with `Stop`
+public Event stopEvents;
+```
+
+![image](https://github.com/user-attachments/assets/72007c35-a0f5-4c66-bc29-803947b4d74a)
+
 ## I2 Localization ##
 
 Tools for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Window` - `Saints` - `Enable I2 Localization Support`
@@ -5595,7 +6846,7 @@ Compared with `NaughtyAttributes` and `MarkupAttributes`:
 3.  `SaintsEditor`
 
     *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). it has `LayoutGrooup`/`LayoutEnd` for convenience coding.
-    *   It provides `Button` (with less functions) and a way to show a non-field property (`ShowInInspector`).
+    *   It provides `Button` (with less function) and a way to show a non-field property (`ShowInInspector`).
     *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
     *   Supports both `UI Toolkit` and `IMGUI`.
 
@@ -5789,9 +7040,71 @@ This only works for decorator draws above or below the field. The above drawer w
 
 `""` means no group.
 
-### Syntax for Show/Hide/Enable/Disable-If ##
+### `EMode` ###
 
-This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
+*   `EMode.Edit`: the Unity Editor is not playing
+*   `EMode.Play`: the Unity Editor is playing
+*   `EMode.InstanceInScene`: target is a prefab placed in a scene
+*   `EMode.InstanceInPrefab`: target is inside a prefab (but is not the top root of that prefab)
+*   `EMode.Regular`: target is at the top root of the prefab
+*   `EMode.Variant`: target is at the top root of the prefab, and is also a variant prefab
+*   `EMode.NonPrefabInstance`: target is not a prefab (but can be inside a prefab)
+*   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
+*   `EMode.PrefabAsset` = `Variant | Regular`
+
+### Callback ###
+
+For decorators that accept a callback, you can usually use `$` to indicate that you want a callback. The callback can be a method, a property, or a field.
+
+Use `\\$` if you do not want it to be a callback. This is useful for decorators like `RichLabel`, `InfoBox` that the displaying string itself starts with `$`.
+
+Using `$:` if the callback is a static/const field. We support the following style:
+
+```csharp
+namespace SaintsField.Samples.Scripts
+{
+    public class StaticCallback : SaintsMonoBehaviour
+    {
+        private static readonly string StaticString = "This is a static string";
+        private const string ConstString = "This is a constant string";
+
+        // using full type name
+        [AboveRichLabel("$:SaintsField.Samples.Scripts." + nameof(StaticCallback) + "." + nameof(StaticString))]
+        // using only type name. This is slow and might find the incorrect target.
+        // We'll first search the assembly of this object. If not found, then search all assemblies.
+        [InfoBox("$:" + nameof(StaticCallback) + "." + nameof(ConstString))]
+        public int field;
+
+#if UNITY_EDITOR
+        private static Texture2D ImageCallback(string name) =>
+            AssetDatabase.LoadAssetAtPath<Texture2D>(
+                $"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/{name}.png");
+#endif
+
+#if UNITY_EDITOR
+        // use only field/method name. This will only try to search on the current target.
+        [BelowImage("$:" + nameof(ImageCallback), maxWidth: 20)]
+#endif
+        public string imgName;
+
+        [ShowInInspector] private static bool _disableMe = true;
+
+#if UNITY_EDITOR
+        [DisableIf("$:" + nameof(_disableMe))]
+        [RequiredIf("$:" + nameof(_disableMe), false)]
+#endif
+        public string disableIf;
+    }
+}
+```
+
+You can skip the `namespace` part. And if you also skip the `type` part, we'll try to find the callback from the current type first, then search all types in the current assembly, and finally search all types in all assemblies.
+
+Note: decorators like `OnEvent`, `OnButtonClick` does not support this `$:` yet. I'm still working on making all APIs consistent.
+
+### Syntax for Show/Hide/Enable/Disable/Required-If ##
+
+This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `RequiredIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
 
 These decorators accept many objects.
 
@@ -6134,7 +7447,7 @@ Note: `csc.rsp` can override settings by Saints Menu.
 
 UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Validator`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
 
-This tool allows you to check if some target has `Required` but not filled, or a auto getters (e.g. `GetComponentInChildren`) but not filled or mismatched. Auto getters error will give you an button to fix it there. Note the fix function might be broken if the target is inside a prefab.
+This tool allows you to check if some target has `Required` but not filled, or an auto getter (e.g. `GetComponentInChildren`) but not filled or mismatched. Auto getters error will give you a button to fix it there. Note the fix function might be broken if the target is inside a prefab.
 
 You can specify the targets as you want. Currently, it supports scenes, and folder searching.
 

@@ -1,4 +1,5 @@
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System.Collections.Generic;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -25,11 +26,26 @@ namespace SaintsField.Editor.Playa.Renderer
                 this,
                 this,
                 null,
-                FieldWithInfo.Target
+                FieldWithInfo.Targets[0]
             );
             if (r != null)
             {
                 r.style.width = new StyleLength(Length.Percent(100));
+                void Search(string search)
+                {
+                    string labelName = FieldWithInfo.SerializedProperty.displayName;
+
+                    DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None;
+                    if (r.style.display != display)
+                    {
+                        r.style.display = display;
+                    }
+                }
+
+                OnSearchFieldUIToolkit.AddListener(Search);
+                r.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
             }
 
             // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}/{r}");
@@ -219,7 +235,7 @@ namespace SaintsField.Editor.Playa.Renderer
             // // return (imGuiContainer, false);
         }
 
-        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        public IEnumerable<AbsRenderer> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         }

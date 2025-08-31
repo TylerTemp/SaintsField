@@ -25,7 +25,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             public Util.TargetWorldPosInfo StartTargetWorldPosInfo;
             public Util.TargetWorldPosInfo EndTargetWorldPosInfo;
             public Color Color;
+
+            public string Id;
         }
+
+        protected abstract Texture2D GetIcon();
 
         private static void UpdateOneDirectionInfo(OneDirectionInfo oneDirectionConstInfo)
         {
@@ -57,7 +61,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
-                    Debug.Log(error);
+                    Debug.LogWarning(error);
 #endif
                     oneDirectionConstInfo.Error = error;
                     return;
@@ -363,7 +367,23 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             return true;
         }
 
-        protected abstract void OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo, Vector3 worldPosStart, Vector3 worldPosEnd);
+        protected virtual bool OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo,
+            Vector3 worldPosStart, Vector3 worldPosEnd)
+        {
+            if (!SerializedUtils.IsOk(oneDirectionInfo.SerializedProperty))
+            {
+                HandleVisibility.SetOutView(oneDirectionInfo.Id);
+                return false;
+            }
+
+            HandleVisibility.SetInView(oneDirectionInfo.Id, oneDirectionInfo.SerializedProperty.propertyPath, oneDirectionInfo.SerializedProperty.serializedObject.targetObject.name, GetIcon());
+
+            if (HandleVisibility.IsHidden(oneDirectionInfo.Id))
+            {
+                return false;
+            }
+            return true;
+        }
 
         private static (bool ok, Vector3 worldPos) GetWorldPosFromInfo(Util.TargetWorldPosInfo worldPosInfo)
         {
@@ -375,12 +395,5 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             Transform trans = worldPosInfo.Transform;
             return trans == null ? (false, Vector3.zero) : (true, trans.position);
         }
-
-#if UNITY_2021_3_OR_NEWER
-        ~OneDirectionHandleBase()
-        {
-            SceneView.duringSceneGui -= OnSceneGUIUIToolkit;
-        }
-#endif
     }
 }

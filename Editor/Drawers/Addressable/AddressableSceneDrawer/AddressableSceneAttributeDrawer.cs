@@ -14,14 +14,14 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(AddressableSceneAttribute), true)]
     public partial class AddressableSceneAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
         private static (string error, AddressableAssetEntry sceneEntry) GetSceneEntry(string value, AddressableSceneAttribute addressableSceneAttribute)
         {
-            if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
+            if (!AddressableAssetSettingsDefaultObject.GetSettings(false))
             {
                 return (AddressableUtil.ErrorNoSettings, null);
             }
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
         private static (string error, AddressableAssetEntry sceneEntry) GetSceneEntryFromSceneAsset(UnityEngine.Object newObj, AddressableSceneAttribute addressableSceneAttribute)
         {
-            if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
+            if (!AddressableAssetSettingsDefaultObject.GetSettings(false))
             {
                 return (AddressableUtil.ErrorNoSettings, null);
             }

@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
                     (Rect foldout, Rect left) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
                     bool expanded = FieldWithInfo.SerializedProperty.isExpanded =
-                        EditorGUI.Foldout(foldout, FieldWithInfo.SerializedProperty.isExpanded, useGUIContent);
+                        EditorGUI.Foldout(foldout, FieldWithInfo.SerializedProperty.isExpanded, useGUIContent, true);
                     if(expanded)
                     {
                         EditorGUI.PropertyField(

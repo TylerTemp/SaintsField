@@ -16,7 +16,9 @@ namespace SaintsField.Editor.Drawers.AdaptDrawer
     {
         private static string NameAdaptHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__AdaptHelpBox";
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             return new HelpBox("", HelpBoxMessageType.None)

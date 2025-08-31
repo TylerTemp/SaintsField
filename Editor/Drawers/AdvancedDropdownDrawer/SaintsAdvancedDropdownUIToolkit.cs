@@ -32,16 +32,18 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         {
             int screenHeight = Screen.currentResolution.height;
 
-            float maxHeight = Screen.currentResolution.height - rootWorldBound.y - rootWorldBound.height - 100;
+            const float edgeHeight = 150;
+
+            float maxHeight = screenHeight - rootWorldBound.yMax - edgeHeight;
             Rect worldBound = new Rect(rootWorldBound);
             // Debug.Log(worldBound);
             // ReSharper disable once InvertIf
-            if (maxHeight < 100)
+            if (maxHeight < edgeHeight)
             {
                 // worldBound.x -= 400;
-                worldBound.y -= 100 + worldBound.height;
+                worldBound.y -= edgeHeight + worldBound.height;
                 // Debug.Log(worldBound);
-                maxHeight = Mathf.Max(100, screenHeight - 100);
+                maxHeight = Mathf.Max(edgeHeight, screenHeight - edgeHeight);
             }
 
             return (worldBound, maxHeight);
@@ -77,33 +79,157 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
         private IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> _curPageStack = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>();
 
+        private static readonly KeyCode[] NormalInputKeys = Enumerable
+            .Range((int)KeyCode.Space, KeyCode.KeypadEquals - KeyCode.Space)
+            .Cast<KeyCode>()
+            .ToArray();
+        // private static readonly char[] PrintableAscii = {
+        //     ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+        //     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?',
+        //     '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+        //     'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+        //     '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+        //     'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'
+        // };
+
+        private Texture2D _nextIcon;
+        private Texture2D _checkGroupIcon;
+        private Texture2D _checkIcon;
+        private StyleSheet _hackSliderStyle;
+        private VisualTreeAsset _itemAsset;
+        private VisualElement _scrollViewContainer;
+        private VisualTreeAsset _separatorAsset;
+
+        private ToolbarSearchField _toolbarSearchField;
+
+        // public VisualElement DebugCloneTree()
+        // {
+        //     return CloneTree();
+        // }
+
         private VisualElement CloneTree()
         {
             StyleSheet ussStyle = Util.LoadResource<StyleSheet>("UIToolkit/SaintsAdvancedDropdown/Style.uss");
-            StyleSheet hackSliderStyle = Util.LoadResource<StyleSheet>("UIToolkit/SaintsAdvancedDropdown/HackSliderStyle.uss");
+            _hackSliderStyle = Util.LoadResource<StyleSheet>("UIToolkit/SaintsAdvancedDropdown/HackSliderStyle.uss");
 
             VisualTreeAsset popUpAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/Popup.uxml");
             VisualElement root = popUpAsset.CloneTree();
 
             root.styleSheets.Add(ussStyle);
 
+            _toolbarSearchField = root.Q<ToolbarSearchField>();
+            TextField toolbarTextField = _toolbarSearchField.Q<TextField>();
+            VisualElement searchField = toolbarTextField.Q("unity-text-input");
+
             // root.Q<Image>(name: "saintsfield-advanced-dropdown-search-clean-image").image = Util.LoadResource<Texture2D>("classic-close.png");
 
-            VisualTreeAsset separatorAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/Separator.uxml");
+            _separatorAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/Separator.uxml");
 
-            VisualTreeAsset itemAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/ItemRow.uxml");
+            _itemAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsAdvancedDropdown/ItemRow.uxml");
 
-            VisualElement scrollViewContainer = root.Q<VisualElement>("saintsfield-advanced-dropdown-scroll-view-container");
+            _scrollViewContainer = root.Q<VisualElement>("saintsfield-advanced-dropdown-scroll-view-container");
             ScrollView scrollView = root.Q<ScrollView>();
             scrollView.contentContainer.RegisterCallback<GeometryChangedEvent>(GeoUpdateWindowSize);
+
+            scrollView.focusable = true;
+            scrollView.RegisterCallback<NavigationMoveEvent>(evt =>
+            {
+                if(_displayPage.Count > 0)
+                {
+                    if (evt.direction is NavigationMoveEvent.Direction.Up or NavigationMoveEvent.Direction.Down)
+                    {
+                        int offsetIndex = _displayKeyboardHighlight +
+                                          (evt.direction == NavigationMoveEvent.Direction.Up ? -1 : 1);
+                        int newIndex =
+                            Util.PositiveMod(offsetIndex, _displayPage.Count);
+
+                        // Debug.Log($"_displayKeyboardHighlight={_displayKeyboardHighlight}; {offsetIndex} % {_displayPage.Count}={newIndex}");
+                        _displayKeyboardHighlight = newIndex;
+
+                        foreach ((DisplayPageItem value, int index)  in _displayPage.WithIndex())
+                        {
+                            if (index == newIndex)
+                            {
+                                // Debug.Log($"add {index} class {KeyboardHoverClass}");
+                                value.Item.Q<Button>().AddToClassList(KeyboardHoverClass);
+                            }
+                            else
+                            {
+                                value.Item.Q<Button>().RemoveFromClassList(KeyboardHoverClass);
+                            }
+                        }
+                    }
+                    else if (evt.direction == NavigationMoveEvent.Direction.Left)
+                    {
+                        _pagePreAction?.Invoke();
+                    }
+                    else if (evt.direction == NavigationMoveEvent.Direction.Right)
+                    {
+                        if(_displayKeyboardHighlight >= 0 && _displayKeyboardHighlight < _displayPage.Count)
+                        {
+                            DisplayPageItem displayPageItem = _displayPage[_displayKeyboardHighlight];
+                            displayPageItem.OnNext?.Invoke();
+                        }
+                    }
+                }
+            }, TrickleDown.TrickleDown);
+
+            scrollView.RegisterCallback<KeyUpEvent>(evt =>
+            {
+                // Debug.Log(evt.keyCode);
+                if (evt.keyCode == KeyCode.Escape)
+                {
+                    // editorWindow.Close();
+                    _toolbarSearchField.Focus();
+                    return;
+                }
+
+                if (evt.keyCode == KeyCode.Return)
+                {
+                    if(_displayKeyboardHighlight >= 0 && _displayKeyboardHighlight < _displayPage.Count)
+                    {
+                        DisplayPageItem displayPageItem = _displayPage[_displayKeyboardHighlight];
+                        displayPageItem.OnSelect?.Invoke();
+                    }
+                }
+            }, TrickleDown.TrickleDown);
+
+            scrollView.RegisterCallback<KeyUpEvent>(evt =>
+            {
+                // Debug.Log(evt.modifiers);
+                // Debug.Log(Console.CapsLock);
+                // Debug.Log(Input.GetKey(KeyCode.CapsLock));
+                // Debug.Log(Array.IndexOf(NormalInputKeys, evt.keyCode) != -1);
+                // ReSharper disable once InvertIf
+                if (searchField.focusController?.focusedElement != searchField
+                    && evt.modifiers == EventModifiers.None
+                    && Array.IndexOf(NormalInputKeys, evt.keyCode) != -1)
+                {
+                    searchField.Focus();
+                    // evt.caps
+
+                    using (KeyDownEvent pooled = KeyDownEvent.GetPooled(evt.character, evt.keyCode, evt.modifiers))
+                    {
+                        pooled.target = searchField;
+                        searchField.SendEvent(pooled);
+                    }
+                    using (KeyUpEvent pooled = KeyUpEvent.GetPooled(evt.character, evt.keyCode, evt.modifiers))
+                    {
+                        pooled.target = searchField;
+                        searchField.SendEvent(pooled);
+                    }
+                    toolbarTextField.schedule.Execute(() =>
+                        toolbarTextField.SelectRange(toolbarTextField.value.Length, toolbarTextField.value.Length));
+                }
+            }, TrickleDown.TrickleDown);
 
             // scrollView.contentContainer.style.borderBottomWidth = 1;
             // scrollView.contentContainer.style.borderBottomColor = Color.green;
 
             // Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
-            Texture2D next = Util.LoadResource<Texture2D>("arrow-next.png");
-            Texture2D checkGroup = Util.LoadResource<Texture2D>("arrow-right.png");
-            Texture2D check = Util.LoadResource<Texture2D>("check.png");
+            _nextIcon = Util.LoadResource<Texture2D>("arrow-next.png");
+            _checkGroupIcon = Util.LoadResource<Texture2D>("arrow-right.png");
+            _checkIcon = Util.LoadResource<Texture2D>("check.png");
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
             Debug.Log($"selectStack={string.Join("->", _metaInfo.SelectStacks.Select(each => $"{each.Display}/{each.Index}"))}");
@@ -129,22 +255,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     _metaInfo.CurValues,
                     _allowUnSelect,
                     _metaInfo.DropdownListValue,
-                    scrollViewContainer,
                     _metaInfo.SelectStacks,
                     newStack,
-                    animRightToLeft,
-                    separatorAsset,
-                    itemAsset,
-                    next,
-                    check,
-                    checkGroup,
-                    hackSliderStyle,
-                    GoToStackEvent.Invoke,
-                    (newDisplay, newValue) =>
-                    {
-                        _setValue(newDisplay, newValue);
-                        editorWindow.Close();
-                    });
+                    animRightToLeft);
 
                 _curPageStack = newStack;
             });
@@ -157,10 +270,41 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 : _metaInfo.SelectStacks);
 
             // search
-            ToolbarSearchField toolbarSearchField = root.Q<ToolbarSearchField>();
             IReadOnlyList<(IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)> flattenOptions = AdvancedDropdownAttributeDrawer.Flatten(_metaInfo.DropdownListValue).ToArray();
             // Dictionary<string, VisualElement> stackDisplayToElement = new Dictionary<string, VisualElement>();
-            toolbarSearchField.RegisterValueChangedCallback(evt =>
+            // _toolbarSearchField.focusable = true;
+#if UNITY_6000_0_OR_NEWER
+            _toolbarSearchField.placeholderText = "Search";
+#endif
+            _toolbarSearchField.RegisterCallback<NavigationMoveEvent>(evt =>
+            {
+                // ReSharper disable once InvertIf
+                if(evt.direction is NavigationMoveEvent.Direction.Up or NavigationMoveEvent.Direction.Down)
+                {
+                    // Debug.Log(evt.direction);
+                    scrollView.Focus();
+                    // using (var pooledEvent = NavigationMoveEvent.GetPooled(evt.direction, evt.modifiers))
+                    // {
+                    //     pooledEvent.target = scrollView;
+                    //     scrollView.SendEvent(pooledEvent);
+                    // }
+                    // scrollView.SendEvent(evt);
+                }
+
+                if (evt.direction == NavigationMoveEvent.Direction.Left &&
+                    string.IsNullOrEmpty(_toolbarSearchField.value))
+                {
+                    _pagePreAction?.Invoke();
+                }
+            }, TrickleDown.TrickleDown);
+            _toolbarSearchField.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if(evt.keyCode == KeyCode.Escape && string.IsNullOrEmpty(_toolbarSearchField.value))
+                {
+                    editorWindow.Close();
+                }
+            }, TrickleDown.TrickleDown);
+            _toolbarSearchField.RegisterValueChangedCallback(evt =>
             {
                 // Debug.Log($"search {evt.newValue}");
                 string[] searchFragments = evt.newValue
@@ -185,6 +329,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     return;
                 }
 
+                _displayPage.Clear();
+                _displayKeyboardHighlight = -1;
+                _pagePreAction = () => _toolbarSearchField.Focus();
+
                 toolbarBreadcrumbs.style.display = DisplayStyle.None;
 
                 (IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)[] matchedValueOptions = flattenOptions.Where(each =>
@@ -200,18 +348,21 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                 bool hasValueMatch = matchedValueOptions.Length > 0;
 
+                bool anyHasIcon = false;
+                List<Image> iconImages = new List<Image>(matchedValueOptions.Length);
+
                 scrollView.Clear();
                 foreach ((IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value) in matchedValueOptions)
                 {
                     string stackDisplay = string.Join("/", stackDisplays.SkipLast(1));
 
-                    TemplateContainer elementItem = itemAsset.CloneTree();
+                    TemplateContainer elementItem = _itemAsset.CloneTree();
 
                     Button itemContainer =
                         elementItem.Q<Button>(className: "saintsfield-advanced-dropdown-item");
 
                     Image selectImage = itemContainer.Q<Image>("item-checked-image");
-                    selectImage.image = check;
+                    selectImage.image = _checkIcon;
 
                     string labelText = stackDisplay.Length == 0
                         ? display
@@ -225,9 +376,12 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}, value={value}");
 #endif
 
+                    Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
+                    iconImages.Add(itemIconImage);
                     if(!string.IsNullOrEmpty(icon))
                     {
-                        itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(icon);
+                        anyHasIcon = true;
+                        itemIconImage.image = Util.LoadResource<Texture2D>(icon);
                     }
 
                     if (curSelect)
@@ -249,16 +403,19 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
                             Debug.Log($"cur selected: {value}");
 #endif
-
-                            itemContainer.pickingMode = PickingMode.Ignore;
+                            itemContainer.clicked += editorWindow.Close;
+                            _displayPage.Add(new DisplayPageItem(itemContainer, null, editorWindow.Close));
                         }
                         else
                         {
-                            itemContainer.clicked += () =>
+                            Action onSelect = () =>
                             {
                                 _setValue(stackDisplay, value);
                                 editorWindow.Close();
                             };
+                            itemContainer.clicked += onSelect;
+
+                            _displayPage.Add(new DisplayPageItem(itemContainer, null, onSelect));
                         }
                     }
 
@@ -270,19 +427,19 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                 if(hasValueMatch && pathMatch.Length > 0)
                 {
-                    scrollView.Add(separatorAsset.CloneTree());
+                    scrollView.Add(_separatorAsset.CloneTree());
                 }
 
                 foreach (SearchPathStack pathStack in pathMatch)
                 {
                     // string stackDisplay = string.Join("/", pathStack.SelectStacks.Select(each => each.Display));
-                    TemplateContainer elementItem = itemAsset.CloneTree();
+                    TemplateContainer elementItem = _itemAsset.CloneTree();
 
                     Button itemContainer =
                         elementItem.Q<Button>(className: "saintsfield-advanced-dropdown-item");
 
                     Image selectImage = itemContainer.Q<Image>("item-checked-image");
-                    selectImage.image = check;
+                    selectImage.image = _checkIcon;
 
                     AdvancedDropdownAttributeDrawer.SelectStack lastStack = pathStack.SelectStacks[^1];
                     AdvancedDropdownAttributeDrawer.SelectStack[] preStacks = pathStack.SelectStacks.Take(pathStack.SelectStacks.Count - 1).ToArray();
@@ -297,21 +454,19 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                     itemContainer.Q<Label>("item-content").text = sb.ToString();
 
-                    // bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-//                         Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}, value={value}");
-// #endif
-
+                    Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
+                    iconImages.Add(itemIconImage);
                     if(!string.IsNullOrEmpty(pathStack.Target.icon))
                     {
-                        itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(pathStack.Target.icon);
+                        anyHasIcon = true;
+                        itemIconImage.image = Util.LoadResource<Texture2D>(pathStack.Target.icon);
                     }
 
                     // if (curSelect)
                     // {
                     //     selectImage.visible = true;
                     // }
-                    itemContainer.Q<Image>("item-next-image").image = next;
+                    itemContainer.Q<Image>("item-next-image").image = _nextIcon;
 
                     if (pathStack.Target.disabled)
                     {
@@ -321,40 +476,27 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     }
                     else  // not disabled (no not-enabled appearance)
                     {
-                        itemContainer.clicked += () =>
+                        Action onNext = () =>
                         {
                             // Debug.Log($"go to {string.Join("/", pathStack.SelectStacks)}");
-                            toolbarSearchField.SetValueWithoutNotify("");
-                            if(!_isFlat)
+                            _toolbarSearchField.SetValueWithoutNotify("");
+                            if (!_isFlat)
                             {
                                 toolbarBreadcrumbs.style.display = DisplayStyle.Flex;
                             }
 
-                            GoToStackEvent.Invoke(pathStack.SelectStacks.Append(new AdvancedDropdownAttributeDrawer.SelectStack
-                            {
-                                Index = 0,
-                                Display = pathStack.Target.children.First(each => !each.isSeparator).displayName,
-                            }).ToArray());
+                            GoToStackEvent.Invoke(pathStack.SelectStacks.Append(
+                                new AdvancedDropdownAttributeDrawer.SelectStack
+                                {
+                                    Index = 0,
+                                    Display = pathStack.Target.children.First(each => !each.isSeparator).displayName,
+                                }).ToArray());
                             // _setValue(stackDisplay, value);
                             // editorWindow.Close();
                         };
-//                             if (curSelect && !_allowUnSelect)
-//                             {
-//                                 itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-//                                 Debug.Log($"cur selected: {value}");
-// #endif
-//
-//                                 itemContainer.pickingMode = PickingMode.Ignore;
-//                             }
-//                             else
-//                             {
-//                                 itemContainer.clicked += () =>
-//                                 {
-//                                     _setValue(stackDisplay, value);
-//                                     editorWindow.Close();
-//                                 };
-//                             }
+                        itemContainer.clicked += onNext;
+
+                        _displayPage.Add(new DisplayPageItem(itemContainer, onNext, onNext));
                     }
                     scrollView.Add(elementItem);
                 }
@@ -371,9 +513,24 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         },
                     });
                 }
+                else if (!anyHasIcon)
+                {
+                    foreach (Image iconImage in iconImages)
+                    {
+                        iconImage.style.display = DisplayStyle.None;
+                    }
+                }
             });
 
-            root.RegisterCallback<AttachToPanelEvent>(_ => root.Q<TextField>().Q("unity-text-input").Focus());
+            root.RegisterCallback<AttachToPanelEvent>(_ => searchField.Focus());
+            // root.RegisterCallback<AttachToPanelEvent>(_ => scrollView.Focus());
+
+// #if UNITY_2023_2_OR_NEWER
+//             // don't lose focus
+//             root.RegisterCallback<PointerDownEvent>(
+//                 evt => root.focusController.IgnoreEvent(evt),
+//                 TrickleDown.TrickleDown);
+// #endif
 
             return root;
         }
@@ -388,14 +545,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 return string.Join("/", SelectStacks.Select(each => $"[{each.Index}]:{each.Display}"));
             }
         }
-
-        // public struct SearchPathStackAcc
-        // {
-        //     public int Index;
-        //     public string Display;
-        //     public IReadOnlyList<string> ParentDisplays;
-        // }
-
 
         private static IEnumerable<SearchPathStack> SearchPath(IReadOnlyList<string> searchFragments, IAdvancedDropdownList dropdownList)
         {
@@ -463,38 +612,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             float height = contentContainer.resolvedStyle.height + toolbarSearchContainer.resolvedStyle.height + toolbarBreadcrumbs.resolvedStyle.height + 8;
 
             editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, Mathf.Min(height, _maxHeight));
-            // editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, height);
-            // VisualElement target = (VisualElement)evt.target;
-            // // float newHeight = evt.newRect.height + 5;
-            // float newHeight = target.resolvedStyle.height + 1;
-            //
-            // DelayUpdateSize delayUpdateSize = (DelayUpdateSize)target.userData;
-            //
-            // target.userData = new DelayUpdateSize
-            // {
-            //     IsDelay = true,
-            //     Height = newHeight,
-            // };
-            //
-            // if (delayUpdateSize.IsDelay)
-            // {
-            //     Debug.Log($"delay to {newHeight}");
-            //     return;
-            // }
-            //
-            // Debug.Log($"will update {newHeight}");
-            // ((VisualElement) evt.target).schedule.Execute(() =>
-            // {
-            //     DelayUpdateSize newSize = (DelayUpdateSize)target.userData;
-            //     Debug.Log($"start to update {newSize.Height}");
-            //     editorWindow.maxSize = editorWindow.minSize = new Vector2(_width, newSize.Height);
-            //     // _delayUpdateSize = false;
-            //     target.userData = new DelayUpdateSize
-            //     {
-            //         IsDelay = false,
-            //         Height = newSize.Height,
-            //     };
-            // });
         }
 
         private static void SwapToolbarBreadcrumbs(ToolbarBreadcrumbs toolbarBreadcrumbs, IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> pageStack, Action<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> goToStack)
@@ -520,36 +637,82 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        private static void SwapPage(
+        private readonly struct DisplayPageItem
+        {
+            public readonly VisualElement Item;
+            public readonly Action OnNext;
+            public readonly Action OnSelect;
+
+            public DisplayPageItem(VisualElement item, Action onNext, Action onSelect)
+            {
+                Item = item;
+
+                OnNext = onNext;
+                OnSelect = onSelect;
+            }
+        }
+
+        private readonly List<DisplayPageItem> _displayPage = new List<DisplayPageItem>();
+        // private List<int> _displayPageSelectIndices;
+        private int _displayKeyboardHighlight = -1;
+
+        public const string KeyboardHoverClass = "saintsfield-advanced-dropdown-item-keyboard-active";
+        // private const Color KeyboardHoverHardColor = new Color(89 / 255f, 89 / 255f, 89 / 255f);
+
+        private void OnPageCursorEnter(int index)
+        {
+            if (string.IsNullOrWhiteSpace(_toolbarSearchField.value))
+            {
+                return;
+            }
+
+            if(_displayKeyboardHighlight != index)
+            {
+                _displayKeyboardHighlight = index;
+                foreach (DisplayPageItem displayPageItem in _displayPage)
+                {
+                    displayPageItem.Item.Q<Button>().RemoveFromClassList(KeyboardHoverClass);
+                }
+            }
+        }
+
+        private void OnPageCursorLeave(int index)
+        {
+            if (_displayKeyboardHighlight == index)
+            {
+                _displayKeyboardHighlight = -1;
+            }
+        }
+
+        private Action _pagePreAction;
+
+        private void SwapPage(
             IReadOnlyList<object> curValues,
             bool allowUnSelect,
             IAdvancedDropdownList mainDropdownList,
-            VisualElement scrollViewContainer,
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack,
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> pageStack,
-            bool animRightToLeft,
-            VisualTreeAsset separatorAsset,
-            VisualTreeAsset itemAsset,
-            // ReSharper disable once SuggestBaseTypeForParameter
-            Texture2D next,
-            Texture2D check,
-            Texture2D checkGroup,
-            StyleSheet hackSliderStyle,
-            Action<IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack>> goToStack,
-            Action<string, object> setValue)
+            bool animRightToLeft)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
             Debug.Log($"pageStack={string.Join("->", pageStack.Select(each => $"{each.Display}/{each.Index}"))}");
 #endif
-            (IReadOnlyList<IAdvancedDropdownList> displayPage, int selectIndex) = GetPage(
+            (IReadOnlyList<IAdvancedDropdownList> displayPage, IReadOnlyList<int> selectIndices) = GetPage(
                 mainDropdownList,
+                curValues,
                 new Queue<AdvancedDropdownAttributeDrawer.SelectStack>(pageStack.SkipLast(1)),
                 new Queue<AdvancedDropdownAttributeDrawer.SelectStack>(selectStack));
 
-            scrollViewContainer.styleSheets.Add(hackSliderStyle);
+            // _displayPage = new List<IAdvancedDropdownList>(displayPage);
+            _displayPage.Clear();
+            _displayKeyboardHighlight = -1;
 
-            ScrollView scrollView = scrollViewContainer.Q<ScrollView>();
+            // Debug.Log(selectIndex);
+
+            _scrollViewContainer.styleSheets.Add(_hackSliderStyle);
+
+            ScrollView scrollView = _scrollViewContainer.Q<ScrollView>();
 
             VisualElement fadeOutOriChildren = new VisualElement();
 
@@ -569,7 +732,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             {
                 fadeOutOriChildren.RegisterCallback<AttachToPanelEvent>(AttackPanelAnimOutRightDestroy);
             }
-            scrollViewContainer.Add(fadeOutOriChildren);
+            _scrollViewContainer.Add(fadeOutOriChildren);
 
             scrollView.Clear();
 
@@ -577,7 +740,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             // https://forum.unity.com/threads/how-to-refresh-scrollview-scrollbars-to-reflect-changed-content-width-and-height.1260920/
             scrollContent.RegisterCallback<TransitionEndEvent>(_ =>
             {
-                scrollViewContainer.styleSheets.Remove(hackSliderStyle);
+                _scrollViewContainer.styleSheets.Remove(_hackSliderStyle);
 
                 Rect fakeOldRect = Rect.zero;
                 Rect fakeNewRect = scrollView.layout;
@@ -594,49 +757,51 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 ? "saintsfield-advanced-dropdown-anim-right"
                 : "saintsfield-advanced-dropdown-anim-left");
 
-            // List<Image> allSelectImage = new List<Image>();
+            bool anyHasIcon = false;
+            List<Image> iconImages = new List<Image>(displayPage.Count);
 
             foreach ((IAdvancedDropdownList dropdownItem, int index) in displayPage.WithIndex())
             {
                 if (dropdownItem.isSeparator)
                 {
-                    VisualElement separator = separatorAsset.CloneTree();
+                    VisualElement separator = _separatorAsset.CloneTree();
                     scrollContent.Add(separator);
                     continue;
                 }
 
-                VisualElement elementItem = itemAsset.CloneTree();
+                VisualElement elementItem = _itemAsset.CloneTree();
 
                 Button itemContainer =
                     elementItem.Q<Button>(className: "saintsfield-advanced-dropdown-item");
 
                 Image selectImage = itemContainer.Q<Image>("item-checked-image");
                 selectImage.image = dropdownItem.children.Count > 0
-                    ? checkGroup
-                    : check;
+                    ? _checkGroupIcon
+                    : _checkIcon;
                 // allSelectImage.Add(selectImage);
 
                 itemContainer.Q<Label>("item-content").text = dropdownItem.displayName;
 
+                Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
+                iconImages.Add(itemIconImage);
                 if(!string.IsNullOrEmpty(dropdownItem.icon))
                 {
-                    itemContainer.Q<Image>("item-icon-image").image = Util.LoadResource<Texture2D>(dropdownItem.icon);
+                    itemIconImage.image = Util.LoadResource<Texture2D>(dropdownItem.icon);
+                    anyHasIcon = true;
                 }
+                List<AdvancedDropdownAttributeDrawer.SelectStack> prePageStack = pageStack.SkipLast(1).ToList();
+                _pagePreAction = pageStack.Count <= 1
+                    ? null
+                    : () => GoToStackEvent.Invoke(prePageStack);
 
                 if(dropdownItem.children.Count > 0)
                 {
-                    itemContainer.Q<Image>("item-next-image").image = next;
+                    itemContainer.Q<Image>("item-next-image").image = _nextIcon;
 
-                    // int nextSelectIndex = index;
-                    // if (pageStack.Count <= selectStack.Count)  // within range
-                    // {
-                    //     nextSelectIndex = selectStack[pageStack.Count].Index;
-                    // }
+                    AdvancedDropdownAttributeDrawer.SelectStack curPage = pageStack[^1];
 
-                    // ReSharper disable once UseIndexFromEndExpression
-                    AdvancedDropdownAttributeDrawer.SelectStack curPage = pageStack[pageStack.Count - 1];
-
-                    AdvancedDropdownAttributeDrawer.SelectStack[] nextPageStack = pageStack.SkipLast(1).Concat(new []
+                    List<AdvancedDropdownAttributeDrawer.SelectStack> nextPageStack = new List<AdvancedDropdownAttributeDrawer.SelectStack>(prePageStack);
+                    nextPageStack.AddRange(new []
                     {
                         new AdvancedDropdownAttributeDrawer.SelectStack
                         {
@@ -648,9 +813,21 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             Display = dropdownItem.displayName,
                             Index = -1,
                         },
-                    }).ToArray();
+                    });
 
-                    itemContainer.clicked += () => goToStack(nextPageStack);
+                    // AdvancedDropdownAttributeDrawer.SelectStack[] nextPageStack = pageStack.SkipLast(1).Concat().ToArray();
+
+                    Action nextAction = () => GoToStackEvent.Invoke(nextPageStack);
+
+                    itemContainer.clicked += nextAction;
+
+                    _displayPage.Add(new DisplayPageItem(elementItem,
+                        nextAction,
+                        nextAction
+                    ));
+
+                    elementItem.RegisterCallback<PointerEnterEvent>(_ => OnPageCursorEnter(index));
+                    elementItem.RegisterCallback<PointerLeaveEvent>(_ => OnPageCursorLeave(index));
                 }
                 else
                 {
@@ -660,39 +837,67 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
                         itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
                     }
-                    else if(selectIndex == index && !allowUnSelect)
+                    else if(selectIndices.Contains(index) && !allowUnSelect)
                     {
-                        itemContainer.pickingMode = PickingMode.Ignore;
+                        // itemContainer.pickingMode = PickingMode.Ignore;
                         itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
+                        elementItem.RegisterCallback<PointerEnterEvent>(_ => OnPageCursorEnter(index));
+                        elementItem.RegisterCallback<PointerLeaveEvent>(_ => OnPageCursorLeave(index));
+                        itemContainer.clicked += editorWindow.Close;
+                        _displayPage.Add(new DisplayPageItem(elementItem,
+                            null,
+                            editorWindow.Close
+                        ));
                     }
                     else
                     {
-                        itemContainer.clicked += () =>
+                        Action selectAction = () =>
                         {
                             string newDisplay = string.Join("/",
                                 pageStack.Skip(1).Select(each => each.Display).Append(dropdownItem.displayName));
-                            setValue(newDisplay, dropdownItem.value);
-                            // allSelectImage.ForEach(each => each.visible = false);
-                            // selectImage.visible = true;
+                            // setValue(newDisplay, dropdownItem.value);
+                            _setValue(newDisplay, dropdownItem.value);
+                            editorWindow.Close();
                         };
+
+                        itemContainer.clicked += selectAction;
+                        // elementItem.RegisterCallback<PointerEnterEvent>(_ => Debug.Log(dropdownItem.displayName));
+                        elementItem.RegisterCallback<PointerEnterEvent>(_ => OnPageCursorEnter(index));
+                        elementItem.RegisterCallback<PointerLeaveEvent>(_ => OnPageCursorLeave(index));
+
+                        _displayPage.Add(new DisplayPageItem(elementItem,
+                            null,
+                            selectAction
+                        ));
                     }
                 }
 
-                // bool isSelected = selectIndex == index;
-                bool isSelected = curValues.Contains(dropdownItem.value);
+                bool isSelected = selectIndices.Contains(index);
+                // bool isSelected = curValues.Contains(dropdownItem.value);
                 // Debug.Log($"isSelected={isSelected}, {index}");
                 if (isSelected)
                 {
                     selectImage.visible = true;
                     itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-selected");
+                    _displayKeyboardHighlight = _displayPage.Count - 1;
                 }
 
                 scrollContent.Add(elementItem);
             }
 
+            if (!anyHasIcon)
+            {
+                foreach (Image iconImage in iconImages)
+                {
+                    iconImage.style.display = DisplayStyle.None;
+                }
+            }
+
             scrollContent.RegisterCallback<GeometryChangedEvent>(GeoAnimIntoView);
 
             scrollView.Add(scrollContent);
+
+            // Debug.Log($"init _displayKeyboardHighlight = {_displayKeyboardHighlight}, length={_displayPage.Count}");
         }
 
         private static void GeoAnimIntoView(GeometryChangedEvent evt)
@@ -731,13 +936,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 // targetItem.RegisterCallback<TransitionRunEvent>(Debug.Log);
                 targetItem.RegisterCallback<TransitionEndEvent>(TransitionDestroy);
             });
-
-            // targetItem.RemoveFromClassList("saintsfield-advanced-dropdown-anim-in-view");
-            // targetItem.RegisterCallback<TransitionEndEvent>(TransitionDestroy);
-            // targetItem.RegisterCallback<TransitionCancelEvent>(Debug.Log);
-            // targetItem.RegisterCallback<TransitionStartEvent>(Debug.Log);
-            // targetItem.RegisterCallback<TransitionRunEvent>(Debug.Log);
-            // targetItem.AddToClassList(className);
         }
 
         private static void TransitionDestroy(TransitionEndEvent evt)
@@ -746,23 +944,34 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             ((VisualElement)evt.target).RemoveFromHierarchy();
         }
 
-        private static (IReadOnlyList<IAdvancedDropdownList> pageItems, int selectIndex) GetPage(
+        private static (IReadOnlyList<IAdvancedDropdownList> pageItems, IReadOnlyList<int> selectIndices) GetPage(
             IAdvancedDropdownList dropdownList,
+            IReadOnlyList<object> curValues,
             Queue<AdvancedDropdownAttributeDrawer.SelectStack> pageStack,
             Queue<AdvancedDropdownAttributeDrawer.SelectStack> selectStack
         )
         {
-            if (pageStack.Count <= 0)
+            if (pageStack.Count <= 0)  // we are at the page we want
             {
-                int selectIndex = -1;
-                if(selectStack.Count > 0)
+                List<int> rootIndices = new List<int>();
+
+                foreach ((IAdvancedDropdownList eachChild, int eachIndex) in dropdownList.children.WithIndex())
                 {
-                    selectIndex = selectStack.Dequeue().Index;
+                    if (eachChild.ChildCount() > 0)
+                    {
+                        bool hasSubSelect = CheckAnySelect(eachChild.children, curValues);
+                        if (hasSubSelect)
+                        {
+                            rootIndices.Add(eachIndex);
+                        }
+                    }
+                    else if (!eachChild.isSeparator && curValues.Contains(eachChild.value))
+                    {
+                        rootIndices.Add(eachIndex);
+                    }
                 }
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-                Debug.Log($"return page {dropdownList.displayName}");
-#endif
-                return (dropdownList.children, selectIndex);
+
+                return (dropdownList.children, rootIndices);
             }
 
             AdvancedDropdownAttributeDrawer.SelectStack first = pageStack.Dequeue();
@@ -781,7 +990,33 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
 
             // ReSharper disable once TailRecursiveCall
-            return GetPage(dropdownList.children[index], pageStack, selectStack);
+            return GetPage(dropdownList.children[index], curValues, pageStack, selectStack);
+        }
+
+        private static bool CheckAnySelect(IReadOnlyList<IAdvancedDropdownList> eachChildChildren, IReadOnlyList<object> curValues)
+        {
+            foreach (IAdvancedDropdownList subChild in eachChildChildren)
+            {
+                if (subChild.isSeparator)
+                {
+                    continue;
+                }
+
+                if (subChild.ChildCount() > 0)
+                {
+                    if (CheckAnySelect(subChild.children, curValues))
+                    {
+                        return true;
+                    }
+                }
+
+                else if (curValues.Contains(subChild.value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN

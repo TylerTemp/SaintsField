@@ -13,7 +13,10 @@
         "Unity.Mathematics",
         "Obvious.Soap",
         "Unity.TextMeshPro",
-        "Kybernetik.UltEvents"
+        "Kybernetik.UltEvents",
+        "AYellowpaper.SerializeInterfaces",
+        "com.inter-illusion.i2",
+        "today.comes.saintsfield.Runtime.TypeReference"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,0 +1,15 @@
+/*.saintsfield-toggle-button-active:hover {*/
+/*    background-color: var(--unity-colors-button-background-hover);*/
+/*}*/
+
+.saintsfield-toggle-button-active {
+    /*background-color: rgb(48, 48, 48);*/
+    background-color: var(--unity-colors-button-background-hover_pressed);
+}
+
+.saintsfield-toggle-button-active:hover {
+    /*background-color: rgb(48, 48, 48);*/
+    /*background-color: var(--unity-colors-button-border_accent-focus);*/
+    background-color: var(--unity-colors-button-background-hover);
+    /*background-color: red;*/
+}

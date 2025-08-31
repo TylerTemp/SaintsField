@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5585713370949437822
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3027232570561868814}
+  - component: {fileID: 737149892156228971}
+  m_Layer: 0
+  m_Name: ResizableTextArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3027232570561868814
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5585713370949437822}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.13942365, y: 0.047697563, z: -0.006200691}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &737149892156228971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5585713370949437822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff1162fe387fd3408ee8c17c002ea6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shortValue: fsdfdsfds
+  _long: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap
+    10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7
+    wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap
+    5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2
+    wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long
+    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
+  _noLabel: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9
+    wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap
+    7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4
+    wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp
+    2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long
+    wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
+  longLabel: 
+  myStruct:
+    myString: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp
+      9 wap 10 wrap 11 wrap 12
+
+      long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap
+      6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+      long wrap 1 warp 2 wrap
+      3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+      long
+      wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+      11 wrap 12
+
+      long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap
+      8 warp 9 wap 10 wrap 11'
+  arr:
+  - 
+  - 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+    11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8
+    warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap
+    6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap 1 warp 2 wrap 3
+    wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+    long wrap
+    1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11'
+  structArr:
+  - myString: 
+  - myString: 'long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp
+      9 wap 10 wrap 11 wrap 12
+
+      long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap
+      6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+      long wrap 1 warp 2 wrap
+      3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap 11 wrap 12
+
+      long
+      wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap 8 warp 9 wap 10 wrap
+      11 wrap 12
+
+      long wrap 1 warp 2 wrap 3 wrap 4 wrap 5 wrap 6 wrap 7 wrap
+      8 warp 9 wap 10 wrap 11'
+  shortDisabled: Disabled

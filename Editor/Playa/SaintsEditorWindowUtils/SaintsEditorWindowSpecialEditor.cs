@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Playa.Renderer;
@@ -23,11 +24,11 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             base.OnEnable();
         }
 
-        public override AbsRenderer MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+        public override IEnumerable<AbsRenderer> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
         {
             if(fieldWithInfo.RenderType == SaintsRenderType.SerializedField && fieldWithInfo.FieldInfo.Name == "m_SerializedDataModeController")
             {
-                return null;
+                yield break;
             }
 
             SaintsEditorWindow.WindowInlineEditorAttribute windowInlineEditorAttribute = fieldWithInfo.PlayaAttributes.OfType<SaintsEditorWindow.WindowInlineEditorAttribute>().FirstOrDefault();
@@ -35,12 +36,16 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             if (windowInlineEditorAttribute != null)
             {
                 // Debug.Log(fieldWithInfo);
-                return new WindowInlineEditorRenderer(so, fieldWithInfo, windowInlineEditorAttribute.EditorType);
+                yield return new WindowInlineEditorRenderer(so, fieldWithInfo, windowInlineEditorAttribute.EditorType);
+                yield break;
             }
 
             // Debug.Log($"{fieldWithInfo.RenderType}/{fieldWithInfo.FieldInfo?.Name}/{string.Join(",", fieldWithInfo.PlayaAttributes)}");
 
-            return base.MakeRenderer(so, fieldWithInfo);
+            foreach (AbsRenderer absRenderer in base.MakeRenderer(so, fieldWithInfo))
+            {
+                yield return absRenderer;
+            }
             // return null;
         }
     }

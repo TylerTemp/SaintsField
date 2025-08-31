@@ -119,6 +119,17 @@ namespace SaintsField.Utils
                     const float c = 155f / 255f;
                     return new Color(c, c, c);
                 }
+                case "editorbuttonhover":
+                {
+                    if (EditorGUIUtility.isProSkin)
+                    {
+                        const int p = 80;
+                        return new Color32(p, p, p, 255);
+                    }
+
+                    const float c = 155f / 255f;
+                    return new Color(c, c, c);
+                }
 #endif
 
 

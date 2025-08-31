@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using SaintsField.Condition;
 
 namespace SaintsField

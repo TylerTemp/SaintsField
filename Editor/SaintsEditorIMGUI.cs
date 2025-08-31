@@ -1,4 +1,5 @@
 using System;
+using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Playa;
 using UnityEditor;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace SaintsField.Editor
     {
         public override bool RequiresConstantRepaint() => true;
 
-        public virtual void OnEnable()
+        private void OnEnableIMGUI()
         {
             if (!_saintsEditorIMGUI)
             {
@@ -19,18 +20,15 @@ namespace SaintsField.Editor
             // Debug.Log($"OnEnable");
             try
             {
-                _renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
+                _renderers = Setup(Array.Empty<string>(), serializedObject, this, targets);
             }
             catch (Exception)
             {
                 _renderers = null;  // just... let IMGUI renderer to deal with it...
             }
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-            AliveInstances.Add(this);
-#endif
         }
 
-        public virtual void OnDestroy()
+        private void OnDestroyIMGUI()
         {
             if (_renderers != null)
             {
@@ -40,17 +38,16 @@ namespace SaintsField.Editor
                 }
             }
             _renderers = null;
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-            RemoveInstance(this);
-#endif
         }
 
         public override void OnInspectorGUI()
         {
+            DrawHeaderGUI.HelperUpdate();
+
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if(_renderers == null)
             {
-                _renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
+                _renderers = Setup(Array.Empty<string>(), serializedObject, this, targets);
             }
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             AliveInstances.Add(this);

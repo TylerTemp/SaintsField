@@ -86,71 +86,6 @@ namespace SaintsField.Editor.Core
             }
 
             return ("", result);
-            // List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            // types.Reverse();
-            // foreach (Type eachType in types)
-            // {
-            //     (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-            //         ReflectUtils.GetProp(eachType, richTextXml);
-            //     switch (getPropType)
-            //     {
-            //         case ReflectUtils.GetPropType.Field:
-            //         {
-            //             object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-            //             return ("", result == null ? string.Empty : result.ToString());
-            //         }
-            //
-            //         case ReflectUtils.GetPropType.Property:
-            //         {
-            //             object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-            //             return ("", result == null ? string.Empty : result.ToString());
-            //         }
-            //         case ReflectUtils.GetPropType.Method:
-            //         {
-            //             MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-            //
-            //             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            //             object rawValue = fieldInfo.GetValue(target);
-            //             object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-            //             object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-            //                 ? new[]
-            //                 {
-            //                     curValue,
-            //                 }
-            //                 : new []
-            //                 {
-            //                     curValue,
-            //                     arrayIndex,
-            //                 });
-            //
-            //             try
-            //             {
-            //                 return ("", (string)methodInfo.Invoke(
-            //                     target,
-            //                     passParams
-            //                 ));
-            //             }
-            //             catch (TargetInvocationException e)
-            //             {
-            //                 Debug.LogException(e);
-            //                 Debug.Assert(e.InnerException != null);
-            //                 return (e.InnerException.Message, property.displayName);
-            //             }
-            //             catch (Exception e)
-            //             {
-            //                 // _error = e.Message;
-            //                 Debug.LogException(e);
-            //                 return (e.Message, property.displayName);
-            //             }
-            //         }
-            //         case ReflectUtils.GetPropType.NotFound:
-            //             continue;
-            //         default:
-            //             throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-            //     }
-            // }
-            //
-            // return ($"not found `{richTextXml}` on `{target}`", property.displayName);
         }
 
         public struct RichTextChunk: IEquatable<RichTextChunk>
@@ -187,15 +122,17 @@ namespace SaintsField.Editor.Core
 
         // NOTE: Unity rich text is NOT xml; This is not Unity rich text as
         // Unity will treat invalid rich text as plain text. This will try to fix the broken xml
+        // TODO: use RuntimeUil.ParseRichXml parser
         public static IEnumerable<RichTextChunk> ParseRichXml(string richXml, string labelText, SerializedProperty property, MemberInfo fieldInfo, object parent)
         {
             List<string> colors = new List<string>();
 
-            // Define a regular expression pattern to match the tags
-            const string pattern = "(<[^>]+>)";
-
-            // Use Regex.Split to split the string by tags
-            string[] splitByTags = Regex.Split(richXml, pattern);
+            // // Define a regular expression pattern to match the tags
+            // const string pattern = "(<[^>]+>)";
+            //
+            // // Use Regex.Split to split the string by tags
+            // string[] splitByTags = Regex.Split(richXml, pattern);
+            string[]  splitByTags = RuntimeUtil.SplitByTags(richXml).Select(each => each.stringChunk).ToArray();
 
             // List<string> colorPresent = new List<string>();
             // List<string> stringPresent = new List<string>();
@@ -276,6 +213,18 @@ namespace SaintsField.Editor.Core
                             richText.Append(baseType == null? "": baseType.Name);
                         }
                             break;
+                        case "index":
+                        {
+                            if (property != null && SerializedUtils.IsOk(property))
+                            {
+                                int index = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                                if (index >= 0)
+                                {
+                                    richText.Append(TagStringFormatter(index, parsedResult.value));
+                                }
+                            }
+                        }
+                            break;
                         case "icon":
                         {
                             Debug.Assert(parsedResult.value != null);
@@ -340,9 +289,9 @@ namespace SaintsField.Editor.Core
                                             foreach (string attrName in subFields)
                                             {
                                                 MemberInfo accMemberInfo = null;
-                                                foreach (var type in ReflectUtils.GetSelfAndBaseTypes(accParent))
+                                                foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(accParent))
                                                 {
-                                                    foreach (var info in type.GetMember(attrName,
+                                                    foreach (MemberInfo info in type.GetMember(attrName,
                                                                  BindingFlags.Public | BindingFlags.NonPublic |
                                                                  BindingFlags.Instance | BindingFlags.Static |
                                                                  BindingFlags.FlattenHierarchy))
@@ -387,32 +336,7 @@ namespace SaintsField.Editor.Core
 
                                     if (!hasError)
                                     {
-                                        string tagFinalResult;
-                                        if (RuntimeUtil.IsNull(finalValue))
-                                        {
-                                            tagFinalResult = "";
-                                        }
-                                        else if (string.IsNullOrEmpty(parsedResult.value))
-                                        {
-                                            tagFinalResult = $"{finalValue}";
-                                        }
-                                        else
-                                        {
-                                            string formatString = $"{{0:{parsedResult.value}}}";
-                                            try
-                                            {
-                                                tagFinalResult = string.Format(formatString, finalValue);
-                                            }
-#pragma warning disable CS0168
-                                            catch (Exception ex)
-#pragma warning restore CS0168
-                                            {
-#if SAINTSFIELD_DEBUG
-                                                Debug.LogException(ex);
-#endif
-                                                tagFinalResult = $"{finalValue}";
-                                            }
-                                        }
+                                        string tagFinalResult = TagStringFormatter(finalValue, parsedResult.value);
                                         richText.Append(tagFinalResult);
                                     }
                                 }
@@ -445,6 +369,62 @@ namespace SaintsField.Editor.Core
             }
 
             // return richTextChunks;
+        }
+
+        private static string TagStringFormatter(object finalValue, string parsedResultValue)
+        {
+            if (RuntimeUtil.IsNull(finalValue))
+            {
+                // ReSharper disable once TailRecursiveCall
+                return TagStringFormatter("", parsedResultValue);
+            }
+
+            if (string.IsNullOrEmpty(parsedResultValue))
+            {
+                return $"{finalValue}";
+            }
+
+            if (parsedResultValue.Contains("{") && parsedResultValue.Contains("}"))
+            {
+                try
+                {
+                    return string.Format(parsedResultValue, finalValue);
+                }
+#pragma warning disable CS0168
+                catch (Exception ex)
+#pragma warning restore CS0168
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(ex);
+#endif
+                    return $"{finalValue}";
+                }
+            }
+
+            if (parsedResultValue.StartsWith("B"))
+            {
+                string binaryFormatResult = Util.FormatBinary(parsedResultValue, finalValue);
+                // Debug.Log($"{parsedResult.value}/{finalValue}/{binaryFormatResult}");
+                if (binaryFormatResult != "")
+                {
+                    return binaryFormatResult;
+                }
+            }
+
+            string formatString = $"{{0:{parsedResultValue}}}";
+            try
+            {
+                return string.Format(formatString, finalValue);
+            }
+#pragma warning disable CS0168
+            catch (Exception ex)
+#pragma warning restore CS0168
+            {
+#if SAINTSFIELD_DEBUG
+                // Debug.LogException(ex);
+#endif
+                return $"{finalValue}";
+            }
         }
 
         private enum RichPartType
@@ -584,7 +564,7 @@ namespace SaintsField.Editor.Core
                         ColorPresent = curChunk.IconColor,
                         IconPath = curChunk.Content,
                     };
-                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture))
+                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture) || texture == null)
                     {
                         texture = Tex.TextureTo(
                             Util.LoadResource<Texture2D>(curChunk.Content),
@@ -594,7 +574,7 @@ namespace SaintsField.Editor.Core
                         );
                         if (texture.width != 1 && texture.height != 1)
                         {
-                            _textureCache.Add(cacheKey, texture);
+                            _textureCache[cacheKey] = texture;
                         }
                     }
 
@@ -659,12 +639,12 @@ namespace SaintsField.Editor.Core
                         IconPath = curChunk.Content,
                     };
 
-                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture))
+                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture) || texture == null)
                     {
                         texture = Util.LoadResource<Texture2D>(curChunk.Content);
                         if (texture.width != 1 && texture.height != 1)
                         {
-                            _textureCache.Add(cacheKey, texture);
+                            _textureCache[cacheKey] = texture;
                         }
                     }
 
@@ -700,7 +680,7 @@ namespace SaintsField.Editor.Core
 
         private Texture GetTexture2D(TextureCacheKey cacheKey, RichTextChunk curChunk, float height)
         {
-            if (_textureCache.TryGetValue(cacheKey, out Texture texture))
+            if (_textureCache.TryGetValue(cacheKey, out Texture texture) && texture != null)
             {
                 return texture;
             }
@@ -713,7 +693,7 @@ namespace SaintsField.Editor.Core
             );
             if (texture.width != 1 && texture.height != 1)
             {
-                _textureCache.Add(cacheKey, texture);
+                _textureCache[cacheKey] = texture;
             }
 
             return texture;

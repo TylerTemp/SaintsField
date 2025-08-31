@@ -11,6 +11,9 @@ namespace SaintsField.Samples.Scripts.Interface
         [Serializable]
         public class Interface1 : SaintsInterface<Component, IInterface1>
         {
+            public Interface1(Component obj) : base(obj)
+            {
+            }
         }
 
         [AboveButton(nameof(MyFuncLog), buttonLabel: nameof(MyFunc), isCallback: true)]
@@ -68,6 +71,9 @@ namespace SaintsField.Samples.Scripts.Interface
         [Serializable]
         public class InterfaceSo : SaintsInterface<ScriptableInter12, IInterface1>
         {
+            public InterfaceSo(ScriptableInter12 obj) : base(obj)
+            {
+            }
         }
 
         [Expandable]

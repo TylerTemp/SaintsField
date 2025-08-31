@@ -83,7 +83,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             {
                 SpineAttachmentPickerAttribute spineAttachmentPickerAttribute = (SpineAttachmentPickerAttribute) saintsAttribute;
 
-                AttachmentsResult attachmentsResult = GetAttachments(spineAttachmentPickerAttribute, property, info, parent);
+                SpineAttachmentUtils.AttachmentsResult attachmentsResult = GetAttachments(spineAttachmentPickerAttribute, property, info, parent);
                 if (attachmentsResult.Error != "")
                 {
                     cached.Error = attachmentsResult.Error;
@@ -121,12 +121,14 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             #endregion
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent) => EnsureCache(property).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string error = EnsureCache(property).Error;

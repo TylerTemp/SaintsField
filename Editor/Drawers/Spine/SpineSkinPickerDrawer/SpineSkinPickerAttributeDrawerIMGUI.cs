@@ -21,18 +21,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             public string ChangedValue;
         }
 
-        private static readonly Dictionary<string, CachedImGui> _cachedImGui = new Dictionary<string, CachedImGui>();
+        private static readonly Dictionary<string, CachedImGui> CachedImGuiDict = new Dictionary<string, CachedImGui>();
 
-        private CachedImGui EnsureCache(SerializedProperty property)
+        private static CachedImGui EnsureCache(SerializedProperty property)
         {
             string key = SerializedUtils.GetUniqueId(property);
             // ReSharper disable once InvertIf
-            if(!_cachedImGui.TryGetValue(key, out CachedImGui cachedImGui))
+            if(!CachedImGuiDict.TryGetValue(key, out CachedImGui cachedImGui))
             {
-                _cachedImGui[key] = cachedImGui = new CachedImGui();
+                CachedImGuiDict[key] = cachedImGui = new CachedImGui();
                 NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
-                    _cachedImGui.Remove(key);
+                    CachedImGuiDict.Remove(key);
                 });
             }
 
@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_iconSkin is null)
             {
-                _iconSkin = Util.LoadResource<Texture2D>(IconPath);
+                _iconSkin = Util.LoadResource<Texture2D>(SpineSkinUtils.IconPath);
             }
 
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(property.stringValue)
@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             {
                 SpineSkinPickerAttribute spineSkinPickerAttribute = (SpineSkinPickerAttribute) saintsAttribute;
 
-                (string error, ExposedList<Skin> skins) = GetSkins(spineSkinPickerAttribute.SkeletonTarget, property, info, parent);
+                (string error, ExposedList<Skin> skins) = SpineSkinUtils.GetSkins(spineSkinPickerAttribute.SkeletonTarget, property, info, parent);
                 if (error != "")
                 {
                     cached.Error = error;
@@ -116,12 +116,14 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
             #endregion
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent) => EnsureCache(property).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string error = EnsureCache(property).Error;

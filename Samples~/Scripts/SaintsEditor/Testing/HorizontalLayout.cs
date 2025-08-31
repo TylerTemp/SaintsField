@@ -38,7 +38,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public string g21;
         [RichLabel("<color=lime><label/>")]
         public string g22;
-        [RichLabel("$" + nameof(g23))]
+        [RichLabel("$" + nameof(g22))]
         public string[] g23;
 
         public bool toggle;

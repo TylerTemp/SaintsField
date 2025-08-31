@@ -182,7 +182,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     else
                     {
                         userDataPayload.XML = xml;
-                        UIToolkitUtils.SetLabel(userDataPayload.Label, RichTextDrawer.ParseRichXml(xml, userDataPayload.FriendlyName, FieldWithInfo.SerializedProperty, GetMemberInfo(FieldWithInfo), FieldWithInfo.Target), userDataPayload.RichTextDrawer);
+                        UIToolkitUtils.SetLabel(userDataPayload.Label, RichTextDrawer.ParseRichXml(xml, userDataPayload.FriendlyName, FieldWithInfo.SerializedProperty, GetMemberInfo(FieldWithInfo), FieldWithInfo.Targets[0]), userDataPayload.RichTextDrawer);
                     }
                 }
             }

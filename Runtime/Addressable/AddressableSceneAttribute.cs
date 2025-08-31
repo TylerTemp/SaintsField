@@ -1,5 +1,8 @@
+using System.Diagnostics;
+
 namespace SaintsField.Addressable
 {
+    [Conditional("UNITY_EDITOR")]
     public class AddressableSceneAttribute: AddressableAddressAttribute
     {
         public readonly bool SepAsSub = true;

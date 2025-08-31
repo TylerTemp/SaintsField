@@ -1,0 +1,129 @@
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using SaintsField.DropdownBase;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.UIToolkitElements;
+using SaintsField.Editor.Utils;
+using SaintsField.Interfaces;
+using SaintsField.Playa;
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
+{
+    public partial class TreeDropdownAttributeDrawer
+    {
+        private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__TreeDropdown_Button";
+        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__TreeDropdown_HelpBox";
+
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container,
+            FieldInfo info,
+            object parent)
+        {
+            AdvancedDropdownMetaInfo initMetaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
+
+            UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(GetPreferredLabel(property));
+            dropdownButton.style.flexGrow = 1;
+            dropdownButton.name = NameButton(property);
+            dropdownButton.userData = initMetaInfo.CurValues;
+            // dropdownButton.ButtonLabelElement.text = AdvancedDropdownAttributeDrawer.GetMetaStackDisplay(initMetaInfo);
+
+            dropdownButton.AddToClassList(ClassAllowDisable);
+
+            EmptyPrefabOverrideElement emptyPrefabOverrideElement = new EmptyPrefabOverrideElement(property);
+            emptyPrefabOverrideElement.Add(dropdownButton);
+
+            return emptyPrefabOverrideElement;
+        }
+
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+        {
+            // AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
+            // return new SaintsTreeDropdownElement(metaInfo, false)
+            // {
+            //     style =
+            //     {
+            //         flexGrow = 1,
+            //     },
+            // };
+            HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+                name = NameHelpBox(property),
+            };
+
+            return helpBox;
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            UIToolkitUtils.DropdownButtonField dropdownButtonField = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
+            VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
+            dropdownButtonField.ButtonElement.clicked += () =>
+            {
+                AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
+
+                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+                SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
+                    metaInfo,
+                    root.worldBound.width,
+                    maxHeight,
+                    false,
+                    (curItem, _) =>
+                    {
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
+                            parent, curItem);
+                        Util.SignPropertyValue(property, info, parent, curItem);
+                        property.serializedObject.ApplyModifiedProperties();
+                        onValueChangedCallback(curItem);
+                        return null;
+                    }
+                );
+
+                // DebugPopupExample.SaintsAdvancedDropdownUIToolkit = sa;
+                // var editorWindow = EditorWindow.GetWindow<DebugPopupExample>();
+                // editorWindow.Show();
+
+                UnityEditor.PopupWindow.Show(worldBound, sa);
+
+                string curError = metaInfo.Error;
+                HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+                // ReSharper disable once InvertIf
+                if (helpBox.text != curError)
+                {
+                    helpBox.text = curError;
+                    helpBox.style.display = curError == ""? DisplayStyle.None : DisplayStyle.Flex;
+                }
+            };
+
+            dropdownButtonField.TrackPropertyValue(property, UpdateButtonLabel);
+            UpdateButtonLabel(property);
+            return;
+
+            void UpdateButtonLabel(SerializedProperty p)
+            {
+                string display =
+                    AdvancedDropdownAttributeDrawer.GetMetaStackDisplay(AdvancedDropdownAttributeDrawer.GetMetaInfo(p, (PathedDropdownAttribute)saintsAttribute, info, parent, false));
+                if(dropdownButtonField.ButtonLabelElement.text != display)
+                {
+                    dropdownButtonField.ButtonLabelElement.text = display;
+                }
+            }
+        }
+    }
+}
+#endif

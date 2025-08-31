@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
@@ -43,7 +44,8 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
@@ -86,6 +88,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
@@ -98,11 +101,27 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             if (helpBox.text != error)
             {
                 helpBox.text = error;
-                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                DisplayStyle helpDisplay = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+                if (helpBox.style.display != helpDisplay)
+                {
+                    helpBox.style.display = helpDisplay;
+                }
             }
 
             ShowImageField root = container.Q<ShowImageField>(NameRoot(property, index));
             Image image = root.ImageElement;
+
+            DisplayStyle imageDisplay = error == "" ? DisplayStyle.Flex : DisplayStyle.None;
+            if (preview == null)
+            {
+                imageDisplay = DisplayStyle.None;
+            }
+
+            if (image.style.display != imageDisplay)
+            {
+                image.style.display = imageDisplay;
+            }
+
             Payload payload = (Payload)image.userData;
             // ReSharper disable once Unity.NoNullPropagation
             // int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;

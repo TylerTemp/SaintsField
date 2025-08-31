@@ -1,0 +1,15 @@
+#chip-label {
+    cursor: move-arrow;
+}
+
+#chip-label:disabled {
+    cursor: arrow;
+}
+
+.chip-button-close {
+    background-image: url("project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/close.png?fileID=2800000&guid=f2d0b83660a56994fa039297f84cbf05&type=3#close");
+}
+
+.chip-button-reset {
+    background-image: url("project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/refresh.png?fileID=2800000&guid=bfdf848cb00f1544db8f6a367acd4d8e&type=3#refresh");
+}

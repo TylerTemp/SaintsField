@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/TreeDropdown/TreeRowStyle.uss?fileID=7433441132597879392&amp;guid=f36a8875b37d3184c91ada8597ffba9e&amp;type=3#TreeRowStyle" />
+    <Style src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/RightFoldoutRotate.uss?fileID=7433441132597879392&amp;guid=0a3ebc4f4793a5d48ba5bfc122a7eda4&amp;type=3#RightFoldoutRotate" />
+    <ui:VisualElement name="saintsfield-tree-row" focusable="true" class="saintsfield-tree-row-active">
+        <ui:VisualElement name="saintsfield-tree-row-foldout" focusable="true" class="saintsfield-tree-row-button saints-right-foldout-rotate" style="background-image: url(&quot;project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-right.png?fileID=2800000&amp;guid=55dad5685bb71954aa8919431bffb168&amp;type=3#classic-dropdown-right&quot;);" />
+        <ui:VisualElement name="saintsfield-tree-row-toggle" focusable="true" class="saintsfield-tree-row-button" style="background-image: url(&quot;project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/checkbox-outline-blank.png?fileID=2800000&amp;guid=49e87dfab57d490419c09d9859ac93c1&amp;type=3#checkbox-outline-blank&quot;);" />
+        <ui:Label name="saintsfield-tree-row-label" picking-mode="Ignore" />
+    </ui:VisualElement>
+    <ui:VisualElement name="saintsfield-tree-row-content" style="flex-grow: 1;" />
+</ui:UXML>

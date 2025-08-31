@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.DropdownBase;
+using SaintsField.Utils;
 
 namespace SaintsField
 {
     public class AdvancedDropdownList<T> : IAdvancedDropdownList
     {
+        public IReadOnlyList<string> absolutePathFragments { get; private set; }
         public string displayName { get; }
 
         private readonly T _typeValue;
@@ -28,6 +29,7 @@ namespace SaintsField
         public AdvancedDropdownList()
         {
             displayName = "";
+            absolutePathFragments = new List<string> { "" };
             _typeValue = default;
             _typeChildren = new List<AdvancedDropdownList<T>>();
             disabled = false;
@@ -38,6 +40,7 @@ namespace SaintsField
         public AdvancedDropdownList(string displayName, bool disabled = false, string icon = null)
         {
             this.displayName = displayName;
+            absolutePathFragments = new List<string> { displayName };
             _typeValue = default;
             _typeChildren = new List<AdvancedDropdownList<T>>();
             this.disabled = disabled;
@@ -48,6 +51,7 @@ namespace SaintsField
         public AdvancedDropdownList(string displayName, T value, bool disabled = false, string icon = null, bool isSeparator = false)
         {
             this.displayName = displayName;
+            absolutePathFragments = new List<string> { displayName };
             _typeValue = value;
             _typeChildren = new List<AdvancedDropdownList<T>>();
             this.disabled = disabled;
@@ -59,6 +63,7 @@ namespace SaintsField
             bool isSeparator = false)
         {
             this.displayName = displayName;
+            absolutePathFragments = new List<string> { displayName };
             // this.value = value;
             _typeChildren = children.ToList();
             this.disabled = disabled;
@@ -66,12 +71,16 @@ namespace SaintsField
             this.isSeparator = isSeparator;
         }
 
-        public void Add(AdvancedDropdownList<T> child) => _typeChildren.Add(child);
+        public void Add(AdvancedDropdownList<T> child)
+        {
+            child.absolutePathFragments = absolutePathFragments.Append(child.displayName).ToArray();
+            _typeChildren.Add(child);
+        }
 
         // this will parse "/"
         public void Add(string displayNames, T value, bool disabled = false, string icon = null)
         {
-            AddByNames(this, new Queue<string>(displayNames.Split('/')), value, disabled, icon);
+            AddByNames(this, new Queue<string>(RuntimeUtil.SeperatePath(displayNames)), value, disabled, icon);
         }
 
         // this add a separator
@@ -115,7 +124,12 @@ namespace SaintsField
             AddByNames(targetChild, nameQuery, value, disabled, icon);
         }
 
-        public void AddSeparator() => _typeChildren.Add(Separator());
+        public void AddSeparator()
+        {
+            AdvancedDropdownList<T> sep = Separator();
+            sep.absolutePathFragments = new List<string>(absolutePathFragments);
+            _typeChildren.Add(sep);
+        }
 
         public int ChildCount() => _typeChildren.Count(each => !each.isSeparator);
         public int SepCount() => _typeChildren.Count(each => each.isSeparator);

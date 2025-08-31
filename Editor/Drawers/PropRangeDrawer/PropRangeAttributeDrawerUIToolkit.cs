@@ -95,6 +95,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             {
                 name = NamePropRange(property),
             };
+            propRangeField.BindProperty(property);
 
             propRangeField.AddToClassList(ClassAllowDisable);
             propRangeField.labelElement.style.overflow = Overflow.Hidden;
@@ -105,6 +106,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)

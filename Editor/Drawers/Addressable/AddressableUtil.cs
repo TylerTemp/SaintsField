@@ -14,6 +14,7 @@ namespace SaintsField.Editor.Drawers.Addressable
     public static class AddressableUtil
     {
         public const string ErrorNoSettings = "Addressable has no settings created yet.";
+
         public static void OpenGroupEditor() => EditorApplication.ExecuteMenuItem("Window/Asset Management/Addressables/Groups");
         public static void OpenLabelEditor()
         {
@@ -25,7 +26,7 @@ namespace SaintsField.Editor.Drawers.Addressable
         public static (string error, IEnumerable<AddressableAssetEntry> assetGroups) GetAllEntries(string group, IReadOnlyList<IReadOnlyList<string>> labelFilters)
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
-            if (settings == null)
+            if (!settings)
             {
                 return (ErrorNoSettings, Array.Empty<AddressableAssetEntry>());
             }

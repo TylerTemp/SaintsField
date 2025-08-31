@@ -105,7 +105,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return;
             }
 
-            GetXPathValuesResult r = GetXPathValues(getByXPathAttributes
+            GetXPathValuesResult r = CalcXPathValues(getByXPathAttributes
                     .Select(xPathAttribute => new XPathResourceInfo
                     {
                         OptimizationPayload = xPathAttribute.OptimizationPayload,

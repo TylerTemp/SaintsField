@@ -14,7 +14,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
             // connect every element in the list
             SaintsArrow(eColor: EColor.Green, headLength: 0.1f),
             // connect every element to the `centerPoint`
-            SaintsArrow(start: nameof(centerPoint), eColor: EColor.Red, headLength: 0.1f),
+            SaintsArrow(start: nameof(centerPoint), eColor: EColor.Red, headLength: 0.1f, alpha: 0.5f, dotted: 0.2f),
 
             PositionHandle,
             DrawLabel("$" + nameof(PosIndexLabel)),

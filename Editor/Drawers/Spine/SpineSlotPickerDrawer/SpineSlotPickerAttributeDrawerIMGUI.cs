@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_iconSkin is null)
             {
-                _iconSkin = Util.LoadResource<Texture2D>(IconPath);
+                _iconSkin = Util.LoadResource<Texture2D>(SpineSlotUtils.IconPath);
             }
 
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(property.stringValue)
@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             {
                 SpineSlotPickerAttribute spineSlotPickerAttribute = (SpineSlotPickerAttribute) saintsAttribute;
 
-                (string error, IReadOnlyList<SlotInfo> slots) = GetSlots(spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property, info, parent);
+                (string error, IReadOnlyList<SpineSlotUtils.SlotInfo> slots) = GetSlots(spineSlotPickerAttribute.ContainsBoundingBoxes, spineSlotPickerAttribute.SkeletonTarget, property, info, parent);
                 if (error != "")
                 {
                     cached.Error = error;
@@ -117,12 +117,14 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
             #endregion
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent) => EnsureCache(property).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string error = EnsureCache(property).Error;

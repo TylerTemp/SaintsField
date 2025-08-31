@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <ui:VisualElement name="saintsfield-advanced-dropdown-search-container" class="saintsfield-advanced-dropdown-search-container" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+    <ui:VisualElement name="saintsfield-advanced-dropdown-search-container" class="saintsfield-advanced-dropdown-search-container" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0);">
         <uie:ToolbarSearchField focusable="true" />
     </ui:VisualElement>
-    <uie:ToolbarBreadcrumbs name="ToolbarBreadcrumbs" />
+    <uie:ToolbarBreadcrumbs name="ToolbarBreadcrumbs" focusable="true" />
     <ui:VisualElement name="saintsfield-advanced-dropdown-scroll-view-container" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
         <ui:ScrollView name="ScrollView" />
     </ui:VisualElement>

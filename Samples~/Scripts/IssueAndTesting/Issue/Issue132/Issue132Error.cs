@@ -2,6 +2,7 @@ using SaintsField.Playa;
 using SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue62;
 using SaintsField.Samples.Scripts.IssueAndTesting.Issue46;
 using UnityEngine;
+using MCDamageHandler = SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue270.MCDamageHandler;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue132
 {
@@ -23,7 +24,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue132
         // ReSharper disable once InconsistentNaming
         // ReSharper disable once MemberCanBePrivate.Global
         public          MCDamageHandler parent => _parentOverride ? _parentOverride : _parent;
-        public override MCTeam          team   => parent?.team;
+        public override MCTeam          team   => null;
         // 0 = totally immune to damage
         public float damageRatio = 1;
     }

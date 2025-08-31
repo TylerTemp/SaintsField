@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="saints-event-container" class="unity-event__container">
+        <ui:Label name="saints-event-label" text="Label" class="unity-list-view__header" />
+        <ui:VisualElement name="unity-list-view__footer" class="unity-list-view__footer">
+            <ui:Button text="-" parse-escape-sequences="true" display-tooltip-when-elided="true" name="saints-event-remove-button" tooltip="Remove" />
+            <ui:Button text="+&lt;size=60%&gt;&lt;voffset=0.1em&gt;I&lt;/voffset&gt;&lt;/size&gt;" parse-escape-sequences="true" display-tooltip-when-elided="true" name="saints-event-add-instance-button" tooltip="Add Instance" />
+            <ui:Button text="+&lt;size=60%&gt;&lt;voffset=0.1em&gt;&lt;color=#ffa500&gt;S&lt;/color&gt;&lt;/voffset&gt;&lt;/size&gt;" parse-escape-sequences="true" display-tooltip-when-elided="true" name="saints-event-add-static-button" tooltip="Add Static" style="justify-content: center;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -4,10 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -50,11 +54,14 @@ namespace SaintsField.Editor.AutoRunner
             string[] listed = string.IsNullOrEmpty(folderSearch.searchPattern)
                 ? Directory.GetFiles(folderSearch.path)
                 : Directory.GetFiles(folderSearch.path, folderSearch.searchPattern, folderSearch.searchOption);
-            foreach (string file in listed.Where(each => !each.EndsWith(".meta")).Select(each => each.Replace("\\", "/")))
+            foreach (string file in listed
+                         // .Where(each => !each.EndsWith(".meta"))
+                         .Where(each => each.EndsWith(".prefab") || each.EndsWith(".asset") || each.EndsWith(".controller"))
+                         .Select(each => each.Replace("\\", "/")))
             {
                 // Debug.Log($"#AutoRunner# Processing {file}");
                 Object obj = AssetDatabase.LoadAssetAtPath<Object>(file);
-                if (obj == null)
+                if (!obj)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
                     Debug.Log($"#AutoRunner# Skip null object {file} under folder {folderSearch.path}");
@@ -62,22 +69,87 @@ namespace SaintsField.Editor.AutoRunner
                     continue;
                 }
 
-                SerializedObject so;
-                try
+                // ReSharper disable once MergeIntoLogicalPattern
+                if(obj is GameObject go)
                 {
-                    so = new SerializedObject(obj);
-                }
+                    foreach (Component comp in go.transform.GetComponentsInChildren<Component>(true))
+                    {
+                        SerializedObject so;
+                        try
+                        {
+                            so = new SerializedObject(comp);
+                        }
 #pragma warning disable CS0168
-                catch (Exception e)
+                        catch (Exception e)
 #pragma warning restore CS0168
-                {
+                        {
 #if SAINTSFIELD_DEBUG
-                    Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
+                            Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
 #endif
-                    continue;
-                }
+                            continue;
+                        }
 
-                yield return so;
+                        yield return so;
+                    }
+                }
+                else if (obj is ScriptableObject scriptableObject)
+                {
+                    SerializedObject so;
+                    try
+                    {
+                        so = new SerializedObject(scriptableObject);
+                    }
+#pragma warning disable CS0168
+                    catch (Exception e)
+#pragma warning restore CS0168
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
+#endif
+                        continue;
+                    }
+
+                    yield return so;
+                }
+                else if (obj is Animator animator)
+                {
+                    AnimatorController controller = animator.runtimeAnimatorController as AnimatorController;
+                    // ReSharper disable once InvertIf
+                    if(controller)
+                    {
+                        foreach (AnimatorControllerLayer animatorControllerLayer in controller.layers)
+                        {
+                            foreach ((UnityEditor.Animations.AnimatorState state,
+                                         IReadOnlyList<string> _) in AnimatorStateAttributeDrawer
+                                         .GetAnimatorStateRecursively(
+                                             animatorControllerLayer.stateMachine,
+                                             animatorControllerLayer.stateMachine.stateMachines.Select(each =>
+                                                 each.stateMachine), Array.Empty<string>()))
+                            {
+                                // Debug.Log(state.behaviours);
+                                foreach (StateMachineBehaviour stateMachineBehaviour in state.behaviours)
+                                {
+                                    SerializedObject so;
+                                    try
+                                    {
+                                        so = new SerializedObject(stateMachineBehaviour);
+                                    }
+#pragma warning disable CS0168
+                                    catch (Exception e)
+#pragma warning restore CS0168
+                                    {
+#if SAINTSFIELD_DEBUG
+                                        Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
+#endif
+                                        continue;
+                                    }
+
+                                    yield return so;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -225,7 +297,7 @@ namespace SaintsField.Editor.AutoRunner
                 switch (extraResource)
                 {
                     case GameObject go:
-                        serializeObjects = go.GetComponents<Component>().Cast<Object>().ToArray();
+                        serializeObjects = go.transform.GetComponentsInChildren<Component>(true).Cast<Object>().ToArray();
                         break;
                     case ScriptableObject scriptableObject:
                         serializeObjects = new Object[] { scriptableObject };
@@ -237,6 +309,8 @@ namespace SaintsField.Editor.AutoRunner
                         serializeObjects = Array.Empty<Object>();
                         break;
                 }
+
+                Debug.Log(string.Join<Object>(", ", serializeObjects));
 
                 List<SerializedObject> serializedObjects = new List<SerializedObject>();
 
@@ -258,14 +332,16 @@ namespace SaintsField.Editor.AutoRunner
                     }
                     serializedObjects.Add(so);
                     // extraSoIterations.Add((extraResource, new[] { so }));
-                    yield return new ProcessInfo
-                    {
-                        GroupTotal = sceneSoIterations.Count + folderSoIterations.Count + extraSoIterations.Count,
-                        GroupCurrent = 0,
-                        ProcessCount = 0,
-                        ProcessMessage = $"Processing asset {extraResource}",
-                    };
+                    // Debug.Log($"yield {so.targetObject}");
                 }
+
+                yield return new ProcessInfo
+                {
+                    GroupTotal = sceneSoIterations.Count + folderSoIterations.Count + extraSoIterations.Count,
+                    GroupCurrent = 0,
+                    ProcessCount = 0,
+                    ProcessMessage = $"Processing asset {extraResource}",
+                };
 
                 if (serializeObjects.Length > 0)
                 {
@@ -323,9 +399,34 @@ namespace SaintsField.Editor.AutoRunner
                         }
                     }
 
-
                     // Debug.Log($"#AutoRunner# Processing {so.targetObject}");
                     bool hasFixer = false;
+
+                    // method
+                    Object serializedTarget = so.targetObject;
+                    // we only care about public method
+                    foreach (MethodInfo methodInfo in serializedTarget
+                                 .GetType()
+                                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy))
+                    {
+                        IPlayaAutoRunnerFix[] playaFixAttributes = ReflectCache.GetCustomAttributes<IPlayaAutoRunnerFix>(methodInfo);
+                        foreach (IPlayaAutoRunnerFix playaAutoRunnerFix in playaFixAttributes)
+                        {
+                            AutoRunnerFixerResult autoRunnerResult = CheckPlayaAutoRunnerAttribute(playaAutoRunnerFix, methodInfo, serializedTarget, serializedTarget);
+                            // ReSharper disable once InvertIf
+                            if (autoRunnerResult != null)
+                            {
+                                Results.Add(new AutoRunnerResult
+                                {
+                                    FixerResult = autoRunnerResult,
+                                    mainTarget = ConvertMainTarget(target),
+                                    subTarget = so.targetObject,
+                                    propertyPath = $"{methodInfo.Name}({string.Join(", ", methodInfo.GetParameters().Select(each => each.Name))}) => {methodInfo.ReturnType}",
+                                    SerializedObject = so,
+                                });
+                            }
+                        }
+                    }
 
                     SerializedProperty property = so.GetIterator();
                     while (property.NextVisible(true))
@@ -560,6 +661,9 @@ namespace SaintsField.Editor.AutoRunner
             // EditorUtility.SetDirty(EditorInspectingTarget == null? this: EditorInspectingTarget);
 
             string msg = $"All done, {Results.Count} found";
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
+            Debug.Log($"#AutoRunner# finished with message: {msg}");
+#endif
             yield return new ProcessInfo
             {
                 GroupTotal = totalCount,
@@ -567,10 +671,22 @@ namespace SaintsField.Editor.AutoRunner
                 ProcessCount = processedItemCount,
                 ProcessMessage = msg,
             };
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
-            Debug.Log($"#AutoRunner# {msg}");
-#endif
             // EditorRefreshTarget();
+        }
+
+        private static AutoRunnerFixerResult CheckPlayaAutoRunnerAttribute(IPlayaAutoRunnerFix playaAutoRunnerAttribute, MemberInfo memberInfo, Object serializedTarget, object target)
+        {
+            if (playaAutoRunnerAttribute is IPlayaMethodBindAttribute onButtonClickAttribute)
+            {
+                return CheckPlayaOnButtonClickAttribute(onButtonClickAttribute, (MethodInfo)memberInfo, serializedTarget, target);
+            }
+
+            return null;
+        }
+
+        private static AutoRunnerFixerResult CheckPlayaOnButtonClickAttribute(IPlayaMethodBindAttribute onButtonClick, MethodInfo methodInfo, Object serializedTarget, object target)
+        {
+            return MethodBindRenderer.AutoRunFix(onButtonClick, methodInfo, serializedTarget, target);
         }
 
         protected bool AllowToRestoreScene()
@@ -609,18 +725,17 @@ namespace SaintsField.Editor.AutoRunner
                 // mainTargetString = s;
                 return s;
             }
-            else if (target is Scene scene)
+
+            if (target is Scene scene)
             {
                 // mainTargetString = scene.path;
                 // mainTargetIsAssetPath = true;
                 return AssetDatabase.LoadAssetAtPath<SceneAsset>(scene.path);
             }
-            else
-            {
-                // mainTargetString = AssetDatabase.GetAssetPath((Object) target);
-                // mainTargetIsAssetPath = true;
-                return target;
-            }
+
+            // mainTargetString = AssetDatabase.GetAssetPath((Object) target);
+            // mainTargetIsAssetPath = true;
+            return target;
         }
 
         protected static IEnumerable<Scene> GetDirtyOpenedScene()

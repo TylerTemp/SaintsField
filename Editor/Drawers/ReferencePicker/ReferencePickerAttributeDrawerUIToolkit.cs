@@ -86,6 +86,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 // },
                 style =
                 {
+                    color = Color.gray,
                     position = Position.Absolute,
                     right = SingleLineHeight,
                     display = ((ReferencePickerAttribute) saintsAttribute).HideLabel? DisplayStyle.None: DisplayStyle.Flex,
@@ -111,7 +112,9 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             return button;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             if (_initError is not null)
@@ -140,41 +143,6 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             VisualElement root = container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property));
             button.clicked += () =>
             {
-                // object managedReferenceValue = property.managedReferenceValue;
-                // GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-                // genericDropdownMenu.AddItem("[Null]", managedReferenceValue == null, () =>
-                // {
-                //     PropSetValue(container, property, null);
-                //     onValueChangedCallback(null);
-                // });
-                // genericDropdownMenu.AddSeparator("");
-                //
-                // foreach (Type type in GetTypes(property))
-                // {
-                //     string displayName = $"{type.Name}: {type.Namespace}";
-                //
-                //     genericDropdownMenu.AddItem(displayName, managedReferenceValue != null && managedReferenceValue.GetType() == type, () =>
-                //     {
-                //         object instance = CopyObj(managedReferenceValue, Activator.CreateInstance(type));
-                //         PropSetValue(container, property, instance);
-                //
-                //         onValueChangedCallback(instance);
-                //     });
-                // }
-                //
-                // Rect fakePos = container.worldBound;
-                // fakePos.height = SingleLineHeight;
-                //
-                // genericDropdownMenu.DropDown(fakePos, container, true);
-
-                // Rect worldBound = root.worldBound;
-                // float maxHeight = Screen.height - root.worldBound.y - root.worldBound.height - 100;
-                // if (maxHeight < 100)
-                // {
-                //     // Debug.LogError($"near out of screen: {maxHeight}");
-                //     // worldBound.y -= 300 + worldBound.height;
-                //     maxHeight = 300;
-                // }
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
                 worldBound.height = SingleLineHeight;
 
@@ -228,6 +196,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             if (_initError is not null)

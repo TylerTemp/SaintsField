@@ -1,11 +1,12 @@
 using System;
 using System.Diagnostics;
+using SaintsField.Interfaces;
 
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Method)]
-    public class OnButtonClickAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute
+    public class OnButtonClickAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute, IPlayaMethodBindAttribute, IPlayaAutoRunnerFix
     {
         public MethodBind MethodBind => MethodBind.ButtonOnClick;
 

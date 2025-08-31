@@ -8,10 +8,12 @@ using DG.Tweening;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer;
+using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using FontStyle = UnityEngine.FontStyle;
 #if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEngine.UIElements;
@@ -77,7 +79,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         public void Add(string groupPath, ISaintsRenderer renderer)
         {
-            MethodRenderer methodRenderer = renderer as MethodRenderer;
+            ButtonRenderer methodRenderer = renderer as ButtonRenderer;
             Debug.Assert(methodRenderer != null, $"You can NOT nest {renderer} in {this}");
 
             DOTweenPlayAttribute doTweenPlayAttribute = methodRenderer.FieldWithInfo.PlayaAttributes.OfType<DOTweenPlayAttribute>().FirstOrDefault();
@@ -425,6 +427,17 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
         }
 
+        public void OnSearchField(string searchString)
+        {
+            _onSearchFieldUIToolkit.Invoke(searchString);
+        }
+
+        public void SetSerializedProperty(SerializedProperty property)
+        {
+        }
+
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+
         // private bool _debugCheck;
 
         #endregion
@@ -537,6 +550,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 };
 
                 string labelName = string.IsNullOrEmpty(attribute.Label) ? ObjectNames.NicifyVariableName(methodInfo.Name) : attribute.Label;
+
+                _onSearchFieldUIToolkit.AddListener(Search);
+                methodRoot.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+
                 // methodRoot.Add(new Label(labelName));
                 Toggle autoPlayToggle = new Toggle(labelName)
                 {
@@ -658,6 +675,18 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     stopButton.SetEnabled(false);
                     playPauseButton.style.backgroundImage = _playIcon;
                 };
+                continue;
+
+                void Search(string search)
+                {
+                    DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None;
+                    if (methodRoot.style.display != display)
+                    {
+                        methodRoot.style.display = display;
+                    }
+                }
             }
 
             root.schedule.Execute(() => OnUpdate(root, mainPlayStopButton, doTweenToolkits));

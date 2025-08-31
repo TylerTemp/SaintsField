@@ -1,0 +1,28 @@
+{
+    "name": "today.comes.saintsfield.Runtime.Events",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e0cd26848372d4e5c891c569017e11f1",
+        "GUID:2765e68924a08a94ea0ea66b31c0168f",
+        "GUID:4088d7a88942d3946a9372aea28cbc8c",
+        "GUID:9b261077c7a2ac34886513ec1345f8e0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "!SAINTSFIELD_SERIALIZATION_DISABLE",
+        "SAINTSFIELD_SERIALIZATION"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.serialization",
+            "expression": "",
+            "define": "SAINTSFIELD_SERIALIZATION"
+        }
+    ],
+    "noEngineReferences": false
+}

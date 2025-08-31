@@ -1,0 +1,17 @@
+{
+    "name": "today.comes.saintsfield.Runtime.Wwise",
+    "rootNamespace": "",
+    "references": ["GUID:9b261077c7a2ac34886513ec1345f8e0","GUID:55b98396b7628454da7ce17a99ac5e67"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE",
+        "!SAINTSFIELD_WWISE_DISABLE"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

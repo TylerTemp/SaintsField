@@ -13,10 +13,28 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         // private VisualElement _fieldElement;
 
+        public class NativeFieldPropertyRendererErrorField: BaseField<string>
+        {
+            private readonly HelpBox _helpBox;
+            public NativeFieldPropertyRendererErrorField(string label, VisualElement visualInput) : base(label, visualInput)
+            {
+                _helpBox = (HelpBox)visualInput;
+            }
+
+            public void SetErrorMessage(string error)
+            {
+                if (_helpBox.text != error)
+                {
+                    _helpBox.text = error;
+                }
+            }
+        }
+
         private static StyleSheet _ussClassSaintsFieldEditingDisabledHide;
 
         private string NameContainer() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}";
         private string NameResult() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-result";
+        private string NameErrorBox() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-error";
 
         private class DataPayload
         {
@@ -25,9 +43,33 @@ namespace SaintsField.Editor.Playa.Renderer
             public object Value;
             public bool IsGeneralCollection;
             public IReadOnlyList<object> OldCollection;
+            public bool AlwaysCheckUpdate;
         }
 
         // private double _lastValueChangedTime;
+
+        private NativeFieldPropertyRendererErrorField MakeNativeFieldPropertyRendererErrorField(string error)
+        {
+            NativeFieldPropertyRendererErrorField result = new NativeFieldPropertyRendererErrorField(
+                GetFriendlyName(FieldWithInfo),
+                new HelpBox(error, HelpBoxMessageType.Error)
+            )
+            {
+                name = NameErrorBox(),
+            };
+            if (InAnyHorizontalLayout)
+            {
+                result.style.flexDirection = FlexDirection.Column;
+            }
+            else
+            {
+                result.AddToClassList(NativeFieldPropertyRendererErrorField.alignedFieldUssClassName);
+            }
+
+            result.labelElement.style.color = EColor.EditorSeparator.GetColor();
+
+            return result;
+        }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container1)
         {
@@ -37,7 +79,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 return (null, false);
             }
 
-            object value = GetValue(FieldWithInfo);
+            (string error, object value) = GetValue(FieldWithInfo);
 
             VisualElement container = new VisualElement
             {
@@ -54,10 +96,31 @@ namespace SaintsField.Editor.Playa.Renderer
                 },
                 name = NameContainer(),
             };
-            // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
             Action<object> setter = GetSetterOrNull(FieldWithInfo);
+
+            if (error != "")
+            {
+                container.Add(MakeNativeFieldPropertyRendererErrorField(error));
+                container.userData = new DataPayload
+                {
+                    HasDrawer = false,
+                    Value = null,
+                    Setter = setter,
+                    IsGeneralCollection = false,
+                    OldCollection = Array.Empty<object>(),
+                    AlwaysCheckUpdate = true,
+                };
+                return (container, true);
+            }
+
+            // VisualElement result = UIToolkitLayout(value, GetNiceName(FieldWithInfo));
+
             Type fieldType = GetFieldType(FieldWithInfo);
-            VisualElement result = UIToolkitValueEdit(null, NoLabel? null: GetNiceName(FieldWithInfo), fieldType, value, null, setter, true, InAnyHorizontalLayout);
+            string labelName = NoLabel ? null : GetNiceName(FieldWithInfo);
+            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, true, InAnyHorizontalLayout);
+
+            _onSearchFieldUIToolkit.AddListener(Search);
+            container.RegisterCallback<DetachFromPanelEvent>(e => _onSearchFieldUIToolkit.RemoveListener(Search));
 
             bool isCollection = !typeof(UnityEngine.Object).IsAssignableFrom(fieldType) && (fieldType.IsArray || typeof(IEnumerable).IsAssignableFrom(fieldType));
             // Debug.Log(isCollection);
@@ -86,6 +149,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     Setter = setter,
                     IsGeneralCollection = isCollection,
                     OldCollection = oldCollection,
+                    AlwaysCheckUpdate = isNestedField,
                 };
             }
             else
@@ -97,10 +161,22 @@ namespace SaintsField.Editor.Playa.Renderer
                     Setter = setter,
                     IsGeneralCollection = isCollection,
                     OldCollection = null,
+                    AlwaysCheckUpdate = isNestedField,
                 };
             }
 
             return (container, true);
+
+            void Search(string search)
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(labelName, search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+                if (container.style.display != display)
+                {
+                    container.style.display = display;
+                }
+            }
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
@@ -113,11 +189,40 @@ namespace SaintsField.Editor.Playa.Renderer
 
             VisualElement container= root.Q<VisualElement>(NameContainer());
 
-            DataPayload userData = (DataPayload)container.userData;
+            (string error, object value) = GetValue(FieldWithInfo);
 
-            object value = GetValue(FieldWithInfo);
+            string nameErrorBox = NameErrorBox();
+            NativeFieldPropertyRendererErrorField errorHelpBox = container.Q<NativeFieldPropertyRendererErrorField>(nameErrorBox);
+            if (error == "")
+            {
+                errorHelpBox?.RemoveFromHierarchy();
+            }
+            else
+            {
+                if (errorHelpBox == null)
+                {
+                    container.Add(MakeNativeFieldPropertyRendererErrorField(error));
+                }
+                else
+                {
+                    errorHelpBox.SetErrorMessage(error);
+                }
+
+                return preCheckResult;
+            }
+
+            DataPayload userData = (DataPayload)container.userData;
             bool valueIsNull = RuntimeUtil.IsNull(value);
-            bool isEqual = userData.HasDrawer && Util.GetIsEqual(userData.Value, value);
+            bool isEqual;
+            if (userData.AlwaysCheckUpdate)
+            {
+                isEqual = false;
+            }
+            else
+            {
+                isEqual = userData.HasDrawer && Util.GetIsEqual(userData.Value, value);
+            }
+
             if(isEqual && userData.IsGeneralCollection)
             {
                 IReadOnlyList<object> oldCollection = userData.OldCollection;
@@ -163,7 +268,7 @@ namespace SaintsField.Editor.Playa.Renderer
                         userData.OldCollection = null;
                     }
                 }
-                VisualElement result = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, true, InAnyHorizontalLayout);
+                VisualElement result = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, true, InAnyHorizontalLayout).result;
                 // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {

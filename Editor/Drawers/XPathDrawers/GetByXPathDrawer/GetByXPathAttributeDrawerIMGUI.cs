@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             public SerializedProperty SerializedProperty;
         }
 
-        private class GetByXPathGenericCache
+        public class GetByXPathGenericCache
         {
             // public int ImGuiRenderCount;  // IMGUI fix
             // public double ImGuiResourcesLastTime;  // IMGUI fix
@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             public readonly Dictionary<int, PropertyCache> IndexToPropertyCache = new Dictionary<int, PropertyCache>();
         }
 
-        private static readonly Dictionary<string, GetByXPathGenericCache> SharedCache = new Dictionary<string, GetByXPathGenericCache>();
+        public static readonly Dictionary<string, GetByXPathGenericCache> SharedCache = new Dictionary<string, GetByXPathGenericCache>();
 
         // private static readonly Dictionary<UnityEngine.Object, HashSet<string>> InspectingTargets = new Dictionary<UnityEngine.Object, HashSet<string>>();
 
@@ -73,9 +73,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
             }
-#pragma warning disable CS0168 
+#pragma warning disable CS0168
             catch (ObjectDisposedException e)
-#pragma warning restore CS0168 
+#pragma warning restore CS0168
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
@@ -83,9 +83,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                 return 0;
             }
-#pragma warning disable CS0168 
+#pragma warning disable CS0168
             catch (NullReferenceException e)
-#pragma warning restore CS0168 
+#pragma warning restore CS0168
             {
 #if SAINTSFIELD_DEBUG
                 Debug.LogException(e);
@@ -358,7 +358,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return willDraw;
         }
 
-        private static bool DrawPicker(GetByXPathAttribute firstAttr, GetByXPathGenericCache genericCache, Rect leftRect, SerializedProperty property,
+        private bool DrawPicker(GetByXPathAttribute firstAttr, GetByXPathGenericCache genericCache, Rect leftRect, SerializedProperty property,
             PropertyCache propertyCache, OnGUIPayload onGUIPayload, FieldInfo info)
         {
             if (!firstAttr.UsePickerButton)
@@ -390,7 +390,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
@@ -400,6 +401,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info, object parent)

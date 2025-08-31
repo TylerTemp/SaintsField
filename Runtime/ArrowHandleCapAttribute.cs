@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using UnityEngine;
 
 namespace SaintsField
 {
@@ -11,8 +10,9 @@ namespace SaintsField
         public ArrowHandleCapAttribute(
             string start = null, int startIndex = 0, string startSpace = "this",
             string end = null, int endIndex = 0, string endSpace = "this",
-            EColor eColor = EColor.White, string color = null
-        ): base(start, startIndex, startSpace, end, endIndex, endSpace, eColor, color)
+            EColor eColor = EColor.White, float alpha = 1f, string color = null,
+            float dotted = -1f
+        ): base(start, startIndex, startSpace, end, endIndex, endSpace, eColor, alpha, color, dotted)
         {
         }
     }

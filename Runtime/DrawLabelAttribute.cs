@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class DrawLabelAttribute : PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
@@ -20,7 +20,7 @@ namespace SaintsField
 
         public readonly string Space;
 
-        public DrawLabelAttribute(EColor eColor, string content = null, string space = "this", string color = null)
+        public DrawLabelAttribute(EColor eColor, string content = null, string space = "this", float alpha = 1f, string color = null)
         {
             (string parsedContent, bool parsedIsCallback) = RuntimeUtil.ParseCallback(content);
             Content = parsedContent;
@@ -28,6 +28,10 @@ namespace SaintsField
             Space = space;
 
             Color = eColor.GetColor();
+            if (alpha < 1f)
+            {
+                Color.a = alpha;
+            }
             ColorCallback = null;
 
             bool colorIsString = !string.IsNullOrEmpty(color);
@@ -48,7 +52,7 @@ namespace SaintsField
             }
         }
 
-        public DrawLabelAttribute(string content = null, string space = "this", string color = null): this(EColor.White, content, space, color)
+        public DrawLabelAttribute(string content = null, string space = "this", float alpha=1f, string color = null): this(EColor.White, content, space, alpha, color)
         {
         }
     }

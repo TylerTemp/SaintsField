@@ -3,16 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Utils;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -24,52 +21,6 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
         {
             public SaintsInterfaceField(string label, VisualElement visualInput) : base(label, visualInput)
             {
-            }
-        }
-
-        private static (Type valueType, Type interfaceType) GetTypes(SerializedProperty property, FieldInfo info)
-        {
-            Type interfaceContainer = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
-                ? ReflectUtils.GetElementType(info.FieldType)
-                : info.FieldType;
-
-
-            foreach (Type thisType in GetGenBaseTypes(interfaceContainer))
-            {
-                if (thisType.IsGenericType && thisType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
-                {
-                    Type[] genericArguments = thisType.GetGenericArguments();
-                    // Debug.Log($"from {thisType.Name} get types: {string.Join(",", genericArguments.Select(each => each.Name))}");
-                    // Debug.Log();
-                    return (genericArguments[0], genericArguments[1]);
-                }
-            }
-
-            throw new ArgumentException($"Failed to obtain generic arguments from {interfaceContainer}");
-        }
-
-        private static IEnumerable<Type> GetGenBaseTypes(Type type)
-        {
-            if (type.IsGenericType)
-            {
-                yield return type;
-            }
-
-            Type lastType = type;
-            while (true)
-            {
-                Type baseType = lastType.BaseType;
-                if (baseType == null)
-                {
-                    yield break;
-                }
-
-                if (baseType.IsGenericType)
-                {
-                    yield return baseType;
-                }
-
-                lastType = baseType;
             }
         }
 
@@ -105,9 +56,11 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             StyleSheet hideStyle = Util.LoadResource<StyleSheet>("UIToolkit/PropertyFieldHideSelector.uss");
             propertyField.styleSheets.Add(hideStyle);
 
+            Texture2D pickerImage = EditorGUIUtility.IconContent("d_pick_uielements").image as Texture2D;
+
             Button selectButton = new Button
             {
-                text = "●",
+                // text = "●",
                 style =
                 {
                     width = 18,
@@ -115,6 +68,15 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                     marginRight = 0,
                     flexGrow = 0,
                     flexShrink = 0,
+                    backgroundImage = pickerImage,
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
                 },
             };
 
@@ -144,12 +106,17 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             saintsInterfaceField.SetValueWithoutNotify(valueProp.objectReferenceValue);
 
             (Type valueType, Type interfaceType) = GetTypes(property, fieldInfo);
+            Debug.Assert(valueType != null);
+            Debug.Assert(interfaceType != null);
 
             selectButton.clicked += () =>
             {
                 SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
                 // objectPickerWindowUIToolkit.ResetClose();
                 objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {interfaceType.Name} of {valueType.Name}");
+                Object curValueObj = valueProp.objectReferenceValue;
+                bool curValueObjIsNull = RuntimeUtil.IsNull(curValueObj);
+
                 if(_useCache)
                 {
                     objectPickerWindowUIToolkit.AssetsObjects =
@@ -187,6 +154,20 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 });
 
                 objectPickerWindowUIToolkit.ShowAuxWindow();
+                if (curValueObjIsNull)
+                {
+                    objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+                }
+                else
+                {
+                    objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                        curValueObj,
+                        // ReSharper disable once PossibleNullReferenceException
+                        curValueObj.name,
+                        curValueObj.GetType().Name,
+                        AssetDatabase.GetAssetPath(curValueObj)
+                    ));
+                }
                 objectPickerWindowUIToolkit.RefreshDisplay();
                 if(_useCache)
                 {
@@ -272,14 +253,17 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             }).Every(1);
 
-            saintsInterfaceField.RegisterCallback<AttachToPanelEvent>(e =>
+            saintsInterfaceField.RegisterCallback<AttachToPanelEvent>(_ =>
             {
                 SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshResults);
             });
-            saintsInterfaceField.RegisterCallback<DetachFromPanelEvent>(e =>
+            saintsInterfaceField.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
                 SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults);
             });
+
+            UIToolkitUtils.AddContextualMenuManipulator(saintsInterfaceField, property,
+                () => {});
 
             return saintsInterfaceField;
         }

@@ -12,12 +12,59 @@ using Object = UnityEngine.Object;
 namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SaintsObjInterface<>), true)]
     [CustomPropertyDrawer(typeof(SaintsInterface<,>), true)]
     public partial class SaintsInterfaceDrawer: PropertyDrawer
     {
+        public static (Type valueType, Type interfaceType) GetTypes(SerializedProperty property, FieldInfo info)
+        {
+            Type interfaceContainer = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                ? ReflectUtils.GetElementType(info.FieldType)
+                : info.FieldType;
+
+
+            foreach (Type thisType in GetGenBaseTypes(interfaceContainer))
+            {
+                if (thisType.IsGenericType && thisType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
+                {
+                    Type[] genericArguments = thisType.GetGenericArguments();
+                    // Debug.Log($"from {thisType.Name} get types: {string.Join(",", genericArguments.Select(each => each.Name))}");
+                    // Debug.Log();
+                    return (genericArguments[0], genericArguments[1]);
+                }
+            }
+
+            // throw new ArgumentException($"Failed to obtain generic arguments from {interfaceContainer}");
+            return (null, null);
+        }
+
+        private static IEnumerable<Type> GetGenBaseTypes(Type type)
+        {
+            if (type.IsGenericType)
+            {
+                yield return type;
+            }
+
+            Type lastType = type;
+            while (true)
+            {
+                Type baseType = lastType.BaseType;
+                if (baseType == null)
+                {
+                    yield break;
+                }
+
+                if (baseType.IsGenericType)
+                {
+                    yield return baseType;
+                }
+
+                lastType = baseType;
+            }
+        }
+
         private class FieldInterfaceSelectWindow : SaintsObjectPickerWindowIMGUI
         {
             private Type _fieldType;
@@ -54,7 +101,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 return SplitEachTarget(r, _interfaceType);
             }
 
-            private IEnumerable<ItemInfo> SplitEachTarget(IEnumerable<ItemInfo> itemInfos, Type interfaceType)
+            private static IEnumerable<ItemInfo> SplitEachTarget(IEnumerable<ItemInfo> itemInfos, Type interfaceType)
             {
                 foreach (ItemInfo itemInfo in itemInfos)
                 {
@@ -133,7 +180,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             private bool FetchFilter(ItemInfo itemInfo)  // gameObject, Sprite, Texture2D, ...
             {
-                if (itemInfo.Object == null)
+                if (!itemInfo.Object)
                 {
                     return true;
                 }

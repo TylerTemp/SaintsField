@@ -84,7 +84,8 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             return Draw(position, property, saintsAttribute, info, parent);
         }
 
-        protected override bool WillDrawBelow(SerializedProperty property, ISaintsAttribute saintsAttribute,
+        protected override bool WillDrawBelow(SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
             object parent)
@@ -96,6 +97,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             // Debug.Log($"draw below view width: {width}");

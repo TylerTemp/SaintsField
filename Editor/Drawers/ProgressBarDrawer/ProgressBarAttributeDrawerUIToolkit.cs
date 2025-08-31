@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -104,12 +105,14 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             progressBarField.AddToClassList(ProgressBarField.alignedFieldUssClassName);
 
             progressBarField.AddToClassList(ClassAllowDisable);
+            progressBarField.BindProperty(property);
 
             return progressBarField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
@@ -152,6 +155,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;

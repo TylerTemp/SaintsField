@@ -19,10 +19,10 @@ namespace SaintsField.Editor.Drawers.RateDrawer
                 ImGuiEnsureDispose(property.serializedObject.targetObject);
                 _star = Util.LoadResource<Texture2D>("star.png");
 
-                _starActive = Tex.ApplyTextureColor(_star, ActiveColor);
-                _starIncrease = Tex.ApplyTextureColor(_star, WillActiveColor);
-                _starDecrease = Tex.ApplyTextureColor(_star, WillInactiveColor);
-                _starInactive = Tex.ApplyTextureColor(_star, InactiveColor);
+                _starActive = Tex.ApplyTextureColor(_star, RateUtils.ActiveColor);
+                _starIncrease = Tex.ApplyTextureColor(_star, RateUtils.WillActiveColor);
+                _starDecrease = Tex.ApplyTextureColor(_star, RateUtils.WillInactiveColor);
+                _starInactive = Tex.ApplyTextureColor(_star, RateUtils.InactiveColor);
 
                 _starSlash = Util.LoadResource<Texture2D>("star-slash.png");
                 _starSlashActive = Tex.ApplyTextureColor(_starSlash, Color.red);

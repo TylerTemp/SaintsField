@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             return EditorGUIUtility.singleLineHeight;
         }
 
-        private readonly Dictionary<string, bool> inArrayMousePressed = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> _inArrayMousePressed = new Dictionary<string, bool>();
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
@@ -30,9 +30,10 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             object parent)
         {
             string arrayKey = $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
-            if (!inArrayMousePressed.ContainsKey(arrayKey))
+            // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
+            if (!_inArrayMousePressed.ContainsKey(arrayKey))
             {
-                inArrayMousePressed[arrayKey] = false;
+                _inArrayMousePressed[arrayKey] = false;
             }
 
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
@@ -84,7 +85,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             {
                 // GUIUtility.hotControl = 0;
                 // Debug.Log($"UP!");
-                inArrayMousePressed[arrayKey] = false;
+                _inArrayMousePressed[arrayKey] = false;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
                 Debug.Log($"mouse up {property.propertyPath}: {inArrayMousePressed[arrayKey]}");
 #endif
@@ -93,7 +94,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             if (e.type == EventType.MouseDown && e.button == 0)
             {
                 // arrayMousePressed[arrayIndex] = position.Contains(e.mousePosition);
-                inArrayMousePressed[arrayKey] = position.Contains(e.mousePosition);
+                _inArrayMousePressed[arrayKey] = position.Contains(e.mousePosition);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
                 Debug.Log($"mouse down {position}: {inArrayMousePressed[arrayKey]}/{property.propertyPath}");
 #endif
@@ -113,7 +114,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 #endif
 
             if (GUI.enabled && (e.type == EventType.MouseDown || e.type == EventType.MouseDrag) &&
-                inArrayMousePressed[arrayKey])
+                _inArrayMousePressed[arrayKey])
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
                 Debug.Log($"{property.propertyPath}/{inArrayMousePressed[arrayKey]}");

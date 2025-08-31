@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:Template name="DropdownButton" src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/DropdownButton.uxml?fileID=9197481963319205126&amp;guid=5b3989db140d9844cae8395164fffb9d&amp;type=3#DropdownButton" />
+    <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: flex-start;">
+        <SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements.ParamTypeButton />
+        <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" name="persistent-argument-label" style="flex-shrink: 1; min-width: 60px; width: 25%; padding-top: 3px; text-overflow: ellipsis; overflow: hidden;" />
+        <ui:VisualElement name="persistent-argument-value-editor" style="flex-shrink: 1; flex-grow: 1;">
+            <ui:VisualElement name="persistent-argument-value-dynamic" style="flex-grow: 1;">
+                <ui:Instance template="DropdownButton" name="DropdownButton" />
+            </ui:VisualElement>
+            <ui:VisualElement name="persistent-argument-value-serialized-unity-object" style="flex-grow: 1;">
+                <uie:ObjectField style="flex-grow: 1; flex-shrink: 1;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="persistent-argument-value-serialized-value" style="flex-grow: 1;">
+                <ui:Instance template="DropdownButton" name="DropdownButton" style="display: none;" />
+                <ui:VisualElement name="persistent-argument-value-serialized-value-editor" style="flex-grow: 1;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="persistent-argument-value-default" style="flex-grow: 1; justify-content: center;">
+                <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" />
+                <ui:HelpBox message-type="Error" style="flex-grow: 1;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -9,5 +9,6 @@
         Method,
         // DOTweenMethod,
         NativeProperty,
+        ClassStruct,
     }
 }

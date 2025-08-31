@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
@@ -8,6 +9,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
         [Serializable]
         public class GeneralInterface : SaintsInterface<UnityEngine.Object, IDummy>
         {
+            public GeneralInterface(Object obj) : base(obj)
+            {
+            }
+
             public override string ToString()
             {
                 return I?.GetComment() ?? "NULL";

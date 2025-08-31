@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(DrawWireDiscAttribute), true)]
     public partial class DrawWireDiscAttributeDrawer: SaintsPropertyDrawer
@@ -28,19 +28,32 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             public Color Color;
             public Vector3 Center;
             public Vector3 Normal;
+
+            public string Id;
         }
 
         private static void OnSceneGUIInternal(SceneView _, WireDiscInfo wireDiscInfo)
         {
             UpdateWireDiscInfo(wireDiscInfo);
 
-            if (!string.IsNullOrEmpty(wireDiscInfo.TargetWorldPosInfo.Error))
+            if (!string.IsNullOrEmpty(wireDiscInfo.TargetWorldPosInfo.Error) || !string.IsNullOrEmpty(wireDiscInfo.Error))
             {
                 return;
             }
 
             // Handles.Label(pos, labelInfo.ActualContent, labelInfo.GUIStyle);
             // Debug.Log(pos);
+
+            HandleVisibility.SetInView(
+                wireDiscInfo.Id,
+                wireDiscInfo.SerializedProperty.propertyPath,
+                wireDiscInfo.SerializedProperty.serializedObject.targetObject.name,
+                EditorGUIUtility.IconContent("CircleCollider2D Icon").image as Texture2D);
+
+            if (HandleVisibility.IsHidden(wireDiscInfo.Id))
+            {
+                return;
+            }
 
             // Handles.DrawWireDisc(pos, Vector3.up, wireDiscInfo.Radius);
             using(new HandleColorScoop(wireDiscInfo.Color))
@@ -54,6 +67,12 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 
         private static void UpdateWireDiscInfo(WireDiscInfo wireDiscInfo)
         {
+            if (!SerializedUtils.IsOk(wireDiscInfo.SerializedProperty))
+            {
+                wireDiscInfo.Error = "SerializedProperty disposed";
+                return;
+            }
+
             Type rawType = wireDiscInfo.MemberInfo is FieldInfo fi
                 ? fi.FieldType
                 : ((PropertyInfo)wireDiscInfo.MemberInfo).PropertyType;
@@ -255,6 +274,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 Radius = drawWireDiscAttribute.Radius,
                 Color = drawWireDiscAttribute.Color,
                 // TargetWorldPosInfo = Util.GetPropertyTargetWorldPosInfoSpace(drawWireDiscAttribute.Space, serializedProperty, memberInfo, parent),
+
+                Id = SerializedUtils.GetUniqueId(serializedProperty),
             };
             return wireDiscInfo;
         }

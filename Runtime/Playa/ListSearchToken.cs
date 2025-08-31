@@ -10,5 +10,10 @@ namespace SaintsField.Playa
             Type = type;
             Token = token;
         }
+
+        public override string ToString()
+        {
+            return $"<search {Type}={Token}/>";
+        }
     }
 }

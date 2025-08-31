@@ -28,7 +28,7 @@ namespace SaintsField
             float radius = 1f, string radiusCallback = null,
             string space = "this",
             float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f, string posOffsetCallback = null,
-            EColor eColor = EColor.White, string color = null
+            EColor eColor = EColor.White, float alpha = 1f, string color = null
         )
         {
             Radius = radius;
@@ -38,6 +38,10 @@ namespace SaintsField
             PosOffsetCallback = posOffsetCallback;
 
             Color = eColor.GetColor();
+            if (alpha < 1f)
+            {
+                Color.a = alpha;
+            }
 
             bool colorIsString = !string.IsNullOrEmpty(color);
             ColorCallback = null;

@@ -1,0 +1,54 @@
+#saintsfield-tree-row {
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 20px;
+}
+
+#saintsfield-tree-row, #saintsfield-tree-row-toggle, #saintsfield-tree-row-foldout {
+    cursor: link;
+}
+
+#saintsfield-tree-row.saintsfield-tree-row-active:hover {
+    background-color: var(--unity-colors-button-background-hover);
+}
+
+#saintsfield-tree-row.saintsfield-tree-row-selected {
+    background-color: var(--unity-colors-button-background-hover_pressed);
+}
+
+#saintsfield-tree-row.saintsfield-tree-row-selected:hover {
+    background-color: var(--unity-colors-button-border_accent-focus);
+}
+
+#saintsfield-tree-row.saintsfield-tree-row-disabled {
+    cursor: arrow;
+}
+
+#saintsfield-tree-row.saintsfield-tree-row-keyboard-active {
+    background-color: var(--unity-colors-button-background-hover);
+}
+
+.saintsfield-tree-row-button {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    /*background-image: url("project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/checkbox-outline-blank.png?fileID=2800000&guid=49e87dfab57d490419c09d9859ac93c1&type=3#checkbox-outline-blank");*/
+    padding: 0;
+    margin: 0;
+}
+
+#saintsfield-tree-row-label {
+    -unity-text-align: middle-left;
+    flex-grow: 1;
+    margin-left: 2px;
+}

@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
 
             textField.BindProperty(property);
 
-            return new ResizableTextArea(GetPreferredLabel(property), textField)
+            ResizableTextArea r = new ResizableTextArea(GetPreferredLabel(property), textField)
             {
                 style =
                 {
@@ -71,6 +71,11 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                 },
                 name = NameResiable(property),
             };
+
+            UIToolkitUtils.AddContextualMenuManipulator(r.labelElement, property, () => Util.PropertyChangedCallback(property, info, null));
+            r.BindProperty(property);
+
+            return r;
 
             // textField.style.minHeight = singleLineHeight * SaintsFieldConfigUtil.ResizableTextAreaMinRow();
 

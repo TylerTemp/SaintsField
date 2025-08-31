@@ -7,13 +7,30 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.HandleDrawers
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(SaintsArrowAttribute), true)]
     public class SaintsArrowAttributeDrawer: OneDirectionHandleBase
     {
-        protected override void OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo, Vector3 worldPosStart, Vector3 worldPosEnd)
+        private static Texture2D _icon;
+
+        protected override Texture2D GetIcon()
         {
+            if (_icon is null)
+            {
+                return _icon = EditorGUIUtility.IconContent("UpArrow").image as Texture2D;
+            }
+
+            return _icon;
+        }
+
+        protected override bool OnSceneDraw(SceneView sceneView, OneDirectionInfo oneDirectionInfo, Vector3 worldPosStart, Vector3 worldPosEnd)
+        {
+            if (!base.OnSceneDraw(sceneView, oneDirectionInfo, worldPosStart, worldPosEnd))
+            {
+                return false;
+            }
+
             float sqrMagnitude = (worldPosStart - worldPosEnd).sqrMagnitude;
 
             SaintsArrowAttribute saintsArrowAttribute =
@@ -33,9 +50,23 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
             using (new HandleColorScoop(oneDirectionInfo.Color))
             {
-                Handles.DrawLine(head, tail);
-                Handles.DrawLine(head, arrowheadLeft);
-                Handles.DrawLine(head, arrowheadRight);
+                DrawLine(head, tail, oneDirectionInfo.OneDirectionAttribute.Dotted);
+                DrawLine(head, arrowheadLeft, oneDirectionInfo.OneDirectionAttribute.Dotted);
+                DrawLine(head, arrowheadRight, oneDirectionInfo.OneDirectionAttribute.Dotted);
+            }
+
+            return true;
+        }
+
+        private static void DrawLine(Vector3 start, Vector3 end, float dotted)
+        {
+            if(dotted > 0f)
+            {
+                Handles.DrawDottedLine(start, end, dotted);
+            }
+            else
+            {
+                Handles.DrawLine(start, end);
             }
         }
     }

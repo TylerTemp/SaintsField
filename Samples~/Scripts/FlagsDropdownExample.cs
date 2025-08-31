@@ -21,5 +21,8 @@ namespace SaintsField.Samples.Scripts
 
         [FlagsDropdown]
         public F flags;
+
+        [FlagsTreeDropdown]
+        public F tree;
     }
 }

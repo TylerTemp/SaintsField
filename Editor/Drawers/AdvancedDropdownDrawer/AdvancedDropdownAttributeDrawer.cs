@@ -5,17 +5,17 @@ using System.Reflection;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
-
-
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
+#endif
     [CustomPropertyDrawer(typeof(AdvancedDropdownAttribute), true)]
     public partial class AdvancedDropdownAttributeDrawer: SaintsPropertyDrawer
     {
-
-
         public struct SelectStack : IEquatable<SelectStack>
         {
             // ReSharper disable InconsistentNaming
@@ -44,13 +44,35 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        private static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, AdvancedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj, bool isImGui)
+        public static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, PathedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj, bool isImGui)
         {
             string funcName = advancedDropdownAttribute.FuncName;
 
             string error;
             IAdvancedDropdownList dropdownListValue = null;
-            if (funcName is null)
+            if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Options)
+            {
+                AdvancedDropdownList<object> optionsDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                foreach (object value in advancedDropdownAttribute.Options)
+                {
+                    optionsDropdown.Add(RuntimeUtil.IsNull(value)? "[Null]": value.ToString(), value);
+                }
+
+                error = "";
+                dropdownListValue = optionsDropdown;
+            }
+            else if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Tuples)
+            {
+                AdvancedDropdownList<object> tuplesDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                foreach ((string path, object value) in advancedDropdownAttribute.Tuples)
+                {
+                    tuplesDropdown.Add(path, value);
+                }
+
+                error = "";
+                dropdownListValue = tuplesDropdown;
+            }
+            else if (funcName is null)
             {
                 Type elementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
                 if(elementType.IsEnum)
@@ -149,12 +171,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 {
                     error = $"{funcName} return value is not a AdvancedDropdownList";
                 }
-
-                // dropdownListValue = getOfDropdownListValue;
-                // (string getOfError, IAdvancedDropdownList getOfDropdownListValue) =
-                //     Util.GetOf<IAdvancedDropdownList>(funcName, null, property, field, parentObj);
-                // error = getOfError;
-                // dropdownListValue = getOfDropdownListValue;
             }
             if(dropdownListValue == null || error != "")
             {
@@ -339,7 +355,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return newChildren;
         }
 
-        private static string GetMetaStackDisplay(AdvancedDropdownMetaInfo metaInfo)
+        public static string GetMetaStackDisplay(AdvancedDropdownMetaInfo metaInfo)
         {
             return metaInfo.SelectStacks.Count == 0
                 ? "-"

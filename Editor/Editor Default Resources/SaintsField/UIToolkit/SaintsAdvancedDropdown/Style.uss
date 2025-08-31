@@ -26,31 +26,37 @@ Button.saintsfield-advanced-dropdown-item {
 }
 
 .saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-active:hover {
-    background-color: rgb(89, 89, 89);
+    background-color: var(--unity-colors-button-background-hover);
 }
 
 .saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-selected {
-    background-color: rgb(48, 48, 48);
-    cursor: arrow;
+    /*background-color: rgb(48, 48, 48);*/
+    background-color: var(--unity-colors-button-background-hover_pressed);
 }
 
-.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-selected.active:hover {
-    background-color: rgb(48, 48, 48);
+.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-selected:hover {
+    /*background-color: rgb(48, 48, 48);*/
+    background-color: var(--unity-colors-button-border_accent-focus);
+    /*background-color: red;*/
 }
-
-/*.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-disabled > * > Label {*/
-/*    color: rgb(89, 89, 89);*/
-/*}*/
 
 .saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-disabled {
     cursor: arrow;
+}
+
+/* WTF Unity an override does not work??? */
+/*.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-keyboard-active.saintsfield-advanced-dropdown-item-active {*/
+/*    background-color: var(--unity-colors-button-border_accent-focus);*/
+/*}*/
+
+.saintsfield-advanced-dropdown-item.saintsfield-advanced-dropdown-item-keyboard-active {
+    background-color: var(--unity-colors-button-background-hover);
 }
 
 .saintsfield-advanced-dropdown-separator {
     height: 2px;
     background-color: rgb(89, 89, 89);
 }
-
 
 .saintsfield-advanced-dropdown-anim {
     transition-duration: 0.2s;
@@ -75,8 +81,3 @@ Button.saintsfield-advanced-dropdown-item {
 .saintsfield-advanced-dropdown-fade-out-container {
     position: absolute;
 }
-
-/* This does not work */
-/*Scroller {*/
-/*    display: none;*/
-/*}*/

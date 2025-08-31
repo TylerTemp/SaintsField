@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(PositionHandleAttribute), true)]
     public partial class PositionHandleAttributeDrawer: SaintsPropertyDrawer
@@ -109,7 +109,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             public string Error;
             public Vector3 Center;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
+
+            public string Id;
         }
+
+        private static Texture2D _moveIcon;
 
         private static void OnSceneGUIInternal(SceneView _, PositionHandleInfo positionHandleInfo)
         {
@@ -119,6 +123,22 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 #if SAINTSFIELD_DEBUG
                 Debug.LogError(positionHandleInfo.Error);
 #endif
+                return;
+            }
+
+            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            if (_moveIcon is null)
+            {
+                _moveIcon = Util.LoadResource<Texture2D>("position-handle.png");
+            }
+
+            HandleVisibility.SetInView(positionHandleInfo.Id,
+                positionHandleInfo.SerializedProperty.propertyPath,
+                positionHandleInfo.SerializedProperty.serializedObject.targetObject.name,
+                _moveIcon);
+
+            if (HandleVisibility.IsHidden(positionHandleInfo.Id))
+            {
                 return;
             }
 

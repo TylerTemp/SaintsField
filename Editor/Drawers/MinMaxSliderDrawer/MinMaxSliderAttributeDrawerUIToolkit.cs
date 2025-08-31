@@ -50,6 +50,23 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             public float FreeMax;
         }
 
+        // Oh hell... I don't want to properly do this anymore
+        private class BindableV2IntField: BaseField<Vector2Int>
+        {
+            public BindableV2IntField(VisualElement visualInput) : base(null, visualInput)
+            {
+                style.marginLeft = style.marginRight = 0;
+            }
+        }
+
+        public class BindableV2Field : BaseField<Vector2>
+        {
+            public BindableV2Field(VisualElement visualInput) : base(null, visualInput)
+            {
+                style.marginLeft = style.marginRight = 0;
+            }
+        }
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
@@ -57,7 +74,9 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             if (property.propertyType != SerializedPropertyType.Vector2 &&
                 property.propertyType != SerializedPropertyType.Vector2Int)
             {
-                return null;
+                PropertyField fallback = PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                fallback.AddToClassList(ClassFieldUIToolkit(property));
+                return fallback;
             }
 
             bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
@@ -157,11 +176,25 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
             minMaxSliderField.AddToClassList(ClassAllowDisable);
 
-            return minMaxSliderField;
+            if (isInt)
+            {
+                BindableV2IntField wrapper = new BindableV2IntField(minMaxSliderField);
+                wrapper.BindProperty(property);
+                return wrapper;
+            }
+            else
+            {
+                BindableV2Field wrapper = new BindableV2Field(minMaxSliderField);
+                wrapper.BindProperty(property);
+                return wrapper;
+            }
+
+            // return minMaxSliderField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
@@ -175,6 +208,15 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             };
 
             helpBox.AddToClassList(ClassAllowDisable);
+
+            // ReSharper disable once InvertIf
+            if (property.propertyType != SerializedPropertyType.Vector2 &&
+                property.propertyType != SerializedPropertyType.Vector2Int)
+            {
+                helpBox.text = $"Expect Vector2/Vector2Int, get {property.propertyType}";
+                helpBox.style.display = DisplayStyle.Flex;
+            }
+
             return helpBox;
         }
 
@@ -182,6 +224,11 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            if (property.propertyType != SerializedPropertyType.Vector2 &&
+                property.propertyType != SerializedPropertyType.Vector2Int)
+            {
+                return;
+            }
             MinMaxSliderField minMaxSliderField =
                 container.Q<MinMaxSliderField>(NameMinMaxSliderField(property));
 
@@ -328,8 +375,15 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
+            if (property.propertyType != SerializedPropertyType.Vector2 &&
+                property.propertyType != SerializedPropertyType.Vector2Int)
+            {
+                return;
+            }
+
             bool isInt = property.propertyType == SerializedPropertyType.Vector2Int;
             MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)saintsAttribute;
 
@@ -536,6 +590,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             Action<object> onValueChangedCallback, MinMaxSliderAttribute sliderAttribute, VisualElement container,
             FieldInfo info, object parent)
         {
+            // ReSharper disable once InlineTemporaryVariable
             Vector2Int vector2IntValue = sliderValue;
 
             AdjustFreeRangeHighAndLow(sliderValue, property, sliderAttribute, container, info, parent);

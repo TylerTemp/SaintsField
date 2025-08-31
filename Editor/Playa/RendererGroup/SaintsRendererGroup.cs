@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Playa;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaintsField.Editor.Playa.RendererGroup
 {
@@ -10,7 +12,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
     {
         public bool InDirectHorizontalLayout { get; set; }
         public bool InAnyHorizontalLayout { get; set; }
-        public bool NoLabel { get; set; }
 
         public class Config
         {
@@ -129,6 +130,24 @@ namespace SaintsField.Editor.Playa.RendererGroup
             foreach ((string _, ISaintsRenderer renderer) in _renderers)
             {
                 renderer.OnDestroy();
+            }
+        }
+
+#if UNITY_2021_3_OR_NEWER
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+#endif
+        public void OnSearchField(string searchString)
+        {
+#if UNITY_2021_3_OR_NEWER
+            _onSearchFieldUIToolkit.Invoke(searchString);
+#endif
+        }
+
+        public void SetSerializedProperty(SerializedProperty property)
+        {
+            foreach ((string _, ISaintsRenderer renderer) in _renderers)
+            {
+                renderer.SetSerializedProperty(property);
             }
         }
 

@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Utils
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(Name, Value, Mask);
+                return Util.CombineHashCode(Name, Value, Mask);
             }
         }
 

@@ -16,7 +16,8 @@ namespace SaintsField.Samples.Scripts.HandleExamples
 
         [DrawWireDisc(
             radisCallback: nameof(radius),
-            color: nameof(color),
+            eColor: EColor.Red,
+            alpha: 0.3f,
             posOffsetCallback: nameof(positionOffset),
             norCallback: nameof(normal),
             rotCallback: nameof(rotation)

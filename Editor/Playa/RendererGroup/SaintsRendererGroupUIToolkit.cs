@@ -394,8 +394,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                 Debug.Log($"add item@{groupPath}->{groupId}: {renderer}");
 #endif
-                renderer.InDirectHorizontalLayout = EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
-                renderer.InAnyHorizontalLayout = InAnyHorizontalLayout || renderer.InDirectHorizontalLayout;
+
+                bool inHorizontal = EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
+                renderer.InAnyHorizontalLayout = InAnyHorizontalLayout || inHorizontal;
 
                 VisualElement fieldElement = renderer.CreateVisualElement();
                 // ReSharper disable once InvertIf
@@ -408,6 +409,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                     visualElements.Add(fieldElement);
                     body.Add(fieldElement);
+
+                    _onSearchFieldUIToolkit.AddListener(renderer.OnSearchField);
+                    fieldElement.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(renderer.OnSearchField));
                 }
             }
 

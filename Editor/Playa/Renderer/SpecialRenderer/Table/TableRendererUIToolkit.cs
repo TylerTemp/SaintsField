@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Linq;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -35,7 +36,22 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
             // _hasSize = FillTable(FieldWithInfo.SerializedProperty, result, elementType, FieldWithInfo.SerializedProperty);
             FillTableToContainer(result);
 
+            OnSearchFieldUIToolkit.AddListener(Search);
+            result.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
+
             return (result, true);
+
+            void Search(string search)
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(FieldWithInfo.SerializedProperty.displayName, search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                if (result.style.display != display)
+                {
+                    result.style.display = display;
+                }
+            }
         }
 
         private void FillTableToContainer(VisualElement container)
@@ -94,6 +110,20 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
                 UIToolkitUtils.AddContextualMenuManipulator(foldout, arrayProperty, () => {});
                 foldout.Add(propField);
                 result.Add(foldout);
+
+                result.Add(new EmptyPrefabOverrideElement(arrayProperty)
+                {
+                    style =
+                    {
+                        position = Position.Absolute,
+                        top = 0,
+                        bottom = 0,
+                        left = 0,
+                        right = 0,
+                        height = 18,
+                    },
+                    pickingMode = PickingMode.Ignore,
+                });
 
                 #region Drag
                 VisualElement foldoutInput = foldout.Q<VisualElement>(classes: "unity-foldout__input");

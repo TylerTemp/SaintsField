@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="Button" style="flex-shrink: 1; padding-right: 2px; margin-right: 0; margin-left: 0; -unity-text-align: middle-left; align-items: flex-start; height: 18px; flex-direction: row;">
+        <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" picking-mode="Ignore" style="flex-shrink: 1; margin-right: 15px; flex-grow: 1;" />
+        <ui:VisualElement picking-mode="Ignore" style="flex-shrink: 0; height: 16px; width: 16px; background-image: url(&apos;project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-gray.png?fileID=2800000&amp;guid=63bdc84e7caf8bb4c87ce2bfbaddad14&amp;type=3#classic-dropdown-gray&apos;); -unity-background-scale-mode: scale-to-fit;" />
+    </ui:Button>
+</ui:UXML>

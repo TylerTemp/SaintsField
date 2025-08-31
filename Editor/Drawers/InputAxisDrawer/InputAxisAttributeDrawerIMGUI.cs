@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_axisNames == null)
             {
-                _axisNames = GetAxisNames();
+                _axisNames = InputAxisUtils.GetAxisNames();
             }
 
             int index = IndexOf(_axisNames, property.stringValue);
@@ -43,7 +43,7 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
                 {
                     if (newIndex >= _axisNames.Count)
                     {
-                        OpenInputManager();
+                        InputAxisUtils.OpenInputManager();
                         return;
                     }
 

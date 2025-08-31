@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +12,7 @@ using UnityEngine.AddressableAssets;
 namespace SaintsField.Editor.Drawers.ShowImageDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(ShowImageAttribute), true)]
     [CustomPropertyDrawer(typeof(AboveImageAttribute), true)]
@@ -64,12 +65,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 }
 #endif
 
-                Texture2D reflect2D;
-                (reflectError, reflect2D) = GetImageFromTarget(fieldValue);
-                if (reflectError == "")
-                {
-                    return (reflectError, reflect2D);
-                }
+                return GetImageFromTarget(fieldValue);
             }
 
             // SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
@@ -111,6 +107,11 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
 
         private static (string error, Texture2D image) GetImageFromTarget(object result)
         {
+            if (RuntimeUtil.IsNull(result))
+            {
+                return ("", null);
+            }
+
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (result)
             {

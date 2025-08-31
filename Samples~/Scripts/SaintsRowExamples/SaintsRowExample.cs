@@ -31,9 +31,20 @@ namespace SaintsField.Samples.Scripts.SaintsRowExamples
             private void EmptyFunction()
             {
             }
+
+            public enum When
+            {
+                None,
+                Any,
+                All,
+            }
+
+            public When when;
         }
 
         [SaintsRow] public MyStruct myStruct;
         [SaintsRow(inline: true)] public MyStruct myStructInline;
+
+        public MyStruct myStructOri;
     }
 }
