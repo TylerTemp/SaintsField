@@ -436,7 +436,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
         {
         }
 
-        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+        // fix for old unity
+        private class OnSearchFieldUIToolkitEvent: UnityEvent<string> {}
+
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new OnSearchFieldUIToolkitEvent();
 
         // private bool _debugCheck;
 

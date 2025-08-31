@@ -126,7 +126,9 @@ namespace SaintsField.Editor.AutoRunner
 
             return settings.groups
                 .SelectMany(each => each.entries)
+#if SAINTSFIELD_ADDRESSABLE_1_19_19_OR_NEWER
                 .Where(each => typeof(SceneAsset).IsAssignableFrom(each.MainAssetType))
+#endif
                 .Select(each => each.MainAsset)
                 .OfType<SceneAsset>()
                 .Except(sceneList);
@@ -149,10 +151,19 @@ namespace SaintsField.Editor.AutoRunner
             return settings.groups
                 .SelectMany(each => each.entries)
                 .Where(each =>
-                    typeof(GameObject).IsAssignableFrom(each.MainAssetType)
-                    || typeof(UnityEditor.Animations.AnimatorController).IsAssignableFrom(each.MainAssetType)
-                    || typeof(ScriptableObject).IsAssignableFrom(each.MainAssetType)
-                )
+                {
+                    Type mainAssetType =
+#if SAINTSFIELD_ADDRESSABLE_1_19_19_OR_NEWER
+                    each.MainAssetType
+#else
+                    each.MainAsset?.GetType()
+#endif
+                    ;
+
+                    return typeof(GameObject).IsAssignableFrom(mainAssetType)
+                           || typeof(UnityEditor.Animations.AnimatorController).IsAssignableFrom(mainAssetType)
+                           || typeof(ScriptableObject).IsAssignableFrom(mainAssetType);
+                })
                 .Select(each => each.MainAsset)
                 .Except(extraResources);
         }
