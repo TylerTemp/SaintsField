@@ -509,7 +509,7 @@ namespace SaintsField.Editor.Utils
 
             if (!useImGui)
             {
-                Debug.Log($"CreatePropertyGUI for {property.propertyPath} with {propertyDrawer}");
+                // Debug.Log($"CreatePropertyGUI for {property.propertyPath} with {propertyDrawer}");
                 VisualElement r = propertyDrawer.CreatePropertyGUI(property);
                 if (r != null)
                 {
@@ -595,7 +595,16 @@ namespace SaintsField.Editor.Utils
             // Debug.Log(element is BindableElement);
             if (element is IBindable bindableElement)
             {
+                // https://github.com/TylerTemp/SaintsField/issues/286
+                // Even TextAreaDrawer has `propertyGui.bindingPath = property.propertyPath;`
+                // the binding process will still fail, and need to bind again
+                // I have no idea why... UI Toolkit's editor function is documented very poorly
+
+                // Debug.Log(bindableElement.bindingPath);  // this have a value
+                // Debug.Log(bindableElement.binding);
                 bindableElement.BindProperty(property);
+                // Debug.Log(bindableElement.bindingPath);
+                // Debug.Log(bindableElement.binding);
             }
         }
 

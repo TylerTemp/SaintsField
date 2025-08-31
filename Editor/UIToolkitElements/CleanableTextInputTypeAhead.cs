@@ -50,7 +50,9 @@ namespace SaintsField.Editor.UIToolkitElements
                 if (e.keyCode is KeyCode.Return or KeyCode.KeypadEnter || e.character == '\n')
                 {
                     e.StopPropagation();
+#if !UNITY_6000_0_OR_NEWER
                     e.PreventDefault();
+#endif
                     int getIndex = GetHighlightedIndex();
                     if (getIndex != -1)
                     {

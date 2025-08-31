@@ -103,11 +103,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.24.5**
+**4.25.1**
 
-1.  UI Toolkit: Improve `SaintsDictionary`, `Table`, `SaintsHashSet` UI to make it more like Unity's ListView
-2.  UI Toolkit: use `LeftToggle` when using bool in `SaintsDictionary`, `Table`, `SaintsHashSet`, and Horizontal Layout
-3.  UI Toolkit: fix Horizontal Layout broken label layout since 4.16.0
+UI Toolkit: fix `TextArea` inside list/array not serialized [#286](https://github.com/TylerTemp/SaintsField/issues/286)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

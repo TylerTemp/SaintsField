@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.25.1 ##
+
+UI Toolkit: fix `TextArea` inside list/array not serialized [#286](https://github.com/TylerTemp/SaintsField/issues/286)
+
 ## 4.25.0 ##
 
 UI Toolkit: Add `TreeDropdown`, `FlagsTreeDropdown`, `OptionsTreeDropdown`, `PairsTreeDropdown`
