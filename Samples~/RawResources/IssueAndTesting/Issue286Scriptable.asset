@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 308e24092737b7548864f7f400209cec, type: 3}
   m_Name: Issue286Scriptable
   m_EditorClassIdentifier: 
+  styles: []
   ta:
-  - fdsfds
+  - go go
