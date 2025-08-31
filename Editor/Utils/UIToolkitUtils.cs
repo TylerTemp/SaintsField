@@ -505,10 +505,11 @@ namespace SaintsField.Editor.Utils
             bool useImGui = uiToolkitMethod == null ||
                             uiToolkitMethod.DeclaringType == typeof(PropertyDrawer);  // null: old Unity || did not override
 
-            // Debug.Log($"{useDrawerType}/{uiToolkitMethod.DeclaringType}/{FieldWithInfo.SerializedProperty.propertyPath}");
+            // Debug.Log($"{useDrawerType}/{uiToolkitMethod?.DeclaringType}/{property.propertyPath}");
 
             if (!useImGui)
             {
+                Debug.Log($"CreatePropertyGUI for {property.propertyPath} with {propertyDrawer}");
                 VisualElement r = propertyDrawer.CreatePropertyGUI(property);
                 if (r != null)
                 {
@@ -584,10 +585,17 @@ namespace SaintsField.Editor.Utils
                     if(propertyRelative != null)
                     {
                         lv.BindProperty(propertyRelative);
+                        return;
                     }
                 }
                 // Debug.Log(lv.itemsSource);
                 // return ele;
+            }
+
+            // Debug.Log(element is BindableElement);
+            if (element is IBindable bindableElement)
+            {
+                bindableElement.BindProperty(property);
             }
         }
 

@@ -1321,9 +1321,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 606290658}
+  - component: {fileID: 606290660}
   - component: {fileID: 606290659}
   m_Layer: 0
-  m_Name: Issue286TextArea
+  m_Name: Issue286TextAreaFallback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1356,6 +1357,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c7a05687c1b5614198c76f8bf89987f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fallbackTextArea:
+  - fdsfds
+--- !u!114 &606290660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 606290657}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b7aef220c52e474b9b9716a0c2bd9e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultTextArea:
+  - 1111
 --- !u!1 &607623391
 GameObject:
   m_ObjectHideFlags: 0
@@ -3575,8 +3592,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1872314224
   InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -3584,8 +3599,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &1500346665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3598,7 +3611,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c12153bf83683e54884fabf6011eeea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
   normalIntArrays: 
   normalString: 
   content: 
@@ -3631,7 +3643,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 686656c53f7998841aecdf3d0da41a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
   normalIntArrays: 
   normalString: 
   content: 

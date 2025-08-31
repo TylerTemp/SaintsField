@@ -36,5 +36,30 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue240SaintsRowStr
 
 
         }
+
+        [Serializable]
+        public struct FloatWithBaseValue
+        {
+            [OnValueChanged(nameof(RevertFinalToBaseValue))] public float baseValue;
+            public float finalValue;
+
+            public void RevertFinalToBaseValue()
+            {
+                finalValue = baseValue;
+            }
+
+            [OnValueChanged(nameof(RevertFinalToBaseValue2))] public float baseValue2;
+            public float finalValue2;
+
+            public void RevertFinalToBaseValue2()
+            {
+#if UNITY_EDITOR
+                SaintsContext.SerializedProperty.FindPropertyRelative(nameof(finalValue2)).floatValue = baseValue2;
+                SaintsContext.SerializedProperty.serializedObject.ApplyModifiedProperties();
+#endif
+            }
+        }
+
+        public FloatWithBaseValue fwb;
     }
 }
