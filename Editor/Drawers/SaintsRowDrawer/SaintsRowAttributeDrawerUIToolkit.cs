@@ -35,8 +35,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         protected override bool UseCreateFieldUIToolKit => true;
 
         public const string SaintsRowClass = "saints-field--saintsrow";
-        private static string NameActualContaier(SerializedProperty property) => $"${property.propertyPath}__saintsrow";
-
+        private static string NameActualContainer(SerializedProperty property) => $"${property.propertyPath}__saints_row";
 
         public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
@@ -57,12 +56,18 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     {
                         flexGrow = 1,
                     },
-                    name = NameActualContaier(property),
+                    name = NameActualContainer(property),
                 };
             }
             else
             {
-                VisualElement foldoutWrapper = new VisualElement();
+                VisualElement foldoutWrapper = new VisualElement
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                    },
+                };
 
                 Foldout foldout = new Foldout
                 {
@@ -72,7 +77,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     {
                         flexGrow = 1,
                     },
-                    name = NameActualContaier(property),
+                    name = NameActualContainer(property),
                 };
                 foldout.RegisterValueChangedCallback(evt =>
                 {
@@ -292,7 +297,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 }
             }
 
-            VisualElement actualContainer = root.Q<VisualElement>(NameActualContaier(property));
+            VisualElement actualContainer = root.Q<VisualElement>(NameActualContainer(property));
 
             actualContainer.Add(bodyElement);
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED

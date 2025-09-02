@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.25.2 ##
+
+1.  UI Toolkit: Fix `Required` not work
+2.  UI Toolkit: Fix `SaintsRow` & `struct` with `SaintsEditor` incorrect width 
+
 ## 4.25.1 ##
 
 UI Toolkit: fix `TextArea` inside list/array not serialized [#286](https://github.com/TylerTemp/SaintsField/issues/286)

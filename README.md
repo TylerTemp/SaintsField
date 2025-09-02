@@ -103,9 +103,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.25.1**
+**4.25.2**
 
-UI Toolkit: fix `TextArea` inside list/array not serialized [#286](https://github.com/TylerTemp/SaintsField/issues/286)
+1.  UI Toolkit: Fix `Required` not work
+2.  UI Toolkit: Fix `SaintsRow` & `struct` with `SaintsEditor` incorrect width
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

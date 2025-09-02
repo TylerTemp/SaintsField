@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
-            if (allAttributes.Any(each => each is RequiredAttribute))
+            if (allAttributes.Any(each => each is RequiredIfAttribute))
             {
                 return;
             }

@@ -5,13 +5,13 @@ namespace SaintsField.Samples.Scripts.Required
 {
     public class RequiredExample: MonoBehaviour
     {
-        [Required("Add this please!")] public Sprite _spriteImage;
+        [Required("Add this please!")] public Sprite spriteImage;
         // works for property field
         [field: SerializeField, Required] public GameObject Go { get; private set; }
-        [Required] public UnityEngine.Object _object;
-        [SerializeField, Required] private float _floatIsVauleType;
+        [Required] public UnityEngine.Object unityObj;
+        [SerializeField, Required] private float floatIsValueType;
 
-        [SerializeField, Required, Range(-1, 1)] private int _intIsVauleType;
+        [SerializeField, Required, Range(-1, 1)] private int intIsVauleType;
 
         [Serializable]
         public struct MyStruct
