@@ -183,7 +183,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         {
                             // Debug.Log($"{property.propertyPath} Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
                             root.userData = property.managedReferenceId;
-                            root.Clear();
+
+                            VisualElement actualContainer = root.Q<VisualElement>(NameActualContainer(property));
+                            actualContainer.Clear();
 
                             SerializedProperty newProp = property.serializedObject.FindProperty(propPath);
 
