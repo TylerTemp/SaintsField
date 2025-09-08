@@ -513,7 +513,7 @@ namespace SaintsField.Editor.Utils
                 VisualElement r = propertyDrawer.CreatePropertyGUI(property);
                 if (r != null)
                 {
-                    PropertyDrawerElementDirtyFix(property, propertyDrawer, r);
+                    // PropertyDrawerElementDirtyFix(property, propertyDrawer, r);
                     return UIToolkitCache.MergeWithDec(r, allAttributes);
                 }
             }
@@ -571,42 +571,43 @@ namespace SaintsField.Editor.Utils
             // return (imGuiContainer, false);
         }
 
-        public static void PropertyDrawerElementDirtyFix(SerializedProperty property, PropertyDrawer propertyDrawer, VisualElement element)
-        {
-            // ReSharper disable once InvertIf
-            if (propertyDrawer is UnityEventDrawer)  // I have zero idea why...
-            {
-                ListView lv = element.Q<ListView>();
-                // ReSharper disable once InvertIf
-                if(lv != null)
-                {
-                    SerializedProperty propertyRelative = property.FindPropertyRelative("m_PersistentCalls.m_Calls");
-                    // lv.bindingPath = propertyRelative.propertyPath;
-                    if(propertyRelative != null)
-                    {
-                        lv.BindProperty(propertyRelative);
-                        return;
-                    }
-                }
-                // Debug.Log(lv.itemsSource);
-                // return ele;
-            }
-
-            // Debug.Log(element is BindableElement);
-            if (element is IBindable bindableElement)
-            {
-                // https://github.com/TylerTemp/SaintsField/issues/286
-                // Even TextAreaDrawer has `propertyGui.bindingPath = property.propertyPath;`
-                // the binding process will still fail, and need to bind again
-                // I have no idea why... UI Toolkit's editor function is documented very poorly
-
-                // Debug.Log(bindableElement.bindingPath);  // this have a value
-                // Debug.Log(bindableElement.binding);
-                bindableElement.BindProperty(property);
-                // Debug.Log(bindableElement.bindingPath);
-                // Debug.Log(bindableElement.binding);
-            }
-        }
+        // This is now fixed using Bind(serializedObject)
+        // public static void PropertyDrawerElementDirtyFix(SerializedProperty property, PropertyDrawer propertyDrawer, VisualElement element)
+        // {
+        //     // ReSharper disable once InvertIf
+        //     if (propertyDrawer is UnityEventDrawer)  // I have zero idea why...
+        //     {
+        //         ListView lv = element.Q<ListView>();
+        //         // ReSharper disable once InvertIf
+        //         if(lv != null)
+        //         {
+        //             SerializedProperty propertyRelative = property.FindPropertyRelative("m_PersistentCalls.m_Calls");
+        //             // lv.bindingPath = propertyRelative.propertyPath;
+        //             if(propertyRelative != null)
+        //             {
+        //                 lv.BindProperty(propertyRelative);
+        //                 return;
+        //             }
+        //         }
+        //         // Debug.Log(lv.itemsSource);
+        //         // return ele;
+        //     }
+        //
+        //     // Debug.Log(element is BindableElement);
+        //     if (element is IBindable bindableElement)
+        //     {
+        //         // https://github.com/TylerTemp/SaintsField/issues/286
+        //         // Even TextAreaDrawer has `propertyGui.bindingPath = property.propertyPath;`
+        //         // the binding process will still fail, and need to bind again
+        //         // I have no idea why... UI Toolkit's editor function is documented very poorly
+        //
+        //         // Debug.Log(bindableElement.bindingPath);  // this have a value
+        //         // Debug.Log(bindableElement.binding);
+        //         bindableElement.BindProperty(property);
+        //         // Debug.Log(bindableElement.bindingPath);
+        //         // Debug.Log(bindableElement.binding);
+        //     }
+        // }
 
         private static StyleSheet _unityObjectFieldLabelDisplayNone;
 
