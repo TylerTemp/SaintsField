@@ -103,10 +103,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.25.2**
+**4.26.0**
 
-1.  UI Toolkit: Fix `Required` not work
-2.  UI Toolkit: Fix `SaintsRow` & `struct` with `SaintsEditor` incorrect width
+1.  `AboveImage`, `BelowImage` now support `./PATH` to find an image from hierarchy of current field's game object, and `/PATH` of current game object.
+2.  UI Toolkit: fix serialzable struct/class gives error when select a target. Merged [#291](https://github.com/TylerTemp/SaintsField/pull/291) by [@viitana](https://github.com/viitana)
+3.  Fix `[Expandable]` doesn't support multi selection [#284](https://github.com/TylerTemp/SaintsField/issues/284)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

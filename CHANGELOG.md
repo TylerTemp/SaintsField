@@ -4,6 +4,7 @@
 
 1.  `AboveImage`, `BelowImage` now support `./PATH` to find an image from hierarchy of current field's game object, and `/PATH` of current game object.
 2.  UI Toolkit: fix serialzable struct/class gives error when select a target. Merged [#291](https://github.com/TylerTemp/SaintsField/pull/291) by [@viitana](https://github.com/viitana)
+3.  Fix `[Expandable]` doesn't support multi selection [#284](https://github.com/TylerTemp/SaintsField/issues/284)
 
 ## 4.25.2 ##
 
