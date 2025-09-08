@@ -29,7 +29,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue240SaintsRowStr
             {
 #if UNITY_EDITOR
                 // for `Button` we get the property of the container (`foo1` field here)
-                SaintsContext.SerializedProperty.FindPropertyRelative(nameof(foo)).intValue++;
+                SaintsContext.FindPropertyRelateTo(nameof(foo)).intValue++;
                 SaintsContext.SerializedProperty.serializedObject.ApplyModifiedProperties();
 #endif
             }
@@ -54,7 +54,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue240SaintsRowStr
             public void RevertFinalToBaseValue2()
             {
 #if UNITY_EDITOR
-                SaintsContext.SerializedProperty.FindPropertyRelative(nameof(finalValue2)).floatValue = baseValue2;
+                SaintsContext.FindPropertyRelateTo(nameof(finalValue2)).floatValue = baseValue2;
                 SaintsContext.SerializedProperty.serializedObject.ApplyModifiedProperties();
 #endif
             }
