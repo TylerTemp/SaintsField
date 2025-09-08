@@ -22,6 +22,8 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
 
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
 
+            SaintsContext.SerializedProperty = property;
+
             _error = InvokeCallback(((OnValueChangedAttribute)saintsAttribute).Callback, onGUIPayload.newValue,
                 arrayIndex, parent);
         }

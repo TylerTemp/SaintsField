@@ -559,5 +559,10 @@ namespace SaintsField.Utils
 
             return true;
         }
+
+        public static string GetAutoPropertyName(string propName)
+        {
+            return $"<{propName}>k__BackingField";
+        }
     }
 }

@@ -37,6 +37,8 @@ namespace SaintsField.Editor.Drawers.ValidateInputDrawer
 #if SAINTSFIELD_NAUGHYTATTRIBUTES
             labelText = property.displayName;
 #endif
+
+            SaintsContext.SerializedProperty = property;
             _error = CallValidateMethod(callback, labelText, property, info, parent);
 
             return true;

@@ -18,12 +18,12 @@ namespace SaintsField.Editor.Utils
 
         public static SerializedProperty FindPropertyByAutoPropertyName(SerializedObject obj, string propName)
         {
-            return obj.FindProperty($"<{propName}>k__BackingField");
+            return obj.FindProperty(RuntimeUtil.GetAutoPropertyName(propName));
         }
 
         public static SerializedProperty FindPropertyByAutoPropertyName(SerializedProperty property, string propName)
         {
-            return property.FindPropertyRelative($"<{propName}>k__BackingField");
+            return property.FindPropertyRelative(RuntimeUtil.GetAutoPropertyName(propName));
         }
 
         public static bool IsArrayOrDirectlyInsideArray(SerializedProperty property)

@@ -86,6 +86,8 @@ namespace SaintsField.Editor.Drawers.ValidateInputDrawer
                 return;
             }
 
+            SaintsContext.SerializedProperty = property;
+
             string validateResult = CallValidateMethod(callback, property.displayName, property, info, parent);
             // Debug.Log($"call validate input {validateResult}");
 

@@ -700,6 +700,7 @@ namespace SaintsField.Editor.Core
                         return;
                     }
 
+                    SaintsContext.SerializedProperty = property;
                     foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
                     {
                         saintsPropertyInfo.Drawer.OnValueChanged(
@@ -931,6 +932,8 @@ namespace SaintsField.Editor.Core
                     Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
                     return;
                 }
+
+                SaintsContext.SerializedProperty = property;
 
                 foreach (SaintsPropertyInfo saintsPropertyInfo in saintsPropertyDrawers)
                 {
