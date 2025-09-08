@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   styles:
   - styleTag: 
-    openingTag: ss
-    closingTag: ss
+    openingTag: ok changed
+    closingTag: ok changed
   ta:
-  - fsdfdsfsd
+  - ok changed

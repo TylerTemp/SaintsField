@@ -1370,6 +1370,9 @@ public IRefInterface myInterface;
 
 `SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc. (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
 
+> [!TIP]
+> If you're using `UI Toolkit`, you do not need this attribute at all. It'll kickin by default.
+
 This attribute does NOT need `SaintsEditor` enabled. It's an out-of-box tool.
 
 Parameters:
@@ -4809,6 +4812,8 @@ Show an image above/below the field.
 
     If it's null, it'll try to get the image from the field itself.
 
+    You can use path to specify a hierarchy target. See the example below.
+
 *   `string maxWidth=-1`
 
     preview max width, -1 for original image size. If it's greater than current view width, it'll be scaled down to fit the view. . Use `int.MaxValue` to always fit the view width.
@@ -4845,6 +4850,21 @@ public string alignField;
 ```
 
 ![show_image](https://github.com/TylerTemp/SaintsField/assets/6391063/8fb6397f-12a7-4eaf-9e2b-65f563c89f97)
+
+You can use `./Path/Of/Current/Field` (starts with `./`) to find a target from current field's hierarchy. This is useful when you want to show an image inside a prefab.
+
+Using `/Path/Of/Current/Target` (starts with `/`) to find a target from current target's hierarchy
+
+```csharp
+// field object, then find the target in hierarchy
+[InfoBox("Show Image under subPrefab/SR")]
+[BelowImage("./SR", maxWidth: 40)] public GameObject subPrefab;
+
+// find the target in current object's hierarchy
+[InfoBox("Show Image under current GameObject/SubWithSpriteRenderer/SR")]
+[BelowImage("/SubWithSpriteRenderer/SR", maxWidth: 40)] public string thisSub;
+```
+![show image in hierarchy](https://github.com/user-attachments/assets/805978e3-0bd0-4ad4-b16f-acbe3dc5f1e8)
 
 #### `ParticlePlay` ####
 

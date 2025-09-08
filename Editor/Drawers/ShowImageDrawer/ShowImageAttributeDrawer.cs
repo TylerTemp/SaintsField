@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
@@ -48,6 +49,67 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 }
 
                 return GetImageFromTarget(GetCurObject(property, info, target));
+            }
+
+            bool useFieldHierarchy = name.StartsWith("./");
+            bool useCurrentHierarchy = name.StartsWith("/");
+            if (useFieldHierarchy || useCurrentHierarchy)
+            {
+                GameObject startingGo;
+                string hierarchyPath;
+                if (useFieldHierarchy)  // get field
+                {
+                    (string curError, int _, object curValue)  = Util.GetValue(property, info, target);
+                    if (curError != "")
+                    {
+                        return ($"Fail to get value of `{property.propertyPath}`: {curError}", null);
+                    }
+
+                    if (RuntimeUtil.IsNull(curValue))
+                    {
+                        return ("", null);
+                    }
+
+                    switch (curValue)
+                    {
+                        case Component comp:
+                            startingGo = comp.gameObject;
+                            break;
+                        case GameObject go:
+                            startingGo = go;
+                            break;
+                        default:
+                            return ($"Field value {curValue} is not GameObject or Component", null);
+                    }
+
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                    hierarchyPath = name.Substring(2);
+                }
+                else  // using current object
+                {
+                    switch (target)
+                    {
+                        case Component comp:
+                            startingGo = comp.gameObject;
+                            break;
+                        case GameObject go:
+                            startingGo = go;
+                            break;
+                        default:
+                            return ($"Target object {target} is not GameObject or Component", null);
+                    }
+
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                    hierarchyPath = name.Substring(1);
+                }
+
+                Transform findChild = startingGo.transform.Find(hierarchyPath);
+                // ReSharper disable once ConvertIfStatementToReturnStatement
+                if (!findChild)
+                {
+                    return ($"Fail to find child `{hierarchyPath}` under `{startingGo.name}`", null);
+                }
+                return GetImageFromTarget(findChild.gameObject);
             }
 
             // search parent first

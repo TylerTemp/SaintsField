@@ -1,9 +1,14 @@
 # Changelog
 
+## 4.26.0 ##
+
+1.  `AboveImage`, `BelowImage` now support `./PATH` to find an image from hierarchy of current field's game object, and `/PATH` of current game object.
+2.  UI Toolkit: fix serialzable struct/class gives error when select a target. Merged [#291](https://github.com/TylerTemp/SaintsField/pull/291) by [@viitana](https://github.com/viitana)
+
 ## 4.25.2 ##
 
 1.  UI Toolkit: Fix `Required` not work
-2.  UI Toolkit: Fix `SaintsRow` & `struct` with `SaintsEditor` incorrect width 
+2.  UI Toolkit: Fix `SaintsRow` & `struct` with `SaintsEditor` incorrect width
 
 ## 4.25.1 ##
 

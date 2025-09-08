@@ -179,8 +179,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                     flexGrow = 1,
                 },
             };
-            showImageField.AddToClassList("unity-base-field__aligned");
-
+            showImageField.AddToClassList(ShowImageField.alignedFieldUssClassName);
 
             switch (showImageAttribute.Align)
             {
