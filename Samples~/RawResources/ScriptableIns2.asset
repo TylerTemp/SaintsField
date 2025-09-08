@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: ScriptableIns2
   m_EditorClassIdentifier: 
   hideMeInTable: 0
-  hideMeGroup1: 0
-  _intRange: 52
+  hideMeGroup1: 57
+  _intRange: 96
   normalRange: 37
   animationCurve:
     serializedVersion: 2

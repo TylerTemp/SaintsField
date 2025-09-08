@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
         private class ExpandableInfo
         {
             public string Error;
-            public Object TargetObject;
+            // public HashSet<Object> TargetObjects;
             public SerializedObject SerializedObject;
             public IReadOnlyList<ISaintsRenderer> Renderers;
         }
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
         {
             string key = SerializedUtils.GetUniqueId(property);
 
-            Object serObject = GetSerObject(property, info, parent);
+            SerializedObject serializedObject = GetSerObject(property, info, parent);
 
             bool hasKey = IdToInfo.TryGetValue(key, out ExpandableInfo expandableInfo);
             // ReSharper disable once ConvertIfStatementToSwitchStatement
@@ -71,12 +71,12 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 });
             }
 
-            if (hasKey && ReferenceEquals(serObject, expandableInfo.TargetObject))
+            if (hasKey && EqualSerObject(serializedObject, expandableInfo.SerializedObject))
             {
                 return expandableInfo;
             }
 
-            if (serObject == null)
+            if (serializedObject == null)
             {
                 // if (property.isExpanded)
                 // {
@@ -86,7 +86,6 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 return new ExpandableInfo
                 {
                     Error = "",
-                    TargetObject = null,
                     SerializedObject = null,
                     Renderers = Array.Empty<ISaintsRenderer>(),
                 };
@@ -105,9 +104,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 }
             }
 
-            SerializedObject ser = new SerializedObject(serObject);
-
-            IReadOnlyList<ISaintsRenderer> renderers = SaintsEditor.Setup(Array.Empty<string>(), ser, makeRenderer, new[]{serObject});
+            IReadOnlyList<ISaintsRenderer> renderers = SaintsEditor.Setup(Array.Empty<string>(), serializedObject, makeRenderer, serializedObject.targetObjects);
 
             // Debug.Log(serObject);
 
@@ -116,8 +113,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             return IdToInfo[key] = new ExpandableInfo
             {
                 Error = "",
-                TargetObject = serObject,
-                SerializedObject = ser,
+                SerializedObject = serializedObject,
                 Renderers = renderers,
             };
         }

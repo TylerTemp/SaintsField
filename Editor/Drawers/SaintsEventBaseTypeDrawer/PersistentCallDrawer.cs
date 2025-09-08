@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Utils;
 using SaintsField.Events;
 using UnityEditor;
 
@@ -16,6 +17,76 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
     [CustomPropertyDrawer(typeof(PersistentCall), true)]
     public partial class PersistentCallDrawer: SaintsPropertyDrawer
     {
+
+        private readonly struct TypeDropdownInfo: IEquatable<TypeDropdownInfo>
+        {
+            public readonly string DropPath;
+            public readonly Type Type;
+            public readonly UnityEngine.Object ObjectRef;
+
+            public TypeDropdownInfo(string dropPath, Type type, UnityEngine.Object objectRef)
+            {
+                DropPath = dropPath;
+                Type = type;
+                ObjectRef = objectRef;
+            }
+
+            public bool Equals(TypeDropdownInfo other)
+            {
+                return Type == other.Type;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is TypeDropdownInfo other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return Type != null ? Type.GetHashCode() : 0;
+            }
+        }
+
+        private readonly struct TypeDropdownGroup
+        {
+            public readonly string GroupName;
+            public readonly IReadOnlyList<TypeDropdownInfo> Types;
+
+            public TypeDropdownGroup(string groupName, IReadOnlyList<TypeDropdownInfo> types)
+            {
+                GroupName = groupName;
+                Types = types;
+            }
+        }
+
+        private readonly struct MethodSelect: IEquatable<MethodSelect>
+        {
+            public readonly Type Type;
+            public readonly MethodInfo MethodInfo;
+
+            public MethodSelect(Type type, MethodInfo methodInfo)
+            {
+                Type = type;
+                MethodInfo = methodInfo;
+            }
+
+            public bool Equals(MethodSelect other)
+            {
+                return Equals(MethodInfo, other.MethodInfo);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is MethodSelect other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return Util.CombineHashCode(Type, MethodInfo);
+            }
+        }
+
+
         private static string PropNameCallState() => nameof(PersistentCall.callState);
         // private const string PropNameIsStatic = "_isStatic";
         // private const string PropNameTarget = "_target";

@@ -111,12 +111,12 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             }
 
             VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
-            Object curObject = (Object)propsElement.userData;
+            SerializedObject curObject = (SerializedObject)propsElement.userData;
 
-            Object serObject = GetSerObject(property, info, parent);
+            SerializedObject serObject = GetSerObject(property, info, parent);
             // Debug.Log(serObject);
 
-            if (ReferenceEquals(serObject, curObject))
+            if (EqualSerObject(serObject, curObject))
             {
                 // Debug.Log($"equal: {serObject}/{curObject}");
                 return;
@@ -135,8 +135,13 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 return;
             }
 
-            if (serObject is GameObject go)
+            if (serObject.targetObject is GameObject go)
             {
+                if (serObject.targetObjects.Length > 1)
+                {
+                    propsElement.Add(new HelpBox("Multiple GameObjects inspecting is not supported. Only the first one is shown.", HelpBoxMessageType.Warning));
+                }
+
                 // wtf Unity you can not inspect GameObject?
                 foreach (Component comp in go.GetComponents<Component>())
                 {
@@ -177,7 +182,11 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             }
             else
             {
-                InspectorElement inspectorElement = new InspectorElement(serObject);
+                InspectorElement inspectorElement = new InspectorElement(serObject)
+                {
+                    userData = serObject,
+                };
+
                 propsElement.Add(inspectorElement);
                 propsElement.style.backgroundColor = BackgroundColor;
             }
