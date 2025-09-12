@@ -33,6 +33,9 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             public List<IEnumerator> Enumerators = new List<IEnumerator>();
         }
 
+        private VisualElement _returnValueContainer;
+        private VisualElement _returnContainer;
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
             container.style.flexGrow = 1;
@@ -46,7 +49,11 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             object[] parameterValues = new object[parameters.Length];
             VisualElement root = null;
 
-            if (hasParameters)
+            bool hasReturnValue = !_buttonAttribute.HideReturnValue
+                && methodInfo.ReturnType != typeof(void)
+                && !typeof(IEnumerator).IsAssignableFrom(methodInfo.ReturnType);
+
+            if (hasParameters || hasReturnValue)
             {
                 root = new VisualElement
                 {
@@ -119,6 +126,10 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             {
                                 paraValue = parameterValues[index] = newValue;
                                 paraValueChanged = true;
+                                if(_returnContainer != null && _returnContainer.style.display == DisplayStyle.Flex)
+                                {
+                                    _returnContainer.style.display = DisplayStyle.None;
+                                }
                             },
                             false,
                             true
@@ -133,7 +144,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         paraValueChanged = false;
                     }).Every(100);
                 }
-
             }
 
             ButtonUserData buttonUserData = new ButtonUserData
@@ -167,7 +177,38 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             buttonElement = new Button(() =>
             {
                 SaintsContext.SerializedProperty = _serializedProperty;
-                IEnumerable<object> returnValues = FieldWithInfo.Targets.Select(t => methodInfo.Invoke(t, parameterValues));
+                object[] returnValues = FieldWithInfo.Targets.Select(t => methodInfo.Invoke(t, parameterValues)).ToArray();
+
+                if (hasReturnValue)
+                {
+                    Debug.Assert(_returnValueContainer != null);
+                    _returnValueContainer.Clear();
+                    object returnValue = returnValues[0];
+                    VisualElement r = UIToolkitValueEdit(
+                        _returnValueContainer.Children().FirstOrDefault(),
+                        "",
+                        methodInfo.ReturnType,
+                        returnValue,
+                        null,
+                        newValue => { },
+                        false,
+                        true
+                    ).result;
+                    if (r != null)
+                    {
+                        if (r is Foldout { value: false } fo)
+                        {
+                            fo.RegisterCallback<AttachToPanelEvent>(_ => fo.value = true);
+                            // fo.value = true;
+                        }
+                        if(_returnContainer.style.display != DisplayStyle.Flex)
+                        {
+                            _returnContainer.style.display = DisplayStyle.Flex;
+                        }
+
+                        _returnValueContainer.Add(r);
+                    }
+                }
 
                 buttonUserData.Enumerators.Clear();
                 buttonUserData.Enumerators.AddRange(returnValues.OfType<IEnumerator>());
@@ -289,6 +330,31 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             buttonElement.style.borderTopLeftRadius = buttonElement.style.borderTopRightRadius = 0;
             buttonElement.style.borderLeftWidth = buttonElement.style.borderRightWidth = buttonElement.style.borderBottomWidth = 0;
             root.Add(buttonElement);
+
+            // ReSharper disable once InvertIf
+            if(hasReturnValue)
+            {
+                _returnContainer = new VisualElement();
+                _returnValueContainer = new VisualElement();
+                _returnContainer.Add(_returnValueContainer);
+
+                _returnContainer.Add(new Button(() =>
+                {
+                    _returnContainer.style.display = DisplayStyle.None;
+                })
+                {
+                    text = "x",
+                    style =
+                    {
+                        position = Position.Absolute,
+                        top = 0,
+                        right = 0,
+                    }
+                });
+
+                // returnValueContainer.SetEnabled(false);
+                root.Add(_returnContainer);
+            }
 
 
             return (root, needUpdate);

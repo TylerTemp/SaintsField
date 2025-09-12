@@ -54,5 +54,24 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
                 }
             }
         }
+
+        [Button]
+        private int AddCalculator(int a, int b) => a + b;
+
+        [GetComponentInChildren] public GameObject[] goLis;
+
+        private class ResultClass
+        {
+            public GameObject Go;
+        }
+
+        [Button]
+        private ResultClass ReturnClass(int v) => new ResultClass
+        {
+            Go = goLis[v % goLis.Length]
+        };
+
+        [Button(hideReturnValue: true)]
+        private int ReturnIgnored() => Random.Range(0, 100);
     }
 }

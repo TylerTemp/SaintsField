@@ -16,7 +16,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
     public partial class ButtonRenderer: AbsRenderer
     {
         private readonly SerializedObject _serializedObject;
-        private readonly ButtonAttribute _buttonAttribute = null;
+        private readonly ButtonAttribute _buttonAttribute;
 
         public ButtonRenderer(ButtonAttribute buttonAttribute, SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             object value = playaMethodBindAttribute.Value;
 
             UnityEventBase unityEventBase = null;
-            UnityEngine.Object unityEventContainerObject = null;
+            UnityEngine.Object unityEventContainerObject;
             List<Type> invokeRequiredTypes = new List<Type>();
             string eventDisplayName;
             if (methodBind == MethodBind.ButtonOnClick)

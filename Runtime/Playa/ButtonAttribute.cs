@@ -12,12 +12,14 @@ namespace SaintsField.Playa
     {
         public readonly string Label;
         public readonly bool IsCallback;
+        public readonly bool HideReturnValue;
 
-        public ButtonAttribute(string label = null)
+        public ButtonAttribute(string label = null, bool hideReturnValue = false)
         {
             (string content, bool isCallback) = RuntimeUtil.ParseCallback(label);
             Label = content;
             IsCallback = isCallback;
+            HideReturnValue = hideReturnValue;
             // Debug.Log($"{IsCallback}/{content}");
         }
     }
