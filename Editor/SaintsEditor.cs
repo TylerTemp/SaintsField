@@ -12,6 +12,7 @@ using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer;
+using SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
@@ -1089,6 +1090,10 @@ namespace SaintsField.Editor
                         else if (playaAttribute is ButtonAttribute buttonAttribute)
                         {
                             yield return new ButtonRenderer(buttonAttribute, serializedObject, fieldWithInfo);
+                        }
+                        else if(playaAttribute is ShowInInspectorAttribute _)
+                        {
+                            yield return new RealTimeCalculatorRenderer(serializedObject, fieldWithInfo);
                         }
                     }
                     yield break;
