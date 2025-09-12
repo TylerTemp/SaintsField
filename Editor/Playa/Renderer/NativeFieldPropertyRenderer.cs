@@ -3,10 +3,7 @@ using SaintsField.Playa;
 using UnityEditor;
 using System.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
-using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
 {
@@ -28,7 +25,7 @@ namespace SaintsField.Editor.Playa.Renderer
         }
 
 #if UNITY_2021_3_OR_NEWER
-        private UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
 #endif
         public override void OnSearchField(string searchString)
         {
