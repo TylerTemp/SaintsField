@@ -33,7 +33,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             // [ShowIf(nameof(valueType), RCType.Float)] public ValueDetail<float> floatValue; //this is not working
             // [ShowIf(nameof(valueType), RCType.Float)] public UnityEvent<float> onFloatValueFetched; //this is not working
             // [ShowIf(nameof(valueType), RCType.Bool)] public ValueDetail<bool> boolValue; //this is not working
-            [ShowIf(nameof(valueType), RCType.Bool)] public UnityEvent<bool> onBoolValueFetched; //this is not working
+            [FieldShowIf(nameof(valueType), RCType.Bool)] public UnityEvent<bool> onBoolValueFetched; //this is not working
             // [ShowIf(nameof(valueType), RCType.String)] public ValueDetail<string> stringValue; //this is not working
             // [ShowIf(nameof(valueType), RCType.String)] public UnityEvent<string> onStringValueFetched; //this is not working
             // [ShowIf(nameof(valueType), RCType.Long)] public ValueDetail<long> longValue; //this is not working

@@ -40,15 +40,15 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
                 name = "TImeline Elemenet";
             }
             public bool label;
-            [ShowIf("label")]
+            [FieldShowIf("label")]
             public string LabelText = "Round 1";
             [SaintsRow]
             public List<VideoItem> videos = new List<VideoItem>();
             public bool loop;
-            [ShowIf("ShouldShowLoop")]
+            [FieldShowIf("ShouldShowLoop")]
             public int loopCount=1;
             public bool startTimer;
-            [ShowIf("startTimer")]
+            [FieldShowIf("startTimer")]
             public float timerTime = 60;
             bool ShouldShowLoop()
             {

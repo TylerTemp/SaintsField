@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
-using SaintsField.Condition;
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
-    public class HideIfAttribute: ShowIfAttribute
+    public class FieldHideIfAttribute: FieldShowIfAttribute
     {
         public override bool IsShow => false;
-        public HideIfAttribute(params object[] orCallbacks) : base(orCallbacks)
+        public FieldHideIfAttribute(params object[] orCallbacks) : base(orCallbacks)
         {
         }
     }

@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue132
 
         [LayoutGroup(" ------ CHILD -----",ELayout.Title|ELayout.Background),
          GetComponentInParents(excludeSelf: true),
-         HideIf(nameof(_parentOverride)),
+         FieldHideIf(nameof(_parentOverride)),
         ]
         // ReSharper disable once InconsistentNaming
         public MCDamageHandler _parent;

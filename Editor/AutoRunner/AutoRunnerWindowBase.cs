@@ -29,7 +29,7 @@ namespace SaintsField.Editor.AutoRunner
             [AssetFolder]
             public string path;
             public string searchPattern;
-            [ShowIf(nameof(searchPattern))]
+            [FieldShowIf(nameof(searchPattern))]
             public SearchOption searchOption;
 
             public override string ToString()

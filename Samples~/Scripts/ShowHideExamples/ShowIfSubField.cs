@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts.ShowHideExamples
     {
         [GetComponentInChildren, Expandable] public ToggleSub toggle;
 
-        [ShowIf(nameof(toggle) + ".requireADescription")]
+        [FieldShowIf(nameof(toggle) + ".requireADescription")]
         public string description;
     }
 }

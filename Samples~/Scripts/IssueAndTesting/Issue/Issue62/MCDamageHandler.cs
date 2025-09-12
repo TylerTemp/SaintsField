@@ -10,20 +10,20 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue62
     {
 
 		public virtual MCDamageHandler realSelf => this;
-		[SerializeField,HideIf(nameof(isRelay))]
+		[SerializeField,FieldHideIf(nameof(isRelay))]
 		internal float _initialHealth = 100f;
-		[HideIf(nameof(isRelay))]
+		[FieldHideIf(nameof(isRelay))]
 		public float _currentHealth;
-		[HideIf(nameof(isRelay))]
+		[FieldHideIf(nameof(isRelay))]
 		public Transform _head;
-		[GetComponent,HideIf(nameof(isRelay))]
+		[GetComponent,FieldHideIf(nameof(isRelay))]
 		public PandaBehaviour panda;
-		[GetComponent,HideIf(nameof(isRelay))]
+		[GetComponent,FieldHideIf(nameof(isRelay))]
 		public MCAnimationController anim;
 		public         Transform head => _head==null ? transform : _head;
 		public virtual MCTeam    team => _team;
 		[Expandable]
-		[HideIf(nameof(isRelay))]
+		[FieldHideIf(nameof(isRelay))]
 		[SerializeField]
 		internal MCTeam _team;
 		[ShowInInspector]
@@ -51,14 +51,14 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue62
 			}
 		}
 		public float normalizedHealth => _currentHealth/_initialHealth;
-		[HideIf(nameof(isRelay))]
+		[FieldHideIf(nameof(isRelay))]
 		public Transform targetOffset;
 		[SepTitle("DAMAGE",EColor.Brown)]
-		[HideIf(nameof(isRelay))]
+		[FieldHideIf(nameof(isRelay))]
 		public bool kickback = true;
 		// [GetComponent,ReadOnly,EnableIf(nameof(kickback)),HideIf(nameof(isRelay))]
 		// public NavMeshAgent agent;
-		[GetComponent,ReadOnly,EnableIf(nameof(kickback)),HideIf(nameof(isRelay))]
+		[GetComponent,ReadOnly,EnableIf(nameof(kickback)),FieldHideIf(nameof(isRelay))]
 		public Rigidbody rigid;
 		// [GetComponent,ReadOnly]
 		// public MCArmor _selfArmor;
@@ -68,12 +68,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue62
 		// [HideIf(nameof(isRelay))]
 		// public UltEvent<float> onNormalizedHealthChange;
 		[SepTitle("DEATH",EColor.Black)]
-		[HideIf(nameof(isRelay))]
+		[FieldHideIf(nameof(isRelay))]
 		public bool destroyOnDeath = true;
-		[EnableIf(nameof(destroyOnDeath)),HideIf(nameof(isRelay))]
+		[EnableIf(nameof(destroyOnDeath)),FieldHideIf(nameof(isRelay))]
 		public float deathDelay = 1f;
 		[Tooltip("can be instantiated even when destroy is off, usable as a jetisson FX")]
-		[HideIf(nameof(isRelay))]
+		[FieldHideIf(nameof(isRelay))]
 		public GameObject explosionPrefab,
 											corpsePrefab;
 		// [HideIf(nameof(isRelay))]

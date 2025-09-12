@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers.VisibilityDrawer
     {
         // protected abstract (string error, bool shown) IsShown(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target);
 
-        protected override bool GetThisDecoratorVisibility(ShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
+        protected override bool GetThisDecoratorVisibility(FieldShowIfAttribute targetAttribute, SerializedProperty property, FieldInfo info, object target)
         {
             (string error, bool shown) = GetShow(property, info);
             _error = error;

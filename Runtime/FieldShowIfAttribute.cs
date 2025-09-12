@@ -10,7 +10,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = true)]
-    public class ShowIfAttribute: PropertyAttribute, ISaintsAttribute, IVisibilityAttribute
+    public class FieldShowIfAttribute: PropertyAttribute, ISaintsAttribute, IVisibilityAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Visibility;
         public string GroupBy => "";
@@ -18,7 +18,7 @@ namespace SaintsField
         public IReadOnlyList<ConditionInfo> ConditionInfos { get; }
         public virtual bool IsShow => true;
 
-        public ShowIfAttribute(params object[] andCallbacks)
+        public FieldShowIfAttribute(params object[] andCallbacks)
         {
             ConditionInfos = andCallbacks.Length > 0
                 ? Parser.Parse(andCallbacks).ToArray()

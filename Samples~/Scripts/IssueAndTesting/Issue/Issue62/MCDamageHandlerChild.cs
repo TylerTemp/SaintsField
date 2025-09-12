@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue62
         // [HideIf(nameof(_parentOverride))]
         [LayoutGroup(" ------ CHILD -----",ELayout.Title|ELayout.Background)]
         [GetComponentInParents(excludeSelf: true)]
-        [HideIf(nameof(_parentOverride))]
+        [FieldHideIf(nameof(_parentOverride))]
         public MCDamageHandler _parent;
         // [Comment("set this to override the auto parent")]
         public MCDamageHandler _parentOverride;

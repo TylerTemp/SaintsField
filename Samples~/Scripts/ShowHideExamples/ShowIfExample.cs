@@ -7,8 +7,8 @@ namespace SaintsField.Samples.Scripts.ShowHideExamples
         public bool bool1;
         public bool bool2;
         // show=1&&2
-        [ShowIf(nameof(bool1), nameof(bool2))] public string show1And2;
+        [FieldShowIf(nameof(bool1), nameof(bool2))] public string show1And2;
         // show=1||2
-        [ShowIf(nameof(bool1)), ShowIf(nameof(bool2))] public string show1Or2;
+        [FieldShowIf(nameof(bool1)), FieldShowIf(nameof(bool2))] public string show1Or2;
     }
 }

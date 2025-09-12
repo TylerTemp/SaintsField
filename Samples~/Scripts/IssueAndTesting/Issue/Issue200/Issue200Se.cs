@@ -32,7 +32,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue200
         public RectOffset roUnity;
         [SaintsRow]
         public RectOffset ro2SaintsFieldDraw;
-        [ShowIf(true)]
+        [FieldShowIf(true)]
         public RectOffset ro2SaintsFallback;
 
         private string D()

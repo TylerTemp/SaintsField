@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             // disable/enable/show/hide
-            bool ifCondition = FieldWithInfo.PlayaAttributes.Count(each => each is PlayaShowIfAttribute
+            bool ifCondition = FieldWithInfo.PlayaAttributes.Count(each => each is ShowIfAttribute
                                                                            // ReSharper disable once MergeIntoLogicalPattern
                                                                            || each is PlayaEnableIfAttribute
                                                                            // ReSharper disable once MergeIntoLogicalPattern

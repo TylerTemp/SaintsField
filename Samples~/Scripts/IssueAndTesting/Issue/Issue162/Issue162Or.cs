@@ -7,9 +7,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue162
         [InfoBox("Use HideIf(A || B)")]
         public Transform _receiverTransform;
 
-        [HideIf(nameof(_receiverTransform), nameof(randomReceiver))]
+        [FieldHideIf(nameof(_receiverTransform), nameof(randomReceiver))]
         public bool worldReceiver;
-        [HideIf(nameof(_receiverTransform), nameof(worldReceiver))]
+        [FieldHideIf(nameof(_receiverTransform), nameof(worldReceiver))]
         public bool randomReceiver;
     }
 }

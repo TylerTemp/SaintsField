@@ -5,13 +5,13 @@ namespace SaintsField.Samples.Scripts.ShowHideExamples
 {
     public class ShowHideSimpleExample: MonoBehaviour
     {
-        [HideIf] public string justHide;
-        [ShowIf] public string justShow;
+        [FieldHideIf] public string justHide;
+        [FieldShowIf] public string justShow;
 
         public bool condition;
 
-        [ShowIf(nameof(condition))] public string boolShow;
-        [HideIf(nameof(condition))] public string boolHide;
+        [FieldShowIf(nameof(condition))] public string boolShow;
+        [FieldHideIf(nameof(condition))] public string boolHide;
 
         [Serializable]
         public enum Enum1
@@ -31,8 +31,8 @@ namespace SaintsField.Samples.Scripts.ShowHideExamples
 
         public Enum2 enum2;
 
-        [ShowIf(nameof(enum1), Enum1.On)] public string enum1Show;
-        [ShowIf(nameof(enum1), Enum1.On, nameof(enum2), Enum2.On)] public string enum1And2Show;
+        [FieldShowIf(nameof(enum1), Enum1.On)] public string enum1Show;
+        [FieldShowIf(nameof(enum1), Enum1.On, nameof(enum2), Enum2.On)] public string enum1And2Show;
 
         [Serializable, Flags]
         public enum EnumFlag
@@ -47,6 +47,6 @@ namespace SaintsField.Samples.Scripts.ShowHideExamples
         [EnumToggleButtons]
         public EnumFlag enumFlag;
 
-        [ShowIf(nameof(enumFlag), EnumFlag.Flag1 | EnumFlag.Flag3)] public string flag1Show;
+        [FieldShowIf(nameof(enumFlag), EnumFlag.Flag1 | EnumFlag.Flag3)] public string flag1Show;
     }
 }

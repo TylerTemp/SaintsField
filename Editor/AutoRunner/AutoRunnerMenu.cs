@@ -32,7 +32,7 @@ namespace SaintsField.Editor.AutoRunner
         public AutoRunnerWindow inspectTarget;
 
         [Layout("Dropdown")]
-        [Ordered, Button("Save"), PlayaShowIf(nameof(EditorInlineInspectNoFile))]
+        [Ordered, Button("Save"), ShowIf(nameof(EditorInlineInspectNoFile))]
         private void SaveToProject()
         {
             string defaultPath;

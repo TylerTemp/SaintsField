@@ -6,10 +6,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
     {
         [SepTitle("Inherent:Test", EColor.Gray)]
         public bool isString;
-        [ShowIf("isString")]
+        [FieldShowIf("isString")]
         public string strA;
 
         public bool haveInfo2;
-        [PlayaShowIf(nameof(haveInfo2))] public string infoTextureName2;
+        [ShowIf(nameof(haveInfo2))] public string infoTextureName2;
     }
 }

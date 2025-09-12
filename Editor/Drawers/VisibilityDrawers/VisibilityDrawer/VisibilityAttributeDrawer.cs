@@ -25,11 +25,11 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers.VisibilityDrawer
 
         private static (string error, bool show) GetShow(SerializedProperty property, MemberInfo info)
         {
-            (ShowIfAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<ShowIfAttribute>(property);
+            (FieldShowIfAttribute[] attributes, object parent) = SerializedUtils.GetAttributesAndDirectParent<FieldShowIfAttribute>(property);
 
             List<bool> showOrResults = new List<bool>();
             string error = "";
-            foreach (ShowIfAttribute showIfAttribute in attributes)
+            foreach (FieldShowIfAttribute showIfAttribute in attributes)
             {
                 (string error, bool shown) showResult = showIfAttribute.IsShow
                     ? ShowIfAttributeDrawer.HelperShowIfIsShown(showIfAttribute.ConditionInfos, property, info, parent)

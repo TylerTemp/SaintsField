@@ -16,7 +16,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 
             public StepType stepType;
 
-            [GUIColor(EColor.Lime), ShowIf(nameof(stepType), StepType.Dialog)]
+            [GUIColor(EColor.Lime), FieldShowIf(nameof(stepType), StepType.Dialog)]
             public string dialog;
         }
 

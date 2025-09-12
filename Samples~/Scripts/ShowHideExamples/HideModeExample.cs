@@ -6,10 +6,10 @@ namespace SaintsField.Samples.Scripts.ShowHideExamples
     {
         public bool boolValue;
 
-        [HideIf(EMode.Edit)] public string hideEdit;
-        [HideIf(EMode.Play)] public string hidePlay;
+        [FieldHideIf(EMode.Edit)] public string hideEdit;
+        [FieldHideIf(EMode.Play)] public string hidePlay;
 
-        [HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditOrBool;
-        [HideIf(EMode.Edit, nameof(boolValue))] public string hideEditAndBool;
+        [FieldHideIf(EMode.Edit), FieldHideIf(nameof(boolValue))] public string hideEditOrBool;
+        [FieldHideIf(EMode.Edit, nameof(boolValue))] public string hideEditAndBool;
     }
 }

@@ -18,7 +18,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         public struct SimpleExampleStruct
         {
             public Toggle toggle;
-            [ShowIf(nameof(toggle), Toggle.On)] public float value;
+            [FieldShowIf(nameof(toggle), Toggle.On)] public float value;
         }
 
         public SimpleExampleStruct example;
@@ -59,9 +59,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             public float disableIf;
             [EnableIf(nameof(toggle), Toggle.On)]
             public float enableIf;
-            [ShowIf(nameof(toggle), Toggle.On)]
+            [FieldShowIf(nameof(toggle), Toggle.On)]
             public float showIf;
-            [HideIf(nameof(toggle), Toggle.On)]
+            [FieldHideIf(nameof(toggle), Toggle.On)]
             public float hideIf;
 
             [SepTitle(EColor.Aqua)]

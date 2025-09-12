@@ -270,7 +270,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             {
                 needUpdate = FieldWithInfo.PlayaAttributes.Count(each =>
                     // ReSharper disable once MergeIntoLogicalPattern
-                    each is PlayaShowIfAttribute
+                    each is ShowIfAttribute
                     || each is PlayaEnableIfAttribute
                     || each is PlayaDisableIfAttribute
                     || each is IPlayaMethodBindAttribute) > 0;

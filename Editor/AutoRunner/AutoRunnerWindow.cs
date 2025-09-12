@@ -49,7 +49,7 @@ namespace SaintsField.Editor.AutoRunner
 
         private int _resourceTotal = 1;
 
-        [Ordered, ShowInInspector, PlayaShowIf(nameof(_processedItemCount))] private int _processedItemCount;
+        [Ordered, ShowInInspector, ShowIf(nameof(_processedItemCount))] private int _processedItemCount;
 
         [LayoutStart("Add Buttons", ELayout.Horizontal)]
 
@@ -227,7 +227,7 @@ namespace SaintsField.Editor.AutoRunner
             // StartEditorCoroutine(R());
         }
 
-        [Ordered, Button, PlayaShowIf(nameof(AllowToRestoreScene)), PlayaShowIf(nameof(_isRunning))]
+        [Ordered, Button, ShowIf(nameof(AllowToRestoreScene)), ShowIf(nameof(_isRunning))]
         // ReSharper disable once UnusedMember.Local
         private void StopAndRestoreScene()
         {

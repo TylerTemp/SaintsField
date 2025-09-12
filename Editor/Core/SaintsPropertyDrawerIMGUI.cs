@@ -110,7 +110,7 @@ namespace SaintsField.Editor.Core
             List<bool> showAndResults = new List<bool>();
             foreach (SaintsWithIndex saintsAttributeWithIndex in saintsAttributeWithIndexes)
             {
-                if (saintsAttributeWithIndex.SaintsAttribute is ShowIfAttribute showIfAttribute)
+                if (saintsAttributeWithIndex.SaintsAttribute is FieldShowIfAttribute showIfAttribute)
                 {
                     SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
                     showAndResults.Add(drawer.GetThisDecoratorVisibility(showIfAttribute, property, fieldInfo, parent));
@@ -446,7 +446,7 @@ namespace SaintsField.Editor.Core
 
             // Debug.Log($"Saints: {property.displayName} found {allSaintsAttributes.Count}");
 
-            if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is ShowIfAttribute),
+            if (!GetVisibility(property, allSaintsAttributes.Where(each => each.SaintsAttribute is FieldShowIfAttribute),
                     parent))
             {
                 return;

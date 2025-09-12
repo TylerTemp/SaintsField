@@ -7,10 +7,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         [SerializeField]
         private bool _overrideValue;
 
-        [SerializeField, ShowIf(nameof(_overrideValue)), Min(0), Tooltip("A value of 0 means it's infinite")]
+        [SerializeField, FieldShowIf(nameof(_overrideValue)), Min(0), Tooltip("A value of 0 means it's infinite")]
         private int _valueOverride;
 
-        [SerializeField, MinValue(0), ShowIf(nameof(_overrideValue)), Tooltip("A value of 0 means it's infinite")]
+        [SerializeField, MinValue(0), FieldShowIf(nameof(_overrideValue)), Tooltip("A value of 0 means it's infinite")]
         private int _valueOverrideUsingSaintsField;
     }
 }

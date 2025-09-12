@@ -25,7 +25,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue11
         public bool showMyMethod;
 
         #region  example of using property value
-        [Button, PlayaShowIf(nameof(showMyMethod))]
+        [Button, ShowIf(nameof(showMyMethod))]
         public void MyMethod1()
         {
             Debug.Log("Method1");
@@ -42,7 +42,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue11
 #endif
 
 #if UNITY_EDITOR
-        [Button, PlayaShowIf(nameof(ShouldShowMyMethod))]
+        [Button, ShowIf(nameof(ShouldShowMyMethod))]
 #endif
         public void MyMethod2()
         {
@@ -51,7 +51,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue11
         #endregion
 
         // this works on normal field too
-        [PlayaShowIf(nameof(showMyMethod))]
+        [ShowIf(nameof(showMyMethod))]
         public int myInt;
     }
 }

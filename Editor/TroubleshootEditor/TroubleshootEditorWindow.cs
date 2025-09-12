@@ -224,7 +224,7 @@ namespace SaintsField.Editor.TroubleshootEditor
         }
 
         [Ordered,
-         ShowIf(nameof(NeedPickComponent)),
+         FieldShowIf(nameof(NeedPickComponent)),
          AdvancedDropdown(nameof(PickComponent)),
          OnValueChanged(nameof(TroubleshootComponentChanged)),
          BelowInfoBox("$" + nameof(GetDrawerInfo)),
@@ -256,7 +256,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         [Ordered,
          AdvancedDropdown(nameof(PickFieldName)),
-         ShowIf(nameof(GetTroubleshootSerTarget)), DisableIf(nameof(_inProgress)),
+         FieldShowIf(nameof(GetTroubleshootSerTarget)), DisableIf(nameof(_inProgress)),
          OnValueChanged(nameof(RunTargetChecker)),
          BelowInfoBox("$" + nameof(_targetMessage)), BelowInfoBox("$" + nameof(_fieldMessage))]
         public int field;

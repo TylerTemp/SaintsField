@@ -7,6 +7,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
     {
         public UnityEvent<Vector2> onPointerDeltaChangeOriginal;
         public bool needDelta;
-        [ShowIf(nameof(needDelta))] public UnityEvent<Vector2> onPointerDeltaChange;
+        [FieldShowIf(nameof(needDelta))] public UnityEvent<Vector2> onPointerDeltaChange;
     }
 }
