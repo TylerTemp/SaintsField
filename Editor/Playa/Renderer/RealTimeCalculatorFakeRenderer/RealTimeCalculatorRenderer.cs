@@ -1,5 +1,8 @@
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using UnityEditor;
+#if UNITY_2021_3_OR_NEWER
+using UnityEngine.Events;
+#endif
 
 namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
 {
@@ -17,9 +20,15 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
 
         }
 
+#if UNITY_2021_3_OR_NEWER
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+#endif
+
         public override void OnSearchField(string searchString)
         {
-            throw new System.NotImplementedException();
+#if UNITY_2021_3_OR_NEWER
+            _onSearchFieldUIToolkit.Invoke(searchString);
+#endif
         }
     }
 }

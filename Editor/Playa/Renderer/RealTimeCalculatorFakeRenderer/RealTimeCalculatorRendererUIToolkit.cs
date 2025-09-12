@@ -155,26 +155,25 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
             }
 
 
-            // _onSearchFieldUIToolkit.AddListener(Search);
-            // container.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+            _onSearchFieldUIToolkit.AddListener(Search);
+            root.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
 
             _returnValueContainer = new VisualElement();
             root.Add(_returnValueContainer);
 
-
             return (root, true);
 
-            // void Search(string search)
-            // {
-            //     DisplayStyle display = Util.UnityDefaultSimpleSearch(methodNameFriendly, search)
-            //         ? DisplayStyle.Flex
-            //         : DisplayStyle.None;
-            //
-            //     if (buttonElement.style.display != display)
-            //     {
-            //         buttonElement.style.display = display;
-            //     }
-            // }
+            void Search(string search)
+            {
+                DisplayStyle display = Util.UnityDefaultSimpleSearch(GetName(FieldWithInfo), search)
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                if (root.style.display != display)
+                {
+                    root.style.display = display;
+                }
+            }
         }
 
         // private RichTextDrawer _richTextDrawer;
