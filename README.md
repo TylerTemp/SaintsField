@@ -1941,6 +1941,31 @@ private void DictExternalAdd()
 
 [![video](https://github.com/user-attachments/assets/dd3e7add-36f3-4f59-918c-58022d68cac6)](https://github.com/user-attachments/assets/57baefa0-144c-4c7f-8100-dd7b102d3935)
 
+You can use it on a function. If parameters / return value is provided, they'll be shown too, make it like a real time calculator.
+
+```csharp
+using SaintsField.Playa;
+// A function is also supported
+[ShowInInspector]
+private string Function() => $"Function is supported ({Random.Range(0, 10)})";
+
+// Make a function like a real time calculator
+[ShowInInspector]
+private int AddCalculator(int a, int b)
+{
+    return a + b;
+}
+
+// class, struct and unity object are supported too
+private class ClassType
+{
+    public Transform Value;
+}
+[ShowInInspector]
+private ClassType GetClassType(int index) => new ClassType { Value = childrenTrans[index % childrenTrans.Length] };
+```
+[![](https://github.com/user-attachments/assets/2331745f-f950-4b84-a06a-75264b2d2f24)](https://github.com/user-attachments/assets/9b6a8be1-acc3-4322-b6e5-76b596e736e3)
+
 ### Numerical ###
 
 #### `Rate` ####

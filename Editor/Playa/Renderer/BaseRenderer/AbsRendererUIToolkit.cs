@@ -218,7 +218,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         {
             public Type UnityObjectOverrideType;
             public UIToolkitValueEditPayloadState State;
-            public bool IsFullFilled;
+            // public bool IsFullFilled;
         }
 
         private static readonly Color ReColor = EColor.EditorSeparator.GetColor();
@@ -1706,6 +1706,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         textField.labelElement.style.color = ReColor;
                     }
 
+                    // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                     if(_nullUss is null)  // bypass life circle
                     {
                         _nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
@@ -1728,9 +1729,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             bool useOld = genFoldout != null;
             if (!useOld)
             {
+                // Debug.Log($"Create foldout for value {value}");
                 genFoldout = new Foldout
                 {
-                    value = _expandedValue.Contains(value),
+                    value = ExpandedValue.Contains(value),
                     text = label,
                     style =
                     {
@@ -1738,7 +1740,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     },
                     userData = new UIToolkitValueEditPayload
                     {
-                        IsFullFilled = false,
+                        // IsFullFilled = false,
                         UnityObjectOverrideType = value?.GetType(),
                     },
                 };
@@ -1861,7 +1863,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
                 });
 
-                if (_expandedValue.Contains(value))
+                if (ExpandedValue.Contains(value))
                 {
                     FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
                 }
@@ -1875,6 +1877,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // Debug.Log($"valueActualType={valueActualType}");
             if (valueActualType != null && typeof(Object).IsAssignableFrom(valueActualType))
             {
+                // ReSharper disable once PossibleInvalidCastException
                 ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (Object)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
                 // Debug.Log($"objFieldResult={objFieldResult}");
                 if (objFieldResult != null)
@@ -1893,7 +1896,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 fieldsBody.Clear();
                 payload.State = UIToolkitValueEditPayloadState.FieldObject;
-                payload.IsFullFilled = false;
+                // payload.IsFullFilled = false;
                 return (useOld ? null : genFoldout, true);
             }
 
@@ -1928,11 +1931,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if (expanded)
             {
-                _expandedValue.Add(value);
+                ExpandedValue.Add(value);
             }
             else
             {
-                _expandedValue.Remove(value);
+                ExpandedValue.Remove(value);
             }
 
             if (!expanded)
@@ -1940,13 +1943,16 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return;
             }
 
-            UIToolkitValueEditPayload payload = (UIToolkitValueEditPayload)genFoldout.userData;
-            if (payload.IsFullFilled)
-            {
-                return;
-            }
+            // UIToolkitValueEditPayload payload = (UIToolkitValueEditPayload)genFoldout.userData;
 
-            payload.IsFullFilled = true;
+            // Debug.Log($"expand value {value}; payload.IsFullFilled={payload.IsFullFilled}");
+
+            // if (payload.IsFullFilled)
+            // {
+            //     return;
+            // }
+
+            // payload.IsFullFilled = true;
             VisualElement fieldsBody = genFoldout.Q<VisualElement>(name: "saintsfield-edit-fields");
 
             // ReSharper disable once PossibleNullReferenceException
@@ -2175,7 +2181,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return false;
         }
 
-        private static HashSet<object> _expandedValue = new HashSet<object>();
+        private static readonly HashSet<object> ExpandedValue = new HashSet<object>();
 
         private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, Object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
