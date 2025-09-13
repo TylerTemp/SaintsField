@@ -85,19 +85,19 @@ Unity: 2019.1 or higher
 If you have DOTween installed
 *   Please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
 *   Or disable related functions with `Window` - `Saints` - `Disable DOTween Support`
-*   If you can not find this menu, please read "Add a Macro" section about how to manually disable DOTween support in SaintsField.
+*   If you can not find this menu, please read the "Add a Macro" section about how to manually disable DOTween support in SaintsField.
 
 [**Optional**] To use the full functions of this project, please also do: `Window` - `Saints` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
 
 If you're using `unitypackage` or git submodule, but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
-*   Copy files from project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
+*   Copy files from the project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
     If you're using a file browser instead of Unity's project tab to copy files, you may want to exclude the `.meta` file to avoid GUID conflict.
 
 **Troubleshoot**
 
-After installed, you can use `Window` - `Saints` - `Troubleshoot` to check if some attributes do not work.
+After installation, you can use `Window` - `Saints` - `Troubleshoot` to check if some attributes do not work.
 
 namespace: `SaintsField`
 
@@ -105,8 +105,8 @@ namespace: `SaintsField`
 
 **4.28.0**
 
-1.  UI Toolkit: `ShowInInspector` now support method
-2.  UI Toolkit: `Button` now support method
+1.  UI Toolkit: `ShowInInspector` now supports method
+2.  UI Toolkit: `Button` now supports displaying the returned value
 3.  UI Toolkit: fix `ShowInInspector` didn't update the display if a struct/class field has a sub-field change
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
@@ -132,11 +132,11 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
     Note about format control:
 
     *   If the format contains `{}`, it will be used like a `string.Format`. E.g. `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
-    *   Otherwise, it will be re-written to `{0:formatControl}`. E.g. `<index=D4/>` will be interpreted like `string.Format("{0:D4}", index)`.
+    *   Otherwise, it will be rewritten to `{0:formatControl}`. E.g., `<index=D4/>` will be interpreted like `string.Format("{0:D4}", index)`.
 
     `null` means no label
 
-    for `icon` it will search the following path:
+    for `icon`, it will search the following path:
 
     *   `"Assets/Editor Default Resources/SaintsField/"`  (You can override things here)
     *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
