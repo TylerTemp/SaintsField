@@ -1895,7 +1895,7 @@ private class ClassType
 [ShowInInspector]
 private ClassType GetClassType(int index) => new ClassType { Value = childrenTrans[index % childrenTrans.Length] };
 ```
-[![](https://github.com/user-attachments/assets/2331745f-f950-4b84-a06a-75264b2d2f24)](https://github.com/user-attachments/assets/9b6a8be1-acc3-4322-b6e5-76b596e736e3)
+[![video](https://github.com/user-attachments/assets/2331745f-f950-4b84-a06a-75264b2d2f24)](https://github.com/user-attachments/assets/9b6a8be1-acc3-4322-b6e5-76b596e736e3)
 
 
 UI Toolkit: A null-class can be created, edited and set to `null`:
