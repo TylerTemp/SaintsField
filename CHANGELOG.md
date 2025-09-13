@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.28.0 ##
+
+1.  UI Toolkit: `ShowInInspector` now support method
+2.  UI Toolkit: `Button` now support method
+3.  UI Toolkit: fix `ShowInInspector` didn't update the display if a struct/class field has a sub-field change
+
 ## 4.27.0 ##
 
 > [!CAUTION]

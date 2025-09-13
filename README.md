@@ -103,24 +103,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.27.0**
+**4.28.0**
 
-> [!CAUTION]
-> Contains **Breaking Changes**
-
-This version merged `ShowIf`/`HideIf` into `PlayShowIf`/`PlayaHideIf`. Which means, now `ShowIf`/`HideIf` behaves the same like `OdinInspector`, `NaughtyAttributes` etc. It now works on collection types (array, list) as expected (previously it works on collection's elements, which might be confusing).
-
-1.  **Breaking Changes**: make `ShowIf`/`HideIf` the same behavor as `PlayShowIf`, `PlayaHideIf`. If you get error that can not find `ShowIf`/`HideIf`, please add
-
-    ```csharp
-    using SaintsField.Playa;
-    ```
-
-    [#269](https://github.com/TylerTemp/SaintsField/issues/269)
-
-2.  Add `GetMainCamera` as an alias of `[GetByXPath("scene:://@{GetComponent(Camera)}[@{tag} = 'MainCamera']")]`, to get the "MainCamera" tagged camera in the scene.
-3.  IMGUI: Optimize auto getters ticking [#267](https://github.com/TylerTemp/SaintsField/issues/267)
-4.  Change default `AssetPreview` align to `FieldStart` so it matchs the default behavior of `AboveImage`/`BelowImage`
+1.  UI Toolkit: `ShowInInspector` now support method
+2.  UI Toolkit: `Button` now support method
+3.  UI Toolkit: fix `ShowInInspector` didn't update the display if a struct/class field has a sub-field change
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -951,10 +938,11 @@ private void Toggle() => _errorOut = !_errorOut;
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments.
+Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments. UI Toolkit: if the method have a return value, the result will also be shown.
 
 *   `string buttonLabel = null` the button label. If null, it'll use the function name. If it starts with `$`, use a callback or field value as the label.
     Rich text is supported.
+*   `bool hideReturnValue = false` do not display the returned value.
 
 **Known Issue**: Using dynamic label in `SaintsRow`, the label will not update in real time. This is because a `Serializable` class/struc
 field value will be cached by Unity, and reflection can not get an updated value. This issue can not be solved unless
@@ -998,6 +986,32 @@ private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = 
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/7a79ed1f-e227-4cf4-8885-e2ea81f4df3a)
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Button]  // Display the returned value when clicked
+private int AddCalculator(int a, int b) => a + b;
+
+[GetComponentInChildren] public GameObject[] goLis;
+
+private class ResultClass
+{
+    public GameObject Go;
+}
+
+[Button]  // A struct, class, UnityObject return type is supported too
+private ResultClass ReturnClass(int v) => new ResultClass
+{
+    Go = goLis[v % goLis.Length]
+};
+
+[Button(hideReturnValue: true)]  // Hide the returned value
+private int ReturnIgnored() => Random.Range(0, 100);
+```
+
+[![video](https://github.com/user-attachments/assets/8632fa84-2e69-46c2-aa1a-8cb247b3888f)](https://github.com/user-attachments/assets/b56f05a2-590f-4683-8b81-2ff4998c4578)
 
 ### Game Related ###
 
@@ -1831,11 +1845,11 @@ Results:
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-Show a non-field property.
+Show a non-serialized target, be a field, property or a method.
 
-For UI Toolkit: this attribute allow you to edit the corresponing field like odin do. Limitation:
+For UI Toolkit: this attribute allow you to edit the corresponding field like odin do. Limitation:
 
-1.  UI Toolkit only
+1.  Only UI Toolkit support the editing feature
 2.  Does not use custom drawer even the type has one (Same as Odin)
 
 ```csharp
@@ -1857,6 +1871,32 @@ public Color AutoColor
 ```
 
 ![show_in_inspector](https://github.com/TylerTemp/SaintsField/assets/6391063/3e6158b4-6950-42b1-b102-3c8884a59899)
+
+UI Toolkit: You can use it on a function to show a computed value. If parameters / return value is provided, they'll be shown too.
+
+```csharp
+using SaintsField.Playa;
+// A function is also supported
+[ShowInInspector]
+private string Function() => $"Function is supported ({Random.Range(0, 10)})";
+
+// Make a function like a real time calculator
+[ShowInInspector]
+private int AddCalculator(int a, int b)
+{
+    return a + b;
+}
+
+// class, struct and unity object are supported too
+private class ClassType
+{
+    public Transform Value;
+}
+[ShowInInspector]
+private ClassType GetClassType(int index) => new ClassType { Value = childrenTrans[index % childrenTrans.Length] };
+```
+[![](https://github.com/user-attachments/assets/2331745f-f950-4b84-a06a-75264b2d2f24)](https://github.com/user-attachments/assets/9b6a8be1-acc3-4322-b6e5-76b596e736e3)
+
 
 UI Toolkit: A null-class can be created, edited and set to `null`:
 
@@ -1940,31 +1980,6 @@ private void DictExternalAdd()
 ```
 
 [![video](https://github.com/user-attachments/assets/dd3e7add-36f3-4f59-918c-58022d68cac6)](https://github.com/user-attachments/assets/57baefa0-144c-4c7f-8100-dd7b102d3935)
-
-You can use it on a function. If parameters / return value is provided, they'll be shown too, make it like a real time calculator.
-
-```csharp
-using SaintsField.Playa;
-// A function is also supported
-[ShowInInspector]
-private string Function() => $"Function is supported ({Random.Range(0, 10)})";
-
-// Make a function like a real time calculator
-[ShowInInspector]
-private int AddCalculator(int a, int b)
-{
-    return a + b;
-}
-
-// class, struct and unity object are supported too
-private class ClassType
-{
-    public Transform Value;
-}
-[ShowInInspector]
-private ClassType GetClassType(int index) => new ClassType { Value = childrenTrans[index % childrenTrans.Length] };
-```
-[![](https://github.com/user-attachments/assets/2331745f-f950-4b84-a06a-75264b2d2f24)](https://github.com/user-attachments/assets/9b6a8be1-acc3-4322-b6e5-76b596e736e3)
 
 ### Numerical ###
 

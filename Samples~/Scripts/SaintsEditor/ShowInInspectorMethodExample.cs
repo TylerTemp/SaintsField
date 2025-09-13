@@ -25,7 +25,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         // class, struct and unity object are supported too
         [ShowInInspector]
-        private ClassType GetClassType(int index) => new ClassType { Value = childrenTrans[index % childrenTrans.Length] };
+        private ClassType GetClassType(int index) => new ClassType { Value = childrenTrans[(index % childrenTrans.Length + childrenTrans.Length) % childrenTrans.Length] };
 
         // [ShowInInspector]
         // private ClassType _showTrans;

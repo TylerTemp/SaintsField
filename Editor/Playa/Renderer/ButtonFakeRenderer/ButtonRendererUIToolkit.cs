@@ -334,7 +334,13 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             // ReSharper disable once InvertIf
             if(hasReturnValue)
             {
-                _returnContainer = new VisualElement();
+                _returnContainer = new VisualElement
+                {
+                    style =
+                    {
+                        display = DisplayStyle.None,
+                    },
+                };
                 _returnValueContainer = new VisualElement();
                 _returnContainer.Add(_returnValueContainer);
 
@@ -349,7 +355,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         position = Position.Absolute,
                         top = 0,
                         right = 0,
-                    }
+                    },
                 });
 
                 // returnValueContainer.SetEnabled(false);
