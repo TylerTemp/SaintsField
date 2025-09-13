@@ -1,5 +1,24 @@
 # Changelog
 
+## 4.27.0 ##
+
+> [!CAUTION]
+> Contains **Breaking Changes**
+
+This version merged `ShowIf`/`HideIf` into `PlayShowIf`/`PlayaHideIf`. Which means, now `ShowIf`/`HideIf` behaves the same like `OdinInspector`, `NaughtyAttributes` etc. It now works on collection types (array, list) as expected (previously it works on collection's elements, which might be confusing).
+
+1.  **Breaking Changes**: make `ShowIf`/`HideIf` the same behavor as `PlayShowIf`, `PlayaHideIf`. If you get error that can not find `ShowIf`/`HideIf`, please add
+
+    ```csharp
+    using SaintsField.Playa;
+    ```
+
+    [#269](https://github.com/TylerTemp/SaintsField/issues/269)
+
+2.  Add `GetMainCamera` as an alias of `[GetByXPath("scene:://@{GetComponent(Camera)}[@{tag} = 'MainCamera']")]`, to get the "MainCamera" tagged camera in the scene.
+3.  IMGUI: Optimize auto getters ticking [#267](https://github.com/TylerTemp/SaintsField/issues/267)
+4.  Change default `AssetPreview` align to `FieldStart` so it matchs the default behavior of `AboveImage`/`BelowImage`
+
 ## 4.26.0 ##
 
 1.  `AboveImage`, `BelowImage` now support `./PATH` to find an image from hierarchy of current field's game object, and `/PATH` of current game object.

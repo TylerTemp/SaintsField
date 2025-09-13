@@ -17,7 +17,7 @@ namespace SaintsField
         public readonly int Height;
         public readonly EAlign Align;
 
-        public AssetPreviewAttribute(int width=-1, int height=-1, EAlign align=EAlign.End, bool above=false, string groupBy="")
+        public AssetPreviewAttribute(int width=-1, int height=-1, EAlign align=EAlign.FieldStart, bool above=false, string groupBy="")
         {
             GroupBy = groupBy;
 

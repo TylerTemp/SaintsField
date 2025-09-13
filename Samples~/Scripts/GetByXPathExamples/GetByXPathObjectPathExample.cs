@@ -1,3 +1,4 @@
+using SaintsField.Playa;
 using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 
@@ -15,12 +16,16 @@ namespace SaintsField.Samples.Scripts.GetByXPathExamples
 
         // Show if sign the auto target, hide otherwise
         // Note: this only works for UI Toolkit. For IMGUI, the ShowIf/HideIf will work first, and completely disable the other attributes
-        [GetByXPath("./NoSuchTarget!"), FieldShowIf(nameof(noSuchTarget)), ReadOnly] public GameObject noSuchTarget;
-        [GetByXPath(".//Must*/Child"), FieldShowIf(nameof(hasSuchTargetSoShow)), ReadOnly] public GameObject hasSuchTargetSoShow;
+        [GetByXPath("./NoSuchTarget!"), ShowIf(nameof(noSuchTarget)), ReadOnly] public GameObject noSuchTarget;
+        [GetByXPath(".//Must*/Child"), ShowIf(nameof(hasSuchTargetSoShow)), ReadOnly] public GameObject hasSuchTargetSoShow;
 
         [GetByXPath(".//Child[@{activeSelf}]")] public GameObject[] childActive;
 
         [GetByXPath("scene:://@{GetComponent(Camera)}[@{tag} = 'MainCamera']")] public Camera mainCamera;
+        // Get Main Camera
+        [GetMainCamera] public Camera mainCameraComp;
+        // Get the transform that has the main camera
+        [GetMainCamera] public Transform mainCameraTrans;
         [GetByXPath("//*[@layer = 'Ignore Raycast']")] public GameObject ignoreRaycast;
     }
 }

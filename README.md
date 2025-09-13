@@ -103,11 +103,24 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.26.0**
+**4.27.0**
 
-1.  `AboveImage`, `BelowImage` now support `./PATH` to find an image from hierarchy of current field's game object, and `/PATH` of current game object.
-2.  UI Toolkit: fix serialzable struct/class gives error when select a target. Merged [#291](https://github.com/TylerTemp/SaintsField/pull/291) by [@viitana](https://github.com/viitana)
-3.  Fix `[Expandable]` doesn't support multi selection [#284](https://github.com/TylerTemp/SaintsField/issues/284)
+> [!CAUTION]
+> Contains **Breaking Changes**
+
+This version merged `ShowIf`/`HideIf` into `PlayShowIf`/`PlayaHideIf`. Which means, now `ShowIf`/`HideIf` behaves the same like `OdinInspector`, `NaughtyAttributes` etc. It now works on collection types (array, list) as expected (previously it works on collection's elements, which might be confusing).
+
+1.  **Breaking Changes**: make `ShowIf`/`HideIf` the same behavor as `PlayShowIf`, `PlayaHideIf`. If you get error that can not find `ShowIf`/`HideIf`, please add
+
+    ```csharp
+    using SaintsField.Playa;
+    ```
+
+    [#269](https://github.com/TylerTemp/SaintsField/issues/269)
+
+2.  Add `GetMainCamera` as an alias of `[GetByXPath("scene:://@{GetComponent(Camera)}[@{tag} = 'MainCamera']")]`, to get the "MainCamera" tagged camera in the scene.
+3.  IMGUI: Optimize auto getters ticking [#267](https://github.com/TylerTemp/SaintsField/issues/267)
+4.  Change default `AssetPreview` align to `FieldStart` so it matchs the default behavior of `AboveImage`/`BelowImage`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2477,6 +2490,21 @@ public string EditorGetFallbackXPath() => normalIcon == null
     : $"assets::/Alternative/{AssetDatabase.GetAssetPath(normalIcon)["Assets/".Length..]}";
 ```
 
+#### `GetMainCamera` ####
+
+Get main camera (or a gameObject/Component with main camera) from the current scene.
+
+This looks for scene object with `Camera` component and `MainCamera` tag. (This is an alias of `[GetByXPath("scene:://@{GetComponent(Camera)}[@{tag} = 'MainCamera']")]`)
+
+```csharp
+using SaintsField;
+
+// Get Main Camera
+[GetMainCamera] public Camera mainCameraComp;
+// Get the transform that has the main camera
+[GetMainCamera] public Transform mainCameraTrans;
+```
+
 #### `AddComponent` ####
 
 Automatically add a component to the current target if the target does not have this component. (This will not sign the component added)
@@ -2905,9 +2933,14 @@ using SaintsField.Playa;
 
 It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
-#### `ShowIf` / `HideIf` ####
+#### `FieldShowIf` / `FieldHideIf` ####
 
-Show or hide the field based on a condition. . Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
+> [!WARNING]
+> Deprecated. Use `ShowIf`/`HideIf` instead.
+
+Only use this if you can **NOT** have `SaintsEditor` enabled. If you can not use `SaintsEditor`, you should be able to use an alternative `ShowIf`/`HideIf` provided by the editor plugin you're globally using.
+
+Show or hide the field based on a condition. Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
 
 Arguments:
 
@@ -2923,28 +2956,28 @@ Arguments:
 
 *   AllowMultiple: Yes
 
-You can use multiple `ShowIf`, `HideIf`, and even a mix of the two.
+You can use multiple `FieldShowIf`, `FieldShowIf`, and even a mix of the two.
 
-For `ShowIf`: The field will be shown if **ALL** condition is true (`and` operation)
+For `FieldShowIf`: The field will be shown if **ALL** condition is true (`and` operation)
 
-For `HideIf`: The field will be hidden if **ANY** condition is true (`or` operation)
+For `FieldShowIf`: The field will be hidden if **ANY** condition is true (`or` operation)
 
 For multiple attributes: The field will be shown if **ANY** condition is true (`or` operation)
 
-For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || ShowIf(B...)` is true.
+For example, `[FieldShowIf(A...), FieldShowIf(B...)]` will be shown if `FieldShowIf(A...) || FieldShowIf(B...)` is true.
 
-`HideIf` is the opposite of `ShowIf`. Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
+`FieldHideIf` is the opposite of `FieldShowIf`. Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
 
-*   `HideIf(A)` == `ShowIf(!A)`
-*   `HideIf(A, B)` == `HideIf(A || B)` == `ShowIf(!(A || B))` == `ShowIf(!A && !B)`
-*   `[Hideif(A), HideIf(B)]` == `[ShowIf(!A), ShowIf(!B)]` == `ShowIf(!A || !B)`
+*   `FieldHideIf(A)` == `FieldShowIf(!A)`
+*   `FieldHideIf(A, B)` == `FieldHideIf(A || B)` == `FieldShowIf(!(A || B))` == `FieldShowIf(!A && !B)`
+*   `[FieldHideIf(A), FieldHideIf(B)]` == `[FieldShowIf(!A), FieldShowIf(!B)]` == `FieldShowIf(!A || !B)`
 
 A simple example:
 
 ```csharp
 using SaintsField;
 
-[ShowIf(nameof(ShouldShow))]
+[FieldShowIf(nameof(ShouldShow))]
 public int showMe;
 
 public bool ShouldShow()  // change the logic here
@@ -2953,7 +2986,7 @@ public bool ShouldShow()  // change the logic here
 }
 
 // This also works on static/const callbacks using `$:`
-[HideIf("$:" + nameof(Util) + "." + nameof(_shouldHide))] public int hideMe;
+[FieldHideIf("$:" + nameof(Util) + "." + nameof(_shouldHide))] public int hideMe;
 // you can put this under another file like `Util.cs`
 public static class Util
 {
@@ -2973,7 +3006,7 @@ public enum EnumToggle
     On,
 }
 public EnumToggle enum1;
-[ShowIf(nameof(enum1), EnumToggle.On)] public string enum1Show;
+[FieldShowIf(nameof(enum1), EnumToggle.On)] public string enum1Show;
 ```
 
 A more complex example:
@@ -2996,13 +3029,181 @@ public bool bool2 {
 }
 
 // example of checking two normal callbacks and two enum callbacks
-[ShowIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12;
+[FieldShowIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12;
 ```
 
 A more complex example about logic operation:
 
 ```csharp
 using SaintsField;
+
+public bool _bool1;
+public bool _bool2;
+public bool _bool3;
+public bool _bool4;
+
+[FieldShowIf(nameof(_bool1))]
+[FieldShowIf(nameof(_bool2))]
+[RichLabel("<color=red>show=1||2")]
+public string _showIf1Or2;
+
+
+[FieldShowIf(nameof(_bool1), nameof(_bool2))]
+[RichLabel("<color=green>show=1&&2")]
+public string _showIf1And2;
+
+[FieldHideIf(nameof(_bool1))]
+[FieldHideIf(nameof(_bool2))]
+[RichLabel("<color=blue>show=!1||!2")]
+public string _hideIf1Or2;
+
+
+[FieldHideIf(nameof(_bool1), nameof(_bool2))]
+[RichLabel("<color=yellow>show=!(1||2)=!1&&!2")]
+public string _hideIf1And2;
+
+[FieldShowIf(nameof(_bool1))]
+[FieldHideIf(nameof(_bool2))]
+[RichLabel("<color=magenta>show=1||!2")]
+public string _showIf1OrNot2;
+
+[FieldShowIf(nameof(_bool1), nameof(_bool2))]
+[FieldShowIf(nameof(_bool3), nameof(_bool4))]
+[RichLabel("<color=orange>show=(1&&2)||(3&&4)")]
+public string _showIf1234;
+
+[FieldHideIf(nameof(_bool1), nameof(_bool2))]
+[FieldHideIf(nameof(_bool3), nameof(_bool4))]
+[RichLabel("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
+public string _hideIf1234;
+```
+
+[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/1625472e-5769-4c16-81a3-637511437e1d)](https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0)
+
+Example about EMode:
+
+```csharp
+using SaintsField;
+
+public bool boolValue;
+
+[FieldShowIf(EMode.Edit)] public string showEdit;
+[FieldShowIf(EMode.Play)] public string showPlay;
+
+[FieldShowIf(EMode.Edit, nameof(boolValue))] public string showEditAndBool;
+[FieldShowIf(EMode.Edit), FieldShowIf(nameof(boolValue))] public string showEditOrBool;
+
+[FieldHideIf(EMode.Edit)] public string hideEdit;
+[FieldHideIf(EMode.Play)] public string hidePlay;
+
+[FieldHideIf(EMode.Edit, nameof(boolValue))] public string hideEditOrBool;
+[FieldHideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
+```
+
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
+
+
+#### `ShowIf`/`HideIf` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Show or hide the field based on a condition. Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
+
+Arguments:
+
+*   (Optional) `EMode editorMode`
+
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
+
+*   `object by...`
+
+    callbacks or attributes for the condition. For more information, see `Callback` section.
+
+*   Allow Multiple: Yes
+
+You can use multiple `ShowIf`, `HideIf`, and even a mix of the two.
+
+For `ShowIf`: The field will be shown if **ALL** condition is true (`and` operation)
+
+For `HideIf`: The field will be hidden if **ANY** condition is true (`or` operation)
+
+For multiple attributes: The field will be shown if **ANY** condition is true (`or` operation)
+
+For example, `[ShowIf(A...), ShowIf(B...)]` will be shown if `ShowIf(A...) || ShowIf(B...)` is true.
+
+`HideIf` is the opposite of `ShowIf`. Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
+
+*   `HideIf(A)` == `ShowIf(!A)`
+*   `HideIf(A, B)` == `HideIf(A || B)` == `ShowIf(!(A || B))` == `ShowIf(!A && !B)`
+*   `[Hideif(A), HideIf(B)]` == `[ShowIf(!A), ShowIf(!B)]` == `ShowIf(!A || !B)`
+
+A simple example:
+
+```csharp
+using SaintsField.Playa;
+
+[ShowIf(nameof(ShouldShow))]
+public int showMe;
+
+public bool ShouldShow()  // change the logic here
+{
+    return true;
+}
+
+// This also works on static/const callbacks using `$:`
+[HideIf("$:" + nameof(Util) + "." + nameof(_shouldHide))] public int hideMe;
+// you can put this under another file like `Util.cs`
+public static class Util
+{
+    [ShowInIspector] private static bool _shouldHide;
+}
+```
+
+It also supports `enum` types. The syntax is like this:
+
+```csharp
+using SaintsField.Playa;
+
+[Serializable]
+public enum EnumToggle
+{
+    Off,
+    On,
+}
+public EnumToggle enum1;
+[ShowIf(nameof(enum1), EnumToggle.On)] public string enum1Show;
+```
+
+A more complex example:
+
+```csharp
+using SaintsField.Playa;
+
+[Serializable]
+public enum EnumToggle
+{
+    Off,
+    On,
+}
+
+public EnumToggle enum1;
+public EnumToggle enum2;
+public bool bool1;
+public bool bool2 {
+    return true;
+}
+
+// example of checking two normal callbacks and two enum callbacks
+[ShowIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12;
+```
+
+A more complex example about logic operation:
+
+```csharp
+using SaintsField.Playa;
 
 public bool _bool1;
 public bool _bool2;
@@ -3050,7 +3251,7 @@ public string _hideIf1234;
 Example about EMode:
 
 ```csharp
-using SaintsField;
+using SaintsField.Playa;
 
 public bool boolValue;
 
@@ -3069,17 +3270,6 @@ public bool boolValue;
 
 It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
-
-#### `PlayaShowIf`/`PlayaHideIf` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-This is the same as `ShowIf`, `HideIf`, plus it's allowed to be applied to array, `Button`, `ShowInInspector`
-
-Different from `ShowIf`/`HideIf`:
-1.  apply on an array will directly show or hide the array itself, rather than each element.
-2.  Callback function can not receive value and index
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -4779,7 +4969,7 @@ Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D.
 
     preview height, -1 for auto resize (with the same aspect) using the width
 
-*   `EAlign align=EAlign.End`
+*   `EAlign align=EAlign.FieldStart`
 
     Align of the preview image. Options are `Start`, `End`, `Center`, `FieldStart`
 
