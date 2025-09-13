@@ -249,28 +249,27 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return false;
             }
 
+            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+
             if (NothingSigner(genericCache.GetByXPathAttributes[0]))
             {
                 // Debug.Log("return");
                 return DrawPicker(genericCache.GetByXPathAttributes[0], genericCache, position, property,
-                    genericCache.IndexToPropertyCache[SerializedUtils.PropertyPathIndex(property.propertyPath)], onGUIPayload, info);
+                    genericCache.IndexToPropertyCache[propertyIndex], onGUIPayload, info);
             }
 
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-
-            UpdateSharedCacheBase(genericCache, property, info);
             // if (genericCache.UpdateResourceAfterTime > 0)
             // {
             //     Debug.Log($"{genericCache.UpdateResourceAfterTime} {EditorApplication.timeSinceStartup}");
             // }
             // Debug.Log(genericCache.UpdateResourceAfterTime);
-            if(!configExists || genericCache.UpdateResourceAfterTime > EditorApplication.timeSinceStartup)
+            if(!configExists || !genericCache.IndexToPropertyCache.ContainsKey(propertyIndex) || genericCache.UpdateResourceAfterTime > EditorApplication.timeSinceStartup)
             {
+                UpdateSharedCacheBase(genericCache, property, info);
                 genericCache.UpdateResourceAfterTime = double.MinValue;
                 UpdateSharedCacheSource(genericCache, property, info);
+                UpdateSharedCacheSetValue(genericCache, !configExists, property);
             }
-
-            UpdateSharedCacheSetValue(genericCache, !configExists, property);
 
             if(!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
             {
@@ -340,7 +339,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         genericCache.ExpectedType, genericCache.ExpectedInterface,
                         newValue =>
                         {
-                            var oldValue = propertyCache.TargetValue;
+                            object oldValue = propertyCache.TargetValue;
                             propertyCache.TargetValue = newValue;
                             if(DoSignPropertyCache(propertyCache, false))
                             {
