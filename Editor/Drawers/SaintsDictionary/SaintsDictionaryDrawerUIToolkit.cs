@@ -1196,7 +1196,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 case ResponsiveType.None:
                     return Length.Auto();
                 case ResponsiveType.Pixel:
+#if UNITY_6000_OR_NEWER
                     return Length.Pixels(responsiveLength.Value);
+#else
+                    return responsiveLength.Value;
+#endif
                 case ResponsiveType.Percent:
                     return Length.Percent(responsiveLength.Value);
                 default:
