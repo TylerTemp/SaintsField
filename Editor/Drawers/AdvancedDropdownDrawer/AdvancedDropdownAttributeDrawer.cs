@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -44,12 +45,15 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
+        private static readonly Regex enumLabelRegex = new Regex(@"<label\s*/?>", RegexOptions.Compiled);
+
         public static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, PathedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj, bool isImGui)
         {
             string funcName = advancedDropdownAttribute.FuncName;
 
             string error;
             IAdvancedDropdownList dropdownListValue = null;
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Options)
             {
                 AdvancedDropdownList<object> optionsDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
@@ -81,7 +85,13 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "");
                     foreach (object enumValue in enumValues)
                     {
-                        enumDropdown.Add(ReflectUtils.GetRichLabelFromEnum(elementType, enumValue).value, enumValue);
+                        (bool found, string value) = ReflectUtils.GetRichLabelFromEnum(elementType, enumValue);
+                        string useLabel = value;
+                        if (found)
+                        {
+                            useLabel = enumLabelRegex.Replace(value, enumValue.ToString());
+                        }
+                        enumDropdown.Add(useLabel, enumValue);
                     }
 
                     error = "";

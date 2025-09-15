@@ -112,6 +112,12 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
                 fullWidthRichLabelAttribute.IsCallback, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+
+            if(helpBox == null)
+            {
+                return;
+            }
+
             if ((string)helpBox.userData != error)
             {
                 helpBox.userData = error;

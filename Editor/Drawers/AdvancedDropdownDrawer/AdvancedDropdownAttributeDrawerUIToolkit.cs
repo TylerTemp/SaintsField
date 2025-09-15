@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -17,6 +18,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_Button";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_HelpBox";
 
+        private RichTextDrawer _richTextDrawer = new RichTextDrawer();
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
@@ -30,7 +33,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButton(property);
             dropdownButton.userData = initMetaInfo.CurValues;
-            dropdownButton.ButtonLabelElement.text = GetMetaStackDisplay(initMetaInfo);
+            string display = GetMetaStackDisplay(initMetaInfo);
+            UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXml(GetMetaStackDisplay(initMetaInfo), "", null, null, null), _richTextDrawer);
+            dropdownButton.ButtonLabelElement.userData = display;
 
             dropdownButton.AddToClassList(ClassAllowDisable);
 
@@ -151,9 +156,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
             string display =
                 GetMetaStackDisplay(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false));
-            if(dropdownButton.ButtonLabelElement.text != display)
+            // ReSharper disable once InvertIf
+            if((string)dropdownButton.ButtonLabelElement.userData != display)
             {
-                dropdownButton.ButtonLabelElement.text = display;
+                dropdownButton.ButtonLabelElement.userData = display;
+                UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXml(display, "", null, null, null), _richTextDrawer);
             }
         }
 
@@ -163,9 +170,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
             string display =
                 GetMetaStackDisplay(GetMetaInfo(property, (AdvancedDropdownAttribute)saintsAttribute, info, parent, false));
-            if(dropdownButton.ButtonLabelElement.text != display)
+            // ReSharper disable once InvertIf
+            if((string)dropdownButton.ButtonLabelElement.userData != display)
             {
-                dropdownButton.ButtonLabelElement.text = display;
+                dropdownButton.ButtonLabelElement.userData = display;
+                UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXml(display, "", null, null, null), _richTextDrawer);
             }
         }
     }

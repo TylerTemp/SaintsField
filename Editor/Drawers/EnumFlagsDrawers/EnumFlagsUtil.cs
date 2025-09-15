@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -58,6 +59,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             }
             else
             {
+                // ReSharper disable once UseIndexFromEndExpression
                 (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stacks, string _) = AdvancedDropdownUtil.GetSelected(curValues[curValues.Count - 1], Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), dropdownListValue);
                 curSelected = stacks;
             }
@@ -77,6 +79,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             };
         }
 
+        private static readonly Regex EnumLabelRegex = new Regex(@"<label\s*/?>", RegexOptions.Compiled);
+
         public static EnumFlagsMetaInfo GetMetaInfo(SerializedProperty property, FieldInfo info)
         {
             Type enumType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;;
@@ -91,6 +95,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     {
                         string normalName = Enum.GetName(enumType, each);
                         (bool found, string richName) = ReflectUtils.GetRichLabelFromEnum(enumType, each);
+                        if (found)
+                        {
+                            richName = EnumLabelRegex.Replace(richName, normalName ?? "");
+                        }
                         return new EnumDisplayInfo
                         {
                             Name = normalName,

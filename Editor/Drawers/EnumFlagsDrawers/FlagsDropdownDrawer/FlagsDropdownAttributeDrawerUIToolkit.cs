@@ -34,6 +34,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             }
 
             _enumMeta = EnumFlagsUtil.GetMetaInfo(property, info);
+
             FlagsDropdownElement intDropdownElement = new FlagsDropdownElement(_enumMeta);
             intDropdownElement.BindProperty(property);
             return new IntDropdownField(GetPreferredLabel(property), intDropdownElement)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SaintsField.DropdownBase;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -101,6 +102,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         private VisualTreeAsset _separatorAsset;
 
         private ToolbarSearchField _toolbarSearchField;
+
+        private RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         // public VisualElement DebugCloneTree()
         // {
@@ -226,7 +229,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             // scrollView.contentContainer.style.borderBottomWidth = 1;
             // scrollView.contentContainer.style.borderBottomColor = Color.green;
 
-            // Texture2D icon = RichTextDrawer.LoadTexture("eye.png");
             _nextIcon = Util.LoadResource<Texture2D>("arrow-next.png");
             _checkGroupIcon = Util.LoadResource<Texture2D>("arrow-right.png");
             _checkIcon = Util.LoadResource<Texture2D>("check.png");
@@ -368,7 +370,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         ? display
                         : $"{display} <color=#{ColorUtility.ToHtmlStringRGBA(EColor.Gray.GetColor())}>({stackDisplay})</color>";
 
-                    itemContainer.Q<Label>("item-content").text = labelText;
+                    UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXml(labelText, "", null, null, null), _richTextDrawer);
 
                     // bool curSelect = _metaInfo.SelectStacks.Count > 0 && _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
                     bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
@@ -452,7 +454,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         sb.Append(")</color>");
                     }
 
-                    itemContainer.Q<Label>("item-content").text = sb.ToString();
+                    UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXml(sb.ToString(), "", null, null, null), _richTextDrawer);
 
                     Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
                     iconImages.Add(itemIconImage);
@@ -780,7 +782,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     : _checkIcon;
                 // allSelectImage.Add(selectImage);
 
-                itemContainer.Q<Label>("item-content").text = dropdownItem.displayName;
+                UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXml(dropdownItem.displayName, "", null, null, null), _richTextDrawer);
 
                 Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
                 iconImages.Add(itemIconImage);
