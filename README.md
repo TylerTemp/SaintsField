@@ -103,11 +103,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.28.0**
+**4.29.0**
 
-1.  UI Toolkit: `ShowInInspector` now supports method
-2.  UI Toolkit: `Button` now supports displaying the returned value
-3.  UI Toolkit: fix `ShowInInspector` didn't update the display if a struct/class field has a sub-field change
+1.  UI Toolkit: `[SaintsDictionary]` add `keyWidth`, `valueWidth` to customize the width of key/value column
+2.  UI Toolkit: `SaintsDictionary` & `Table` now saved the column width if you dragged it
+3.  UI Toolkit: Add `AdvancedDropdown`, `TreeDropdown` displaying custom tags supported by SaintsField
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -6259,6 +6259,8 @@ Add `SaintsDictionary` attribute to control:
 *   `string valueLabel = "Values"`
 *   `bool searchable = true`: false to disable the search ability
 *   `int numberOfItemsPerPage = 0`: items per page. 0 for no paging
+*   `string keyWidth = null`: key column width. Can be percent like "20%", or pixel like "50" (or "50px"). `null` for auto width.
+*   `string valueWidth = null`: value column width. Can be percent like "20%", or pixel like "50" (or "50px"). `null` for auto width.
 
 ```csharp
 suing SaintsField;
@@ -6286,6 +6288,17 @@ public SaintsDictionary<int, MyStruct> basicType;
 ```
 
 ![image](https://github.com/user-attachments/assets/c2dad54d-bfa6-4c52-acee-e2aa74898d71)
+
+Set init width
+
+```csharp
+suing SaintsField;
+
+[SaintsDictionary(keyWidth: "30%")] public SaintsDictionary<int, string> keyWidthControl;
+[SaintsDictionary(valueWidth: "120px")] public SaintsDictionary<int, string> valueWidthControl;
+```
+
+![](https://github.com/user-attachments/assets/8ef121c0-9762-49ad-915b-cf83e1ef79f9)
 
 You can also inherit `SaintsDictionaryBase<TKey, TValue>` to create your own custom dictionary.
 

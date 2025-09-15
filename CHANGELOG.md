@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.29.0 ##
+
+1.  UI Toolkit: `[SaintsDictionary]` add `keyWidth`, `valueWidth` to customize the width of key/value column
+2.  UI Toolkit: `SaintsDictionary` & `Table` now saved the column width if you dragged it
+3.  UI Toolkit: Add `AdvancedDropdown`, `TreeDropdown` displaying custom tags supported by SaintsField
+
 ## 4.28.0 ##
 
 1.  UI Toolkit: `ShowInInspector` now support method

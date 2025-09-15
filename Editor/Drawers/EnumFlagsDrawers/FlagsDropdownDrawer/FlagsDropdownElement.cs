@@ -59,6 +59,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             int totalCount = selectedNames.Count;
             foreach ((EnumFlagsUtil.EnumDisplayInfo displayInfo, int index) in selectedNames.WithIndex())
             {
+                // Debug.Log($"append {displayInfo.Name}:{displayInfo.RichName}");
                 AddLabelRichText(Label, displayInfo);
                 bool isLast = index == totalCount - 1;
                 if (!isLast)
@@ -69,28 +70,21 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
 
         }
 
-        private RichTextDrawer _richTextDrawer;
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         private void AddLabelRichText(Label label, EnumFlagsUtil.EnumDisplayInfo displayInfo)
         {
             if (displayInfo.HasRichName)
             {
-                _richTextDrawer ??= new RichTextDrawer();
-                VisualElement visualElement = new VisualElement
-                {
-                    style =
-                    {
-                        flexDirection = FlexDirection.Row,
-                    },
-                };
+                // Debug.Log($"add rich {displayInfo.RichName}");
                 foreach (VisualElement chunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(displayInfo.RichName, displayInfo.Name, null, null, null)))
                 {
-                    visualElement.Add(chunk);
+                    label.Add(chunk);
                 }
-                label.Add(visualElement);
             }
             else
             {
+                // Debug.Log($"add text {displayInfo.Name}");
                 AddLabelSingleText(label, displayInfo.Name);
             }
         }

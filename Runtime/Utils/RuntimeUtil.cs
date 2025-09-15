@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using SaintsField.Playa;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Utils
 {
@@ -18,6 +20,7 @@ namespace SaintsField.Utils
 
             if (content.StartsWith("\\"))
             {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
                 return (content.Substring(1, content.Length - 1), false);
             }
 
@@ -563,6 +566,39 @@ namespace SaintsField.Utils
         public static string GetAutoPropertyName(string propName)
         {
             return $"<{propName}>k__BackingField";
+        }
+
+        public static ResponsiveLength ParseResponsiveLength(string content)
+        {
+            if (string.IsNullOrEmpty(content))
+            {
+                return new ResponsiveLength(ResponsiveType.None, -1);
+            }
+            string trimContent = content.Trim();
+            if (trimContent.EndsWith("%"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                // ReSharper disable once ConvertIfStatementToReturnStatement
+                if (float.TryParse(trimContent.Substring(0, trimContent.Length - 1), out float number))
+                {
+                    return new ResponsiveLength(ResponsiveType.Percent, number);
+                }
+                throw new ArgumentException($"{content} is not a valid percent length");
+            }
+
+            string pxContent = trimContent;
+            if (trimContent.ToLower().EndsWith("px"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                pxContent = trimContent.Substring(0, trimContent.Length - 2);
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (float.TryParse(pxContent, out float pxNumber))
+            {
+                return new ResponsiveLength(ResponsiveType.Pixel, pxNumber);
+            }
+            throw new ArgumentException($"{content} is not a valid pixel length");
         }
     }
 }

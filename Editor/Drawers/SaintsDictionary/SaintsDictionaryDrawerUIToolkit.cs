@@ -11,6 +11,7 @@ using SaintsField.Editor.Playa;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -127,6 +128,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 showBorder = true,
 
                 name = NameListView(property),
+                viewDataKey = SerializedUtils.GetUniqueId(property),
 
                 // this has some issue because we bind order with renderer. Sort is not possible
 // #if UNITY_6000_0_OR_NEWER
@@ -600,11 +602,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 },
             };
 
+            ResponsiveLength keyWidth = saintsDictionaryAttribute?.KeyWidth ?? default;
             multiColumnListView.columns.Add(new Column
             {
                 name = "Keys",
                 // title = "Keys",
-                stretchable = true,
+                stretchable = keyWidth.Type == ResponsiveType.None,
+                width = MakeLength(saintsDictionaryAttribute?.KeyWidth ?? default),
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
@@ -721,11 +725,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 },
             });
 
+            ResponsiveLength valueWidth = saintsDictionaryAttribute?.ValueWidth ?? default;
             multiColumnListView.columns.Add(new Column
             {
                 name = "Values",
                 // title = "Values",
-                stretchable = true,
+                stretchable = valueWidth.Type == ResponsiveType.None,
+                width = MakeLength(saintsDictionaryAttribute?.ValueWidth ?? default),
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
@@ -1181,6 +1187,21 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             int bIndex = lis.IndexOf(b);
 
             (lis[aIndex], lis[bIndex]) = (lis[bIndex], lis[aIndex]);
+        }
+
+        private static Length MakeLength(ResponsiveLength responsiveLength)
+        {
+            switch (responsiveLength.Type)
+            {
+                case ResponsiveType.None:
+                    return Length.Auto();
+                case ResponsiveType.Pixel:
+                    return Length.Pixels(responsiveLength.Value);
+                case ResponsiveType.Percent:
+                    return Length.Percent(responsiveLength.Value);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(responsiveLength.Type), responsiveLength.Type, null);
+            }
         }
     }
 }

@@ -623,7 +623,7 @@ namespace SaintsField.Editor.Core
                         style =
                         {
                             flexShrink = 0,
-                            unityTextAlign = TextAnchor.MiddleLeft,
+                            unityTextAlign = TextAnchor.UpperLeft,
                             paddingLeft = 0,
                             paddingRight = 0,
                             whiteSpace = WhiteSpace.Normal,

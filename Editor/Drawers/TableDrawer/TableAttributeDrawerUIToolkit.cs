@@ -121,6 +121,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                 reorderMode = ListViewReorderMode.Animated,
                 showBorder = true,
 
+                viewDataKey = SerializedUtils.GetUniqueId(arrayProp),
+
                 // this has some issue because we bind order with renderer. Sort is not possible
 // #if UNITY_6000_0_OR_NEWER
 //                 sortingMode = ColumnSortingMode.Default,

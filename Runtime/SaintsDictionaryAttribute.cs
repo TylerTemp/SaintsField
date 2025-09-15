@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -18,12 +19,24 @@ namespace SaintsField
         public readonly int NumberOfItemsPerPage;
         public readonly bool Searchable;
 
-        public SaintsDictionaryAttribute(string keyLabel = "Keys", string valueLabel = "Values", bool searchable = true, int numberOfItemsPerPage = 0)
+        public readonly ResponsiveLength KeyWidth;
+        public readonly ResponsiveLength ValueWidth;
+
+        public SaintsDictionaryAttribute(
+            string keyLabel = "Keys",
+            string valueLabel = "Values",
+            bool searchable = true,
+            int numberOfItemsPerPage = 0,
+            string keyWidth = null,
+            string valueWidth = null)
         {
             KeyLabel = keyLabel;
             ValueLabel = valueLabel;
             NumberOfItemsPerPage = numberOfItemsPerPage;
             Searchable = searchable;
+
+            KeyWidth = RuntimeUtil.ParseResponsiveLength(keyWidth);
+            ValueWidth = RuntimeUtil.ParseResponsiveLength(valueWidth);
         }
     }
 }

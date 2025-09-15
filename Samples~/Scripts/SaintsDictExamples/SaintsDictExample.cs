@@ -48,6 +48,9 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
             { 9, "9" },
         };
 
+        [SaintsDictionary(keyWidth: "30%")] public SaintsDictionary<int, string> keyWidthControl;
+        [SaintsDictionary(valueWidth: "120px")] public SaintsDictionary<int, string> valueWidthControl;
+
 
         private void Awake()
         {

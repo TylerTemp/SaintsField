@@ -24,6 +24,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [FlagsDropdown]
         public NamedEnums flagsEnums;
 
+        [TreeDropdown]
+        public NamedEnums treeEnums;
+
+        [FlagsTreeDropdown]
+        public NamedEnums flagsTreeEnums;
+
         [Conditional("UNITY_EDITOR")]
         public class GuildLabelAttribute : RichLabelAttribute
         {

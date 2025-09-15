@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
@@ -31,7 +32,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             dropdownButton.style.flexGrow = 1;
             dropdownButton.name = NameButton(property);
             dropdownButton.userData = initMetaInfo.CurValues;
-            // dropdownButton.ButtonLabelElement.text = AdvancedDropdownAttributeDrawer.GetMetaStackDisplay(initMetaInfo);
 
             dropdownButton.AddToClassList(ClassAllowDisable);
 
@@ -44,14 +44,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            // AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
-            // return new SaintsTreeDropdownElement(metaInfo, false)
-            // {
-            //     style =
-            //     {
-            //         flexGrow = 1,
-            //     },
-            // };
             HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
             {
                 style =
@@ -63,6 +55,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             return helpBox;
         }
+
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -115,9 +109,10 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             {
                 string display =
                     AdvancedDropdownAttributeDrawer.GetMetaStackDisplay(AdvancedDropdownAttributeDrawer.GetMetaInfo(p, (PathedDropdownAttribute)saintsAttribute, info, parent, false));
-                if(dropdownButtonField.ButtonLabelElement.text != display)
+                if((string)dropdownButtonField.ButtonLabelElement.userData != display)
                 {
-                    dropdownButtonField.ButtonLabelElement.text = display;
+                    dropdownButtonField.ButtonLabelElement.userData = display;
+                    UIToolkitUtils.SetLabel(dropdownButtonField.ButtonLabelElement, RichTextDrawer.ParseRichXml(display, "", null, null, null), _richTextDrawer);
                 }
             }
         }
