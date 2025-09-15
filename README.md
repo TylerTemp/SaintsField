@@ -103,7 +103,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.29.0**
+**4.30.0**
 
 1.  UI Toolkit: `[SaintsDictionary]` add `keyWidth`, `valueWidth` to customize the width of key/value column
 2.  UI Toolkit: `SaintsDictionary` & `Table` now saved the column width if you dragged it
