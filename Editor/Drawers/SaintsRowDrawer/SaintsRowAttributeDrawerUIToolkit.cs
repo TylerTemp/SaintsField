@@ -261,16 +261,13 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 }
 
                 Debug.Assert(value != null);
-                // value = getValue;
             }
-
-            // Debug.Assert(value != null);
 
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
                 .ToDictionary(each => each.name, each => each.property);
 
             IReadOnlyList<ISaintsRenderer> renderer =
-                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, new []{value});
+                SaintsEditor.HelperGetRenderers(serializedFieldNames, null, property.serializedObject, makeRenderer, new []{value});
 
              VisualElement bodyElement = new VisualElement();
 

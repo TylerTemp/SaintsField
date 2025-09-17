@@ -2330,6 +2330,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
+            Debug.Log($"render list start {listValue.Length}/{label}/{valueType}");
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render list start {listValue.Length}/{label}/{valueType}");
 #endif
@@ -2483,17 +2484,27 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         elementType,
                         actualValue,
                         null,
-                        showAddRemoveFooter
-                         ? newItemValue =>
-                            {
+//                         showAddRemoveFooter
+//                          ? newItemValue =>
+//                             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+//                                 Debug.Log($"List {actualIndex} set newValue {newItemValue}");
+// #endif
+//                                 IList rawListValueArray = (IList) payload.RawListValue;
+//                                 rawListValueArray[actualIndex] = newItemValue;
+//                                 payload.RawValues[actualIndex] = newItemValue;
+//                             }
+//                          : null,
+                        newItemValue =>
+                        {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-                                Debug.Log($"List {actualIndex} set newValue {newItemValue}");
+                            Debug.Log($"List {actualIndex} set newValue {newItemValue}");
 #endif
-                                IList rawListValueArray = (IList) payload.RawListValue;
-                                rawListValueArray[actualIndex] = newItemValue;
-                                payload.RawValues[actualIndex] = newItemValue;
-                            }
-                         : null,
+                            IList rawListValueArray = (IList) payload.RawListValue;
+                            rawListValueArray[actualIndex] = newItemValue;
+                            payload.RawValues[actualIndex] = newItemValue;
+                            setterOrNull?.Invoke(rawListValueArray);
+                        },
                         false,
                         inHorizontalLayout).result;
                     if (item != null)

@@ -7812,3 +7812,15 @@ My (not full) test about compatibility:
 *   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
 *   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
 *   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good when it's inside Odin's own serializer.
+
+## Donation ##
+
+## Donation Link
+
+PayPal: [![Image](https://github.com/user-attachments/assets/af35c913-151f-463d-9635-e562683b1ce8)](https://www.paypal.com/donate/?hosted_button_id=B38BUN42VQ73N)
+
+## Donation List
+
+Thanks for the following generous donors:
+
+- [bilemedimkq](https://github.com/bilemedimkq) donated on 2025-09-17

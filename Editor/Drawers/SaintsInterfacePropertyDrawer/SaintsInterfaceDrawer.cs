@@ -24,8 +24,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 ? ReflectUtils.GetElementType(info.FieldType)
                 : info.FieldType;
 
-
-            foreach (Type thisType in GetGenBaseTypes(interfaceContainer))
+            foreach (Type thisType in RectUtils.GetGenBaseTypes(interfaceContainer))
             {
                 if (thisType.IsGenericType && thisType.GetGenericTypeDefinition() == typeof(SaintsInterface<,>))
                 {
@@ -38,31 +37,6 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             // throw new ArgumentException($"Failed to obtain generic arguments from {interfaceContainer}");
             return (null, null);
-        }
-
-        private static IEnumerable<Type> GetGenBaseTypes(Type type)
-        {
-            if (type.IsGenericType)
-            {
-                yield return type;
-            }
-
-            Type lastType = type;
-            while (true)
-            {
-                Type baseType = lastType.BaseType;
-                if (baseType == null)
-                {
-                    yield break;
-                }
-
-                if (baseType.IsGenericType)
-                {
-                    yield return baseType;
-                }
-
-                lastType = baseType;
-            }
         }
 
         private class FieldInterfaceSelectWindow : SaintsObjectPickerWindowIMGUI

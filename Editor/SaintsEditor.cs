@@ -17,6 +17,7 @@ using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
+using SaintsField.SaintsSerialization;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
@@ -80,13 +81,156 @@ namespace SaintsField.Editor
         public static IReadOnlyList<ISaintsRenderer> Setup(ICollection<string> skipSerializedFields, SerializedObject serializedObject, IMakeRenderer makeRenderer,
             IReadOnlyList<object> targets)
         {
-            string[] serializableFields = GetSerializedProperties(serializedObject).ToArray();
+            // HashSet<string> brokenFields = new HashSet<string>();
+            SerializedProperty saintsSerializedProp = serializedObject.FindProperty(Util.SerializedFieldName);
+            if (saintsSerializedProp != null)
+            {
+                #region Setup Serialization
+                if (targets.Count != 0 && !targets.All(RuntimeUtil.IsNull))
+                {
+                    bool changed = false;
+
+                    object target = targets[0];
+                    List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
+                    types.Reverse();
+                    foreach (Type systemType in types)
+                    {
+                        const BindingFlags reflectFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly;
+
+                        foreach (MemberInfo memberInfo in systemType.GetMembers(reflectFlags))
+                        {
+                            bool foundIsField = memberInfo.MemberType == MemberTypes.Field;
+                            bool isProperty = memberInfo.MemberType == MemberTypes.Property;
+                            if (!foundIsField && !isProperty)
+                            {
+                                continue;
+                            }
+
+                            SaintsSerializedAttribute[] prop = ReflectCache.GetCustomAttributes<SaintsSerializedAttribute>(memberInfo);
+                            if (prop.Length == 0)
+                            {
+                                continue;
+                            }
+
+                            Type foundType;
+                            if (foundIsField)
+                            {
+                                foundType = ((FieldInfo)memberInfo).FieldType;
+                            }
+                            else
+                            {
+                                foundType = ((PropertyInfo)memberInfo).PropertyType;
+                            }
+
+                            bool isList = false;
+                            if(foundType.IsGenericType)
+                            {
+                                Type templateType = ReflectUtils.GetGenBaseTypes(foundType).Last();
+                                isList = templateType.IsGenericType && templateType.GetGenericTypeDefinition() == typeof(List<>);
+                            }
+
+                            CollectionType collectionType;
+                            Type elementType;
+                            if (foundType.IsArray)
+                            {
+                                collectionType = CollectionType.Array;
+                                elementType = ReflectUtils.GetElementType(foundType);
+                            }
+                            else if (isList)
+                            {
+                                collectionType = CollectionType.List;
+                                elementType = ReflectUtils.GetElementType(foundType);
+                            }
+                            else
+                            {
+                                collectionType = CollectionType.Default;
+                                elementType = foundType;
+                            }
+
+                            if (!elementType.IsEnum)
+                            {
+                                continue;
+                            }
+
+                            Type enumUnderType = elementType.GetEnumUnderlyingType();
+                            bool enumUnderLong = enumUnderType == typeof(long);
+                            bool enumUnderUong = enumUnderType == typeof(ulong);
+
+                            if (!enumUnderLong &&
+                                !enumUnderUong)
+                            {
+                                continue;
+                            }
+
+                            // find the target
+                            SerializedProperty foundSaintsSerializedProp = null;
+                            for (int index = 0; index < saintsSerializedProp.arraySize; index++)
+                            {
+                                SerializedProperty checkSaintsSerialzedProp =
+                                    saintsSerializedProp.GetArrayElementAtIndex(index);
+                                if (checkSaintsSerialzedProp.FindPropertyRelative(nameof(SaintsSerializedProperty.name))
+                                        .stringValue == memberInfo.Name)
+                                {
+                                    foundSaintsSerializedProp = checkSaintsSerialzedProp;
+                                    break;
+                                }
+                            }
+
+                            if (foundSaintsSerializedProp == null)
+                            {
+                                // add one
+                                int newIndex = saintsSerializedProp.arraySize;
+                                saintsSerializedProp.arraySize++;
+                                changed = true;
+                                foundSaintsSerializedProp = saintsSerializedProp.GetArrayElementAtIndex(newIndex);
+                                foundSaintsSerializedProp.FindPropertyRelative(nameof(SaintsSerializedProperty.name))
+                                    .stringValue = memberInfo.Name;
+                            }
+
+                            // Update the information
+                            SerializedProperty propertyTypeProp =
+                                foundSaintsSerializedProp.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType));
+                            SerializedProperty isPropertyProp =
+                                foundSaintsSerializedProp.FindPropertyRelative(nameof(SaintsSerializedProperty.isProperty));
+                            SerializedProperty collectionTypeProp =
+                                foundSaintsSerializedProp.FindPropertyRelative(nameof(SaintsSerializedProperty.collectionType));
+                            SaintsPropertyType propertyType = enumUnderLong
+                                ? SaintsPropertyType.EnumLong
+                                : SaintsPropertyType.EnumULong;
+                            if (propertyTypeProp.intValue != (int)propertyType)
+                            {
+                                propertyTypeProp.intValue = (int)propertyType;
+                                changed = true;
+                            }
+                            if (isPropertyProp.boolValue != !foundIsField)
+                            {
+                                isPropertyProp.boolValue = !foundIsField;
+                                changed = true;
+                            }
+
+                            // ReSharper disable once InvertIf
+                            if (collectionTypeProp.intValue != (int)collectionType)
+                            {
+                                collectionTypeProp.intValue = (int)collectionType;
+                                changed = true;
+                            }
+                        }
+                    }
+
+                    if (changed)
+                    {
+                        serializedObject.ApplyModifiedProperties();
+                    }
+                }
+                #endregion
+            }
+
             // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
-            Dictionary<string, SerializedProperty> serializedPropertyDict = serializableFields
+            Dictionary<string, SerializedProperty> serializedPropertyDict = GetSerializedProperties(serializedObject)
                 .Where(each => !skipSerializedFields.Contains(each))
                 .ToDictionary(each => each, serializedObject.FindProperty);
             // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
-            return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, targets);
+            return HelperGetRenderers(serializedPropertyDict, saintsSerializedProp, serializedObject, makeRenderer, targets);
         }
 
         public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(Type objectType, IEnumerable<IPlayaClassAttribute> playaClassAttributes, SerializedObject serializedObject, IReadOnlyList<object> targets)
@@ -139,6 +283,7 @@ namespace SaintsField.Editor
 
         public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
+            SerializedProperty saintsSerializedProp,
             IReadOnlyList<object> targets)
         {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
@@ -248,6 +393,8 @@ namespace SaintsField.Editor
                                         FieldInfo = fieldInfo,
                                         InherentDepth = inherentDepth,
                                         Order = order,
+
+                                        SaintsSerializedProp = saintsSerializedProp,
                                         // serializable = false,
                                     });
                                     memberDepthIds.Add(fieldInfo.Name);
@@ -420,11 +567,13 @@ namespace SaintsField.Editor
         // }
 
         public static IReadOnlyList<ISaintsRenderer> HelperGetRenderers(
-            IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict, SerializedObject serializedObject,
+            IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
+            SerializedProperty saintsSerializedProp,
+            SerializedObject serializedObject,
             IMakeRenderer makeRenderer,
             IReadOnlyList<object> targets)
         {
-            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedPropertyDict, targets).ToArray();
+            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedPropertyDict, saintsSerializedProp, targets).ToArray();
 
             // let's handle some HeaderGUI here... not a good idea but...
             bool anyChange = false;

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Condition;
 using SaintsField.Editor.Linq;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
@@ -18,6 +17,8 @@ namespace SaintsField.Editor.Utils
 {
     public static class Util
     {
+        public const string SerializedFieldName = "_saintsSerializedProperties";
+
         public static readonly string[] ResourceSearchFolder = {
             "Assets/Editor Default Resources/SaintsField",
             "Assets/SaintsField/Editor/Editor Default Resources/SaintsField",  // unitypackage

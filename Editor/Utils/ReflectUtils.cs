@@ -522,5 +522,30 @@ namespace SaintsField.Editor.Utils
 
             return (false, enumFieldName);
         }
+
+        public static IEnumerable<Type> GetGenBaseTypes(Type type)
+        {
+            if (type.IsGenericType)
+            {
+                yield return type;
+            }
+
+            Type lastType = type;
+            while (true)
+            {
+                Type baseType = lastType.BaseType;
+                if (baseType == null)
+                {
+                    yield break;
+                }
+
+                if (baseType.IsGenericType)
+                {
+                    yield return baseType;
+                }
+
+                lastType = baseType;
+            }
+        }
     }
 }

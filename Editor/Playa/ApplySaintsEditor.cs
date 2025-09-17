@@ -42,4 +42,17 @@ namespace SaintsField.Editor.Playa
     {
     }
 #endif
+
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(SaintsMonoBehaviour), true)]
+    public class SaintsMonoBehaviorEditor : ApplySaintsEditorBase
+    {
+    }
+
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(SaintsScriptableObject), true)]
+    public class SaintsScriptableObjectEditor : ApplySaintsEditorBase
+    {
+    }
+
 }

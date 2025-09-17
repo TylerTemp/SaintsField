@@ -43,6 +43,10 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             {
                 return;
             }
+            catch (NullReferenceException)
+            {
+                return;
+            }
 
             CheckMethodBindInternal(playaMethodBindAttribute, fieldWithInfo.MethodInfo, targetObj, fieldWithInfo.Targets[0]).fixer?.Invoke();
         }
