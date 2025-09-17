@@ -6505,9 +6505,9 @@ private class MyTypeClass : IMyTypeRef{}
 [TypeReference(EType.AllAssembly | EType.AllowInternal, superTypes: new[]{typeof(IMyTypeRef)})]
 public TypeReference typeReferenceOf;
 ```
-[![](https://github.com/user-attachments/assets/a11c8c68-019b-4b13-abde-f8c21ed2fd15)](https://github.com/user-attachments/assets/edac2a97-b9e1-4e8e-aa7f-567f25a50528)
+[![video](https://github.com/user-attachments/assets/a11c8c68-019b-4b13-abde-f8c21ed2fd15)](https://github.com/user-attachments/assets/edac2a97-b9e1-4e8e-aa7f-567f25a50528)
 
-This feature is heavy inspired by [ClassTypeReference-for-Unity](https://github.com/SolidAlloy/ClassTypeReference-for-Unity), please go give them a star!
+This feature is heavily inspired by [ClassTypeReference-for-Unity](https://github.com/SolidAlloy/ClassTypeReference-for-Unity), please go give them a star!
 
 ### `SaintsEvent` ###
 
