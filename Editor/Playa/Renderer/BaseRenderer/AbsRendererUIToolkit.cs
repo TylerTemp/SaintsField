@@ -7,6 +7,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -1330,6 +1331,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType.BaseType == typeof(Enum) || value is Enum)
             {
+                return (TreeDropdownAttributeDrawer.DrawEnumUIToolkit(oldElement, label, valueType, value, beforeSet,
+                    setterOrNull,
+                    labelGrayColor, inHorizontalLayout), false);
                 if (oldElement is EnumField oldEnumField)
                 {
                     oldEnumField.SetValueWithoutNotify((Enum)value);

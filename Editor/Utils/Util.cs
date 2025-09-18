@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using SaintsField.Condition;
 using SaintsField.Editor.Linq;
 using UnityEditor;
@@ -2133,6 +2134,24 @@ namespace SaintsField.Editor.Utils
 
             string targetLower = target.ToLower();
             return search.ToLower().Split(new [] { ' ' }, StringSplitOptions.RemoveEmptyEntries).All(searchSegment => targetLower.Contains(searchSegment));
+        }
+
+        private static readonly Regex EnumLabelRegex = new Regex(@"<label\s*/?>", RegexOptions.Compiled);
+
+        public static IEnumerable<(object enumValue, string enumLabel, string enumRichLabel)> GetEnumValues(Type elementType)
+        {
+            Array enumValues = Enum.GetValues(elementType);
+            foreach (object enumValue in enumValues)
+            {
+                (bool found, string value) = ReflectUtils.GetRichLabelFromEnum(elementType, enumValue);
+                string useLabel = null;
+                if (found)
+                {
+                    useLabel = EnumLabelRegex.Replace(value, enumValue.ToString());
+                }
+
+                yield return (enumValue, value, useLabel);
+            }
         }
     }
 }

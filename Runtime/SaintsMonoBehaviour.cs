@@ -24,6 +24,37 @@ namespace SaintsField
 
         public void OnBeforeSerialize()
         {
+            List<int> toRemoveIndexes = new List<int>();
+            for (int index = 0; index < _saintsSerializedProperties.Count; index++)
+            {
+                SaintsSerializedProperty serializedProperty = _saintsSerializedProperties[index];
+                string propName = serializedProperty.name;
+                if (serializedProperty.isProperty)
+                {
+                    PropertyInfo propertyInfo = GetType().GetProperty(propName,
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (propertyInfo == null)
+                    {
+                        toRemoveIndexes.Add(index);
+                    }
+                }
+                else
+                {
+                    FieldInfo fieldInfo = GetType().GetField(propName,
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (fieldInfo == null)
+                    {
+                        toRemoveIndexes.Add(index);
+                    }
+                }
+            }
+
+            toRemoveIndexes.Reverse();
+            foreach (int removeIndex in toRemoveIndexes)
+            {
+                Debug.Log($"remove @{removeIndex}=>{_saintsSerializedProperties[removeIndex].name}");
+                _saintsSerializedProperties.RemoveAt(removeIndex);
+            }
         }
 
         public void OnAfterDeserialize()
@@ -34,11 +65,19 @@ namespace SaintsField
                 if (serializedProperty.isProperty)
                 {
                     PropertyInfo propertyInfo = GetType().GetProperty(propName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (propertyInfo == null)
+                    {
+                        continue;
+                    }
                     propertyInfo.SetValue(this, GetSaintsSerializedPropertyValue(serializedProperty, GetSaintsElementType(propertyInfo.PropertyType)));
                 }
                 else
                 {
                     FieldInfo fieldInfo = GetType().GetField(propName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (fieldInfo == null)
+                    {
+                        continue;
+                    }
                     Type elementType = GetSaintsElementType(fieldInfo.FieldType);
                     object realValue = GetSaintsSerializedPropertyValue(serializedProperty, elementType);
                     fieldInfo.SetValue(this, realValue);
@@ -120,7 +159,7 @@ namespace SaintsField
                         case CollectionType.List:
                             return serializedProperty.longValues.Length == 0
                                 ? (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType))
-                                : (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), Array.ConvertAll(serializedProperty.longValues, each => Convert.ChangeType(each, elementType)));
+                                : (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), MakeArray(elementType, serializedProperty.longValues, serializedProperty.longValues.Length));
                         default:
                             throw new ArgumentOutOfRangeException(nameof(serializedProperty.collectionType), serializedProperty.collectionType, null);
                     }
@@ -141,7 +180,7 @@ namespace SaintsField
                         case CollectionType.List:
                             return serializedProperty.uLongValues.Length == 0
                                 ? (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType))
-                                : (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), Array.ConvertAll(serializedProperty.uLongValues, each => Convert.ChangeType(each, elementType)));
+                                : (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), MakeArray(elementType, serializedProperty.uLongValues, serializedProperty.uLongValues.Length));
                         default:
                             throw new ArgumentOutOfRangeException(nameof(serializedProperty.collectionType), serializedProperty.collectionType, null);
                     }

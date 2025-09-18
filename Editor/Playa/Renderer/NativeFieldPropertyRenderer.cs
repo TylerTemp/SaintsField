@@ -139,7 +139,7 @@ namespace SaintsField.Editor.Playa.Renderer
             else if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue ==
                      (int)SaintsPropertyType.EnumULong)
             {
-                Debug.Log(value);
+                // Debug.Log(value);
                 // Debug.Log(value.GetType());
                 bool changed = false;
                 if(targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.collectionType)).intValue == (int) CollectionType.Default)

@@ -693,6 +693,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b80cbf4737bfe45469982b2683c6041d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   unitParent: {fileID: 0}
   destroySelfUnit: 0
   destroyThisComponent: 0
@@ -709,6 +710,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c97df683fd5f14b8bcec527e048a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   unitParent: {fileID: 0}
   destroySelfUnit: 0
   destroyThisComponent: 0
@@ -761,6 +763,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d8104be554c34f4e9eeb7d789bd5901, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   valueFillerDict:
     _intKeys:
     - value: 0
@@ -3003,6 +3006,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3155a4ce9841f70448f9e17dd750172e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   childrenObjs:
   - {fileID: 1551478299}
   - {fileID: 639593449}
@@ -3056,6 +3060,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f26e3a49310c6704f93951e3eb8a749a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
 --- !u!1 &125054724
 GameObject:
   m_ObjectHideFlags: 0
@@ -3602,6 +3607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c058a3fd06b56c41a48e46e10ef4d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   myStructs:
   - myInt: 12
     myString: 
@@ -4968,6 +4974,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5013ee29324fc140a2dfb50a71e836d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   tableStruct:
   - i1: 0
     i2: 0
@@ -4999,6 +5006,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6a8bae4e54bec44e806d9cc7cac7456, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   tableStruct:
   - i1: 0
     i2: 0
@@ -5430,6 +5438,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a45b7b38fd6ffe43a58bf76e130f4f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   scriptableArray:
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
@@ -6112,6 +6121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31b39e66b233ea24a99674fe9be5f20d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   getComponentInSceneArray:
   - {fileID: 1271404094}
   - {fileID: 1516486913}
@@ -6150,6 +6160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79df818bce4963b49a4136431481d698, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   getComponent: {fileID: 454510170}
   getComponentArray:
   - {fileID: 454510170}
@@ -6401,6 +6412,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b51a1ee91875cc449d8df769d0af777, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
 --- !u!1 &508450317
 GameObject:
   m_ObjectHideFlags: 0
@@ -7719,6 +7731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5220f2e7cd8d0874cb8936f895ca2f85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   toggleDict:
     _keys: 
     _values: 
@@ -7858,6 +7871,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8877d4234d993d4bb74d330996b7336, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   lods:
   - distance: 0
     boidMesh: {fileID: 0}
@@ -8087,6 +8101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b85e587c6a4c3b948b7a5c43bc9b5890, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   _editorNumber: 31
 --- !u!1 &655414024
 GameObject:
@@ -8135,6 +8150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14f9ef16c7648ffaec890c152f2769b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   pathAndResults:
   - xPath: 'scene-root::/Issues*[0]//[@{GetComponent(EPathDebug).enabled}][last()]'
     results:
@@ -8420,6 +8436,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab65dd4da397f9f478c851a43b992a00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   intValue: 1
   dynamic1:
   - 
@@ -13500,6 +13517,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b403da2b815f5be4daa57366ff965f73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   _levelsOrderAndCost:
   - level: 1
     missionsToUnlock:
@@ -14062,6 +14080,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a01f32b96f151b4d9c2a0136de5f05f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   boolV: 0
   leftToggle: 0
   sByteV: 0
@@ -14129,6 +14148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e15ff37d61cdcf4187d4d0a5c936138, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   floatEvent:
     value: 0
     onEvent:
@@ -14502,6 +14522,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6986c12ccdaa7a540845708ecb0e78f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   child: {fileID: 458927138}
   noPicker: {fileID: 458927138}
   refreshButton: {fileID: 798353091}
@@ -14642,6 +14663,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6592a4ac93892354eabd04ce44ce0e55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
 --- !u!1 &822337502
 GameObject:
   m_ObjectHideFlags: 0
@@ -14966,6 +14988,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a45b7b38fd6ffe43a58bf76e130f4f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   scriptableArray:
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
@@ -15310,6 +15333,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fbb524b8b9189b43b7cadc1645e79fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   getComponentInChildrenArray:
   - {fileID: 842523985}
   - {fileID: 454510170}
@@ -15345,6 +15369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b870edd8a84301f4580d8461311a4ff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   dummy: {fileID: 1378025648959380131, guid: 7b3e60b555f89854cb234b0451a42f8a, type: 3}
   dummies:
   - {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
@@ -15686,6 +15711,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe1027d8720786e4ca51c6e943fe60ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   foo1:
     fooInline: 5
     foo: 40
@@ -17216,6 +17242,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e27e407be47be4ebcf71d13ce7ecec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   Data:
   - rid: 7049377450077716484
   - rid: 7049377450077716485
@@ -17445,6 +17472,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7561d6b21375501429535dfd862febb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   mPoints:
   - {fileID: 482348125}
   - {fileID: 682673173}
@@ -18522,6 +18550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e421ea150886349b576dbf69a61839, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   children: []
 --- !u!1 &1110953676
 GameObject:
@@ -19387,37 +19416,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2088148949201590721, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
   m_PrefabInstance: {fileID: 2088148948144400106}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1193632237
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1193632239}
-  m_Layer: 0
-  m_Name: WwiseGlobal
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1193632239
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1193632237}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1194808673
 GameObject:
   m_ObjectHideFlags: 0
@@ -19462,6 +19460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c31b9eb5d3b63c49a0ceaf7454544cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   myStructs:
   - myKeyStruct:
       key: 1
@@ -19904,6 +19903,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5596c9668adf4b648b52090a3b1d4d44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   field: 0
   imgName: star
   disableIf: 
@@ -20528,6 +20528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5eea8957ffcc3d4468323c62a616c010, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   fs:
   - 0.7
   - 0.3
@@ -20939,6 +20940,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2288c39cfae26744a8849fbc5124074f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   delay: 0
   randomizeOffset: 1
 --- !u!1 &1328998356
@@ -23237,6 +23239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58fb6438e47a78a4b86d1f9b3a9d42e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   go:
   - {fileID: 1740970937}
   - {fileID: 1495021542}
@@ -23746,6 +23749,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0abf0ec34f66f04eb1e8175e53d9712, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   toggleMat: {fileID: 2100000, guid: 03af6470f53b830469257315faf122ad, type: 2}
   searchPngs:
   - {fileID: 21300000, guid: f6dd782be9f6242428748582d3c70a63, type: 3}
@@ -23986,6 +23990,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe1027d8720786e4ca51c6e943fe60ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   foo1:
     fooInline: 0
     foo: 3
@@ -24100,6 +24105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60ae44b020d44724aaf0cb7f9831d86f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   noPanda: 0
   range: {x: 2, y: 10}
 --- !u!1 &1567553375
@@ -24147,6 +24153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32401508156202d4bad0348c53009151, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   example: {fileID: 1567553378}
 --- !u!114 &1567553378
 MonoBehaviour:
@@ -26374,6 +26381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b212b9e12abd505498398eec9205dc2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   levels:
   - price: 1112321
     change: 0
@@ -26485,14 +26493,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9ba566336dd27b4397f954640c6f4c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::DictionaryEnumLabel
+  _saintsSerializedProperties: []
+  dropEnums: 1
+  buttonEnums: 0
+  flagsEnums: 1
+  treeEnums: 0
+  flagsTreeEnums: 0
   namedEnumDict:
     _keys: 
     _values: 
     _saintsKeys: []
     _saintsValues: []
-  dropEnums: 1
-  buttonEnums: 0
-  flagsEnums: 1
 --- !u!1 &1780388858
 GameObject:
   m_ObjectHideFlags: 0
@@ -26992,6 +27003,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9d2189280162e247a8852de01b7afa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   gameObjects:
   - {fileID: 1826537367}
   - {fileID: 1271404088}
@@ -27973,6 +27985,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dba73149adeef14eaac426ebd4e73d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   saintsIssue238Interface:
     <V>k__BackingField: {fileID: 0}
 --- !u!1 &1879161570
@@ -28394,6 +28407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f47148b64b2a6940b102cc4f06fcf81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
 --- !u!1 &1909857249
 GameObject:
   m_ObjectHideFlags: 0
@@ -33656,6 +33670,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fbb8c5c9457de14fb910f09d1ad4450, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   type: 1
   newIncreasePerInput: 0
   addToIncreasePerInput: 0
@@ -34077,6 +34092,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26ed529c0df81284babe41dbd5ea5be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   fixed3:
   - myInt: 0
     myString: 
@@ -34319,6 +34335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36e5c620db1deb141bc544e0bbc22a73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   genDict:
     _keys: []
     _values: []
@@ -34382,6 +34399,16 @@ MonoBehaviour:
     - value: 7
     - value: 8
     - value: 9
+  keyWidthControl:
+    _keys: 
+    _values: []
+    _saintsKeys: []
+    _saintsValues: []
+  valueWidthControl:
+    _keys: 
+    _values: []
+    _saintsKeys: []
+    _saintsValues: []
 --- !u!1 &2009356786
 GameObject:
   m_ObjectHideFlags: 0
@@ -37428,4 +37455,3 @@ SceneRoots:
   - {fileID: 17218375}
   - {fileID: 1491166548}
   - {fileID: 1338113063}
-  - {fileID: 1193632239}

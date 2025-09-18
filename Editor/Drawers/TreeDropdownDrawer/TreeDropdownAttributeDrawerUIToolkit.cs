@@ -1,9 +1,11 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -115,6 +117,433 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     UIToolkitUtils.SetLabel(dropdownButtonField.ButtonLabelElement, RichTextDrawer.ParseRichXml(display, "", null, null, null), _richTextDrawer);
                 }
             }
+        }
+
+        private readonly struct DrawInfo
+        {
+            public readonly struct EnumValueInfo
+            {
+                public readonly bool HasValue;
+                public readonly object Value;
+                public readonly string Label;
+
+                public EnumValueInfo(object value, string label)
+                {
+                    HasValue = true;
+                    Value = value;
+                    Label = label;
+                }
+            }
+
+            public readonly IReadOnlyList<EnumValueInfo> EnumValues;
+            public readonly EnumValueInfo NothingValue;
+            public readonly EnumValueInfo EverythingValue;
+            public readonly object EverythingBit;
+            public readonly bool IsFlags;
+            public readonly bool IsULong;
+
+            public DrawInfo(IReadOnlyList<EnumValueInfo> enumValues, EnumValueInfo everythingValue, EnumValueInfo nothingValue, object everythingBit, bool isFlags, bool isULong)
+            {
+                EnumValues = enumValues;
+                EverythingValue = everythingValue;
+                NothingValue = nothingValue;
+                EverythingBit = everythingBit;
+                IsFlags = isFlags;
+                IsULong = isULong;
+            }
+        }
+
+        private class DrawPayload
+        {
+            public DrawInfo DrawInfo;
+            public object Value;
+        }
+
+        public static VisualElement DrawEnumUIToolkit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
+        {
+            Type fieldType = valueType ?? value.GetType();
+            Debug.Assert(fieldType.IsEnum, fieldType);
+
+            bool isFlags = Attribute.IsDefined(fieldType, typeof(FlagsAttribute));
+            string fieldClass = isFlags? "saintsfield-editor-enum-flags-field" : "saintsfield-editor-enum-field";
+            if (oldElement is UIToolkitUtils.DropdownButtonField dropdownButton && dropdownButton.ClassListContains(fieldClass))
+            {
+                DrawPayload drawPayload = (DrawPayload)oldElement.userData;
+                drawPayload.Value = value;
+                // Debug.Log($"update to {value}");
+                DrawEnumUIToolkitUpdateButtonLabel(dropdownButton);
+                return null;
+            }
+
+            List<DrawInfo.EnumValueInfo> enumNormalValues = new List<DrawInfo.EnumValueInfo>();
+            DrawInfo.EnumValueInfo nothingValue = new DrawInfo.EnumValueInfo();
+            DrawInfo.EnumValueInfo everythingValue = new DrawInfo.EnumValueInfo();
+
+            bool isULong = fieldType.GetEnumUnderlyingType() == typeof(ulong);
+
+            long longValue = 0;
+            ulong uLongValue = 0;
+
+            foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(fieldType))
+            {
+                DrawInfo.EnumValueInfo info = new DrawInfo.EnumValueInfo(enumValue, enumRichLabel ?? enumLabel);
+                if (isFlags)
+                {
+                    if (isULong)
+                    {
+                        uLongValue |= (ulong)enumValue;
+                        if ((ulong)enumValue == 0)
+                        {
+                            nothingValue = info;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        longValue |= (long)enumValue;
+                        if ((long)enumValue == 0)
+                        {
+                            nothingValue = info;
+                            continue;
+                        }
+                    }
+                }
+                enumNormalValues.Add(info);
+            }
+
+            int foundEverythingIndex = -1;
+            for (int everythingIndex = 0; everythingIndex < enumNormalValues.Count; everythingIndex++)
+            {
+                DrawInfo.EnumValueInfo enumNormalValue = enumNormalValues[everythingIndex];
+                if (isFlags)
+                {
+                    if (isULong)
+                    {
+                        if ((ulong)enumNormalValue.Value == uLongValue)
+                        {
+                            everythingValue = enumNormalValue;
+                            foundEverythingIndex = everythingIndex;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if ((long)enumNormalValue.Value == longValue)
+                        {
+                            everythingValue = enumNormalValue;
+                            foundEverythingIndex = everythingIndex;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (foundEverythingIndex != -1)
+            {
+                enumNormalValues.RemoveAt(foundEverythingIndex);
+            }
+
+            DrawInfo newInfo = new DrawInfo(enumNormalValues, everythingValue, nothingValue, isULong? uLongValue: longValue, isFlags, isULong);
+            DrawPayload refDrawPayload = new DrawPayload
+            {
+                DrawInfo = newInfo,
+                Value = value,
+            };
+
+            UIToolkitUtils.DropdownButtonField newDropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
+            newDropdownButton.style.flexGrow = 1;
+            newDropdownButton.userData = refDrawPayload;
+
+            newDropdownButton.AddToClassList(ClassAllowDisable);
+            newDropdownButton.AddToClassList(fieldClass);
+
+            newDropdownButton.ButtonElement.clicked += () =>
+            {
+                #region MetaInfo
+
+                AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>("");
+                List<object> curValues = new List<object>();
+                bool containsEverythingOrNothing = false;
+
+                if(newInfo.IsFlags)
+                {
+                    if (newInfo.NothingValue.HasValue)
+                    {
+                        enumDropdown.Add(newInfo.NothingValue.Label, newInfo.NothingValue.Value);
+                    }
+                    else
+                    {
+                        enumDropdown.Add("Nothing", newInfo.IsULong? 0UL: 0L);
+                    }
+
+                    if (newInfo.IsULong)
+                    {
+                        containsEverythingOrNothing = (ulong)refDrawPayload.Value == 0;
+                    }
+                    else
+                    {
+                        containsEverythingOrNothing = (long)refDrawPayload.Value == 0;
+                    }
+                    if (containsEverythingOrNothing)
+                    {
+                        curValues.Add(newInfo.IsULong? 0UL: 0L);
+                    }
+
+                    if (newInfo.EverythingValue.HasValue)
+                    {
+                        enumDropdown.Add(newInfo.EverythingValue.Label, newInfo.EverythingValue.Value);
+                    }
+                    else
+                    {
+                        enumDropdown.Add("Everything", newInfo.EverythingBit);
+                    }
+
+                    if (!containsEverythingOrNothing)
+                    {
+                        if (newInfo.IsULong)
+                        {
+                            containsEverythingOrNothing = ((ulong)refDrawPayload.Value & (ulong)newInfo.EverythingBit) == (ulong) newInfo.EverythingBit;
+                        }
+                        else
+                        {
+                            containsEverythingOrNothing = ((long)refDrawPayload.Value & (long)newInfo.EverythingBit) == (long) newInfo.EverythingBit;
+                        }
+                        if (containsEverythingOrNothing)
+                        {
+                            curValues.Add(newInfo.EverythingBit);
+                        }
+                    }
+
+                    enumDropdown.AddSeparator();
+                }
+
+                foreach (DrawInfo.EnumValueInfo enumInfo in newInfo.EnumValues)
+                {
+                    // Debug.Log($"Add {enumInfo.Label} {enumInfo.Value}");
+                    enumDropdown.Add(enumInfo.Label, enumInfo.Value);
+                    if (!containsEverythingOrNothing)
+                    {
+                        if (isFlags)
+                        {
+                            if (isULong)
+                            {
+                                if (((ulong)refDrawPayload.Value & (ulong)enumInfo.Value) != 0)
+                                {
+                                    curValues.Add(enumInfo.Value);
+                                }
+                            }
+                            else
+                            {
+                                if (((long)refDrawPayload.Value & (long)enumInfo.Value) != 0)
+                                {
+                                    curValues.Add(enumInfo.Value);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (enumInfo.Value == refDrawPayload.Value)
+                            {
+                                curValues.Add(value);
+                            }
+                        }
+                    }
+                }
+
+                #endregion
+
+                AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+                {
+                    DropdownListValue = enumDropdown,
+                    CurValues = curValues,
+                    SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                    Error = "",
+                };
+
+                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(newDropdownButton.worldBound);
+
+                SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
+                    metaInfo,
+                    newDropdownButton.worldBound.width,
+                    maxHeight,
+                    false,
+                    (curItem, on) =>
+                    {
+                        // Debug.Log($"curItem={curItem}");
+                        beforeSet?.Invoke(refDrawPayload.Value);
+                        if(setterOrNull != null)
+                        {
+                            if (newInfo.IsFlags)
+                            {
+                                if (newInfo.IsULong)
+                                {
+                                    ulong curValue = (ulong)curItem;
+                                    ulong newValue;
+                                    if (curValue == 0)
+                                    {
+                                        newValue = 0UL;
+                                    }
+                                    else if (curValue == (ulong)newInfo.EverythingBit)
+                                    {
+                                        newValue = (ulong)newInfo.EverythingBit;
+                                    }
+                                    else if (on)
+                                    {
+                                        if ((ulong)refDrawPayload.Value == (ulong)refDrawPayload.DrawInfo.EverythingBit)
+                                        {
+                                            newValue = curValue;
+                                        }
+                                        else
+                                        {
+                                            newValue = (ulong)refDrawPayload.Value | curValue;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        newValue = EnumFlagsUtil.SetOffBit((ulong)refDrawPayload.Value, curValue);
+                                    }
+                                    refDrawPayload.Value = newValue;
+                                    // Debug.Log($"setterOrNull({newValue})");
+                                    setterOrNull(newValue);
+                                }
+                                else
+                                {
+                                    long curValue = (long)curItem;
+                                    long newValue;
+                                    if (curValue == 0)
+                                    {
+                                        newValue = 0L;
+                                    }
+                                    else if (curValue == (long)newInfo.EverythingBit)
+                                    {
+                                        newValue = (long)newInfo.EverythingBit;
+                                    }
+                                    else if (on)
+                                    {
+                                        if ((long)refDrawPayload.Value == (long)refDrawPayload.DrawInfo.EverythingBit)
+                                        {
+                                            newValue = curValue;
+                                        }
+                                        else
+                                        {
+                                            newValue = (long)refDrawPayload.Value | curValue;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        newValue = EnumFlagsUtil.SetOffBit((long)refDrawPayload.Value, curValue);
+                                    }
+                                    refDrawPayload.Value = newValue;
+                                    // Debug.Log($"setterOrNull({newValue})");
+                                    setterOrNull(newValue);
+                                }
+                            }
+                            else
+                            {
+                                // Debug.Log($"setterOrNull({curItem})");
+                                setterOrNull(curItem);
+                            }
+                        }
+                        return null;
+                    }
+                );
+                UnityEditor.PopupWindow.Show(worldBound, sa);
+            };
+
+            DrawEnumUIToolkitUpdateButtonLabel(newDropdownButton);
+
+            return newDropdownButton;
+        }
+
+        private static void DrawEnumUIToolkitUpdateButtonLabel(UIToolkitUtils.DropdownButtonField dropdownButton)
+        {
+            DrawPayload refDrawPayload = (DrawPayload)dropdownButton.userData;
+            string label = DrawEnumGetButtonLabel(refDrawPayload);
+            Label btnLabel = dropdownButton.ButtonLabelElement;
+            UIToolkitUtils.SetLabel(btnLabel, RichTextDrawer.ParseRichXml(label, "", null, null, null), new RichTextDrawer());
+        }
+
+        private static string DrawEnumGetButtonLabel(DrawPayload refDrawPayload)
+        {
+            if(refDrawPayload.DrawInfo.IsFlags)
+            {
+                bool isNothing;
+                if (refDrawPayload.DrawInfo.IsULong)
+                {
+                    isNothing = (ulong)refDrawPayload.Value == 0;
+                }
+                else
+                {
+                    isNothing = (long)refDrawPayload.Value == 0;
+                }
+
+
+                if (isNothing)
+                {
+                    if (refDrawPayload.DrawInfo.NothingValue.HasValue)
+                    {
+                        return refDrawPayload.DrawInfo.NothingValue.Label;
+                    }
+
+                    return "Nothing";
+                }
+
+                bool isEverything;
+                if (refDrawPayload.DrawInfo.IsULong)
+                {
+                    isEverything = ((ulong)refDrawPayload.Value & (ulong)refDrawPayload.DrawInfo.EverythingBit) ==
+                                   (ulong)refDrawPayload.DrawInfo.EverythingBit;
+                }
+                else
+                {
+                    isEverything = ((long)refDrawPayload.Value & (long)refDrawPayload.DrawInfo.EverythingBit) ==
+                                   (long)refDrawPayload.DrawInfo.EverythingBit;
+                }
+
+                if (isEverything)
+                {
+                    if (refDrawPayload.DrawInfo.NothingValue.HasValue)
+                    {
+                        return refDrawPayload.DrawInfo.NothingValue.Label;
+                    }
+
+                    return "Everything";
+                }
+            }
+
+            List<string> labels = new List<string>();
+            foreach (DrawInfo.EnumValueInfo drawInfoEnumValue in refDrawPayload.DrawInfo.EnumValues)
+            {
+                if (refDrawPayload.DrawInfo.IsFlags)
+                {
+                    if (refDrawPayload.DrawInfo.IsULong)
+                    {
+                        if (((ulong)refDrawPayload.Value & (ulong)drawInfoEnumValue.Value) != 0)
+                        {
+                            labels.Add(drawInfoEnumValue.Label);
+                        }
+                    }
+                    else
+                    {
+                        if (((long)refDrawPayload.Value & (long)drawInfoEnumValue.Value) != 0)
+                        {
+                            labels.Add(drawInfoEnumValue.Label);
+                        }
+                    }
+                }
+                else
+                {
+                    if (drawInfoEnumValue.Value.Equals(refDrawPayload.Value))
+                    {
+                        labels.Add(drawInfoEnumValue.Label);
+                        break;
+                    }
+                }
+            }
+
+            return labels.Count == 0
+                ? "<color=red>?</color>"
+                : string.Join(", ", labels);
         }
     }
 }

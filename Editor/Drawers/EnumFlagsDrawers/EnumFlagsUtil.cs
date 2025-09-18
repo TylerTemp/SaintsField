@@ -150,5 +150,17 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             int fullBits = curValue | bitValue;
             return fullBits ^ bitValue;
         }
+
+        public static long SetOffBit(long curValue, long bitValue)
+        {
+            long fullBits = curValue | bitValue;
+            return fullBits ^ bitValue;
+        }
+
+        public static ulong SetOffBit(ulong curValue, ulong bitValue)
+        {
+            ulong fullBits = curValue | bitValue;
+            return fullBits ^ bitValue;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -69,7 +70,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         private void OnClicked(object value, bool isOn, bool isPrimary)
         {
             IReadOnlyList<object> r = _setValue(value, isOn);
-            if (!_allowUnSelect || isPrimary)
+            if (!_allowUnSelect || isPrimary || RuntimeUtil.IsNull(r))
             {
                 editorWindow.Close();
             }
