@@ -126,7 +126,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if (targetContainer == null)
             {
-                Debug.Log($"Nothing found for {fieldInfoName} in {saintsSerializedProp.propertyPath}");
+                // Debug.Log($"Nothing found for {fieldInfoName} in {saintsSerializedProp.propertyPath}");
                 return;
             }
 
@@ -155,7 +155,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     int index = 0;
                     foreach (object v in (IEnumerable)value)
                     {
-                        Debug.Log($"[{index}] {v}");
+                        // Debug.Log($"[{index}] {v}");
                         if (index >= arraySize)
                         {
                             uLongValuesProp.InsertArrayElementAtIndex(index);
