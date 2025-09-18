@@ -88,7 +88,10 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 #endif
                     SerializedProperty serProp = serObj.FindProperty(propPath);
                     Object obj = SerializedUtils.GetSerObject(serProp, info, parent);
-                    targets.Add(obj);
+                    if(!RuntimeUtil.IsNull(obj))
+                    {
+                        targets.Add(obj);
+                    }
                 }
             }
 
