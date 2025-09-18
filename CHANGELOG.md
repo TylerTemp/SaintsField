@@ -2,11 +2,11 @@
 
 ## 4.30.1 ##
 
-UI Toolkit: fix `enum` type label didn't take a new line in horizontal layout
+UI Toolkit: fix `enum` type label didn't take a new line in horizontal layout [#296](https://github.com/TylerTemp/SaintsField/issues/296)
 
 **DONATION**
 
-[bilemedimkq](https://github.com/bilemedimkq) made a donation for this release through [PayPal](https://www.paypal.com/donate/?hosted_button_id=B38BUN42VQ73N). Thank you so much!
+[bilemedimkq](https://github.com/bilemedimkq) made a donation for this project through [PayPal](https://www.paypal.com/donate/?hosted_button_id=B38BUN42VQ73N). Thank you so much!
 
 ## 4.30.0 ##
 
