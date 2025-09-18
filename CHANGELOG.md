@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.30.1 ##
+
+UI Toolkit: fix `enum` type label didn't take a new line in horizontal layout
+
+**DONATION**
+
+[bilemedimkq](https://github.com/bilemedimkq) made a donation for this release through [PayPal](https://www.paypal.com/donate/?hosted_button_id=B38BUN42VQ73N). Thank you so much!
+
 ## 4.30.0 ##
 
 1.  UI Toolkit: `[SaintsDictionary]` add `keyWidth`, `valueWidth` to customize the width of key/value column

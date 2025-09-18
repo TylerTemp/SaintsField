@@ -103,11 +103,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.30.0**
+**4.30.1**
 
-1.  UI Toolkit: `[SaintsDictionary]` add `keyWidth`, `valueWidth` to customize the width of key/value column
-2.  UI Toolkit: `SaintsDictionary` & `Table` now saved the column width if you dragged it
-3.  UI Toolkit: Add `AdvancedDropdown`, `TreeDropdown` displaying custom tags supported by SaintsField
+UI Toolkit: fix `enum` type label didn't take a new line in horizontal layout
+
+**DONATION**
+
+[bilemedimkq](https://github.com/bilemedimkq) made a donation for this release through [PayPal](https://www.paypal.com/donate/?hosted_button_id=B38BUN42VQ73N). Thank you so much!
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
