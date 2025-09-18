@@ -144,9 +144,11 @@ namespace SaintsField.Editor.Playa.Renderer
                 bool changed = false;
                 if(targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.collectionType)).intValue == (int) CollectionType.Default)
                 {
+#if UNITY_2022_1_OR_NEWER
                     targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue)).ulongValue =
                         Convert.ToUInt64(value);
                     changed = true;
+#endif
                 }
                 else
                 {
@@ -163,6 +165,7 @@ namespace SaintsField.Editor.Playa.Renderer
                             changed = true;
                         }
 
+#if UNITY_2022_1_OR_NEWER
                         SerializedProperty targetElement = uLongValuesProp.GetArrayElementAtIndex(index);
                         ulong targetNewValue = Convert.ToUInt64(v);
                         if (targetElement.ulongValue != targetNewValue)
@@ -170,6 +173,7 @@ namespace SaintsField.Editor.Playa.Renderer
                             targetElement.ulongValue = targetNewValue;
                             changed = true;
                         }
+#endif
                         index++;
                     }
                 }
