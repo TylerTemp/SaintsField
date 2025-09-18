@@ -103,9 +103,10 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
             {
                 Foldout foldout = new Foldout
                 {
-                    value = true,
+                    value = arrayProperty.isExpanded,
                     text = arrayProperty.displayName,
                     style = { flexGrow = 1 },
+                    viewDataKey = arrayProperty.propertyPath,
                 };
                 UIToolkitUtils.AddContextualMenuManipulator(foldout, arrayProperty, () => {});
                 foldout.Add(propField);
