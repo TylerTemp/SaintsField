@@ -132,7 +132,9 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                                 }
                             },
                             false,
-                            true
+                            true,
+                            Array.Empty<Attribute>(),
+                            false
                         ).result;
                         // ReSharper disable once InvertIf
                         if (r != null)
@@ -192,7 +194,9 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         null,
                         newValue => { },
                         false,
-                        true
+                        true,
+                        ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo),
+                        false
                     ).result;
                     if (r != null)
                     {

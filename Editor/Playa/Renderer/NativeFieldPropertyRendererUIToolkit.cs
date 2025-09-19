@@ -3,9 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using SaintsField.Utils;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
@@ -80,20 +81,22 @@ namespace SaintsField.Editor.Playa.Renderer
                 return (null, false);
             }
 
+            bool isSaintsSerialized = FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute);
+
             (string error, object value) = GetValue(FieldWithInfo);
 
             VisualElement container = new VisualElement
             {
                 style =
                 {
-                    borderLeftWidth = 2,
-                    borderRightWidth = 2,
+                    borderLeftWidth = isSaintsSerialized? 0: 2,
+                    borderRightWidth = isSaintsSerialized? 0: 2,
                     borderLeftColor = EColor.EditorEmphasized.GetColor(),
                     borderRightColor = EColor.EditorEmphasized.GetColor(),
                     borderTopLeftRadius = 3,
                     borderBottomLeftRadius = 3,
-                    marginLeft = 1,
-                    marginRight = 1,
+                    marginLeft = isSaintsSerialized? 0: 1,
+                    marginRight = isSaintsSerialized? 0: 1,
                 },
                 name = NameContainer(),
             };
@@ -118,10 +121,10 @@ namespace SaintsField.Editor.Playa.Renderer
 
             Type fieldType = GetFieldType(FieldWithInfo);
             string labelName = NoLabel ? null : GetNiceName(FieldWithInfo);
-            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, true, InAnyHorizontalLayout);
+            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), isSaintsSerialized);
 
             _onSearchFieldUIToolkit.AddListener(Search);
-            container.RegisterCallback<DetachFromPanelEvent>(e => _onSearchFieldUIToolkit.RemoveListener(Search));
+            container.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
 
             bool isCollection = !typeof(UnityEngine.Object).IsAssignableFrom(fieldType) && (fieldType.IsArray || typeof(IEnumerable).IsAssignableFrom(fieldType));
             // Debug.Log(isCollection);
@@ -269,7 +272,10 @@ namespace SaintsField.Editor.Playa.Renderer
                         userData.OldCollection = null;
                     }
                 }
-                VisualElement result = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, true, InAnyHorizontalLayout).result;
+
+                bool isSaintsSerialized = FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute);
+
+                VisualElement result = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), isSaintsSerialized).result;
                 // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {

@@ -490,7 +490,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         // Debug.Log($"re-render SerializedValueEditorRepaint");
                         SerializedValueEditorRepaint();
 
-                    }, false, true);
+                    }, false, true, ReflectCache.GetCustomAttributes(info), false);
 
                 if (result != null)
                 {

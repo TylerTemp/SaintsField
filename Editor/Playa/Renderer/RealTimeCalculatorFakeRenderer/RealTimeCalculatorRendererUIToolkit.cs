@@ -139,7 +139,9 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                                 paraValueChanged = true;
                             },
                             false,
-                            true
+                            true,
+                            Array.Empty<Attribute>(),
+                            false
                         ).result;
                         // ReSharper disable once InvertIf
                         if (r != null)
@@ -285,7 +287,7 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                 }
 
                 Type type = RuntimeUtil.IsNull(value) ? methodInfo.ReturnType : value.GetType();
-                (VisualElement result, bool isNestedField) = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetName(FieldWithInfo), type, value, null, _ => {}, false, InAnyHorizontalLayout);
+                (VisualElement result, bool isNestedField) = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetName(FieldWithInfo), type, value, null, _ => {}, false, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo), false);
                 if(result!=null)
                 {
                     if (isNestedField && result is Foldout { value: false } fo)

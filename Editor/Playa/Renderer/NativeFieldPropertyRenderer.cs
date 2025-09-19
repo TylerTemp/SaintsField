@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using SaintsField.Playa;
 using UnityEditor;
 using System.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.SaintsSerialization;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace SaintsField.Editor.Playa.Renderer
@@ -59,7 +57,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 }
             }
 
-            return ($"Can not get value", null);
+            return ("Can not get value", null);
         }
 
         private static string GetName(SaintsFieldWithInfo fieldWithInfo) =>
@@ -130,17 +128,13 @@ namespace SaintsField.Editor.Playa.Renderer
                 return;
             }
 
-            if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue ==
-                (int)SaintsPropertyType.EnumLong)
+            if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue == (int)SaintsPropertyType.EnumLong)
             {
                 targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)).longValue = Convert.ToInt64(value);
                 targetContainer.serializedObject.ApplyModifiedProperties();
             }
-            else if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue ==
-                     (int)SaintsPropertyType.EnumULong)
+            else if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue == (int)SaintsPropertyType.EnumULong)
             {
-                // Debug.Log(value);
-                // Debug.Log(value.GetType());
                 bool changed = false;
                 if(targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.collectionType)).intValue == (int) CollectionType.Default)
                 {
@@ -157,11 +151,9 @@ namespace SaintsField.Editor.Playa.Renderer
                     int index = 0;
                     foreach (object v in (IEnumerable)value)
                     {
-                        // Debug.Log($"[{index}] {v}");
                         if (index >= arraySize)
                         {
                             uLongValuesProp.InsertArrayElementAtIndex(index);
-                            arraySize++;
                             changed = true;
                         }
 
@@ -176,7 +168,59 @@ namespace SaintsField.Editor.Playa.Renderer
 #endif
                         index++;
                     }
+
+                    if (index < uLongValuesProp.arraySize)
+                    {
+                        uLongValuesProp.arraySize = index;
+                        changed = true;
+                    }
                 }
+
+                if(changed)
+                {
+                    targetContainer.serializedObject.ApplyModifiedProperties();
+                }
+            }
+            else if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue == (int)SaintsPropertyType.EnumLong)
+            {
+                bool changed = false;
+                if(targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.collectionType)).intValue == (int) CollectionType.Default)
+                {
+                    targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)).longValue = Convert.ToInt64(value);
+                    changed = true;
+                }
+                else
+                {
+                    SerializedProperty longValuesProp = targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.longValues));
+                    int arraySize = longValuesProp.arraySize;
+                    int index = 0;
+                    foreach (object v in (IEnumerable)value)
+                    {
+                        if (index >= arraySize)
+                        {
+                            longValuesProp.InsertArrayElementAtIndex(index);
+                            changed = true;
+                        }
+
+#if UNITY_2022_1_OR_NEWER
+                        SerializedProperty targetElement = longValuesProp.GetArrayElementAtIndex(index);
+                        long targetNewValue = Convert.ToInt64(v);
+                        if (targetElement.longValue != targetNewValue)
+                        {
+                            targetElement.longValue = targetNewValue;
+                            changed = true;
+                        }
+#endif
+                        index++;
+                    }
+
+                    if (index < longValuesProp.arraySize)
+                    {
+                        longValuesProp.arraySize = index;
+                        changed = true;
+                    }
+                }
+
                 if(changed)
                 {
                     targetContainer.serializedObject.ApplyModifiedProperties();

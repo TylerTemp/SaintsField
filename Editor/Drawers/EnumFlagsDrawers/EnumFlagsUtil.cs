@@ -130,18 +130,45 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             return (curValue & checkValue) == checkValue;
         }
 
+        public static bool IsOn(ulong curValue, ulong checkValue)
+        {
+            if (checkValue == 0)
+            {
+                return false;
+            }
+            return (curValue & checkValue) == checkValue;
+        }
+        public static bool IsOn(long curValue, long checkValue)
+        {
+            if (checkValue == 0)
+            {
+                return false;
+            }
+            return (curValue & checkValue) == checkValue;
+        }
+
         public static int ToggleBit(int curValue, int bitValue)
         {
             if (IsOn(curValue, bitValue))
             {
-                // int fullBits = curValue | bitValue;
-                // return fullBits ^ bitValue;
                 return SetOffBit(curValue, bitValue);
             }
-
-            // int bothOnBits = curValue & bitValue;
-            // Debug.Log($"curValue={curValue}, bitValue={bitValue}, bothOnBits={bothOnBits}");
-            // return bothOnBits ^ curValue;
+            return curValue | bitValue;
+        }
+        public static long ToggleBit(long curValue, long bitValue)
+        {
+            if (IsOn(curValue, bitValue))
+            {
+                return SetOffBit(curValue, bitValue);
+            }
+            return curValue | bitValue;
+        }
+        public static ulong ToggleBit(ulong curValue, ulong bitValue)
+        {
+            if (IsOn(curValue, bitValue))
+            {
+                return SetOffBit(curValue, bitValue);
+            }
             return curValue | bitValue;
         }
 

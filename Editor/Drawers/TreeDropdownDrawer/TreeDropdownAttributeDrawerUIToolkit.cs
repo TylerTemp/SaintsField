@@ -1,7 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
@@ -184,7 +183,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             long longValue = 0;
             ulong uLongValue = 0;
 
-            foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(fieldType))
+            foreach ((object enumValue, string enumLabel, string enumRichLabel) in Util.GetEnumValues(fieldType))
             {
                 DrawInfo.EnumValueInfo info = new DrawInfo.EnumValueInfo(enumValue, enumRichLabel ?? enumLabel);
                 if (isFlags)
@@ -253,6 +252,10 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             UIToolkitUtils.DropdownButtonField newDropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
             newDropdownButton.style.flexGrow = 1;
             newDropdownButton.userData = refDrawPayload;
+            if (labelGrayColor)
+            {
+                newDropdownButton.labelElement.style.color = EColor.EditorSeparator.GetColor();
+            }
 
             newDropdownButton.AddToClassList(ClassAllowDisable);
             newDropdownButton.AddToClassList(fieldClass);

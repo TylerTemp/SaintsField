@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SaintsField.Playa;
 using SaintsField.SaintsSerialization;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -20,11 +21,12 @@ namespace SaintsField
 
         public void OnBeforeSerialize()
         {
-
+            SaintsSerializedUtil.OnBeforeSerialize(_saintsSerializedProperties, GetType());
         }
 
         public void OnAfterDeserialize()
         {
+            SaintsSerializedUtil.OnAfterDeserialize(_saintsSerializedProperties, GetType(), this);
         }
     }
 }

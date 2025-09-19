@@ -261,6 +261,13 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
+            Button expandButton = CreateExpandButtonUIToolkit();
+            expandButton.name = NameFoldout(property);
+            return expandButton;
+        }
+
+        private static Button CreateExpandButtonUIToolkit()
+        {
             Button expandButton = new Button
             {
                 style =
@@ -293,7 +300,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 #endif
                 },
 
-                name = NameFoldout(property),
             };
 
             StyleSheet rotateUss = Util.LoadResource<StyleSheet>("UIToolkit/RightFoldoutRotate.uss");
@@ -541,6 +547,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 bitButton.style.borderTopColor = bitButton.style.borderBottomColor = StyleKeyword.Null;
             }
         }
+
     }
 }
 #endif

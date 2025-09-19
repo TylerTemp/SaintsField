@@ -6,12 +6,14 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
+using Sirenix.OdinInspector.Editor.Drawers;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -225,7 +227,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         private static readonly Color ReColor = EColor.EditorSeparator.GetColor();
 
         // before set: useful for struct editing that C# will messup and change the value of the reference you have
-        public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
+        public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, bool neverNullable)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render start {label}/{valueType}/{value}");
@@ -1331,53 +1333,69 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType.BaseType == typeof(Enum) || value is Enum)
             {
+                // Debug.Log(string.Join(",", allAttributes));
+
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case EnumToggleButtonsAttribute _:
+                        {
+                            return (EnumToggleButtonsAttributeDrawer.DrawEnumUIToolkit(allAttributes, oldElement, label, valueType,
+                                value, beforeSet,
+                                setterOrNull,
+                                labelGrayColor, inHorizontalLayout), false);
+                        }
+                    }
+                }
+
                 return (TreeDropdownAttributeDrawer.DrawEnumUIToolkit(oldElement, label, valueType, value, beforeSet,
                     setterOrNull,
                     labelGrayColor, inHorizontalLayout), false);
-                if (oldElement is EnumField oldEnumField)
-                {
-                    oldEnumField.SetValueWithoutNotify((Enum)value);
-                    return (null, false);
-                }
-
-                EnumField element = new EnumField(label, (Enum)value);
-                if (labelGrayColor)
-                {
-                    element.labelElement.style.color = ReColor;
-                }
-                // ReSharper disable once PossibleNullReferenceException
-                typeof(EnumField).GetField("m_EnumType", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(element, valueType);
-                if (inHorizontalLayout)
-                {
-                    element.style.flexDirection = FlexDirection.Column;
-                    // element.style.flexWrap = Wrap.Wrap;
-                    // Label elementLabel = element.Q<Label>();
-                    // if (elementLabel != null)
-                    // {
-                    //     elementLabel.style.minWidth = 0;
-                    //     elementLabel.style.borderRightWidth = 1;
-                    //     elementLabel.style.borderRightColor = EColor.Gray.GetColor();
-                    // }
-                }
-                else
-                {
-                    element.AddToClassList(EnumField.alignedFieldUssClassName);
-                }
-                if (setterOrNull == null)
-                {
-                    element.SetEnabled(false);
-                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
-                }
-                else
-                {
-                    element.RegisterValueChangedCallback(evt =>
-                    {
-                        beforeSet?.Invoke(value);
-                        setterOrNull(evt.newValue);
-                    });
-                }
-
-                return (element, false);
+                // if (oldElement is EnumField oldEnumField)
+                // {
+                //     oldEnumField.SetValueWithoutNotify((Enum)value);
+                //     return (null, false);
+                // }
+                //
+                // EnumField element = new EnumField(label, (Enum)value);
+                // if (labelGrayColor)
+                // {
+                //     element.labelElement.style.color = ReColor;
+                // }
+                // // ReSharper disable once PossibleNullReferenceException
+                // typeof(EnumField).GetField("m_EnumType", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(element, valueType);
+                // if (inHorizontalLayout)
+                // {
+                //     element.style.flexDirection = FlexDirection.Column;
+                //     // element.style.flexWrap = Wrap.Wrap;
+                //     // Label elementLabel = element.Q<Label>();
+                //     // if (elementLabel != null)
+                //     // {
+                //     //     elementLabel.style.minWidth = 0;
+                //     //     elementLabel.style.borderRightWidth = 1;
+                //     //     elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                //     // }
+                // }
+                // else
+                // {
+                //     element.AddToClassList(EnumField.alignedFieldUssClassName);
+                // }
+                // if (setterOrNull == null)
+                // {
+                //     element.SetEnabled(false);
+                //     element.AddToClassList(ClassSaintsFieldEditingDisabled);
+                // }
+                // else
+                // {
+                //     element.RegisterValueChangedCallback(evt =>
+                //     {
+                //         beforeSet?.Invoke(value);
+                //         setterOrNull(evt.newValue);
+                //     });
+                // }
+                //
+                // return (element, false);
             }
             if (typeof(Object).IsAssignableFrom(valueType) || value is Object)
             {
@@ -1561,7 +1579,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
                 return (MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly,
                     dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
-                    inHorizontalLayout), false);
+                    inHorizontalLayout, neverNullable), false);
 #else  // WTF Unity, backport it!
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1655,7 +1673,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (MakeListView(oldElement as Foldout, label, valueType, enumerableValue,
                     enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor,
-                    inHorizontalLayout), false);
+                    inHorizontalLayout, allAttributes, neverNullable), false);
             }
 
             // Debug.Log(valueType);
@@ -1852,7 +1870,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         beforeSet?.Invoke(value);
                         setterOrNull?.Invoke(obj);
                     }
-                }));
+                }, neverNullable));
                 genFoldout.Add(fieldsBodyNew);
                 // genFoldout.Add(new VisualElement
                 // {
@@ -1864,12 +1882,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 genFoldout.RegisterValueChangedCallback(evt =>
                 {
                     bool expanded = evt.newValue;
-                    FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                    FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
                 });
 
                 if (ExpandedValue.Contains(value))
                 {
-                    FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                    FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
                 }
             }
 
@@ -1908,7 +1926,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if (genFoldout.value)
             {
-                FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
             }
 
             bool enabled = setterOrNull != null;
@@ -1923,7 +1941,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
         private static void FillExpandIfNeeded(bool expanded, object value, Foldout genFoldout, VisualElement oldElement,
-            Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
+            Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, bool neverNullable)
         {
             const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
 
@@ -2063,7 +2081,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             setterOrNull?.Invoke(value);
                         },
                         labelGrayColor,
-                        inHorizontalLayout).result;
+                        inHorizontalLayout,
+                        ReflectCache.GetCustomAttributes(fieldInfo),
+                        neverNullable).result;
                 }
                 // Debug.Log($"{name}: {result}: {fieldInfo.FieldType}");
                 // ReSharper disable once InvertIf
@@ -2158,7 +2178,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             }
                             : null,
                         labelGrayColor,
-                        inHorizontalLayout).result;
+                        inHorizontalLayout,
+                        ReflectCache.GetCustomAttributes(propertyInfo),
+                        neverNullable).result;
                 }
 
                 // ReSharper disable once InvertIf
@@ -2245,7 +2267,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 : $"{type.Name}: <color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>{type.Namespace}</color>";
         }
 
-        private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType, object currentValue, Action<Type> setType)
+        private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType, object currentValue, Action<Type> setType, bool neverNullable)
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
             dropdownButton.ButtonElement.text = GetDropdownTypeLabel(currentValue?.GetType());
@@ -2254,7 +2276,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 .GetTypesDerivedFrom(fieldType)
                 .ToArray();
             AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>();
-            bool canBeNull = !fieldType.IsValueType;
+            bool canBeNull = !fieldType.IsValueType && !neverNullable;
             if(canBeNull)
             {
                 dropdownList.Add("[Null]", null);
@@ -2332,7 +2354,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public object RawListValue;
         }
 
-        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
+        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, bool neverNullable)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render list start {listValue.Length}/{label}/{valueType}");
@@ -2363,34 +2385,37 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if(setterOrNull != null)
                 {
                     // nullable
-                    foldout.Q<Toggle>().Add(new Button(() =>
+                    if(!neverNullable)
                     {
-                        beforeSet?.Invoke(rawListValue);
-                        setterOrNull(null);
-                    })
-                    {
-                        // text = "x",
-                        tooltip = "Set to null",
-                        style =
+                        foldout.Q<Toggle>().Add(new Button(() =>
                         {
-                            position = Position.Absolute,
-                            // top = -EditorGUIUtility.singleLineHeight,
-                            top = 0,
-                            right = 0,
-                            width = EditorGUIUtility.singleLineHeight,
-                            height = EditorGUIUtility.singleLineHeight,
+                            beforeSet?.Invoke(rawListValue);
+                            setterOrNull(null);
+                        })
+                        {
+                            // text = "x",
+                            tooltip = "Set to null",
+                            style =
+                            {
+                                position = Position.Absolute,
+                                // top = -EditorGUIUtility.singleLineHeight,
+                                top = 0,
+                                right = 0,
+                                width = EditorGUIUtility.singleLineHeight,
+                                height = EditorGUIUtility.singleLineHeight,
 
-                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+                                backgroundImage = Util.LoadResource<Texture2D>("close.png"),
 #if UNITY_2022_2_OR_NEWER
-                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
+                                backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                                backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                                backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                                backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
 #else
-                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+                                unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
-                        },
-                    });
+                            },
+                        });
+                    }
                 }
             }
 
@@ -2509,7 +2534,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             setterOrNull?.Invoke(rawListValueArray);
                         },
                         false,
-                        inHorizontalLayout).result;
+                        inHorizontalLayout,
+                        allAttributes, neverNullable).result;
                     if (item != null)
                     {
                         visualElement.Clear();
@@ -2656,7 +2682,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
-        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
+        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, bool neverNullable)
         {
             // Debug.Log(dictKeyType);
             // Debug.Log(dictValueType);
@@ -2690,34 +2716,37 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if(setterOrNull != null)
                 {
                     // nullable
-                    foldout.Q<Toggle>().Add(new Button(() =>
+                    if(!neverNullable)
                     {
-                        beforeSet?.Invoke(rawDictValue);
-                        setterOrNull(null);
-                    })
-                    {
-                        // text = "x",
-                        tooltip = "Set to null",
-                        style =
+                        foldout.Q<Toggle>().Add(new Button(() =>
                         {
-                            position = Position.Absolute,
-                            // top = -EditorGUIUtility.singleLineHeight,
-                            top = 0,
-                            right = 0,
-                            width = EditorGUIUtility.singleLineHeight,
-                            height = EditorGUIUtility.singleLineHeight,
+                            beforeSet?.Invoke(rawDictValue);
+                            setterOrNull(null);
+                        })
+                        {
+                            // text = "x",
+                            tooltip = "Set to null",
+                            style =
+                            {
+                                position = Position.Absolute,
+                                // top = -EditorGUIUtility.singleLineHeight,
+                                top = 0,
+                                right = 0,
+                                width = EditorGUIUtility.singleLineHeight,
+                                height = EditorGUIUtility.singleLineHeight,
 
-                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+                                backgroundImage = Util.LoadResource<Texture2D>("close.png"),
 #if UNITY_2022_2_OR_NEWER
-                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
+                                backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                                backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                                backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                                backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
 #else
-                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+                                unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
-                        },
-                    });
+                            },
+                        });
+                    }
                 }
             }
 
@@ -2848,7 +2877,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 // listView.itemsSource[sourceIndex] = newKey;
                                 key = newKey;
                                 keyChanged = true;
-                            }, false, true).result;
+                            }, false, true, Array.Empty<Attribute>(), neverNullable).result;
 
                             if (editing != null)
                             {
@@ -2908,7 +2937,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             object refreshedKey = listView.itemsSource[elementIndex];
                             payload.SetKeyValue(refreshedKey, newValue);
-                        }, false, true).result;
+                        }, false, true, Array.Empty<Attribute>(), neverNullable).result;
 
                         if (editing != null)
                         {
@@ -3037,7 +3066,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             }
                         },
                         false,
-                        inHorizontalLayout
+                        inHorizontalLayout,
+                        Array.Empty<Attribute>(),
+                        neverNullable
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -3072,7 +3103,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             addPairValueChanged = true;
                         },
                         false,
-                        inHorizontalLayout
+                        inHorizontalLayout,
+                        Array.Empty<Attribute>(),
+                        neverNullable
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)

@@ -642,48 +642,17 @@ MonoBehaviour:
     collectionType: 0
     longValue: 0
     longValues: 
-    uLongValue: 5
+    uLongValue: 1
     uLongValues: 
-  - name: _uLongEnumPri
+  - name: ULongEnumNormalPub
     propertyType: 2
     isProperty: 0
     collectionType: 0
     longValue: 0
     longValues: 
-    uLongValue: 6
+    uLongValue: 2
     uLongValues: 
-  - name: <ULongEnumProp>k__BackingField
-    propertyType: 2
-    isProperty: 0
-    collectionType: 0
-    longValue: 0
-    longValues: 
-    uLongValue: 3
-    uLongValues: 
-  - name: ULongEnumPubArr
-    propertyType: 2
-    isProperty: 0
-    collectionType: 1
-    longValue: 0
-    longValues: 
-    uLongValue: 3
-    uLongValues: 0300000000000000
-  - name: _uLongEnumPriArr
-    propertyType: 2
-    isProperty: 0
-    collectionType: 1
-    longValue: 0
-    longValues: 
-    uLongValue: 3
-    uLongValues: 0300000000000000
-  - name: <ULongEnumPropArr>k__BackingField
-    propertyType: 2
-    isProperty: 0
-    collectionType: 1
-    longValue: 0
-    longValues: 
-    uLongValue: 3
-    uLongValues: 0700000000000000
+  testNormalFlags: 0
 --- !u!1 &147024401
 GameObject:
   m_ObjectHideFlags: 0
