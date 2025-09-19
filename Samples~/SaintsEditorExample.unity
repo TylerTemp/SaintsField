@@ -636,6 +636,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.SerEnumULong
   _saintsSerializedProperties:
+  - name: LongEnumPub
+    propertyType: 1
+    isProperty: 0
+    collectionType: 0
+    longValue: 0
+    longValues: 
+    uLongValue: 0
+    uLongValues: 
   - name: ULongEnumPub
     propertyType: 2
     isProperty: 0
@@ -652,7 +660,71 @@ MonoBehaviour:
     longValues: 
     uLongValue: 2
     uLongValues: 
-  testNormalFlags: 0
+  - name: _uLongEnumPri
+    propertyType: 2
+    isProperty: 0
+    collectionType: 0
+    longValue: 0
+    longValues: 
+    uLongValue: 6
+    uLongValues: 
+  - name: <ULongEnumProp>k__BackingField
+    propertyType: 2
+    isProperty: 0
+    collectionType: 0
+    longValue: 0
+    longValues: 
+    uLongValue: 4
+    uLongValues: 
+  - name: ULongEnumPubArr
+    propertyType: 2
+    isProperty: 0
+    collectionType: 1
+    longValue: 0
+    longValues: 
+    uLongValue: 0
+    uLongValues: 0100000000000000
+  - name: _uLongEnumPriArr
+    propertyType: 2
+    isProperty: 0
+    collectionType: 1
+    longValue: 0
+    longValues: 
+    uLongValue: 0
+    uLongValues: 0600000000000000
+  - name: <ULongEnumPropArr>k__BackingField
+    propertyType: 2
+    isProperty: 0
+    collectionType: 1
+    longValue: 0
+    longValues: 
+    uLongValue: 0
+    uLongValues: 0300000000000000
+  - name: ULongEnumPubLis
+    propertyType: 2
+    isProperty: 0
+    collectionType: 2
+    longValue: 0
+    longValues: 
+    uLongValue: 0
+    uLongValues: 0200000000000000
+  - name: _uLongEnumPriLis
+    propertyType: 2
+    isProperty: 0
+    collectionType: 2
+    longValue: 0
+    longValues: 
+    uLongValue: 0
+    uLongValues: 
+  - name: <ULongEnumPropLis>k__BackingField
+    propertyType: 2
+    isProperty: 0
+    collectionType: 2
+    longValue: 0
+    longValues: 
+    uLongValue: 0
+    uLongValues: 
+  testNormalFlags: 1
 --- !u!1 &147024401
 GameObject:
   m_ObjectHideFlags: 0
@@ -4022,6 +4094,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c12153bf83683e54884fabf6011eeea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _saintsSerializedProperties: []
   normalIntArrays: 
   normalString: 
   content: 

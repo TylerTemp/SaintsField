@@ -103,15 +103,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.30.1**
+**4.31.0**
 
-UI Toolkit: fix `enum` type label didn't take a new line in horizontal layout [#296](https://github.com/TylerTemp/SaintsField/issues/296)
+1.  **Experimental**: UI Toolkit: Support serialize `enum` of `long` & `ulong` type [#289](https://github.com/TylerTemp/SaintsField/issues/289)
+2.  UI Toolkit: fix label in wrong location for `enum` type [#298](https://github.com/TylerTemp/SaintsField/issues/298)
+3.  IMGUI: fix `Expandable` can not process when target is `null` [#297](https://github.com/TylerTemp/SaintsField/issues/297)
+4.  UI Toolkit: fix `ShowInInspector` display flags `enum` as normal enum
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
-
-**DONATION**
-
-[bilemedimkq](https://github.com/bilemedimkq) made a donation for this project through [PayPal](https://www.paypal.com/donate/?hosted_button_id=B38BUN42VQ73N). Thank you so much!
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
 
@@ -7126,6 +7125,56 @@ If you are interested, here is how to use it.
 `Window` - `Saints` - `Enable SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
+
+## `SaintsMonoBehaviour` / `SaintsScriptableObject` ##
+
+Inherent from this two type to allow some special serialization feature.
+
+> [!WARNING]
+> This feature is still experimental
+
+### `long`/`ulong` Enum ###
+
+> [!WARNING]
+> This feature is still experimental
+
+You can serialize a `long`/`ulong` base typed `enum` with `SaintsSerialized`:
+
+```csharp
+[Serializable, Flags]
+public enum TestULongEnum: ulong
+{
+    None = 0,
+    First = 1,
+    Second = 1 << 1,
+    Third = 1 << 2,
+    All = First | Second | Third,
+}
+
+[Serializable]
+public enum TestULongEnumNormal: ulong
+{
+    None,
+    First,
+    Second,
+    Third,
+}
+[NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumPub;
+[NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalPub;
+// EnumToggleButtons is supported too
+[NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPubBtns;
+```
+
+![](https://github.com/user-attachments/assets/1e16d6d6-dfdd-483c-b95d-ba19f5706e66)
+
+This can work with `EnumToggleButtons`.
+
+Note some limit:
+
+*   It can only work with `EnumToggleButtons`. **All** other field-based attributes like `InfoBox`, `OnValueChanged` etc are unsupported.
+*   `FormerlySerializedAs` does nothing on it.
+*   Careful before trying it in a product case.
+*   list/array type won't have a size input (as it's unfinished yet)
 
 ## `SaintsEditorWindow` ##
 

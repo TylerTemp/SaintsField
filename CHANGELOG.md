@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.31.0 ##
+
+1.  **Experimental**: UI Toolkit: Support serialize `enum` of `long` & `ulong` type [#289](https://github.com/TylerTemp/SaintsField/issues/289)
+2.  UI Toolkit: fix label in wrong location for `enum` type [#298](https://github.com/TylerTemp/SaintsField/issues/298)
+3.  IMGUI: fix `Expandable` can not process when target is `null` [#297](https://github.com/TylerTemp/SaintsField/issues/297)
+4.  UI Toolkit: fix `ShowInInspector` display flags `enum` as normal enum
+
 ## 4.30.1 ##
 
 UI Toolkit: fix `enum` type label didn't take a new line in horizontal layout [#296](https://github.com/TylerTemp/SaintsField/issues/296)

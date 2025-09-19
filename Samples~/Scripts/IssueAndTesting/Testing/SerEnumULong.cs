@@ -6,15 +6,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
     public class SerEnumULong : SaintsMonoBehaviour
     {
-        // [Serializable, Flags]
-        // public enum LongEnum: long
-        // {
-        //     First = 1,
-        //     Second = 1 << 1,
-        //     Third = 1 << 2,
-        // }
-        //
-        // [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
+        [Serializable, Flags]
+        public enum LongEnum: long
+        {
+            First = 1,
+            Second = 1 << 1,
+            Third = 1 << 2,
+        }
 
         [Serializable, Flags]
         public enum TestULongEnum: ulong
@@ -43,6 +41,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             Third = 1 << 2,
         }
 
+        [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
+
         [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
         [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
         [EnumToggleButtons] public TestNormalEnum testNormalFlags;
@@ -50,11 +50,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [field: NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
 
         [NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPubArr;
-        // [NonSerialized, SaintsSerialized] private TestULongEnum[] _uLongEnumPriArr;
-        // [field: NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPropArr { get; private set; }
-        //
-        // [NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
-        // [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
-        // [field: NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPropLis { get; private set; }
+        [NonSerialized, SaintsSerialized] private TestULongEnum[] _uLongEnumPriArr;
+        [field: NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPropArr { get; private set; }
+
+        [NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
+        [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
+        [field: NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPropLis { get; private set; }
     }
 }
