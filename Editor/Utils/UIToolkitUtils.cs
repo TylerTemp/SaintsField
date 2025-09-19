@@ -1383,7 +1383,7 @@ namespace SaintsField.Editor.Utils
                     AdvancedDropdownAttribute advancedDropdownAttribute = new AdvancedDropdownAttribute();
                     AdvancedDropdownAttributeDrawer advancedDropdownDrawer = (AdvancedDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(AdvancedDropdownAttributeDrawer), fieldInfo, advancedDropdownAttribute, label);
                     advancedDropdownDrawer.OverridePropertyAttributes = new[] { advancedDropdownAttribute };
-                    advancedDropdownDrawer.InHorizontalLayout = true;
+                    advancedDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
                     return advancedDropdownDrawer.CreatePropertyGUI(property);
 
                     // List<object> enumRawValues = Enum.GetValues(rawType)
