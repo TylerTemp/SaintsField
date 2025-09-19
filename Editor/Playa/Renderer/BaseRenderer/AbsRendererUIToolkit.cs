@@ -13,7 +13,6 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
-using Sirenix.OdinInspector.Editor.Drawers;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -1626,7 +1625,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         null,
                         null,
                         false,
-                        inHorizontalLayout
+                        inHorizontalLayout,
+                        allAttributes,
+                        neverNullable
                     ).result;
                     if (newKeyElement != null)
                     {
@@ -1645,7 +1646,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         null,
                         null,
                         false,
-                        inHorizontalLayout
+                        inHorizontalLayout,
+                        allAttributes,
+                        neverNullable
                     ).result;
                     if (newValueContainer != null)
                     {
