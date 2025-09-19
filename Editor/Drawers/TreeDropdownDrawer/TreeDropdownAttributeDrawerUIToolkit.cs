@@ -199,8 +199,9 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                     else
                     {
-                        longValue |= (long)enumValue;
-                        if ((long)enumValue == 0)
+                        long longEnumValue = Convert.ToInt64(enumValue);
+                        longValue |= longEnumValue;
+                        if (longEnumValue == 0)
                         {
                             nothingValue = info;
                             continue;
@@ -227,7 +228,9 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                     else
                     {
-                        if ((long)enumNormalValue.Value == longValue)
+                        long enumLongValue = Convert.ToInt64(enumNormalValue.Value);
+                        // ReSharper disable once InvertIf
+                        if (enumLongValue == longValue)
                         {
                             everythingValue = enumNormalValue;
                             foundEverythingIndex = everythingIndex;
@@ -285,7 +288,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                     else
                     {
-                        containsEverythingOrNothing = (long)refDrawPayload.Value == 0;
+                        containsEverythingOrNothing = Convert.ToInt64(refDrawPayload.Value) == 0;
                     }
                     if (containsEverythingOrNothing)
                     {
@@ -309,7 +312,9 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         }
                         else
                         {
-                            containsEverythingOrNothing = ((long)refDrawPayload.Value & (long)newInfo.EverythingBit) == (long) newInfo.EverythingBit;
+                            long refValue = Convert.ToInt64(refDrawPayload.Value);
+                            long everythingBit = Convert.ToInt64(newInfo.EverythingBit);
+                            containsEverythingOrNothing = EnumFlagsUtil.IsOn(refValue, everythingBit);
                         }
                         if (containsEverythingOrNothing)
                         {
@@ -337,7 +342,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                             }
                             else
                             {
-                                if (((long)refDrawPayload.Value & (long)enumInfo.Value) != 0)
+                                if (EnumFlagsUtil.IsOn(Convert.ToInt64(refDrawPayload.Value), Convert.ToInt64(enumInfo.Value)))
                                 {
                                     curValues.Add(enumInfo.Value);
                                 }
@@ -411,40 +416,42 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                                 }
                                 else
                                 {
-                                    long curValue = (long)curItem;
+                                    long curItemLong = Convert.ToInt64(curItem);
+                                    long evertyingBit = Convert.ToInt64(newInfo.EverythingBit);
+                                    long refValueLong = Convert.ToInt64(refDrawPayload.Value);
                                     long newValue;
-                                    if (curValue == 0)
+                                    if (curItemLong == 0)
                                     {
                                         newValue = 0L;
                                     }
-                                    else if (curValue == (long)newInfo.EverythingBit)
+                                    else if (curItemLong == evertyingBit)
                                     {
-                                        newValue = (long)newInfo.EverythingBit;
+                                        newValue = evertyingBit;
                                     }
                                     else if (on)
                                     {
-                                        if ((long)refDrawPayload.Value == (long)refDrawPayload.DrawInfo.EverythingBit)
+                                        if (refValueLong == evertyingBit)
                                         {
-                                            newValue = curValue;
+                                            newValue = curItemLong;
                                         }
                                         else
                                         {
-                                            newValue = (long)refDrawPayload.Value | curValue;
+                                            newValue = refValueLong | curItemLong;
                                         }
                                     }
                                     else
                                     {
-                                        newValue = EnumFlagsUtil.SetOffBit((long)refDrawPayload.Value, curValue);
+                                        newValue = EnumFlagsUtil.SetOffBit(refValueLong, curItemLong);
                                     }
                                     refDrawPayload.Value = newValue;
                                     // Debug.Log($"setterOrNull({newValue})");
-                                    setterOrNull(newValue);
+                                    setterOrNull(Convert.ChangeType(newValue, fieldType.GetEnumUnderlyingType()));
                                 }
                             }
                             else
                             {
                                 // Debug.Log($"setterOrNull({curItem})");
-                                setterOrNull(curItem);
+                                setterOrNull(Convert.ChangeType(curItem, fieldType.GetEnumUnderlyingType()));
                             }
                         }
                         return null;
@@ -477,7 +484,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
                 else
                 {
-                    isNothing = (long)refDrawPayload.Value == 0;
+                    isNothing = Convert.ToInt64(refDrawPayload.Value) == 0;
                 }
 
 
@@ -499,8 +506,9 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
                 else
                 {
-                    isEverything = ((long)refDrawPayload.Value & (long)refDrawPayload.DrawInfo.EverythingBit) ==
-                                   (long)refDrawPayload.DrawInfo.EverythingBit;
+                    long longValue = Convert.ToInt64(refDrawPayload.Value);
+                    long everthingBit = Convert.ToInt64(refDrawPayload.DrawInfo.EverythingBit);
+                    isEverything = (longValue & everthingBit) == everthingBit;
                 }
 
                 if (isEverything)
@@ -528,7 +536,9 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                     else
                     {
-                        if (((long)refDrawPayload.Value & (long)drawInfoEnumValue.Value) != 0)
+                        long longValue = Convert.ToInt64(refDrawPayload.Value);
+                        long infoValue = Convert.ToInt64(drawInfoEnumValue.Value);
+                        if ((longValue & infoValue) != 0)
                         {
                             labels.Add(drawInfoEnumValue.Label);
                         }

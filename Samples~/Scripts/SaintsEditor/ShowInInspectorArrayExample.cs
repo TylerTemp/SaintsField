@@ -1,11 +1,30 @@
 using System.Collections.Generic;
 using SaintsField.Playa;
 using UnityEngine;
+using System;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class ShowInInspectorArrayExample : SaintsMonoBehaviour
     {
+        [Serializable]
+        public enum EnumN {
+            One,
+            Two,
+            Three,
+        }
+
+        [ShowInInspector] private EnumN em;
+
+        [Serializable, Flags]
+        public enum EnumF {
+            One = 1,
+            Two = 1 << 1,
+            Three = 1 << 2,
+        }
+
+        [ShowInInspector] private EnumF ef;
+
         private static readonly Color[] BaseColors = {Color.red, Color.green, Color.blue};
         private static readonly Color[][] BaseColors2 = {BaseColors, BaseColors};
 
