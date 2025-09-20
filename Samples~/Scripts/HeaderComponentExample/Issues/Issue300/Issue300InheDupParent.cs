@@ -1,4 +1,5 @@
 using SaintsField.ComponentHeader;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,6 +21,11 @@ namespace SaintsField.Samples.Scripts.HeaderComponentExample.Issues.Issue300
             EditorGUI.DrawRect(useRect,Color.gray);
             EditorGUI.DrawRect(progressRect,Color.yellow);
             return new HeaderUsed(useRect);
+        }
+
+        [Button("DAMAGE <color=red>X"), HeaderButton("<color=red> X ", "Damaga")]
+        private void TestDamage(float damage = 1)
+        {
         }
 #endif
     }
