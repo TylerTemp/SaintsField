@@ -1,11 +1,17 @@
 # Changelog
 
-## 4.31.0 ##
+## 4.30.2 ##
 
-1.  **Experimental**: UI Toolkit: Support serialize `enum` of `long` & `ulong` type [#289](https://github.com/TylerTemp/SaintsField/issues/289)
-2.  UI Toolkit: fix label in wrong location for `enum` type [#298](https://github.com/TylerTemp/SaintsField/issues/298)
-3.  IMGUI: fix `Expandable` can not process when target is `null` [#297](https://github.com/TylerTemp/SaintsField/issues/297)
-4.  UI Toolkit: fix `ShowInInspector` display flags `enum` as normal enum
+1.  UI Toolkit: fix label in wrong location for `enum` type [#298](https://github.com/TylerTemp/SaintsField/issues/298)
+2.  IMGUI: fix `Expandable` can not process when target is `null` [#297](https://github.com/TylerTemp/SaintsField/issues/297)
+3.  UI Toolkit: fix `ShowInInspector` display flags `enum` as normal enum
+4.  UI Toolkit: fix `SaintsDictionary` failed to flatten if the target is a class/struct [#301](https://github.com/TylerTemp/SaintsField/issues/301)
+5.  UI Toolkit: General improvements to the FlagsDropdownElement implementation to be closer to the Unity implementation for display by [@Zallist](https://github.com/Zallist) on [pr#299](https://github.com/TylerTemp/SaintsField/pull/299)
+    *   fix: `FlagsDropdownElement` not showing the actual name for NOTHING or EVERYTHING set in the flags enum if set by the developer
+    *   fix: `FlagsDropdownElement` should have a cap on its width via flexShrink
+    *   fix: `FlagsDropdownElement` did not attempt to collapse down flags that were contained within higher flags (up,down,vertical,left,right,horizontal should be collapsed to just vertical,horizontal)
+    *   fix: `FlagsDropdownElement` did not use a tooltip if everything got too long
+    *   fix: `FlagsDropdownElement` did not showing EVERYTHING if the enum value was -1 since CachedValue was instantiated to -1, now it's a nullable int
 
 ## 4.30.1 ##
 

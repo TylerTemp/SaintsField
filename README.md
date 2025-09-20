@@ -103,12 +103,19 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.31.0**
+**4.31.2**
 
-1.  **Experimental**: UI Toolkit: Support serialize `enum` of `long` & `ulong` type [#289](https://github.com/TylerTemp/SaintsField/issues/289)
-2.  UI Toolkit: fix label in wrong location for `enum` type [#298](https://github.com/TylerTemp/SaintsField/issues/298)
-3.  IMGUI: fix `Expandable` can not process when target is `null` [#297](https://github.com/TylerTemp/SaintsField/issues/297)
-4.  UI Toolkit: fix `ShowInInspector` display flags `enum` as normal enum
+1.  UI Toolkit: fix label in wrong location for `enum` type [#298](https://github.com/TylerTemp/SaintsField/issues/298)
+2.  IMGUI: fix `Expandable` can not process when target is `null` [#297](https://github.com/TylerTemp/SaintsField/issues/297)
+3.  UI Toolkit: fix `ShowInInspector` display flags `enum` as normal enum
+4.  UI Toolkit: fix `SaintsDictionary` failed to flatten if the target is a class/struct [#301](https://github.com/TylerTemp/SaintsField/issues/301)
+5.  UI Toolkit: General improvements to the FlagsDropdownElement implementation to be closer to the Unity implementation for display by [@Zallist](https://github.com/Zallist) on [pr#299](https://github.com/TylerTemp/SaintsField/pull/299)
+    *   fix: `FlagsDropdownElement` not showing the actual name for NOTHING or EVERYTHING set in the flags enum if set by the developer
+    *   fix: `FlagsDropdownElement` should have a cap on its width via flexShrink
+    *   fix: `FlagsDropdownElement` did not attempt to collapse down flags that were contained within higher flags (up,down,vertical,left,right,horizontal should be collapsed to just vertical,horizontal)
+    *   fix: `FlagsDropdownElement` did not use a tooltip if everything got too long
+    *   fix: `FlagsDropdownElement` did not showing EVERYTHING if the enum value was -1 since CachedValue was instantiated to -1, now it's a nullable int
+
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -5258,7 +5265,7 @@ public class CustomEventChild : MonoBehaviour
 }
 
 // CustomEventExample.cs
-public class CustomEventExample : SaintsMonoBehaviour
+public class CustomEventExample : MonoBehaviour
 {
     public CustomEventChild _child;
 
@@ -5314,7 +5321,7 @@ Note: this only search the field name. It does not search the nested fields, and
 using SaintsField.Playa;
 
 [Searchable]
-public class SearchableMono : SaintsMonoBehaviour
+public class SearchableMono : MonoBehaviour
 {
     public string myString;
     public int myInt;
@@ -7126,6 +7133,8 @@ If you are interested, here is how to use it.
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
 
+<!--
+
 ## `SaintsMonoBehaviour` / `SaintsScriptableObject` ##
 
 Inherent from this two type to allow some special serialization feature.
@@ -7175,6 +7184,8 @@ Note some limit:
 *   `FormerlySerializedAs` does nothing on it.
 *   Careful before trying it in a product case.
 *   list/array type won't have a size input (as it's unfinished yet)
+
+-->
 
 ## `SaintsEditorWindow` ##
 
