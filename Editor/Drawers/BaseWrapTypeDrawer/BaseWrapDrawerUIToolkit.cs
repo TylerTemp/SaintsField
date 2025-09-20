@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
             // }
 
 
-            // Debug.Log($"{property.propertyPath}: {string.Join(",", allAttributes)}");
+            // Debug.Log($"BaseWrapDrawer: {property.propertyPath}: {string.Join(",", allAttributes)}");
             // IReadOnlyList<PropertyAttribute> mergedAttributes = allAttributes.Concat(fieldAttributes).ToArray();
 
             // Debug.Log(parent.GetType());

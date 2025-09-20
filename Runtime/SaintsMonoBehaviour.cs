@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SaintsField
 {
-    public class SaintsMonoBehaviour : MonoBehaviour, ISerializationCallbackReceiver
+    public partial class SaintsMonoBehaviour : MonoBehaviour, ISerializationCallbackReceiver
     {
 
         [PlayaShowIf(

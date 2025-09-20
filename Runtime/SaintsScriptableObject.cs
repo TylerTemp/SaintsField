@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SaintsField
 {
-    public class SaintsScriptableObject: ScriptableObject, ISerializationCallbackReceiver
+    public partial class SaintsScriptableObject: ScriptableObject, ISerializationCallbackReceiver
     {
         [PlayaShowIf(
 #if SAINTSFIELD_SERIALIZATION_DEBUG

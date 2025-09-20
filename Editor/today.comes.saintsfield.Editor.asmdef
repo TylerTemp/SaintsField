@@ -1,5 +1,6 @@
 {
     "name": "today.comes.saintsfield.Editor",
+    "rootNamespace": "",
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
         "GUID:69448af7b92c7f342b298e06a37122aa",
@@ -27,7 +28,9 @@
         "DOTweenEditor.dll",
         "DOTween.dll",
         "Sirenix.OdinInspector.Editor.dll",
-        "Newtonsoft.Json.dll"
+        "Newtonsoft.Json.dll",
+        "Microsoft.CodeAnalysis.CSharp.dll",
+        "Microsoft.CodeAnalysis.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

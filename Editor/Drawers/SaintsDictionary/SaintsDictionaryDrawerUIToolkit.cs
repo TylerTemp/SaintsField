@@ -87,6 +87,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 text = GetPreferredLabel(property),
                 value = property.isExpanded,
                 name = NameFoldout(property),
+                viewDataKey = property.propertyPath,
             };
 
             VisualElement content = foldout.Q<VisualElement>(className: "unity-foldout__content");
@@ -1075,8 +1076,17 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             Type useDrawerType = null;
             Attribute useAttribute = null;
             IReadOnlyList<PropertyAttribute> appendPropertyAttributes = null;
-            bool isArray = serializedProperty.propertyType == SerializedPropertyType.Generic
-                && serializedProperty.isArray;
+            string wrapName = ReflectUtils.GetIWrapPropName(rawType);
+            Type wrapType = ReflectUtils.GetIWrapPropType(rawType, wrapName);
+            FieldInfo wrapInfo = (FieldInfo)ReflectUtils.GetProp(rawType, wrapName).fieldOrMethodInfo;
+
+            // Debug.Log(rawType);
+            // Debug.Log(wrapName);
+            SerializedProperty serializedBaseProperty = serializedProperty.FindPropertyRelative(wrapName) ??
+                                                        SerializedUtils.FindPropertyByAutoPropertyName(
+                                                            serializedProperty, wrapName);
+            bool isArray = serializedBaseProperty.propertyType == SerializedPropertyType.Generic
+                           && serializedBaseProperty.isArray;
             if(!isArray)
             {
                 ISaintsAttribute saintsAttr = allAttributes
@@ -1093,13 +1103,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 else
                 {
                     (Attribute attrOrNull, Type drawerType) =
-                        GetFallbackDrawerType(info, serializedProperty, allAttributes);
+                        GetFallbackDrawerType(wrapInfo, serializedBaseProperty, allAttributes);
                     // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
                     useAttribute = attrOrNull;
                     useDrawerType = drawerType;
 
                     if (useDrawerType == null &&
-                        serializedProperty.propertyType == SerializedPropertyType.Generic)
+                        serializedBaseProperty.propertyType == SerializedPropertyType.Generic)
                     {
                         PropertyAttribute prop = new SaintsRowAttribute(inline: true);
                         useAttribute = prop;
@@ -1109,16 +1119,16 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 }
             }
 
-            // Debug.Log($"{serializedProperty.propertyPath}/{useDrawerType}");
+            // Debug.Log($"{serializedBaseProperty.propertyPath}/{useDrawerType}");
 
             if (useDrawerType == null)
             {
                 VisualElement r = UIToolkitUtils.CreateOrUpdateFieldRawFallback(
-                    serializedProperty,
+                    serializedBaseProperty,
                     allAttributes,
-                    rawType,
+                    wrapType,
                     null,
-                    info,
+                    wrapInfo,
                     true,
                     makeRenderer,
                     doTweenPlayRecorder,
@@ -1144,7 +1154,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             // Debug.Log($"{useAttribute}/{useDrawerType}: {serializedProperty.propertyPath}");
 
-            PropertyDrawer propertyDrawer = MakePropertyDrawer(useDrawerType, info, useAttribute, null);
+            PropertyDrawer propertyDrawer = MakePropertyDrawer(useDrawerType, wrapInfo, useAttribute, null);
             // Debug.Log(saintsPropertyDrawer);
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
             {
@@ -1164,20 +1174,20 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             if (!useImGui)
             {
                 // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}");
-                VisualElement r = propertyDrawer.CreatePropertyGUI(serializedProperty);
+                VisualElement r = propertyDrawer.CreatePropertyGUI(serializedBaseProperty);
                 return UIToolkitCache.MergeWithDec(r, allAttributes);
             }
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
             // We don't need to handle decorators either
-            PropertyField result = new PropertyField(serializedProperty, string.Empty)
+            PropertyField result = new PropertyField(serializedBaseProperty, string.Empty)
             {
                 style =
                 {
                     flexGrow = 1,
                 },
             };
-            result.Bind(serializedProperty.serializedObject);
+            result.Bind(serializedBaseProperty.serializedObject);
             return result;
         }
 
