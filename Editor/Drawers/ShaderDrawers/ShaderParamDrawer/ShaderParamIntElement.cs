@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 }
             }
 
-            Label.text = $"<color=red>?</color> {(CachedValue == -1? "": $"({CachedValue})")}";
+            Label.text = $"<color=red>?</color> {(CachedValue == null? "": $"({CachedValue})")}";
         }
     }
 }

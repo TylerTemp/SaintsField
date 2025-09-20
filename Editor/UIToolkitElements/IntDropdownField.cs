@@ -9,7 +9,7 @@ namespace SaintsField.Editor.UIToolkitElements
     {
         protected readonly Label Label;
 
-        protected int CachedValue = -1;
+        protected int? CachedValue = null;
 
         public readonly Button Button;
 
@@ -31,7 +31,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public int value
         {
-            get => CachedValue;
+            get => CachedValue ?? 0;
             set
             {
                 if (CachedValue == value)
@@ -58,6 +58,8 @@ namespace SaintsField.Editor.UIToolkitElements
             Button = intDropdownElement.Button;
             AddToClassList(alignedFieldUssClassName);
             AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+
+            this.style.flexShrink = 1;
         }
     }
 }
