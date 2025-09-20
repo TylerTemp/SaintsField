@@ -20,45 +20,76 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
         public override void SetValueWithoutNotify(int newValue)
         {
             CachedValue = newValue;
+            Label.Clear();
+            this.Button.tooltip = "";
 
             if (newValue == 0)
             {
-                // Label.text = "<b>Nothing</b>";
-                Label.Clear();
-                AddLabelSingleText(Label, "<b>Nothing</b>");
+                string label = "<b>Nothing</b>";
+
+                if (_metaInfo.BitValueToName.TryGetValue(newValue, out EnumFlagsUtil.EnumDisplayInfo displayInfo))
+                    label = $"<b>{displayInfo.Name}</b>";
+
+                // Label.text = label;
+                AddLabelSingleText(Label, label);
                 return;
             }
 
             if((newValue & _metaInfo.AllCheckedInt) == _metaInfo.AllCheckedInt)
             {
-                // Label.text = "<b>Everything</b>";
-                Label.Clear();
-                AddLabelSingleText(Label, "<b>Everything</b>");
+                string label = "<b>Everything</b>";
+
+                if (_metaInfo.BitValueToName.TryGetValue(newValue, out EnumFlagsUtil.EnumDisplayInfo displayInfo))
+                    label = $"<b>{displayInfo.Name}</b>";
+
+                // Label.text = label;
+                AddLabelSingleText(Label, label);
                 return;
             }
 
-            List<EnumFlagsUtil.EnumDisplayInfo> selectedNames = new List<EnumFlagsUtil.EnumDisplayInfo>();
+            List<int> selectedNameKeys = new List<int>();
 
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> kvp in _metaInfo.BitValueToName)
+            foreach (int key in _metaInfo.BitValueToName.Keys)
             {
-                if ((newValue & kvp.Key) == kvp.Key)
+                if (key == 0) continue;
+
+                if ((newValue & key) == key)
                 {
-                    selectedNames.Add(kvp.Value);
+                    selectedNameKeys.Add(key);
                 }
             }
 
-            if (selectedNames.Count == 0)
+            if (selectedNameKeys.Count == 0)
             {
-                Label.Clear();
                 AddLabelSingleText(Label, $"<color=red>?</color> {newValue}");
+                this.Button.tooltip = "Invalid flags set";
                 return;
             }
 
-            Label.Clear();
-            int totalCount = selectedNames.Count;
-            foreach ((EnumFlagsUtil.EnumDisplayInfo displayInfo, int index) in selectedNames.WithIndex())
+            // Remove any keys which are used to make up another key in the list
+            // Up==1,Down==2,Vertical==3,Left==4 -> Vertical==3,Left==4
+            // Up==1,Down==2,Vertical==3,Left==4,Right==8,Horizontal==12,All==15 -> All==15
+            for (int i = selectedNameKeys.Count - 1; i >= 0; i--)
             {
+                int key = selectedNameKeys[i];
+                for (int j = 0; j < selectedNameKeys.Count; j++)
+                {
+                    int otherKey = selectedNameKeys[j];
+                    if (otherKey != key && (otherKey & key) == key)
+                    {
+                        selectedNameKeys.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+
+            int totalCount = selectedNameKeys.Count;
+            foreach ((int keyIndex, int index) in selectedNameKeys.WithIndex())
+            {
+                if (!_metaInfo.BitValueToName.TryGetValue(keyIndex, out EnumFlagsUtil.EnumDisplayInfo displayInfo))
+                    continue;
+
                 // Debug.Log($"append {displayInfo.Name}:{displayInfo.RichName}");
                 AddLabelRichText(Label, displayInfo);
                 bool isLast = index == totalCount - 1;
@@ -81,6 +112,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
                 {
                     label.Add(chunk);
                 }
+
+                this.Button.tooltip += displayInfo.Name;
             }
             else
             {
@@ -89,7 +122,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             }
         }
 
-        private static void AddLabelSingleText(Label label, string content)
+        private void AddLabelSingleText(Label label, string content)
         {
             label.Add(new Label(content)
             {
@@ -103,6 +136,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
                 },
                 pickingMode = PickingMode.Ignore,
             });
+
+            this.Button.tooltip += content;
         }
     }
 }
