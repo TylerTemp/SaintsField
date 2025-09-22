@@ -23,9 +23,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
                 Name = "a",
                 MContainers = new[]
                 {
-                    new MContainer { Name = "a" },
-                    // new MContainer { Name = "b" },
+                    new MContainer { Name = "b" },
                     // new MContainer { Name = "c" },
+                    // new MContainer { Name = "d" },
                 }
             },
             // new CContainer

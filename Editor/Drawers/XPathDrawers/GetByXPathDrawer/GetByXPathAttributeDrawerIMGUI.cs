@@ -138,8 +138,11 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             }
 
             int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if(!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
+            {
+                return 0;
+            }
             // update information for this property
-            PropertyCache propertyCache = genericCache.IndexToPropertyCache[propertyIndex];
             GetByXPathAttribute firstAttribute = genericCache.GetByXPathAttributes[0];
 
             if (NothingSigner(genericCache.GetByXPathAttributes[0]))
@@ -262,7 +265,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // {
             //     Debug.Log($"{genericCache.UpdateResourceAfterTime} {EditorApplication.timeSinceStartup}");
             // }
-            // Debug.Log(genericCache.UpdateResourceAfterTime);
+
             if(!configExists || !genericCache.IndexToPropertyCache.ContainsKey(propertyIndex) || genericCache.UpdateResourceAfterTime > EditorApplication.timeSinceStartup)
             {
                 UpdateSharedCacheBase(genericCache, property, info);

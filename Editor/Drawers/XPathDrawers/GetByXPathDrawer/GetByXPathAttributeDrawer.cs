@@ -346,7 +346,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                                 if (arrayIndex != accValueIndex)
                                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-                                Debug.Log($"#GetByXPath# shift array element {arrayIndex} to {accValueIndex}");
+                                    Debug.Log($"#GetByXPath# shift array element {arrayIndex} to {accValueIndex}");
 #endif
 
                                     target.ArrayProperty.MoveArrayElement(arrayIndex, accValueIndex);

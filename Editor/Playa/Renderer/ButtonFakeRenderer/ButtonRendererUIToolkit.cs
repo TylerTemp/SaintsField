@@ -192,7 +192,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         methodInfo.ReturnType,
                         returnValue,
                         null,
-                        newValue => { },
+                        _ => { },
                         false,
                         true,
                         ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo),
