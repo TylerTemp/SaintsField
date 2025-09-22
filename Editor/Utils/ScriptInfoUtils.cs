@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Utils
 {
@@ -33,29 +34,26 @@ namespace SaintsField.Editor.Utils
             return Array.Empty<CodeAnalysisUtils.MemberContainer>();
         }
 
+#if SAINTSFIELD_CODE_ANALYSIS
         private static (bool found, MonoScript script) GetMonoScriptFromType(Type type)
         {
-            if (typeof(UnityEngine.MonoBehaviour).IsAssignableFrom(type))
+            if(!typeof(Component).IsAssignableFrom(type) && !typeof(ScriptableObject).IsAssignableFrom(type))
             {
-                foreach (MonoScript runtimeMonoScript in MonoImporter.GetAllRuntimeMonoScripts())
-                {
-                    if (runtimeMonoScript.GetClass() == type)
-                    {
-                        return (true, runtimeMonoScript);
-                    }
-                }
+                // Debug.LogWarning($"Type {type} is not a Component or ScriptableObject, cannot find MonoScript.");
+                return (false, null);
             }
-            else if(typeof(UnityEngine.ScriptableObject).IsAssignableFrom(type))
+
+            foreach (MonoScript runtimeMonoScript in MonoImporter.GetAllRuntimeMonoScripts())
             {
-                UnityEngine.ScriptableObject so = UnityEngine.ScriptableObject.CreateInstance(type);
-                MonoScript ms = MonoScript.FromScriptableObject(so);
-                UnityEngine.Object.DestroyImmediate(so);
-                return (true, ms);
+                if (runtimeMonoScript.GetClass() == type)
+                {
+                    // Debug.Log(runtimeMonoScript);
+                    return (true, runtimeMonoScript);
+                }
             }
 
             return (false, null);
         }
-
-
+#endif
     }
 }

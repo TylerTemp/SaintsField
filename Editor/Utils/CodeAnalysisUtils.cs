@@ -114,6 +114,7 @@ namespace SaintsField.Editor.Utils
         private static IEnumerable<ClassContainer> ParseNamespace(NamespaceDeclarationSyntax namespaceDeclarationSyntax)
         {
             string nameSpace = namespaceDeclarationSyntax.Name.ToString();
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
             foreach (MemberDeclarationSyntax memberDeclarationSyntax in namespaceDeclarationSyntax.Members)
             {
                 if (memberDeclarationSyntax.Kind() != SyntaxKind.ClassDeclaration)
