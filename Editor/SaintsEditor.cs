@@ -85,43 +85,6 @@ namespace SaintsField.Editor
             IReadOnlyList<object> targets)
         {
 
-//             const string programText =
-//             @"using System;
-//             using System.Collections;
-//             using System.Linq;
-//             using System.Text;
-//
-//             namespace HelloWorld
-//             {
-//                 class Program
-//                 {
-//                     static void Main(string[] args)
-//                     {
-//                         Console.WriteLine(""Hello, World!"");
-//                     }
-//                 }
-//             }";
-//
-//             SyntaxTree tree = CSharpSyntaxTree.ParseText(programText);
-//             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-//
-//             MemberDeclarationSyntax firstMember = root.Members[0];
-//             Debug.Log($"The first member is a {firstMember.Kind()}.");
-//             var helloWorldDeclaration = (NamespaceDeclarationSyntax)firstMember;
-//             var programDeclaration = (ClassDeclarationSyntax)helloWorldDeclaration.Members[0];
-//             Debug.Log($"There are {programDeclaration.Members.Count} members declared in the {programDeclaration.Identifier} class.");
-//             Debug.Log($"The first member is a {programDeclaration.Members[0].Kind()}.");
-//             var mainDeclaration = (MethodDeclarationSyntax)programDeclaration.Members[0];
-//
-//             Debug.Log($"The return type of the {mainDeclaration.Identifier} method is {mainDeclaration.ReturnType}.");
-//             Debug.Log($"The method has {mainDeclaration.ParameterList.Parameters.Count} parameters.");
-//             foreach (ParameterSyntax item in mainDeclaration.ParameterList.Parameters)
-//                 Debug.Log($"The type of the {item.Identifier} parameter is {item.Type}.");
-//             Debug.Log($"The body text of the {mainDeclaration.Identifier} method follows:");
-//             Debug.Log(mainDeclaration.Body?.ToFullString());
-//
-//             var argsParameter = mainDeclaration.ParameterList.Parameters[0];
-
             // HashSet<string> brokenFields = new HashSet<string>();
             SerializedProperty saintsSerializedProp = serializedObject.FindProperty(Util.SerializedFieldName);
             if (saintsSerializedProp != null)

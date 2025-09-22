@@ -53,6 +53,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 && methodInfo.ReturnType != typeof(void)
                 && !typeof(IEnumerator).IsAssignableFrom(methodInfo.ReturnType);
 
+            Debug.Log($"hasReturnValue={hasReturnValue}");
+
             if (hasParameters || hasReturnValue)
             {
                 root = new VisualElement
@@ -195,7 +197,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         newValue => { },
                         false,
                         true,
-                        ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo),
+                        ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo),
                         false
                     ).result;
                     if (r != null)
@@ -326,7 +328,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             _onSearchFieldUIToolkit.AddListener(Search);
             buttonElement.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
 
-            if (!hasParameters)
+            if (!hasParameters && !hasReturnValue)
             {
                 return (buttonElement, needUpdate);
             }
@@ -365,7 +367,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 // returnValueContainer.SetEnabled(false);
                 root.Add(_returnContainer);
             }
-
 
             return (root, needUpdate);
 
