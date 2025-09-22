@@ -323,12 +323,17 @@ namespace SaintsField.Editor
                     List<SaintsFieldWithInfo> thisDepthInfos = new List<SaintsFieldWithInfo>();
                     List<string> memberDepthIds = new List<string>();
 
-                    foreach (MemberInfo memberInfo in systemType
-                                 .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                             BindingFlags.Public | BindingFlags.DeclaredOnly)
-                                 .OrderBy(memberInfo =>
-                                     memberInfo
-                                         .MetadataToken)) // this is still not the correct order, but... a bit better
+                    IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers = ScriptInfoUtils.GetMembersCorrectOrder(systemType);
+                    List<MemberInfo> memberLis = systemType
+                        .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                    BindingFlags.Public | BindingFlags.DeclaredOnly)
+                        // this is still not the correct order, but... a bit better
+                        .OrderBy(memberInfo => memberInfo.MetadataToken)
+                        .ToList();
+
+                    memberLis.Sort((a, b) => MemberLisCompare(a, b, codeAnalysisMembers));
+
+                    foreach (MemberInfo memberInfo in memberLis)
                     {
                         // Debug.Log(memberInfo.Name);
                         IReadOnlyList<IPlayaAttribute> playaAttributes =
@@ -527,6 +532,90 @@ namespace SaintsField.Editor
                 .ThenBy(each => each.value.Order)
                 .ThenBy(each => each.index)
                 .Select(each => each.value);
+        }
+
+        private static int MemberLisCompare(MemberInfo a, MemberInfo b,IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
+        {
+            int length = codeAnalysisMembers.Count;
+            if (length == 0)
+            {
+                return 0;  // keep order
+            }
+
+            int aIndex = FindMemberIndex(a, codeAnalysisMembers);
+            int bIndex = FindMemberIndex(b, codeAnalysisMembers);
+            if (aIndex == bIndex)
+            {
+                return 0;
+            }
+            if (aIndex == -1)
+            {
+                return 1;
+            }
+            if (bIndex == -1)
+            {
+                return -1;
+            }
+
+            return aIndex - bIndex;
+        }
+
+        private static int FindMemberIndex(MemberInfo memberInfo,
+            IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
+        {
+            for (int index = 0; index < codeAnalysisMembers.Count; index++)
+            {
+                CodeAnalysisUtils.MemberContainer memberContainer = codeAnalysisMembers[index];
+
+                if (memberContainer.Name != memberInfo.Name && RuntimeUtil.GetAutoPropertyName(memberContainer.Name) != memberInfo.Name)
+                {
+                    continue;
+                }
+
+                if(memberInfo.MemberType != MemberTypes.Method)  // field or property, just name is enough
+                {
+                    return index;
+                }
+
+                if (memberContainer.Type != CodeAnalysisUtils.MemberType.Method)
+                {
+                    continue;
+                }
+
+                MethodInfo methodInfo = (MethodInfo)memberInfo;
+
+                string methodInfoReturnTypeString = ReflectUtils.StringifyType(methodInfo.ReturnType);
+                if (methodInfoReturnTypeString != memberContainer.ReturnType)
+                {
+                    continue;
+                }
+
+                if (methodInfo.GetParameters().Length != memberContainer.Arguments.Count)
+                {
+                    continue;
+                }
+
+                bool allMatch = true;
+                ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+                for (int paramIndex = 0; paramIndex < parameterInfos.Length; paramIndex++)
+                {
+                    string methodInfoParamTypeString = ReflectUtils.StringifyType(parameterInfos[paramIndex].ParameterType);
+                    string containerParamTypeString = memberContainer.Arguments[paramIndex];
+                    Debug.Log($"[{paramIndex}] methodInfoParamTypeString={methodInfoParamTypeString}, containerParamTypeString={containerParamTypeString}");
+                    if(methodInfoParamTypeString != containerParamTypeString)
+                    {
+                        allMatch = false;
+                        break;
+                    }
+                }
+
+                if(allMatch)
+                {
+                    return index;
+                }
+            }
+
+            return -1;
         }
 
         // private static IEnumerable<IPlayaAttribute> WrapPlayaAttributes(IPlayaAttribute[] getCustomAttributes)

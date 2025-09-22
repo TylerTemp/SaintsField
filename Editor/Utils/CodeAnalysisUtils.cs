@@ -85,9 +85,9 @@ namespace SaintsField.Editor.Utils
         }
 
 #if SAINTSFIELD_CODE_ANALYSIS
-        public static IEnumerable<ClassContainer> Parse()
+        public static IEnumerable<ClassContainer> Parse(MonoScript ms)
         {
-            MonoScript ms = AssetDatabase.LoadAssetAtPath<MonoScript>("Assets/SaintsField/Samples/Scripts/SaintsEditor/Testing/MixLayoutTest.cs");
+            // MonoScript ms = AssetDatabase.LoadAssetAtPath<MonoScript>("Assets/SaintsField/Samples/Scripts/SaintsEditor/Testing/MixLayoutTest.cs");
             string programText = ms.ToString();
 
             SyntaxTree tree = CSharpSyntaxTree.ParseText(programText);
@@ -129,16 +129,20 @@ namespace SaintsField.Editor.Utils
 
         private static ClassContainer ParseClass(ClassDeclarationSyntax classDeclaration, string nameSpace)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
             Debug.Log(
                 $"[{classDeclaration.Identifier}], Keyword: {classDeclaration.Keyword}, members: {classDeclaration.Members.Count}");
+#endif
             List<string> baseTypes = new List<string>();
             // Get base types (class and interfaces) from ClassDeclarationSyntax
             if (classDeclaration.BaseList != null)
             {
                 foreach (BaseTypeSyntax baseType in classDeclaration.BaseList.Types)
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
                     Debug.Log(
                         $"[{classDeclaration.Identifier}] Base type or interface: {baseType.Type.ToString()}");
+#endif
                     baseTypes.Add(baseType.Type.ToString());
                 }
             }
@@ -146,7 +150,9 @@ namespace SaintsField.Editor.Utils
             List<MemberContainer> members = new List<MemberContainer>();
             foreach ((MemberDeclarationSyntax memberDeclarationSyntax, int index) in classDeclaration.Members.WithIndex())
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
                 Debug.Log($"[{index}] [{memberDeclarationSyntax.Kind()}]");
+#endif
                 switch (memberDeclarationSyntax.Kind())
                 {
                     case SyntaxKind.FieldDeclaration:
@@ -166,8 +172,10 @@ namespace SaintsField.Editor.Utils
 
         private static MemberContainer ParseField(FieldDeclarationSyntax fieldDeclarationSyntax, int index)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
             Debug.Log(
                 $"[{index}]  Field : {fieldDeclarationSyntax.Declaration.Type} {string.Join(", ", fieldDeclarationSyntax.Declaration.Variables.Select(v => v.Identifier.Text))}");
+#endif
             return new MemberContainer(MemberType.Field, fieldDeclarationSyntax.Declaration.Variables[0].Identifier.Text);
             // (new MemberContainer(MemberType.Field,
             //     string.Join(", ",
@@ -186,7 +194,9 @@ namespace SaintsField.Editor.Utils
 
         private static MemberContainer ParseProperty(PropertyDeclarationSyntax propertyDeclarationSyntax, int index)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
             Debug.Log($"[{index}]  Property : {propertyDeclarationSyntax.Type} {propertyDeclarationSyntax.Identifier.Text}");
+#endif
             return new MemberContainer(MemberType.Propoerty, propertyDeclarationSyntax.Identifier.Text);
             // foreach (AttributeListSyntax attributeList in propertyDeclarationSyntax.AttributeLists)
             // {
@@ -199,7 +209,9 @@ namespace SaintsField.Editor.Utils
 
         private static MemberContainer ParseMethod(MethodDeclarationSyntax memberDeclarationSyntax, int index)
         {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
             Debug.Log($"[{index}]  Method : {memberDeclarationSyntax.ReturnType} {memberDeclarationSyntax.Identifier.Text}({string.Join(", ", memberDeclarationSyntax.ParameterList.Parameters.Select(p => $"{p.Type} {p.Identifier.Text}"))})");
+#endif
             return new MemberContainer(
                 memberDeclarationSyntax.Identifier.Text,
                 memberDeclarationSyntax.ParameterList.Parameters
