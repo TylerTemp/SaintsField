@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.30.3 ##
+
+1.  UI Toolkit: fix `Button` return value duplicated rendering when nested with list - struct - list - struct
+2.  UI Toolkit: fix `Button` didn't show the returned value if the function has no parameters
+3.  IMGUI: fix auto getters error when an element is removed from list [#304](https://github.com/TylerTemp/SaintsField/issues/304)
+
 ## 4.30.2 ##
 
 1.  UI Toolkit: fix label in wrong location for `enum` type [#298](https://github.com/TylerTemp/SaintsField/issues/298)

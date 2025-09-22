@@ -95,6 +95,7 @@ namespace SaintsField.Editor.Utils
 
             foreach (MemberDeclarationSyntax memberDeclarationSyntax in root.Members)
             {
+                // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
                 switch (memberDeclarationSyntax.Kind())
                 {
                     case SyntaxKind.NamespaceDeclaration:
@@ -108,50 +109,6 @@ namespace SaintsField.Editor.Utils
                         break;
                 }
             }
-            //
-            // MemberDeclarationSyntax firstMember = root.Members[0];
-            // Debug.Log($"The first member is a {firstMember.Kind()}.");
-            // NamespaceDeclarationSyntax namespaceDeclaration = (NamespaceDeclarationSyntax)firstMember;
-            // Debug.Log($"namespace: {namespaceDeclaration.Name}/{namespaceDeclaration.NamespaceKeyword}");
-            //
-            // ClassDeclarationSyntax classDeclaration = (ClassDeclarationSyntax)namespaceDeclaration.Members[0];
-            // Debug.Log($"[{classDeclaration.Identifier}], Keyword: {classDeclaration.Keyword}, members: {classDeclaration.Members.Count}");
-            // // Get base types (class and interfaces) from ClassDeclarationSyntax
-            // if (classDeclaration.BaseList != null)
-            // {
-            //     foreach (BaseTypeSyntax baseType in classDeclaration.BaseList.Types)
-            //     {
-            //         Debug.Log($"[{classDeclaration.Identifier}] Base type or interface: {baseType.Type.ToString()}");
-            //     }
-            // }
-            //
-            // foreach ((MemberDeclarationSyntax memberDeclarationSyntax, int index) in classDeclaration.Members.WithIndex())
-            // {
-            //     Debug.Log($"[{index}] [{memberDeclarationSyntax.Kind()}]");
-            //     switch (memberDeclarationSyntax.Kind())
-            //     {
-            //         case SyntaxKind.FieldDeclaration:
-            //             ParseField((FieldDeclarationSyntax)memberDeclarationSyntax, index);
-            //             break;
-            //         case SyntaxKind.PropertyDeclaration:
-            //             ParseProperty((PropertyDeclarationSyntax)memberDeclarationSyntax, index);
-            //             break;
-            //         case SyntaxKind.MethodDeclaration:
-            //             ParseMethod((MethodDeclarationSyntax)memberDeclarationSyntax, index);
-            //             break;
-            //     }
-            // }
-
-            // MethodDeclarationSyntax mainDeclaration = (MethodDeclarationSyntax)programDeclaration.Members[0];
-            //
-            // Debug.Log($"The return type of the {mainDeclaration.Identifier} method is {mainDeclaration.ReturnType}.");
-            // Debug.Log($"The method has {mainDeclaration.ParameterList.Parameters.Count} parameters.");
-            // foreach (ParameterSyntax item in mainDeclaration.ParameterList.Parameters)
-            // Debug.Log($"The type of the {item.Identifier} parameter is {item.Type}.");
-            // Debug.Log($"The body text of the {mainDeclaration.Identifier} method follows:");
-            // Debug.Log(mainDeclaration.Body?.ToFullString());
-            //
-            // var argsParameter = mainDeclaration.ParameterList.Parameters[0];
         }
 
         private static IEnumerable<ClassContainer> ParseNamespace(NamespaceDeclarationSyntax namespaceDeclarationSyntax)
@@ -167,57 +124,6 @@ namespace SaintsField.Editor.Utils
                 ClassDeclarationSyntax classDeclaration = (ClassDeclarationSyntax)memberDeclarationSyntax;
 
                 yield return ParseClass(classDeclaration, nameSpace);
-                // Debug.Log(
-                //     $"[{classDeclaration.Identifier}], Keyword: {classDeclaration.Keyword}, members: {classDeclaration.Members.Count}");
-                // List<string> baseTypes = new List<string>();
-                // // Get base types (class and interfaces) from ClassDeclarationSyntax
-                // if (classDeclaration.BaseList != null)
-                // {
-                //     foreach (BaseTypeSyntax baseType in classDeclaration.BaseList.Types)
-                //     {
-                //         Debug.Log(
-                //             $"[{classDeclaration.Identifier}] Base type or interface: {baseType.Type.ToString()}");
-                //         baseTypes.Add(baseType.Type.ToString());
-                //     }
-                // }
-                //
-                // List<MemberContainer> members = new List<MemberContainer>();
-                // foreach ((MemberDeclarationSyntax memberDeclarationSyntax2, int index) in classDeclaration
-                //              .Members.WithIndex())
-                // {
-                //     Debug.Log($"[{index}] [{memberDeclarationSyntax2.Kind()}]");
-                //     switch (memberDeclarationSyntax2.Kind())
-                //     {
-                //         case SyntaxKind.FieldDeclaration:
-                //             FieldDeclarationSyntax fieldDeclarationSyntax =
-                //                 (FieldDeclarationSyntax)memberDeclarationSyntax2;
-                //             Debug.Log(
-                //                 $"[{index}]  Field : {fieldDeclarationSyntax.Declaration.Type} {string.Join(", ", fieldDeclarationSyntax.Declaration.Variables.Select(v => v.Identifier.Text))}");
-                //             members.Add(new MemberContainer(MemberType.Field,
-                //                 string.Join(", ",
-                //                     fieldDeclarationSyntax.Declaration.Variables.Select(v =>
-                //                         v.Identifier.Text))));
-                //             break;
-                //         case SyntaxKind.PropertyDeclaration:
-                //             PropertyDeclarationSyntax propertyDeclarationSyntax =
-                //                 (PropertyDeclarationSyntax)memberDeclarationSyntax2;
-                //             Debug.Log(
-                //                 $"[{index}]  Property : {propertyDeclarationSyntax.Type} {propertyDeclarationSyntax.Identifier.Text}");
-                //             members.Add(new MemberContainer(MemberType.Propoerty,
-                //                 propertyDeclarationSyntax.Identifier.Text));
-                //             break;
-                //         case SyntaxKind.MethodDeclaration:
-                //             MethodDeclarationSyntax methodDeclarationSyntax =
-                //                 (MethodDeclarationSyntax)memberDeclarationSyntax2;
-                //             Debug.Log(
-                //                 $"[{index}]  Method : {methodDeclarationSyntax.ReturnType} {methodDeclarationSyntax.Identifier.Text}({string.Join(", ", methodDeclarationSyntax.ParameterList.Parameters.Select(p => $"{p.Type} {p.Identifier.Text}"))})");
-                //             members.Add(new MemberContainer(methodDeclarationSyntax.Identifier.Text,
-                //                 methodDeclarationSyntax.ParameterList.Parameters
-                //                     .Select(p => $"{p.Type} {p.Identifier.Text}").ToList(),
-                //                 methodDeclarationSyntax.ReturnType.ToString()));
-                //             break;
-                //     }
-                // }
             }
         }
 
@@ -294,7 +200,12 @@ namespace SaintsField.Editor.Utils
         private static MemberContainer ParseMethod(MethodDeclarationSyntax memberDeclarationSyntax, int index)
         {
             Debug.Log($"[{index}]  Method : {memberDeclarationSyntax.ReturnType} {memberDeclarationSyntax.Identifier.Text}({string.Join(", ", memberDeclarationSyntax.ParameterList.Parameters.Select(p => $"{p.Type} {p.Identifier.Text}"))})");
-            return new MemberContainer(memberDeclarationSyntax.Identifier.Text, memberDeclarationSyntax.ParameterList.Parameters.Select(each => each.Identifier.Text), memberDeclarationSyntax.ReturnType.ToString());
+            return new MemberContainer(
+                memberDeclarationSyntax.Identifier.Text,
+                memberDeclarationSyntax.ParameterList.Parameters
+                    // ReSharper disable once PossibleNullReferenceException
+                    .Select(each => each.Type.ToString()),
+                memberDeclarationSyntax.ReturnType.ToString());
             // foreach (AttributeListSyntax attributeList in memberDeclarationSyntax.AttributeLists)
             // {
             //     foreach (AttributeSyntax attribute in attributeList.Attributes)

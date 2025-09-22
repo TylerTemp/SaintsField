@@ -103,19 +103,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.31.2**
+**4.30.3**
 
-1.  UI Toolkit: fix label in wrong location for `enum` type [#298](https://github.com/TylerTemp/SaintsField/issues/298)
-2.  IMGUI: fix `Expandable` can not process when target is `null` [#297](https://github.com/TylerTemp/SaintsField/issues/297)
-3.  UI Toolkit: fix `ShowInInspector` display flags `enum` as normal enum
-4.  UI Toolkit: fix `SaintsDictionary` failed to flatten if the target is a class/struct [#301](https://github.com/TylerTemp/SaintsField/issues/301)
-5.  UI Toolkit: General improvements to the FlagsDropdownElement implementation to be closer to the Unity implementation for display by [@Zallist](https://github.com/Zallist) on [pr#299](https://github.com/TylerTemp/SaintsField/pull/299)
-    *   fix: `FlagsDropdownElement` not showing the actual name for NOTHING or EVERYTHING set in the flags enum if set by the developer
-    *   fix: `FlagsDropdownElement` should have a cap on its width via flexShrink
-    *   fix: `FlagsDropdownElement` did not attempt to collapse down flags that were contained within higher flags (up,down,vertical,left,right,horizontal should be collapsed to just vertical,horizontal)
-    *   fix: `FlagsDropdownElement` did not use a tooltip if everything got too long
-    *   fix: `FlagsDropdownElement` did not showing EVERYTHING if the enum value was -1 since CachedValue was instantiated to -1, now it's a nullable int
-
+1.  UI Toolkit: fix `Button` return value duplicated rendering when nested with list - struct - list - struct
+2.  UI Toolkit: fix `Button` didn't show the returned value if the function has no parameters
+3.  IMGUI: fix auto getters error when an element is removed from list [#304](https://github.com/TylerTemp/SaintsField/issues/304)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

@@ -12,8 +12,6 @@ namespace SaintsField
         {
             return CodeAnalysisUtils.Parse().ToArray();
         }
-
-
     }
 }
 #endif
