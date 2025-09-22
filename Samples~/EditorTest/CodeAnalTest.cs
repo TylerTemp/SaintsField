@@ -13,8 +13,7 @@ namespace SaintsField
             return CodeAnalysisUtils.Parse().ToArray();
         }
 
-        [Button]
-        private int Re() => 5;
+
     }
 }
 #endif

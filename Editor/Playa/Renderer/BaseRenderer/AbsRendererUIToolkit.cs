@@ -220,7 +220,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         {
             public Type UnityObjectOverrideType;
             public UIToolkitValueEditPayloadState State;
-            // public bool IsFullFilled;
+            public bool IsFullFilled;
         }
 
         private static readonly Color ReColor = EColor.EditorSeparator.GetColor();
@@ -1752,6 +1752,15 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             bool useOld = genFoldout != null;
+
+            UIToolkitValueEditPayload payload = useOld
+                ? (UIToolkitValueEditPayload)genFoldout.userData
+                : new UIToolkitValueEditPayload
+                {
+                    IsFullFilled = false,
+                    UnityObjectOverrideType = value?.GetType(),
+                };
+
             if (!useOld)
             {
                 // Debug.Log($"Create foldout for value {value}");
@@ -1763,11 +1772,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         position = Position.Relative,
                     },
-                    userData = new UIToolkitValueEditPayload
-                    {
-                        // IsFullFilled = false,
-                        UnityObjectOverrideType = value?.GetType(),
-                    },
+                    userData = payload,
                 };
                 if (labelGrayColor)
                 {
@@ -1782,11 +1787,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 genFoldout.Add(MakeTypeDropdown("", valueType, value, newType =>
                 {
-                    UIToolkitValueEditPayload payload = (UIToolkitValueEditPayload)genFoldout.userData;
-                    Type preType = payload.UnityObjectOverrideType;
-                    payload.UnityObjectOverrideType = newType;
+                    UIToolkitValueEditPayload refreshedPayload = (UIToolkitValueEditPayload)genFoldout.userData;
+                    Type preType = refreshedPayload.UnityObjectOverrideType;
+                    refreshedPayload.UnityObjectOverrideType = newType;
 
-                    if (payload.State == UIToolkitValueEditPayloadState.FieldObject && newType != null &&
+                    if (refreshedPayload.State == UIToolkitValueEditPayloadState.FieldObject && newType != null &&
                         typeof(Object).IsAssignableFrom(newType))
                     {
                         // string objFieldName = $"saintsfield-objectfield";
@@ -1824,9 +1829,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     if (newType == null)
                     {
                         setterOrNull?.Invoke(null);
-                        if (payload.State != UIToolkitValueEditPayloadState.None)
+                        if (refreshedPayload.State != UIToolkitValueEditPayloadState.None)
                         {
-                            payload.State = UIToolkitValueEditPayloadState.None;
+                            refreshedPayload.State = UIToolkitValueEditPayloadState.None;
                             fieldsBodyNew.Clear();
                         }
                     }
@@ -1834,7 +1839,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         setterOrNull?.Invoke(null);
                         // the objectoverride will handle the rest
-                        if (payload.State != UIToolkitValueEditPayloadState.FieldObject)
+                        if (refreshedPayload.State != UIToolkitValueEditPayloadState.FieldObject)
                         {
                             fieldsBodyNew.Clear();
                         }
@@ -1862,9 +1867,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             obj = ReferencePickerAttributeDrawer.CopyObj(value, obj);
                         }
-                        if (payload.State != UIToolkitValueEditPayloadState.GenericType)
+                        if (refreshedPayload.State != UIToolkitValueEditPayloadState.GenericType)
                         {
-                            payload.State = UIToolkitValueEditPayloadState.GenericType;
+                            refreshedPayload.State = UIToolkitValueEditPayloadState.GenericType;
                             fieldsBodyNew.Clear();
                         }
 
@@ -1880,23 +1885,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 //     name = "saintsfield-edit-fields",
                 // });
 
-
-
                 genFoldout.RegisterValueChangedCallback(evt =>
                 {
+                    if (payload.IsFullFilled)
+                    {
+                        return;
+                    }
+
+                    // Debug.Log($"Expand value {value} -> {evt.newValue}");
                     bool expanded = evt.newValue;
+                    payload.IsFullFilled = true;
                     FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
                 });
 
-                if (ExpandedValue.Contains(value))
-                {
-                    FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
-                }
+                // if (ExpandedValue.Contains(value))
+                // {
+                //     Debug.Log($"Default expand value {value}");
+                //     payload.IsFullFilled = true;
+                //     FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
+                // }
             }
 
             VisualElement fieldsBody = genFoldout.Q<VisualElement>(name: "saintsfield-edit-fields");
 
-            UIToolkitValueEditPayload payload = (UIToolkitValueEditPayload)genFoldout.userData;
+
 
             Type valueActualType = payload.UnityObjectOverrideType ?? value?.GetType();
             // Debug.Log($"valueActualType={valueActualType}");
@@ -1921,14 +1933,15 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 fieldsBody.Clear();
                 payload.State = UIToolkitValueEditPayloadState.FieldObject;
-                // payload.IsFullFilled = false;
+                payload.IsFullFilled = false;
                 return (useOld ? null : genFoldout, true);
             }
 
             payload.State = UIToolkitValueEditPayloadState.GenericType;
 
-            if (genFoldout.value)
+            if (genFoldout.value && !payload.IsFullFilled)
             {
+                payload.IsFullFilled = true;
                 FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
             }
 
@@ -1970,14 +1983,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             // UIToolkitValueEditPayload payload = (UIToolkitValueEditPayload)genFoldout.userData;
 
-            // Debug.Log($"expand value {value}; payload.IsFullFilled={payload.IsFullFilled}");
+            // Debug.Log($"expand value {value} filling");
 
-            // if (payload.IsFullFilled)
-            // {
-            //     return;
-            // }
-
-            // payload.IsFullFilled = true;
             VisualElement fieldsBody = genFoldout.Q<VisualElement>(name: "saintsfield-edit-fields");
 
             // ReSharper disable once PossibleNullReferenceException
@@ -2365,6 +2372,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             Foldout foldout = oldElement;
             if (foldout != null && !foldout.ClassListContains("saintsfield-list"))
             {
+                Debug.Log($"foldout mismatch for {rawListValue}, recreate");
                 foldout = null;
             }
             if (foldout == null)
@@ -2431,7 +2439,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     ItemIndexToOriginIndex = listValue.Select((_, index) => index).ToList(),
                     RawListValue = rawListValue,
                 };
-                // Debug.Log($"Create new listView");
+                // Debug.Log($"Create new listView for {rawListValue}");
                 bool showAddRemoveFooter = true;
                 if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
                 {

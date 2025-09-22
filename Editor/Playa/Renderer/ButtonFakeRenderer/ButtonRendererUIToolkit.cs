@@ -53,8 +53,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 && methodInfo.ReturnType != typeof(void)
                 && !typeof(IEnumerator).IsAssignableFrom(methodInfo.ReturnType);
 
-            Debug.Log($"hasReturnValue={hasReturnValue}");
-
             if (hasParameters || hasReturnValue)
             {
                 root = new VisualElement
@@ -190,7 +188,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     object returnValue = returnValues[0];
                     VisualElement r = UIToolkitValueEdit(
                         _returnValueContainer.Children().FirstOrDefault(),
-                        "",
+                        "<color=green>[return]</color>",
                         methodInfo.ReturnType,
                         returnValue,
                         null,
@@ -211,7 +209,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         {
                             _returnContainer.style.display = DisplayStyle.Flex;
                         }
-
                         _returnValueContainer.Add(r);
                     }
                 }
