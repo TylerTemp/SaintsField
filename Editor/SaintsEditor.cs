@@ -9,6 +9,7 @@ using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
@@ -795,6 +796,7 @@ namespace SaintsField.Editor
 
                 foreach (SaintsFieldWithRenderer rendererInfo in playaAndRenderers)
                 {
+                    // Debug.Log(rendererInfo);
                     switch (rendererInfo.Playa)
                     {
                         case ISaintsLayoutToggle layoutToggle:
@@ -1035,6 +1037,11 @@ namespace SaintsField.Editor
                 Playa = playa;
                 Renderer = renderer;
             }
+
+            public override string ToString()
+            {
+                return $"{Renderer}:{Playa}";
+            }
         }
 
         private static IEnumerable<SaintsFieldWithRenderer> GetPlayaAndRenderer(SaintsFieldWithInfo fieldWithInfo, SerializedObject serializedObject, IMakeRenderer makeRenderer)
@@ -1111,7 +1118,6 @@ namespace SaintsField.Editor
                         break;
                     case LayoutCloseHereAttribute _:  // [Layout(".", keepGrouping: false), LayoutEnd(".")]
                     {
-                        // yield return new SaintsFieldWithRenderer(fieldWithInfo, new LayoutAttribute(".", keepGrouping: false), null);
                         postRenderer.Add(new SaintsFieldWithRenderer(new LayoutEndAttribute("."), null));
                     }
                         break;
@@ -1337,6 +1343,10 @@ namespace SaintsField.Editor
                         else if(playaAttribute is ShowInInspectorAttribute _)
                         {
                             yield return new RealTimeCalculatorRenderer(serializedObject, fieldWithInfo);
+                        }
+                        else if (playaAttribute is LayoutAttribute)
+                        {
+                            yield return new EmptyRenderer();
                         }
                     }
                     yield break;

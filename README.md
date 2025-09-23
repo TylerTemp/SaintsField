@@ -3684,566 +3684,6 @@ public Vector2Int v2Value;
 
 **Deprecated**. Use `ArraySize` instead.
 
-### Layout ###
-
-#### `Ordered` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-`SaintsEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
-
-Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[Ordered] public string myStartField;
-
-[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
-[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
-
-[ShowInInspector, Ordered]
-public Color AutoColor
-{
-    get => Color.green;
-    set {}
-}
-
-[Button, Ordered]
-private void EditorButton()
-{
-    Debug.Log("EditorButton");
-}
-
-[Ordered] public string myOtherFieldUnderneath;
-```
-
-![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
-
-#### `Layout` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-A layout decorator to group fields.
-
-*   `string groupBy` the grouping key. Use `/` to separate different groups and create subgroups.
-*   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
-*   `bool keepGrouping=false`: See `LayoutStart` below
-*   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
-*   `float marginBottom = -1f` add some space after the layout. `-1` for using default spacing.
-
-Options are:
-
-*   `Vertical`
-*   `Horizontal`
-*   `Background` draw a background color for the whole group
-*   `Title` show the title
-*   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw a separator between title and the rest of the content.
-    On `UI Toolkit` it will draw a background color for the title.
-*   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
-*   `Collapse` Same as `Foldout` but is collapsed by default.
-*   `Tab` make this group a tab page separated rather than grouping it
-*   `TitleBox` = `Background | Title | TitleOut`
-*   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
-*   `CollapseBox` = `Background | Title | TitleOut | Collapse`
-
-**Known Issue**
-
-About `Horizental` style:
-
-1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
-2.  On UI Toolkit the label will be put into a new line above
-
-![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
-
-**Appearance**
-
-![layout](https://github.com/user-attachments/assets/1e2e6dfa-85a9-4225-ac8f-8beefc26ae52)
-
-**Example**
-
-```csharp
-using SaintsField;
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[Layout("Titled", ELayout.Title | ELayout.TitleOut)]
-public string titledItem1, titledItem2;
-
-// title
-[Layout("Titled Box", ELayout.Background | ELayout.TitleOut)]
-public string titledBoxItem1;
-[Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
-public string titledBoxItem2;
-
-// foldout
-[LayoutStart("Collapse", ELayout.CollapseBox)]
-public string collapseItem1;
-public string collapseItem2;
-
-[LayoutStart("Foldout", ELayout.FoldoutBox)]
-public string foldoutItem1;
-public string foldoutItem2;
-
-// tabs
-[Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
-[LayoutStart("./Tab1")]
-public string tab1Item1;
-public int tab1Item2;
-
-[LayoutStart("../Tab2")]
-public string tab2Item1;
-public int tab2Item2;
-
-[LayoutStart("../Tab3")]
-public string tab3Item1;
-public int tab3Item2;
-
-// nested groups
-[LayoutStart("Nested", ELayout.Background | ELayout.TitleOut)]
-public int nestedOne;
-
-[LayoutStart("./Nested Group 1", ELayout.TitleOut)]
-public int nestedTwo;
-public int nestedThree;
-
-[LayoutStart("./Nested Group 2", ELayout.TitleOut)]
-public int nestedFour;
-public string nestedFive;
-
-// Unlabeled Box
-[Layout("Unlabeled Box", ELayout.Background)]
-public int unlabeledBoxItem1, unlabeledBoxItem2;
-
-// Foldout In A Box
-[Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
-public int foldoutInABoxItem1, foldoutInABoxItem2;
-
-// Complex example. Button and ShowInInspector works too
-[Ordered]
-[Layout("Root", ELayout.Tab | ELayout.Foldout | ELayout.Background)]
-[Layout("Root/V1")]
-[SepTitle("Basic", EColor.Pink)]
-public string hv1Item1;
-
-[Ordered]
-[Layout("Root/V1/buttons", ELayout.Horizontal)]
-[Button("Root/V1 Button1")]
-public void RootV1Button()
-{
-    Debug.Log("Root/V1 Button");
-}
-[Ordered]
-[Layout("Root/V1/buttons")]
-[Button("Root/V1 Button2")]
-public void RootV1Button2()
-{
-    Debug.Log("Root/V1 Button");
-}
-
-[Ordered]
-[Layout("Root/V1")]
-[ShowInInspector]
-public static Color color1 = Color.red;
-
-[Ordered]
-[DOTweenPlay("Tween1", "Root/V1")]
-public Tween RootV1Tween1()
-{
-    return DOTween.Sequence();
-}
-
-[Ordered]
-[DOTweenPlay("Tween2", "Root/V1")]
-public Tween RootV1Tween2()
-{
-    return DOTween.Sequence();
-}
-
-[Ordered]
-[Layout("Root/V1")]
-public string hv1Item2;
-
-// public string below;
-
-[Ordered]
-[Layout("Root/V2")]
-public string hv2Item1;
-
-[Ordered]
-[Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
-public string hv2Item2, hv2Item3;
-
-[Ordered]
-[Layout("Root/V2")]
-public string hv2Item4;
-
-[Ordered]
-[Layout("Root/V3", ELayout.Horizontal)]
-[ResizableTextArea, RichLabel(null)]
-public string hv3Item1, hv3Item2;
-
-[Ordered]
-[Layout("Root/Buggy")]
-[InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
-public string buggy = "See below:";
-
-[Ordered]
-[Layout("Root/Buggy/H", ELayout.Horizontal)]
-public string buggy1, buggy2, buggy3;
-
-[Ordered]
-[Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]
-[Layout("Title+Tab/g1")]
-public string titleTabG11, titleTabG21;
-
-[Ordered]
-[Layout("Title+Tab/g2")]
-public string titleTabG12, titleTabG22;
-
-[Ordered]
-[Layout("All Together", ELayout.Tab | ELayout.Foldout | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
-[Layout("All Together/g1")]
-public string allTogetherG11, allTogetherG21;
-
-[Ordered]
-[Layout("All Together/g2")]
-public string allTogetherG12, allTogetherG22;
-```
-
-[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
-
-By combining `Layout` with `Playa*`, you can create some complex layout struct:
-
-```csharp
-[LayoutStart("Equipment", ELayout.TitleBox | ELayout.Vertical)]
-[LayoutStart("./Head", ELayout.TitleBox)]
-public string st;
-[LayoutCloseHere]
-public MyStruct inOneStruct;
-
-[LayoutStart("./Upper Body", ELayout.TitleBox)]
-
-[PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
-
-[LayoutStart("./Horizontal", ELayout.Horizontal)]
-
-[LayoutStart("./Left Hand", ELayout.TitleBox)]
-public string g11;
-public string g12;
-public MyStruct myStruct;
-public string g13;
-
-[LayoutStart("../Right Hand", ELayout.TitleBox)]
-public string g21;
-[RichLabel("<color=lime><label/>")]
-public string g22;
-[RichLabel("$" + nameof(g23))]
-public string g23;
-
-public bool toggle;
-```
-
-![image](https://github.com/user-attachments/assets/d2185e50-845a-47a5-abb4-fae0faac7ba4)
-
-If titled box is too heavy, you can use `PlayaSeparator` instead. See `PlayaSeparator` section for more information
-
-#### `LayoutStart` / `LayoutEnd` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-`LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
-
-`LayoutStart(name)` is the same as `Layout(name, keepGrouping: true)`
-
-For `LayoutStart`:
-
-*   `string groupBy` same as `Layout`
-*   `ELayout layout=0` same as `Layout`
-*   `float marginTop = -1f` same as `Layout`
-*   `float marginBottom = -1f` same as `Layout`
-
-For `LayoutEnd`:
-
-*   `string groupBy=null` same as `Layout`. When `null`, close all existing groups.
-
-It supports `./SubGroup` to create a nested subgroup:
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[LayoutStart("Root", ELayout.FoldoutBox)]
-public string root1;
-public string root2;
-
-[LayoutStart("./Sub", ELayout.FoldoutBox)]  // equals "Root/Sub"
-public string sub1;
-public string sub2;
-[LayoutEnd(".")]
-
-[LayoutStart("./Another", ELayout.FoldoutBox)]  // equals "Root/Another"
-public string another1;
-public string another2;
-
-[LayoutEnd(".")]  // equals "Root"
-public string root3;  // this should still belong to "Root"
-public string root4;
-
-[LayoutEnd]  // this should close any existing group
-public string outOfAll;
-
-[LayoutStart("Tabs", ELayout.Tab | ELayout.Collapse)]
-[LayoutStart("./Tab1")]
-public string tab1Item1;
-public int tab1Item2;
-[LayoutEnd(".")]
-
-[LayoutStart("./Tab2")]
-public string tab2Item1;
-public int tab2Item2;
-```
-
-![image](https://github.com/user-attachments/assets/ebd29cbe-cd84-4f76-8834-91d1ae44fd59)
-
-example of using `LayoutStart` with `LayoutEnd`:
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-public string beforeGroup;
-
-[LayoutStart("Group", ELayout.Background | ELayout.TitleOut)]
-public string group1;
-public string group2;  // starts from this will be automatically grouped into "Group"
-public string group3;
-
-[LayoutEnd("Group")]  // this will end the "Group"
-public string afterGroup;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ce1f52ce-9717-4929-95bf-a6dae580631e)
-
-example of using new group name to stop grouping:
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-public string breakBefore;
-
-[LayoutStart("break", ELayout.Background | ELayout.TitleOut)]
-public string breakGroup1;
-public string breakGroup2;
-
-// this group will stop the grouping of "break"
-[LayoutStart("breakIn", ELayout.Background | ELayout.TitleOut)]
-public string breakIn1;
-public string breakIn2;
-
-[LayoutStart("break")]  // this will be grouped into "break", and also end the "breakIn" group
-public string breakGroup3;
-public string breakGroup4;
-
-[LayoutEnd("break")]  // end, it will not be grouped
-public string breakAfter;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ab45aa2f-0dbb-44e4-be54-e17913e8aba9)
-
-example of using `keepGrouping: false` to stop grouping, but keep the last one in group:
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-public string beforeGroupLast;
-
-[LayoutStart("GroupLast")]
-public string groupLast1;
-public string groupLast2;
-public string groupLast3;
-[Layout("GroupLast", ELayout.Background | ELayout.TitleOut)]  // close this group, but be included
-public string groupLast4;
-
-public string afterGroupLast;
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1aaf80f0-3505-42a9-bd33-27e6aac118a5)
-
-#### `LayoutCloseHere` / `LayoutTerminateHere` ####
-
-Include the current field into the coresponding group, then:
-*   `LayoutCloseHere` will close the most recent group, like a `LayoutEnd(".")`
-*   `LayoutTerminateHere` will close all groups, like a `LayoutEnd`
-
-`LayoutCloseHere` is useful when you're done with your subgroup, but you might add some field later, but at the point you don't have a field to put a `LayoutEnd`
-
-```csharp
-[LayoutStart("Tab", ELayout.TitleBox)] public string tab;
-
-[LayoutStart("./1", ELayout.TitleBox)]
-public string tab1Sub1;
-public string tab1Sub2;
-[LayoutCloseHere]
-// same as: [Layout(".", keepGrouping: false), LayoutEnd(".")]
-public string tab1Sub3;
-
-// some feature day you might add some field below, `LayoutCloseHere` ensures you don't accidently include them into the subgroup
-// ... you field added in the feature
-
-[Button]
-public void AFunction() {}
-[Button]
-public void BFunction() {}
-```
-
-![image](https://github.com/user-attachments/assets/c4ea66c9-2706-45fe-9fbf-c7a0023677c6)
-
-`LayoutTerminateHere` is useful when you're done with your group, and your script is also done here (so nowhere to put `EndLayout`). Oneday you come back and add some new fields, this attribute can avoid them to be included in the group accidently.
-
-```csharp
-[LayoutStart("Tab", ELayout.TitleBox)] public string tab;
-
-[LayoutStart("./1", ELayout.TitleBox)]
-public string tab1Sub1;
-public string tab1Sub2;
-[LayoutTerminateHere]
-// same as: [Layout("."), LayoutEnd]
-public string tab1Sub3;
-
-[Button]
-public void AFunction() {}
-[Button]
-public void BFunction() {}
-```
-
-![image](https://github.com/user-attachments/assets/b5afa6ae-3d44-4499-b0b9-3b5ba96c24a3)
-
-#### `LayoutDisableIf` / `LayoutEnableIf` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-Disable or enable an entire layout group. These attributes will work on the first layout underneath it.
-
-Arguments:
-
-*   (Optional) `EMode editorMode`
-
-    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
-
-    See `Misc` - `EMode` for more information.
-
-*   `object by...`
-
-    callbacks or attributes for the condition.
-
-*   AllowMultiple: Yes
-
-You can use multiple `LayoutDisableIf`, `LayoutEnableIf`, and even a mix of the two.
-
-For `LayoutDisableIf`: The layout group will be disabled if **ALL** condition is true (`and` operation)
-
-For `LayoutEnableIf`: The layout group will be enabled if **ANY** condition is true (`or` operation)
-
-For multiple attributes: The layout group will be disabled if **ANY** condition is true (`or` operation)
-
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
-
-```csharp
-using SaintsField.Playa;
-
-public bool editableMain;
-
-[LayoutEnableIf(nameof(editableMain))]
-[LayoutStart("Main", ELayout.FoldoutBox)]
-public bool editable1;
-
-[LayoutEnableIf(nameof(editable1))]
-[LayoutStart("./1", ELayout.FoldoutBox, marginBottom: 10)]
-public int int1;
-public string string1;
-
-[LayoutStart("..")]
-public bool editable2;
-
-[LayoutEnableIf(nameof(editable2))]
-[LayoutStart("./2", ELayout.FoldoutBox)]
-public int int2;
-public string string2;
-
-[LayoutEnd]
-[Space]
-public string layoutEnd;
-```
-
-[![video](https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca)](https://github.com/user-attachments/assets/fac5fce5-6458-4853-893c-23fa50f84872)
-
-#### `LayoutShowIf` / `LayoutHideIf` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-Show or hide an entire layout group. These attributes will work on the first layout underneath it.
-
-Arguments:
-
-*   (Optional) `EMode editorMode`
-
-    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
-
-    See `Misc` - `EMode` for more information.
-
-*   `object by...`
-
-    callbacks or attributes for the condition.
-
-*   Allow Multiple: Yes
-
-You can use multiple `LayoutShowIf`, `LayoutHideIf`, and even a mix of the two.
-
-For `LayoutShowIf`: The layout group will be shown if **ALL** condition is true (`and` operation)
-
-For `LayoutHideIf`: The layout group will be hidden if **ANY** condition is true (`or` operation)
-
-For multiple attributes: The layout group will be shown if **ANY** condition is true (`or` operation)
-
-```csharp
-using SaintsField.Playa;
-
-public bool visibleMain;
-
-[LayoutShowIf(nameof(visibleMain))]
-[LayoutStart("Main", ELayout.FoldoutBox)]
-public bool visible1;
-
-[LayoutShowIf(nameof(visible1))]
-[LayoutStart("./1", ELayout.FoldoutBox, marginBottom: 10)]
-public int int1;
-public string string1;
-
-[LayoutStart("..")]
-public bool visible2;
-
-[LayoutShowIf(nameof(visible2))]
-[LayoutStart("./2", ELayout.FoldoutBox)]
-public int int2;
-public string string2;
-
-[LayoutEnd]
-[Space]
-public string layoutEnd;
-```
-
-[![video](https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca)](https://github.com/user-attachments/assets/fac5fce5-6458-4853-893c-23fa50f84872)
-
-
 ### Miscellaneous ###
 
 #### `Dropdown` ####
@@ -5336,6 +4776,624 @@ public class SearchableMono : MonoBehaviour
 ```
 
 [![video](https://github.com/user-attachments/assets/b8273285-d24e-441d-9ceb-f277685372f3)](https://github.com/user-attachments/assets/5a6b9aae-481d-4898-9cbe-6634c51cb3e4)
+
+
+## Layout System ##
+
+### Setup ###
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Layout system allows you to group severral target (field, property, button etc) together. It also allows you to box it with/without a title box or foldout box.
+
+You can use this system once `SaintsEditor` is enabled in your project. However, because C# reflection can not give a correct order of targets between fields, properties, and method, the layout could gather targets incorrectly. Thus, it's highly recommended to install [Microsoft.CodeAnalysis.CSharp](https://www.nuget.org/packages/microsoft.codeanalysis.csharp/). This dependency will NOT be included in your build.
+
+To know the difference, see this code piece:
+
+```csharp
+using SaintsField.Playa;
+
+[Button] private void OutFirstBtn() {}
+
+[LayoutStart("Group", ELayout.TitleBox)]
+public void Btn() {}
+[field: SerializeField] public int AutoPropLayout { get; private set; }
+
+[Button] private void MiddleButton() {}
+
+public int norFieldLayout;
+```
+
+❌ Without `Microsoft.CodeAnalysis.CSharp`, it uses the default reflection order, which is field first, then property, then method:
+
+![](https://github.com/user-attachments/assets/329b142e-8e45-42dc-93fe-6c7f5e5a6f62)
+
+✅ With `Microsoft.CodeAnalysis.CSharp`, it uses the source code declare order:
+
+![](https://github.com/user-attachments/assets/86678cfa-1c9c-413f-8c5a-47f0b52208d4)
+
+Here are ways of install it (pick one):
+
+**NuGet for Unity** (recommended):
+
+1.  Install [NuGet for Unity](https://github.com/GlitchEnzo/NuGetForUnity?tab=readme-ov-file#how-do-i-install-nugetforunity)
+2.  Open `NuGet` - `Manage NuGet Packages`
+
+    ![](https://github.com/user-attachments/assets/98654064-2815-4769-b071-8863d74a4c78)
+3.  Type `Microsoft.CodeAnalysis.CSharp` and hit `Search`, on the result, click `Install` (the newest version should work just fine)
+
+    ![](https://github.com/user-attachments/assets/766775cd-9e7c-4361-8bab-abab8bda39e8)
+4.  Go `Window` - `Saints` - `Enable Code Analysis...`
+
+**Unity's Official Document**
+
+1.  Read [Roslyn analyzers and source generators](https://docs.unity3d.com/6000.2/Documentation/Manual/create-source-generator.html), and see the "Install the `Microsoft.CodeAnalysis.Csharp` NuGet package" for how to install it.
+2.  Go `Window` - `Saints` - `Enable Code Analysis...`
+
+### `Layout` ###
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+A layout decorator to group fields.
+
+*   `string groupBy` the grouping key. Use `/` to separate different groups and create subgroups.
+*   `ELayout layout=ELayout.Vertical` the layout of the current group. Note this is a `EnumFlag`, means you can mix with options.
+*   `bool keepGrouping=false`: See `LayoutStart` below
+*   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
+*   `float marginBottom = -1f` add some space after the layout. `-1` for using default spacing.
+
+Options are:
+
+*   `Vertical`
+*   `Horizontal`
+*   `Background` draw a background color for the whole group
+*   `Title` show the title
+*   `TitleOut` make `title` more visible. Add this will by default add `Title`. On `IMGUI` it will draw a separator between title and the rest of the content.
+    On `UI Toolkit` it will draw a background color for the title.
+*   `Foldout` allow to fold/unfold this group. If you have no `Tab` on, then this will automatically add `Title`
+*   `Collapse` Same as `Foldout` but is collapsed by default.
+*   `Tab` make this group a tab page separated rather than grouping it
+*   `TitleBox` = `Background | Title | TitleOut`
+*   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
+*   `CollapseBox` = `Background | Title | TitleOut | Collapse`
+
+**Known Issue**
+
+About `Horizental` style:
+
+1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
+2.  On UI Toolkit the label will be put into a new line above
+
+![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
+
+**Appearance**
+
+![layout](https://github.com/user-attachments/assets/1e2e6dfa-85a9-4225-ac8f-8beefc26ae52)
+
+**Example**
+
+```csharp
+using SaintsField;
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Layout("Titled", ELayout.Title | ELayout.TitleOut)]
+public string titledItem1, titledItem2;
+
+// title
+[Layout("Titled Box", ELayout.Background | ELayout.TitleOut)]
+public string titledBoxItem1;
+[Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
+public string titledBoxItem2;
+
+// foldout
+[LayoutStart("Collapse", ELayout.CollapseBox)]
+public string collapseItem1;
+public string collapseItem2;
+
+[LayoutStart("Foldout", ELayout.FoldoutBox)]
+public string foldoutItem1;
+public string foldoutItem2;
+
+// tabs
+[Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
+[LayoutStart("./Tab1")]
+public string tab1Item1;
+public int tab1Item2;
+
+[LayoutStart("../Tab2")]
+public string tab2Item1;
+public int tab2Item2;
+
+[LayoutStart("../Tab3")]
+public string tab3Item1;
+public int tab3Item2;
+
+// nested groups
+[LayoutStart("Nested", ELayout.Background | ELayout.TitleOut)]
+public int nestedOne;
+
+[LayoutStart("./Nested Group 1", ELayout.TitleOut)]
+public int nestedTwo;
+public int nestedThree;
+
+[LayoutStart("./Nested Group 2", ELayout.TitleOut)]
+public int nestedFour;
+public string nestedFive;
+
+// Unlabeled Box
+[Layout("Unlabeled Box", ELayout.Background)]
+public int unlabeledBoxItem1, unlabeledBoxItem2;
+
+// Foldout In A Box
+[Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
+public int foldoutInABoxItem1, foldoutInABoxItem2;
+
+// Complex example. Button and ShowInInspector works too
+[Ordered]
+[Layout("Root", ELayout.Tab | ELayout.Foldout | ELayout.Background)]
+[Layout("Root/V1")]
+[SepTitle("Basic", EColor.Pink)]
+public string hv1Item1;
+
+[Ordered]
+[Layout("Root/V1/buttons", ELayout.Horizontal)]
+[Button("Root/V1 Button1")]
+public void RootV1Button()
+{
+    Debug.Log("Root/V1 Button");
+}
+[Ordered]
+[Layout("Root/V1/buttons")]
+[Button("Root/V1 Button2")]
+public void RootV1Button2()
+{
+    Debug.Log("Root/V1 Button");
+}
+
+[Ordered]
+[Layout("Root/V1")]
+[ShowInInspector]
+public static Color color1 = Color.red;
+
+[Ordered]
+[DOTweenPlay("Tween1", "Root/V1")]
+public Tween RootV1Tween1()
+{
+    return DOTween.Sequence();
+}
+
+[Ordered]
+[DOTweenPlay("Tween2", "Root/V1")]
+public Tween RootV1Tween2()
+{
+    return DOTween.Sequence();
+}
+
+[Ordered]
+[Layout("Root/V1")]
+public string hv1Item2;
+
+// public string below;
+
+[Ordered]
+[Layout("Root/V2")]
+public string hv2Item1;
+
+[Ordered]
+[Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
+public string hv2Item2, hv2Item3;
+
+[Ordered]
+[Layout("Root/V2")]
+public string hv2Item4;
+
+[Ordered]
+[Layout("Root/V3", ELayout.Horizontal)]
+[ResizableTextArea, RichLabel(null)]
+public string hv3Item1, hv3Item2;
+
+[Ordered]
+[Layout("Root/Buggy")]
+[InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
+public string buggy = "See below:";
+
+[Ordered]
+[Layout("Root/Buggy/H", ELayout.Horizontal)]
+public string buggy1, buggy2, buggy3;
+
+[Ordered]
+[Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]
+[Layout("Title+Tab/g1")]
+public string titleTabG11, titleTabG21;
+
+[Ordered]
+[Layout("Title+Tab/g2")]
+public string titleTabG12, titleTabG22;
+
+[Ordered]
+[Layout("All Together", ELayout.Tab | ELayout.Foldout | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
+[Layout("All Together/g1")]
+public string allTogetherG11, allTogetherG21;
+
+[Ordered]
+[Layout("All Together/g2")]
+public string allTogetherG12, allTogetherG22;
+```
+
+[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
+
+By combining `Layout` with `Playa*`, you can create some complex layout struct:
+
+```csharp
+[LayoutStart("Equipment", ELayout.TitleBox | ELayout.Vertical)]
+[LayoutStart("./Head", ELayout.TitleBox)]
+public string st;
+[LayoutCloseHere]
+public MyStruct inOneStruct;
+
+[LayoutStart("./Upper Body", ELayout.TitleBox)]
+
+[PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
+
+[LayoutStart("./Horizontal", ELayout.Horizontal)]
+
+[LayoutStart("./Left Hand", ELayout.TitleBox)]
+public string g11;
+public string g12;
+public MyStruct myStruct;
+public string g13;
+
+[LayoutStart("../Right Hand", ELayout.TitleBox)]
+public string g21;
+[RichLabel("<color=lime><label/>")]
+public string g22;
+[RichLabel("$" + nameof(g23))]
+public string g23;
+
+public bool toggle;
+```
+
+![image](https://github.com/user-attachments/assets/d2185e50-845a-47a5-abb4-fae0faac7ba4)
+
+If titled box is too heavy, you can use `PlayaSeparator` instead. See `PlayaSeparator` section for more information
+
+### `LayoutStart` / `LayoutEnd` ###
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+`LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
+
+`LayoutStart(name)` is the same as `Layout(name, keepGrouping: true)`
+
+For `LayoutStart`:
+
+*   `string groupBy` same as `Layout`
+*   `ELayout layout=0` same as `Layout`
+*   `float marginTop = -1f` same as `Layout`
+*   `float marginBottom = -1f` same as `Layout`
+
+For `LayoutEnd`:
+
+*   `string groupBy=null` same as `Layout`. When `null`, close all existing groups.
+
+It supports `./SubGroup` to create a nested subgroup:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[LayoutStart("Root", ELayout.FoldoutBox)]
+public string root1;
+public string root2;
+
+[LayoutStart("./Sub", ELayout.FoldoutBox)]  // equals "Root/Sub"
+public string sub1;
+public string sub2;
+[LayoutEnd(".")]
+
+[LayoutStart("./Another", ELayout.FoldoutBox)]  // equals "Root/Another"
+public string another1;
+public string another2;
+
+[LayoutEnd(".")]  // equals "Root"
+public string root3;  // this should still belong to "Root"
+public string root4;
+
+[LayoutEnd]  // this should close any existing group
+public string outOfAll;
+
+[LayoutStart("Tabs", ELayout.Tab | ELayout.Collapse)]
+[LayoutStart("./Tab1")]
+public string tab1Item1;
+public int tab1Item2;
+[LayoutEnd(".")]
+
+[LayoutStart("./Tab2")]
+public string tab2Item1;
+public int tab2Item2;
+```
+
+![image](https://github.com/user-attachments/assets/ebd29cbe-cd84-4f76-8834-91d1ae44fd59)
+
+example of using `LayoutStart` with `LayoutEnd`:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+public string beforeGroup;
+
+[LayoutStart("Group", ELayout.Background | ELayout.TitleOut)]
+public string group1;
+public string group2;  // starts from this will be automatically grouped into "Group"
+public string group3;
+
+[LayoutEnd("Group")]  // this will end the "Group"
+public string afterGroup;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ce1f52ce-9717-4929-95bf-a6dae580631e)
+
+example of using new group name to stop grouping:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+public string breakBefore;
+
+[LayoutStart("break", ELayout.Background | ELayout.TitleOut)]
+public string breakGroup1;
+public string breakGroup2;
+
+// this group will stop the grouping of "break"
+[LayoutStart("breakIn", ELayout.Background | ELayout.TitleOut)]
+public string breakIn1;
+public string breakIn2;
+
+[LayoutStart("break")]  // this will be grouped into "break", and also end the "breakIn" group
+public string breakGroup3;
+public string breakGroup4;
+
+[LayoutEnd("break")]  // end, it will not be grouped
+public string breakAfter;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ab45aa2f-0dbb-44e4-be54-e17913e8aba9)
+
+example of using `keepGrouping: false` to stop grouping, but keep the last one in group:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+public string beforeGroupLast;
+
+[LayoutStart("GroupLast")]
+public string groupLast1;
+public string groupLast2;
+public string groupLast3;
+[Layout("GroupLast", ELayout.Background | ELayout.TitleOut)]  // close this group, but be included
+public string groupLast4;
+
+public string afterGroupLast;
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/1aaf80f0-3505-42a9-bd33-27e6aac118a5)
+
+### `LayoutCloseHere` / `LayoutTerminateHere` ###
+
+Include the current field into the coresponding group, then:
+*   `LayoutCloseHere` will close the most recent group, like a `LayoutEnd(".")`
+*   `LayoutTerminateHere` will close all groups, like a `LayoutEnd`
+
+`LayoutCloseHere` is useful when you're done with your subgroup, but you might add some field later, but at the point you don't have a field to put a `LayoutEnd`
+
+Note: if you have code analysis enabled, you will not need this attribute. `LayoutEnd` should be enough.
+
+```csharp
+[LayoutStart("Tab", ELayout.TitleBox)] public string tab;
+
+[LayoutStart("./1", ELayout.TitleBox)]
+public string tab1Sub1;
+public string tab1Sub2;
+[LayoutCloseHere]
+// same as: [Layout(".", keepGrouping: false), LayoutEnd(".")]
+public string tab1Sub3;
+
+// some feature day you might add some field below, `LayoutCloseHere` ensures you don't accidently include them into the subgroup
+// ... you field added in the feature
+
+[Button]
+public void AFunction() {}
+[Button]
+public void BFunction() {}
+```
+
+![image](https://github.com/user-attachments/assets/c4ea66c9-2706-45fe-9fbf-c7a0023677c6)
+
+`LayoutTerminateHere` is useful when you're done with your group, and your script is also done here (so nowhere to put `EndLayout`). Oneday you come back and add some new fields, this attribute can avoid them to be included in the group accidently.
+
+```csharp
+[LayoutStart("Tab", ELayout.TitleBox)] public string tab;
+
+[LayoutStart("./1", ELayout.TitleBox)]
+public string tab1Sub1;
+public string tab1Sub2;
+[LayoutTerminateHere]
+// same as: [Layout("."), LayoutEnd]
+public string tab1Sub3;
+
+[Button]
+public void AFunction() {}
+[Button]
+public void BFunction() {}
+```
+
+![image](https://github.com/user-attachments/assets/b5afa6ae-3d44-4499-b0b9-3b5ba96c24a3)
+
+### `LayoutDisableIf` / `LayoutEnableIf` ###
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Disable or enable an entire layout group. These attributes will work on the first layout underneath it.
+
+Arguments:
+
+*   (Optional) `EMode editorMode`
+
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
+
+*   `object by...`
+
+    callbacks or attributes for the condition.
+
+*   AllowMultiple: Yes
+
+You can use multiple `LayoutDisableIf`, `LayoutEnableIf`, and even a mix of the two.
+
+For `LayoutDisableIf`: The layout group will be disabled if **ALL** condition is true (`and` operation)
+
+For `LayoutEnableIf`: The layout group will be enabled if **ANY** condition is true (`or` operation)
+
+For multiple attributes: The layout group will be disabled if **ANY** condition is true (`or` operation)
+
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
+
+```csharp
+using SaintsField.Playa;
+
+public bool editableMain;
+
+[LayoutEnableIf(nameof(editableMain))]
+[LayoutStart("Main", ELayout.FoldoutBox)]
+public bool editable1;
+
+[LayoutEnableIf(nameof(editable1))]
+[LayoutStart("./1", ELayout.FoldoutBox, marginBottom: 10)]
+public int int1;
+public string string1;
+
+[LayoutStart("..")]
+public bool editable2;
+
+[LayoutEnableIf(nameof(editable2))]
+[LayoutStart("./2", ELayout.FoldoutBox)]
+public int int2;
+public string string2;
+
+[LayoutEnd]
+[Space]
+public string layoutEnd;
+```
+
+[![video](https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca)](https://github.com/user-attachments/assets/fac5fce5-6458-4853-893c-23fa50f84872)
+
+### `LayoutShowIf` / `LayoutHideIf` ###
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Show or hide an entire layout group. These attributes will work on the first layout underneath it.
+
+Arguments:
+
+*   (Optional) `EMode editorMode`
+
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
+
+*   `object by...`
+
+    callbacks or attributes for the condition.
+
+*   Allow Multiple: Yes
+
+You can use multiple `LayoutShowIf`, `LayoutHideIf`, and even a mix of the two.
+
+For `LayoutShowIf`: The layout group will be shown if **ALL** condition is true (`and` operation)
+
+For `LayoutHideIf`: The layout group will be hidden if **ANY** condition is true (`or` operation)
+
+For multiple attributes: The layout group will be shown if **ANY** condition is true (`or` operation)
+
+```csharp
+using SaintsField.Playa;
+
+public bool visibleMain;
+
+[LayoutShowIf(nameof(visibleMain))]
+[LayoutStart("Main", ELayout.FoldoutBox)]
+public bool visible1;
+
+[LayoutShowIf(nameof(visible1))]
+[LayoutStart("./1", ELayout.FoldoutBox, marginBottom: 10)]
+public int int1;
+public string string1;
+
+[LayoutStart("..")]
+public bool visible2;
+
+[LayoutShowIf(nameof(visible2))]
+[LayoutStart("./2", ELayout.FoldoutBox)]
+public int int2;
+public string string2;
+
+[LayoutEnd]
+[Space]
+public string layoutEnd;
+```
+
+[![video](https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca)](https://github.com/user-attachments/assets/fac5fce5-6458-4853-893c-23fa50f84872)
+
+### `Ordered` ###
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+> [!NOTE]
+> If you have code analysis enabled, you will not need this attribute. The order should be correct.
+
+`SaintsEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
+
+Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Ordered] public string myStartField;
+
+[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
+[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
+
+[ShowInInspector, Ordered]
+public Color AutoColor
+{
+    get => Color.green;
+    set {}
+}
+
+[Button, Ordered]
+private void EditorButton()
+{
+    Debug.Log("EditorButton");
+}
+
+[Ordered] public string myOtherFieldUnderneath;
+```
+
+![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
+
+
 
 ## Handles ##
 

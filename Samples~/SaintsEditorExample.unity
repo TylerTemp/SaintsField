@@ -680,95 +680,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc5d2fac74c5ae4e89d46fc08310525, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.SerEnumULong
-  _saintsSerializedProperties:
-  - name: LongEnumPub
-    propertyType: 1
-    isProperty: 0
-    collectionType: 0
-    longValue: 0
-    longValues: 
-    uLongValue: 0
-    uLongValues: 
-  - name: ULongEnumPub
-    propertyType: 2
-    isProperty: 0
-    collectionType: 0
-    longValue: 0
-    longValues: 
-    uLongValue: 1
-    uLongValues: 
-  - name: ULongEnumNormalPub
-    propertyType: 2
-    isProperty: 0
-    collectionType: 0
-    longValue: 0
-    longValues: 
-    uLongValue: 2
-    uLongValues: 
-  - name: _uLongEnumPri
-    propertyType: 2
-    isProperty: 0
-    collectionType: 0
-    longValue: 0
-    longValues: 
-    uLongValue: 6
-    uLongValues: 
-  - name: <ULongEnumProp>k__BackingField
-    propertyType: 2
-    isProperty: 0
-    collectionType: 0
-    longValue: 0
-    longValues: 
-    uLongValue: 4
-    uLongValues: 
-  - name: ULongEnumPubArr
-    propertyType: 2
-    isProperty: 0
-    collectionType: 1
-    longValue: 0
-    longValues: 
-    uLongValue: 0
-    uLongValues: 0100000000000000
-  - name: _uLongEnumPriArr
-    propertyType: 2
-    isProperty: 0
-    collectionType: 1
-    longValue: 0
-    longValues: 
-    uLongValue: 0
-    uLongValues: 0600000000000000
-  - name: <ULongEnumPropArr>k__BackingField
-    propertyType: 2
-    isProperty: 0
-    collectionType: 1
-    longValue: 0
-    longValues: 
-    uLongValue: 0
-    uLongValues: 0300000000000000
-  - name: ULongEnumPubLis
-    propertyType: 2
-    isProperty: 0
-    collectionType: 2
-    longValue: 0
-    longValues: 
-    uLongValue: 0
-    uLongValues: 0200000000000000
-  - name: _uLongEnumPriLis
-    propertyType: 2
-    isProperty: 0
-    collectionType: 2
-    longValue: 0
-    longValues: 
-    uLongValue: 0
-    uLongValues: 
-  - name: <ULongEnumPropLis>k__BackingField
-    propertyType: 2
-    isProperty: 0
-    collectionType: 2
-    longValue: 0
-    longValues: 
-    uLongValue: 0
-    uLongValues: 
+  _saintsSerializedProperties: []
   testNormalFlags: 1
 --- !u!1 &147024401
 GameObject:
@@ -1499,6 +1411,69 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _saintsSerializedProperties: []
+--- !u!1 &458616576
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 458616577}
+  - component: {fileID: 458616579}
+  - component: {fileID: 458616578}
+  m_Layer: 0
+  m_Name: MixinOrder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &458616577
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458616576}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &458616578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458616576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0753ddb6fe1d2144cb5145c6e0d5cb80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.MixLayoutTest
+  _saintsSerializedProperties: []
+  <AutoPropLayout>k__BackingField: 0
+  norFieldLayout: 0
+--- !u!114 &458616579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458616576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25ff2e2403fa74c4192a9e9befce85ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.MixOrderTest
+  _saintsSerializedProperties: []
+  <SecondProp>k__BackingField: 0
+  thirdField: 0
 --- !u!1 &480485011
 GameObject:
   m_ObjectHideFlags: 0
@@ -2609,7 +2584,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 889525105}
-  - component: {fileID: 889525107}
+  - component: {fileID: 889525106}
   m_Layer: 0
   m_Name: CodeAnal
   m_TagString: Untagged
@@ -2632,7 +2607,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1175289511}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &889525107
+--- !u!114 &889525106
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3535,6 +3510,7 @@ Transform:
   - {fileID: 1559042046}
   - {fileID: 144259623}
   - {fileID: 889525105}
+  - {fileID: 458616577}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1196999815

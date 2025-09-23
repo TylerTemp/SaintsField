@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SaintsField.Editor.ColorPalette;
+#if !SAINTSFIELD_I2_LOC
 using SaintsField.Editor.I2Setup;
+#endif
 using SaintsField.Utils;
 using UnityEditor;
 #if UNITY_2023_1_OR_NEWER
@@ -282,6 +284,41 @@ namespace SaintsField.Editor.Utils
             Selection.activeObject = colorPaletteArray;
 #endif
         }
+
+        #endregion
+
+        #region Code Analysis
+
+#if SAINTSFIELD_CODE_ANALYSIS
+
+#if SAINTSFIELD_DEBUG
+        [MenuItem("Saints/Disable Code Analysis...")]
+#else
+        [MenuItem("Window/Saints/Disable Code Analysis...")]
+#endif
+        public static void DisableCodeAnalysis()
+        {
+            RemoveCompileDefine("SAINTSFIELD_CODE_ANALYSIS");
+        }
+#else
+
+#if SAINTSFIELD_DEBUG
+        [MenuItem("Saints/Enable Code Analysis...")]
+#else
+        [MenuItem("Window/Saints/Enable Code Analysis...")]
+#endif
+        public static void EnableCodeAnalysis()
+        {
+            if(EditorUtility.DisplayDialog("Enable Code Analysis",
+                   "Are you sure you have Microsoft.CodeAnalysis.CSharp installed in your project?",
+                   "Yes, Enable Analysis",
+                   "Cancel"))
+            {
+                AddCompileDefine("SAINTSFIELD_CODE_ANALYSIS");
+            }
+        }
+#endif
+
 
         #endregion
 
