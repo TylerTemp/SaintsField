@@ -4807,7 +4807,7 @@ public int norFieldLayout;
 
 ![](https://github.com/user-attachments/assets/329b142e-8e45-42dc-93fe-6c7f5e5a6f62)
 
-✅ With `Microsoft.CodeAnalysis.CSharp`, it uses the source code declare order:
+✅ With `Microsoft.CodeAnalysis.CSharp`, it uses the source code declaration order:
 
 ![](https://github.com/user-attachments/assets/86678cfa-1c9c-413f-8c5a-47f0b52208d4)
 

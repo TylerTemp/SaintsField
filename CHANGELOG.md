@@ -4,7 +4,7 @@
 
 **WE ARE FINALLY HERE!**
 
-If the project has `Microsoft.CodeAnalysis.CSharp`, use it to ensure the fields (properties, methods)' order as defined in code. This can greatly reduce the cofusion when you have mixed order of fields/properties/methods with `LayoutStart`
+If the project has `Microsoft.CodeAnalysis.CSharp`, use it to ensure the fields (properties, methods)' order as defined in code. This can greatly reduce the confusion when you have a mixed order of fields/properties/methods with `LayoutStart`
 
 ## 4.30.3 ##
 
