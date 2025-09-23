@@ -6,28 +6,27 @@ using UnityEngine;
 
 namespace SaintsField
 {
-    public partial class SaintsMonoBehaviour : MonoBehaviour, ISerializationCallbackReceiver
+    public class SaintsMonoBehaviour : MonoBehaviour  //, ISerializationCallbackReceiver
     {
-
-        [PlayaShowIf(
-#if SAINTSFIELD_SERIALIZATION_DEBUG
-            true
-#else
-            false
-#endif
-        )]
-        // [ListDrawerSettings(searchable: true)]
-        [Table]
-        [SerializeField] private List<SaintsSerializedProperty> _saintsSerializedProperties = new List<SaintsSerializedProperty>();
-
-        public void OnBeforeSerialize()
-        {
-            SaintsSerializedUtil.OnBeforeSerialize(_saintsSerializedProperties, GetType());
-        }
-
-        public void OnAfterDeserialize()
-        {
-            SaintsSerializedUtil.OnAfterDeserialize(_saintsSerializedProperties, GetType(), this);
-        }
+//         [PlayaShowIf(
+// #if SAINTSFIELD_SERIALIZATION_DEBUG
+//             true
+// #else
+//             false
+// #endif
+//         )]
+//         // [ListDrawerSettings(searchable: true)]
+//         [Table]
+//         [SerializeField] private List<SaintsSerializedProperty> _saintsSerializedProperties = new List<SaintsSerializedProperty>();
+//
+//         public void OnBeforeSerialize()
+//         {
+//             SaintsSerializedUtil.OnBeforeSerialize(_saintsSerializedProperties, GetType());
+//         }
+//
+//         public void OnAfterDeserialize()
+//         {
+//             SaintsSerializedUtil.OnAfterDeserialize(_saintsSerializedProperties, GetType(), this);
+//         }
     }
 }

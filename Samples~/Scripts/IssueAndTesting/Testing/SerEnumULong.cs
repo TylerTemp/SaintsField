@@ -4,7 +4,7 @@ using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
-    public class SerEnumULong : SaintsMonoBehaviour
+    public partial class SerEnumULong : SaintsMonoBehaviour
     {
         [Serializable, Flags]
         public enum LongEnum: long
@@ -56,5 +56,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
         [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
         [field: NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPropLis { get; private set; }
+
+        // [ShowInInspector] private string GenString => GeneratedStringSaintsField();
     }
 }
