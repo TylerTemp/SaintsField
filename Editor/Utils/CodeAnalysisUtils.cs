@@ -90,7 +90,16 @@ namespace SaintsField.Editor.Utils
             // MonoScript ms = AssetDatabase.LoadAssetAtPath<MonoScript>("Assets/SaintsField/Samples/Scripts/SaintsEditor/Testing/MixLayoutTest.cs");
             string programText = ms.ToString();
 
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(programText);
+            SyntaxTree tree;
+            try
+            {
+                tree = CSharpSyntaxTree.ParseText(programText);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                yield break;
+            }
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
 
             foreach (MemberDeclarationSyntax memberDeclarationSyntax in root.Members)
