@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer
@@ -10,3 +11,4 @@ namespace SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer
         }
     }
 }
+#endif
