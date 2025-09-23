@@ -103,11 +103,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.30.3**
+**4.31.0**
 
-1.  UI Toolkit: fix `Button` return value duplicated rendering when nested with list - struct - list - struct
-2.  UI Toolkit: fix `Button` didn't show the returned value if the function has no parameters
-3.  IMGUI: fix auto getters error when an element is removed from list [#304](https://github.com/TylerTemp/SaintsField/issues/304)
+If the project has `Microsoft.CodeAnalysis.CSharp`, use it to ensure the fields (properties, methods)' order as defined in code. This can greatly reduce the cofusion when you have mixed order of fields/properties/methods with `LayoutStart`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

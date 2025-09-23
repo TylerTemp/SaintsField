@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.31.0 ##
+
+**WE ARE FINALLY HERE!**
+
+If the project has `Microsoft.CodeAnalysis.CSharp`, use it to ensure the fields (properties, methods)' order as defined in code. This can greatly reduce the cofusion when you have mixed order of fields/properties/methods with `LayoutStart`
+
 ## 4.30.3 ##
 
 1.  UI Toolkit: fix `Button` return value duplicated rendering when nested with list - struct - list - struct
