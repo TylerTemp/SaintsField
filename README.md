@@ -105,7 +105,7 @@ namespace: `SaintsField`
 
 **4.32.0**
 
-UI Toolkit: You can now serialize a long/ulong type of `enum`, which is not supported by Unity. Please read "Extended Serialization" secstion for more info.
+UI Toolkit: You can now serialize a long/ulong type of `enum`, which is not supported by Unity. Please read "Extended Serialization" section for more info.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

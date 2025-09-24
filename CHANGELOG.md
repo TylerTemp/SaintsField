@@ -4,8 +4,7 @@
 
 **WE ARE FINALLY HERE!** Again...
 
-UI Toolkit: You can now serialize a long/ulong type of `enum`, which is not supported by Unity. Please read "Extended Serialization" secstion for more info.
-
+UI Toolkit: You can now serialize a long/ulong type of `enum`, which is not supported by Unity. Please read "Extended Serialization" section for more info.
 ## 4.31.0 ##
 
 **WE ARE FINALLY HERE!**
