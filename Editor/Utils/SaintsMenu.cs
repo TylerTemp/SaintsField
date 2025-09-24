@@ -17,6 +17,15 @@ namespace SaintsField.Editor.Utils
 {
     public static class SaintsMenu
     {
+        const string MENU_ROOT =
+#if SAINTSFIELD_DEBUG
+            "Saints/"
+#else
+            "Window/Saints/"
+#endif
+        ;
+
+
 
         #region Config
 
@@ -319,6 +328,46 @@ namespace SaintsField.Editor.Utils
         }
 #endif
 
+
+        #endregion
+
+
+        #region Enable Extended Serialization
+
+#if SAINTSFIELD_SERIALIZED
+
+        [MenuItem(MENU_ROOT + "Extended Serialization/Disable This Feature")]
+        public static void DisableExtendedSerialization()
+        {
+            RemoveCompileDefine("SAINTSFIELD_SERIALIZED");
+        }
+
+        #region SAINTSFIELD_SERIALIZED_DEBUG
+#if SAINTSFIELD_SERIALIZED_DEBUG
+
+        [MenuItem(MENU_ROOT + "Extended Serialization/Disable Debug")]
+        public static void DisableExtendedSerializationDebug()
+        {
+            RemoveCompileDefine("SAINTSFIELD_SERIALIZED_DEBUG");
+        }
+#else
+
+        [MenuItem(MENU_ROOT + "Extended Serialization/Enable Debug")]
+        public static void EnableExtendedSerializationDebug()
+        {
+            AddCompileDefine("SAINTSFIELD_SERIALIZED_DEBUG");
+        }
+
+#endif
+        #endregion
+
+#else
+        [MenuItem(MENU_ROOT + "Enable Extended Serialization")]
+        public static void EnableExtendedSerialization()
+        {
+            AddCompileDefine("SAINTSFIELD_SERIALIZED");
+        }
+#endif
 
         #endregion
 

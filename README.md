@@ -7181,45 +7181,53 @@ If you are interested, here is how to use it.
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
 
-<!--
 
-## `SaintsMonoBehaviour` / `SaintsScriptableObject` ##
 
-Inherent from this two type to allow some special serialization feature.
+## Extended Serialization ##
 
 > [!WARNING]
 > This feature is still experimental
+
+`SaintsEditor` supports some types that usually can not be serialized.
+
+To use this feature, go `Window` - `Saints` - `Enable Extended Serialization`
 
 ### `long`/`ulong` Enum ###
 
 > [!WARNING]
 > This feature is still experimental
 
-You can serialize a `long`/`ulong` base typed `enum` with `SaintsSerialized`:
+You can serialize a `long`/`ulong` base typed `enum` with `SaintsSerialized`, which is not supported by Unity.
+
+1.  **IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial`
+2.  Add `[NonSerialized, SaintsSerialized]` to your enum field
 
 ```csharp
-[Serializable, Flags]
-public enum TestULongEnum: ulong
+public partial class MyBehavior: MonoBehaviour
 {
-    None = 0,
-    First = 1,
-    Second = 1 << 1,
-    Third = 1 << 2,
-    All = First | Second | Third,
-}
+    [Serializable, Flags]
+    public enum TestULongEnum: ulong
+    {
+        None = 0,
+        First = 1,
+        Second = 1 << 1,
+        Third = 1 << 2,
+        All = First | Second | Third,
+    }
 
-[Serializable]
-public enum TestULongEnumNormal: ulong
-{
-    None,
-    First,
-    Second,
-    Third,
+    [Serializable]
+    public enum TestULongEnumNormal: ulong
+    {
+        None,
+        First,
+        Second,
+        Third,
+    }
+    [NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumPub;
+    [NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalPub;
+    // EnumToggleButtons is supported too
+    [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPubBtns;
 }
-[NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumPub;
-[NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalPub;
-// EnumToggleButtons is supported too
-[NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPubBtns;
 ```
 
 ![](https://github.com/user-attachments/assets/1e16d6d6-dfdd-483c-b95d-ba19f5706e66)
@@ -7228,12 +7236,10 @@ This can work with `EnumToggleButtons`.
 
 Note some limit:
 
-*   It can only work with `EnumToggleButtons`. **All** other field-based attributes like `InfoBox`, `OnValueChanged` etc are unsupported.
+*   It can only work with `EnumToggleButtons`. **All** other field-based attributes like `InfoBox`, `OnValueChanged` etc are unsupported. It works with any `Playa` (Editor level) attributes.
 *   `FormerlySerializedAs` does nothing on it.
 *   Careful before trying it in a product case.
 *   list/array type won't have a size input (as it's unfinished yet)
-
--->
 
 ## `SaintsEditorWindow` ##
 
