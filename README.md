@@ -6319,7 +6319,7 @@ Add `SaintsDictionary` attribute to control:
 *   `string valueWidth = null`: value column width. Can be percent like "20%", or pixel like "50" (or "50px"). `null` for auto width.
 
 ```csharp
-suing SaintsField;
+using SaintsField;
 
 [SaintsDictionary("Slot", "Enemy", numberOfItemsPerPage: 5)]
 public SaintsDictionary<int, GameObject> slotToEnemyPrefab;
@@ -6330,7 +6330,7 @@ public SaintsDictionary<int, GameObject> slotToEnemyPrefab;
 Using on a general struct/class is supported:
 
 ```csharp
-suing SaintsField;
+using SaintsField;
 
 [Serializable]
 public struct MyStruct
@@ -6348,7 +6348,7 @@ public SaintsDictionary<int, MyStruct> basicType;
 Set init width
 
 ```csharp
-suing SaintsField;
+using SaintsField;
 
 [SaintsDictionary(keyWidth: "30%")] public SaintsDictionary<int, string> keyWidthControl;
 [SaintsDictionary(valueWidth: "120px")] public SaintsDictionary<int, string> valueWidthControl;
