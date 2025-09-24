@@ -7203,6 +7203,10 @@ You can serialize a `long`/`ulong` base typed `enum` with `SaintsSerialized`, wh
 2.  Add `[NonSerialized, SaintsSerialized]` to your enum field
 
 ```csharp
+// IMPORTANT: partial class
+
+using SaintsField.Playa;
+
 public partial class MyBehavior: MonoBehaviour
 {
     [Serializable, Flags]
