@@ -213,7 +213,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cc0e0675338cbd45b9e5298d729c20d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::Issue296Table
-  _saintsSerializedProperties: []
   gatherings:
   - cell1:
       type: 0
@@ -270,7 +269,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc6093053f8fe1f4e862ab12c6f76236, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   inputs:
   - gradient:
       serializedVersion: 2
@@ -427,7 +425,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3de95c31d15970e41bc8f2aa6f9024e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   e1: 0
   e2: 2
   hideAndArray: []
@@ -465,7 +462,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e524b2d2a2b07747a0dfcb0d06ca3b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   separator: 
   left: 
   right: Right <color=lime>Dynamic
@@ -530,7 +526,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c62bd0365d7c804584eacb0a0de3ce4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.EditingMultipleRendering
-  _saintsSerializedProperties: []
 --- !u!1 &123624941
 GameObject:
   m_ObjectHideFlags: 0
@@ -575,7 +570,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8ceb65fb726c6f48a398e742483754a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   enumNormalPure: 10
   enumNormalFall: 3
   enumNormalPures: 03000000
@@ -628,7 +622,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb402a79b8bd85646b18070685f729b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   structArr: []
   structArrLis: []
   floatArr:
@@ -680,8 +673,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc5d2fac74c5ae4e89d46fc08310525, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.SerEnumULong
-  _saintsSerializedProperties: []
-  testNormalFlags: 1
+  testNormalFlags: 5
+  LongEnumPub__SaintsSerialized__:
+    propertyType: 1
+    longValue: 1
+    uLongValue: 0
+  ULongEnumPub__SaintsSerialized__:
+    propertyType: 2
+    longValue: 0
+    uLongValue: 2
+  ULongEnumNormalPub__SaintsSerialized__:
+    propertyType: 2
+    longValue: 0
+    uLongValue: 2
+  _uLongEnumPri__SaintsSerialized__:
+    propertyType: 2
+    longValue: 0
+    uLongValue: 1
+  ULongEnumProp__SaintsSerialized__:
+    propertyType: 2
+    longValue: 0
+    uLongValue: 2
+  ULongEnumPubArr__SaintsSerialized__:
+  - propertyType: 2
+    longValue: 0
+    uLongValue: 1
+  _uLongEnumPriArr__SaintsSerialized__:
+  - propertyType: 2
+    longValue: 0
+    uLongValue: 2
+  ULongEnumPropArr__SaintsSerialized__:
+  - propertyType: 2
+    longValue: 0
+    uLongValue: 1
+  ULongEnumPubLis__SaintsSerialized__:
+  - propertyType: 2
+    longValue: 0
+    uLongValue: 2
+  _uLongEnumPriLis__SaintsSerialized__:
+  - propertyType: 2
+    longValue: 0
+    uLongValue: 2
+  ULongEnumPropLis__SaintsSerialized__:
+  - propertyType: 2
+    longValue: 0
+    uLongValue: 4
 --- !u!1 &147024401
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,7 +762,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 294dbace9f5e48f478447b0a21506a30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1 &164211539
 GameObject:
   m_ObjectHideFlags: 0
@@ -771,7 +806,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c48fe958d6b1d49887221eced484b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   isRelay: 0
   _team: {fileID: 0}
 --- !u!1 &168732408
@@ -864,7 +898,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b58f21873f0dd7044bf92082eec83fbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   boolValue: 0
   justHide: 
   justShow: 
@@ -948,7 +981,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13fd51e23eed393418085b1a36730458, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   parentsWithSelf:
   - {fileID: 174421157}
   - {fileID: 174421158}
@@ -1152,7 +1184,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3cba903993b3454d993148224281d44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1 &282662862
 GameObject:
   m_ObjectHideFlags: 0
@@ -1243,7 +1274,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f9a3337a83b42641994e526b4065c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   getComponentArray:
   - {fileID: 282662869}
   - {fileID: 282662868}
@@ -1304,7 +1334,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbd1cb6f61cf0134d998f8ed400ebdd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   l1: 
   lOut: 
   l2: 
@@ -1362,7 +1391,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3eaa451c8a34f224aa636e81f8f1085d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   row:
     dynamicLabel: Test Value Goes Here
   dynamicLabel: <icon=star.png/><color=lime><icon=star.png/>Hi There
@@ -1410,7 +1438,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd8377b70001a4740ab30ba7af2b5e9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1 &458616576
 GameObject:
   m_ObjectHideFlags: 0
@@ -1456,7 +1483,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0753ddb6fe1d2144cb5145c6e0d5cb80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.MixLayoutTest
-  _saintsSerializedProperties: []
   <AutoPropLayout>k__BackingField: 0
   norFieldLayout: 0
 --- !u!114 &458616579
@@ -1471,7 +1497,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25ff2e2403fa74c4192a9e9befce85ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.MixOrderTest
-  _saintsSerializedProperties: []
   <SecondProp>k__BackingField: 0
   thirdField: 0
 --- !u!1 &480485011
@@ -1518,7 +1543,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98a95d9d9a73b7f41a368f631fb44703, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   picker:
     rid: -2
   pickerStruct:
@@ -1575,7 +1599,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5435a09f374c984db370b1ddcccc6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   holders:
   - {fileID: 168732410}
   - {fileID: 1240873461}
@@ -1671,7 +1694,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c7a05687c1b5614198c76f8bf89987f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   fallbackTextArea:
   - 11111
 --- !u!114 &606290660
@@ -1886,7 +1908,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9348a1abd94a4f57a8a00c25d207662a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1 &690734318
 GameObject:
   m_ObjectHideFlags: 0
@@ -1916,7 +1937,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d84dd7a9a64f28849b9b06d4867b7557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   root1: 
   root2: 
   sub1: 
@@ -2003,7 +2023,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a0dfce9bf5e439da18e3284b3fae52a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   contents:
   - 0
   - 1
@@ -2057,7 +2076,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea9a4ca799121b14f829453dbaf80d39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue304IMGUIGetter
-  _saintsSerializedProperties: []
   _colliders:
   - {fileID: 2039869107}
   - {fileID: 1196999817}
@@ -2091,7 +2109,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7679c7ceb2f84949873cc184e7f3768, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   s: 
   editableMain: 1
   visibleMain: 1
@@ -2218,7 +2235,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83982e527df609d419fc0f440822f990, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   value1: 0
   value2: 0
   value3: 0
@@ -2267,7 +2283,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd916de5d8b22a54f8e5b7389491dee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   beforeGroup: 
   group1: 
   group2: 
@@ -2332,7 +2347,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155834b475f64f548877c244d4809290, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   tab: 
   tab1Sub1: 
   tab1Sub2: 
@@ -2349,7 +2363,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fe1adfa3ebce6f43aa4160170624a2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   tab: 
   tab1Sub1: 
   tab1Sub2: 
@@ -2398,7 +2411,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e430b0ffd69de6a43a4bad2f86ece40e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   character: 120
   enumFromSome: 0
   enumFromSomeFlags: 0
@@ -2532,7 +2544,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 823b4df43ae1cd345960c8f21ae5fe1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   boolValue: 1
   justDisable: 
   justEnable: 
@@ -2619,7 +2630,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce80c99e8ba440c580d745ce53147594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples.EditorTest::SaintsField.CodeAnalTest
-  _saintsSerializedProperties: []
 --- !u!1 &898746881
 GameObject:
   m_ObjectHideFlags: 0
@@ -2747,7 +2757,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba763499f3bd02e4686d26382434f342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   plainStrings: []
   plainStruct:
     structString: 
@@ -2805,7 +2814,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64681c28205a9e94caff1b3162067adb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1 &940753353
 GameObject:
   m_ObjectHideFlags: 0
@@ -2850,7 +2858,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eca4536637aa48e46a1a198d6a196325, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   myClasses:
   - unique: 1122
   - unique: 3232
@@ -2970,7 +2977,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9393ed7ea503f2a42bc7ee52405e8d03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1 &960222678
 GameObject:
   m_ObjectHideFlags: 0
@@ -3015,7 +3021,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1da549d7da7832a4686c6591ad1c4c1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   dynamicContent: Dynamic Content
   myStruct:
     structString: 
@@ -3108,7 +3113,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c31a09088ba108b4f9707dba8fef6fd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   strings:
   - content1
   - content2
@@ -3173,7 +3177,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d8c34b5b3f00864f900f841afdb39c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   loopedRefs:
   - _searchObj: {fileID: 11400000, guid: f45e08342be92f647866201a7f35179c, type: 2}
   - _searchObj: {fileID: 11400000, guid: e9ded63bd3271d448874bcc45a59c2f3, type: 2}
@@ -3206,7 +3209,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fb26404a0f3303438643da35bd086d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   intIntEvent:
     m_PersistentCalls:
       m_Calls:
@@ -3316,7 +3318,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d64fd33b6b9546549abd8058d031fefa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   goLis:
   - {fileID: 1135433103}
   - {fileID: 876911011}
@@ -3366,7 +3367,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452cdf6963e577a448280ca711ba798b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   ot: 
   st: 
   inOneStruct:
@@ -3746,7 +3746,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99144ccaa9eb9054d9e57f577ac4b337, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   myStartField: 
   myOtherFieldUnderneath: 
   other: 
@@ -3779,7 +3778,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79b3b05b40debaa4588eb6c79e82e573, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.ShowInInspectorMethodExample
-  _saintsSerializedProperties: []
   childrenTrans:
   - {fileID: 1289213608}
   - {fileID: 237284791}
@@ -3863,7 +3861,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ce528bd0998a044da7f6d0ed26f08d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   _complete: 0
 --- !u!4 &1301169200
 Transform:
@@ -3925,7 +3922,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f42e2b36fb69d3e43a4f339b3f3dcac9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   myString: 
   myInt: 1
   otherString: 
@@ -3944,7 +3940,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f42e2b36fb69d3e43a4f339b3f3dcac9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   myString: 
   myInt: -1
   otherString: 
@@ -3983,7 +3978,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9849725d2589b54995673758dc14cfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   start: 
   group1: 
   group2: 
@@ -4062,7 +4056,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e803a9e613d3637499b38d755a082e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   myStructs: []
   mySoListRef:
   - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
@@ -4118,7 +4111,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af891a72ac8fac14b8029f90d36d2646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   s: 3
 --- !u!1 &1453253529
 GameObject:
@@ -4165,7 +4157,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ffcf7adff49123419ed437013803277, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   myStartField: 
   myOtherFieldUnderneath: 
   other: 
@@ -4198,7 +4189,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d323c12c152115449c128163e129b91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!4 &1454665249
 Transform:
   m_ObjectHideFlags: 0
@@ -4268,7 +4258,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c12153bf83683e54884fabf6011eeea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   normalIntArrays: 
   normalString: 
   content: 
@@ -4350,7 +4339,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35687f94cb5abe447badce28da04540b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1 &1536066467
 GameObject:
   m_ObjectHideFlags: 0
@@ -4415,7 +4403,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1454850d1df326a429d88af393b15930, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   parent1: 
   parent2: 
   sub: 
@@ -4447,7 +4434,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f63c9344db08bf4b8e3eacdc9265379, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   parent1: 
   parent2: 
 --- !u!1 &1557535261
@@ -4558,7 +4544,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74a0b038b67097f4cb747e7d0a68d5a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   value: 0
 --- !u!4 &1580933666
 Transform:
@@ -4738,7 +4723,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0fa2d6c4e523545b02f1537f935406, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   dynamicContent: <color=lime>Dynamic! ----------------------------------------------
   myStruct:
     structString: 
@@ -4786,7 +4770,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a671af54d5015494b83edf5accd7bdec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   goArrayRequired: []
   goArrayDefault: []
   goArrayNothing: []
@@ -4869,7 +4852,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f275480c0dd0af42aabdb2ae8ce1a8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   getComponentByPathArray:
   - {fileID: 282662869}
   - {fileID: 282662868}
@@ -4891,7 +4873,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3bd226af40eb33409bd540641697a4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   getComponentInChildrenArray:
   - {fileID: 1704623437}
   - {fileID: 1704623436}
@@ -4930,7 +4911,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cb582d430c90ee42931d4fbb0d85a08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   dummies:
   - {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
   - {fileID: 1637141728839897546, guid: 18d3346b34d52d4489e2f1218393c212, type: 3}
@@ -4953,7 +4933,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e10f3a8cf29b349b91b4c9481a568c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   getSoIArray:
   - <V>k__BackingField: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
   - <V>k__BackingField: {fileID: 11400000, guid: b2e57ce1d7fbe5345a38f4feb30cdc6f, type: 2}
@@ -5002,7 +4981,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36c527a4c74564b4a85cba762ef01c41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1 &1772967109
 GameObject:
   m_ObjectHideFlags: 0
@@ -5047,7 +5025,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2328cf38291a7c49871ca506c7e3bae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   myStrings:
   - 
   - 
@@ -5110,7 +5087,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 054075d9ba74ba04486905ab4043aea7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   spriteRenderer: {fileID: 1776789733}
 --- !u!212 &1776789733
 SpriteRenderer:
@@ -5245,7 +5221,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faa9b5612d7f98244bb2dd656f935cdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   s: []
   dynamicContent: <color=brown>dynamic!
 --- !u!1 &1872824170
@@ -5322,7 +5297,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e6af45594c6a4d4bb7d7ddf3e1e0b23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   getComponentInParentArray:
   - {fileID: 1872824174}
   - {fileID: 1872824171}
@@ -5450,7 +5424,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36aca8de532e7b9408f283b969b38541, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   myString: 
   myStrings:
   - 
@@ -5516,7 +5489,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0c5ab3f94ba447bb86e31ca29224a2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   note: 
   titledItem1: 
   titledItem2: 
@@ -5605,7 +5577,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e8e97dda40588845b225ef5cef994e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   myList: []
   myArray:
   - 
@@ -5639,7 +5610,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7d39aede68c2bb4f926a85c16033106, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   arrayDefault: []
   listDefault: []
   arrayDrawer: []
@@ -5858,7 +5828,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af891a72ac8fac14b8029f90d36d2646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   s: 2
 --- !u!1 &2049735626
 GameObject:
@@ -5904,7 +5873,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af891a72ac8fac14b8029f90d36d2646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   s: 1
 --- !u!1 &2117085778
 GameObject:
@@ -5950,7 +5918,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e00e11efcd43e5a47889cc2759e48959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   testBg: 
 --- !u!1001 &2642422015470383070
 PrefabInstance:

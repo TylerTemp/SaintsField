@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
@@ -33,19 +34,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             Third,
         }
 
-        [Serializable, Flags]
-        public enum TestNormalEnum
-        {
-            First = 1,
-            Second = 1 << 1,
-            Third = 1 << 2,
-        }
 
-        [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
+        [NonSerialized, SaintsSerialized]
+        public LongEnum LongEnumPub;
 
         [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
         [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
-        [EnumToggleButtons] public TestNormalEnum testNormalFlags;
         [NonSerialized, SaintsSerialized] private TestULongEnum _uLongEnumPri;
         [field: NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
 
@@ -58,5 +52,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [field: NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPropLis { get; private set; }
 
         // [ShowInInspector] private string GenString => GeneratedStringSaintsField();
+        // [ShowInInspector] private string GenString2 => ExampleSourceGenerated.ExampleSourceGenerated.GetTestText();
+
+        // [Button]
+        // private void InspectIt()
+        // {
+        //     Debug.Log(ULongEnumPubArr);
+        //     Debug.Log(ULongEnumPubArr == null);
+        // }
     }
 }

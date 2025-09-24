@@ -5,7 +5,7 @@ namespace SaintsField.SaintsSerialization
     [Serializable]
     public enum SaintsPropertyType
     {
-        Other,
+        Undefined,  // SainsEditor never kicked in even once.
         EnumLong,
         EnumULong,
     }

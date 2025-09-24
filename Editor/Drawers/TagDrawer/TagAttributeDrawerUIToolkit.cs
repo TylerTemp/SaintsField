@@ -120,7 +120,7 @@ namespace SaintsField.Editor.Drawers.TagDrawer
             }
 
             dropdown.AddSeparator();
-            dropdown.Add("Edit Scenes In Build...", null, false, "d_editicon.sml");
+            dropdown.Add("Edit Tags...", null, false, "d_editicon.sml");
 
             AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
             {

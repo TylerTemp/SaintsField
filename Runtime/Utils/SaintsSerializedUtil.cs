@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using SaintsField.SaintsSerialization;
 using UnityEngine;
 
@@ -9,175 +7,331 @@ namespace SaintsField.Utils
 {
     public static class SaintsSerializedUtil
     {
-        public static void OnBeforeSerialize(List<SaintsSerializedProperty> saintsSerializedProperties, Type serContainerType)
+        public static SaintsSerializedProperty OnBeforeSerialize(object obj, Type type)
         {
-            List<int> toRemoveIndexes = new List<int>();
-            for (int index = 0; index < saintsSerializedProperties.Count; index++)
+            if (!type.IsEnum)
             {
-                SaintsSerializedProperty serializedProperty = saintsSerializedProperties[index];
-                string propName = serializedProperty.name;
-                if (serializedProperty.isProperty)
-                {
-                    PropertyInfo propertyInfo = serContainerType.GetProperty(propName,
-                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                    if (propertyInfo == null)
-                    {
-                        toRemoveIndexes.Add(index);
-                    }
-                }
-                else
-                {
-                    FieldInfo fieldInfo = serContainerType.GetField(propName,
-                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                    if (fieldInfo == null)
-                    {
-                        toRemoveIndexes.Add(index);
-                    }
-                }
+                return default;
             }
 
-            toRemoveIndexes.Reverse();
-            foreach (int removeIndex in toRemoveIndexes)
+            Type underType = Enum.GetUnderlyingType(type);
+            if (underType == typeof(long))
             {
-                Debug.LogWarning($"Saints Serialied {saintsSerializedProperties[removeIndex].name}@{removeIndex} disappeared, removed from serialized list.");
-                saintsSerializedProperties.RemoveAt(removeIndex);
+                return new SaintsSerializedProperty
+                {
+                    propertyType = SaintsPropertyType.EnumLong,
+                    longValue = Convert.ToInt64(obj)
+                };
             }
+
+            if (underType == typeof(ulong))
+            {
+                return new SaintsSerializedProperty
+                {
+                    propertyType = SaintsPropertyType.EnumULong,
+                    uLongValue = Convert.ToUInt64(obj)
+                };
+            }
+
+            throw new NotSupportedException($"SaintsSerializedUtil OnBeforeSerialize not support enum underlying type {underType.FullName}");
         }
 
-        public static void OnAfterDeserialize(List<SaintsSerializedProperty> _saintsSerializedProperties, Type serContainerType, UnityEngine.Object serTarget)
-        {
-            foreach (SaintsSerializedProperty serializedProperty in _saintsSerializedProperties)
-            {
-                string propName = serializedProperty.name;
-                if (serializedProperty.isProperty)
-                {
-                    PropertyInfo propertyInfo = serContainerType.GetProperty(propName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                    if (propertyInfo == null)
-                    {
-                        Debug.LogWarning($"Saints Serialied {propName} not found, skip deseialization.");
-                        continue;
-                    }
-                    propertyInfo.SetValue(serTarget, GetSaintsSerializedPropertyValue(serializedProperty, GetSaintsElementType(propertyInfo.PropertyType)));
-                }
-                else
-                {
-                    FieldInfo fieldInfo = serContainerType.GetField(propName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                    if (fieldInfo == null)
-                    {
-                        Debug.LogWarning($"Saints Serialied {propName} not found, skip deseialization.");
-                        continue;
-                    }
-                    Type elementType = GetSaintsElementType(fieldInfo.FieldType);
-                    object realValue = GetSaintsSerializedPropertyValue(serializedProperty, elementType);
-                    fieldInfo.SetValue(serTarget, realValue);
-                }
-            }
-        }
+        // public static void OnBeforeSerializeArray<T>(ref SaintsSerializedProperty[] toFill, ref T[] objList, Type elementType)
+        // {
+        //     // Debug.Log($"OnBeforeSerializeArray toFill={toFill}, objList={objList}, elementType={elementType}");
+        //     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+        //     if (objList == null)
+        //     {
+        //         objList = Array.Empty<T>();
+        //     }
+        //
+        //     OnBeforeSerializeCollection(ref toFill, objList, elementType);
+        // }
 
-        private static Type GetSaintsElementType(Type type)
-        {
-            if (type.IsArray)
-            {
-                return type.GetElementType();
-            }
+        // public static void OnBeforeSerializeList<T>(ref SaintsSerializedProperty[] toFill, ref List<T> objList, Type elementType)
+        // {
+        //     // Debug.Log($"OnBeforeSerializeArray toFill={toFill}, objList={objList}, elementType={elementType}");
+        //     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+        //     if (objList == null)
+        //     {
+        //         objList = new List<T>();
+        //     }
+        //
+        //     OnBeforeSerializeCollection(ref toFill, objList, elementType);
+        // }
 
-            if(type.IsInterface)
+        public static void OnBeforeSerializeCollection<T>(ref SaintsSerializedProperty[] toFill, IReadOnlyList<T> objList, Type elementType)
+        {
+            Debug.Assert(objList != null);
+            bool inPlace = toFill != null && toFill.Length == objList.Count;
+
+            SaintsSerializedProperty[] results;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (inPlace)
             {
-                if (type.IsGenericType && typeof(IEnumerable).IsAssignableFrom(type))
-                {
-                    return type.GetGenericArguments()[0];
-                }
+                results = Array.Empty<SaintsSerializedProperty>();
             }
             else
             {
-                foreach (Type typeInterface in type.GetInterfaces())
-                {
-                    if (typeInterface.IsGenericType && typeof(IEnumerable).IsAssignableFrom(typeInterface))
-                    {
-                        return typeInterface.GetGenericArguments()[0];
-                    }
-                }
+                results = new SaintsSerializedProperty[objList.Count];
             }
 
-            // if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
-            // {
-            //     return type.GetGenericArguments()[0];
-            // }
-
-            return type;
-        }
-
-        private static Array MakeArray(Type elementType, IEnumerable values, int length)
-        {
-            var arr = Array.CreateInstance(elementType, length);
-            int index = 0;
-            foreach (object each in values)
+            for (int i = 0; i < objList.Count; i++)
             {
-                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                if (elementType.IsEnum)
+                if (inPlace)
                 {
-                    arr.SetValue(Enum.ToObject(elementType, each), index);
+                    toFill[i]  = OnBeforeSerialize(objList[i], elementType);
                 }
                 else
                 {
-                    arr.SetValue(Convert.ChangeType(each, elementType), index);
+                    results[i] = OnBeforeSerialize(objList[i], elementType);
                 }
-
-                index++;
             }
 
-            return arr;
+            if (!inPlace)
+            {
+                toFill = results;
+            }
         }
 
-        private static object GetSaintsSerializedPropertyValue(SaintsSerializedProperty serializedProperty, Type elementType)
+        public static object OnAfterDeserialize(SaintsSerializedProperty saintsSerializedProperty, Type targetType)
         {
-            switch (serializedProperty.propertyType)
+            switch (saintsSerializedProperty.propertyType)
             {
                 case SaintsPropertyType.EnumLong:
-                {
-                    // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-                    switch (serializedProperty.collectionType)
+                    if (targetType.IsEnum)
                     {
-                        case CollectionType.Default:
-                            return serializedProperty.longValue;
-                        case CollectionType.Array:
-                        {
-                            return MakeArray(elementType, serializedProperty.longValues, serializedProperty.longValues.Length);
-                        }
-
-                        case CollectionType.List:
-                            return serializedProperty.longValues.Length == 0
-                                ? (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType))
-                                : (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), MakeArray(elementType, serializedProperty.longValues, serializedProperty.longValues.Length));
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(serializedProperty.collectionType), serializedProperty.collectionType, null);
+                        return Enum.ToObject(targetType, saintsSerializedProperty.longValue);
                     }
-
-                }
+                    return Convert.ChangeType(saintsSerializedProperty.longValue, targetType);
                 case SaintsPropertyType.EnumULong:
-                {
-                    // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-                    switch (serializedProperty.collectionType)
+                    if (targetType.IsEnum)
                     {
-                        case CollectionType.Default:
-                            return serializedProperty.uLongValue;
-                        case CollectionType.Array:
-                        {
-                            return MakeArray(elementType, serializedProperty.uLongValues, serializedProperty.uLongValues.Length);
-                        }
-
-                        case CollectionType.List:
-                            return serializedProperty.uLongValues.Length == 0
-                                ? (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType))
-                                : (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), MakeArray(elementType, serializedProperty.uLongValues, serializedProperty.uLongValues.Length));
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(serializedProperty.collectionType), serializedProperty.collectionType, null);
+                        return Enum.ToObject(targetType, saintsSerializedProperty.uLongValue);
                     }
-                }
-                case SaintsPropertyType.Other:
+                    return Convert.ChangeType(saintsSerializedProperty.uLongValue, targetType);
+                case SaintsPropertyType.Undefined:
+                    return targetType.IsValueType ? Activator.CreateInstance(targetType) : null;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(serializedProperty.propertyType), serializedProperty.propertyType, null);
+                    throw new ArgumentOutOfRangeException(nameof(saintsSerializedProperty.propertyType), saintsSerializedProperty.propertyType, null);
             }
         }
+
+        public static (bool filled, T[]result) OnAfterDeserializeArray<T>(T[] toFill, SaintsSerializedProperty[] saintsSerializedProperties, Type elementType)
+        {
+            // Debug.Log($"OnAfterDeserializeArray toFill={toFill}, serArr={saintsSerializedProperties}, elementType={elementType}");
+
+            bool canFill = toFill != null && toFill.Length == saintsSerializedProperties.Length;
+            T[] results = new T[saintsSerializedProperties.Length];
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                if (canFill)
+                {
+                    toFill[i] = (T)OnAfterDeserialize(saintsSerializedProperties[i], elementType);
+                }
+                else
+                {
+                    results[i] = (T)OnAfterDeserialize(saintsSerializedProperties[i], elementType);
+                }
+            }
+
+            return (canFill, results);
+        }
+
+        public static (bool filled, List<T> result) OnAfterDeserializeList<T>(List<T> toFill, SaintsSerializedProperty[] saintsSerializedProperties, Type targetType)
+        {
+            // Debug.Log($"toFill={toFill}, serArr={saintsSerializedProperties}, targetType={targetType}");
+            bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
+            // Debug.Log($"canFill={canFill}");
+            List<T> results = new List<T>(new T[saintsSerializedProperties.Length]);
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                if (canFill)
+                {
+                    toFill[i] = (T)OnAfterDeserialize(saintsSerializedProperties[i], targetType);
+                }
+                else
+                {
+                    results[i] = (T)OnAfterDeserialize(saintsSerializedProperties[i], targetType);
+                }
+            }
+
+            // if (!canFill)
+            // {
+            //     toFill = results;
+            // }
+            return (canFill, results);
+        }
+
+//         public static void OnBeforeSerialize(List<SaintsSerializedProperty> saintsSerializedProperties, Type serContainerType)
+//         {
+//             List<int> toRemoveIndexes = new List<int>();
+//             for (int index = 0; index < saintsSerializedProperties.Count; index++)
+//             {
+//                 SaintsSerializedProperty serializedProperty = saintsSerializedProperties[index];
+//                 string propName = serializedProperty.name;
+//                 if (serializedProperty.isProperty)
+//                 {
+//                     PropertyInfo propertyInfo = serContainerType.GetProperty(propName,
+//                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+//                     if (propertyInfo == null)
+//                     {
+//                         toRemoveIndexes.Add(index);
+//                     }
+//                 }
+//                 else
+//                 {
+//                     FieldInfo fieldInfo = serContainerType.GetField(propName,
+//                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+//                     if (fieldInfo == null)
+//                     {
+//                         toRemoveIndexes.Add(index);
+//                     }
+//                 }
+//             }
+//
+//             toRemoveIndexes.Reverse();
+//             foreach (int removeIndex in toRemoveIndexes)
+//             {
+//                 Debug.LogWarning($"Saints Serialied {saintsSerializedProperties[removeIndex].name}@{removeIndex} disappeared, removed from serialized list.");
+//                 saintsSerializedProperties.RemoveAt(removeIndex);
+//             }
+//         }
+//
+//         public static void OnAfterDeserialize(List<SaintsSerializedProperty> _saintsSerializedProperties, Type serContainerType, UnityEngine.Object serTarget)
+//         {
+//             foreach (SaintsSerializedProperty serializedProperty in _saintsSerializedProperties)
+//             {
+//                 string propName = serializedProperty.name;
+//                 if (serializedProperty.isProperty)
+//                 {
+//                     PropertyInfo propertyInfo = serContainerType.GetProperty(propName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+//                     if (propertyInfo == null)
+//                     {
+//                         Debug.LogWarning($"Saints Serialied {propName} not found, skip deseialization.");
+//                         continue;
+//                     }
+//                     propertyInfo.SetValue(serTarget, GetSaintsSerializedPropertyValue(serializedProperty, GetSaintsElementType(propertyInfo.PropertyType)));
+//                 }
+//                 else
+//                 {
+//                     FieldInfo fieldInfo = serContainerType.GetField(propName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+//                     if (fieldInfo == null)
+//                     {
+//                         Debug.LogWarning($"Saints Serialied {propName} not found, skip deseialization.");
+//                         continue;
+//                     }
+//                     Type elementType = GetSaintsElementType(fieldInfo.FieldType);
+//                     object realValue = GetSaintsSerializedPropertyValue(serializedProperty, elementType);
+//                     fieldInfo.SetValue(serTarget, realValue);
+//                 }
+//             }
+//         }
+//
+//         private static Type GetSaintsElementType(Type type)
+//         {
+//             if (type.IsArray)
+//             {
+//                 return type.GetElementType();
+//             }
+//
+//             if(type.IsInterface)
+//             {
+//                 if (type.IsGenericType && typeof(IEnumerable).IsAssignableFrom(type))
+//                 {
+//                     return type.GetGenericArguments()[0];
+//                 }
+//             }
+//             else
+//             {
+//                 foreach (Type typeInterface in type.GetInterfaces())
+//                 {
+//                     if (typeInterface.IsGenericType && typeof(IEnumerable).IsAssignableFrom(typeInterface))
+//                     {
+//                         return typeInterface.GetGenericArguments()[0];
+//                     }
+//                 }
+//             }
+//
+//             // if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+//             // {
+//             //     return type.GetGenericArguments()[0];
+//             // }
+//
+//             return type;
+//         }
+//
+//         private static Array MakeArray(Type elementType, IEnumerable values, int length)
+//         {
+//             var arr = Array.CreateInstance(elementType, length);
+//             int index = 0;
+//             foreach (object each in values)
+//             {
+//                 // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+//                 if (elementType.IsEnum)
+//                 {
+//                     arr.SetValue(Enum.ToObject(elementType, each), index);
+//                 }
+//                 else
+//                 {
+//                     arr.SetValue(Convert.ChangeType(each, elementType), index);
+//                 }
+//
+//                 index++;
+//             }
+//
+//             return arr;
+//         }
+//
+//         private static object GetSaintsSerializedPropertyValue(SaintsSerializedProperty serializedProperty, Type elementType)
+//         {
+//             switch (serializedProperty.propertyType)
+//             {
+//                 case SaintsPropertyType.EnumLong:
+//                 {
+//                     // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+//                     switch (serializedProperty.collectionType)
+//                     {
+//                         case CollectionType.Default:
+//                             return serializedProperty.longValue;
+//                         case CollectionType.Array:
+//                         {
+//                             return MakeArray(elementType, serializedProperty.longValues, serializedProperty.longValues.Length);
+//                         }
+//
+//                         case CollectionType.List:
+//                             return serializedProperty.longValues.Length == 0
+//                                 ? (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType))
+//                                 : (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), MakeArray(elementType, serializedProperty.longValues, serializedProperty.longValues.Length));
+//                         default:
+//                             throw new ArgumentOutOfRangeException(nameof(serializedProperty.collectionType), serializedProperty.collectionType, null);
+//                     }
+//
+//                 }
+//                 case SaintsPropertyType.EnumULong:
+//                 {
+//                     // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+//                     switch (serializedProperty.collectionType)
+//                     {
+//                         case CollectionType.Default:
+//                             return serializedProperty.uLongValue;
+//                         case CollectionType.Array:
+//                         {
+//                             return MakeArray(elementType, serializedProperty.uLongValues, serializedProperty.uLongValues.Length);
+//                         }
+//
+//                         case CollectionType.List:
+//                             return serializedProperty.uLongValues.Length == 0
+//                                 ? (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType))
+//                                 : (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType), MakeArray(elementType, serializedProperty.uLongValues, serializedProperty.uLongValues.Length));
+//                         default:
+//                             throw new ArgumentOutOfRangeException(nameof(serializedProperty.collectionType), serializedProperty.collectionType, null);
+//                     }
+//                 }
+//                 case SaintsPropertyType.Other:
+//                 default:
+//                     throw new ArgumentOutOfRangeException(nameof(serializedProperty.propertyType), serializedProperty.propertyType, null);
+//             }
+//         }
     }
 }

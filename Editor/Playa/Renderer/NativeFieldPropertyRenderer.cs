@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 {
                     fieldWithInfo.FieldInfo.SetValue(fieldWithInfo.Targets[0], value);
                     // Debug.Log(fieldWithInfo.SaintsSerializedProp?.propertyPath);
-                    SetAndApplySaintsSerialization(fieldWithInfo.SaintsSerializedProp, fieldWithInfo.FieldInfo.Name, value);
+                    // SetAndApplySaintsSerialization(fieldWithInfo.SaintsSerializedProp, fieldWithInfo.FieldInfo.Name, value);
                 };
             }
 
@@ -98,135 +98,135 @@ namespace SaintsField.Editor.Playa.Renderer
             // return null;
         }
 
-        private static void SetAndApplySaintsSerialization(SerializedProperty saintsSerializedProp, string fieldInfoName, object value)
-        {
-            // if (EditorApplication.isPlayingOrWillChangePlaymode)
-            // {
-            //     return;
-            // }
-
-            if (saintsSerializedProp == null || !SerializedUtils.IsOk(saintsSerializedProp))
-            {
-                // Debug.Log($"Not valid {saintsSerializedProp}");
-                return;
-            }
-
-            SerializedProperty targetContainer = null;
-            for (int index = 0; index < saintsSerializedProp.arraySize; index++)
-            {
-                SerializedProperty checkProp = saintsSerializedProp.GetArrayElementAtIndex(index);
-                if (checkProp.FindPropertyRelative(nameof(SaintsSerializedProperty.name)).stringValue == fieldInfoName)
-                {
-                    targetContainer = checkProp;
-                    break;
-                }
-            }
-
-            if (targetContainer == null)
-            {
-                // Debug.Log($"Nothing found for {fieldInfoName} in {saintsSerializedProp.propertyPath}");
-                return;
-            }
-
-            if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue == (int)SaintsPropertyType.EnumLong)
-            {
-                targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)).longValue = Convert.ToInt64(value);
-                targetContainer.serializedObject.ApplyModifiedProperties();
-            }
-            else if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue == (int)SaintsPropertyType.EnumULong)
-            {
-                bool changed = false;
-                if(targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.collectionType)).intValue == (int) CollectionType.Default)
-                {
-#if UNITY_2022_1_OR_NEWER
-                    targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue)).ulongValue =
-                        Convert.ToUInt64(value);
-                    changed = true;
-#endif
-                }
-                else
-                {
-                    SerializedProperty uLongValuesProp = targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValues));
-                    int arraySize = uLongValuesProp.arraySize;
-                    int index = 0;
-                    foreach (object v in (IEnumerable)value)
-                    {
-                        if (index >= arraySize)
-                        {
-                            uLongValuesProp.InsertArrayElementAtIndex(index);
-                            changed = true;
-                        }
-
-#if UNITY_2022_1_OR_NEWER
-                        SerializedProperty targetElement = uLongValuesProp.GetArrayElementAtIndex(index);
-                        ulong targetNewValue = Convert.ToUInt64(v);
-                        if (targetElement.ulongValue != targetNewValue)
-                        {
-                            targetElement.ulongValue = targetNewValue;
-                            changed = true;
-                        }
-#endif
-                        index++;
-                    }
-
-                    if (index < uLongValuesProp.arraySize)
-                    {
-                        uLongValuesProp.arraySize = index;
-                        changed = true;
-                    }
-                }
-
-                if(changed)
-                {
-                    targetContainer.serializedObject.ApplyModifiedProperties();
-                }
-            }
-            else if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue == (int)SaintsPropertyType.EnumLong)
-            {
-                bool changed = false;
-                if(targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.collectionType)).intValue == (int) CollectionType.Default)
-                {
-                    targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)).longValue = Convert.ToInt64(value);
-                    changed = true;
-                }
-                else
-                {
-                    SerializedProperty longValuesProp = targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.longValues));
-                    int arraySize = longValuesProp.arraySize;
-                    int index = 0;
-                    foreach (object v in (IEnumerable)value)
-                    {
-                        if (index >= arraySize)
-                        {
-                            longValuesProp.InsertArrayElementAtIndex(index);
-                            changed = true;
-                        }
-
-#if UNITY_2022_1_OR_NEWER
-                        SerializedProperty targetElement = longValuesProp.GetArrayElementAtIndex(index);
-                        long targetNewValue = Convert.ToInt64(v);
-                        if (targetElement.longValue != targetNewValue)
-                        {
-                            targetElement.longValue = targetNewValue;
-                            changed = true;
-                        }
-#endif
-                        index++;
-                    }
-
-                    if (index < longValuesProp.arraySize)
-                    {
-                        longValuesProp.arraySize = index;
-                        changed = true;
-                    }
-                }
-
-                if(changed)
-                {
-                    targetContainer.serializedObject.ApplyModifiedProperties();
-                }
-            }
-        }
+//         private static void SetAndApplySaintsSerialization(SerializedProperty saintsSerializedProp, string fieldInfoName, object value)
+//         {
+//             // if (EditorApplication.isPlayingOrWillChangePlaymode)
+//             // {
+//             //     return;
+//             // }
+//
+//             if (saintsSerializedProp == null || !SerializedUtils.IsOk(saintsSerializedProp))
+//             {
+//                 // Debug.Log($"Not valid {saintsSerializedProp}");
+//                 return;
+//             }
+//
+//             SerializedProperty targetContainer = null;
+//             for (int index = 0; index < saintsSerializedProp.arraySize; index++)
+//             {
+//                 SerializedProperty checkProp = saintsSerializedProp.GetArrayElementAtIndex(index);
+//                 if (checkProp.FindPropertyRelative(nameof(SaintsSerializedProperty.name)).stringValue == fieldInfoName)
+//                 {
+//                     targetContainer = checkProp;
+//                     break;
+//                 }
+//             }
+//
+//             if (targetContainer == null)
+//             {
+//                 // Debug.Log($"Nothing found for {fieldInfoName} in {saintsSerializedProp.propertyPath}");
+//                 return;
+//             }
+//
+//             if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue == (int)SaintsPropertyType.EnumLong)
+//             {
+//                 targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)).longValue = Convert.ToInt64(value);
+//                 targetContainer.serializedObject.ApplyModifiedProperties();
+//             }
+//             else if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue == (int)SaintsPropertyType.EnumULong)
+//             {
+//                 bool changed = false;
+//                 if(targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.collectionType)).intValue == (int) CollectionType.Default)
+//                 {
+// #if UNITY_2022_1_OR_NEWER
+//                     targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue)).ulongValue =
+//                         Convert.ToUInt64(value);
+//                     changed = true;
+// #endif
+//                 }
+//                 else
+//                 {
+//                     SerializedProperty uLongValuesProp = targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValues));
+//                     int arraySize = uLongValuesProp.arraySize;
+//                     int index = 0;
+//                     foreach (object v in (IEnumerable)value)
+//                     {
+//                         if (index >= arraySize)
+//                         {
+//                             uLongValuesProp.InsertArrayElementAtIndex(index);
+//                             changed = true;
+//                         }
+//
+// #if UNITY_2022_1_OR_NEWER
+//                         SerializedProperty targetElement = uLongValuesProp.GetArrayElementAtIndex(index);
+//                         ulong targetNewValue = Convert.ToUInt64(v);
+//                         if (targetElement.ulongValue != targetNewValue)
+//                         {
+//                             targetElement.ulongValue = targetNewValue;
+//                             changed = true;
+//                         }
+// #endif
+//                         index++;
+//                     }
+//
+//                     if (index < uLongValuesProp.arraySize)
+//                     {
+//                         uLongValuesProp.arraySize = index;
+//                         changed = true;
+//                     }
+//                 }
+//
+//                 if(changed)
+//                 {
+//                     targetContainer.serializedObject.ApplyModifiedProperties();
+//                 }
+//             }
+//             else if (targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue == (int)SaintsPropertyType.EnumLong)
+//             {
+//                 bool changed = false;
+//                 if(targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.collectionType)).intValue == (int) CollectionType.Default)
+//                 {
+//                     targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)).longValue = Convert.ToInt64(value);
+//                     changed = true;
+//                 }
+//                 else
+//                 {
+//                     SerializedProperty longValuesProp = targetContainer.FindPropertyRelative(nameof(SaintsSerializedProperty.longValues));
+//                     int arraySize = longValuesProp.arraySize;
+//                     int index = 0;
+//                     foreach (object v in (IEnumerable)value)
+//                     {
+//                         if (index >= arraySize)
+//                         {
+//                             longValuesProp.InsertArrayElementAtIndex(index);
+//                             changed = true;
+//                         }
+//
+// #if UNITY_2022_1_OR_NEWER
+//                         SerializedProperty targetElement = longValuesProp.GetArrayElementAtIndex(index);
+//                         long targetNewValue = Convert.ToInt64(v);
+//                         if (targetElement.longValue != targetNewValue)
+//                         {
+//                             targetElement.longValue = targetNewValue;
+//                             changed = true;
+//                         }
+// #endif
+//                         index++;
+//                     }
+//
+//                     if (index < longValuesProp.arraySize)
+//                     {
+//                         longValuesProp.arraySize = index;
+//                         changed = true;
+//                     }
+//                 }
+//
+//                 if(changed)
+//                 {
+//                     targetContainer.serializedObject.ApplyModifiedProperties();
+//                 }
+//             }
+//         }
 
         private static Type GetFieldType(SaintsFieldWithInfo fieldWithInfo) =>
             fieldWithInfo.FieldInfo?.FieldType ?? fieldWithInfo.PropertyInfo.PropertyType;
