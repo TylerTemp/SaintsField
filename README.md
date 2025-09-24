@@ -1,4 +1,4 @@
-# SaintsField #
+3# SaintsField #
 
 [![unity_version](https://github.com/TylerTemp/SaintsField/assets/6391063/c01626a1-9329-4c26-be31-372f8704df1d)](https://unity.com/download)
 [![license_mit](https://github.com/TylerTemp/SaintsField/assets/6391063/a093811a-5dbc-46ad-939e-a9e207ae5bfb)](https://github.com/TylerTemp/SaintsField/blob/master/LICENSE)
@@ -103,9 +103,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.31.0**
+**4.32.0**
 
-If the project has `Microsoft.CodeAnalysis.CSharp`, use it to ensure the fields (properties, methods)' order as defined in code. This can greatly reduce the cofusion when you have mixed order of fields/properties/methods with `LayoutStart`
+UI Toolkit: You can now serialize a long/ulong type of `enum`, which is not supported by Unity. Please read "Extended Serialization" secstion for more info.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -7201,6 +7201,21 @@ You can serialize a `long`/`ulong` base typed `enum` with `SaintsSerialized`, wh
 
 1.  **IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial`
 2.  Add `[NonSerialized, SaintsSerialized]` to your enum field
+
+Note: don't use it inside a serializable class/struct, it won't work:
+
+```csharp
+// this WON'T WORK
+[Serializable]
+public partial class MyClass
+{
+    [NonSerialized, SaintsSerialized]  // This won't work inside a normal class/struct
+    public MyULongEmun myEnum;
+} 
+
+// MyULongEmun won't get serialized in this field
+public MyClass myClass;
+```
 
 ```csharp
 // IMPORTANT: partial class
