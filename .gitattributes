@@ -1,7 +1,6 @@
 * text=auto eol=lf
-
 *.unity diff -merge -text
 *.asset diff -merge -text
 *.prefab diff -merge -text
 *.meta diff -merge text
-
+*.dll filter=lfs diff=lfs merge=lfs -text
