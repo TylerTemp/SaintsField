@@ -51,14 +51,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
         [field: NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPropLis { get; private set; }
 
-        // [ShowInInspector] private string GenString => GeneratedStringSaintsField();
-        // [ShowInInspector] private string GenString2 => ExampleSourceGenerated.ExampleSourceGenerated.GetTestText();
-
-        // [Button]
-        // private void InspectIt()
-        // {
-        //     Debug.Log(ULongEnumPubArr);
-        //     Debug.Log(ULongEnumPubArr == null);
-        // }
+        [Button]
+        private void InspectIt()
+        {
+            Debug.Log(ULongEnumPubArr);
+            Debug.Log(ULongEnumPubArr == null);
+        }
     }
 }
