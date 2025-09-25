@@ -59,7 +59,7 @@ namespace SaintsField.Editor.UIToolkitElements
             AddToClassList(alignedFieldUssClassName);
             AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
 
-            this.style.flexShrink = 1;
+            style.flexShrink = 1;
         }
     }
 }

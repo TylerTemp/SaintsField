@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
         {
             CachedValue = newValue;
             Label.Clear();
-            this.Button.tooltip = "";
+            Button.tooltip = "";
 
             if (newValue == 0)
             {
@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             if (selectedNameKeys.Count == 0)
             {
                 AddLabelSingleText(Label, $"<color=red>?</color> {newValue}");
-                this.Button.tooltip = "Invalid flags set";
+                Button.tooltip = "Invalid flags set";
                 return;
             }
 
@@ -113,7 +113,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
                     label.Add(chunk);
                 }
 
-                this.Button.tooltip += displayInfo.Name;
+                Button.tooltip += displayInfo.Name;
             }
             else
             {
@@ -137,7 +137,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
                 pickingMode = PickingMode.Ignore,
             });
 
-            this.Button.tooltip += content;
+            Button.tooltip += content;
         }
     }
 }

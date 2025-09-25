@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Utils;
@@ -147,6 +148,17 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             return (curValue & checkValue) == checkValue;
         }
 
+        public static bool IsOnObject(object curValue, object checkValue, bool isULong)
+        {
+            if (isULong)
+            {
+                return IsOn((ulong)Convert.ChangeType(curValue, typeof(ulong)),
+                    (ulong)Convert.ChangeType(checkValue, typeof(ulong)));
+            }
+            return IsOn((long)Convert.ChangeType(curValue, typeof(long)),
+                (long)Convert.ChangeType(checkValue, typeof(long)));
+        }
+
         public static int ToggleBit(int curValue, int bitValue)
         {
             if (IsOn(curValue, bitValue))
@@ -188,6 +200,29 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         {
             ulong fullBits = curValue | bitValue;
             return fullBits ^ bitValue;
+        }
+
+        public static object SetOnBitObject(object curValue, object curItem, bool isULong)
+        {
+            if (isULong)
+            {
+                return (ulong) curValue | (ulong) curItem;
+            }
+            return (long) curValue | (long) curItem;
+        }
+
+        public static object SetOffBitObject(object curValue, object curItem, bool isULong)
+        {
+            if (isULong)
+            {
+                ulong fullBits = (ulong)curValue | (ulong)curItem;
+                return fullBits ^ (ulong)curItem;
+            }
+            else
+            {
+                long fullBits = (long)curValue | (long)curItem;
+                return fullBits ^ (long)curItem;
+            }
         }
     }
 }

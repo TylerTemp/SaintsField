@@ -1,13 +1,11 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
-using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
-using SaintsField.Interfaces;
+using SaintsField.SaintsSerialization;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -15,12 +13,281 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 {
-    public partial class TreeDropdownAttributeDrawer
+    public partial class TreeDropdownAttributeDrawer: ISaintsSerializedPropertyDrawer
     {
         private class DrawPayload
         {
             public DrawInfo DrawInfo;
             public object Value;
+        }
+
+        public static VisualElement RenderSerializedActual(string label, SerializedProperty saintsProperty, Type targetType)
+        {
+            SaintsPropertyType propertyType = (SaintsPropertyType)saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
+
+            switch (propertyType)
+            {
+                case SaintsPropertyType.EnumLong:
+                {
+                    EnumMetaInfo enumMetaInfo = GetEnumMetaInfo(targetType);
+                    DropdownButtonLongElement ele = new DropdownButtonLongElement(enumMetaInfo);
+                    SerializedProperty subProp = saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
+                    ele.BindProperty(subProp);
+
+                    DropdownFieldLong r = new DropdownFieldLong(label, ele);
+                    r.AddToClassList(DropdownFieldLong.alignedFieldUssClassName);
+                    r.AddToClassList(ClassAllowDisable);
+
+                    UIToolkitUtils.AddContextualMenuManipulator(r, subProp, () => { });
+
+                    ele.Button.clicked += () => ClickDropdown(ele.Button, enumMetaInfo, Enum.ToObject(enumMetaInfo.EnumType, subProp.longValue), v =>
+                    {
+                        subProp.longValue = (long)v;
+                        subProp.serializedObject.ApplyModifiedProperties();
+                    });
+
+                    return r;
+                }
+                case SaintsPropertyType.EnumULong:
+                {
+                    EnumMetaInfo enumMetaInfo = GetEnumMetaInfo(targetType);
+                    DropdownButtonULongElement ele = new DropdownButtonULongElement(enumMetaInfo);
+                    SerializedProperty subProp = saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
+                    ele.BindProperty(subProp);
+
+                    DropdownFieldULong r = new DropdownFieldULong(label, ele);
+                    r.AddToClassList(DropdownFieldULong.alignedFieldUssClassName);
+                    r.AddToClassList(ClassAllowDisable);
+
+                    UIToolkitUtils.AddContextualMenuManipulator(r, subProp, () => { });
+
+                    ele.Button.clicked += () => ClickDropdown(ele.Button, enumMetaInfo, Enum.ToObject(enumMetaInfo.EnumType, subProp.ulongValue), v =>
+                    {
+                        subProp.ulongValue = (ulong)v;
+                        subProp.serializedObject.ApplyModifiedProperties();
+                    });
+
+                    return r;
+                }
+                case SaintsPropertyType.Undefined:
+                default:
+                    return null;
+            }
+        }
+
+        private static EnumMetaInfo GetEnumMetaInfo(Type enumType)
+        {
+            bool isFlags = Attribute.IsDefined(enumType, typeof(FlagsAttribute));
+            List<EnumMetaInfo.EnumValueInfo> enumNormalValues = new List<EnumMetaInfo.EnumValueInfo>();
+            EnumMetaInfo.EnumValueInfo nothingValue = new EnumMetaInfo.EnumValueInfo();
+            EnumMetaInfo.EnumValueInfo everythingValue = new EnumMetaInfo.EnumValueInfo();
+
+            bool isULong = enumType.GetEnumUnderlyingType() == typeof(ulong);
+
+            long longValue = 0;
+            ulong uLongValue = 0;
+
+            foreach ((object enumValue, string enumLabel, string enumRichLabel) in Util.GetEnumValues(enumType))
+            {
+                EnumMetaInfo.EnumValueInfo info = new EnumMetaInfo.EnumValueInfo(enumValue, enumRichLabel ?? enumLabel, enumLabel);
+                if (isFlags)
+                {
+                    if (isULong)
+                    {
+                        uLongValue |= (ulong)enumValue;
+                        if ((ulong)enumValue == 0)
+                        {
+                            nothingValue = info;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        long longEnumValue = Convert.ToInt64(enumValue);
+                        longValue |= longEnumValue;
+                        if (longEnumValue == 0)
+                        {
+                            nothingValue = info;
+                            continue;
+                        }
+                    }
+                }
+                enumNormalValues.Add(info);
+            }
+
+            // object everythingBit = Convert.ChangeType(isULong ? uLongValue : longValue, enumType.GetEnumUnderlyingType());
+            object everythingBit;
+
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (isULong)
+            {
+                everythingBit = Enum.ToObject(enumType, uLongValue);
+            }
+            else
+            {
+                everythingBit = Enum.ToObject(enumType, longValue);
+            }
+
+            int foundEverythingIndex = -1;
+            for (int everythingIndex = 0; everythingIndex < enumNormalValues.Count; everythingIndex++)
+            {
+                EnumMetaInfo.EnumValueInfo enumNormalValue = enumNormalValues[everythingIndex];
+                if (isFlags)
+                {
+                    // Debug.Log($"each={enumNormalValue.Value}/{(ulong)enumNormalValue.Value}; everythingBit={everythingBit}");
+                    if (enumNormalValue.Value.Equals(everythingBit))
+                    {
+                        everythingValue = enumNormalValue;
+                        foundEverythingIndex = everythingIndex;
+                        break;
+                    }
+                }
+            }
+
+            if (foundEverythingIndex != -1)
+            {
+                enumNormalValues.RemoveAt(foundEverythingIndex);
+            }
+
+            return new EnumMetaInfo(enumNormalValues, everythingValue, nothingValue, everythingBit, isFlags, enumType);
+        }
+
+        private static void ClickDropdown(VisualElement newDropdownButton, EnumMetaInfo enumMetaInfo, object curValue, Action<object> setterOrNull)
+        {
+            bool isULong = enumMetaInfo.UnderType == typeof(ulong);
+            #region MetaInfo
+
+            AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>("");
+            List<object> curValues = new List<object>();
+            bool containsEverythingOrNothing = false;
+
+            object zeroEnum = Enum.ToObject(enumMetaInfo.EnumType, 0);
+            if(enumMetaInfo.IsFlags)
+            {
+                if (enumMetaInfo.NothingValue.HasValue)
+                {
+                    enumDropdown.Add(enumMetaInfo.NothingValue.Label, enumMetaInfo.NothingValue.Value);
+                }
+                else
+                {
+                    enumDropdown.Add("Nothing", zeroEnum);
+                }
+
+                containsEverythingOrNothing = zeroEnum.Equals(curValue);
+
+                if (containsEverythingOrNothing)
+                {
+                    curValues.Add(zeroEnum);
+                }
+
+                if (enumMetaInfo.EverythingValue.HasValue)
+                {
+                    enumDropdown.Add(enumMetaInfo.EverythingValue.Label, enumMetaInfo.EverythingValue.Value);
+                }
+                else
+                {
+                    enumDropdown.Add("Everything", enumMetaInfo.EverythingBit);
+                }
+
+                if (!containsEverythingOrNothing)
+                {
+                    containsEverythingOrNothing = EnumFlagsUtil.IsOnObject(curValue, enumMetaInfo.EverythingBit,
+                        isULong);
+                    if (containsEverythingOrNothing)
+                    {
+                        curValues.Add(enumMetaInfo.EverythingBit);
+                    }
+                }
+
+                enumDropdown.AddSeparator();
+            }
+
+            foreach (EnumMetaInfo.EnumValueInfo enumInfo in enumMetaInfo.EnumValues)
+            {
+                // Debug.Log($"Add {enumInfo.Label} {enumInfo.Value}");
+                enumDropdown.Add(enumInfo.Label, enumInfo.Value);
+                if (!containsEverythingOrNothing)
+                {
+                    if (enumMetaInfo.IsFlags)
+                    {
+                        if (EnumFlagsUtil.IsOnObject(curValue, enumInfo.Value, isULong))
+                        {
+                            curValues.Add(enumInfo.Value);
+                        }
+                    }
+                    else
+                    {
+                        if (enumInfo.Value.Equals(curValue))
+                        {
+                            curValues.Add(curValue);
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            {
+                DropdownListValue = enumDropdown,
+                CurValues = curValues,
+                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                Error = "",
+            };
+
+            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(newDropdownButton.worldBound);
+
+            SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
+                metaInfo,
+                newDropdownButton.worldBound.width,
+                maxHeight,
+                false,
+                (curItem, on) =>
+                {
+                    // Debug.Log($"curItem={curItem}");
+                    // beforeSet?.Invoke(refDrawPayload.Value);
+                    if(setterOrNull != null)
+                    {
+                        object newValue;
+                        if (enumMetaInfo.IsFlags)
+                        {
+
+                            if (curItem.Equals(zeroEnum))
+                            {
+                                newValue = zeroEnum;
+                            }
+                            else if (curItem.Equals(enumMetaInfo.EverythingBit))
+                            {
+                                newValue = enumMetaInfo.EverythingBit;
+                            }
+                            else if (on)
+                            {
+                                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                                if (enumMetaInfo.EverythingBit.Equals(curValue))
+                                {
+                                    newValue = Convert.ChangeType(curItem, enumMetaInfo.UnderType);
+                                }
+                                else
+                                {
+                                    newValue = Convert.ChangeType(EnumFlagsUtil.SetOnBitObject(curValue, curItem, isULong), enumMetaInfo.UnderType);
+                                }
+                            }
+                            else
+                            {
+                                newValue = Convert.ChangeType(EnumFlagsUtil.SetOffBitObject(curValue, curItem, isULong), enumMetaInfo.UnderType);
+                            }
+                        }
+                        else
+                        {
+                            newValue = Convert.ChangeType(curItem, enumMetaInfo.UnderType);
+                        }
+
+                        setterOrNull(newValue);
+                    }
+                    return null;
+                }
+            );
+            UnityEditor.PopupWindow.Show(worldBound, sa);
         }
 
         public static VisualElement DrawEnumUIToolkit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)

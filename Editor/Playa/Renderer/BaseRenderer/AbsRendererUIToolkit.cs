@@ -1947,10 +1947,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             bool enabled = setterOrNull != null;
             // ReSharper disable once InvertIf
-            if (genFoldout.enabledSelf != enabled)
+            if (genFoldout.contentContainer.enabledSelf != enabled)
             {
-                genFoldout.SetEnabled(enabled);
-                genFoldout.AddToClassList(ClassSaintsFieldEditingDisabled);
+                genFoldout.contentContainer.SetEnabled(enabled);
+                genFoldout.contentContainer.AddToClassList(ClassSaintsFieldEditingDisabled);
             }
 
             return (useOld ? null : genFoldout, true);

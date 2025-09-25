@@ -13,6 +13,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             First = 1,
             Second = 1 << 1,
             Third = 1 << 2,
+            M12 = First | Second,
         }
 
         [Serializable, Flags]
@@ -22,6 +23,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             First = 1,
             Second = 1 << 1,
             Third = 1 << 2,
+            M12 = First | Second,
             All = First | Second | Third,
         }
 
@@ -34,12 +36,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             Third,
         }
 
+        [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
 
-        [NonSerialized, SaintsSerialized]
-        public LongEnum LongEnumPub;
-
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
+        // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
+        // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
         [NonSerialized, SaintsSerialized] private TestULongEnum _uLongEnumPri;
         [field: NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
 
@@ -51,11 +51,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
         [field: NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPropLis { get; private set; }
 
-        [Button]
-        private void InspectIt()
-        {
-            Debug.Log(ULongEnumPubArr);
-            Debug.Log(ULongEnumPubArr == null);
-        }
+        // [Button]
+        // private void InspectIt()
+        // {
+        //     Debug.Log(ULongEnumPubArr);
+        //     Debug.Log(ULongEnumPubArr == null);
+        // }
     }
 }

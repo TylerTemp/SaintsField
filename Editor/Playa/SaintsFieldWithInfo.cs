@@ -16,8 +16,6 @@ namespace SaintsField.Editor.Playa
 
         public SaintsRenderType RenderType;
 
-        public SerializedProperty SaintsSerializedProp;
-
         public SerializedProperty SerializedProperty;
 
         public string MemberId;

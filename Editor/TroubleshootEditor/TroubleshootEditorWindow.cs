@@ -294,7 +294,7 @@ namespace SaintsField.Editor.TroubleshootEditor
                     .ToDictionary(each => each, serializedObject.FindProperty);
             }
 
-            foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor.HelperGetSaintsFieldWithInfo(serializedPropertyDict, null, new[]{inspectTarget}))
+            foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor.HelperGetSaintsFieldWithInfo(serializedPropertyDict, new[]{inspectTarget}))
             {
                 // Debug.Log(saintsFieldWithInfo.RenderType);
                 if (saintsFieldWithInfo.RenderType == SaintsRenderType.SerializedField)
