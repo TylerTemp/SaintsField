@@ -315,6 +315,11 @@ namespace SaintsField.Editor
                                         MemberInfo serInfo = null;
                                         if (!saintsSerializedActualPathToMemberInfo.TryGetValue(thisName, out serInfo))
                                         {
+                                            if (!saintsSerializedActualPathToMemberInfo.ContainsKey(
+                                                    RuntimeUtil.GetAutoPropertyName(thisName)))
+                                            {
+                                                continue;
+                                            }
                                             serInfo = saintsSerializedActualPathToMemberInfo[RuntimeUtil.GetAutoPropertyName(thisName)];
                                         }
                                         Debug.Assert(serInfo != null, fieldInfo.Name);

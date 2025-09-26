@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
@@ -50,6 +49,14 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
         [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
         [field: NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPropLis { get; private set; }
+
+        // [Serializable]
+        // public struct Nested1
+        // {
+        //     [NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumPub;
+        // }
+        //
+        // [SaintsSerialized] public Nested1 nested1;
 
         // [Button]
         // private void InspectIt()

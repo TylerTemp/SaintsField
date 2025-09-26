@@ -12,7 +12,7 @@ namespace SaintsField.Utils
         {
             if (!type.IsEnum)
             {
-                return default;
+                return new SaintsSerializedProperty();
             }
 
             Type underType = Enum.GetUnderlyingType(type);
