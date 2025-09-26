@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.UIToolkitElements;
@@ -238,7 +239,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 {
                     label = label[..^"__Saints Serialized__".Length];
                 }
-                VisualElement renderSerializedActual = RenderSerializedActual(label, property, info, saintsSerializedActual.PathType);
+                VisualElement renderSerializedActual = RenderSerializedActual(label, property, info, saintsSerializedActual.PathType, SerializedUtils.GetFieldInfoAndDirectParent(property).parent);
                 root.Add(renderSerializedActual);
                 return;
             }
@@ -326,7 +327,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 #endif
         }
 
-        private static VisualElement RenderSerializedActual(string label, SerializedProperty property, MemberInfo serInfo, Type targetType)
+        private static VisualElement RenderSerializedActual(string label, SerializedProperty property, MemberInfo serInfo, Type targetType, object parent)
         {
             SaintsPropertyType propertyType = (SaintsPropertyType)property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
 
@@ -335,7 +336,30 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 case SaintsPropertyType.EnumLong:
                 case SaintsPropertyType.EnumULong:
                 {
-                    return TreeDropdownAttributeDrawer.RenderSerializedActual(label, property, targetType);
+                    PropertyAttribute[] attributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(serInfo);
+                    EnumToggleButtonsAttribute enumToggle = null;
+                    FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
+                    FlagsDropdownAttribute flagsDropdownAttribute = null;
+                    foreach (PropertyAttribute attribute in attributes)
+                    {
+                        switch (attribute)
+                        {
+                            case EnumToggleButtonsAttribute et:
+                                enumToggle = et;
+                                break;
+                            case FlagsTreeDropdownAttribute ftd:
+                                flagsTreeDropdownAttribute = ftd;
+                                break;
+                            case FlagsDropdownAttribute fd:
+                                flagsDropdownAttribute = fd;
+                                break;
+                        }
+                    }
+                    if (enumToggle != null)
+                    {
+                        return EnumToggleButtonsAttributeDrawer.RenderSerializedActual(enumToggle, label, property, serInfo, targetType, parent);
+                    }
+                    return TreeDropdownAttributeDrawer.RenderSerializedActual((ISaintsAttribute)flagsTreeDropdownAttribute ?? flagsDropdownAttribute, label, property, targetType);
                     // return null;
                 }
                 case SaintsPropertyType.Undefined:

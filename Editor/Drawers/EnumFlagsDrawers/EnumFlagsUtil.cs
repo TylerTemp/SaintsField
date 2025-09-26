@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 
@@ -184,6 +185,16 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             return curValue | bitValue;
         }
 
+        public static object ToggleBitObject(object curValue, object bitValue, bool isULong)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (IsOnObject(curValue, bitValue, isULong))
+            {
+                return SetOffBitObject(curValue, bitValue, isULong);
+            }
+            return SetOnBitObject(curValue, bitValue, isULong);
+        }
+
         public static int SetOffBit(int curValue, int bitValue)
         {
             int fullBits = curValue | bitValue;
@@ -223,6 +234,83 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                 long fullBits = (long)curValue | (long)curItem;
                 return fullBits ^ (long)curItem;
             }
+        }
+
+        public static EnumMetaInfo GetEnumMetaInfo(Type enumType)
+        {
+            bool isFlags = Attribute.IsDefined(enumType, typeof(FlagsAttribute));
+            List<EnumMetaInfo.EnumValueInfo> enumNormalValues = new List<EnumMetaInfo.EnumValueInfo>();
+            EnumMetaInfo.EnumValueInfo nothingValue = new EnumMetaInfo.EnumValueInfo();
+            EnumMetaInfo.EnumValueInfo everythingValue = new EnumMetaInfo.EnumValueInfo();
+
+            bool isULong = enumType.GetEnumUnderlyingType() == typeof(ulong);
+
+            long longValue = 0;
+            ulong uLongValue = 0;
+
+            foreach ((object enumValue, string enumLabel, string enumRichLabel) in Util.GetEnumValues(enumType))
+            {
+                EnumMetaInfo.EnumValueInfo info = new EnumMetaInfo.EnumValueInfo(enumValue, enumRichLabel ?? enumLabel, enumLabel);
+                if (isFlags)
+                {
+                    if (isULong)
+                    {
+                        uLongValue |= (ulong)enumValue;
+                        if ((ulong)enumValue == 0)
+                        {
+                            nothingValue = info;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        long longEnumValue = Convert.ToInt64(enumValue);
+                        longValue |= longEnumValue;
+                        if (longEnumValue == 0)
+                        {
+                            nothingValue = info;
+                            continue;
+                        }
+                    }
+                }
+                enumNormalValues.Add(info);
+            }
+
+            // object everythingBit = Convert.ChangeType(isULong ? uLongValue : longValue, enumType.GetEnumUnderlyingType());
+            object everythingBit;
+
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (isULong)
+            {
+                everythingBit = Enum.ToObject(enumType, uLongValue);
+            }
+            else
+            {
+                everythingBit = Enum.ToObject(enumType, longValue);
+            }
+
+            int foundEverythingIndex = -1;
+            for (int everythingIndex = 0; everythingIndex < enumNormalValues.Count; everythingIndex++)
+            {
+                EnumMetaInfo.EnumValueInfo enumNormalValue = enumNormalValues[everythingIndex];
+                if (isFlags)
+                {
+                    // Debug.Log($"each={enumNormalValue.Value}/{(ulong)enumNormalValue.Value}; everythingBit={everythingBit}");
+                    if (enumNormalValue.Value.Equals(everythingBit))
+                    {
+                        everythingValue = enumNormalValue;
+                        foundEverythingIndex = everythingIndex;
+                        break;
+                    }
+                }
+            }
+
+            if (foundEverythingIndex != -1)
+            {
+                enumNormalValues.RemoveAt(foundEverythingIndex);
+            }
+
+            return new EnumMetaInfo(enumNormalValues, everythingValue, nothingValue, everythingBit, isFlags, enumType);
         }
     }
 }

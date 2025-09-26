@@ -266,7 +266,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             return expandButton;
         }
 
-        private static Button CreateExpandButtonUIToolkit()
+        public static Button CreateExpandButtonUIToolkit()
         {
             Button expandButton = new Button
             {

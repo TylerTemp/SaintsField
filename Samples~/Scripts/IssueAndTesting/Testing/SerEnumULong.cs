@@ -18,7 +18,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [Serializable, Flags]
         public enum TestULongEnum: ulong
         {
-            None = 0,
+            No = 0,
             First = 1,
             Second = 1 << 1,
             Third = 1 << 2,
@@ -37,8 +37,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
         [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
 
-        // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
-        // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
+        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
+        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
         [NonSerialized, SaintsSerialized] private TestULongEnum _uLongEnumPri;
         [field: NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
 

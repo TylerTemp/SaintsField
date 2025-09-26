@@ -5,6 +5,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Utils;
+using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -21,7 +22,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             public object Value;
         }
 
-        public static VisualElement RenderSerializedActual(string label, SerializedProperty saintsProperty, Type targetType)
+        public static VisualElement RenderSerializedActual(ISaintsAttribute _, string label, SerializedProperty saintsProperty, Type targetType)
         {
             SaintsPropertyType propertyType = (SaintsPropertyType)saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
 
@@ -29,7 +30,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             {
                 case SaintsPropertyType.EnumLong:
                 {
-                    EnumMetaInfo enumMetaInfo = GetEnumMetaInfo(targetType);
+                    EnumMetaInfo enumMetaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
                     DropdownButtonLongElement ele = new DropdownButtonLongElement(enumMetaInfo);
                     SerializedProperty subProp = saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
                     ele.BindProperty(subProp);
@@ -50,7 +51,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
                 case SaintsPropertyType.EnumULong:
                 {
-                    EnumMetaInfo enumMetaInfo = GetEnumMetaInfo(targetType);
+                    EnumMetaInfo enumMetaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
                     DropdownButtonULongElement ele = new DropdownButtonULongElement(enumMetaInfo);
                     SerializedProperty subProp = saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
                     ele.BindProperty(subProp);
@@ -73,83 +74,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 default:
                     return null;
             }
-        }
-
-        private static EnumMetaInfo GetEnumMetaInfo(Type enumType)
-        {
-            bool isFlags = Attribute.IsDefined(enumType, typeof(FlagsAttribute));
-            List<EnumMetaInfo.EnumValueInfo> enumNormalValues = new List<EnumMetaInfo.EnumValueInfo>();
-            EnumMetaInfo.EnumValueInfo nothingValue = new EnumMetaInfo.EnumValueInfo();
-            EnumMetaInfo.EnumValueInfo everythingValue = new EnumMetaInfo.EnumValueInfo();
-
-            bool isULong = enumType.GetEnumUnderlyingType() == typeof(ulong);
-
-            long longValue = 0;
-            ulong uLongValue = 0;
-
-            foreach ((object enumValue, string enumLabel, string enumRichLabel) in Util.GetEnumValues(enumType))
-            {
-                EnumMetaInfo.EnumValueInfo info = new EnumMetaInfo.EnumValueInfo(enumValue, enumRichLabel ?? enumLabel, enumLabel);
-                if (isFlags)
-                {
-                    if (isULong)
-                    {
-                        uLongValue |= (ulong)enumValue;
-                        if ((ulong)enumValue == 0)
-                        {
-                            nothingValue = info;
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        long longEnumValue = Convert.ToInt64(enumValue);
-                        longValue |= longEnumValue;
-                        if (longEnumValue == 0)
-                        {
-                            nothingValue = info;
-                            continue;
-                        }
-                    }
-                }
-                enumNormalValues.Add(info);
-            }
-
-            // object everythingBit = Convert.ChangeType(isULong ? uLongValue : longValue, enumType.GetEnumUnderlyingType());
-            object everythingBit;
-
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (isULong)
-            {
-                everythingBit = Enum.ToObject(enumType, uLongValue);
-            }
-            else
-            {
-                everythingBit = Enum.ToObject(enumType, longValue);
-            }
-
-            int foundEverythingIndex = -1;
-            for (int everythingIndex = 0; everythingIndex < enumNormalValues.Count; everythingIndex++)
-            {
-                EnumMetaInfo.EnumValueInfo enumNormalValue = enumNormalValues[everythingIndex];
-                if (isFlags)
-                {
-                    // Debug.Log($"each={enumNormalValue.Value}/{(ulong)enumNormalValue.Value}; everythingBit={everythingBit}");
-                    if (enumNormalValue.Value.Equals(everythingBit))
-                    {
-                        everythingValue = enumNormalValue;
-                        foundEverythingIndex = everythingIndex;
-                        break;
-                    }
-                }
-            }
-
-            if (foundEverythingIndex != -1)
-            {
-                enumNormalValues.RemoveAt(foundEverythingIndex);
-            }
-
-            return new EnumMetaInfo(enumNormalValues, everythingValue, nothingValue, everythingBit, isFlags, enumType);
         }
 
         private static void ClickDropdown(VisualElement newDropdownButton, EnumMetaInfo enumMetaInfo, object curValue, Action<object> setterOrNull)

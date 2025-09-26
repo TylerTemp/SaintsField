@@ -116,15 +116,27 @@ namespace SaintsField.Editor.Core
             //         Index = index,
             //     })
             //     .ToArray();
-            SaintsPropertyDrawers = iSaintsAttributes
-                // .WithIndex()
-                .Select((value, index) => new SaintsPropertyInfo
+            List<SaintsPropertyInfo> saintsPropertyDrawers = new List<SaintsPropertyInfo>();
+            bool alreadyHasFieldDrawer = false;
+            foreach ((ISaintsAttribute value, int index) in iSaintsAttributes.WithIndex())
+            {
+                if (value.AttributeType == SaintsAttributeType.Field)  // we only want one field drawer
+                {
+                    if (alreadyHasFieldDrawer)
+                    {
+                        continue;
+                    }
+                    alreadyHasFieldDrawer = true;
+                }
+                saintsPropertyDrawers.Add(new SaintsPropertyInfo
                 {
                     Drawer = GetOrCreateSaintsDrawerByAttr(value),
                     Attribute = value,
                     Index = index,
-                })
-                .ToList();
+                });
+            }
+
+            SaintsPropertyDrawers = saintsPropertyDrawers;
 
             // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
             if (string.IsNullOrEmpty(GetPreferredLabel(property)))
