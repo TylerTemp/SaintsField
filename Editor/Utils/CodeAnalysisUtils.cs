@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SaintsField.Editor.Linq;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEngine;
 
 #if SAINTSFIELD_CODE_ANALYSIS
@@ -90,10 +91,86 @@ namespace SaintsField.Editor.Utils
             // MonoScript ms = AssetDatabase.LoadAssetAtPath<MonoScript>("Assets/SaintsField/Samples/Scripts/SaintsEditor/Testing/MixLayoutTest.cs");
             string programText = ms.ToString();
 
+            BuildTargetGroup targetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+            NamedBuildTarget namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(targetGroup);
+            PlayerSettings.GetScriptingDefineSymbols(namedBuildTarget, out string[] defines);
+
+            List<string> definesList = defines.ToList();
+
+            #region Version Defines
+#if UNITY_2019_1_OR_NEWER
+            definesList.Add("UNITY_2019_1_OR_NEWER");
+#endif
+#if UNITY_2019_2_OR_NEWER
+            definesList.Add("UNITY_2019_2_OR_NEWER");
+#endif
+#if UNITY_2019_3_OR_NEWER
+            definesList.Add("UNITY_2019_3_OR_NEWER");
+#endif
+#if UNITY_2019_4_OR_NEWER
+            definesList.Add("UNITY_2019_4_OR_NEWER");
+#endif
+#if UNITY_2020_1_OR_NEWER
+            definesList.Add("UNITY_2020_1_OR_NEWER");
+#endif
+#if UNITY_2020_2_OR_NEWER
+            definesList.Add("UNITY_2020_2_OR_NEWER");
+#endif
+#if UNITY_2020_3_OR_NEWER
+            definesList.Add("UNITY_2020_3_OR_NEWER");
+#endif
+#if UNITY_2021_1_OR_NEWER
+            definesList.Add("UNITY_2021_1_OR_NEWER");
+#endif
+#if UNITY_2021_2_OR_NEWER
+            definesList.Add("UNITY_2021_2_OR_NEWER");
+#endif
+#if UNITY_2021_3_OR_NEWER
+            definesList.Add("UNITY_2021_3_OR_NEWER");
+#endif
+#if UNITY_2022_1_OR_NEWER
+            definesList.Add("UNITY_2022_1_OR_NEWER");
+#endif
+#if UNITY_2022_2_OR_NEWER
+            definesList.Add("UNITY_2022_2_OR_NEWER");
+#endif
+#if UNITY_2022_3_OR_NEWER
+            definesList.Add("UNITY_2022_3_OR_NEWER");
+#endif
+#if UNITY_2023_1_OR_NEWER
+            definesList.Add("UNITY_2023_1_OR_NEWER");
+#endif
+#if UNITY_2023_2_OR_NEWER
+            definesList.Add("UNITY_2023_2_OR_NEWER");
+#endif
+#if UNITY_2023_3_OR_NEWER
+            definesList.Add("UNITY_2023_3_OR_NEWER");
+#endif
+#if UNITY_6000_1_OR_NEWER
+            definesList.Add("UNITY_6000_1_OR_NEWER");
+#endif
+#if UNITY_6000_2_OR_NEWER
+            definesList.Add("UNITY_6000_2_OR_NEWER");
+#endif
+#if UNITY_6000_3_OR_NEWER
+            definesList.Add("UNITY_6000_3_OR_NEWER");
+#endif
+            #endregion
+
+            definesList.Insert(0, "UNITY_EDITOR");
+
+            string[] preprocessorSymbols = definesList.ToArray();
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
+            Debug.Log(
+                $"[define] {string.Join("; ", preprocessorSymbols)}");
+#endif
+            CSharpParseOptions options = new CSharpParseOptions(preprocessorSymbols: preprocessorSymbols);
+
             SyntaxTree tree;
             try
             {
-                tree = CSharpSyntaxTree.ParseText(programText);
+                tree = CSharpSyntaxTree.ParseText(programText, options);
             }
             catch (Exception e)
             {
@@ -115,6 +192,9 @@ namespace SaintsField.Editor.Utils
                         break;
                     case SyntaxKind.ClassDeclaration:
                         yield return ParseClass((ClassDeclarationSyntax)memberDeclarationSyntax, null);
+                        break;
+                    default:
+                        Debug.Log(memberDeclarationSyntax.Kind());
                         break;
                 }
             }
