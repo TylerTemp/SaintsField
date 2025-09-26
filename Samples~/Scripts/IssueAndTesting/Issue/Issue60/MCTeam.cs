@@ -14,11 +14,30 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue46
     // [CreateAssetMenu]
     public class MCTeam: SaintsScriptableObject
     {
+        [Serializable]
+        public class TeamCounter
+        {
+            [Layout("team counter",ELayout.Horizontal)] [Required, Expandable]
+            public MCTeam team;
+            [ProgressBar(-20,20,step: 1f,colorCallback: nameof(FillColor))]   public float  affinity;
+            public ALLIANCETYPE alliance
+            {
+                get {
+                    if(affinity>neutralRange.y) return ALLIANCETYPE.FRIEND;
+                    else
+                    if(affinity<neutralRange.x) return ALLIANCETYPE.ENEMY;
+                    else return ALLIANCETYPE.NEUTRAL;
+                }
+            }
+            [HideInInspector] public Vector2 neutralRange;
+            EColor FillColor() => alliance==ALLIANCETYPE.ENEMY ? EColor.Red : (alliance==ALLIANCETYPE.FRIEND ? EColor.Green : EColor.Gray);
+        }
+
         [Layer]
-        public int mainLayer
-            ,agentLayer;
+        public int mainLayer, agentLayer;
         [Tooltip("for physics raycast, <everything> is fine but setting it can help optimize")] public LayerMask         layers;
-        public                                                                                         List<TeamCounter> alliances;
+        [ListDrawerSettings]
+        public List<TeamCounter> alliances;
         [MinMaxSlider(-10,10)] //, free:true)]
         public Vector2 neutralRange = new Vector2(-1,1);
 #if UNITY_EDITOR
@@ -51,23 +70,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue46
             return (teamCounter.alliance,teamCounter.affinity);
         }
 
-        [Serializable]
-        public class TeamCounter
-        {
-            [Layout("team counter",ELayout.Horizontal)] [Required,Expandable] public MCTeam team;
-            [ProgressBar(-20,20,step: 1f,colorCallback: nameof(FillColor))]   public float  affinity;
-            public ALLIANCETYPE alliance
-            {
-                get {
-                    if(affinity>neutralRange.y) return ALLIANCETYPE.FRIEND;
-                    else
-                    if(affinity<neutralRange.x) return ALLIANCETYPE.ENEMY;
-                    else return ALLIANCETYPE.NEUTRAL;
-                }
-            }
-            [HideInInspector] public Vector2 neutralRange;
-            EColor FillColor() => alliance==ALLIANCETYPE.ENEMY ? EColor.Red : (alliance==ALLIANCETYPE.FRIEND ? EColor.Green : EColor.Gray);
-        }
+
     }
 
 }

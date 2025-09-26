@@ -29,11 +29,7 @@ namespace SaintsField.Editor.Utils
 
         #region Config
 
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Create or Edit SaintsField Config")]
-#else
-        [MenuItem("Window/Saints/Create or Edit SaintsField Config")]
-#endif
+        [MenuItem(MENU_ROOT + "Create or Edit SaintsField Config")]
         public static void CreateOrEditSaintsFieldConfig()
         {
             SaintsFieldConfig saintsFieldConfig;
@@ -370,6 +366,14 @@ namespace SaintsField.Editor.Utils
 #endif
 
         #endregion
+
+#if SAINTSFIELD_DEBUG
+        [MenuItem(MENU_ROOT + "IMGUI Debugger" )]
+        public static void OpenIMGUIDebugger()
+        {
+            EditorWindow.GetWindow(Type.GetType("UnityEditor.GUIViewDebuggerWindow,UnityEditor")).Show();
+        }
+#endif
 
         // ReSharper disable once UnusedMember.Local
         public static void AddCompileDefine(string newDefineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)
