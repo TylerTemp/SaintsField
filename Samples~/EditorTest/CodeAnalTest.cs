@@ -8,10 +8,12 @@ namespace SaintsField
 {
     public class CodeAnalTest: SaintsMonoBehaviour
     {
+        public MonoScript ms;
+
         [Button]
-        private CodeAnalysisUtils.ClassContainer[] Run()
+        private CodeAnalysisUtils.ClassContainer Run()
         {
-            return CodeAnalysisUtils.Parse(AssetDatabase.LoadAssetAtPath<MonoScript>("Assets/SaintsField/Samples/Scripts/SaintsEditor/Testing/MixLayoutTest.cs")).ToArray();
+            return CodeAnalysisUtils.Parse(ms).First();
         }
     }
 }
