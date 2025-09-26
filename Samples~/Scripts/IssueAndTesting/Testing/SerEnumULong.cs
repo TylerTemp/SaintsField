@@ -38,6 +38,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
 
         [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
+        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum[] ULongEnumPubs;
         [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
         [NonSerialized, SaintsSerialized] private TestULongEnum _uLongEnumPri;
         [field: NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
