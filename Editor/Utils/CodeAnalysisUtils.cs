@@ -92,8 +92,13 @@ namespace SaintsField.Editor.Utils
             string programText = ms.ToString();
 
             BuildTargetGroup targetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+#if UNITY_2022_3_OR_NEWER
             NamedBuildTarget namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(targetGroup);
             PlayerSettings.GetScriptingDefineSymbols(namedBuildTarget, out string[] defines);
+#else
+            string currentSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
+            string[] defines = currentSymbols.Split(';').Select(each => each.Trim()).ToArray();
+#endif
 
             List<string> definesList = defines.ToList();
 
