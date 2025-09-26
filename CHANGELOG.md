@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.32.1 ##
+
+1.  UI Toolkit: `long`/`ulong` enum type now support:
+    *   works with other attributes now
+    *   list now have a item count like a normal list
+    *   right click context menu now works
+    *   prefab changing indicator is working now
+2.  Fix code analysis not parsing marcos in source code
+3.  Code analysis now skip targets which are not in `Assets` folder
+
 ## 4.32.0 ##
 
 **WE ARE FINALLY HERE!** Again...

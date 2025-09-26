@@ -103,9 +103,15 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.32.0**
+**4.32.1**
 
-UI Toolkit: You can now serialize a long/ulong type of `enum`, which is not supported by Unity. Please read "Extended Serialization" section for more info.
+1.  UI Toolkit: `long`/`ulong` enum type now support:
+    *   works with other attributes now
+    *   list now have a item count like a normal list
+    *   right click context menu now works
+    *   prefab changing indicator is working now
+2.  Fix code analysis not parsing marcos in source code
+3.  Code analysis now skip targets which are not in `Assets` folder
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -7255,10 +7261,10 @@ This can work with `EnumToggleButtons`.
 
 Note some limit:
 
-*   It can only work with `EnumToggleButtons`. **All** other field-based attributes like `InfoBox`, `OnValueChanged` etc are unsupported. It works with any `Playa` (Editor level) attributes.
+*   (Fixed) ~~It can only work with `EnumToggleButtons`. **All** other field-based attributes like `InfoBox`, `OnValueChanged` etc are unsupported. It works with any `Playa` (Editor level) attributes.~~
 *   `FormerlySerializedAs` does nothing on it.
 *   Careful before trying it in a product case.
-*   list/array type won't have a size input (as it's unfinished yet)
+*   (Fixed) ~~list/array type won't have a size input (as it's unfinished yet)~~
 
 ## `SaintsEditorWindow` ##
 
