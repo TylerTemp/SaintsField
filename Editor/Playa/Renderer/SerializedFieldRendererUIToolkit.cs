@@ -1,7 +1,9 @@
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
 using System.Collections.Generic;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
+using SaintsField.SaintsSerialization;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -16,11 +18,27 @@ namespace SaintsField.Editor.Playa.Renderer
         private VisualElement _fieldElement;
         protected override (VisualElement target, bool needUpdate) CreateSerializedUIToolkit()
         {
+            string label = null;
+            if (!NoLabel)
+            {
+                label = FieldWithInfo.SerializedProperty.displayName;
+                Type elementType = FieldWithInfo.FieldInfo.FieldType;
+                if (FieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic &&
+                    FieldWithInfo.SerializedProperty.isArray)
+                {
+                    elementType = ReflectUtils.GetElementType(elementType);
+                }
+
+                if (elementType == typeof(SaintsSerializedProperty) && label.EndsWith("__Saints Serialized__"))
+                {
+                    label = label[..^"__Saints Serialized__".Length];
+                }
+            }
             VisualElement r = UIToolkitUtils.CreateOrUpdateFieldProperty(
                 FieldWithInfo.SerializedProperty,
                 ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo),
                 FieldWithInfo.FieldInfo.FieldType,
-                NoLabel? null: FieldWithInfo.SerializedProperty.displayName,
+                label,
                 FieldWithInfo.FieldInfo,
                 InAnyHorizontalLayout,
                 this,
