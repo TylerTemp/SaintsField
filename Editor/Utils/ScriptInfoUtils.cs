@@ -34,8 +34,7 @@ namespace SaintsField.Editor.Utils
             return Array.Empty<CodeAnalysisUtils.MemberContainer>();
         }
 
-#if SAINTSFIELD_CODE_ANALYSIS
-        private static (bool found, MonoScript script) GetMonoScriptFromType(Type type)
+        public static (bool found, MonoScript script) GetMonoScriptFromType(Type type)
         {
             if(!typeof(Component).IsAssignableFrom(type) && !typeof(ScriptableObject).IsAssignableFrom(type))
             {
@@ -54,6 +53,5 @@ namespace SaintsField.Editor.Utils
 
             return (false, null);
         }
-#endif
     }
 }

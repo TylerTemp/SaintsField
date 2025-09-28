@@ -239,9 +239,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 {
                     label = label[..^"__Saints Serialized__".Length];
                 }
-                VisualElement renderSerializedActual = RenderSerializedActual(label, property, info, saintsSerializedActual.PathType, SerializedUtils.GetFieldInfoAndDirectParent(property).parent);
-                root.Add(renderSerializedActual);
-                return;
+                // VisualElement renderSerializedActual = RenderSerializedActual(label, property, info, saintsSerializedActual.PathType, SerializedUtils.GetFieldInfoAndDirectParent(property).parent);
+                // root.Add(renderSerializedActual);
+                // return;
             }
 
             // Debug.Log($"{property.propertyPath}: {inHorizontalLayout}");

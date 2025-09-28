@@ -289,7 +289,7 @@ namespace SaintsField.Editor.Core
                                             foreach (string attrName in subFields)
                                             {
                                                 MemberInfo accMemberInfo = null;
-                                                foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(accParent))
+                                                foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
                                                 {
                                                     foreach (MemberInfo info in type.GetMember(attrName,
                                                                  BindingFlags.Public | BindingFlags.NonPublic |

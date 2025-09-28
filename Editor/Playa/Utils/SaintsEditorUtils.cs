@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.Condition;
+using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
+using SaintsField.SaintsSerialization;
+using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor.Playa.Utils
@@ -115,6 +119,223 @@ namespace SaintsField.Editor.Playa.Utils
 #endif
 
             return (showIfResult, disableIfResult);
+        }
+
+        public static (string filePath, IReadOnlyList<SerializedInfo> serializedInfos) GetSaintsSerialized(Type monoClass)
+        {
+            (bool found, MonoScript script) = ScriptInfoUtils.GetMonoScriptFromType(monoClass);
+            // Debug.Log($"type={monoClass}, script={script}");
+            if (!found)
+            {
+                return default;
+            }
+            string filePath = AssetDatabase.GetAssetPath(script).Replace("\\", "/");
+            // Debug.Log(filePath);
+            if(!filePath.ToLower().StartsWith("assets/"))
+            {
+                return default;
+            }
+
+            string mainFilePath = filePath.Substring("Assets/".Length, filePath.Length - "Assets/".Length);
+
+            List<Type> types = ReflectUtils.GetSelfAndBaseTypesFromType(monoClass);
+
+            List<SerializedInfo> results = new List<SerializedInfo>();
+
+            // Debug.Log($"main={monoClass}; types={string.Join(", ", types)}");
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (Type type in types)
+            {
+                // Debug.Log(type);
+                MemberInfo[] memberLis = type
+                    .GetMembers(BindingFlags.Instance | BindingFlags.NonPublic |
+                                BindingFlags.Public | BindingFlags.DeclaredOnly);
+
+                foreach (MemberInfo memberInfo in memberLis)
+                {
+                    if (memberInfo.Name.StartsWith("<") && memberInfo.Name.EndsWith(">k__BackingField"))
+                    {
+                        continue;
+                    }
+
+                    SerializedInfo result;
+                    switch (memberInfo)
+                    {
+                        case FieldInfo fi:
+                        {
+                            result = GetSerializedInfo(fi, false, fi.FieldType);
+                            // Debug.Log($"{fi.FieldType.IsArray}.{fi.FieldType}");
+                        }
+                            break;
+                        case PropertyInfo pi:
+                        {
+                            result = GetSerializedInfo(pi, true, pi.PropertyType);
+                            // Debug.Log($"{pi.PropertyType.IsArray}.{pi.PropertyType.IsArray}");
+                        }
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    if (result != null)
+                    {
+                        results.Add(result);
+                    }
+                }
+            }
+
+            // return results.Count > 0? (mainFilePath, results): default;
+            return (mainFilePath, results);
+        }
+
+        private static SerializedInfo GetSerializedInfo(MemberInfo memberInfo, bool isProperty, Type targetType)
+        {
+            if (targetType == typeof(SaintsSerializedProperty))
+            {
+                return null;
+            }
+
+            Attribute[] attributes = ReflectCache.GetCustomAttributes<Attribute>(memberInfo);
+            bool hasNonSer = false;
+            bool hasSaintsSer = false;
+            foreach (Attribute attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case NonSerializedAttribute:
+                        hasNonSer = true;
+                        break;
+                    case SaintsSerializedAttribute:
+                        hasSaintsSer = true;
+                        break;
+                }
+            }
+
+            if (hasNonSer && !hasSaintsSer)
+            {
+                return null;
+            }
+
+            SaintsTargetCollection targetCollection = SaintsTargetCollection.FieldOrProperty;
+            Type elementType = null;
+            if (targetType.IsArray)
+            {
+                targetCollection = SaintsTargetCollection.Array;
+                elementType = targetType.GetElementType();
+            }
+            else
+            {
+                Type lisType = GetList(targetType);
+                // ReSharper disable once InvertIf
+                if (lisType != null)
+                {
+                    targetCollection = SaintsTargetCollection.List;
+                    elementType = lisType.GetGenericArguments()[0];
+                }
+            }
+
+            Type checkingType = targetCollection == SaintsTargetCollection.FieldOrProperty
+                ? targetType
+                : elementType;
+
+            // ReSharper disable once PossibleNullReferenceException
+            bool checkingIsEnum = checkingType.IsEnum;
+
+            if (!checkingIsEnum && IsGeneralClassOrStruct(checkingType))
+            {
+                if (!checkingType.IsDefined(typeof(SerializableAttribute)))
+                {
+                    return null;
+                }
+
+                SerializedInfo r = new SerializedInfo(memberInfo.Name, isProperty, targetCollection, SaintsPropertyType.ClassOrStruct);
+
+                // class/struct check
+                foreach (MemberInfo subMember in checkingType
+                             .GetMembers(BindingFlags.Instance | BindingFlags.NonPublic |
+                                         BindingFlags.Public | BindingFlags.DeclaredOnly))
+                {
+                    SerializedInfo subSerInfo;
+                    switch (subMember)
+                    {
+                        case FieldInfo fi:
+                            subSerInfo = GetSerializedInfo(fi, false, fi.FieldType);
+                            break;
+                        case PropertyInfo pi:
+                            subSerInfo = GetSerializedInfo(pi, true, pi.PropertyType);
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    if (subSerInfo != null)
+                    {
+                        r.SubFields.Add(subSerInfo);
+                    }
+                }
+
+                return r.SubFields.Count > 0 ? r : null;
+            }
+
+            if (!checkingIsEnum)
+            {
+                return null;
+            }
+
+            Type underType = checkingType.GetEnumUnderlyingType();
+            bool isLong = underType == typeof(long);
+            bool isULong = underType == typeof(ulong);
+            if (isLong)
+            {
+                return new SerializedInfo(memberInfo.Name, isProperty, targetCollection,
+                    SaintsPropertyType.EnumLong);
+            }
+
+            if (isULong)
+            {
+                return new SerializedInfo(memberInfo.Name, isProperty, targetCollection,
+                    SaintsPropertyType.EnumULong);
+            }
+
+            return null;
+        }
+
+        private static Type GetList(Type currentType)
+        {
+            if (!typeof(IEnumerable).IsAssignableFrom(currentType))
+            {
+                return null;
+            }
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (Type baseType in ReflectUtils.GetGenBaseTypes(currentType))
+            {
+                if (baseType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    return baseType;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsGeneralClassOrStruct(Type type)
+        {
+            if (typeof(UnityEngine.Object).IsAssignableFrom(type))
+            {
+                return false;
+            }
+
+            if (type == typeof(SaintsSerializedProperty))
+            {
+                return false;
+            }
+
+            if (type.IsPrimitive || type == typeof(string) || type == typeof(decimal) || type.IsEnum)
+            {
+                return false;
+            }
+            return type.IsClass || (type.IsValueType && !type.IsPrimitive && !type.IsEnum);
         }
     }
 }

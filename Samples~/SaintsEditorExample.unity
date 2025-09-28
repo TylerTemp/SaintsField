@@ -2512,6 +2512,7 @@ GameObject:
   m_Component:
   - component: {fileID: 889525105}
   - component: {fileID: 889525106}
+  - component: {fileID: 889525107}
   m_Layer: 0
   m_Name: CodeAnal
   m_TagString: Untagged
@@ -2546,6 +2547,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce80c99e8ba440c580d745ce53147594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples.EditorTest::SaintsField.CodeAnalTest
+  ms: {fileID: 0}
+--- !u!114 &889525107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 889525104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7e088744d9886940a1d461b07102b56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples.EditorTest::SaintsField.Samples.EditorTest.CodeSerTest
 --- !u!1 &898746881
 GameObject:
   m_ObjectHideFlags: 0

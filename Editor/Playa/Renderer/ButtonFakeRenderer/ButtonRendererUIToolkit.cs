@@ -115,7 +115,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         {
                             return;
                         }
-
                         VisualElement r = UIToolkitValueEdit(
                             paraContainer.Children().FirstOrDefault(),
                             parameterInfo.Name,
@@ -132,7 +131,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                                 }
                             },
                             false,
-                            true,
+                            InAnyHorizontalLayout,
                             Array.Empty<Attribute>(),
                             false
                         ).result;
@@ -194,7 +193,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         null,
                         _ => { },
                         false,
-                        true,
+                        InAnyHorizontalLayout,
                         ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo),
                         false
                     ).result;

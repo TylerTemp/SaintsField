@@ -36,25 +36,37 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         }
 
         [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
+        [NonSerialized, SaintsSerialized] public LongEnum[] LongEnumPubArr;
 
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum[] ULongEnumPubs;
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
-        [NonSerialized, SaintsSerialized] private TestULongEnum _uLongEnumPri;
-        [field: NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
+        // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
+        // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum[] ULongEnumPubs;
+        // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
+        // [NonSerialized, SaintsSerialized] private TestULongEnum _uLongEnumPri;
+        // [field: NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
+        //
+        // [NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPubArr;
+        // [NonSerialized, SaintsSerialized] private TestULongEnum[] _uLongEnumPriArr;
+        // [field: NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPropArr { get; private set; }
 
-        [NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPubArr;
-        [NonSerialized, SaintsSerialized] private TestULongEnum[] _uLongEnumPriArr;
-        [field: NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPropArr { get; private set; }
-
-        [NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
-        [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
-        [field: NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPropLis { get; private set; }
+        // public int serFiledMe;
+        //
+        // [NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
+        // [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
+        // public List<TestULongEnum> ULongEnumPropLis { get; private set; }
 
         // [Serializable]
         // public struct Nested1
         // {
-        //     [NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumPub;
+        //     [Serializable]
+        //     public struct InsideClare
+        //     {
+        //         [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
+        //         [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
+        //     }
+        //
+        //     [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
+        //     [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
+        //     public InsideClare insideClare;
         // }
         //
         // [SaintsSerialized] public Nested1 nested1;

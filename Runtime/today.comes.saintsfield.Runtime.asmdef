@@ -28,6 +28,11 @@
             "define": "SAINTSFIELD_NETCODE_GAMEOBJECTS"
         },
         {
+            "name": "com.unity.nuget.newtonsoft-json",
+            "expression": "",
+            "define": "SAINTSFIELD_NEWTONSOFT_JSON"
+        },
+        {
             "name": "today.comes.saintsdraw",
             "expression": "1.0.4",
             "define": "SAINTSFIELD_SAINTSDRAW"
