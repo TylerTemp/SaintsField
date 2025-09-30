@@ -1,20 +1,23 @@
 fileFormatVersion: 2
-guid: a7aee8ee3392300489e882dd42139f30
+guid: 0a829aaa3a7935d40bf263bd99c89623
 labels:
 - RoslynAnalyzer
 PluginImporter:
   externalObjects: {}
-  serializedVersion: 3
+  serializedVersion: 2
   iconMap: {}
   executionOrder: {}
   defineConstraints:
   - SAINTSFIELD_SERIALIZED
+  - '!SAINTSFIELD_SERIALIZED_DEBUG'
   isPreloaded: 0
   isOverridable: 0
   isExplicitlyReferenced: 1
   validateReferences: 0
   platformData:
-    Any:
+  - first:
+      : Any
+    second:
       enabled: 0
       settings:
         Exclude Editor: 1
@@ -22,29 +25,46 @@ PluginImporter:
         Exclude OSXUniversal: 1
         Exclude Win: 1
         Exclude Win64: 1
-    Editor:
+  - first:
+      Any: 
+    second:
+      enabled: 0
+      settings: {}
+  - first:
+      Editor: Editor
+    second:
       enabled: 0
       settings:
         CPU: AnyCPU
         DefaultValueInitialized: true
         OS: AnyOS
-    Linux64:
+  - first:
+      Standalone: Linux64
+    second:
       enabled: 0
       settings:
         CPU: None
-    OSXUniversal:
+  - first:
+      Standalone: OSXUniversal
+    second:
       enabled: 0
       settings:
         CPU: None
-    Win:
+  - first:
+      Standalone: Win
+    second:
       enabled: 0
       settings:
         CPU: None
-    Win64:
+  - first:
+      Standalone: Win64
+    second:
       enabled: 0
       settings:
         CPU: None
-    WindowsStoreApps:
+  - first:
+      Windows Store Apps: WindowsStoreApps
+    second:
       enabled: 0
       settings:
         CPU: AnyCPU
