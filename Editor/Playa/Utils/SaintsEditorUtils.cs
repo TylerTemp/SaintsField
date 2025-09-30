@@ -145,23 +145,8 @@ namespace SaintsField.Editor.Playa.Utils
             return (showIfResult, disableIfResult);
         }
 
-        public static (string filePath, IReadOnlyList<SerializedInfo> serializedInfos) GetSaintsSerialized(Type monoClass)
+        public static IReadOnlyList<SerializedInfo> GetSaintsSerialized(Type monoClass)
         {
-            (bool found, MonoScript script) = ScriptInfoUtils.GetMonoScriptFromType(monoClass);
-            // Debug.Log($"type={monoClass}, script={script}");
-            if (!found)
-            {
-                return default;
-            }
-            string filePath = AssetDatabase.GetAssetPath(script).Replace("\\", "/");
-            // Debug.Log(filePath);
-            if(!filePath.ToLower().StartsWith("assets/"))
-            {
-                return default;
-            }
-
-            string mainFilePath = filePath.Substring("Assets/".Length, filePath.Length - "Assets/".Length);
-
             List<Type> types = ReflectUtils.GetSelfAndBaseTypesFromType(monoClass);
 
             List<SerializedInfo> results = new List<SerializedInfo>();
@@ -209,7 +194,7 @@ namespace SaintsField.Editor.Playa.Utils
             }
 
             // return results.Count > 0? (mainFilePath, results): default;
-            return (mainFilePath, results);
+            return results;
         }
 
         private static SerializedInfo GetSerializedInfo(MemberInfo memberInfo, bool isProperty, Type targetType)

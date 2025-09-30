@@ -12,7 +12,7 @@ namespace SaintsField.Samples.EditorTest
         [Button]
         private SerializedInfo[] T()
         {
-            return SaintsEditorUtils.GetSaintsSerialized(typeof(SerEnumULong)).serializedInfos.ToArray();
+            return SaintsEditorUtils.GetSaintsSerialized(typeof(SerEnumULong)).ToArray();
         }
 #endif
     }

@@ -2,8 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Utils;
 using SaintsField.Playa;
 using UnityEditor;
+using UnityEditor.AssetImporters;
 using UnityEngine;
 
 namespace SaintsField.Editor.Utils
@@ -39,13 +43,14 @@ namespace SaintsField.Editor.Utils
         [InitializeOnLoadMethod]
         private static void Init()
         {
+            bool hasChange = false;
             List<TypeRawInfo> infos = new List<TypeRawInfo>();
             foreach (Type type in TypeCache.GetTypesWithAttribute<SaintsSerializedAttribute>())
             {
                 Debug.Log($"type.FullName={type.FullName}; ass={type.Assembly.FullName}");
                 if (string.IsNullOrEmpty(type.FullName))
                 {
-                    return;
+                    continue;
                 }
                 List<string> typeDotNames = type.FullName.Split('.').ToList();
                 string namespaceStr;
@@ -86,9 +91,57 @@ namespace SaintsField.Editor.Utils
                 Type containingType =
                     Type.GetType($"{group.Key.Namespace}.{group.Key.MainTypeName}, {group.Key.AssemblyName}");
                 Debug.Log(containingType);
+                Debug.Assert(containingType != null, $"{group.Key.Namespace}.{group.Key.MainTypeName}, {group.Key.AssemblyName}");
+
+                GenInfo entranceInfo;
+                if (groupedList[0].SubTypeChains.Count == 0)
+                {
+                    entranceInfo = MakeGenInfo(groupedList[0]);
+                    groupedList.RemoveAt(0);
+                }
+                else
+                {
+                    entranceInfo = new GenInfo(containingType);
+                }
+
+                Dictionary<Type, GenInfo> typeToGenInfo = new Dictionary<Type, GenInfo>
+                {
+                    { containingType, entranceInfo },
+                };
+
+                foreach (TypeRawInfo typeRawInfo in groupedList)
+                {
+                    Debug.Assert(typeRawInfo.SubTypeChains.Count > 0, typeRawInfo);
+                    Type eachType = Type.GetType($"{typeRawInfo.Namespace}.{typeRawInfo.MainTypeName}{string.Join("", typeRawInfo.SubTypeChains.Select(each => $"+{each}"))}, {typeRawInfo.AssemblyName}");
+                    if (eachType == null)
+                    {
+                        Debug.LogWarning($"failed to find type for {typeRawInfo}");
+                        continue;
+                    }
+                    IReadOnlyList<SerializedInfo> r = SaintsEditorUtils.GetSaintsSerialized(eachType);
+                    Debug.Log($"get {r.Count} for {eachType}: {string.Join("\n", r)}");
+
+                    Type parentType = Type.GetType($"{typeRawInfo.Namespace}.{typeRawInfo.MainTypeName}{string.Join("", typeRawInfo.SubTypeChains.SkipLast(1).Select(each => $"+{each}"))}, {typeRawInfo.AssemblyName}");
+                    if (parentType == null)
+                    {
+                        Debug.LogWarning($"failed to find the parent type for {typeRawInfo}");
+                        continue;
+                    }
+
+                    if (!typeToGenInfo.TryGetValue(parentType, out GenInfo parentInfo))
+                    {
+                        Debug.LogWarning($"failed to find the parent GenInfo for {typeRawInfo} parent={parentType}");
+                        continue;
+                    }
+
+                    GenInfo genInfo = MakeGenInfo(typeRawInfo);
+                    parentInfo.SubTypes.Add(genInfo);
+                    typeToGenInfo.Add(eachType, genInfo);
+                }
 
                 string assShort = group.Key.AssemblyName.Split(',')[0];
                 string infoFile = $"Temp/SaintsField/{assShort}_{group.Key.Namespace}_{group.Key.MainTypeName}.json";
+                string generatedFile = $"Temp/SaintsField/{assShort}_{group.Key.Namespace}_{group.Key.MainTypeName}.json.g";
                 string infoFolder = Path.GetDirectoryName(infoFile);
                 if (!Directory.Exists(infoFolder))
                 {
@@ -96,8 +149,104 @@ namespace SaintsField.Editor.Utils
                     Directory.CreateDirectory(infoFolder);
                 }
 
-                File.WriteAllText(infoFile, "{}");
+                string newContent = JsonConvert.SerializeObject(entranceInfo, Formatting.Indented);
+
+                bool needGen = true;
+                if (File.Exists(infoFile))
+                {
+                    string oldContent = File.ReadAllText(infoFile);
+                    needGen = oldContent != newContent;
+                }
+
+                // ReSharper disable once InvertIf
+                if(needGen)
+                {
+                    hasChange = true;
+                    File.WriteAllText(infoFile, newContent);
+                    if(File.Exists(generatedFile))
+                    {
+                        File.Delete(generatedFile);
+                    }
+                }
+
             }
+
+            if (hasChange)
+            {
+                EditorApplication.delayCall += () =>
+                {
+                    Debug.Log($"Force reload to generate code");
+                    AssetDatabase.ImportAsset("Assets/SaintsField/Dll/SaintsFieldSourceGenerator.dll", ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+                };
+            }
+        }
+
+        private static GenInfo MakeGenInfo(TypeRawInfo typeRawInfo)
+        {
+            Type type = Type.GetType($"{typeRawInfo.Namespace}.{typeRawInfo.MainTypeName}{string.Join("", typeRawInfo.SubTypeChains.Select(each => $"+{each}"))}, {typeRawInfo.AssemblyName}");
+            if (type == null)
+            {
+                throw new Exception($"failed to find type for {typeRawInfo}");
+            }
+            IReadOnlyList<SerializedInfo> r = SaintsEditorUtils.GetSaintsSerialized(type);
+            Debug.Log($"get {r.Count} for {type}: {string.Join("\n", r)}");
+            GenInfo genInfo = new GenInfo(type)
+            {
+                SerializedInfos = r,
+            };
+            return genInfo;
+        }
+
+        private class GenInfo
+        {
+            public readonly string Namespace;
+            public readonly string Keyword;
+            public readonly bool IsStruct;
+            public readonly string Name;
+            public IReadOnlyList<SerializedInfo> SerializedInfos = Array.Empty<SerializedInfo>();
+            public readonly List<GenInfo> SubTypes = new List<GenInfo>();
+
+            public GenInfo(Type type)
+            {
+                Namespace = type.Namespace;
+                Keyword = GetTypeKeyword(type);
+                IsStruct = type.IsValueType;
+                Name = type.Name;
+            }
+
+            public override string ToString()
+            {
+                return
+                    $"<GenInfo name={Name} isStruct={IsStruct} keyword={Keyword} ser={string.Join(", ", SerializedInfos)} subTypes={string.Join(", ", SubTypes)}/>";
+            }
+        }
+
+        private static string GetTypeKeyword(Type type)
+        {
+            if (type.IsPublic)
+                return "public";
+            // else if (type.IsNotPublic)
+            //     Console.WriteLine("internal (top-level)");
+            if (type.IsNestedPublic)
+                // Console.WriteLine("nested public");
+                return "public";
+            if (type.IsNestedPrivate)
+                // Console.WriteLine("nested private");
+                return "private";
+            if (type.IsNestedFamily)
+                // Console.WriteLine("nested protected");
+                return "protected";
+            if (type.IsNestedAssembly)
+                // Console.WriteLine("nested internal");
+                return "internal";
+            if (type.IsNestedFamORAssem)
+                return "protected internal";
+            if (type.IsNestedFamANDAssem)
+                return "private protected";
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (type.IsNotPublic) //top-level but not public
+                return "internal";
+            return null;
         }
 #endif
     }

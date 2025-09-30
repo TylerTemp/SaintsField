@@ -87,51 +87,51 @@ namespace SaintsField.Editor
             IReadOnlyList<object> targets)
         {
             string[] serFields = GetSerializedProperties(serializedObject).ToArray();
-#if SAINTSFIELD_SERIALIZED && SAINTSFIELD_NEWTONSOFT_JSON
-            (string filePath, IReadOnlyList<SerializedInfo> serializedInfos) = SaintsEditorUtils.GetSaintsSerialized(targets[0].GetType());
-            if (serializedInfos != null)
-            {
-                // Debug.Log(filePath.Replace("\\", "/"));
-                string fileContent = System.IO.File.ReadAllText($"Assets/{filePath}");
-                string fileMd5 = SaintsEditorUtils.CreateMD5(fileContent);
-                // DateTime lastWriteTime = System.IO.File.GetLastWriteTime($"Assets/{filePath}");
-                // Debug.Log($"{lastWriteTime:yyyyMMdd-HHmmss-ffff}/{filePath}");
-                // // string lastWriteTimeString = lastWriteTime.ToString("yyyyMMdd-HHmmss-ffff");
-                // string lastWriteTimeString = "";
-
-                // const string serFolder = "Temp/SaintsField";
-                string tempFile = $"Temp/SaintsField/{filePath}.{fileMd5}.json";
-                string tempFolder = System.IO.Path.GetDirectoryName(tempFile);
-                if (!System.IO.Directory.Exists(tempFolder))
-                {
-                    // ReSharper disable once AssignNullToNotNullAttribute
-                    System.IO.Directory.CreateDirectory(tempFolder);
-                }
-
-                if (serializedInfos.Count == 0)
-                {
-                    System.IO.File.WriteAllText(tempFile, "[]");
-                }
-                else
-                {
-                    // string tempFile = $"{serFolder}/{filePath}.json";
-                    // Debug.Log(tempFile);
-                    string oldContent = System.IO.File.Exists(tempFile)
-                        ? System.IO.File.ReadAllText(tempFile)
-                        : null;
-                    string newContent = Newtonsoft.Json.JsonConvert.SerializeObject(serializedInfos,
-                        Newtonsoft.Json.Formatting.Indented);
-                    if (oldContent != newContent)
-                    {
-                        System.IO.File.WriteAllText(tempFile, newContent);
-#if SAINTSFIELD_DEBUG
-                        Debug.Log($"Force Re-Import {filePath}");
-#endif
-                        AssetDatabase.ImportAsset("Assets/" + filePath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-                    }
-                }
-            }
-#endif
+// #if SAINTSFIELD_SERIALIZED && SAINTSFIELD_NEWTONSOFT_JSON
+//             (string filePath, IReadOnlyList<SerializedInfo> serializedInfos) = SaintsEditorUtils.GetSaintsSerialized(targets[0].GetType());
+//             if (serializedInfos != null)
+//             {
+//                 // Debug.Log(filePath.Replace("\\", "/"));
+//                 string fileContent = System.IO.File.ReadAllText($"Assets/{filePath}");
+//                 string fileMd5 = SaintsEditorUtils.CreateMD5(fileContent);
+//                 // DateTime lastWriteTime = System.IO.File.GetLastWriteTime($"Assets/{filePath}");
+//                 // Debug.Log($"{lastWriteTime:yyyyMMdd-HHmmss-ffff}/{filePath}");
+//                 // // string lastWriteTimeString = lastWriteTime.ToString("yyyyMMdd-HHmmss-ffff");
+//                 // string lastWriteTimeString = "";
+//
+//                 // const string serFolder = "Temp/SaintsField";
+//                 string tempFile = $"Temp/SaintsField/{filePath}.{fileMd5}.json";
+//                 string tempFolder = System.IO.Path.GetDirectoryName(tempFile);
+//                 if (!System.IO.Directory.Exists(tempFolder))
+//                 {
+//                     // ReSharper disable once AssignNullToNotNullAttribute
+//                     System.IO.Directory.CreateDirectory(tempFolder);
+//                 }
+//
+//                 if (serializedInfos.Count == 0)
+//                 {
+//                     System.IO.File.WriteAllText(tempFile, "[]");
+//                 }
+//                 else
+//                 {
+//                     // string tempFile = $"{serFolder}/{filePath}.json";
+//                     // Debug.Log(tempFile);
+//                     string oldContent = System.IO.File.Exists(tempFile)
+//                         ? System.IO.File.ReadAllText(tempFile)
+//                         : null;
+//                     string newContent = Newtonsoft.Json.JsonConvert.SerializeObject(serializedInfos,
+//                         Newtonsoft.Json.Formatting.Indented);
+//                     if (oldContent != newContent)
+//                     {
+//                         System.IO.File.WriteAllText(tempFile, newContent);
+// #if SAINTSFIELD_DEBUG
+//                         Debug.Log($"Force Re-Import {filePath}");
+// #endif
+//                         AssetDatabase.ImportAsset("Assets/" + filePath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+//                     }
+//                 }
+//             }
+// #endif
 
             // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
             Dictionary<string, SerializedProperty> serializedPropertyDict = serFields

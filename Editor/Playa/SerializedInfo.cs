@@ -23,6 +23,9 @@ namespace SaintsField.Editor.Playa
             TargetCollection = targetCollection;
             SaintsPropertyType = saintsPropertyType;
         }
+
+        public override string ToString() =>
+            $"<SerializedInfo name={Name} type={ElementTypeName} propType={SaintsPropertyType} isProp={IsProperty} collection={TargetCollection} subs={string.Join(", ", SubFields)}";
     }
 
 }
