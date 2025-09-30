@@ -6,6 +6,7 @@ namespace SaintsField.Editor.Playa
     public class SerializedInfo
     {
         public readonly string Name;
+        public readonly string ElementTypeName;
         public readonly SaintsPropertyType SaintsPropertyType;
         public readonly bool IsProperty;
         // public readonly bool IsArray;
@@ -14,9 +15,10 @@ namespace SaintsField.Editor.Playa
 
         public readonly List<SerializedInfo> SubFields = new List<SerializedInfo>();
 
-        public SerializedInfo(string name, bool isProperty, SaintsTargetCollection targetCollection, SaintsPropertyType saintsPropertyType)
+        public SerializedInfo(string name, string elementTypeName, bool isProperty, SaintsTargetCollection targetCollection, SaintsPropertyType saintsPropertyType)
         {
             Name = name;
+            ElementTypeName = elementTypeName;
             IsProperty = isProperty;
             TargetCollection = targetCollection;
             SaintsPropertyType = saintsPropertyType;

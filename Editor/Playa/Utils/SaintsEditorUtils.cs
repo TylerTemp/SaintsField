@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.SaintsSerialization;
@@ -13,6 +14,29 @@ namespace SaintsField.Editor.Playa.Utils
 {
     public static class SaintsEditorUtils
     {
+#if SAINTSFIELD_SERIALIZED && SAINTSFIELD_NEWTONSOFT_JSON
+        public static string CreateMD5(string input)
+        {
+            // Use input string to calculate MD5 hash
+            // ReSharper disable once ConvertToUsingDeclaration
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] inputBytes = Encoding.ASCII.GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                // return Convert.ToHexString(hashBytes); // .NET 5 +
+
+                // Convert the byte array to hexadecimal string prior to .NET 5
+                StringBuilder sb = new StringBuilder();
+                foreach (byte hashByte in hashBytes)
+                {
+                    sb.Append(hashByte.ToString("X2"));
+                }
+                return sb.ToString();
+            }
+        }
+#endif
+
         public static ToggleCheckInfo FillResult(ToggleCheckInfo toggleCheckInfo)
         {
             (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(toggleCheckInfo.ConditionInfos, null, null, toggleCheckInfo.Target);
@@ -238,8 +262,13 @@ namespace SaintsField.Editor.Playa.Utils
                 ? targetType
                 : elementType;
 
+            Debug.Assert(checkingType != null, targetType);
+
             // ReSharper disable once PossibleNullReferenceException
             bool checkingIsEnum = checkingType.IsEnum;
+
+            // ReSharper disable once PossibleNullReferenceException
+            string fillTypeNameWithNameSpace = checkingType.FullName.Replace('+', '.');
 
             if (!checkingIsEnum && IsGeneralClassOrStruct(checkingType))
             {
@@ -248,7 +277,7 @@ namespace SaintsField.Editor.Playa.Utils
                     return null;
                 }
 
-                SerializedInfo r = new SerializedInfo(memberInfo.Name, isProperty, targetCollection, SaintsPropertyType.ClassOrStruct);
+                SerializedInfo r = new SerializedInfo(memberInfo.Name, fillTypeNameWithNameSpace, isProperty, targetCollection, SaintsPropertyType.ClassOrStruct);
 
                 // class/struct check
                 foreach (MemberInfo subMember in checkingType
@@ -287,20 +316,20 @@ namespace SaintsField.Editor.Playa.Utils
             bool isULong = underType == typeof(ulong);
             if (isLong)
             {
-                return new SerializedInfo(memberInfo.Name, isProperty, targetCollection,
+                return new SerializedInfo(memberInfo.Name, fillTypeNameWithNameSpace, isProperty, targetCollection,
                     SaintsPropertyType.EnumLong);
             }
 
             if (isULong)
             {
-                return new SerializedInfo(memberInfo.Name, isProperty, targetCollection,
+                return new SerializedInfo(memberInfo.Name, fillTypeNameWithNameSpace, isProperty, targetCollection,
                     SaintsPropertyType.EnumULong);
             }
 
             return null;
         }
 
-        private static Type GetList(Type currentType)
+        public static Type GetList(Type currentType)
         {
             if (!typeof(IEnumerable).IsAssignableFrom(currentType))
             {

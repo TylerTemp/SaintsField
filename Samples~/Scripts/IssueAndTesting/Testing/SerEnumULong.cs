@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
 using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
+    // [SaintsSerialized]
     public partial class SerEnumULong : SaintsMonoBehaviour
     {
         [Serializable, Flags]
@@ -35,9 +35,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             Third,
         }
 
-        [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
-        [NonSerialized, SaintsSerialized] public LongEnum[] LongEnumPubArr;
-
+        // [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
+        // [NonSerialized, SaintsSerialized] public LongEnum[] LongEnumPubArr;
+        //
         // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
         // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum[] ULongEnumPubs;
         // [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
@@ -54,22 +54,40 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         // [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
         // public List<TestULongEnum> ULongEnumPropLis { get; private set; }
 
-        // [Serializable]
-        // public struct Nested1
-        // {
-        //     [Serializable]
-        //     public struct InsideClare
-        //     {
-        //         [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
-        //         [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
-        //     }
-        //
-        //     [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
-        //     [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
-        //     public InsideClare insideClare;
-        // }
-        //
+        [Serializable, SaintsSerialized]
+        public partial struct Nested1
+        {
+            [Serializable, SaintsSerialized]
+            public partial struct InsideClare
+            {
+                // [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
+                [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
+            }
+
+            // [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
+            // [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
+            // public InsideClare insideClare;
+            public InsideClare[] insideClareArr;
+        }
+
         // [SaintsSerialized] public Nested1 nested1;
+
+
+        [Serializable, SaintsSerialized]
+        public partial struct Nested2
+        {
+            [Serializable, SaintsSerialized]
+            public partial struct InsideClare
+            {
+                // [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
+                [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
+            }
+
+            // [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
+            // [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
+            // public InsideClare insideClare;
+            public InsideClare[] insideClareArr;
+        }
 
         // [Button]
         // private void InspectIt()

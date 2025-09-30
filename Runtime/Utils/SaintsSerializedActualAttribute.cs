@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Newtonsoft.Json;
 using SaintsField.Playa;
 using SaintsField.SaintsSerialization;
 
@@ -13,12 +12,13 @@ namespace SaintsField.Utils
     public class SaintsSerializedActualAttribute: Attribute, IPlayaAttribute
     {
         // public readonly string Path;
-        // public readonly Type PathType;
+        public readonly Type ElementType;
 
         public readonly IReadOnlyList<SaintsSerializedPath> Paths;
 
-        public SaintsSerializedActualAttribute(params string[] objPaths)
+        public SaintsSerializedActualAttribute(Type elementType, params string[] objPaths)
         {
+            ElementType = elementType;
             Paths = objPaths.Select(ConvertSaintsSerializedPath).ToArray();
         }
 

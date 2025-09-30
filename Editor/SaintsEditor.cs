@@ -21,6 +21,7 @@ using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
+using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -86,29 +87,33 @@ namespace SaintsField.Editor
             IReadOnlyList<object> targets)
         {
             string[] serFields = GetSerializedProperties(serializedObject).ToArray();
-#if SAINTSFIELD_NEWTONSOFT_JSON
+#if SAINTSFIELD_SERIALIZED && SAINTSFIELD_NEWTONSOFT_JSON
             (string filePath, IReadOnlyList<SerializedInfo> serializedInfos) = SaintsEditorUtils.GetSaintsSerialized(targets[0].GetType());
             if (serializedInfos != null)
             {
+                // Debug.Log(filePath.Replace("\\", "/"));
+                string fileContent = System.IO.File.ReadAllText($"Assets/{filePath}");
+                string fileMd5 = SaintsEditorUtils.CreateMD5(fileContent);
+                // DateTime lastWriteTime = System.IO.File.GetLastWriteTime($"Assets/{filePath}");
+                // Debug.Log($"{lastWriteTime:yyyyMMdd-HHmmss-ffff}/{filePath}");
+                // // string lastWriteTimeString = lastWriteTime.ToString("yyyyMMdd-HHmmss-ffff");
+                // string lastWriteTimeString = "";
 
                 // const string serFolder = "Temp/SaintsField";
-                string tempFile = $"Temp/SaintsField/{filePath}.json";
+                string tempFile = $"Temp/SaintsField/{filePath}.{fileMd5}.json";
                 string tempFolder = System.IO.Path.GetDirectoryName(tempFile);
+                if (!System.IO.Directory.Exists(tempFolder))
+                {
+                    // ReSharper disable once AssignNullToNotNullAttribute
+                    System.IO.Directory.CreateDirectory(tempFolder);
+                }
+
                 if (serializedInfos.Count == 0)
                 {
-                    if(System.IO.File.Exists(tempFile))
-                    {
-                        System.IO.File.Delete(tempFile);
-                    }
+                    System.IO.File.WriteAllText(tempFile, "[]");
                 }
                 else
                 {
-                    if (!System.IO.Directory.Exists(tempFolder))
-                    {
-                        // ReSharper disable once AssignNullToNotNullAttribute
-                        System.IO.Directory.CreateDirectory(tempFolder);
-                    }
-
                     // string tempFile = $"{serFolder}/{filePath}.json";
                     // Debug.Log(tempFile);
                     string oldContent = System.IO.File.Exists(tempFile)
@@ -118,14 +123,12 @@ namespace SaintsField.Editor
                         Newtonsoft.Json.Formatting.Indented);
                     if (oldContent != newContent)
                     {
-                        System.IO.File.WriteAllText(tempFile,
-                            Newtonsoft.Json.JsonConvert.SerializeObject(serializedInfos,
-                                Newtonsoft.Json.Formatting.Indented));
+                        System.IO.File.WriteAllText(tempFile, newContent);
+#if SAINTSFIELD_DEBUG
                         Debug.Log($"Force Re-Import {filePath}");
+#endif
                         AssetDatabase.ImportAsset("Assets/" + filePath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
                     }
-
-
                 }
             }
 #endif
@@ -235,8 +238,8 @@ namespace SaintsField.Editor
 
                     Dictionary<MemberInfo, IPlayaAttribute[]> memberInfoToPlaya =
                         new Dictionary<MemberInfo, IPlayaAttribute[]>();
-                    // Dictionary<string, MemberInfo> saintsSerializedActualPathToMemberInfo =
-                    //     new Dictionary<string, MemberInfo>();
+                    Dictionary<string, MemberInfo> saintsSerializedActualNameToMemberInfo =
+                        new Dictionary<string, MemberInfo>();
 
                     foreach (MemberInfo memberInfo in memberLis)
                     {
@@ -249,7 +252,11 @@ namespace SaintsField.Editor
                         }
                         else
                         {
-                            // saintsSerializedActualPathToMemberInfo[saintsSerializedActualAttribute.Path] = memberInfo;
+                            foreach (SaintsSerializedPath saintsSerializedPath in saintsSerializedActualAttribute.Paths)
+                            {
+                                saintsSerializedActualNameToMemberInfo[saintsSerializedPath.Name] = memberInfo;
+                            }
+
                             pendingSerializedProperties.Remove(memberInfo.Name);
                             pendingSerializedProperties.Remove(RuntimeUtil.GetAutoPropertyName(memberInfo.Name));
                         }
@@ -313,7 +320,7 @@ namespace SaintsField.Editor
                                 {
                                     SaintsSerializedAttribute saintsSerializedAttribute = null;
                                     OrderedAttribute orderProp = null;
-                                    foreach (var playa in playaAttributes)
+                                    foreach (IPlayaAttribute playa in playaAttributes)
                                     {
                                         switch (playa)
                                         {
@@ -351,42 +358,44 @@ namespace SaintsField.Editor
                                     }
                                     else
                                     {
-                                        // string thisName = fieldInfo.Name;
-                                        // if (thisName.StartsWith("<") && thisName.EndsWith(">k__BackingField"))
-                                        // {
-                                        //     thisName = thisName.Substring(1,
-                                        //         thisName.Length - 1 - ">k__BackingField".Length);
-                                        // }
-                                        // // MemberInfo serInfo = null;
-                                        // // if (!saintsSerializedActualPathToMemberInfo.TryGetValue(thisName, out serInfo))
-                                        // // {
-                                        // //     if (!saintsSerializedActualPathToMemberInfo.ContainsKey(
-                                        // //             RuntimeUtil.GetAutoPropertyName(thisName)))
-                                        // //     {
-                                        // //         continue;
-                                        // //     }
-                                        // //     serInfo = saintsSerializedActualPathToMemberInfo[RuntimeUtil.GetAutoPropertyName(thisName)];
-                                        // // }
-                                        // // Debug.Assert(serInfo != null, fieldInfo.Name);
-                                        // // fieldInfo = (FieldInfo)serInfo;
-                                        //
-                                        // thisDepthInfos.Add(new SaintsFieldWithInfo
-                                        // {
-                                        //     PlayaAttributes = playaAttributes,
-                                        //     // PlayaAttributesQueue = playaAttributes,
-                                        //     // LayoutBases = layoutBases,
-                                        //     Targets = targets,
-                                        //
-                                        //     RenderType = SaintsRenderType.SerializedField,
-                                        //     // memberType = nonSerFieldInfo.MemberType,
-                                        //     MemberId = fieldInfo.Name,
-                                        //     FieldInfo = fieldInfo,
-                                        //     InherentDepth = inherentDepth,
-                                        //     Order = order,
-                                        //     // serializable = false,
-                                        //
-                                        //     SerializedProperty = serializedPropertyDict[fieldInfo.Name],
-                                        // });
+                                        string thisName = fieldInfo.Name;
+                                        if (thisName.StartsWith("<") && thisName.EndsWith(">k__BackingField"))
+                                        {
+                                            thisName = thisName.Substring(1,
+                                                thisName.Length - 1 - ">k__BackingField".Length);
+                                        }
+
+                                        if (!saintsSerializedActualNameToMemberInfo.TryGetValue(thisName, out MemberInfo serInfo))
+                                        {
+                                            Debug.LogWarning($"failed to find serialized actual field for {fieldInfo.Name}");
+                                            continue;
+                                        }
+
+                                        // Attribute[] injectedAttrs = ReflectCache
+                                        //     .GetCustomAttributes(fieldInfo)
+                                        //     .Where(each => each is not NonSerializedAttribute
+                                        //                    && each is not HideInInspector
+                                        //                    && each is not SaintsSerializedAttribute)
+                                        //     .Prepend(ReflectCache.GetCustomAttributes<SaintsSerializedActualAttribute>(serInfo).First())
+                                        //     .ToArray();
+
+                                        thisDepthInfos.Add(new SaintsFieldWithInfo
+                                        {
+                                            PlayaAttributes = playaAttributes,
+                                            // PlayaAttributesQueue = playaAttributes,
+                                            // LayoutBases = layoutBases,
+                                            Targets = targets,
+
+                                            RenderType = SaintsRenderType.SerializedField,
+                                            // memberType = nonSerFieldInfo.MemberType,
+                                            MemberId = serInfo.Name,
+                                            FieldInfo = (FieldInfo)serInfo,
+                                            InherentDepth = inherentDepth,
+                                            Order = order,
+                                            // serializable = false,
+
+                                            SerializedProperty = serializedPropertyDict[serInfo.Name],
+                                        });
                                     }
                                     memberDepthIds.Add(fieldInfo.Name);
                                 }
