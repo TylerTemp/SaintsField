@@ -39,7 +39,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
         public void SetValueWithoutNotify(T newValue)
         {
-            // Debug.Log(newValue);
             _hasCachedValue = true;
             _cachedValue = newValue;
 

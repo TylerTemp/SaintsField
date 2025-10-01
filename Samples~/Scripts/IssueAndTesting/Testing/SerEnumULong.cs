@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
-    [SaintsSerialized]
     public partial class SerEnumULong : SaintsMonoBehaviour
     {
         [Serializable, Flags]
@@ -52,19 +51,14 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [NonSerialized, SaintsSerialized] private TestULongEnum[] _uLongEnumPriArr;
         [field: NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPropArr { get; private set; }
 
-        public int serFiledMe;
-
         [NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
         [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
         public List<TestULongEnum> ULongEnumPropLis { get; private set; }
-        // [ShowInInspector] private string s => GeneratedStringSaintsField();
 
-
-
-        [Serializable, SaintsSerialized]
+        [Serializable]
         public partial struct Nested1
         {
-            [Serializable, SaintsSerialized]
+            [Serializable]
             public partial struct InsideClare
             {
                 // [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
@@ -74,16 +68,18 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
             [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
             public InsideClare insideClare;
-            // public InsideClare[] insideClareArr;
+            public InsideClare[] insideClareArr;
         }
 
-        [SaintsSerialized] public Nested1 nested1;
+        public Nested1 nested1;
 
+        // [Button] private TestULongEnum inNest() => nested1.InNested1;
+        // [ShowInInspector] private object D => nested1__SaintsSerialized__;
 
-        [Serializable, SaintsSerialized]
+        [Serializable]
         public partial struct Nested2
         {
-            [Serializable, SaintsSerialized]
+            [Serializable]
             public partial struct InsideClare
             {
                 // [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
@@ -96,11 +92,13 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             public InsideClare[] insideClareArr;
         }
 
-        [Button]
-        private void InspectIt()
-        {
-            Debug.Log(ULongEnumPubArr);
-            Debug.Log(ULongEnumPubArr == null);
-        }
+        public Nested2 nested2;
+
+        // [Button]
+        // private void InspectIt()
+        // {
+        //     Debug.Log(ULongEnumPubArr);
+        //     Debug.Log(ULongEnumPubArr == null);
+        // }
     }
 }

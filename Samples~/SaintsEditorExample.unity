@@ -5951,8 +5951,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 1175289511}
     m_Modifications:
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClareArr.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClareArr.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: LongEnumPub__SaintsSerialized__.longValue
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPub__SaintsSerialized__.uLongValue
@@ -5999,16 +6007,32 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.InNested1__SaintsSerialized__.uLongValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumNormalPub__SaintsSerialized__.uLongValue
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.InNested1Arr__SaintsSerialized__.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: LongEnumPubArr__SaintsSerialized__.Array.data[0].longValue
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[0].uLongValue
-      value: 6
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClare.Insides__SaintsSerialized__.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClare.Insides__SaintsSerialized__.Array.size
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPubArr__SaintsSerialized__.Array.data[0].uLongValue
@@ -6064,6 +6088,54 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: _uLongEnumPriLis__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.InNested1Arr__SaintsSerialized__.Array.data[0].uLongValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.InNested1Arr__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClare.Insides__SaintsSerialized__.Array.data[0].uLongValue
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClare.Insides__SaintsSerialized__.Array.data[0].uLongValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClare.Insides__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClare.Insides__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.data[0].uLongValue
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.data[0].uLongValue
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.data[0].propertyType
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}

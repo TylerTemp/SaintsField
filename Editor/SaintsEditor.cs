@@ -252,10 +252,7 @@ namespace SaintsField.Editor
                         }
                         else
                         {
-                            foreach (SaintsSerializedPath saintsSerializedPath in saintsSerializedActualAttribute.Paths)
-                            {
-                                saintsSerializedActualNameToMemberInfo[saintsSerializedPath.Name] = memberInfo;
-                            }
+                            saintsSerializedActualNameToMemberInfo[saintsSerializedActualAttribute.Name] = memberInfo;
 
                             pendingSerializedProperties.Remove(memberInfo.Name);
                             pendingSerializedProperties.Remove(RuntimeUtil.GetAutoPropertyName(memberInfo.Name));
@@ -378,6 +375,10 @@ namespace SaintsField.Editor
                                         //                    && each is not SaintsSerializedAttribute)
                                         //     .Prepend(ReflectCache.GetCustomAttributes<SaintsSerializedActualAttribute>(serInfo).First())
                                         //     .ToArray();
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
+                                        Debug.Log($"wrap {fieldInfo.Name} to {serInfo.Name}");
+#endif
 
                                         thisDepthInfos.Add(new SaintsFieldWithInfo
                                         {
