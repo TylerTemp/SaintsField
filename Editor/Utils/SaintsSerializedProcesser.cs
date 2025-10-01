@@ -47,13 +47,22 @@ namespace SaintsField.Editor.Utils
         {
             bool hasChange = false;
             List<TypeRawInfo> infos = new List<TypeRawInfo>();
+            List<MonoScript> foundMonoScripts = new List<MonoScript>();
+
             foreach (Type type in TypeCache.GetTypesWithAttribute<SaintsSerializedAttribute>())
             {
-                Debug.Log($"type.FullName={type.FullName}; ass={type.Assembly.FullName}");
+                // Debug.Log($"type.FullName={type.FullName}; ass={type.Assembly.FullName}");
                 if (string.IsNullOrEmpty(type.FullName))
                 {
                     continue;
                 }
+
+                (bool monoScriptFound, MonoScript monoScript) = ScriptInfoUtils.GetMonoScriptFromType(type);
+                if (monoScriptFound)
+                {
+                    foundMonoScripts.Add(monoScript);
+                }
+
                 List<string> typeDotNames = type.FullName.Split('.').ToList();
                 string namespaceStr;
                 string typeMain;
@@ -83,16 +92,16 @@ namespace SaintsField.Editor.Utils
             IEnumerable<IGrouping<(string AssemblyName, string Namespace, string MainTypeName), TypeRawInfo>> grouped = infos.GroupBy(i => (i.AssemblyName, i.Namespace, i.MainTypeName));
             foreach (IGrouping<(string AssemblyName, string Namespace, string MainTypeName), TypeRawInfo> group in grouped)
             {
-                Debug.Log($"Group: {group.Key.AssemblyName} | {group.Key.Namespace} | {group.Key.MainTypeName}");
+                // Debug.Log($"Group: {group.Key.AssemblyName} | {group.Key.Namespace} | {group.Key.MainTypeName}");
                 List<TypeRawInfo> groupedList = group.OrderBy(each => string.Join("+", each.SubTypeChains)).ToList();
-                foreach (TypeRawInfo info in groupedList)
-                {
-                    Debug.Log($"  - {info}");
-                }
+                // foreach (TypeRawInfo info in groupedList)
+                // {
+                //     Debug.Log($"  - {info}");
+                // }
 
                 Type containingType =
                     Type.GetType($"{group.Key.Namespace}.{group.Key.MainTypeName}, {group.Key.AssemblyName}");
-                Debug.Log(containingType);
+                // Debug.Log(containingType);
                 Debug.Assert(containingType != null, $"{group.Key.Namespace}.{group.Key.MainTypeName}, {group.Key.AssemblyName}");
 
                 GenInfo entranceInfo;
@@ -121,7 +130,7 @@ namespace SaintsField.Editor.Utils
                         continue;
                     }
                     IReadOnlyList<SerializedInfo> r = SaintsEditorUtils.GetSaintsSerialized(eachType);
-                    Debug.Log($"get {r.Count} for {eachType}: {string.Join("\n", r)}");
+                    // Debug.Log($"get {r.Count} for {eachType}: {string.Join("\n", r)}");
 
                     Type parentType = Type.GetType($"{typeRawInfo.Namespace}.{typeRawInfo.MainTypeName}{string.Join("", typeRawInfo.SubTypeChains.SkipLast(1).Select(each => $"+{each}"))}, {typeRawInfo.AssemblyName}");
                     if (parentType == null)
@@ -165,20 +174,25 @@ namespace SaintsField.Editor.Utils
                 {
                     hasChange = true;
                     File.WriteAllText(infoFile, newContent);
-                    if(File.Exists(generatedFile))
-                    {
-                        File.Delete(generatedFile);
-                    }
                 }
 
+                if(File.Exists(generatedFile))
+                {
+                    File.Delete(generatedFile);
+                }
             }
 
             if (hasChange)
             {
                 EditorApplication.delayCall += () =>
                 {
-                    Debug.Log($"Force reload to generate code");
-                    AssetDatabase.ImportAsset("Assets/SaintsField/Dll/SaintsFieldSourceGenerator.dll", ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+                    Debug.Log($"Force reload to generate code {string.Join(", ", foundMonoScripts)}");
+                    // foreach (MonoScript foundMonoScript in foundMonoScripts)
+                    // {
+                    //     AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(foundMonoScript), ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceUpdate);
+                    // }
+                    // EditorUtility.RequestScriptReload();
+                    // AssetDatabase.ImportAsset("Assets/SaintsField/Dll/SaintsFieldSourceGenerator.dll", ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
                 };
             }
         }
@@ -191,7 +205,7 @@ namespace SaintsField.Editor.Utils
                 throw new Exception($"failed to find type for {typeRawInfo}");
             }
             IReadOnlyList<SerializedInfo> r = SaintsEditorUtils.GetSaintsSerialized(type);
-            Debug.Log($"get {r.Count} for {type}: {string.Join("\n", r)}");
+            // Debug.Log($"get {r.Count} for {type}: {string.Join("\n", r)}");
             GenInfo genInfo = new GenInfo(type)
             {
                 SerializedInfos = r,

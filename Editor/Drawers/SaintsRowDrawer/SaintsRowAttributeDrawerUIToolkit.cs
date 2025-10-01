@@ -340,9 +340,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 {
                     Attribute[] attributes = PointedTargetAttributes(saintsSerializedActual.Paths, property.serializedObject.targetObject.GetType());
 
-#if SAINTSFIELD_DEBUG
-                    Debug.Log($"saintsrow serInfo={serInfo.Name} attrs = {string.Join(", ", attributes.Select(a => a.GetType().Name))}");
-#endif
+// #if SAINTSFIELD_DEBUG
+//                     Debug.Log($"saintsrow serInfo={serInfo.Name} attrs = {string.Join(", ", attributes.Select(a => a.GetType().Name))}");
+// #endif
                     EnumToggleButtonsAttribute enumToggle = null;
                     FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
                     FlagsDropdownAttribute flagsDropdownAttribute = null;

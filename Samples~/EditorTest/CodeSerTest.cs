@@ -8,6 +8,7 @@ namespace SaintsField.Samples.EditorTest
 {
     public class CodeSerTest : SaintsMonoBehaviour
     {
+
 #if SAINTSFIELD_NEWTONSOFT_JSON
         [Button]
         private SerializedInfo[] T()

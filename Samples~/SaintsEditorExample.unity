@@ -2547,7 +2547,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce80c99e8ba440c580d745ce53147594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples.EditorTest::SaintsField.CodeAnalTest
-  ms: {fileID: 0}
+  ms: {fileID: 11500000, guid: 0bc5d2fac74c5ae4e89d46fc08310525, type: 3}
 --- !u!114 &889525107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4165,6 +4165,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1872314224
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &1500346665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4177,6 +4190,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c12153bf83683e54884fabf6011eeea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  normalIntArrays: 
+  normalString: 
+  content: 
+  testVar:
+    m_InternalValue: 0
 --- !u!4 &1500346666
 Transform:
   m_ObjectHideFlags: 0
@@ -4204,6 +4223,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 686656c53f7998841aecdf3d0da41a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  normalIntArrays: 
+  normalString: 
+  content: 
+  testVar:
+    m_InternalValue: 0
 --- !u!1 &1533286423
 GameObject:
   m_ObjectHideFlags: 0

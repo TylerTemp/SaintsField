@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
@@ -10,7 +11,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [Serializable, Flags]
         public enum LongEnum: long
         {
-
             First = 1,
             Second = 1 << 1,
             Third = 1 << 2,
@@ -64,16 +64,16 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [Serializable, SaintsSerialized]
         public partial struct Nested1
         {
-            // [Serializable, SaintsSerialized]
-            // public partial struct InsideClare
-            // {
-            //     // [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
-            //     [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
-            // }
+            [Serializable, SaintsSerialized]
+            public partial struct InsideClare
+            {
+                // [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
+                [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
+            }
 
             [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
-            // [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
-            // public InsideClare insideClare;
+            [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
+            public InsideClare insideClare;
             // public InsideClare[] insideClareArr;
         }
 
@@ -92,15 +92,15 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
             // [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
             // [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
-            // public InsideClare insideClare;
+            public InsideClare insideClare;
             public InsideClare[] insideClareArr;
         }
 
-        // [Button]
-        // private void InspectIt()
-        // {
-        //     Debug.Log(ULongEnumPubArr);
-        //     Debug.Log(ULongEnumPubArr == null);
-        // }
+        [Button]
+        private void InspectIt()
+        {
+            Debug.Log(ULongEnumPubArr);
+            Debug.Log(ULongEnumPubArr == null);
+        }
     }
 }
