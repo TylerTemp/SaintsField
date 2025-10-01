@@ -336,7 +336,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             switch (propertyType)
             {
                 case SaintsPropertyType.EnumLong:
+#if UNITY_2022_1_OR_NEWER
                 case SaintsPropertyType.EnumULong:
+#endif
                 {
                     // Attribute[] attributes = PointedTargetAttributes(saintsSerializedActual.Name, property.serializedObject.targetObject.GetType());
                     Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);

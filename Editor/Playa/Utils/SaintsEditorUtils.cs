@@ -298,18 +298,20 @@ namespace SaintsField.Editor.Playa.Utils
 
             Type underType = checkingType.GetEnumUnderlyingType();
             bool isLong = underType == typeof(long);
-            bool isULong = underType == typeof(ulong);
             if (isLong)
             {
                 return new SerializedInfo(memberInfo.Name, fillTypeNameWithNameSpace, isProperty, targetCollection,
                     SaintsPropertyType.EnumLong);
             }
 
+#if UNITY_2022_1_OR_NEWER
+            bool isULong = underType == typeof(ulong);
             if (isULong)
             {
                 return new SerializedInfo(memberInfo.Name, fillTypeNameWithNameSpace, isProperty, targetCollection,
                     SaintsPropertyType.EnumULong);
             }
+#endif
 
             return null;
         }

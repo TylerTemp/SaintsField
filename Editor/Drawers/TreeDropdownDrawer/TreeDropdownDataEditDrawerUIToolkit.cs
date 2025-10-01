@@ -49,6 +49,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
                     return r;
                 }
+#if UNITY_2022_1_OR_NEWER
                 case SaintsPropertyType.EnumULong:
                 {
                     EnumMetaInfo enumMetaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
@@ -70,19 +71,11 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         ulong uv = (ulong)v;
                         subProp.ulongValue = uv;
                         subProp.serializedObject.ApplyModifiedProperties();
-
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
-//                         Debug.Log($"update {targetType} value to {subProp.ulongValue} ({v})/{ele.value}");
-// #endif
-
-                        // if (ele.value != uv)
-                        // {
-                        //     ele.SetValueWithoutNotify(uv);
-                        // }
                     });
 
                     return r;
                 }
+#endif
                 case SaintsPropertyType.Undefined:
                 default:
                     return null;

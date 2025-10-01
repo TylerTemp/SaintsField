@@ -25,6 +25,7 @@ namespace SaintsField.Utils
                 };
             }
 
+#if UNITY_2022_1_OR_NEWER
             if (underType == typeof(ulong))
             {
                 return new SaintsSerializedProperty
@@ -33,6 +34,7 @@ namespace SaintsField.Utils
                     uLongValue = Convert.ToUInt64(obj)
                 };
             }
+#endif
 
             throw new NotSupportedException($"SaintsSerializedUtil OnBeforeSerialize not support enum underlying type {underType.FullName}");
         }
@@ -105,12 +107,14 @@ namespace SaintsField.Utils
                         return (T)Enum.ToObject(targetType, saintsSerializedProperty.longValue);
                     }
                     return (T)Convert.ChangeType(saintsSerializedProperty.longValue, targetType);
+#if UNITY_2022_1_OR_NEWER
                 case SaintsPropertyType.EnumULong:
                     if (targetType.IsEnum)
                     {
                         return (T)Enum.ToObject(targetType, saintsSerializedProperty.uLongValue);
                     }
                     return (T)Convert.ChangeType(saintsSerializedProperty.uLongValue, targetType);
+#endif
                 case SaintsPropertyType.Undefined:
                     return targetType.IsValueType ? (T)Activator.CreateInstance(targetType) : default;
                 default:

@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
                     ButtonsULongElement under = new ButtonsULongElement(enumMetaInfo, property, info, parent, newValue =>
                     {
-                        subProp.ulongValue = Convert.ToUInt64(newValue);
+                        subProp.longValue = Convert.ToInt64(newValue);
                         subProp.serializedObject.ApplyModifiedProperties();
                     })
                     {
@@ -77,6 +77,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                         }
                     }
                 }
+#if UNITY_2022_1_OR_NEWER
                 case SaintsPropertyType.EnumULong:
                 {
                     EnumMetaInfo enumMetaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
@@ -134,6 +135,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                         }
                     }
                 }
+#endif
                 case SaintsPropertyType.Undefined:
                 default:
                     return null;
