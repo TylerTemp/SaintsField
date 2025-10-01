@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Utils
 {
     public static class ReflectUtils
     {
-        public static List<Type> GetSelfAndBaseTypes(object target)
+        public static List<Type> GetSelfAndBaseTypesFromInstance(object target)
         {
             return GetSelfAndBaseTypesFromType(target.GetType());
         }

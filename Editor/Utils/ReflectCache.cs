@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace SaintsField.Editor.Utils
 {
@@ -11,23 +12,28 @@ namespace SaintsField.Editor.Utils
 
         private readonly struct AttributesKey : IEquatable<AttributesKey>
         {
-            readonly MemberInfo memberInfo;
-            readonly bool inherit;
-            readonly Type type;
+            private readonly MemberInfo _memberInfo;
+            private readonly bool _inherit;
+            private readonly Type _type;
 
             public AttributesKey(MemberInfo memberInfo, bool inherit, Type type = null)
             {
-                this.memberInfo = memberInfo;
-                this.inherit = inherit;
-                this.type = type;
+                _memberInfo = memberInfo;
+                _inherit = inherit;
+                _type = type;
             }
 
             public bool Equals(AttributesKey other) =>
-                Equals(memberInfo, other.memberInfo) && inherit == other.inherit && type == other.type;
+                Equals(_memberInfo, other._memberInfo) && _inherit == other._inherit && _type == other._type;
 
             public override bool Equals(object obj) => obj is AttributesKey other && Equals(other);
 
-            public override int GetHashCode() => Util.CombineHashCode(memberInfo, inherit, type);
+            public override int GetHashCode() => Util.CombineHashCode(_memberInfo, _inherit, _type);
+
+            public override string ToString()
+            {
+                return $"<Attribute member={_memberInfo.Name}-{_memberInfo.MemberType} type={_type} inherit={_inherit}/>";
+            }
         }
 
         public static Attribute[] GetCustomAttributes(MemberInfo memberInfo, bool inherit = false)
@@ -35,10 +41,11 @@ namespace SaintsField.Editor.Utils
             AttributesKey key = new AttributesKey(memberInfo, inherit);
             if (CustomAttributes.TryGetValue(key, out Attribute[] attributes))
             {
+                // Debug.Log($"cached fetch for {key} = {string.Join<Attribute>(", ", attributes)}");
                 return attributes;
             }
 
-            // ReSharper disable once CoVariantArrayConversion
+            // Debug.Log($"refresh fetch for {key}");
             attributes = memberInfo.GetCustomAttributes().ToArray();
             CustomAttributes[key] = attributes;
             return attributes;
@@ -50,12 +57,21 @@ namespace SaintsField.Editor.Utils
             if (CustomAttributes.TryGetValue(key, out Attribute[] attributes))
             {
                 // return (T[])attributes;
+                // Debug.Log($"cached fetch for {key} = {string.Join<Attribute>(", ", attributes)}");
                 return attributes.OfType<T>().ToArray();
             }
 
+            // Debug.Log($"refresh fetch for {key}");
             attributes = memberInfo.GetCustomAttributes().ToArray();
             CustomAttributes[key] = attributes;
             return attributes.OfType<T>().ToArray();
         }
+
+        // public static void ReplaceCustomAttributes(MemberInfo memberInfo, Attribute[] attributes, bool inherit = false)
+        // {
+        //     AttributesKey key = new AttributesKey(memberInfo, inherit);
+        //     Debug.Log($"replace cache for {key}");
+        //     CustomAttributes[key] = attributes;
+        // }
     }
 }

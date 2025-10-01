@@ -95,24 +95,24 @@ namespace SaintsField.Utils
             }
         }
 
-        public static object OnAfterDeserialize(SaintsSerializedProperty saintsSerializedProperty, Type targetType)
+        public static T OnAfterDeserialize<T>(SaintsSerializedProperty saintsSerializedProperty, Type targetType)
         {
             switch (saintsSerializedProperty.propertyType)
             {
                 case SaintsPropertyType.EnumLong:
                     if (targetType.IsEnum)
                     {
-                        return Enum.ToObject(targetType, saintsSerializedProperty.longValue);
+                        return (T)Enum.ToObject(targetType, saintsSerializedProperty.longValue);
                     }
-                    return Convert.ChangeType(saintsSerializedProperty.longValue, targetType);
+                    return (T)Convert.ChangeType(saintsSerializedProperty.longValue, targetType);
                 case SaintsPropertyType.EnumULong:
                     if (targetType.IsEnum)
                     {
-                        return Enum.ToObject(targetType, saintsSerializedProperty.uLongValue);
+                        return (T)Enum.ToObject(targetType, saintsSerializedProperty.uLongValue);
                     }
-                    return Convert.ChangeType(saintsSerializedProperty.uLongValue, targetType);
+                    return (T)Convert.ChangeType(saintsSerializedProperty.uLongValue, targetType);
                 case SaintsPropertyType.Undefined:
-                    return targetType.IsValueType ? Activator.CreateInstance(targetType) : null;
+                    return targetType.IsValueType ? (T)Activator.CreateInstance(targetType) : default;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(saintsSerializedProperty.propertyType), saintsSerializedProperty.propertyType, null);
             }
@@ -128,11 +128,11 @@ namespace SaintsField.Utils
             {
                 if (canFill)
                 {
-                    toFill[i] = (T)OnAfterDeserialize(saintsSerializedProperties[i], elementType);
+                    toFill[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], elementType);
                 }
                 else
                 {
-                    results[i] = (T)OnAfterDeserialize(saintsSerializedProperties[i], elementType);
+                    results[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], elementType);
                 }
             }
 
@@ -149,11 +149,11 @@ namespace SaintsField.Utils
             {
                 if (canFill)
                 {
-                    toFill[i] = (T)OnAfterDeserialize(saintsSerializedProperties[i], targetType);
+                    toFill[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], targetType);
                 }
                 else
                 {
-                    results[i] = (T)OnAfterDeserialize(saintsSerializedProperties[i], targetType);
+                    results[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], targetType);
                 }
             }
 

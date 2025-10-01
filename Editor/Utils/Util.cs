@@ -177,7 +177,7 @@ namespace SaintsField.Editor.Utils
             string propName = ReflectUtils.GetIWrapPropName(wrapProp.GetType());
             const BindingFlags bind = BindingFlags.Instance | BindingFlags.NonPublic |
                                       BindingFlags.Public | BindingFlags.FlattenHierarchy;
-            foreach (Type selfAndBaseType in ReflectUtils.GetSelfAndBaseTypes(wrapProp))
+            foreach (Type selfAndBaseType in ReflectUtils.GetSelfAndBaseTypesFromInstance(wrapProp))
             {
                 // Debug.Log(selfAndBaseType);
                 FieldInfo actualFieldInfo = selfAndBaseType.GetField(propName, bind);
@@ -471,7 +471,7 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, T value) GetOfNoParams<T>(object target, string by, T defaultValue)
         {
-            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
 
@@ -566,7 +566,7 @@ namespace SaintsField.Editor.Utils
                 return ("Target is null", defaultValue);
             }
 
-            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
 
@@ -846,7 +846,7 @@ namespace SaintsField.Editor.Utils
                 return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target);
             }
 
-            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
             {
                 MethodInfo methodInfo = type.GetMethod(by, bindAttr);
                 if (methodInfo == null)
@@ -1426,7 +1426,7 @@ namespace SaintsField.Editor.Utils
             foreach (string attrName in by.Split(SerializedUtils.pathSplitSeparator))
             {
                 MemberInfo accMemberInfo = null;
-                foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(accParent))
+                foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
                 {
                     MemberInfo[] members = type.GetMember(attrName,
                         BindingFlags.Public | BindingFlags.NonPublic |

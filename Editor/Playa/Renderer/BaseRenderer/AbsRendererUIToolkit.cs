@@ -225,7 +225,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static readonly Color ReColor = EColor.EditorSeparator.GetColor();
 
-        // before set: useful for struct editing that C# will messup and change the value of the reference you have
+        // before set: useful for struct editing that C# will mess-up and change the value of the reference you have
         public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, bool neverNullable)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT

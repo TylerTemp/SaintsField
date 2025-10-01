@@ -173,7 +173,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(parent))
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(parent))
             {
                 MethodInfo methodInfo = type.GetMethod(titleCallback, bindAttr);
                 if (methodInfo == null)

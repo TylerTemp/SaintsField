@@ -213,7 +213,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             object target = fieldWithInfo.Targets[0];
 
             // types.Reverse();
-            foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypes(target))
+            foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
                     ReflectUtils.GetProp(eachType, by);

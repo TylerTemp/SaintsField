@@ -54,6 +54,9 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     EnumMetaInfo enumMetaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
                     DropdownButtonULongElement ele = new DropdownButtonULongElement(enumMetaInfo);
                     SerializedProperty subProp = saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
+                    Debug.Log($"bind {targetType} to {subProp.propertyPath}");
+#endif
                     ele.BindProperty(subProp);
 
                     DropdownFieldULong r = new DropdownFieldULong(label, ele);
@@ -64,8 +67,18 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
                     ele.Button.clicked += () => ClickDropdown(ele.Button, enumMetaInfo, Enum.ToObject(enumMetaInfo.EnumType, subProp.ulongValue), v =>
                     {
-                        subProp.ulongValue = (ulong)v;
+                        ulong uv = (ulong)v;
+                        subProp.ulongValue = uv;
                         subProp.serializedObject.ApplyModifiedProperties();
+
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
+//                         Debug.Log($"update {targetType} value to {subProp.ulongValue} ({v})/{ele.value}");
+// #endif
+
+                        // if (ele.value != uv)
+                        // {
+                        //     ele.SetValueWithoutNotify(uv);
+                        // }
                     });
 
                     return r;

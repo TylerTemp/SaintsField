@@ -2512,6 +2512,7 @@ GameObject:
   m_Component:
   - component: {fileID: 889525105}
   - component: {fileID: 889525106}
+  - component: {fileID: 889525107}
   m_Layer: 0
   m_Name: CodeAnal
   m_TagString: Untagged
@@ -2546,6 +2547,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce80c99e8ba440c580d745ce53147594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples.EditorTest::SaintsField.CodeAnalTest
+  ms: {fileID: 11500000, guid: 0bc5d2fac74c5ae4e89d46fc08310525, type: 3}
+--- !u!114 &889525107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 889525104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7e088744d9886940a1d461b07102b56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples.EditorTest::SaintsField.Samples.EditorTest.CodeSerTest
 --- !u!1 &898746881
 GameObject:
   m_ObjectHideFlags: 0
@@ -4151,6 +4165,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1872314224
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &1500346665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4163,6 +4190,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c12153bf83683e54884fabf6011eeea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  normalIntArrays: 
+  normalString: 
+  content: 
+  testVar:
+    m_InternalValue: 0
 --- !u!4 &1500346666
 Transform:
   m_ObjectHideFlags: 0
@@ -4190,6 +4223,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 686656c53f7998841aecdf3d0da41a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  normalIntArrays: 
+  normalString: 
+  content: 
+  testVar:
+    m_InternalValue: 0
 --- !u!1 &1533286423
 GameObject:
   m_ObjectHideFlags: 0
@@ -5912,8 +5951,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 1175289511}
     m_Modifications:
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClareArr.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClareArr.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: LongEnumPub__SaintsSerialized__.longValue
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPub__SaintsSerialized__.uLongValue
@@ -5930,6 +5977,10 @@ PrefabInstance:
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: _uLongEnumPri__SaintsSerialized__.uLongValue
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: LongEnumPubArr__SaintsSerialized__.Array.size
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPubArr__SaintsSerialized__.Array.size
@@ -5956,12 +6007,32 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.InNested1__SaintsSerialized__.uLongValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumNormalPub__SaintsSerialized__.uLongValue
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.InNested1Arr__SaintsSerialized__.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: LongEnumPubArr__SaintsSerialized__.Array.data[0].longValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[0].uLongValue
-      value: 6
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClare.Insides__SaintsSerialized__.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClare.Insides__SaintsSerialized__.Array.size
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPubArr__SaintsSerialized__.Array.data[0].uLongValue
@@ -5974,6 +6045,10 @@ PrefabInstance:
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[0].propertyType
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: LongEnumPubArr__SaintsSerialized__.Array.data[0].propertyType
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPropArr__SaintsSerialized__.Array.data[0].uLongValue
@@ -6013,6 +6088,54 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: _uLongEnumPriLis__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.InNested1Arr__SaintsSerialized__.Array.data[0].uLongValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.InNested1Arr__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClare.Insides__SaintsSerialized__.Array.data[0].uLongValue
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClare.Insides__SaintsSerialized__.Array.data[0].uLongValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClare.Insides__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClare.Insides__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.data[0].uLongValue
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.data[0].uLongValue
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested1.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190998600362900080, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: nested2.insideClareArr.Array.data[0].Insides__SaintsSerialized__.Array.data[0].propertyType
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}

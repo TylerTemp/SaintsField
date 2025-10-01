@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct)]
     public class SaintsSerializedAttribute : Attribute, IPlayaAttribute
     {
     }

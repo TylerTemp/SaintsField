@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                           BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-            foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(parent))
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(parent))
             {
                 MethodInfo methodInfo = type.GetMethod(callback, bindAttr);
                 if (methodInfo == null)

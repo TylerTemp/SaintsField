@@ -18,8 +18,10 @@ using SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
+using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
+using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -84,9 +86,55 @@ namespace SaintsField.Editor
         public static IReadOnlyList<ISaintsRenderer> Setup(ICollection<string> skipSerializedFields, SerializedObject serializedObject, IMakeRenderer makeRenderer,
             IReadOnlyList<object> targets)
         {
+            string[] serFields = GetSerializedProperties(serializedObject).ToArray();
+// #if SAINTSFIELD_SERIALIZED && SAINTSFIELD_NEWTONSOFT_JSON
+//             (string filePath, IReadOnlyList<SerializedInfo> serializedInfos) = SaintsEditorUtils.GetSaintsSerialized(targets[0].GetType());
+//             if (serializedInfos != null)
+//             {
+//                 // Debug.Log(filePath.Replace("\\", "/"));
+//                 string fileContent = System.IO.File.ReadAllText($"Assets/{filePath}");
+//                 string fileMd5 = SaintsEditorUtils.CreateMD5(fileContent);
+//                 // DateTime lastWriteTime = System.IO.File.GetLastWriteTime($"Assets/{filePath}");
+//                 // Debug.Log($"{lastWriteTime:yyyyMMdd-HHmmss-ffff}/{filePath}");
+//                 // // string lastWriteTimeString = lastWriteTime.ToString("yyyyMMdd-HHmmss-ffff");
+//                 // string lastWriteTimeString = "";
+//
+//                 // const string serFolder = "Temp/SaintsField";
+//                 string tempFile = $"Temp/SaintsField/{filePath}.{fileMd5}.json";
+//                 string tempFolder = System.IO.Path.GetDirectoryName(tempFile);
+//                 if (!System.IO.Directory.Exists(tempFolder))
+//                 {
+//                     // ReSharper disable once AssignNullToNotNullAttribute
+//                     System.IO.Directory.CreateDirectory(tempFolder);
+//                 }
+//
+//                 if (serializedInfos.Count == 0)
+//                 {
+//                     System.IO.File.WriteAllText(tempFile, "[]");
+//                 }
+//                 else
+//                 {
+//                     // string tempFile = $"{serFolder}/{filePath}.json";
+//                     // Debug.Log(tempFile);
+//                     string oldContent = System.IO.File.Exists(tempFile)
+//                         ? System.IO.File.ReadAllText(tempFile)
+//                         : null;
+//                     string newContent = Newtonsoft.Json.JsonConvert.SerializeObject(serializedInfos,
+//                         Newtonsoft.Json.Formatting.Indented);
+//                     if (oldContent != newContent)
+//                     {
+//                         System.IO.File.WriteAllText(tempFile, newContent);
+// #if SAINTSFIELD_DEBUG
+//                         Debug.Log($"Force Re-Import {filePath}");
+// #endif
+//                         AssetDatabase.ImportAsset("Assets/" + filePath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+//                     }
+//                 }
+//             }
+// #endif
 
             // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
-            Dictionary<string, SerializedProperty> serializedPropertyDict = GetSerializedProperties(serializedObject)
+            Dictionary<string, SerializedProperty> serializedPropertyDict = serFields
                 .Where(each => !skipSerializedFields.Contains(each))
                 .ToDictionary(each => each, serializedObject.FindProperty);
             // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
@@ -164,7 +212,7 @@ namespace SaintsField.Editor
             else
             {
                 object target = targets[0];
-                types = ReflectUtils.GetSelfAndBaseTypes(target);
+                types = ReflectUtils.GetSelfAndBaseTypesFromInstance(target);
                 types.Reverse();
                 // base type -> this type
                 // a later field should override current in different depth
@@ -190,7 +238,7 @@ namespace SaintsField.Editor
 
                     Dictionary<MemberInfo, IPlayaAttribute[]> memberInfoToPlaya =
                         new Dictionary<MemberInfo, IPlayaAttribute[]>();
-                    Dictionary<string, MemberInfo> saintsSerializedActualPathToMemberInfo =
+                    Dictionary<string, MemberInfo> saintsSerializedActualNameToMemberInfo =
                         new Dictionary<string, MemberInfo>();
 
                     foreach (MemberInfo memberInfo in memberLis)
@@ -204,7 +252,8 @@ namespace SaintsField.Editor
                         }
                         else
                         {
-                            saintsSerializedActualPathToMemberInfo[saintsSerializedActualAttribute.Path] = memberInfo;
+                            saintsSerializedActualNameToMemberInfo[saintsSerializedActualAttribute.Name] = memberInfo;
+
                             pendingSerializedProperties.Remove(memberInfo.Name);
                             pendingSerializedProperties.Remove(RuntimeUtil.GetAutoPropertyName(memberInfo.Name));
                         }
@@ -268,7 +317,7 @@ namespace SaintsField.Editor
                                 {
                                     SaintsSerializedAttribute saintsSerializedAttribute = null;
                                     OrderedAttribute orderProp = null;
-                                    foreach (var playa in playaAttributes)
+                                    foreach (IPlayaAttribute playa in playaAttributes)
                                     {
                                         switch (playa)
                                         {
@@ -312,18 +361,24 @@ namespace SaintsField.Editor
                                             thisName = thisName.Substring(1,
                                                 thisName.Length - 1 - ">k__BackingField".Length);
                                         }
-                                        MemberInfo serInfo = null;
-                                        if (!saintsSerializedActualPathToMemberInfo.TryGetValue(thisName, out serInfo))
+
+                                        if (!saintsSerializedActualNameToMemberInfo.TryGetValue(thisName, out MemberInfo serInfo))
                                         {
-                                            if (!saintsSerializedActualPathToMemberInfo.ContainsKey(
-                                                    RuntimeUtil.GetAutoPropertyName(thisName)))
-                                            {
-                                                continue;
-                                            }
-                                            serInfo = saintsSerializedActualPathToMemberInfo[RuntimeUtil.GetAutoPropertyName(thisName)];
+                                            Debug.LogWarning($"failed to find serialized actual field for {fieldInfo.Name}");
+                                            continue;
                                         }
-                                        Debug.Assert(serInfo != null, fieldInfo.Name);
-                                        fieldInfo = (FieldInfo)serInfo;
+
+                                        // Attribute[] injectedAttrs = ReflectCache
+                                        //     .GetCustomAttributes(fieldInfo)
+                                        //     .Where(each => each is not NonSerializedAttribute
+                                        //                    && each is not HideInInspector
+                                        //                    && each is not SaintsSerializedAttribute)
+                                        //     .Prepend(ReflectCache.GetCustomAttributes<SaintsSerializedActualAttribute>(serInfo).First())
+                                        //     .ToArray();
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
+                                        Debug.Log($"wrap {fieldInfo.Name} to {serInfo.Name}");
+#endif
 
                                         thisDepthInfos.Add(new SaintsFieldWithInfo
                                         {
@@ -334,8 +389,8 @@ namespace SaintsField.Editor
 
                                             RenderType = SaintsRenderType.SerializedField,
                                             // memberType = nonSerFieldInfo.MemberType,
-                                            MemberId = fieldInfo.Name,
-                                            FieldInfo = fieldInfo,
+                                            MemberId = serInfo.Name,
+                                            FieldInfo = (FieldInfo)serInfo,
                                             InherentDepth = inherentDepth,
                                             Order = order,
                                             // serializable = false,
