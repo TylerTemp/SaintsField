@@ -7,6 +7,10 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
+            if (!preCheckResult.IsShown)
+            {
+                return 0f;
+            }
             return EditorGUI.GetPropertyHeight(FieldWithInfo.SerializedProperty, true);
         }
 
@@ -15,6 +19,10 @@ namespace SaintsField.Editor.Playa.Renderer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
             Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
 #endif
+            if (!preCheckResult.IsShown)
+            {
+                return;
+            }
 
             GUIContent useGUIContent = preCheckResult.HasRichLabel
                 ? new GUIContent(new string(' ', FieldWithInfo.SerializedProperty.displayName.Length), tooltip: FieldWithInfo.SerializedProperty.tooltip)
