@@ -103,15 +103,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.32.1**
+**4.32.2**
 
-1.  UI Toolkit: `long`/`ulong` enum type now support:
-    *   works with other attributes now
-    *   list now have a item count like a normal list
-    *   right click context menu now works
-    *   prefab changing indicator is working now
-2.  Fix code analysis not parsing marcos in source code
-3.  Code analysis now skip targets which are not in `Assets` folder
+1.  UI Toolkit: allow custom serialization for `long`/`ulong` enum type in struct/class [#289](github.com/TylerTemp/SaintsField/issues/289)
+2.  Fix code analysis can not recognize if you write multiple field variable in one line [#308](github.com/TylerTemp/SaintsField/issues/308)
+3.  IMGUI: fix auto validator won't open [#313](https://github.com/TylerTemp/SaintsField/issues/313)
+4.  IMGUI: fix incorrect ShowIf/HideIf height and display logic [#309](github.com/TylerTemp/SaintsField/issues/309)
+5.  Fix dll lfs [#310](https://github.com/TylerTemp/SaintsField/issues/310)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -7193,6 +7191,7 @@ If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/T
 
 > [!WARNING]
 > This feature is still experimental
+> This feature is UI Toolkit only
 
 `SaintsEditor` supports some types that usually can not be serialized.
 
@@ -7248,6 +7247,8 @@ public partial class MyBehavior: MonoBehaviour
         Second,
         Third,
     }
+    
+    [FormerlySerializedAs("MyOldName")]  // FormerlySerializedAs works too
     [NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumPub;
     [NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalPub;
     // EnumToggleButtons is supported too
@@ -7258,13 +7259,6 @@ public partial class MyBehavior: MonoBehaviour
 ![](https://github.com/user-attachments/assets/1e16d6d6-dfdd-483c-b95d-ba19f5706e66)
 
 This can work with `EnumToggleButtons`.
-
-Note some limit:
-
-*   (Fixed) ~~It can only work with `EnumToggleButtons`. **All** other field-based attributes like `InfoBox`, `OnValueChanged` etc are unsupported. It works with any `Playa` (Editor level) attributes.~~
-*   `FormerlySerializedAs` does nothing on it.
-*   Careful before trying it in a product case.
-*   (Fixed) ~~list/array type won't have a size input (as it's unfinished yet)~~
 
 ## `SaintsEditorWindow` ##
 

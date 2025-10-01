@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
@@ -36,7 +37,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             Third,
         }
 
-        [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
+        [NonSerialized, SaintsSerialized, FormerlySerializedAs("LongEnumPubTestValue")] public LongEnum LongEnumPub;
 
         [NonSerialized, SaintsSerialized] public LongEnum[] LongEnumPubArr;
 
