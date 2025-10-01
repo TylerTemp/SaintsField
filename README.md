@@ -105,10 +105,10 @@ namespace: `SaintsField`
 
 **4.32.2**
 
-1.  UI Toolkit: allow custom serialization for `long`/`ulong` enum type in struct/class [#289](github.com/TylerTemp/SaintsField/issues/289)
-2.  Fix code analysis can not recognize if you write multiple field variable in one line [#308](github.com/TylerTemp/SaintsField/issues/308)
+1.  UI Toolkit: allow custom serialization for `long`/`ulong` enum type in struct/class [#289](https://github.com/TylerTemp/SaintsField/issues/289)
+2.  Fix code analysis can not recognize if you write multiple field variable in one line [#308](https://github.com/TylerTemp/SaintsField/issues/308)
 3.  IMGUI: fix auto validator won't open [#313](https://github.com/TylerTemp/SaintsField/issues/313)
-4.  IMGUI: fix incorrect ShowIf/HideIf height and display logic [#309](github.com/TylerTemp/SaintsField/issues/309)
+4.  IMGUI: fix incorrect ShowIf/HideIf height and display logic [#309](https://github.com/TylerTemp/SaintsField/issues/309)
 5.  Fix dll lfs [#310](https://github.com/TylerTemp/SaintsField/issues/310)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
