@@ -166,7 +166,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
             {
                 if (_eLayout.HasFlagFast(ELayout.Horizontal))
                 {
-                    contentHeight += Mathf.Max(GetRenderer().Select(each => each.GetHeightIMGUI(width)).ToArray());
+                    float curMaxHeight = 0f;
+                    foreach (ISaintsRenderer renderer in GetRenderer())
+                    {
+                        float curHeight = renderer.GetHeightIMGUI(width);
+                        curMaxHeight = Mathf.Max(curMaxHeight, curHeight);
+                    }
+                    contentHeight += curMaxHeight;
                 }
                 else
                 {

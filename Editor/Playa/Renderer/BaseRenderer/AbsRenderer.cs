@@ -65,6 +65,15 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         protected PreCheckResult GetPreCheckResult(SaintsFieldWithInfo fieldWithInfo, bool isImGui)
         {
+            if (fieldWithInfo.PlayaAttributes == null)
+            {
+                return new PreCheckResult
+                {
+                    IsShown = true,
+                    ArraySize = (-1, -1),
+                };
+            }
+
             List<ToggleCheckInfo> preCheckInternalInfos = new List<ToggleCheckInfo>(fieldWithInfo.PlayaAttributes.Count);
             (int, int) arraySize = (-1, -1);
             foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
