@@ -211,10 +211,10 @@ namespace SaintsField.Editor.Playa.Utils
             {
                 switch (attribute)
                 {
-                    case NonSerializedAttribute:
+                    case NonSerializedAttribute _:
                         hasNonSer = true;
                         break;
-                    case SaintsSerializedAttribute:
+                    case SaintsSerializedAttribute _:
                         hasSaintsSer = true;
                         break;
                 }

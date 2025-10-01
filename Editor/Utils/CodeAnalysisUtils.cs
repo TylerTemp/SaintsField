@@ -251,7 +251,7 @@ namespace SaintsField.Editor.Utils
                 switch (memberDeclarationSyntax.Kind())
                 {
                     case SyntaxKind.FieldDeclaration:
-                        members.Add(ParseField((FieldDeclarationSyntax)memberDeclarationSyntax, index));
+                        members.AddRange(ParseField((FieldDeclarationSyntax)memberDeclarationSyntax, index));
                         break;
                     case SyntaxKind.PropertyDeclaration:
                         members.Add(ParseProperty((PropertyDeclarationSyntax)memberDeclarationSyntax, index));
@@ -265,13 +265,17 @@ namespace SaintsField.Editor.Utils
             return new ClassContainer(nameSpace, classDeclaration.Identifier.Text, baseTypes, members);
         }
 
-        private static MemberContainer ParseField(FieldDeclarationSyntax fieldDeclarationSyntax, int index)
+        private static IEnumerable<MemberContainer> ParseField(FieldDeclarationSyntax fieldDeclarationSyntax, int index)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
             Debug.Log(
                 $"[{index}]  Field : {fieldDeclarationSyntax.Declaration.Type} {string.Join(", ", fieldDeclarationSyntax.Declaration.Variables.Select(v => v.Identifier.Text))}");
 #endif
-            return new MemberContainer(MemberType.Field, fieldDeclarationSyntax.Declaration.Variables[0].Identifier.Text);
+            foreach (VariableDeclaratorSyntax variable in fieldDeclarationSyntax.Declaration.Variables)
+            {
+                yield return new MemberContainer(MemberType.Field, variable.Identifier.Text);
+            }
+
             // (new MemberContainer(MemberType.Field,
             //     string.Join(", ",
             //         fieldDeclarationSyntax.Declaration.Variables.Select(v =>
