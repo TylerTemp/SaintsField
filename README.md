@@ -7195,8 +7195,6 @@ If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/T
 
 `SaintsEditor` supports some types that usually can not be serialized.
 
-To use this feature, go `Window` - `Saints` - `Enable Extended Serialization`
-
 ### `long`/`ulong` Enum ###
 
 > [!WARNING]
@@ -7205,22 +7203,8 @@ To use this feature, go `Window` - `Saints` - `Enable Extended Serialization`
 You can serialize a `long`/`ulong` base typed `enum` with `SaintsSerialized`, which is not supported by Unity.
 
 1.  **IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial`
-2.  Add `[NonSerialized, SaintsSerialized]` to your enum field
+2.  Add `[SaintsSerialized]` to your enum field. To avoid Unity's default broken serialization, it's suggested to add `[NonSerialized]` too.
 
-Note: don't use it inside a serializable class/struct, it won't work:
-
-```csharp
-// this WON'T WORK
-[Serializable]
-public partial class MyClass
-{
-    [NonSerialized, SaintsSerialized]  // This won't work inside a normal class/struct
-    public MyULongEmun myEnum;
-} 
-
-// MyULongEmun won't get serialized in this field
-public MyClass myClass;
-```
 
 ```csharp
 // IMPORTANT: partial class
@@ -7253,6 +7237,16 @@ public partial class MyBehavior: MonoBehaviour
     [NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalPub;
     // EnumToggleButtons is supported too
     [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPubBtns;
+
+    [Serializable]  // use inside class/struct requires `partial` keyword too
+    public partial class MyClass
+    {
+        [NonSerialized, SaintsSerialized]  // This work inside a normal class/struct. Note the `partial`!
+        public MyULongEmun myEnum;
+    } 
+
+    // We don't need `SaintsSerialized` for this field
+    public MyClass myClass;
 }
 ```
 
