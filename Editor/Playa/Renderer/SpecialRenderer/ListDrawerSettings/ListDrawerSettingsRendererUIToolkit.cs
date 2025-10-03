@@ -512,6 +512,8 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     flexGrow = 1,
                     position = Position.Relative,
                 },
+                viewDataKey = property.propertyPath,
+                // bindingPath = property.propertyPath,
             };
 
             Foldout foldoutElement = listView.Q<Foldout>();
