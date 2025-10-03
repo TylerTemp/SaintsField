@@ -190,6 +190,107 @@ namespace SaintsField.Editor
             // return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
         }
 
+        // wtf with C#'s list order unstable... it's a fucking but not a feature
+        public class MemberOrderComparer : IComparer<MemberInfo>
+        {
+            private readonly IReadOnlyList<CodeAnalysisUtils.MemberContainer> _codeAnalysisMembers;
+
+            public MemberOrderComparer(IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
+            {
+                _codeAnalysisMembers = codeAnalysisMembers;
+            }
+
+            public int Compare(MemberInfo a, MemberInfo b)
+            {
+                int length = _codeAnalysisMembers.Count;
+                if (length == 0)
+                {
+                    return 0;  // keep order
+                }
+
+                int aIndex = FindMemberIndex(a, _codeAnalysisMembers);
+                int bIndex = FindMemberIndex(b, _codeAnalysisMembers);
+
+                if (aIndex == -1 || bIndex == -1)
+                {
+                    return 0;
+                }
+
+                // if (aIndex == bIndex)
+                // {
+                //     return 0;
+                // }
+                // if (aIndex == -1)
+                // {
+                //     return 1;
+                // }
+                // if (bIndex == -1)
+                // {
+                //     return -1;
+                // }
+
+                return aIndex - bIndex;
+            }
+
+            private static int FindMemberIndex(MemberInfo memberInfo,
+                IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
+            {
+                for (int index = 0; index < codeAnalysisMembers.Count; index++)
+                {
+                    CodeAnalysisUtils.MemberContainer memberContainer = codeAnalysisMembers[index];
+
+                    if (memberContainer.Name != memberInfo.Name && RuntimeUtil.GetAutoPropertyName(memberContainer.Name) != memberInfo.Name)
+                    {
+                        continue;
+                    }
+
+                    if(memberInfo.MemberType != MemberTypes.Method)  // field or property, just name is enough
+                    {
+                        return index;
+                    }
+
+                    if (memberContainer.Type != CodeAnalysisUtils.MemberType.Method)
+                    {
+                        continue;
+                    }
+
+                    MethodInfo methodInfo = (MethodInfo)memberInfo;
+
+                    string methodInfoReturnTypeString = ReflectUtils.StringifyType(methodInfo.ReturnType);
+                    if (methodInfoReturnTypeString != memberContainer.ReturnType)
+                    {
+                        continue;
+                    }
+
+                    if (methodInfo.GetParameters().Length != memberContainer.Arguments.Count)
+                    {
+                        continue;
+                    }
+
+                    bool allMatch = true;
+                    ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+                    for (int paramIndex = 0; paramIndex < parameterInfos.Length; paramIndex++)
+                    {
+                        string methodInfoParamTypeString = ReflectUtils.StringifyType(parameterInfos[paramIndex].ParameterType);
+                        string containerParamTypeString = memberContainer.Arguments[paramIndex];
+                        // Debug.Log($"[{paramIndex}] methodInfoParamTypeString={methodInfoParamTypeString}, containerParamTypeString={containerParamTypeString}");
+                        if(methodInfoParamTypeString != containerParamTypeString)
+                        {
+                            allMatch = false;
+                            break;
+                        }
+                    }
+
+                    if(allMatch)
+                    {
+                        return index;
+                    }
+                }
+
+                return -1;
+            }
+        }
+
         public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
             IReadOnlyList<object> targets)
@@ -227,14 +328,18 @@ namespace SaintsField.Editor
                     List<string> memberDepthIds = new List<string>();
 
                     IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers = ScriptInfoUtils.GetMembersCorrectOrder(systemType);
+                    MemberOrderComparer memberOrderComparer = new MemberOrderComparer(codeAnalysisMembers);
                     List<MemberInfo> memberLis = systemType
                         .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                     BindingFlags.Public | BindingFlags.DeclaredOnly)
                         // this is still not the correct order, but... a bit better
                         .OrderBy(memberInfo => memberInfo.MetadataToken)
+                        .ThenBy(memberInfo => memberInfo, memberOrderComparer)
                         .ToList();
 
-                    memberLis.Sort((a, b) => MemberLisCompare(a, b, codeAnalysisMembers));
+// #if SAINTSFIELD_CODE_ANALYSIS
+                    // memberLis.Sort((a, b) => MemberLisCompare(a, b, codeAnalysisMembers));
+// #endif
 
                     Dictionary<MemberInfo, IPlayaAttribute[]> memberInfoToPlaya =
                         new Dictionary<MemberInfo, IPlayaAttribute[]>();
@@ -525,89 +630,39 @@ namespace SaintsField.Editor
                 .Select(each => each.value);
         }
 
-        private static int MemberLisCompare(MemberInfo a, MemberInfo b,IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
-        {
-            int length = codeAnalysisMembers.Count;
-            if (length == 0)
-            {
-                return 0;  // keep order
-            }
+        // private static int MemberLisCompare(MemberInfo a, MemberInfo b,IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
+        // {
+        //     int length = codeAnalysisMembers.Count;
+        //     if (length == 0)
+        //     {
+        //         return 0;  // keep order
+        //     }
+        //
+        //     int aIndex = FindMemberIndex(a, codeAnalysisMembers);
+        //     int bIndex = FindMemberIndex(b, codeAnalysisMembers);
+        //
+        //     if (aIndex == -1 || bIndex == -1)
+        //     {
+        //         return 0;
+        //     }
+        //
+        //     // if (aIndex == bIndex)
+        //     // {
+        //     //     return 0;
+        //     // }
+        //     // if (aIndex == -1)
+        //     // {
+        //     //     return 1;
+        //     // }
+        //     // if (bIndex == -1)
+        //     // {
+        //     //     return -1;
+        //     // }
+        //
+        //     return aIndex - bIndex;
+        // }
 
-            int aIndex = FindMemberIndex(a, codeAnalysisMembers);
-            int bIndex = FindMemberIndex(b, codeAnalysisMembers);
-            if (aIndex == bIndex)
-            {
-                return 0;
-            }
-            if (aIndex == -1)
-            {
-                return 1;
-            }
-            if (bIndex == -1)
-            {
-                return -1;
-            }
 
-            return aIndex - bIndex;
-        }
-
-        private static int FindMemberIndex(MemberInfo memberInfo,
-            IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
-        {
-            for (int index = 0; index < codeAnalysisMembers.Count; index++)
-            {
-                CodeAnalysisUtils.MemberContainer memberContainer = codeAnalysisMembers[index];
-
-                if (memberContainer.Name != memberInfo.Name && RuntimeUtil.GetAutoPropertyName(memberContainer.Name) != memberInfo.Name)
-                {
-                    continue;
-                }
-
-                if(memberInfo.MemberType != MemberTypes.Method)  // field or property, just name is enough
-                {
-                    return index;
-                }
-
-                if (memberContainer.Type != CodeAnalysisUtils.MemberType.Method)
-                {
-                    continue;
-                }
-
-                MethodInfo methodInfo = (MethodInfo)memberInfo;
-
-                string methodInfoReturnTypeString = ReflectUtils.StringifyType(methodInfo.ReturnType);
-                if (methodInfoReturnTypeString != memberContainer.ReturnType)
-                {
-                    continue;
-                }
-
-                if (methodInfo.GetParameters().Length != memberContainer.Arguments.Count)
-                {
-                    continue;
-                }
-
-                bool allMatch = true;
-                ParameterInfo[] parameterInfos = methodInfo.GetParameters();
-                for (int paramIndex = 0; paramIndex < parameterInfos.Length; paramIndex++)
-                {
-                    string methodInfoParamTypeString = ReflectUtils.StringifyType(parameterInfos[paramIndex].ParameterType);
-                    string containerParamTypeString = memberContainer.Arguments[paramIndex];
-                    // Debug.Log($"[{paramIndex}] methodInfoParamTypeString={methodInfoParamTypeString}, containerParamTypeString={containerParamTypeString}");
-                    if(methodInfoParamTypeString != containerParamTypeString)
-                    {
-                        allMatch = false;
-                        break;
-                    }
-                }
-
-                if(allMatch)
-                {
-                    return index;
-                }
-            }
-
-            return -1;
-        }
 
         // private static IEnumerable<IPlayaAttribute> WrapPlayaAttributes(IPlayaAttribute[] getCustomAttributes)
         // {
