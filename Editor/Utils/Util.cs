@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using SaintsField.Condition;
 using SaintsField.Editor.Linq;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
@@ -1384,8 +1385,10 @@ namespace SaintsField.Editor.Utils
                 return (false, null);
             }
 
-            string findPath = parentPath + "." + relativePath;
-            SerializedProperty findProp = property.serializedObject.FindProperty(findPath);
+            // string findPath = parentPath + "." + relativePath;
+            SerializedProperty findProp =
+                property.serializedObject.FindProperty(parentPath + "." + relativePath)
+                ?? property.serializedObject.FindProperty(parentPath + "." + RuntimeUtil.GetAutoPropertyName(relativePath));
             // Debug.Log($"find prop {findPath} = {findProp}");
             return SerializedUtils.GetPropertyValue(findProp);
         }

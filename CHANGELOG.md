@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.32.4 ##
+
+For conditional checker (ShowIf, HideIf, RequiredIf), it'll try to obtain the serialized value first, to bypass Unity's limitation of `struct` value not refreshed.
+This cover the 80% of the use case where you need to compare values using another serialized field/property inside a struct.
+
 ## 4.32.3 ##
 
 1.  Fix an issue or field ordering with/without Code Analysis
