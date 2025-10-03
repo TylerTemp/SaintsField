@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -191,7 +192,7 @@ namespace SaintsField.Editor
         }
 
         // wtf with C#'s list order unstable... it's a fucking but not a feature
-        public class MemberOrderComparer : IComparer<MemberInfo>
+        public class MemberOrderComparer : IComparer<MemberInfo>, IComparer
         {
             private readonly IReadOnlyList<CodeAnalysisUtils.MemberContainer> _codeAnalysisMembers;
 
@@ -209,32 +210,39 @@ namespace SaintsField.Editor
                 }
 
                 int aIndex = FindMemberIndex(a, _codeAnalysisMembers);
+                // Debug.Log($"{a.Name} index {aIndex}");
                 int bIndex = FindMemberIndex(b, _codeAnalysisMembers);
+                // Debug.Log($"{b.Name} index {bIndex}");
 
-                if (aIndex == -1 || bIndex == -1)
+                // if (aIndex == -1 || bIndex == -1)
+                // {
+                //     // Debug.Log($"{a.Name} -> {aIndex}; {b.Name} -> {bIndex} return 0");
+                //     return 0;
+                // }
+
+                if (aIndex == bIndex)
                 {
                     return 0;
                 }
+                if (aIndex == -1)
+                {
+                    return 1;
+                }
+                if (bIndex == -1)
+                {
+                    return -1;
+                }
 
-                // if (aIndex == bIndex)
-                // {
-                //     return 0;
-                // }
-                // if (aIndex == -1)
-                // {
-                //     return 1;
-                // }
-                // if (bIndex == -1)
-                // {
-                //     return -1;
-                // }
-
+                // Debug.Log($"{a.Name} -> {aIndex}; {b.Name} -> {bIndex}");
                 return aIndex - bIndex;
+                // return bIndex - aIndex;
             }
 
             private static int FindMemberIndex(MemberInfo memberInfo,
                 IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
             {
+                // Debug.Log($"looking for member {memberInfo.Name}");
+
                 for (int index = 0; index < codeAnalysisMembers.Count; index++)
                 {
                     CodeAnalysisUtils.MemberContainer memberContainer = codeAnalysisMembers[index];
@@ -246,6 +254,7 @@ namespace SaintsField.Editor
 
                     if(memberInfo.MemberType != MemberTypes.Method)  // field or property, just name is enough
                     {
+                        // Debug.Log($"return {memberInfo.Name} as {index}");
                         return index;
                     }
 
@@ -283,11 +292,22 @@ namespace SaintsField.Editor
 
                     if(allMatch)
                     {
+                        // Debug.Log($"return {memberInfo.Name} as {index}");
                         return index;
                     }
                 }
 
                 return -1;
+            }
+
+            public int Compare(object x, object y)
+            {
+                if (x is MemberInfo xM && y is MemberInfo yM)
+                {
+                    return Compare(xM, yM);
+                }
+
+                return 0;
             }
         }
 
@@ -322,19 +342,31 @@ namespace SaintsField.Editor
                 for (int inherentDepth = 0; inherentDepth < types.Count; inherentDepth++)
                 {
                     Type systemType = types[inherentDepth];
+                    // if (systemType == typeof(UnityEngine.Component) ||
+                    //     systemType == typeof(UnityEngine.ScriptableObject) ||
+                    //     systemType == typeof(UnityEngine.MonoBehaviour))
+                    // {
+                    //     continue;
+                    // }
 
                     // as we can not get the correct order, we'll make it order as: field(serialized+nonSerialized), property, method
                     List<SaintsFieldWithInfo> thisDepthInfos = new List<SaintsFieldWithInfo>();
                     List<string> memberDepthIds = new List<string>();
 
+#if SAINTSFIELD_CODE_ANALYSIS
                     IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers = ScriptInfoUtils.GetMembersCorrectOrder(systemType);
                     MemberOrderComparer memberOrderComparer = new MemberOrderComparer(codeAnalysisMembers);
+#endif
+
                     List<MemberInfo> memberLis = systemType
                         .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                     BindingFlags.Public | BindingFlags.DeclaredOnly)
+#if SAINTSFIELD_CODE_ANALYSIS
+                        .OrderBy(memberInfo => memberInfo, memberOrderComparer)
+#else
                         // this is still not the correct order, but... a bit better
                         .OrderBy(memberInfo => memberInfo.MetadataToken)
-                        .ThenBy(memberInfo => memberInfo, memberOrderComparer)
+#endif
                         .ToList();
 
 // #if SAINTSFIELD_CODE_ANALYSIS
@@ -343,6 +375,7 @@ namespace SaintsField.Editor
 
                     Dictionary<MemberInfo, IPlayaAttribute[]> memberInfoToPlaya =
                         new Dictionary<MemberInfo, IPlayaAttribute[]>();
+                    List<MemberInfo> usedMemberInfos = new List<MemberInfo>();
                     Dictionary<string, MemberInfo> saintsSerializedActualNameToMemberInfo =
                         new Dictionary<string, MemberInfo>();
 
@@ -354,6 +387,7 @@ namespace SaintsField.Editor
                         if (saintsSerializedActualAttribute == null)
                         {
                             memberInfoToPlaya[memberInfo] = playaAttributes;
+                            usedMemberInfos.Add(memberInfo);
                         }
                         else
                         {
@@ -364,11 +398,12 @@ namespace SaintsField.Editor
                         }
                     }
 
-                    foreach (KeyValuePair<MemberInfo, IPlayaAttribute[]> kv in memberInfoToPlaya)
+                    // foreach (KeyValuePair<MemberInfo, IPlayaAttribute[]> kv in memberInfoToPlaya)
+                    foreach (MemberInfo memberInfo in usedMemberInfos)
                     {
-                        // Debug.Log(memberInfo.Name);
-                        MemberInfo memberInfo = kv.Key;
-                        IReadOnlyList<IPlayaAttribute> playaAttributes = kv.Value;
+                        // MemberInfo memberInfo = kv.Key;
+                        // IReadOnlyList<IPlayaAttribute> playaAttributes = kv.Value;
+                        IReadOnlyList<IPlayaAttribute> playaAttributes = memberInfoToPlaya[memberInfo];
                         // IReadOnlyList<IPlayaAttribute> playaAttributes =
                         //     ReflectCache.GetCustomAttributes<IPlayaAttribute>(memberInfo);
 
@@ -511,6 +546,7 @@ namespace SaintsField.Editor
                                 break;
                             case PropertyInfo propertyInfo:
                             {
+                                // Debug.Log(propertyInfo.Name);
                                 #region NativeProperty
 
                                 if (playaAttributes.Count > 0)
@@ -539,6 +575,7 @@ namespace SaintsField.Editor
                                 break;
                             case MethodInfo methodInfo:
                             {
+                                // Debug.Log(methodInfo.Name);
                                 #region Method
 
                                 // method attributes will be collected no matter what, because DOTweenPlayGroup depending on it even

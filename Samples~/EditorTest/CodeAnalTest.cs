@@ -1,4 +1,4 @@
-#if UNITY_EDITOR && SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS
+#if UNITY_EDITOR && SAINTSFIELD_CODE_ANALYSIS
 using System.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;

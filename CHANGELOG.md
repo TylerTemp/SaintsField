@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.32.3 ##
+
+1.  Fix an issue or field ordering with/without Code Analysis
+2.  Fix the `Expand` inside a horizontal layout might get out of box
+
 ## 4.32.2 ##
 
 1.  UI Toolkit: allow custom serialization for `long`/`ulong` enum type in struct/class [#289](https://github.com/TylerTemp/SaintsField/issues/289)

@@ -103,13 +103,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.32.2**
+**4.32.3**
 
-1.  UI Toolkit: allow custom serialization for `long`/`ulong` enum type in struct/class [#289](https://github.com/TylerTemp/SaintsField/issues/289)
-2.  Fix code analysis can not recognize if you write multiple field variable in one line [#308](https://github.com/TylerTemp/SaintsField/issues/308)
-3.  IMGUI: fix auto validator won't open [#313](https://github.com/TylerTemp/SaintsField/issues/313)
-4.  IMGUI: fix incorrect ShowIf/HideIf height and display logic [#309](https://github.com/TylerTemp/SaintsField/issues/309)
-5.  Fix dll lfs [#310](https://github.com/TylerTemp/SaintsField/issues/310)
+1.  Fix an issue or field ordering with/without Code Analysis
+2.  Fix the `Expand` inside a horizontal layout might get out of box
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4815,8 +4812,6 @@ public int norFieldLayout;
 
 ![](https://github.com/user-attachments/assets/86678cfa-1c9c-413f-8c5a-47f0b52208d4)
 
-Here are ways of install it (pick one):
-
 **NuGet for Unity** (recommended):
 
 1.  Install [NuGet for Unity](https://github.com/GlitchEnzo/NuGetForUnity?tab=readme-ov-file#how-do-i-install-nugetforunity)
@@ -4828,10 +4823,7 @@ Here are ways of install it (pick one):
     ![](https://github.com/user-attachments/assets/766775cd-9e7c-4361-8bab-abab8bda39e8)
 4.  Go `Window` - `Saints` - `Enable Code Analysis...`
 
-**Unity's Official Document**
-
-1.  Read [Roslyn analyzers and source generators](https://docs.unity3d.com/6000.2/Documentation/Manual/create-source-generator.html), and see the "Install the `Microsoft.CodeAnalysis.Csharp` NuGet package" for how to install it.
-2.  Go `Window` - `Saints` - `Enable Code Analysis...`
+Or you can manually install related dll to Unity.
 
 ### `Layout` ###
 
