@@ -503,7 +503,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
         private static void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> notFilledtoggleCheckInfos, VisualElement root, VisualElement body)
         {
             List<ToggleCheckInfo> toggleCheckInfos = notFilledtoggleCheckInfos
-                .Select(SaintsEditorUtils.FillResult)
+                .Select(v => SaintsEditorUtils.FillResult(v, null))
                 .ToList();
 
             (bool show, bool disable) = SaintsEditorUtils.GetToggleResult(toggleCheckInfos);

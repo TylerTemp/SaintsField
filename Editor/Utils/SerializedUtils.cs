@@ -587,5 +587,77 @@ namespace SaintsField.Editor.Utils
                 return false;
             }
         }
+
+        public static (bool, object) GetPropertyValue(SerializedProperty property)
+        {
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Integer:
+                    return (true, property.intValue);
+                case SerializedPropertyType.Boolean:
+                    return (true, property.boolValue);
+                case SerializedPropertyType.Float:
+                    return (true, property.floatValue);
+                case SerializedPropertyType.String:
+                    return (true, property.stringValue);
+                case SerializedPropertyType.Color:
+                    return (true, property.colorValue);
+                case SerializedPropertyType.ObjectReference:
+                    return (true, property.objectReferenceValue);
+                case SerializedPropertyType.LayerMask:
+                    return (true, property.intValue);
+                case SerializedPropertyType.Enum:
+                    return (true, property.intValue);
+                case SerializedPropertyType.Vector2:
+                    return (true, property.vector2Value);
+                case SerializedPropertyType.Vector3:
+                    return (true, property.vector3Value);
+                case SerializedPropertyType.Vector4:
+                    return (true, property.vector4Value);
+                case SerializedPropertyType.Rect:
+                    return (true, property.rectValue);
+                case SerializedPropertyType.ArraySize:
+                    if (property.isArray)
+                    {
+                        return (true, property.arraySize);
+                    }
+                    return (false, null);
+                case SerializedPropertyType.Character:
+                    return (true, property.intValue);
+                case SerializedPropertyType.AnimationCurve:
+                    return (true, property.animationCurveValue);
+                case SerializedPropertyType.Bounds:
+                    return (true, property.boundsValue);
+                case SerializedPropertyType.Quaternion:
+                    return (true, property.quaternionValue);
+                case SerializedPropertyType.ExposedReference:
+                    return (true, property.exposedReferenceValue);
+                case SerializedPropertyType.FixedBufferSize:
+                    return (true, property.fixedBufferSize);
+                case SerializedPropertyType.Vector2Int:
+                    return (true, property.vector2IntValue);
+                case SerializedPropertyType.Vector3Int:
+                    return (true, property.vector3IntValue);
+                case SerializedPropertyType.RectInt:
+                    return (true, property.rectIntValue);
+                case SerializedPropertyType.BoundsInt:
+                    return (true, property.boundsIntValue);
+#if UNITY_2019_3_OR_NEWER
+                case SerializedPropertyType.ManagedReference:
+                    return (false, null);
+#endif
+                case SerializedPropertyType.Generic:
+                {
+                    return (false, null);
+                }
+                case SerializedPropertyType.Gradient:
+#if UNITY_2021_1_OR_NEWER
+                case SerializedPropertyType.Hash128:
+                    return (true, property.hash128Value);
+#endif
+                default:
+                    return (false, null);
+            }
+        }
     }
 }

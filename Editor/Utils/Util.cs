@@ -439,7 +439,46 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL
             Debug.Log($"check equal using .Equals on {itemValue} -> {curValue}");
 #endif
-            // ReSharper disable once InvertIf
+
+            if (curValue is Enum curEnum)
+            {
+                if (itemValue is Enum itemE)
+                {
+                    try
+                    {
+                        return curEnum.Equals(itemE);
+                    }
+                    catch (Exception)
+                    {
+                        //
+                    }
+                }
+
+                try
+                {
+                    object curConverted = Convert.ChangeType(curValue, curEnum.GetType().GetEnumUnderlyingType());
+                    object itemConverted = Convert.ChangeType(itemValue, curEnum.GetType().GetEnumUnderlyingType());
+                    return itemConverted.Equals(curConverted);
+                }
+                catch (Exception)
+                {
+                    //
+                }
+            }
+
+            if (itemValue is Enum itemEnum)
+            {
+                try
+                {
+                    object curConverted = Convert.ChangeType(curValue, itemEnum.GetType().GetEnumUnderlyingType());
+                    object itemConverted = Convert.ChangeType(itemValue, itemEnum.GetType().GetEnumUnderlyingType());
+                    return itemConverted.Equals(curConverted);
+                }
+                catch (Exception)
+                {
+                    //
+                }
+            }
 
             bool equalCalledResult = false;
 
@@ -1318,6 +1357,39 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        private static (bool found, object value) FindRelativeProperty(SerializedProperty property, string relativePath)
+        {
+            if (!SerializedUtils.IsOk(property))
+            {
+                return (false, null);
+            }
+
+            string propPath = property.propertyPath;
+            string parentPath = null;
+            string[] dotSplit = propPath.Split('.');
+            if (propPath.EndsWith("]")) // in array
+            {
+                if (dotSplit.Length > 2)
+                {
+                    parentPath = string.Join(".", dotSplit, 0, dotSplit.Length - 2);
+                }
+            }
+            else
+            {
+                parentPath = string.Join(".", dotSplit, 0, dotSplit.Length - 1);
+            }
+
+            if (parentPath == null)
+            {
+                return (false, null);
+            }
+
+            string findPath = parentPath + "." + relativePath;
+            SerializedProperty findProp = property.serializedObject.FindProperty(findPath);
+            // Debug.Log($"find prop {findPath} = {findProp}");
+            return SerializedUtils.GetPropertyValue(findProp);
+        }
+
         public static (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) ConditionChecker(IEnumerable<ConditionInfo> conditionInfos, SerializedProperty property, MemberInfo info, object target)
         {
             List<bool> callbackBoolResults = new List<bool>();
@@ -1339,28 +1411,53 @@ namespace SaintsField.Editor.Utils
                     continue;
                 }
 
-                (string error, object result) = conditionStringTarget.Contains(".")
-                    ? AccGetOf<object>(conditionStringTarget, null, property, target)
-                    : GetOf<object>(conditionStringTarget, null, property, info, target);
+                bool foundResult = false;
+                object result = null;
 
-                if (error != "")
+                (bool found, object value) propResult = FindRelativeProperty(property, conditionStringTarget);
+                if (propResult.found)
                 {
-                    errors.Add(error);
-                    continue;
+                    foundResult = true;
+                    result = propResult.value;
+                }
+
+                if(!foundResult)
+                {
+                    (string error, object getResult) = conditionStringTarget.Contains(".")
+                        ? AccGetOf<object>(conditionStringTarget, null, property, target)
+                        : GetOf<object>(conditionStringTarget, null, property, info, target);
+
+                    if (error != "")
+                    {
+                        errors.Add(error);
+                        continue;
+                    }
+
+                    result = getResult;
                 }
 
                 object value = conditionInfo.Value;
                 if (conditionInfo.ValueIsCallback)
                 {
                     Debug.Assert(value is string, $"value {value} of target {conditionInfo.Target} is not a string as a callback name");
-                    (string errorValue, object callbackResult) = GetOf<object>((string)value, null, property, info, target);
-                    if (errorValue != "")
-                    {
-                        errors.Add(errorValue);
-                        continue;
-                    }
 
-                    value = callbackResult;
+                    (bool found, object value) propValue = FindRelativeProperty(property, conditionStringTarget);
+                    if (propValue.found)
+                    {
+                        value = propValue.value;
+                    }
+                    else
+                    {
+                        (string errorValue, object callbackResult) =
+                            GetOf<object>((string)value, null, property, info, target);
+                        if (errorValue != "")
+                        {
+                            errors.Add(errorValue);
+                            continue;
+                        }
+
+                        value = callbackResult;
+                    }
                 }
 
                 bool boolResult;
@@ -1370,6 +1467,7 @@ namespace SaintsField.Editor.Utils
                         boolResult = ReflectUtils.Truly(result);
                         break;
                     case LogicCompare.Equal:
+                        // Debug.Log($"{result}, {value}");
                         boolResult = GetIsEqual(result, value);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_CONDITION
                         Debug.Log($"#Condition# {result} == {value} = {boolResult}");

@@ -48,7 +48,7 @@ namespace SaintsField.Utils
             return obj == null;
         }
 
-        public static IEnumerable<string> SeperatePath(string path)
+        public static IEnumerable<string> SeparatePath(string path)
         {
             List<RichTextParsedChunk> openTag = new List<RichTextParsedChunk>();
             List<RichTextParsedChunk> acc = new List<RichTextParsedChunk>();
@@ -480,7 +480,6 @@ namespace SaintsField.Utils
             // // Use Regex.Split to split the string by tags
             // string[] splitByTags = Regex.Split(richXml, pattern);
         }
-
 
         private static (RichPartType partType, string content, string value, bool isSelfClose) ParsePart(string part)
         {

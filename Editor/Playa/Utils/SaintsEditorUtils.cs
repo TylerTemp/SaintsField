@@ -37,9 +37,9 @@ namespace SaintsField.Editor.Playa.Utils
         }
 #endif
 
-        public static ToggleCheckInfo FillResult(ToggleCheckInfo toggleCheckInfo)
+        public static ToggleCheckInfo FillResult(ToggleCheckInfo toggleCheckInfo, SerializedProperty serializedProperty)
         {
-            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(toggleCheckInfo.ConditionInfos, null, null, toggleCheckInfo.Target);
+            (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) = Util.ConditionChecker(toggleCheckInfo.ConditionInfos, serializedProperty, null, toggleCheckInfo.Target);
 
             return new ToggleCheckInfo(toggleCheckInfo, errors, boolResults);
         }

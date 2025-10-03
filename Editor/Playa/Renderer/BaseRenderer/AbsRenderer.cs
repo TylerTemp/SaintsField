@@ -120,7 +120,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             for (int i = 0; i < preCheckInternalInfos.Count; i++)
             {
-                preCheckInternalInfos[i] = SaintsEditorUtils.FillResult(preCheckInternalInfos[i]);
+                preCheckInternalInfos[i] = SaintsEditorUtils.FillResult(preCheckInternalInfos[i], fieldWithInfo.SerializedProperty);
             }
 
             (bool showIfResult, bool disableIfResult) = SaintsEditorUtils.GetToggleResult(preCheckInternalInfos);

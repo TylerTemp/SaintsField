@@ -80,7 +80,7 @@ namespace SaintsField
         // this will parse "/"
         public void Add(string displayNames, T value, bool disabled = false, string icon = null)
         {
-            AddByNames(this, new Queue<string>(RuntimeUtil.SeperatePath(displayNames)), value, disabled, icon);
+            AddByNames(this, new Queue<string>(RuntimeUtil.SeparatePath(displayNames)), value, disabled, icon);
         }
 
         // this add a separator
