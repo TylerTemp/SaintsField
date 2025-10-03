@@ -8,6 +8,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -1071,11 +1072,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
         private static VisualElement CreateCellElement(FieldInfo info, Type rawType, SerializedProperty serializedProperty, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
+
             PropertyAttribute[] allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(info);
+            // Debug.Log($"{info.Name}: {string.Join<PropertyAttribute>(", ", allAttributes)}");
 
             Type useDrawerType = null;
             Attribute useAttribute = null;
-            IReadOnlyList<PropertyAttribute> appendPropertyAttributes = null;
+            IReadOnlyList<PropertyAttribute> appendPropertyAttributes = allAttributes;
             string wrapName = ReflectUtils.GetIWrapPropName(rawType);
             Type wrapType = ReflectUtils.GetIWrapPropType(rawType, wrapName);
             FieldInfo wrapInfo = (FieldInfo)ReflectUtils.GetProp(rawType, wrapName).fieldOrMethodInfo;
@@ -1114,12 +1117,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         PropertyAttribute prop = new SaintsRowAttribute(inline: true);
                         useAttribute = prop;
                         useDrawerType = typeof(SaintsRowAttributeDrawer);
-                        appendPropertyAttributes = new[] { prop };
+                        appendPropertyAttributes = allAttributes.Prepend(prop).ToArray();
                     }
                 }
             }
 
-            // Debug.Log($"{serializedBaseProperty.propertyPath}/{useDrawerType}");
+            // Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath}/{useDrawerType}");
 
             if (useDrawerType == null)
             {
@@ -1135,7 +1138,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     null,
                     parent
                 );
-                return UIToolkitCache.MergeWithDec(r, allAttributes);
+                VisualElement merged = UIToolkitCache.MergeWithDec(r, allAttributes);
+                SaintsRendererGroup.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
+                return merged;
             }
 
             // Nah... This didn't handle for mis-ordered case
@@ -1160,6 +1165,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 saintsPropertyDrawer.InHorizontalLayout = true;
                 saintsPropertyDrawer.AppendPropertyAttributes = appendPropertyAttributes;
+                // Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath} -> {string.Join(", ", saintsPropertyDrawer.AppendPropertyAttributes)}");
             }
 
             MethodInfo uiToolkitMethod = useDrawerType.GetMethod("CreatePropertyGUI");
@@ -1175,7 +1181,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}");
                 VisualElement r = propertyDrawer.CreatePropertyGUI(serializedBaseProperty);
-                return UIToolkitCache.MergeWithDec(r, allAttributes);
+                VisualElement merged = UIToolkitCache.MergeWithDec(r, allAttributes);
+                SaintsRendererGroup.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
+                return merged;
             }
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
