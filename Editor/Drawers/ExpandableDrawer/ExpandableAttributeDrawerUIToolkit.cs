@@ -25,6 +25,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
+            // Debug.Log($"expandable for {property.propertyPath}");
             Foldout foldOut = new Foldout
             {
                 style =
@@ -36,6 +37,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 },
                 name = NameFoldout(property),
                 value = property.isExpanded,
+                userData = container,
             };
             Toggle toggle = foldOut.Q<Toggle>();
             if (toggle != null)

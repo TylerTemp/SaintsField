@@ -579,6 +579,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         if (toggle.userData is VisualElement moverTarget)
                         {
+                            // Debug.Log($"moving {toggle} for {moverTarget}");
                             if (moverTarget.style.paddingLeft != 12)
                             {
                                 moverTarget.style.paddingLeft = 12;
@@ -586,6 +587,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         }
                         else
                         {
+                            // Debug.Log($"moving {toggle} marginLeft");
                             toggle.style.marginLeft = 0;
                         }
                     }

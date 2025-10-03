@@ -7835,6 +7835,9 @@ Go to `Window` - `Saints` to enable/disable functions you want
 
     #"Enable IMGUI duplicated decorators drawing fix"
     -define:SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
+
+    #"Enable the code analysis"
+    -define:SAINTSFIELD_CODE_ANALYSIS
     ```
 
 Note: `csc.rsp` can override settings by Saints Menu.
