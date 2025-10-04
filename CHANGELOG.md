@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.32.5 ##
+
+1.  UI Toolkit: fix long/ulong non-flags enum picker failed to display a correct name
+2.  UI Toolkit: fix conditional checker error if the target is not found
+3.  UI Toolkit: fix list/array element incorrectly rendered the decorator attributes again
+
 ## 4.32.4 ##
 
 For conditional checker (ShowIf, HideIf, RequiredIf), it'll try to obtain the serialized value first, to bypass Unity's limitation of `struct` value not refreshed.

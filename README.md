@@ -103,10 +103,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.32.4**
+**4.32.5**
 
-For conditional checker (ShowIf, HideIf, RequiredIf), it'll try to obtain the serialized value first, to bypass Unity's limitation of `struct` value not refreshed.
-This cover the 80% of the use case where you need to compare values using another serialized field/property inside a struct.
+1.  UI Toolkit: fix long/ulong non-flags enum picker failed to display a correct name
+2.  UI Toolkit: fix conditional checker error if the target is not found
+3.  UI Toolkit: fix list/array element incorrectly rendered the decorator attributes again
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
