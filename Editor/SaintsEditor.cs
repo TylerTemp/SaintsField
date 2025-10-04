@@ -322,6 +322,10 @@ namespace SaintsField.Editor
             Dictionary<string, SerializedProperty> pendingSerializedProperties = serializedPropertyDict.ToDictionary(each => each.Key, each => each.Value);
             pendingSerializedProperties.Remove("m_Script");
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
+            Debug.Log($"serializedPropertyDict: {string.Join(", ", serializedPropertyDict.Keys)}");
+#endif
+
             List<Type> types = new List<Type>();
             if (targets.Count == 0 || targets.All(RuntimeUtil.IsNull))
             {
@@ -395,6 +399,10 @@ namespace SaintsField.Editor
 
                             pendingSerializedProperties.Remove(memberInfo.Name);
                             pendingSerializedProperties.Remove(RuntimeUtil.GetAutoPropertyName(memberInfo.Name));
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
+                            Debug.Log($"remove {memberInfo.Name} from pendingSer and put {saintsSerializedActualAttribute.Name} as actual serialize field");
+#endif
                         }
                     }
 

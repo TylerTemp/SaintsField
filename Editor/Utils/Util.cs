@@ -1390,6 +1390,13 @@ namespace SaintsField.Editor.Utils
                 property.serializedObject.FindProperty(parentPath + "." + relativePath)
                 ?? property.serializedObject.FindProperty(parentPath + "." + RuntimeUtil.GetAutoPropertyName(relativePath));
             // Debug.Log($"find prop {findPath} = {findProp}");
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (findProp == null)
+            {
+                return (false, null);
+            }
+
             return SerializedUtils.GetPropertyValue(findProp);
         }
 

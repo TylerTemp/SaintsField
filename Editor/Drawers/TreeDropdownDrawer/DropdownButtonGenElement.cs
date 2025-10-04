@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Utils;
 using UnityEngine;
@@ -19,7 +20,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         private bool _hasCachedValue;
         private T _cachedValue;
 
-        public readonly Button Button;
+        private readonly Button _button;
 
         protected DropdownButtonGenElement(EnumMetaInfo metaInfo)
         {
@@ -28,13 +29,15 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             TemplateContainer dropdownElement = UIToolkitUtils.CloneDropdownButtonTree();
             dropdownElement.style.flexGrow = 1;
 
-            Button = dropdownElement.Q<Button>();
+            _button = dropdownElement.Q<Button>();
 
-            Button.style.flexGrow = 1;
+            _button.style.flexGrow = 1;
 
-            _label = Button.Q<Label>();
+            _label = _button.Q<Label>();
 
             Add(dropdownElement);
+
+            _button.clicked += ClickDropdown;
         }
 
         public void SetValueWithoutNotify(T newValue)
@@ -43,11 +46,12 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             _cachedValue = newValue;
 
             // Debug.Log(_metaInfo.IsFlags);
+            object newEnum = Enum.ToObject(_metaInfo.EnumType, newValue);
+            bool isInvalid = false;
             if(_metaInfo.IsFlags)
             {
                 List<EnumMetaInfo.EnumValueInfo> renderLabels = new List<EnumMetaInfo.EnumValueInfo>();
                 object zeroBit = Enum.ToObject(_metaInfo.EnumType, 0);
-                object newEnum = Enum.ToObject(_metaInfo.EnumType, newValue);
                 if (newEnum.Equals(zeroBit))
                 {
                     renderLabels.Add(_metaInfo.NothingValue.HasValue
@@ -121,6 +125,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     if (onValueInfos.Count == 0)
                     {
                         renderLabels.Add(InvalidValueInfo(newValue));
+                        isInvalid = true;
                     }
                     else
                     {
@@ -136,13 +141,19 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             {
                 foreach (EnumMetaInfo.EnumValueInfo metaInfoEnumValue in _metaInfo.EnumValues)
                 {
-                    if (metaInfoEnumValue.Value.Equals(newValue))
+                    if (metaInfoEnumValue.Value.Equals(newEnum))
                     {
                         SetLabelRichTextWithTooltips(_label, new[] { metaInfoEnumValue });
                         return;
                     }
                 }
                 SetLabelRichTextWithTooltips(_label, new[] { InvalidValueInfo(newValue) } );
+                isInvalid = true;
+            }
+
+            if (isInvalid)
+            {
+                _button.tooltip = $"<color=red>Invalid Value</color> {newValue}";
             }
         }
 
@@ -165,8 +176,147 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 using ChangeEvent<T> evt = ChangeEvent<T>.GetPooled(previous, value);
                 evt.target = this;
                 SendEvent(evt);
+                // Debug.Log($"event sent: {previous} -> {value}");
             }
         }
+
+        private void ClickDropdown()
+        {
+            // Debug.Log($"bindingPath={bindingPath}; curValue={value}; has={_hasCachedValue}");
+            // Debug.Log($"binding={binding}/{binding?.GetType()}. dataSource={dataSource}");
+
+            bool isULong = _metaInfo.UnderType == typeof(ulong);
+            #region MetaInfo
+
+            AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>("");
+            List<object> curValues = new List<object>();
+            object curValue = Enum.ToObject(_metaInfo.EnumType, value);
+            bool containsEverythingOrNothing = false;
+
+            object zeroEnum = Enum.ToObject(_metaInfo.EnumType, 0);
+            if(_metaInfo.IsFlags)
+            {
+                if (_metaInfo.NothingValue.HasValue)
+                {
+                    enumDropdown.Add(_metaInfo.NothingValue.Label, _metaInfo.NothingValue.Value);
+                }
+                else
+                {
+                    enumDropdown.Add("Nothing", zeroEnum);
+                }
+
+                containsEverythingOrNothing = zeroEnum.Equals(curValue);
+
+                if (containsEverythingOrNothing)
+                {
+                    curValues.Add(zeroEnum);
+                }
+
+                if (_metaInfo.EverythingValue.HasValue)
+                {
+                    enumDropdown.Add(_metaInfo.EverythingValue.Label, _metaInfo.EverythingValue.Value);
+                }
+                else
+                {
+                    enumDropdown.Add("Everything", _metaInfo.EverythingBit);
+                }
+
+                if (!containsEverythingOrNothing)
+                {
+                    containsEverythingOrNothing = EnumFlagsUtil.IsOnObject(curValue, _metaInfo.EverythingBit,
+                        isULong);
+                    if (containsEverythingOrNothing)
+                    {
+                        curValues.Add(_metaInfo.EverythingBit);
+                    }
+                }
+
+                enumDropdown.AddSeparator();
+            }
+
+            foreach (EnumMetaInfo.EnumValueInfo enumInfo in _metaInfo.EnumValues)
+            {
+                // Debug.Log($"Add {enumInfo.Label} {enumInfo.Value}");
+                enumDropdown.Add(enumInfo.Label, enumInfo.Value);
+                if (!containsEverythingOrNothing)
+                {
+                    if (_metaInfo.IsFlags)
+                    {
+                        if (EnumFlagsUtil.IsOnObject(curValue, enumInfo.Value, isULong))
+                        {
+                            curValues.Add(enumInfo.Value);
+                        }
+                    }
+                    else
+                    {
+                        if (enumInfo.Value.Equals(curValue))
+                        {
+                            curValues.Add(curValue);
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            {
+                DropdownListValue = enumDropdown,
+                CurValues = curValues,
+                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                Error = "",
+            };
+
+            (Rect popWorldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(_button.worldBound);
+
+            SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
+                metaInfo,
+                _button.worldBound.width,
+                maxHeight,
+                false,
+                (curItem, on) =>
+                {
+                    // Debug.Log($"curItem={curItem}");
+                    // beforeSet?.Invoke(refDrawPayload.Value);
+                    if (_metaInfo.IsFlags)
+                    {
+
+                        if (curItem.Equals(zeroEnum))
+                        {
+                            value = (T)Convert.ChangeType(0, _metaInfo.UnderType);
+                        }
+                        else if (curItem.Equals(_metaInfo.EverythingBit))
+                        {
+                            value = (T)Convert.ChangeType(_metaInfo.EverythingBit, _metaInfo.UnderType);
+                        }
+                        else if (on)
+                        {
+                            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                            if (_metaInfo.EverythingBit.Equals(curValue))
+                            {
+                                value = (T)Convert.ChangeType(curItem, _metaInfo.UnderType);
+                            }
+                            else
+                            {
+                                value = (T)Convert.ChangeType(EnumFlagsUtil.SetOnBitObject(curValue, curItem, isULong), _metaInfo.UnderType);
+                            }
+                        }
+                        else
+                        {
+                            value = (T)Convert.ChangeType(EnumFlagsUtil.SetOffBitObject(curValue, curItem, isULong), _metaInfo.UnderType);
+                        }
+                    }
+                    else
+                    {
+                        value = (T)Convert.ChangeType(curItem, _metaInfo.UnderType);
+                    }
+                    _button.Blur();
+                    return null;
+                }
+            );
+            UnityEditor.PopupWindow.Show(popWorldBound, sa);
+        }
+
 
         private RichTextDrawer _richTextDrawer;
 
@@ -205,7 +355,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
             }
 
-            Button.tooltip = string.Join(", ", tooltips);
+            _button.tooltip = string.Join(", ", tooltips);
         }
 
         private static void AddLabelSingleText(Label label, string content)

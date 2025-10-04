@@ -360,6 +360,7 @@ namespace SaintsField.Editor.Utils
             IMakeRenderer makeRenderer,
             IDOTweenPlayRecorder doTweenPlayRecorder,
             VisualElement originalField,
+            bool mergeDec,
             object parent)
         {
             // PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
@@ -472,7 +473,12 @@ namespace SaintsField.Editor.Utils
                     originalField,
                     parent
                 );
-                return r == null ? null : UIToolkitCache.MergeWithDec(r, allAttributes);
+                if (r == null)
+                {
+                    return null;
+                }
+
+                return mergeDec? UIToolkitCache.MergeWithDec(r, allAttributes): r;
             }
 
             // Nah... This didn't handle for mis-ordered case
@@ -514,7 +520,7 @@ namespace SaintsField.Editor.Utils
                 if (r != null)
                 {
                     // PropertyDrawerElementDirtyFix(property, propertyDrawer, r);
-                    return UIToolkitCache.MergeWithDec(r, allAttributes);
+                    return mergeDec? UIToolkitCache.MergeWithDec(r, allAttributes): r;
                 }
             }
 
@@ -665,7 +671,7 @@ namespace SaintsField.Editor.Utils
                                         allAttributes,
                                         ReflectUtils.GetElementType(rawType),
                                         $"Element {index}",
-                                        fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null, parent);
+                                        fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null, false, parent);
                                     // Debug.Log($"done rendering {index}/{itemProp.propertyPath}/{result == null}/{property.arraySize}");
                                     if (result != null)
                                     {

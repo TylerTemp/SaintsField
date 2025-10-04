@@ -31,29 +31,29 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [Serializable]
         public enum TestULongEnumNormal: ulong
         {
-            None,
-            First,
+            First = 1,
             Second,
             Third,
         }
 
-        [NonSerialized, SaintsSerialized, FormerlySerializedAs("LongEnumPubTestValue")] public LongEnum LongEnumPub;
+        [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalNoButton;
 
-        [NonSerialized, SaintsSerialized] public LongEnum[] LongEnumPubArr;
+        [HideInInspector, NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
 
+        [HideInInspector, NonSerialized, SaintsSerialized] public LongEnum[] LongEnumPubArr;
 
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum[] ULongEnumPubs;
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
-        [NonSerialized, SaintsSerialized] private TestULongEnum _uLongEnumPri;
-        [field: NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
+        [HideInInspector, NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
+        [HideInInspector, NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum[] ULongEnumPubs;
+        [HideInInspector, NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
+        [SaintsSerialized] private TestULongEnum _uLongEnumPri;
+        [field: SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
 
-        [NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPubArr;
-        [NonSerialized, SaintsSerialized] private TestULongEnum[] _uLongEnumPriArr;
-        [field: NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPropArr { get; private set; }
+        [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnum[] ULongEnumPubArr;
+        [SaintsSerialized] private TestULongEnum[] _uLongEnumPriArr;
+        [field: SaintsSerialized] public TestULongEnum[] ULongEnumPropArr { get; private set; }
 
-        [NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
-        [NonSerialized, SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
+        [HideInInspector, NonSerialized, SaintsSerialized] public List<TestULongEnum> ULongEnumPubLis;
+        [SaintsSerialized] private List<TestULongEnum> _uLongEnumPriLis;
         public List<TestULongEnum> ULongEnumPropLis { get; private set; }
 
         [Serializable]
@@ -62,12 +62,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             [Serializable]
             public partial struct InsideClare
             {
-                // [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
-                [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
+                [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnum Inside;
+                [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
             }
 
-            [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
-            [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
+            [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
+            [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
             public InsideClare insideClare;
             public InsideClare[] insideClareArr;
         }
@@ -83,12 +83,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             [Serializable]
             public partial struct InsideClare
             {
-                // [NonSerialized, SaintsSerialized] public TestULongEnum Inside;
-                [NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
+                // [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnum Inside;
+                [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnum[] Insides;
             }
 
-            // [NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
-            // [NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
+            // [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnum InNested1;
+            // [HideInInspector, NonSerialized, SaintsSerialized] public TestULongEnum[] InNested1Arr;
             public InsideClare insideClare;
             public InsideClare[] insideClareArr;
         }

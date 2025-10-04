@@ -44,6 +44,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 this,
                 this,
                 null,
+                true,
                 FieldWithInfo.Targets[0]
             );
             if (r != null)

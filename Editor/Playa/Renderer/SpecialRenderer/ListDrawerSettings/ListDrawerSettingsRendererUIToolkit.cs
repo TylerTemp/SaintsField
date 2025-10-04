@@ -445,6 +445,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     this,
                     this,
                     null,
+                    false,
                     FieldWithInfo.Targets[0]
                 );
                 // Debug.Log($"draw list item {prop.propertyPath}: {resultField}");

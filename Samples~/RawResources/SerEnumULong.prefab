@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6266862509457590421}
-  - component: {fileID: 2190998600362900080}
+  - component: {fileID: 5054142045232435872}
   m_Layer: 0
   m_Name: SerEnumULong
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2190998600362900080
+--- !u!114 &5054142045232435872
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44,7 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc5d2fac74c5ae4e89d46fc08310525, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.SerEnumULong
-  LongEnumPub__SaintsSerialized__:
-    propertyType: 1
+  ULongEnumNormalNoButton__SaintsSerialized__:
+    propertyType: 2
+    propertyPath: 
     longValue: 0
     uLongValue: 0
+    subProperties: []

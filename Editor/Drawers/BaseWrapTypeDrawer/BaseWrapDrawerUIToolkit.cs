@@ -54,6 +54,7 @@ namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
                     this,
                     this,
                     null,
+                    true,
                     parent
                 );
             // ReSharper disable once InvertIf
