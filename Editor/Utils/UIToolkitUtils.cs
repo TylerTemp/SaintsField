@@ -14,6 +14,7 @@ using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Playa;
+using SaintsField.Utils;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -666,16 +667,26 @@ namespace SaintsField.Editor.Utils
 
                                     // Debug.Log($"draw item {itemProp.propertyPath}/rawType={rawType}/itemType={ReflectUtils.GetElementType(rawType)}");
 
+                                    string defaultName = itemProp.displayName;
+
                                     VisualElement result = CreateOrUpdateFieldProperty(
                                         itemProp,
                                         allAttributes,
                                         ReflectUtils.GetElementType(rawType),
-                                        $"Element {index}",
+                                        itemProp.displayName,
                                         fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null, false, parent);
                                     // Debug.Log($"done rendering {index}/{itemProp.propertyPath}/{result == null}/{property.arraySize}");
                                     if (result != null)
                                     {
                                         element.Add(result);
+                                        result.schedule.Execute(() =>
+                                        {
+                                            if (SerializedUtils.IsOk(itemProp) && itemProp.displayName != defaultName)
+                                            {
+                                                defaultName = itemProp.displayName;
+                                                ChangeLabel(result, RichTextDrawer.ParseRichXml(defaultName, label, property, fieldInfo, parent), new RichTextDrawer(), 0);
+                                            }
+                                        }).Every(150);
                                     }
                                 },
                                 unbindItem = (element, _) =>
