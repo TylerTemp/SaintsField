@@ -296,30 +296,38 @@ namespace SaintsField.Editor.Utils
 
 #if SAINTSFIELD_CODE_ANALYSIS
 
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Disable Code Analysis...")]
-#else
-        [MenuItem("Window/Saints/Disable Code Analysis...")]
-#endif
+        [MenuItem(MENU_ROOT + "Disable Code Analysis")]
         public static void DisableCodeAnalysis()
         {
             RemoveCompileDefine("SAINTSFIELD_CODE_ANALYSIS");
         }
 #else
 
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Enable Code Analysis...")]
-#else
-        [MenuItem("Window/Saints/Enable Code Analysis...")]
-#endif
+        [MenuItem(MENU_ROOT + "Enable Code Analysis...")]
         public static void EnableCodeAnalysis()
         {
-            if(EditorUtility.DisplayDialog("Enable Code Analysis",
-                   "Are you sure you have Microsoft.CodeAnalysis.CSharp installed in your project?",
-                   "Yes, Enable Analysis",
-                   "Cancel"))
+            bool codyAnalysisFound = AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.StartsWith("Microsoft.CodeAnalysis.CSharp,"));
+            if (codyAnalysisFound)
             {
                 AddCompileDefine("SAINTSFIELD_CODE_ANALYSIS");
+                EditorUtility.DisplayDialog("Code Analysis Enabled",
+                    "Done. Please wait for script re-compile",
+                    "OK",
+                    "");
+                return;
+            }
+
+            if (EditorUtility.DisplayDialog("Code Analysis Not Found",
+                    "Microsoft.CodeAnalysis.CSharp not found in your project. This will break your script compilation if it's not installed at all.\n" +
+                    "If you believe this is a detection mistake, you can enable it anyway",
+                    "Enable Anyway",
+                    "How To Install?"))
+            {
+                AddCompileDefine("SAINTSFIELD_CODE_ANALYSIS");
+            }
+            else
+            {
+                Application.OpenURL("https://github.com/TylerTemp/SaintsField/?tab=readme-ov-file#setup");
             }
         }
 #endif
