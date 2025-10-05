@@ -615,8 +615,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1e41fc9047e65e42b959f1eddd644fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue321ListName
-  testArray:
-  - name: My Name
+  fixedInNewVersion:
+  - name: My <color=lime>Name!
+    value: 0
+  workaroundForOldVersion:
+  - name: My <color=brown>Name!
     value: 0
 --- !u!1 &123624941
 GameObject:

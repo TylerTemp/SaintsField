@@ -12,10 +12,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
             public int value;
         }
 
-        public TestStruct[] testArray;
-        public List<TestStruct> testLis;
+        public TestStruct[] fixedInNewVersion;
 
         [RichLabel("<field.name/>")]
-        public List<TestStruct> useRichLabel;
+        public TestStruct[] workaroundForOldVersion;
     }
 }
