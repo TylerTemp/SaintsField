@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.32.6 ##
+
+1.  UI Toolkit: fix list-view not using `name` property if there is one
+2.  UI Toolkit: fix list of serializable class/struct with `UnityEvent`, the `UnityEvent` didn't get rendered correctly
+
 ## 4.32.5 ##
 
 1.  UI Toolkit: fix long/ulong non-flags enum picker failed to display a correct name

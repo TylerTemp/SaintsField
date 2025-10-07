@@ -520,6 +520,7 @@ namespace SaintsField.Editor.Utils
                 VisualElement r = propertyDrawer.CreatePropertyGUI(property);
                 if (r != null)
                 {
+                    r.Bind(property.serializedObject);
                     // PropertyDrawerElementDirtyFix(property, propertyDrawer, r);
                     return mergeDec? UIToolkitCache.MergeWithDec(r, allAttributes): r;
                 }
@@ -679,14 +680,20 @@ namespace SaintsField.Editor.Utils
                                     if (result != null)
                                     {
                                         element.Add(result);
-                                        result.schedule.Execute(() =>
+                                        if(itemProp.propertyType == SerializedPropertyType.Generic || itemProp.propertyType == SerializedPropertyType.ManagedReference)
                                         {
-                                            if (SerializedUtils.IsOk(itemProp) && itemProp.displayName != defaultName)
+                                            result.schedule.Execute(() =>
                                             {
-                                                defaultName = itemProp.displayName;
-                                                ChangeLabel(result, RichTextDrawer.ParseRichXml(defaultName, label, property, fieldInfo, parent), new RichTextDrawer(), 0);
-                                            }
-                                        }).Every(150);
+                                                if (SerializedUtils.IsOk(itemProp) &&
+                                                    itemProp.displayName != defaultName)
+                                                {
+                                                    defaultName = itemProp.displayName;
+                                                    ChangeLabel(result,
+                                                        RichTextDrawer.ParseRichXml(defaultName, label, property,
+                                                            fieldInfo, parent), new RichTextDrawer(), 0);
+                                                }
+                                            }).Every(150);
+                                        }
                                     }
                                 },
                                 unbindItem = (element, _) =>

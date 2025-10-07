@@ -16,7 +16,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
 
         [Tooltip("Set the events appointed here. Timeline markers will shoot events based on the corresponding 'event identifier'.")]
         public List<NamedEvent> namedEvents = new List<NamedEvent>();
-        public List<UnityEvent> EventsTest;
-        public UnityEvent EventTest;
+        public List<UnityEvent> eventsTest;
+        public UnityEvent eventTest;
+
+        public NamedEvent nameEvent;
     }
 }

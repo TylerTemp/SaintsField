@@ -103,11 +103,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.32.5**
+**4.32.6**
 
-1.  UI Toolkit: fix long/ulong non-flags enum picker failed to display a correct name
-2.  UI Toolkit: fix conditional checker error if the target is not found
-3.  UI Toolkit: fix list/array element incorrectly rendered the decorator attributes again
+1.  UI Toolkit: fix list-view not using `name` property if there is one
+2.  UI Toolkit: fix list of serializable class/struct with `UnityEvent`, the `UnityEvent` didn't get rendered correctly
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

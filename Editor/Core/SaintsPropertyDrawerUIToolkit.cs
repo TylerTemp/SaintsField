@@ -677,10 +677,8 @@ namespace SaintsField.Editor.Core
             VisualElement element = DrawUsingDrawerInstance(passedPreferredLabel, drawerType, typeDrawer, property, info,
                 saintsPropertyDrawers, containerElement);
             // // ReSharper disable once InvertIf
-            // if (element != null)
-            // {
-            //     UIToolkitUtils.PropertyDrawerElementDirtyFix(property, typeDrawer, element);
-            // }
+            element?.Bind(property.serializedObject);
+            // UIToolkitUtils.PropertyDrawerElementDirtyFix(property, typeDrawer, element);
 
             return element;
         }
