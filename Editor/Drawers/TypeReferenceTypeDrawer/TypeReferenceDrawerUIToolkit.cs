@@ -47,8 +47,8 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             };
         }
 
-        private IReadOnlyList<Assembly> _cachedAsssemblies;
-        private readonly Dictionary<Assembly, Type[]> _cachedAsssembliesTypes = new Dictionary<Assembly, Type[]>();
+        private IReadOnlyList<Assembly> _cachedAssemblies;
+        private readonly Dictionary<Assembly, Type[]> _cachedAssembliesTypes = new Dictionary<Assembly, Type[]>();
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -69,9 +69,9 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(dropdown.worldBound);
                 worldBound.height = SingleLineHeight;
 
-                _cachedAsssemblies ??= GetAssembly(typeReferenceAttribute, parent).ToArray();
-                FillAsssembliesTypes(_cachedAsssemblies, _cachedAsssembliesTypes);
-                AdvancedDropdownMetaInfo metaInfo = GetDropdownMetaInfo(type, typeReferenceAttribute, _cachedAsssemblies, _cachedAsssembliesTypes, false, parent);
+                _cachedAssemblies ??= GetAssembly(typeReferenceAttribute, parent).ToArray();
+                FillAsssembliesTypes(_cachedAssemblies, _cachedAssembliesTypes);
+                AdvancedDropdownMetaInfo metaInfo = GetDropdownMetaInfo(type, typeReferenceAttribute, _cachedAssemblies, _cachedAssembliesTypes, false, parent);
 
                 UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
                     metaInfo,

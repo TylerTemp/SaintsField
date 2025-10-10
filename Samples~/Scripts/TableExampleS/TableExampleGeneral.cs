@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
-using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.TableExampleS

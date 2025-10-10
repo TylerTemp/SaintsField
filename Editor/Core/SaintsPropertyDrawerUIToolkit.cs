@@ -87,24 +87,35 @@ namespace SaintsField.Editor.Core
             };
 
             (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
-            PropertyAttribute[] allAttributes;
+            // Debug.Log($"getting {property.propertyPath}: {string.Join<PropertyAttribute>(", ", allAttributesRaw)}");
+            IReadOnlyList<PropertyAttribute> allAttributes;
             if (SaintsSubRenderer)
             {
-                allAttributes = attribute == null? Array.Empty<PropertyAttribute>(): new []{attribute};
+                Debug.Log($"SaintsSubRenderer={attribute}");
+                List<PropertyAttribute> attrs = allAttributesRaw.Where(each => each is not ISaintsAttribute).ToList();
+                if (attribute != null && !attrs.Contains(attribute))
+                {
+                    attrs.Add(attribute);
+                }
+                allAttributes = attrs;
             }
             else
             {
                 if (OverridePropertyAttributes != null)
                 {
+                    // Debug.Log($"OverridePropertyAttributes={OverridePropertyAttributes}");
                     allAttributes = OverridePropertyAttributes.ToArray();
                 }
                 else
                 {
+                    // Debug.Log($"AppendPropertyAttributes={AppendPropertyAttributes}");
                     allAttributes = AppendPropertyAttributes == null
                         ? allAttributesRaw
                         : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
                 }
             }
+
+            // Debug.Log(string.Join<PropertyAttribute>(", ", allAttributes));
 
             ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
             // Debug.Assert(iSaintsAttributes.Length > 0, property.propertyPath);

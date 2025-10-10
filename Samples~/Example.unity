@@ -3850,6 +3850,23 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+  myStruct:
+    vector2: {x: 0, y: 0}
+    vector2Int: {x: 0, y: 0}
+    vector3: {x: 0, y: 0, z: 0}
+    vector3Int: {x: 0, y: 0, z: 0}
+    color: {r: 0, g: 0, b: 0, a: 0}
+    gameObject: {fileID: 0}
+    so: {fileID: 0}
+    sprite: {fileID: 0}
+    animator: {fileID: 0}
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  rawScriptableArray: []
 --- !u!1 &414579718
 GameObject:
   m_ObjectHideFlags: 0
@@ -13354,6 +13371,23 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+  myStruct:
+    vector2: {x: 0, y: 0}
+    vector2Int: {x: 0, y: 0}
+    vector3: {x: 0, y: 0, z: 0}
+    vector3Int: {x: 0, y: 0, z: 0}
+    color: {r: 0, g: 0, b: 0, a: 0}
+    gameObject: {fileID: 0}
+    so: {fileID: 0}
+    sprite: {fileID: 0}
+    animator: {fileID: 0}
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  rawScriptableArray: []
 --- !u!1001 &834960804
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17366,6 +17400,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1152718067
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1152718068}
+  - component: {fileID: 1152718069}
+  m_Layer: 0
+  m_Name: Issue319TypeReferenceShadow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1152718068
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1152718067}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1152718069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1152718067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b12b8947e4cf69e4cab2c49097e50740, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue319TypeReferenceShadow
+  _typeRefShadow:
+    _typeNameAndAssembly: 
+    _monoScriptGuid: 
 --- !u!1 &1156832778
 GameObject:
   m_ObjectHideFlags: 0
@@ -18456,7 +18537,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -21425,6 +21506,7 @@ Transform:
   - {fileID: 1165363215}
   - {fileID: 276448956}
   - {fileID: 2036189592}
+  - {fileID: 1152718068}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1490458620
@@ -33026,7 +33108,6 @@ MonoBehaviour:
     - value: 0
     _saintsValues:
     - value: {fileID: 1131818498}
-  list: []
 --- !u!1 &2043659985
 GameObject:
   m_ObjectHideFlags: 0
