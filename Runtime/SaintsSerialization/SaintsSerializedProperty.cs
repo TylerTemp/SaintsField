@@ -4,7 +4,7 @@ using System;
 namespace SaintsField.SaintsSerialization
 {
     [Serializable]
-    public class SaintsSerializedProperty
+    public struct SaintsSerializedProperty
     {
         public SaintsPropertyType propertyType;
         public string propertyPath;
@@ -12,6 +12,6 @@ namespace SaintsField.SaintsSerialization
         public long longValue;
         public ulong uLongValue;
 
-        public SaintsSerializedProperty[] subProperties;
+        // public SaintsSerializedProperty[] subProperties;
     }
 }

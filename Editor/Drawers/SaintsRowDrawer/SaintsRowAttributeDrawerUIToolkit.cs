@@ -47,12 +47,14 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         {
             bool inline = saintsRowAttribute?.Inline ?? false;
 
-            if (!inline && ForceInlineScoop.InlineCount > 0)
+            if (ForceInlineScoop.InlineCount > 0)
             {
-                inline = true;
+                if (!inline)
+                {
+                    inline = true;
+                }
+                ForceInlineScoop.InlineCount--;
             }
-
-            ForceInlineScoop.InlineCount--;
 
             VisualElement root;
 

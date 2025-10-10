@@ -103,10 +103,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.32.6**
+**4.32.7**
 
-1.  UI Toolkit: fix list-view not using `name` property if there is one
-2.  UI Toolkit: fix list of serializable class/struct with `UnityEvent`, the `UnityEvent` didn't get rendered correctly
+1.  UI Toolkit: Fix `[TypeReference]` get shadowed by other attributes [#319](https://github.com/TylerTemp/SaintsField/issues/319)
+2.  UI Toolkit: Fix `Table` nested class/struct incorrect indent
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
