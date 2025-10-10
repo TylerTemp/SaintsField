@@ -428,7 +428,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             bool saintsRowInline = memberIds.Count == 1;
                             bool noLabel = serCount <= 1;
 
-                            using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline))
+                            using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline? 1: 0))
                             {
                                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                                 foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
@@ -579,7 +579,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         bool saintsRowInline = memberIds.Count == 1;
                         bool noLabel = serCount <= 1;
 
-                        using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline))
+                        using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline? 1: 0))
                         {
                             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                             foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)

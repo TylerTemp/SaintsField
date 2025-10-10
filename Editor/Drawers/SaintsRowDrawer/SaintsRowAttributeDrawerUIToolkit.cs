@@ -25,16 +25,16 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         public class ForceInlineScoop : IDisposable
         {
             // ReSharper disable once NotAccessedField.Global
-            public static bool Inline;
+            public static int InlineCount;
 
-            public ForceInlineScoop(bool inline)
+            public ForceInlineScoop(int inlineCount)
             {
-                Inline = inline;
+                InlineCount = inlineCount;
             }
 
             public void Dispose()
             {
-                Inline = false;
+                InlineCount = 0;
             }
         }
 
@@ -47,10 +47,12 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         {
             bool inline = saintsRowAttribute?.Inline ?? false;
 
-            if (!inline)
+            if (!inline && ForceInlineScoop.InlineCount > 0)
             {
-                inline = ForceInlineScoop.Inline;
+                inline = true;
             }
+
+            ForceInlineScoop.InlineCount--;
 
             VisualElement root;
 
