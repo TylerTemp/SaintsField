@@ -89,6 +89,77 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 },
             };
             dateRow.Add(dropdownButton);
+
+            VisualElement timeRow = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    alignItems = Align.Center,
+                },
+            };
+            Add(timeRow);
+
+            _hourInputElement = new HourInputElement()
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            timeRow.Add(_hourInputElement);
+            timeRow.Add(new Label(":")
+            {
+                style =
+                {
+                    marginLeft = 1,
+                    marginRight = 1,
+                },
+            });
+
+            _minuteInputElement = new MinuteInputElement()
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            timeRow.Add(_minuteInputElement);
+            timeRow.Add(new Label(":")
+            {
+                style =
+                {
+                    marginLeft = 1,
+                    marginRight = 1,
+                },
+            });
+
+            _secondInputElement = new SecondInputElement()
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            timeRow.Add(_secondInputElement);
+            timeRow.Add(new Label(".")
+            {
+                style =
+                {
+                    marginLeft = 1,
+                    marginRight = 1,
+                },
+            });
+
+            _millisecondInputElement = new MillisecondInputElement()
+            {
+                style =
+                {
+                    flexGrow = 1,
+                },
+            };
+            timeRow.Add(_millisecondInputElement);
+
         }
 
         private void ShowDropdown(bool asYear)
@@ -117,9 +188,18 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             _yearInputElement.bindingPath = path;
             _monthInputElement.bindingPath = path;
             _dayInputElement.bindingPath = path;
+
+            _hourInputElement.bindingPath = path;
+            _minuteInputElement.bindingPath = path;
+            _secondInputElement.bindingPath = path;
+            _millisecondInputElement.bindingPath = path;
         }
 
         private long _cachedValue;
+        private readonly HourInputElement _hourInputElement;
+        private readonly MinuteInputElement _minuteInputElement;
+        private readonly SecondInputElement _secondInputElement;
+        private readonly MillisecondInputElement _millisecondInputElement;
 
         public void SetValueWithoutNotify(long newValue)
         {
