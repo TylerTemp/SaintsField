@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         private static string NameButton(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_Button";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__AdvancedDropdown_HelpBox";
 
-        private RichTextDrawer _richTextDrawer = new RichTextDrawer();
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,

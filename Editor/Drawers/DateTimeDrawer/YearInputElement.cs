@@ -1,0 +1,58 @@
+using System;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace SaintsField.Editor.Drawers.DateTimeDrawer
+{
+#if UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
+    [UxmlElement]
+#endif
+    // ReSharper disable once PartialTypeWithSinglePart
+    public partial class YearInputElement: BindableElement, INotifyValueChanged<long>
+    {
+        public readonly IntegerField IntegerField;
+        private long _cachedValue;
+
+        public YearInputElement()
+        {
+            IntegerField = new IntegerField
+            {
+                maxLength = 4,
+                style =
+                {
+                    marginLeft = 0,
+                    marginRight = 0,
+                },
+            };
+            IntegerField.RegisterValueChangedCallback(evt => value = DateTimeUtils.WrapYear(_cachedValue, Mathf.Max(1, evt.newValue)));
+            Add(IntegerField);
+        }
+
+        public void SetValueWithoutNotify(long newValue)
+        {
+            DateTime dt = new DateTime(newValue);
+            int year = dt.Year;
+            _cachedValue = newValue;
+            IntegerField.SetValueWithoutNotify(year);
+        }
+
+        public long value
+        {
+            get => _cachedValue;
+            set
+            {
+                if (_cachedValue == value)
+                {
+                    return;
+                }
+
+                long previous = this.value;
+                SetValueWithoutNotify(value);
+
+                using ChangeEvent<long> evt = ChangeEvent<long>.GetPooled(previous, value);
+                evt.target = this;
+                SendEvent(evt);
+            }
+        }
+    }
+}

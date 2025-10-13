@@ -91,7 +91,7 @@ namespace SaintsField.Editor.Core
             IReadOnlyList<PropertyAttribute> allAttributes;
             if (SaintsSubRenderer)
             {
-                Debug.Log($"SaintsSubRenderer={attribute}");
+                // Debug.Log($"SaintsSubRenderer={attribute}");
                 List<PropertyAttribute> attrs = allAttributesRaw.Where(each => each is not ISaintsAttribute).ToList();
                 if (attribute != null && !attrs.Contains(attribute))
                 {

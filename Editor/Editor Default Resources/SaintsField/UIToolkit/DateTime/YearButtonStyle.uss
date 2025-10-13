@@ -1,0 +1,30 @@
+#year-button {
+    cursor: link;
+    flex-shrink: 0;
+    height: 22px;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-radius: 10px;
+    align-items: center;
+    padding: 0 16px;
+    margin: 2px 2px;
+    background-color: rgba(188, 188, 188, 0);
+}
+
+#year-button:hover {
+    background-color: rgba(0, 0, 0, 0.13);
+}
+
+#year-button:active {
+    background-color: rgba(255, 255, 255, 0.17);
+}
+
+#year-button.selected {
+    background-color: rgb(61, 152, 236);
+}
+
+#year-button:disabled {
+    cursor: arrow;
+}

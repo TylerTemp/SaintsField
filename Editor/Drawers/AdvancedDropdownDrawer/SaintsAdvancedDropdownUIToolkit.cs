@@ -103,7 +103,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
         private ToolbarSearchField _toolbarSearchField;
 
-        private RichTextDrawer _richTextDrawer = new RichTextDrawer();
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         // public VisualElement DebugCloneTree()
         // {

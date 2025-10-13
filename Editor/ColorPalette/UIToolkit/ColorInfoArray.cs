@@ -69,15 +69,15 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             }
         }
 
-        private readonly ScrollView _rootScoller;
+        private readonly ScrollView _rootScroller;
         private readonly SerializedProperty _colorInfoArrayProp;
 
         // ReSharper disable once UnusedMember.Global
         public ColorInfoArray(): this(null, null){}
 
-        public ColorInfoArray(ScrollView rootScoller, SerializedProperty colorInfoArrayProp)
+        public ColorInfoArray(ScrollView rootScroller, SerializedProperty colorInfoArrayProp)
         {
-            _rootScoller = rootScoller;
+            _rootScroller = rootScroller;
             _colorInfoArrayProp = colorInfoArrayProp;
             this.TrackPropertyValue(colorInfoArrayProp, OnTrackPropertyValue);
             Rebuild();
@@ -113,7 +113,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 int thisIndex = i;
                 SerializedProperty colorInfoProp = _colorInfoArrayProp.GetArrayElementAtIndex(thisIndex);
                 SerializedProperty colorInfoLabelsProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.labels));
-                CleanableLabelInputTypeAhead cleanableLabelInputTypeAhead = new CleanableLabelInputTypeAhead(colorInfoLabelsProp, _rootScoller, _colorInfoArrayProp);
+                CleanableLabelInputTypeAhead cleanableLabelInputTypeAhead = new CleanableLabelInputTypeAhead(colorInfoLabelsProp, _rootScroller, _colorInfoArrayProp);
                 Container container = Container.CreateContainer(colorInfoLabelsProp, cleanableLabelInputTypeAhead);
 
                 SerializedProperty colorInfoColorProp = colorInfoProp.FindPropertyRelative(nameof(ColorPaletteArray.ColorInfo.color));
