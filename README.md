@@ -4851,11 +4851,16 @@ You can install it using any method below:
 
     ![](https://github.com/user-attachments/assets/42138dfb-1e11-409d-a4c0-36cf8c5a8bb4)
 
+7.  Go `Window` - `Saints` - `Enable Code Analysis...`
+
 [**OpenUPM Uplink**](https://openupm.com/nuget/#using-uplinked-unitynuget)
 
 ```bash
 openupm add org.nuget.microsoft.codeanalysis.csharp 
 ```
+
+Then go `Window` - `Saints` - `Enable Code Analysis...`
+
 
 **NuGet for Unity**:
 
