@@ -6,6 +6,7 @@
 2.  UI Toolkit: Add `[DateTime]` attribute to allow you pick a datetime using `long` type
 3.  UI Toolkit: Fix `ShowInInspector` can not show a `DateTime` type
 4.  UI Toolkit: Add `[ShowInInspector][DateTime]` for `long` to allow showing a `long` value as a `DateTime`
+5.  Improve the document for installing `Microsoft.CodeAnalysis.CSharp`
 
 Since this version, IMGUI support is now deprecated.
 
