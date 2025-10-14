@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -24,7 +25,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
     public abstract partial class AbsRenderer
     {
         private const string ClassSaintsFieldPlaya = "saintsfield-playa";
-        private const string ClassSaintsFieldEditingDisabled = "saintsfield-editing-disabled";
+        public const string ClassSaintsFieldEditingDisabled = "saintsfield-editing-disabled";
         public const string ClassSaintsFieldPlayaContainer = ClassSaintsFieldPlaya + "-container";
 
         private VisualElement _rootElement;
@@ -223,7 +224,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public bool IsFullFilled;
         }
 
-        private static readonly Color ReColor = EColor.EditorSeparator.GetColor();
+        public static readonly Color ReColor = EColor.EditorSeparator.GetColor();
 
         // before set: useful for struct editing that C# will mess-up and change the value of the reference you have
         public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, bool neverNullable)
@@ -589,7 +590,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
-            if (valueType == typeof(long) || value is long)
+            if ((valueType == typeof(long) || value is long) && allAttributes.All(each => each is not DateTimeAttribute))
             {
                 if (oldElement is LongField oldLongField)
                 {
@@ -1526,6 +1527,53 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
+            
+            if (valueType == typeof(DateTime) || value is DateTime || allAttributes.Any(each => each is DateTimeAttribute))
+            {
+                return (DateTimeAttributeDrawer.UIToolkitValueEdit(
+                    oldElement,
+                    label,
+                    valueType,
+                    value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes), false);
+
+                // GradientField element = new GradientField(label)
+                // {
+                //     value = value as Gradient,
+                // };
+                //
+                // if (labelGrayColor)
+                // {
+                //     element.labelElement.style.color = ReColor;
+                // }
+                // if (inHorizontalLayout)
+                // {
+                //     element.style.flexDirection = FlexDirection.Column;
+                // }
+                // else
+                // {
+                //     element.AddToClassList(GradientField.alignedFieldUssClassName);
+                // }
+                // if (setterOrNull == null)
+                // {
+                //     element.SetEnabled(false);
+                //     element.AddToClassList(ClassSaintsFieldEditingDisabled);
+                // }
+                // else
+                // {
+                //     element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                //     element.RegisterValueChangedCallback(evt =>
+                //     {
+                //         beforeSet?.Invoke(value);
+                //         setterOrNull(evt.newValue);
+                //     });
+                // }
+                // return (element, false);
+            }
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
 
@@ -2279,6 +2327,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType, object currentValue, Action<Type> setType, bool neverNullable)
         {
+            Debug.Log($"fieldType={fieldType} label={label} currentValue={currentValue}");
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
             dropdownButton.ButtonElement.text = GetDropdownTypeLabel(currentValue?.GetType());
 
