@@ -29,7 +29,7 @@ namespace SaintsField.Editor.AutoRunner
 
         protected override IEnumerable<FolderSearch> GetFolderSearches() => folderSearches;
 
-        [Ordered, PlayaRichLabel("Extra Resources"), ArrayDefaultExpand, Expandable]
+        [Ordered, LabelText("Extra Resources"), ArrayDefaultExpand, Expandable]
         public Object[] extraResources = Array.Empty<Object>();
 
         protected override IEnumerable<Object> GetExtraAssets() => extraResources;

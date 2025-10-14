@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                                                            // ReSharper disable once MergeIntoLogicalPattern
                                                                            || each is PlayaDisableIfAttribute) > 0;
             _arraySizeCondition = FieldWithInfo.PlayaAttributes.Any(each => each is IPlayaArraySizeAttribute);
-            _richLabelCondition = FieldWithInfo.PlayaAttributes.Any(each => each is PlayaRichLabelAttribute);
+            _richLabelCondition = FieldWithInfo.PlayaAttributes.Any(each => each is LabelTextAttribute);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
             Debug.Log(
                 $"SerField: {FieldWithInfo.SerializedProperty.displayName}({FieldWithInfo.SerializedProperty.propertyPath}); if={ifCondition}; arraySize={_arraySizeCondition}, richLabel={_richLabelCondition}");

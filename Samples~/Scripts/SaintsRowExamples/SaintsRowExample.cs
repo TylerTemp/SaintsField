@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts.SaintsRowExamples
         {
             // public string normalField;
 
-            [PlayaRichLabel("<color=green><icon=star.png/><label/>"), InfoBox("Info box for array with long long long long long long long long long long text", groupBy: "above"), InfoBox("Info box for array", groupBy: "above")]
+            [LabelText("<color=green><icon=star.png/><label/>"), InfoBox("Info box for array with long long long long long long long long long long text", groupBy: "above"), InfoBox("Info box for array", groupBy: "above")]
             public string[] myStrings;
 
             [Button]

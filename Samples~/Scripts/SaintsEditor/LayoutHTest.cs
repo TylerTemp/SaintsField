@@ -18,7 +18,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             public string thisIsALongDriveForPeopleWithNothingToThinkAbout;
         }
 
-        [PlayaRichLabel("<color=pink><label/>"), SaintsRow(inline: true)] public Info[] inputs;
+        [LabelText("<color=pink><label/>"), SaintsRow(inline: true)] public Info[] inputs;
 
     }
 }

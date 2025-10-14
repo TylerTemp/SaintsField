@@ -1,21 +1,15 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class PlayaRichLabelAttribute: Attribute, IPlayaAttribute
+    public class PlayaRichLabelAttribute: LabelTextAttribute
     {
-        // ReSharper disable InconsistentNaming
-        public readonly string RichTextXml;
-        public readonly bool IsCallback;
-        // ReSharper enable InconsistentNaming
-
-        public PlayaRichLabelAttribute(string richTextXml, bool isCallback=false)
+        public PlayaRichLabelAttribute(string richTextXml, bool isCallback = false) : base(richTextXml, isCallback)
         {
-            RichTextXml = richTextXml;
-            IsCallback = isCallback;
         }
     }
 }
