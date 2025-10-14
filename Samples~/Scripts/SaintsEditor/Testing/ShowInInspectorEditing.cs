@@ -265,17 +265,17 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [ShowInInspector, Ordered] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
 
-        [ShowInInspector, Ordered, PlayaInfoBox("If getter gives error, we display an error box")]
+        [ShowInInspector, Ordered, InfoBox("If getter gives error, we display an error box")]
         private int WrongGetter => throw new NotSupportedException("Expected Exception");
 
-        [ShowInInspector, Ordered, PlayaInfoBox("We don't handle if setter gives error")]
+        [ShowInInspector, Ordered, InfoBox("We don't handle if setter gives error")]
         private int WrongSetter  // this will just give errors to console, we won't handle it.
         {
             get => 20;
             set => throw new NotSupportedException("Expected Exception");
         }
 
-        [ShowInInspector, Ordered, PlayaInfoBox("nested field can be error handled too")]
+        [ShowInInspector, Ordered, InfoBox("nested field can be error handled too")]
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         private IEnumerator _ienumerator = new []{1, 2, 3}.GetEnumerator();
 

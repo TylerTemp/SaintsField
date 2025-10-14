@@ -24,7 +24,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [LayoutStart("./Upper Body")]
 
-        [PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
+        [InfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
 
         [LayoutStart("./Horizontal", ELayout.Horizontal)]
 

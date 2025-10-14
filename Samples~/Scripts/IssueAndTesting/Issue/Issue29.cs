@@ -34,7 +34,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             [RichLabel(nameof(toggle), true)]
             [OverlayRichLabel(nameof(toggle), true)]
             [PostFieldRichLabel(nameof(toggle), true)]
-            [InfoBox(nameof(toggle), true)]
+            [FieldInfoBox(nameof(toggle), true)]
             [AboveButton(nameof(Log), nameof(toggle), true)]
             [BelowButton(nameof(Log), nameof(toggle), true)]
             [PostFieldButton(nameof(Log), nameof(toggle), true)]

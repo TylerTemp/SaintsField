@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts
         public int max;
 
         [PropRange(nameof(min), nameof(max))]
-        [InfoBox("Test")]
+        [FieldInfoBox("Test")]
         [SepTitle("Test", EColor.Green)]
         public float rangeFloat;
         [PropRange(nameof(min), nameof(max))] public int rangeInt;

@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
 #if SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES
             NaughtyAttributes.Required,
 #else
-            InfoBox("NaughtyAttributes not installed"),
+            FieldInfoBox("NaughtyAttributes not installed"),
 #endif
         ]
 

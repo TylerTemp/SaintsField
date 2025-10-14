@@ -13,20 +13,20 @@ namespace SaintsField.Utils
         [DebugTool.WhichFramework]
         [Separator(10)]
 
-        [InfoBox("The minimum row of resizable text area", EMessageType.None)]
+        [FieldInfoBox("The minimum row of resizable text area", EMessageType.None)]
         [MinValue(1)] public int resizableTextAreaMinRow = 3;
 
-        [InfoBox("Should the ValidateInput use loop check? <color=green><b>(UI Toolkit)")]
+        [FieldInfoBox("Should the ValidateInput use loop check? <color=green><b>(UI Toolkit)")]
         public bool validateInputLoopCheckUIToolkit = ValidateInputLoopCheckDefault;
         public const bool ValidateInputLoopCheckDefault = false;
 
         [Space]
 
-        [InfoBox("UI Toolkit: Aggressive OnValueChanged watcher\n\nThis allows UI Toolkit to monitor changes inside fields of `SerializedReference` or a `Serializable` generic class. In some Unity versions, if the target is an array/list of SerializedReferences, it will give errors when removing an item from the list. Set it to `true` if you faces the error when removing items from list", EMessageType.None)]
+        [FieldInfoBox("UI Toolkit: Aggressive OnValueChanged watcher\n\nThis allows UI Toolkit to monitor changes inside fields of `SerializedReference` or a `Serializable` generic class. In some Unity versions, if the target is an array/list of SerializedReferences, it will give errors when removing an item from the list. Set it to `true` if you faces the error when removing items from list", EMessageType.None)]
         [LeftToggle] public bool disableOnValueChangedWatchArrayFieldUIToolkit;
 
         [Space]
-        [InfoBox("IMGUI: Space for foldout. If you see overlap in expandable, set this value to 13, otherwise 0")]
+        [FieldInfoBox("IMGUI: Space for foldout. If you see overlap in expandable, set this value to 13, otherwise 0")]
         [MinValue(0)] public int foldoutSpaceImGui = FoldoutSpaceImGuiDefault;
         public const int FoldoutSpaceImGuiDefault = 13;
 
@@ -76,9 +76,9 @@ namespace SaintsField.Utils
         [EnumToggleButtons, DefaultExpand] public EXP getByXPathExp = EXP.None;
 
         [LayoutStart("./Deprecated", ELayout.CollapseBox)]
-        [InfoBox("Deprecated", EMessageType.Warning)]
+        [FieldInfoBox("Deprecated", EMessageType.Warning)]
         [EnumToggleButtons, DefaultExpand] public EXP getComponentByPathExp = EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker;
-        [InfoBox("Deprecated", EMessageType.Warning)]
+        [FieldInfoBox("Deprecated", EMessageType.Warning)]
         [EnumToggleButtons, DefaultExpand] public EXP findComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
     }
 }

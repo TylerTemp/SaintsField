@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue162
 {
     public class Issue162And : MonoBehaviour
     {
-        [InfoBox("Use HideIf(A) && HideIf(B)")]
+        [FieldInfoBox("Use HideIf(A) && HideIf(B)")]
         public Transform _receiverTransform;
 
         [FieldHideIf(nameof(_receiverTransform)), FieldHideIf(nameof(randomReceiver))]

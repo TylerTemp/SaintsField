@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             public string XmlContent;
             public EMessageType MessageType;
 
-            public PlayaInfoBoxAttribute InfoBoxAttribute;
+            public InfoBoxAttribute InfoBoxAttribute;
             public SaintsFieldWithInfo FieldWithInfo;
             public RichTextDrawer RichTextDrawer;
         }
@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             return result;
         }
 
-        private static (HelpBox helpBox, bool needUpdate) CreateInfoBox(SaintsFieldWithInfo fieldWithInfo, PlayaInfoBoxAttribute infoBoxAttribute)
+        private static (HelpBox helpBox, bool needUpdate) CreateInfoBox(SaintsFieldWithInfo fieldWithInfo, InfoBoxAttribute infoBoxAttribute)
         {
             RichTextDrawer richTextDrawer = new RichTextDrawer();
             InfoBoxUserData infoBoxUserData = new InfoBoxUserData

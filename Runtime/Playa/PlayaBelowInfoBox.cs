@@ -5,7 +5,7 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class PlayaBelowInfoBox: PlayaInfoBoxAttribute
+    public class PlayaBelowInfoBox: InfoBoxAttribute
     {
         public PlayaBelowInfoBox(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, string groupBy=""): base(content, messageType, show, isCallback, true, groupBy)
         {

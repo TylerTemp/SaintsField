@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             NaughtyAttributes.Required,
             NaughtyAttributes.Expandable,
 #else
-            InfoBox("NaughtyAttributes not installed"),
+            FieldInfoBox("NaughtyAttributes not installed"),
 #endif
         ]
         private Scriptable naCarConfig;

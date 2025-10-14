@@ -1,17 +1,15 @@
-using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using SaintsField.Interfaces;
-using SaintsField.Playa;
 using SaintsField.Utils;
+using UnityEngine;
 
-// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-    public class InfoBoxAttribute: Attribute, IPlayaAttribute, IPlayaClassAttribute, IPlayaIMGUIGroupBy
+    [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
+    public class FieldInfoBoxAttribute: PropertyAttribute, ISaintsAttribute
     {
-        // public readonly string GroupBy;
+        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy { get; }
 
         // public readonly bool Above;
@@ -21,7 +19,8 @@ namespace SaintsField
         public readonly bool IsCallback;
         public readonly string ShowCallback;
 
-        public InfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, bool below=false, string groupBy="")
+        // above is kept for compatibility reason...
+        public FieldInfoBoxAttribute(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, bool below=false, string groupBy="")
         {
             GroupBy = groupBy;
             Below = below;
@@ -31,11 +30,12 @@ namespace SaintsField
             Content = contentParsed;
             IsCallback = isCallbackParsed;
 
+            // Above = above;
             MessageType = messageType;
             ShowCallback = show;
         }
 
-        public InfoBoxAttribute(string content, bool isCallback): this(content, EMessageType.Info, null, isCallback)
+        public FieldInfoBoxAttribute(string content, bool isCallback): this(content, EMessageType.Info, null, isCallback)
         {
         }
     }

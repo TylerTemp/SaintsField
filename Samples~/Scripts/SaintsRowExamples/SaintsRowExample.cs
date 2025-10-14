@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts.SaintsRowExamples
         {
             // public string normalField;
 
-            [PlayaRichLabel("<color=green><icon=star.png/><label/>"), PlayaInfoBox("Info box for array with long long long long long long long long long long text", groupBy: "above"), PlayaInfoBox("Info box for array", groupBy: "above")]
+            [PlayaRichLabel("<color=green><icon=star.png/><label/>"), InfoBox("Info box for array with long long long long long long long long long long text", groupBy: "above"), InfoBox("Info box for array", groupBy: "above")]
             public string[] myStrings;
 
             [Button]
@@ -26,7 +26,7 @@ namespace SaintsField.Samples.Scripts.SaintsRowExamples
                 Debug.Log($"{myObj}, {myInt}, {myStr}");
             }
 
-            [PlayaInfoBox("Above Box")]
+            [InfoBox("Above Box")]
             [PlayaBelowInfoBox("Below Box")]
             private void EmptyFunction()
             {

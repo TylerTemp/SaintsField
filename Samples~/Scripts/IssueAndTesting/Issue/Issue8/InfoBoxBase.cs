@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
 {
     public class InfoBoxBase : MonoBehaviour
     {
-        [InfoBox(nameof(DynamicMessage), EMessageType.Warning, isCallback: true)]
+        [FieldInfoBox(nameof(DynamicMessage), EMessageType.Warning, isCallback: true)]
         [BelowInfoBox(nameof(DynamicMessageWithIcon), isCallback: true)]
         public bool _content;
 

@@ -38,14 +38,14 @@ namespace SaintsField.Samples.Scripts
         public struct MyStruct
         {
             [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
-            [InfoBox(nameof(myResource), true)]
+            [FieldInfoBox(nameof(myResource), true)]
             [BelowRichLabel(nameof(myResource), true)]
             [OnValueChanged(nameof(OnChange))]
             public string myResource;
 
             [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
             [OnValueChanged(nameof(OnChange))]
-            [InfoBox(nameof(OnLabel), true)]
+            [FieldInfoBox(nameof(OnLabel), true)]
             [BelowRichLabel(nameof(OnLabel), true)]
             public string[] myResources;
 

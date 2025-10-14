@@ -151,7 +151,7 @@ namespace SaintsField.Editor
                 switch (playaClassAttribute)
                 {
 
-                    case PlayaInfoBoxAttribute infoBox:
+                    case InfoBoxAttribute infoBox:
                     {
                         yield return new PlayaInfoBoxRenderer(serializedObject, new SaintsFieldWithInfo
                         {
@@ -1153,7 +1153,7 @@ namespace SaintsField.Editor
             {
                 switch (playaAttribute)
                 {
-                    case PlayaInfoBoxAttribute playaInfoBoxAttribute:
+                    case InfoBoxAttribute playaInfoBoxAttribute:
                     {
                         PlayaInfoBoxRenderer infoBoxRenderer = new PlayaInfoBoxRenderer(serializedObject, fieldWithInfo, playaInfoBoxAttribute);
 

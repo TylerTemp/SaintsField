@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
-    [CustomPropertyDrawer(typeof(InfoBoxAttribute), true)]
+    [CustomPropertyDrawer(typeof(FieldInfoBoxAttribute), true)]
     [CustomPropertyDrawer(typeof(BelowInfoBoxAttribute), true)]
     public partial class InfoBoxAttributeDrawer: SaintsPropertyDrawer
     {
@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
             // ReSharper enable InconsistentNaming
         }
 
-        private static MetaInfo GetMetaInfo(SerializedProperty property, InfoBoxAttribute infoboxAttribute,
+        private static MetaInfo GetMetaInfo(SerializedProperty property, FieldInfoBoxAttribute infoboxAttribute,
             FieldInfo info, object target)
         {
             (string drawError, bool willDraw) = WillDraw(property, infoboxAttribute, info, target);
@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
             };
         }
 
-        private static (string error, bool willDraw) WillDraw(SerializedProperty property, InfoBoxAttribute infoboxAttribute, FieldInfo info, object target)
+        private static (string error, bool willDraw) WillDraw(SerializedProperty property, FieldInfoBoxAttribute infoboxAttribute, FieldInfo info, object target)
         {
             if (infoboxAttribute.ShowCallback == null)
             {

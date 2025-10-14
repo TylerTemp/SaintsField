@@ -33,7 +33,7 @@ namespace SaintsField.Editor.AutoRunner
             return Array.Empty<FolderSearch>();
         }
 
-        [PlayaInfoBox("Here you can combine some auto getter to load some assets to auto run")]
+        [InfoBox("Here you can combine some auto getter to load some assets to auto run")]
         [Ordered, PlayaRichLabel("Extra Resources")]
         [GetByXPath("resources::/*.prefab")]  // for example, get prefab under resources
         public Object[] extraResources;

@@ -6,9 +6,9 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 {
     public partial class PlayaInfoBoxRenderer: AbsRenderer
     {
-        private readonly PlayaInfoBoxAttribute _playaInfoBoxAttribute;
+        private readonly InfoBoxAttribute _playaInfoBoxAttribute;
 
-        public PlayaInfoBoxRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, PlayaInfoBoxAttribute playaInfoBoxAttribute) : base(serializedObject, fieldWithInfo)
+        public PlayaInfoBoxRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, InfoBoxAttribute playaInfoBoxAttribute) : base(serializedObject, fieldWithInfo)
         {
             _playaInfoBoxAttribute = playaInfoBoxAttribute;
         }

@@ -38,9 +38,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue23
         }
 
         public GameObjectChild normal;
-        [FieldHideIf(nameof(toggle)), InfoBox("Inherent Fallback")] public GameObjectChild inherent;
+        [FieldHideIf(nameof(toggle)), FieldInfoBox("Inherent Fallback")] public GameObjectChild inherent;
         // won't work on old Unity
-        [FieldHideIf(nameof(toggle)), InfoBox("Direct Fallback")] public ContainerChild<GameObject> direct;
+        [FieldHideIf(nameof(toggle)), FieldInfoBox("Direct Fallback")] public ContainerChild<GameObject> direct;
 
         // public SaintsArray<string> plain;
 

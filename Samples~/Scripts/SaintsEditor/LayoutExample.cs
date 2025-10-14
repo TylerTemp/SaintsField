@@ -132,7 +132,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [Ordered]
         [Layout("Root/Buggy")]
-        [InfoBox("Sadly, Horizontal is buggy in IMGUI")]
+        [FieldInfoBox("Sadly, Horizontal is buggy in IMGUI")]
         public string buggy = "See below:";
 
         [Ordered]

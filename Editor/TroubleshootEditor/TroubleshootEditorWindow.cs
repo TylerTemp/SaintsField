@@ -57,10 +57,10 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         // [Button("Check")]
         [Ordered]
-        [PlayaInfoBox("$" + nameof(_uObjectMessage))]
-        [PlayaInfoBox("$" + nameof(_uComp))]
-        [PlayaInfoBox("$" + nameof(_uMono))]
-        [PlayaInfoBox("$" + nameof(_uScriptableObject))]
+        [InfoBox("$" + nameof(_uObjectMessage))]
+        [InfoBox("$" + nameof(_uComp))]
+        [InfoBox("$" + nameof(_uMono))]
+        [InfoBox("$" + nameof(_uScriptableObject))]
         private IEnumerator Check()
         {
             _inProgress = true;
@@ -183,7 +183,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         [Ordered, Separator(5), Separator, Separator(5),
 
-         InfoBox("Please wait the checking process to finish", show: nameof(NotInProcess)),
+         FieldInfoBox("Please wait the checking process to finish", show: nameof(NotInProcess)),
 
          Required("Pick a target to troubleshoot"),
          OnValueChanged(nameof(TroubleShootTargetChanged)),

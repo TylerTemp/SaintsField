@@ -3,14 +3,14 @@ using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
-    [PlayaInfoBox("This is a class message", EMessageType.None)]
-    [PlayaInfoBox("$" + nameof(dynamicContent))]
+    [InfoBox("This is a class message", EMessageType.None)]
+    [InfoBox("$" + nameof(dynamicContent))]
     public class ClassInfoBoxExample : SaintsMonoBehaviour
     {
         public string dynamicContent;
 
         [Serializable]
-        [PlayaInfoBox("This is a struct message")]
+        [InfoBox("This is a struct message")]
         public struct MyStruct
         {
             public string structString;

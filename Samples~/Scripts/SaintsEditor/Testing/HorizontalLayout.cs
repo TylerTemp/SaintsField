@@ -24,7 +24,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [LayoutStart("./Upper Body", ELayout.TitleBox)]
 
-        [PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
+        [InfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
 
         [LayoutStart("./Horizontal", ELayout.Horizontal)]
 
@@ -44,7 +44,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public bool toggle;
 
         [LayoutEnd]
-        [PlayaInfoBox("Buttons!")]
+        [InfoBox("Buttons!")]
         [LayoutStart("Buttons", ELayout.Horizontal)]
         [Button]
         public void B1(string strV, bool bv, Vector2 v2)

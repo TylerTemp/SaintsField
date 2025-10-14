@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
         protected override VisualElement CreateAboveUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
         {
-            InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
+            FieldInfoBoxAttribute infoboxAttribute = (FieldInfoBoxAttribute)saintsAttribute;
             if (infoboxAttribute.Below)
             {
                 return null;
@@ -61,7 +61,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
                 },
             };
 
-            InfoBoxAttribute infoboxAttribute = (InfoBoxAttribute)saintsAttribute;
+            FieldInfoBoxAttribute infoboxAttribute = (FieldInfoBoxAttribute)saintsAttribute;
             if (!infoboxAttribute.Below)
             {
                 return errorBox;
@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
-            MetaInfo metaInfo = GetMetaInfo(property, (InfoBoxAttribute)saintsAttribute, info, parent);
+            MetaInfo metaInfo = GetMetaInfo(property, (FieldInfoBoxAttribute)saintsAttribute, info, parent);
             HelpBox infoBox = container.Q<HelpBox>(NameInfoBox(property, index));
             MetaInfo oriMetaInfo = (MetaInfo)infoBox.userData;
 
