@@ -4851,11 +4851,16 @@ You can install it using any method below:
 
     ![](https://github.com/user-attachments/assets/42138dfb-1e11-409d-a4c0-36cf8c5a8bb4)
 
+7.  Go `Window` - `Saints` - `Enable Code Analysis...`
+
 [**OpenUPM Uplink**](https://openupm.com/nuget/#using-uplinked-unitynuget)
 
 ```bash
 openupm add org.nuget.microsoft.codeanalysis.csharp 
 ```
+
+Then go `Window` - `Saints` - `Enable Code Analysis...`
+
 
 **NuGet for Unity**:
 
@@ -7327,7 +7332,7 @@ public partial class SerDateTimeExample : MonoBehaviour
 }
 ```
 
-[![](https://github.com/user-attachments/assets/4acd7add-0f25-4f79-aa12-4112157e503d)](https://github.com/user-attachments/assets/7f7ba667-681b-48ff-86ae-171623204636)
+[![video](https://github.com/user-attachments/assets/4acd7add-0f25-4f79-aa12-4112157e503d)](https://github.com/user-attachments/assets/7f7ba667-681b-48ff-86ae-171623204636)
 
 ## `SaintsEditorWindow` ##
 
