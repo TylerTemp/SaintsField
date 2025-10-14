@@ -187,7 +187,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 
          Required("Pick a target to troubleshoot"),
          OnValueChanged(nameof(TroubleShootTargetChanged)),
-         BelowInfoBox("$" + nameof(GetDrawerInfo)),
+         FieldBelowInfoBox("$" + nameof(GetDrawerInfo)),
         ]
         public Object troubleshootTarget;
 
@@ -227,7 +227,7 @@ namespace SaintsField.Editor.TroubleshootEditor
          FieldShowIf(nameof(NeedPickComponent)),
          AdvancedDropdown(nameof(PickComponent)),
          OnValueChanged(nameof(TroubleshootComponentChanged)),
-         BelowInfoBox("$" + nameof(GetDrawerInfo)),
+         FieldBelowInfoBox("$" + nameof(GetDrawerInfo)),
         ]
         public Component troubleshootComponent;
 
@@ -258,7 +258,7 @@ namespace SaintsField.Editor.TroubleshootEditor
          AdvancedDropdown(nameof(PickFieldName)),
          FieldShowIf(nameof(GetTroubleshootSerTarget)), DisableIf(nameof(_inProgress)),
          OnValueChanged(nameof(RunTargetChecker)),
-         BelowInfoBox("$" + nameof(_targetMessage)), BelowInfoBox("$" + nameof(_fieldMessage))]
+         FieldBelowInfoBox("$" + nameof(_targetMessage)), FieldBelowInfoBox("$" + nameof(_fieldMessage))]
         public int field;
 
         private Object GetTroubleshootSerTarget()

@@ -27,7 +27,7 @@ namespace SaintsField.Samples.Scripts.SaintsRowExamples
             }
 
             [InfoBox("Above Box")]
-            [PlayaBelowInfoBox("Below Box")]
+            [BelowInfoBox("Below Box")]
             private void EmptyFunction()
             {
             }

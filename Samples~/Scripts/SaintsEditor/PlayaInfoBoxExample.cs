@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
     public class PlayaInfoBoxExample : SaintsMonoBehaviour
     {
         [InfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
-        [PlayaBelowInfoBox("$" + nameof(DynamicFromArray))]
+        [BelowInfoBox("$" + nameof(DynamicFromArray))]
         public string[] strings = {};
 
         public string dynamic;
@@ -14,14 +14,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [InfoBox("MethodWithButton")]
         [Button("Click Me!")]
-        [PlayaBelowInfoBox("GroupExample", groupBy: "group")]
-        [PlayaBelowInfoBox("$" + nameof(dynamic), groupBy: "group")]
+        [BelowInfoBox("GroupExample", groupBy: "group")]
+        [BelowInfoBox("$" + nameof(dynamic), groupBy: "group")]
         public void MethodWithButton()
         {
         }
 
         [InfoBox("Method")]
-        [PlayaBelowInfoBox("$" + nameof(dynamic))]
+        [BelowInfoBox("$" + nameof(dynamic))]
         public void Method()
         {
         }

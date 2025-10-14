@@ -9,8 +9,8 @@ namespace SaintsField.Samples.Scripts
         // [Space]
         [FieldInfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None)]
         [FieldInfoBox("$" + nameof(DynamicMessage), EMessageType.Warning)]
-        [BelowInfoBox("$" + nameof(DynamicMessageWithIcon))]
-        [BelowInfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
+        [FieldBelowInfoBox("$" + nameof(DynamicMessageWithIcon))]
+        [FieldBelowInfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
         public bool _content;
 
         private (EMessageType, string) DynamicMessageWithIcon => _content ? (EMessageType.Error, "False!") : (EMessageType.None, "True!");

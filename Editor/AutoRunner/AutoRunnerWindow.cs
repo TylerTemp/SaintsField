@@ -43,7 +43,7 @@ namespace SaintsField.Editor.AutoRunner
         protected override bool CheckOnValidate() => checkOnValidate;
 
 
-        [Ordered, ReadOnly, ProgressBar(maxCallback: nameof(_resourceTotal)), BelowInfoBox("$" + nameof(_processingMessage))] public int processing;
+        [Ordered, ReadOnly, ProgressBar(maxCallback: nameof(_resourceTotal)), FieldBelowInfoBox("$" + nameof(_processingMessage))] public int processing;
 
         private string _processingMessage;
 

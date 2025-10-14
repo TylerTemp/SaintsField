@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(FieldInfoBoxAttribute), true)]
-    [CustomPropertyDrawer(typeof(BelowInfoBoxAttribute), true)]
+    [CustomPropertyDrawer(typeof(FieldBelowInfoBoxAttribute), true)]
     public partial class InfoBoxAttributeDrawer: SaintsPropertyDrawer
     {
         // private bool _overrideMessageType;
