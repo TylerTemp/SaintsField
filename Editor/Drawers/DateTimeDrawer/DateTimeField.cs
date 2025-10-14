@@ -1,5 +1,6 @@
 using System;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -78,14 +79,35 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 },
             };
             dateRow.Add(_dayInputElement);
+            VisualElement dayInputElementInput = _dayInputElement.Q<VisualElement>("unity-text-input");
+            if(dayInputElementInput != null)
+            {
+                dayInputElementInput.style.borderTopRightRadius = 0;
+                dayInputElementInput.style.borderBottomRightRadius = 0;
+            }
             _dayInputElement.IntegerField.RegisterCallback<FocusEvent>(_ => ShowDropdown(false));
 
             Button dropdownButton = new Button(() => ShowDropdown(false))
             {
+                tooltip = "Open Calendar Picker",
                 style =
                 {
                     height = SaintsPropertyDrawer.SingleLineHeight,
                     width = SaintsPropertyDrawer.SingleLineHeight,
+                    borderTopLeftRadius = 0,
+                    borderBottomLeftRadius = 0,
+                    marginLeft = 0,
+
+                    backgroundImage = Util.LoadResource<Texture2D>("calendar.png"),
+
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize = new BackgroundSize(12, 12),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
                 },
             };
             dateRow.Add(dropdownButton);
@@ -158,8 +180,44 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                     flexGrow = 1,
                 },
             };
+            VisualElement millisecondInputElementInput = _millisecondInputElement.Q<VisualElement>("unity-text-input");
+            if(millisecondInputElementInput != null)
+            {
+                millisecondInputElementInput.style.borderTopRightRadius = 0;
+                millisecondInputElementInput.style.borderBottomRightRadius = 0;
+            }
             timeRow.Add(_millisecondInputElement);
 
+            Button timeNowButton = new Button(() =>
+            {
+                DateTime oldDt = new DateTime(value);
+                DateTime newDt = new DateTime(oldDt.Year, oldDt.Month, oldDt.Day, DateTime.Now.Hour,
+                    DateTime.Now.Minute, DateTime.Now.Second, DateTime.Now.Millisecond, oldDt.Kind);
+                value = newDt.Ticks;
+            })
+            {
+                tooltip = "Set Time To Now",
+                style =
+                {
+                    height = SaintsPropertyDrawer.SingleLineHeight,
+                    width = SaintsPropertyDrawer.SingleLineHeight,
+                    borderTopLeftRadius = 0,
+                    borderBottomLeftRadius = 0,
+                    marginLeft = 0,
+
+                    backgroundImage = Util.LoadResource<Texture2D>("clock.png"),
+
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize = new BackgroundSize(12, 12),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                },
+            };
+            timeRow.Add(timeNowButton);
         }
 
         private void ShowDropdown(bool asYear)
@@ -167,12 +225,17 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             Rect bound = _getWorldBound?.Invoke() ?? worldBound;
             DateTimeElementDropdown sa = new DateTimeElementDropdown(
                 asYear,
-                bound.width,
-                300
+                Mathf.Min(bound.width, 250),
+                200
             );
+            sa.AttachedEvent.AddListener(() =>
+            {
+                sa.value = _cachedValue;
+                sa.OnValueChanged.AddListener(v => value = v);
+                // For whatever reason, this delay is necessary...
+                sa.DropdownYearPanel.schedule.Execute(sa.DropdownYearPanel.UpdateScrollTo).StartingIn(50);
+            });
             UnityEditor.PopupWindow.Show(worldBound, sa);
-            sa.value = _cachedValue;
-            sa.OnValueChanged.AddListener(v => value = v);
         }
 
         private Func<Rect> _getWorldBound;

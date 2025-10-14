@@ -2573,6 +2573,24 @@ namespace SaintsField.Editor.Utils
 
 
         #endregion
+
+        public static void MakePlaceholderRight(VisualElement target, string label)
+        {
+            target?.Add(new Label(label)
+            {
+                pickingMode = PickingMode.Ignore,
+                style =
+                {
+                    color = Color.gray,
+                },
+            });
+
+            // VisualElement textElement = target.Q<VisualElement>(className: "unity-text-element");
+            // if (textElement != null)
+            // {
+            //     textElement.style.
+            // }
+        }
     }
 #endif
 }

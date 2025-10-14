@@ -1,4 +1,5 @@
 using System;
+using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,6 +17,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
         // ReSharper disable once MemberCanBePrivate.Global
         public MonthInputElement()
         {
+            style.justifyContent = Justify.Center;
             IntegerField = new IntegerField
             {
                 maxLength = 2,
@@ -23,8 +25,10 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 {
                     marginLeft = 0,
                     marginRight = 0,
+                    minWidth = 40,
                 },
             };
+            UIToolkitUtils.MakePlaceholderRight(IntegerField.Q<VisualElement>("unity-text-input"), DateTimeUtils.GetMonthLabel());
             IntegerField.RegisterValueChangedCallback(evt =>
                 value = DateTimeUtils.WrapMonth(_cachedValue, Mathf.Clamp(evt.newValue, 1, 12)));
             Add(IntegerField);

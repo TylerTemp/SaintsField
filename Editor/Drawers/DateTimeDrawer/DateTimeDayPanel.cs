@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 },
             });
 
-            foreach (string title in new[]{"S", "M", "T", "W", "T", "F", "S"})
+            foreach (string title in DateTimeUtils.GetWeekLabels())
             {
                 Label label = new Label(title)
                 {

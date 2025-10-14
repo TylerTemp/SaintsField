@@ -1,4 +1,5 @@
 using System;
+using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -15,6 +16,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
 
         public YearInputElement()
         {
+            style.justifyContent = Justify.Center;
             IntegerField = new IntegerField
             {
                 maxLength = 4,
@@ -22,8 +24,12 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 {
                     marginLeft = 0,
                     marginRight = 0,
+                    // height = Length.Percent(100),
+                    minWidth = 50,
                 },
             };
+            UIToolkitUtils.MakePlaceholderRight(IntegerField.Q<VisualElement>("unity-text-input"), DateTimeUtils.GetYearLabel());
+            // .Add(new Label("y"));
             IntegerField.RegisterValueChangedCallback(evt => value = DateTimeUtils.WrapYear(_cachedValue, Mathf.Max(1, evt.newValue)));
             Add(IntegerField);
         }

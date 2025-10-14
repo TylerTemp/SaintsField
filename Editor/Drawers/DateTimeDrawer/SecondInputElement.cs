@@ -1,4 +1,5 @@
 using System;
+using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -25,6 +26,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                     marginRight = 0,
                 },
             };
+            UIToolkitUtils.MakePlaceholderRight(IntegerField.Q<VisualElement>("unity-text-input"), DateTimeUtils.GetSecondLabel());
             IntegerField.RegisterValueChangedCallback(evt =>
             {
                 DateTime dt = new DateTime(_cachedValue);

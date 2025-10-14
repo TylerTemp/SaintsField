@@ -22,7 +22,12 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             dateTimeElement.BindPath(property.propertyPath);
             dateTimeElement.Bind(property.serializedObject);
 
-            return new DateTimeField(GetPreferredLabel(property), dateTimeElement);
+            DateTimeField r = new DateTimeField(GetPreferredLabel(property), dateTimeElement);
+
+            r.AddToClassList(ClassAllowDisable);
+            r.AddToClassList(DateTimeField.alignedFieldUssClassName);
+
+            return r;
             // VisualElement root = new VisualElement();
             //
             // VisualElement yearMonth = new VisualElement

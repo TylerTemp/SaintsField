@@ -13,18 +13,20 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
     {
         private readonly Dictionary<int, YearButtonElement> _yearButtonElements = new Dictionary<int, YearButtonElement>();
 
+        private readonly ScrollView _scrollView;
+
         public DateTimeYearPanel()
         {
-            ScrollView scrollView = new ScrollView(ScrollViewMode.Vertical);
+            _scrollView = new ScrollView(ScrollViewMode.Vertical);
 
-            scrollView.contentContainer.style.flexDirection = FlexDirection.Row;
-            scrollView.contentContainer.style.flexWrap = Wrap.Wrap;
+            _scrollView.contentContainer.style.flexDirection = FlexDirection.Row;
+            _scrollView.contentContainer.style.flexWrap = Wrap.Wrap;
 
             for (int year = 1900; year < 2099; year++)
             {
                 YearButtonElement yearButtonElement = new YearButtonElement(year);
                 _yearButtonElements[year] = yearButtonElement;
-                scrollView.Add(yearButtonElement);
+                _scrollView.Add(yearButtonElement);
                 int capturedYear = year;
                 yearButtonElement.Button.clicked += () =>
                 {
@@ -32,7 +34,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 };
             }
 
-            Add(scrollView);
+            Add(_scrollView);
         }
 
         private long _cachedValue;
@@ -40,11 +42,21 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
         public void SetValueWithoutNotify(long newValue)
         {
             _cachedValue = newValue;
-            DateTime dt = new DateTime(newValue);
+            UpdateScrollTo();
+        }
+
+        public void UpdateScrollTo()
+        {
+            DateTime dt = new DateTime(_cachedValue);
             int year = dt.Year;
             foreach ((int k, YearButtonElement v) in _yearButtonElements)
             {
-                v.SetSelected(k == year);
+                bool active = k == year;
+                v.SetSelected(active);
+                if (active)
+                {
+                    _scrollView.ScrollTo(v);
+                }
             }
         }
 
