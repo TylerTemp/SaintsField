@@ -8,6 +8,8 @@ namespace SaintsField.Utils
 {
     public static class SaintsSerializedUtil
     {
+        public static long OnBeforeSerializeDateTime(DateTime dt) => dt.Ticks;
+
         public static SaintsSerializedProperty OnBeforeSerialize(object obj, Type type)
         {
             if (!type.IsEnum)
@@ -97,6 +99,42 @@ namespace SaintsField.Utils
             }
         }
 
+        public static void OnBeforeSerializeCollectionDateTime(ref long[] toFill, IReadOnlyList<DateTime> objList)
+        {
+            Debug.Assert(objList != null);
+            bool inPlace = toFill != null && toFill.Length == objList.Count;
+
+            long[] results;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (inPlace)
+            {
+                results = Array.Empty<long>();
+            }
+            else
+            {
+                results = new long[objList.Count];
+            }
+
+            for (int i = 0; i < objList.Count; i++)
+            {
+                if (inPlace)
+                {
+                    toFill[i]  = OnBeforeSerializeDateTime(objList[i]);
+                }
+                else
+                {
+                    results[i] = OnBeforeSerializeDateTime(objList[i]);
+                }
+            }
+
+            if (!inPlace)
+            {
+                toFill = results;
+            }
+        }
+
+        public static DateTime OnAfterDeserializeDateTime(long tick) => new DateTime(tick);
+
         public static T OnAfterDeserialize<T>(SaintsSerializedProperty saintsSerializedProperty, Type targetType)
         {
             switch (saintsSerializedProperty.propertyType)
@@ -122,7 +160,7 @@ namespace SaintsField.Utils
             }
         }
 
-        public static (bool filled, T[]result) OnAfterDeserializeArray<T>(T[] toFill, SaintsSerializedProperty[] saintsSerializedProperties, Type elementType)
+        public static (bool filled, T[] result) OnAfterDeserializeArray<T>(T[] toFill, SaintsSerializedProperty[] saintsSerializedProperties, Type elementType)
         {
             // Debug.Log($"OnAfterDeserializeArray toFill={toFill}, serArr={saintsSerializedProperties}, elementType={elementType}");
 
@@ -137,6 +175,27 @@ namespace SaintsField.Utils
                 else
                 {
                     results[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], elementType);
+                }
+            }
+
+            return (canFill, results);
+        }
+
+        public static (bool filled, DateTime[] result) OnAfterDeserializeArrayDateTime(DateTime[] toFill, long[] saintsSerializedProperties, Type elementType)
+        {
+            // Debug.Log($"OnAfterDeserializeArray toFill={toFill}, serArr={saintsSerializedProperties}, elementType={elementType}");
+
+            bool canFill = toFill != null && toFill.Length == saintsSerializedProperties.Length;
+            DateTime[] results = new DateTime[saintsSerializedProperties.Length];
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                if (canFill)
+                {
+                    toFill[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
+                }
+                else
+                {
+                    results[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
                 }
             }
 
@@ -158,6 +217,31 @@ namespace SaintsField.Utils
                 else
                 {
                     results[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], targetType);
+                }
+            }
+
+            // if (!canFill)
+            // {
+            //     toFill = results;
+            // }
+            return (canFill, results);
+        }
+
+        public static (bool filled, List<DateTime> result) OnAfterDeserializeListDateTime(List<DateTime> toFill, long[] saintsSerializedProperties)
+        {
+            // Debug.Log($"toFill={toFill}, serArr={saintsSerializedProperties}, targetType={targetType}");
+            bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
+            // Debug.Log($"canFill={canFill}");
+            List<DateTime> results = new List<DateTime>(new DateTime[saintsSerializedProperties.Length]);
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                if (canFill)
+                {
+                    toFill[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
+                }
+                else
+                {
+                    results[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
                 }
             }
 

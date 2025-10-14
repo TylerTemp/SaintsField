@@ -245,6 +245,8 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             _getWorldBound = getWorldBound;
         }
 
+        private bool _isBound;
+
         public void BindPath(string path)
         {
             bindingPath = path;
@@ -256,6 +258,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             _minuteInputElement.bindingPath = path;
             _secondInputElement.bindingPath = path;
             _millisecondInputElement.bindingPath = path;
+            _isBound = true;
         }
 
         private long _cachedValue;
@@ -267,6 +270,18 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
         public void SetValueWithoutNotify(long newValue)
         {
             _cachedValue = newValue;
+            // ReSharper disable once InvertIf
+            if(!_isBound)
+            {
+                _yearInputElement.SetValueWithoutNotify(newValue);
+                _monthInputElement.SetValueWithoutNotify(newValue);
+                _dayInputElement.SetValueWithoutNotify(newValue);
+
+                _hourInputElement.SetValueWithoutNotify(newValue);
+                _minuteInputElement.SetValueWithoutNotify(newValue);
+                _secondInputElement.SetValueWithoutNotify(newValue);
+                _millisecondInputElement.SetValueWithoutNotify(newValue);
+            }
         }
 
         public long value
@@ -291,9 +306,12 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
 
     public class DateTimeField: BaseField<long>
     {
-        public DateTimeField(string label, DateTimeElement visualInput) : base(label, visualInput)
+        public readonly DateTimeElement DateTimeElement;
+
+        public DateTimeField(string label, DateTimeElement dateTimeElement) : base(label, dateTimeElement)
         {
-            visualInput.SetGetWorldBound(() => worldBound);
+            DateTimeElement = dateTimeElement;
+            dateTimeElement.SetGetWorldBound(() => worldBound);
         }
     }
 }

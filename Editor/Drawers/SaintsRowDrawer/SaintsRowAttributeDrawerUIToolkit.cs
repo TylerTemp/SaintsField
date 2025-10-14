@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa;
@@ -335,6 +336,37 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         private static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual,
             string label, SerializedProperty property, MemberInfo serInfo, Type targetType, object parent)
         {
+            // Debug.Log(property.propertyPath);
+            Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);
+
+            EnumToggleButtonsAttribute enumToggle = null;
+            FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
+            FlagsDropdownAttribute flagsDropdownAttribute = null;
+            DateTimeAttribute dateTimeAttribute = null;
+            foreach (Attribute attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case EnumToggleButtonsAttribute et:
+                        enumToggle = et;
+                        break;
+                    case FlagsTreeDropdownAttribute ftd:
+                        flagsTreeDropdownAttribute = ftd;
+                        break;
+                    case FlagsDropdownAttribute fd:
+                        flagsDropdownAttribute = fd;
+                        break;
+                    case DateTimeAttribute dt:
+                        dateTimeAttribute ??= dt;
+                        break;
+                }
+            }
+
+            if (dateTimeAttribute != null)
+            {
+                return DateTimeAttributeDrawer.RenderSerializedActual(dateTimeAttribute, label, property, typeof(DateTime), true);
+            }
+
             SaintsPropertyType propertyType = (SaintsPropertyType)property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
 
             switch (propertyType)
@@ -344,30 +376,10 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 case SaintsPropertyType.EnumULong:
 #endif
                 {
-                    // Attribute[] attributes = PointedTargetAttributes(saintsSerializedActual.Name, property.serializedObject.targetObject.GetType());
-                    Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);
-
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
                     Debug.Log($"saintsrow serInfo={serInfo.Name} attrs = {string.Join(", ", attributes.Select(a => a.GetType().Name))}");
 #endif
-                    EnumToggleButtonsAttribute enumToggle = null;
-                    FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
-                    FlagsDropdownAttribute flagsDropdownAttribute = null;
-                    foreach (Attribute attribute in attributes)
-                    {
-                        switch (attribute)
-                        {
-                            case EnumToggleButtonsAttribute et:
-                                enumToggle = et;
-                                break;
-                            case FlagsTreeDropdownAttribute ftd:
-                                flagsTreeDropdownAttribute = ftd;
-                                break;
-                            case FlagsDropdownAttribute fd:
-                                flagsDropdownAttribute = fd;
-                                break;
-                        }
-                    }
+
                     if (enumToggle != null)
                     {
                         return EnumToggleButtonsAttributeDrawer.RenderSerializedActual(enumToggle, label, property, serInfo, targetType, parent);
@@ -381,93 +393,23 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             }
         }
 
-        // private static Attribute[] PointedTargetAttributes(IReadOnlyList<SaintsSerializedPath> paths, Type serObjType)
-        // private static Attribute[] PointedTargetAttributes(string name, Type containerType)
+        // private static Type GetElementType(Type rawType)
         // {
-        //     MemberInfo[] targetMemberInfos = containerType.GetMember(
-        //         name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly);
-        //     // ReSharper disable once InvertIf
-        //     if (targetMemberInfos.Length == 0)
+        //     if (rawType.IsArray)
         //     {
-        //         Debug.LogWarning($"failed to find {name} on type {containerType}");
-        //         return Array.Empty<Attribute>();
+        //         return rawType.GetElementType();
         //     }
         //
-        //     return ReflectCache.GetCustomAttributes(targetMemberInfos[0]);
+        //     Type listType = SaintsEditorUtils.GetList(rawType);
+        //     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+        //     // ReSharper disable once ConvertIfStatementToReturnStatement
+        //     if (listType == null)
+        //     {
+        //         return rawType;
+        //     }
         //
-        //     // Type accType = serObjType;
-        //     // MemberInfo targetMemberInfo = null;
-        //     // foreach (SaintsSerializedPath path in paths)
-        //     // {
-        //     //     bool pathIsProperty = path.IsProperty;
-        //     //     if (pathIsProperty)
-        //     //     {
-        //     //         PropertyInfo propertyInfo = accType.GetProperty(
-        //     //             path.Name,
-        //     //             BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-        //     //         if (propertyInfo == null)
-        //     //         {
-        //     //             Debug.LogWarning($"Failed to get attributes of {path.Name} under {serObjType}, chain: {string.Join("->", paths.Select(p => p.Name))}");
-        //     //             return Array.Empty<Attribute>();
-        //     //         }
-        //     //
-        //     //         targetMemberInfo = propertyInfo;
-        //     //         accType = GetElementType(propertyInfo.PropertyType);
-        //     //     }
-        //     //     else
-        //     //     {
-        //     //         FieldInfo fieldInfo = accType.GetField(
-        //     //             path.Name,
-        //     //             BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-        //     //         if (fieldInfo == null)
-        //     //         {
-        //     //             Debug.LogWarning($"Failed to get attributes of {path.Name} under {serObjType}, chain: {string.Join("->", paths.Select(p => p.Name))}");
-        //     //             return Array.Empty<Attribute>();
-        //     //         }
-        //     //
-        //     //         targetMemberInfo = fieldInfo;
-        //     //         accType = GetElementType(fieldInfo.FieldType);
-        //     //     }
-        //     //     // MemberInfo[] members = accType.GetMember(
-        //     //     //     path.Name,
-        //     //     //     BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-        //     //     // Type memberElementType = null;
-        //     //     // foreach (MemberInfo memberInfo in members)
-        //     //     // {
-        //     //     //     switch (memberInfo.MemberType)
-        //     //     //     {
-        //     //     //         case MemberTypes.Field:
-        //     //     //     }
-        //     //     // }
-        //     // }
-        //     //
-        //     // // ReSharper disable once InvertIf
-        //     // if (targetMemberInfo == null)
-        //     // {
-        //     //     Debug.LogWarning($"Failed to get attributes of {serObjType}, chain: {string.Join("->", paths.Select(p => p.Name))}");
-        //     //     return Array.Empty<Attribute>();
-        //     // }
-        //
-        //     // return ReflectCache.GetCustomAttributes(targetMemberInfo);
+        //     return listType.GetGenericArguments()[0];
         // }
-
-        private static Type GetElementType(Type rawType)
-        {
-            if (rawType.IsArray)
-            {
-                return rawType.GetElementType();
-            }
-
-            Type listType = SaintsEditorUtils.GetList(rawType);
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (listType == null)
-            {
-                return rawType;
-            }
-
-            return listType.GetGenericArguments()[0];
-        }
     }
 }
 #endif

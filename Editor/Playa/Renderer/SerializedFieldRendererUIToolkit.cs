@@ -1,8 +1,10 @@
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using SaintsField.SaintsSerialization;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -22,14 +24,17 @@ namespace SaintsField.Editor.Playa.Renderer
             if (!NoLabel)
             {
                 label = FieldWithInfo.SerializedProperty.displayName;
-                Type elementType = FieldWithInfo.FieldInfo.FieldType;
-                if (FieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic &&
-                    FieldWithInfo.SerializedProperty.isArray)
-                {
-                    elementType = ReflectUtils.GetElementType(elementType);
-                }
-
-                if (elementType == typeof(SaintsSerializedProperty) && label.EndsWith("__Saints Serialized__"))
+                // Type elementType = FieldWithInfo.FieldInfo.FieldType;
+                // if (FieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic &&
+                //     FieldWithInfo.SerializedProperty.isArray)
+                // {
+                //     elementType = ReflectUtils.GetElementType(elementType);
+                // }
+                //
+                // Debug.Log(string.Join(",", FieldWithInfo.PlayaAttributes));
+                // Debug.Log(FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute));
+                // if (elementType == typeof(SaintsSerializedProperty) && label.EndsWith("__Saints Serialized__"))
+                if (label.EndsWith("__Saints Serialized__") && FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute))
                 {
                     label = label[..^"__Saints Serialized__".Length];
                 }
