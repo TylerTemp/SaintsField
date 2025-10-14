@@ -4812,7 +4812,35 @@ public int norFieldLayout;
 
 ![](https://github.com/user-attachments/assets/86678cfa-1c9c-413f-8c5a-47f0b52208d4)
 
-**NuGet for Unity** (recommended):
+You can install it using any method below:
+
+**Unity Package Manager + Unity NuGet**
+
+1.  Open `Project Settings` - `Package Manager`, click plus icon to add a scoped registries
+2.  Add:
+    *   Name: `Unity NuGet`
+    *   URL: `https://unitynuget-registry.openupm.com`
+    *   Scopes: `org.nuget`
+3.  Click `Save` button
+
+    ![](https://github.com/user-attachments/assets/aa48ab9a-b52b-4c10-a110-1f1a342d74d5)
+4.  Open `Window` - `Package Manager`, click the plus icon to add package by name
+
+    ![](https://github.com/user-attachments/assets/f8872324-5ce6-476f-be80-207ad60bb416)
+5.  Type `org.nuget.microsoft.codeanalysis.csharp` and hit `Add`
+
+    ![](https://github.com/user-attachments/assets/25f912e0-bb7a-43b3-8d89-a750652f84af)
+6.  Wait until you see the `Microsoft.CodeAnalysis.CSharp` under `Microsoft` part
+
+    ![](https://github.com/user-attachments/assets/42138dfb-1e11-409d-a4c0-36cf8c5a8bb4)
+
+[**OpenUPM Uplink**](https://openupm.com/nuget/#using-uplinked-unitynuget)
+
+```bash
+openupm add org.nuget.microsoft.codeanalysis.csharp 
+```
+
+**NuGet for Unity**:
 
 1.  Install [NuGet for Unity](https://github.com/GlitchEnzo/NuGetForUnity?tab=readme-ov-file#how-do-i-install-nugetforunity)
 2.  Open `NuGet` - `Manage NuGet Packages`
