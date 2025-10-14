@@ -7327,7 +7327,7 @@ public partial class SerDateTimeExample : MonoBehaviour
 }
 ```
 
-[![](https://github.com/user-attachments/assets/4acd7add-0f25-4f79-aa12-4112157e503d)](https://github.com/user-attachments/assets/7f7ba667-681b-48ff-86ae-171623204636)
+[![video](https://github.com/user-attachments/assets/4acd7add-0f25-4f79-aa12-4112157e503d)](https://github.com/user-attachments/assets/7f7ba667-681b-48ff-86ae-171623204636)
 
 ## `SaintsEditorWindow` ##
 
