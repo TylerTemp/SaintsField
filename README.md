@@ -94,7 +94,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.33.0**
+**4.33.1**
 
 1.  UI Toolkit: Add `DateTime` for "Extended Serialization". You can now serialize a `DateTime` field/property.
 2.  UI Toolkit: Add `[DateTime]` attribute to allow you pick a datetime using `long` type
