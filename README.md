@@ -1,6 +1,6 @@
 # SaintsField #
 
-[![unity_version](https://github.com/TylerTemp/SaintsField/assets/6391063/c01626a1-9329-4c26-be31-372f8704df1d)](https://unity.com/download)
+[![unity_version](https://github.com/user-attachments/assets/dffbf530-6212-481b-bfdb-1e9d9ce3712d)](https://unity.com/download)
 [![license_mit](https://github.com/TylerTemp/SaintsField/assets/6391063/a093811a-5dbc-46ad-939e-a9e207ae5bfb)](https://github.com/TylerTemp/SaintsField/blob/master/LICENSE)
 [![openupm](https://img.shields.io/npm/v/today.comes.saintsfield?label=OpenUPM&registry_uri=https://package.openupm.com)](https://openupm.com/packages/today.comes.saintsfield/)
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/TylerTemp/SaintsField.svg)](http://isitmaintained.com/project/TylerTemp/SaintsField "Percentage of issues still open")
@@ -24,19 +24,10 @@ Unity: 2019.1 or higher
 ### Highlights ###
 
 1.  Works on deep nested fields!
-2.  Supports both IMGUI and UI Toolkit! And it can properly handle IMGUI drawer even with UI Toolkit enabled!
+2.  When a target is drawn by the old IMGUI drawer, it will be rendered correctly inside UI Toolkit.
 3.  Use and only use `PropertyDrawer` and `DecoratorDrawer` (except `SaintsEditor`, which is disabled by default), thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
-
-> [!NOTE]
-> Since [SaintsField 4.0](https://github.com/TylerTemp/SaintsField/discussions/183), the IMGUI is no longer a major maintaining codebase in this project.
->
-> IMGUI will only be focused on issues and small features. Big features like editing in `ShowInInspector` will not be supported in IMGUI.
-
-> [!NOTE]
-> If you want some specific feature been backport from UI Toolkit to IMGUI, open [an issue](https://github.com/TylerTemp/SaintsField/issues) or [discussion](https://github.com/TylerTemp/SaintsField/discussions) to request for it (not guaranteed tho)
-
 
 ### Installation ###
 
