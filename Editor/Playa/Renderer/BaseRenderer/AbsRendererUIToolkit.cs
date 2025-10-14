@@ -2327,7 +2327,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType, object currentValue, Action<Type> setType, bool neverNullable)
         {
-            Debug.Log($"fieldType={fieldType} label={label} currentValue={currentValue}");
+            // Debug.Log($"fieldType={fieldType} label={label} currentValue={currentValue}");
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
             dropdownButton.ButtonElement.text = GetDropdownTypeLabel(currentValue?.GetType());
 
