@@ -88,7 +88,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
                 // value = "WTF WTF WTF WTF WTF WTF "
             };
 
-            OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute)saintsAttribute;
+            OverlayTextAttribute overlayRichLabelAttribute = (OverlayTextAttribute)saintsAttribute;
 
             if (overlayRichLabelAttribute.End)
             {
@@ -145,7 +145,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
         {
             container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property)).style.position = Position.Relative;
 
-            OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute)saintsAttribute;
+            OverlayTextAttribute overlayRichLabelAttribute = (OverlayTextAttribute)saintsAttribute;
             CalcOverlay(property, index, overlayRichLabelAttribute, container, info, parent);
         }
 
@@ -154,7 +154,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
             FieldInfo info,
             object parent, Action<object> onValueChangedCallback, object newValue)
         {
-            OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute)saintsAttribute;
+            OverlayTextAttribute overlayRichLabelAttribute = (OverlayTextAttribute)saintsAttribute;
             CalcOverlay(property, index, overlayRichLabelAttribute, container, info, parent);
         }
 
@@ -163,7 +163,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
-            OverlayRichLabelAttribute overlayRichLabelAttribute = (OverlayRichLabelAttribute)saintsAttribute;
+            OverlayTextAttribute overlayRichLabelAttribute = (OverlayTextAttribute)saintsAttribute;
 
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
             if (parent == null)
@@ -176,7 +176,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
         }
 
         private void CalcOverlay(SerializedProperty property, int index,
-            OverlayRichLabelAttribute overlayRichLabelAttribute,
+            OverlayTextAttribute overlayRichLabelAttribute,
             VisualElement container, FieldInfo info, object parent)
         {
             // object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;

@@ -112,7 +112,86 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 
 ### Label & Text ###
 
-#### `RichLabel`/`NoLabel` ####
+#### `LabelText` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Change the label text of a field. (To change element label of an array/list, use `RichLabel` instead.)
+
+Parameters:
+
+*   `string richTextXml` the rich text xml for the label. Supported tag:
+
+    *   All Unity rich label tag, like `<color=#ff0000>red</color>`
+    *   `<icon=path/to/image.png />` for icon
+    *   `<label />` for current field name
+    *   `<field />`, `<field.subField/>`, `<field.subField=formatControl />` read the value from the field first, if tag has sub-field, continue to read, then use `string.Format` if there is a `formatControl`. See the example below.
+    *   `<container.Type />` for the class/struct name of the container of the field
+    *   `<container.Type.BaseType />` for the class/struct name of the field's container's parent
+    *   `<index />`, `<index=formatControl />` for the index if the target is an array/list
+
+    Note about format control:
+
+    *   If the format contains `{}`, it will be used like a `string.Format`. E.g. `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
+    *   Otherwise, it will be rewritten to `{0:formatControl}`. E.g., `<index=D4/>` will be interpreted like `string.Format("{0:D4}", index)`.
+
+    `null` means no label
+
+    for `icon`, it will search the following path:
+
+    *   `"Assets/Editor Default Resources/SaintsField/"`  (You can override things here)
+    *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
+    *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
+    *   `Assets/Editor Default Resources/`, then fallback to built-in editor resources by name (using [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html))
+
+    You can also use Unity Editor's built-in icons. See [UnityEditorIcons](https://github.com/nukadelic/UnityEditorIcons). e.g. `<icon=d_AudioListener Icon/>`
+
+    for `color` it supports:
+
+    *   Standard [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) colors:
+
+        `aqua`, `black`, `blue`, `brown`, `cyan`, `darkblue`, `fuchsia`, `green`, `gray`, `grey`, `lightblue`, `lime`, `magenta`, `maroon`, `navy`, `olive`, `orange`, `purple`, `red`, `silver`, `teal`, `white`, `yellow`
+
+    *   Some extra colors from [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes/blob/master/Assets/NaughtyAttributes/Scripts/Core/Utility/EColor.cs):
+
+        `clear`, `pink`, `indigo`, `violet`
+
+    *   Some extra colors from UI Toolkit:
+
+        `charcoalGray`, `oceanicSlate`
+
+    *   html color which is supported by [`ColorUtility.TryParseHtmlString`](https://docs.unity3d.com/ScriptReference/ColorUtility.TryParseHtmlString.html), like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
+
+    ![color_list_ui_toolkit_add](https://github.com/TylerTemp/SaintsField/assets/6391063/50ec511b-b914-4395-8b42-793a4389c8da)
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
+*   `bool isCallback=false` (Depreacted, use `$` with "richTextXml" instead)
+
+    if it's a callback (a method/property/field)
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[RichLabel("<color=lame>It's Labeled!")]
+public List<string> myList;
+
+[RichLabel("$" + nameof(MethodLabel))]
+public string[] myArray;
+
+private string MethodLabel(string[] values)
+{
+    return $"<color=green><label /> {string.Join("", values.Select(_ => "<icon=star.png />"))}";
+}
+```
+
+![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
+
+#### `FieldLabelText`/`NoLabel` ####
+
+Like `LabelText`, but it can be applied to an array/list to change the element label (instead of the label of array/list itself)
 
 *   `string|null richTextXml` the content of the label, supported tag:
 
@@ -182,27 +261,27 @@ You can use this to modify elements of an array/list field, in this way:
 ```csharp
 using SaintsField;
 
-[RichLabel("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
+[LabelText("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
 public string _rainbow;
 
-[RichLabel("$" + nameof(LabelCallback))]
+[LabelText("$" + nameof(LabelCallback))]
 public bool _callbackToggle;
 private string LabelCallback() => _callbackToggle ? "<color=green><icon=eye.png /></color> <label/>" : "<icon=eye-slash.png /> <label/>";
 
 [Space]
-[RichLabel("$" + nameof(_propertyLabel))]
+[LabelText("$" + nameof(_propertyLabel))]
 public string _propertyLabel;
 private string _rainbow;
 
 [Serializable]
 private struct MyStruct
 {
-    [RichLabel("<color=green>HI!</color>")]
+    [LabelText("<color=green>HI!</color>")]
     public float LabelFloat;
 }
 
 [SerializeField]
-[RichLabel("<color=green>Fixed For Struct!</color>")]
+[LabelText("<color=green>Fixed For Struct!</color>")]
 private MyStruct _myStructWorkAround;
 ```
 
@@ -265,10 +344,9 @@ public string[] sindices;
 
 ![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
 
-#### `AboveRichLabel` / `BelowRichLabel` ####
+#### `FieldAboveText` / `FieldBelowText` ####
 
-Like `RichLabel`, but it's rendered above/below the field in full width of view instead.
-
+Like `AboveText` /  `BelowText`, but it can be applied to an array/list to draw text above/below each element (instead of the label of array/list itself)
 
 *   `string|null richTextXml` Same as `RichLabel`
 *   `bool isCallback=false` Same as `RichLabel`
@@ -279,11 +357,11 @@ Like `RichLabel`, but it's rendered above/below the field in full width of view 
 using SaintsField;
 
 [SerializeField]
-[AboveRichLabel("┌<icon=eye.png/><label />┐")]
-[RichLabel("├<icon=eye.png/><label />┤")]
-[BelowRichLabel("$" + nameof(BelowLabel))]
-[BelowRichLabel("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
-[BelowRichLabel("==================================", groupBy: "example")]
+[FieldAboveText("┌<icon=eye.png/><label />┐")]
+[LabelText("├<icon=eye.png/><label />┤")]
+[FieldBelowText("$" + nameof(BelowLabel))]
+[FieldBelowText("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
+[FieldBelowText("==================================", groupBy: "example")]
 private int _intValue;
 
 private string BelowLabel() => "└<icon=eye.png/><label />┘";
@@ -291,15 +369,17 @@ private string BelowLabel() => "└<icon=eye.png/><label />┘";
 
 ![full_width_label](https://github.com/TylerTemp/SaintsField/assets/6391063/9283e25a-34b3-4192-8a07-5d97a4e55406)
 
-#### `OverlayRichLabel` ####
+#### `OverlayText` ####
 
-Like `RichLabel`, but it's rendered on top of the field.
+Like `TextLabel`, but it's rendered on top of the field.
 
 Only supports string/number type of field. Does not work with any kind of `TextArea` (multiple line) and `Range`.
 
+Using on an array/list will apply to every element (instead of the array/list itself).
+
 Parameters:
 
-*   `string richTextXml` the content of the label, or a property/callback. Supports tags like `RichLabel`
+*   `string richTextXml` the content of the label, or a property/callback. Supports tags like `LabelText`
 
     If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
 
@@ -307,16 +387,16 @@ Parameters:
 *   `float padding=5f` padding between your input and the label. Not work when `end=true`
 *   `bool end=false` when false, the label will follow the end of your input. Otherwise, it will stay at the end of the field.
 *   `string GroupBy=""` this is only for the error message box.
-*   AllowMultiple: No
+*   Allow Multiple: No
 
 ```csharp
 using SaintsField;
 
-[OverlayRichLabel("<color=grey>km/s")] public double speed = double.MinValue;
-[OverlayRichLabel("<icon=eye.png/>")] public string text;
-[OverlayRichLabel("<color=grey>/int", padding: 1)] public int count = int.MinValue;
-[OverlayRichLabel("<color=grey>/long", padding: 1)] public long longInt = long.MinValue;
-[OverlayRichLabel("<color=grey>suffix", end: true)] public string atEnd;
+[OverlayText("<color=grey>km/s")] public double speed = double.MinValue;
+[OverlayText("<icon=eye.png/>")] public string text;
+[OverlayText("<color=grey>/int", padding: 1)] public int count = int.MinValue;
+[OverlayText("<color=grey>/long", padding: 1)] public long longInt = long.MinValue;
+[OverlayText("<color=grey>suffix", end: true)] public string atEnd;
 ```
 
 ![overlay_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bd85b5c8-3ef2-4899-9bc3-b9799e3331ed)
@@ -361,60 +441,28 @@ public string TakeAGuess()
 
 ![post_field_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bdd9446b-97fe-4cd2-900a-f5ed5f1ccb56)
 
-#### `PlayaRichLabel` ####
+#### `AboveText` /  `BelowText` ####
 
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-This is like `RichLabel`, but it can change label of an array/list
+Like `RichLabel`, but it's rendered above/below the field in full width of view instead.
 
-Please note: at the moment it only works for serialized property, and is only tested on array/list. It's suggested to use `RichLabel` for non-array/list
-serialized fields.
-
-Parameters:
-
-*   `string richTextXml` the rich text xml for the label. Note: custom rich label tag created by this project only works in UI Toolkit mode.
-*   `bool isCallback=false` if it's a callback (a method/property/field)
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[PlayaRichLabel("<color=lame>It's Labeled!")]
-public List<string> myList;
-
-[PlayaRichLabel(nameof(MethodLabel), true)]
-public string[] myArray;
-
-private string MethodLabel(string[] values)
-{
-    return $"<color=green><label /> {string.Join("", values.Select(_ => "<icon=star.png />"))}";
-}
-```
-
-![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
-
-#### `PlayaAboveRichLabel` /  `PlayaBelowRichLabel` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-Just like `AboveRichLabel` / `BelowRichLabel` but it can be applied on a top of an array/list, a property or a method
-
-For `AboveRichLabel`, it can also be applied on a class/struct.
+For `AboveText`, it can also be applied on a class/struct.
 
 Parameters:
 
 *   `string content` the content to show. If it starts with `$`, then a callback/propery/field value is used. When a callback gives null or empty string, the label will be hidden.
+    For `AboveText` the default value for this parameter is `"<color=gray><label/>"`. For `BelowText` this parameter is required.
 
 ```csharp
 using SaintsField;
 using SaintsField.Playa;
 
-[PlayaAboveRichLabel("<color=gray>-- Above --")]
-[PlayaAboveRichLabel("$" + nameof(dynamicContent))]
-[PlayaBelowRichLabel("$" + nameof(dynamicContent))]
-[PlayaBelowRichLabel("<color=gray>-- Below --")]
+[AboveText("<color=gray>-- Above --")]
+[AboveText("$" + nameof(dynamicContent))]
+[AboveText("$" + nameof(dynamicContent))]
+[BelowText("<color=gray>-- Below --")]
 public string[] s;
 
 [Space(20)]
@@ -429,8 +477,8 @@ Example of using on a class/struct like a data comment:
 using SaintsField;
 using SaintsField.Playa;
 
-[PlayaAboveRichLabel("<color=gray>This is a class message")]
-[PlayaAboveRichLabel("$" + nameof(dynamicContent))]
+[AboveText("<color=gray>This is a class message")]
+[AboveText("$" + nameof(dynamicContent))]
 public class ClassPlayaAboveRichLabelExample : MonoBehaviour
 {
     [ResizableTextArea]
@@ -451,77 +499,12 @@ public class ClassPlayaAboveRichLabelExample : MonoBehaviour
 
 #### `InfoBox`/`BelowInfoBox` ####
 
-Draw an info box above/below the field.
-
-*   `string content`
-
-    The content of the info box.
-
-    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
-
-*   `EMessageType messageType=EMessageType.Info`
-
-    Message icon. Options are
-
-    *   `None`
-    *   `Info`
-    *   `Warning`
-    *   `Error`
-
-*   `string show=null`
-
-    a callback name or property name for show or hide this info box.
-
-*   `bool isCallback=false`
-
-    if true, the `content` will be interpreted as a property/callback function.
-
-    If the value (or returned value) is a string, then the content will be changed
-
-    If the value is `(EMessageType messageType, string content)` then both content and message type will be changed
-
-*   ~~`bool above=false`~~
-
-    ~~Draw the info box above the field instead of below~~
-
-    Renamed to `below` since version `3.3.0`
-
-*   `bool below=false`
-
-    Draw the info box below the field instead of above
-
-*   `string groupBy=""` See `GroupBy` section
-
-*   AllowMultiple: Yes
-
-`BelowInfoBox` is a shortcut for `[InfoBox(..., below: true)]`
-
-```csharp
-using SaintsField;
-
-[field: SerializeField] private bool _show;
-
-[Space]
-[InfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None)]
-[BelowInfoBox("$" + nameof(DynamicMessage), EMessageType.Warning)]
-[BelowInfoBox("$" + nameof(DynamicMessageWithIcon))]
-[BelowInfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
-public bool _content;
-
-private (EMessageType, string) DynamicMessageWithIcon => _content ? (EMessageType.Error, "False!") : (EMessageType.None, "True!");
-private string DynamicMessage() => _content ? "False" : "True";
-```
-
-[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/c96b4b14-594d-4bfd-9cc4-e53390ed99be)](https://github.com/TylerTemp/SaintsField/assets/6391063/03ac649a-9e89-407d-a59d-3e224a7f84c8)
-
-#### `PlayaInfoBox`/`PlayaBelowInfoBox` ####
-
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-This is like `InfoBox`, but it can be applied to array/list/method etc.
+Draw an info box above/below the field.
 
-For `PlayaInfoBox`, it can also be directly applied on a class/struct definition.
+It can also be directly applied on a class/struct definition.
 
 *   `string content`
 
@@ -562,24 +545,24 @@ For `PlayaInfoBox`, it can also be directly applied on a class/struct definition
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
-[PlayaInfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
-[PlayaBelowInfoBox("$" + nameof(DynamicFromArray))]  // callback
+[InfoBox("Please Note: special label like <icon=star.png/> only works for <color=lime>UI Toolkit</color> <color=red>(not IMGUI)</color> in InfoBox.")]
+[BelowInfoBox("$" + nameof(DynamicFromArray))]  // callback
 public string[] strings = {};
 
 public string dynamic;
 
 private string DynamicFromArray(string[] value) => value.Length > 0? string.Join("\n", value): "null";
 
-[PlayaInfoBox("MethodWithButton")]
+[InfoBox("MethodWithButton")]
 [Button("Click Me!")]
-[PlayaBelowInfoBox("GroupExample", groupBy: "group")]
-[PlayaBelowInfoBox("$" + nameof(dynamic), groupBy: "group")]
+[BelowInfoBox("GroupExample", groupBy: "group")]
+[BelowInfoBox("$" + nameof(dynamic), groupBy: "group")]
 public void MethodWithButton()
 {
 }
 
-[PlayaInfoBox("Method")]
-[PlayaBelowInfoBox("$" + nameof(dynamic))]
+[InfoBox("Method")]
+[BelowInfoBox("$" + nameof(dynamic))]
 public void Method()
 {
 }
@@ -593,14 +576,14 @@ Example of using on a class/struct definition like a data comment:
 using SaintsField;
 using SaintsField.Playa;
 
-[PlayaInfoBox("This is a class message", EMessageType.None)]
-[PlayaInfoBox("$" + nameof(dynamicContent))]
+[InfoBox("This is a class message", EMessageType.None)]
+[InfoBox("$" + nameof(dynamicContent))]
 public class ClassInfoBoxExample : MonoBehaviour  // The info box will show in inspector wherever you attach this component
 {
     public string dynamicContent;
 
     [Serializable]
-    [PlayaInfoBox("This is a struct message")]
+    [InfoBox("This is a struct message")]
     public struct MyStruct  // The info box will show at first row wherever you use this struct
     {
         public string structString;
@@ -612,9 +595,151 @@ public class ClassInfoBoxExample : MonoBehaviour  // The info box will show in i
 
 ![Image](https://github.com/user-attachments/assets/70a8613e-e17f-4463-8653-a6500b9e757f)
 
-#### `Separator` / `BelowSeparator` ####
+#### `FieldInfoBox`/`FieldBelowInfoBox` ####
+
+Draw an info box above/below the field.
+
+Unlike `InfoBox`, use this on an array/list, the box will be applied to every element (instead of the array/list itself).
+
+*   `string content`
+
+    The content of the info box.
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
+*   `EMessageType messageType=EMessageType.Info`
+
+    Message icon. Options are
+
+    *   `None`
+    *   `Info`
+    *   `Warning`
+    *   `Error`
+
+*   `string show=null`
+
+    a callback name or property name for show or hide this info box.
+
+*   `bool isCallback=false`
+
+    if true, the `content` will be interpreted as a property/callback function.
+
+    If the value (or returned value) is a string, then the content will be changed
+
+    If the value is `(EMessageType messageType, string content)` then both content and message type will be changed
+
+*   `bool below=false`
+
+    Draw the info box below the field instead of above
+
+*   `string groupBy=""` See `GroupBy` section
+
+*   AllowMultiple: Yes
+
+`BelowInfoBox` is a shortcut for `[InfoBox(..., below: true)]`
+
+```csharp
+using SaintsField;
+
+[field: SerializeField] private bool _show;
+
+[Space]
+[FieldInfoBox("Hi\nwrap long line content content content content content content content content content content content content content content content content content content content content content content content content content", EMessageType.None)]
+[FieldBelowInfoBox("$" + nameof(DynamicMessage), EMessageType.Warning)]
+[FieldBelowInfoBox("$" + nameof(DynamicMessageWithIcon))]
+[FieldBelowInfoBox("Hi\n toggle content ", EMessageType.Info, nameof(_show))]
+public bool _content;
+
+private (EMessageType, string) DynamicMessageWithIcon => _content ? (EMessageType.Error, "False!") : (EMessageType.None, "True!");
+private string DynamicMessage() => _content ? "False" : "True";
+```
+
+[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/c96b4b14-594d-4bfd-9cc4-e53390ed99be)](https://github.com/TylerTemp/SaintsField/assets/6391063/03ac649a-9e89-407d-a59d-3e224a7f84c8)
+
+#### `Separator`/`BelowSeparator` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Draw text, separator, spaces for field/property/button/layout on above / below with rich text & dynamic text support.
+
+Parameters:
+
+*   `string title=null` display a title. `null` for no title, only separator.
+
+    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
+
+*   `EColor color=EColor.Gray` color for the title and the separator
+*   `EAlign eAlign=EAlign.Start` how the title is positioned, options are:
+    *   `EAlign.Start`
+    *   `EAlign.Center`
+    *   `EAlign.End`
+*   `bool isCallback=false` when `true`, use `title` as a callback to get a dynamic title
+*   `int space=0` leave some space above or below the separator, like what `Space` does.
+*   `bool below=false` when `true`, draw the separator below the field.
+
+```csharp
+[Separator("Separator", EAlign.Center)]
+public string separator;
+
+[Separator("Left", EAlign.Start)] public string left;
+
+[Separator("$" + nameof(right), EAlign.End)]
+public string right;
+
+[Separator(20)]
+[Separator("Space 20")]
+public string[] arr;
+
+[Separator("End", below: true)] public string end;
+```
+
+![image](https://github.com/user-attachments/assets/7aaee07a-d8f5-4b13-a166-157df57e9d3d)
+
+Using it with `Layout`, you can create some fancy appearance:
+
+```csharp
+[LayoutStart("Equipment", ELayout.TitleBox)]
+
+[LayoutStart("./Head")]
+[Separator("Head", EAlign.Center)]
+public string st;
+[LayoutCloseHere]
+public MyStruct inOneStruct;
+
+[LayoutStart("./Upper Body")]
+
+[InfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
+
+[LayoutStart("./Horizontal", ELayout.Horizontal)]
+
+[LayoutStart("./Left Hand")]
+[Separator("Left Hand", EAlign.Center)]
+public string g11;
+public string g12;
+public MyStruct myStruct;
+public string g13;
+
+[LayoutStart("../Right Hand")]
+[Separator("Right Hand", EAlign.Center)]
+public string g21;
+[LabelText("<color=lime><label/>")]
+public string g22;
+[LabelText("$" + nameof(g23))]
+public string g23;
+
+public bool toggle;
+```
+
+![image](https://github.com/user-attachments/assets/792960eb-50eb-4a26-b563-37282c20a174)
+
+#### `FieldSeparator` / `FieldBelowSeparator` ####
+
+> [!TIPS]
+> Only use this if you can not enable `SaintsEditor`
 
 Draw text, separator, spaces for field on above / below with rich text & dynamic text support.
+Using on an array will apply to every element (instead of the array/list itself).
 
 Parameters:
 
@@ -636,25 +761,25 @@ using SaintsField;
 
 [Space(50)]
 
-[Separator("Start")]
-[Separator("Center", EAlign.Center)]
-[Separator("End", EAlign.End)]
-[BelowSeparator("$" + nameof(Callback))]
+[FieldSeparator("Start")]
+[FieldSeparator("Center", EAlign.Center)]
+[FieldSeparator("End", EAlign.End)]
+[FieldBelowSeparator("$" + nameof(Callback))]
 public string s3;
 public string Callback() => s3;
 
 [Space(50)]
 
-[Separator]
+[FieldSeparator]
 public string s1;
 
-[Separator(10)]  // this behaves like a space
-[Separator("[ Hi <color=LightBlue>Above</color> ]", EColor.Aqua, EAlign.Center)]
-[BelowSeparator("[ Hi <color=Silver>Below</color> ]", EColor.Brown, EAlign.Center)]
-[BelowSeparator(10)]
+[FieldSeparator(10)]  // this behaves like a space
+[FieldSeparator("[ Hi <color=LightBlue>Above</color> ]", EColor.Aqua, EAlign.Center)]
+[FieldBelowSeparator("[ Hi <color=Silver>Below</color> ]", EColor.Brown, EAlign.Center)]
+[FieldBelowSeparator(10)]
 public string hi;
 
-[BelowSeparator]
+[FieldBelowSeparator]
 public string s2;
 ```
 
@@ -679,88 +804,9 @@ public class SeparatorInherent : SeparatorParent
 
 ![image](https://github.com/user-attachments/assets/2f6e369d-1260-4379-9504-6036fb89e15b)
 
-#### `PlayaSeparator` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-Draw text, separator, spaces for field/property/button/layout on above / below with rich text & dynamic text support.
-
-This is UI Toolkit only.
-
-Parameters:
-
-*   `string title=null` display a title. `null` for no title, only separator.
-
-    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
-
-*   `EColor color=EColor.Gray` color for the title and the separator
-*   `EAlign eAlign=EAlign.Start` how the title is positioned, options are:
-    *   `EAlign.Start`
-    *   `EAlign.Center`
-    *   `EAlign.End`
-*   `bool isCallback=false` when `true`, use `title` as a callback to get a dynamic title
-*   `int space=0` leave some space above or below the separator, like what `Space` does.
-*   `bool below=false` when `true`, draw the separator below the field.
-
-```csharp
-[PlayaSeparator("Separator", EAlign.Center)]
-public string separator;
-
-[PlayaSeparator("Left", EAlign.Start)] public string left;
-
-[PlayaSeparator("$" + nameof(right), EAlign.End)]
-public string right;
-
-[PlayaSeparator(20)]
-[PlayaSeparator("Space 20")]
-public string[] arr;
-
-[PlayaSeparator("End", below: true)] public string end;
-```
-
-![image](https://github.com/user-attachments/assets/7aaee07a-d8f5-4b13-a166-157df57e9d3d)
-
-Using it with `Layout`, you can create some fancy appearance:
-
-```csharp
-[LayoutStart("Equipment", ELayout.TitleBox)]
-
-[LayoutStart("./Head")]
-[PlayaSeparator("Head", EAlign.Center)]
-public string st;
-[LayoutCloseHere]
-public MyStruct inOneStruct;
-
-[LayoutStart("./Upper Body")]
-
-[PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
-
-[LayoutStart("./Horizontal", ELayout.Horizontal)]
-
-[LayoutStart("./Left Hand")]
-[PlayaSeparator("Left Hand", EAlign.Center)]
-public string g11;
-public string g12;
-public MyStruct myStruct;
-public string g13;
-
-[LayoutStart("../Right Hand")]
-[PlayaSeparator("Right Hand", EAlign.Center)]
-public string g21;
-[RichLabel("<color=lime><label/>")]
-public string g22;
-[RichLabel("$" + nameof(g23))]
-public string g23;
-
-public bool toggle;
-```
-
-![image](https://github.com/user-attachments/assets/792960eb-50eb-4a26-b563-37282c20a174)
-
 #### `SepTitle` ####
 
-A separator with text. This is a decorator type attribute, which means it can be used on top of a list/array.
+A separator with text. This is a decorator type attribute, which means used on list/array will draw itself above the list/array (not above each element of list/array).
 
 *   `string title=null` display a title. `null` for no title, only separator.
 
@@ -841,6 +887,86 @@ private Color ValidateColor()
 go give a star to them!)
 
 ### Button ###
+
+#### `Button` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments. UI Toolkit: if the method have a return value, the result will also be shown.
+
+*   `string buttonLabel = null` the button label. If null, it'll use the function name. If it starts with `$`, use a callback or field value as the label.
+    Rich text is supported.
+*   `bool hideReturnValue = false` do not display the returned value.
+
+**Known Issue**: Using dynamic label in `SaintsRow`, the label will not update in real time. This is because a `Serializable` class/struc
+field value will be cached by Unity, and reflection can not get an updated value. This issue can not be solved unless
+there is a way to reflect the actual value from a cached container.
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+public string dynamicLabel;
+
+[Button("$" + nameof(dynamicLabel))]
+private void ButtonWithDynamicLabel()
+{
+}
+
+[Button("Normal <icon=star.png/>Button Label")]
+private void ButtonWithNormalLabel()
+{
+}
+
+[Button]
+private void ButtonWithoutLabel()
+{
+}
+```
+
+![image](https://github.com/user-attachments/assets/54c4d9c1-9309-4a1d-b5e3-f9f69be88305)
+
+Example with arguments:
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Button]
+private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = "hi")
+{
+    Debug.Log($"{myObj}, {myInt}, {myStr}");
+}
+```
+
+![image](https://github.com/TylerTemp/SaintsField/assets/6391063/7a79ed1f-e227-4cf4-8885-e2ea81f4df3a)
+
+```csharp
+// Please ensure you already have SaintsEditor enabled in your project before trying this example
+using SaintsField.Playa;
+
+[Button]  // Display the returned value when clicked
+private int AddCalculator(int a, int b) => a + b;
+
+[GetComponentInChildren] public GameObject[] goLis;
+
+private class ResultClass
+{
+    public GameObject Go;
+}
+
+[Button]  // A struct, class, UnityObject return type is supported too
+private ResultClass ReturnClass(int v) => new ResultClass
+{
+    Go = goLis[v % goLis.Length]
+};
+
+[Button(hideReturnValue: true)]  // Hide the returned value
+private int ReturnIgnored() => Random.Range(0, 100);
+```
+
+[![video](https://github.com/user-attachments/assets/8632fa84-2e69-46c2-aa1a-8cb247b3888f)](https://github.com/user-attachments/assets/b56f05a2-590f-4683-8b81-2ff4998c4578)
 
 #### `AboveButton`/`BelowButton`/`PostFieldButton` ####
 
@@ -926,87 +1052,6 @@ private void Toggle() => _errorOut = !_errorOut;
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/4e02498e-ae90-4b11-8076-e26256ea0369)](https://github.com/TylerTemp/SaintsField/assets/6391063/f225115b-f7de-4273-be49-d830766e82e7)
-
-
-#### `Button` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-Draw a button for a function. If the method have arguments (required or optional), it'll draw inputs for these arguments. UI Toolkit: if the method have a return value, the result will also be shown.
-
-*   `string buttonLabel = null` the button label. If null, it'll use the function name. If it starts with `$`, use a callback or field value as the label.
-    Rich text is supported.
-*   `bool hideReturnValue = false` do not display the returned value.
-
-**Known Issue**: Using dynamic label in `SaintsRow`, the label will not update in real time. This is because a `Serializable` class/struc
-field value will be cached by Unity, and reflection can not get an updated value. This issue can not be solved unless
-there is a way to reflect the actual value from a cached container.
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-public string dynamicLabel;
-
-[Button("$" + nameof(dynamicLabel))]
-private void ButtonWithDynamicLabel()
-{
-}
-
-[Button("Normal <icon=star.png/>Button Label")]
-private void ButtonWithNormalLabel()
-{
-}
-
-[Button]
-private void ButtonWithoutLabel()
-{
-}
-```
-
-![image](https://github.com/user-attachments/assets/54c4d9c1-9309-4a1d-b5e3-f9f69be88305)
-
-Example with arguments:
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[Button]
-private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = "hi")
-{
-    Debug.Log($"{myObj}, {myInt}, {myStr}");
-}
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/7a79ed1f-e227-4cf4-8885-e2ea81f4df3a)
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[Button]  // Display the returned value when clicked
-private int AddCalculator(int a, int b) => a + b;
-
-[GetComponentInChildren] public GameObject[] goLis;
-
-private class ResultClass
-{
-    public GameObject Go;
-}
-
-[Button]  // A struct, class, UnityObject return type is supported too
-private ResultClass ReturnClass(int v) => new ResultClass
-{
-    Go = goLis[v % goLis.Length]
-};
-
-[Button(hideReturnValue: true)]  // Hide the returned value
-private int ReturnIgnored() => Random.Range(0, 100);
-```
-
-[![video](https://github.com/user-attachments/assets/8632fa84-2e69-46c2-aa1a-8cb247b3888f)](https://github.com/user-attachments/assets/b56f05a2-590f-4683-8b81-2ff4998c4578)
 
 ### Game Related ###
 
@@ -4360,9 +4405,9 @@ using SaintsField;
 
 [![video](https://github.com/user-attachments/assets/ad5042db-6de3-4f98-8c5d-6387178e3dec)](https://github.com/user-attachments/assets/3c391078-8fcf-4dba-954d-28b6db21b57b)
 
-#### `DefaultExpand` ####
+#### `FieldDefaultExpand` ####
 
-Expand the field by default. Only works on the field that can be expanded, e.g. `struct/class`, `Expandable`, `EnumFlags`, `SaintsRow`.
+Expand every element inside an array/list. Works on normal field too.
 
 ```csharp
 using SaintsField;
@@ -4376,12 +4421,15 @@ public struct SaintsRowStruct
 
 }
 
-[DefaultExpand]
+[FieldDefaultExpand]
+public SaintsRowStruct[] expandEveryElement;
+
+[FieldDefaultExpand]
 public SaintsRowStruct defaultStruct;
 
-[DefaultExpand, SaintsRow] public SaintsRowStruct row;
+[FieldDefaultExpand, SaintsRow] public SaintsRowStruct row;
 
-[DefaultExpand, GetScriptableObject, Expandable] public Scriptable so;
+[FieldDefaultExpand, GetScriptableObject, Expandable] public Scriptable so;
 
 [Serializable, Flags]
 public enum BitMask
@@ -4398,28 +4446,26 @@ public enum BitMask
     Mask5 = 1 << 4,
 }
 
-[DefaultExpand, EnumFlags] public BitMask mask;
+[FieldDefaultExpand, EnumFlags] public BitMask mask;
 ```
 
-#### `ArrayDefaultExpand` ####
+#### `DefaultExpand` ####
 
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-Expand all the elements in the array by default. This works exactly the same as `DefaultExpand`, plus `list`, `array`, `ListDrawerSettings`
+Expand the field by default.
 
 ```csharp
 using SaintsField;
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
 
-[ArrayDefaultExpand]
+[DefaultExpand]
 public string[] arrayDefault;
 
-[ArrayDefaultExpand]
+[DefaultExpand]
 public List<string> listDefault;
 
-[ArrayDefaultExpand, ListDrawerSettings]
+[DefaultExpand, ListDrawerSettings]
 public string[] arrayDrawer;
 
 [Serializable]
@@ -4429,7 +4475,9 @@ public struct TableStruct
     public int value;
 }
 
-[ArrayDefaultExpand, Table] public TableStruct[] table;
+[DefaultExpand] public TableStruct structField;
+
+[DefaultExpand, Table] public TableStruct[] table;
 ```
 
 #### `AssetFolder` ####

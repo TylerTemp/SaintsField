@@ -14,11 +14,11 @@ namespace SaintsField.Samples.Scripts.AdaptExamples
 
         [Adapt(EUnit.Percent)] public int percentI;
 
-        [PropRange(0f, 1f), Adapt(EUnit.Percent), OverlayRichLabel("<color=gray>%", end: true), FieldBelowText("$" + nameof(percentRange)), BelowButton("$" + nameof(ExternalPumpValue), "Pump")] public float percentRange;
+        [PropRange(0f, 1f), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true), FieldBelowText("$" + nameof(percentRange)), BelowButton("$" + nameof(ExternalPumpValue), "Pump")] public float percentRange;
         [
             PropRange(0f, 1f, step: 0.05f),
             Adapt(EUnit.Percent),
-            OverlayRichLabel("<color=gray>%", end: true),
+            OverlayText("<color=gray>%", end: true),
             FieldBelowText("$" + nameof(DisplayActualValue)),
             // BelowButton("$" + nameof(ExternalPumpValueStep), "Pump"),
             // BelowButton("$" + nameof(SetValue))

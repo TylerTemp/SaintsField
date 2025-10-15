@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
         [FieldLabelText("$" + nameof(ArrayLabels))]
         [FieldAboveText("$" + nameof(ArrayLabels))]
         [FieldBelowText("$" + nameof(ArrayLabels))]
-        [OverlayRichLabel("$" + nameof(ArrayLabels))]
+        [OverlayText("$" + nameof(ArrayLabels))]
         [PostFieldRichLabel("$" + nameof(ArrayLabels))]
         public string[] arrayLabels;
 

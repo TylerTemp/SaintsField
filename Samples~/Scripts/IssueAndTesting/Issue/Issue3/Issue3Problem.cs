@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue3
         [FieldBelowText("<icon=star.png/>")]
         public string richBelowIcon;
 
-        [OverlayRichLabel("<icon=star.png/>")]
+        [OverlayText("<icon=star.png/>")]
         public string richOverlayIcon;
         [PostFieldRichLabel("<icon=star.png/>")]
         public string richPostIcon;

@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
                 return false;
             }
 
-            OverlayRichLabelAttribute targetAttribute = (OverlayRichLabelAttribute)saintsAttribute;
+            OverlayTextAttribute targetAttribute = (OverlayTextAttribute)saintsAttribute;
 
             float contentWidth = GetPlainTextWidth(inputContent) + targetAttribute.Padding;
             (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml,
