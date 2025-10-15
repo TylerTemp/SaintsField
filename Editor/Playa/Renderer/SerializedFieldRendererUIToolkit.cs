@@ -33,6 +33,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 //
                 // Debug.Log(string.Join(",", FieldWithInfo.PlayaAttributes));
                 // Debug.Log(FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute));
+                // Debug.Log(FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute));
                 // if (elementType == typeof(SaintsSerializedProperty) && label.EndsWith("__Saints Serialized__"))
                 if (label.EndsWith("__Saints Serialized__") && FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute))
                 {

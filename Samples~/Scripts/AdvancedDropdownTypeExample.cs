@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
@@ -7,5 +8,7 @@ namespace SaintsField.Samples.Scripts
         [AdvancedDropdown] public Color builtInColor;
         [AdvancedDropdown] public Vector2 builtInV2;
         [AdvancedDropdown] public Vector3Int builtInV3Int;
+
+        public TimeSpan ts;
     }
 }
