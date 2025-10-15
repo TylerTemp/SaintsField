@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.Addressable
     public class AddressableAddressExample: MonoBehaviour
     {
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
-        [AddressableAddress][FieldRichLabel("<icon=star.png /><label />")]
+        [AddressableAddress][FieldLabelText("<icon=star.png /><label />")]
 #else
         [InfoBox("Please install Addressable to see this feature.", EMessageType.Error)]
 #endif
@@ -37,7 +37,7 @@ namespace SaintsField.Samples.Scripts.Addressable
 
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
         [ReadOnly]
-        [AddressableAddress][FieldRichLabel("<icon=star.png /><label />")]
+        [AddressableAddress][FieldLabelText("<icon=star.png /><label />")]
 #else
         [InfoBox("Please install Addressable to see this feature.", EMessageType.Error)]
 #endif

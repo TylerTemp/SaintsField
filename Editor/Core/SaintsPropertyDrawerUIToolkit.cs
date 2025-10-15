@@ -152,7 +152,7 @@ namespace SaintsField.Editor.Core
             // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
             if (string.IsNullOrEmpty(GetPreferredLabel(property)))
             {
-                SaintsPropertyDrawers.RemoveAll(each => each.Attribute is FieldRichLabelAttribute rl && string.IsNullOrEmpty(rl.RichTextXml));
+                SaintsPropertyDrawers.RemoveAll(each => each.Attribute is FieldLabelTextAttribute rl && string.IsNullOrEmpty(rl.RichTextXml));
 
                 NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
 
@@ -198,7 +198,7 @@ namespace SaintsField.Editor.Core
                 }
                 else if (SaintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer
                                                            || each.Attribute is NoLabelAttribute
-                                                           || (each.Attribute is FieldRichLabelAttribute rl &&
+                                                           || (each.Attribute is FieldLabelTextAttribute rl &&
                                                                string.IsNullOrEmpty(rl.RichTextXml))))
                 {
                     needAboveProcessor = false;
@@ -230,7 +230,7 @@ namespace SaintsField.Editor.Core
                 bool alreadyHasNoLabel = false;
                 foreach ((SaintsPropertyInfo saintsPropertyInfo, int index) in SaintsPropertyDrawers.WithIndex())
                 {
-                    if (saintsPropertyInfo.Attribute is FieldRichLabelAttribute richLabel)
+                    if (saintsPropertyInfo.Attribute is FieldLabelTextAttribute richLabel)
                     {
                         if (string.IsNullOrEmpty(richLabel.RichTextXml))
                         {

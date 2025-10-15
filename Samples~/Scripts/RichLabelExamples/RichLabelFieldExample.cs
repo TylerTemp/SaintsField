@@ -6,21 +6,21 @@ namespace SaintsField.Samples.Scripts.RichLabelExamples
     {
         [FieldSeparator("Field")]
         // read field value
-        [FieldRichLabel("<color=lime><field/>")] public string fieldLabel;
+        [FieldLabelText("<color=lime><field/>")] public string fieldLabel;
         // read the `_subLabel` field/function from the field
-        [FieldRichLabel("<field._subLabel/>"), GetComponentInChildren, Expandable] public SubField subField;
+        [FieldLabelText("<field._subLabel/>"), GetComponentInChildren, Expandable] public SubField subField;
         // again read the property
-        [FieldRichLabel("<color=lime><field.gameObject.name/>")] public SubField subFieldName;
+        [FieldLabelText("<color=lime><field.gameObject.name/>")] public SubField subFieldName;
 
         [FieldSeparator("Field Null")]
         // not found target will be rendered as empty string
-        [FieldRichLabel("<field._subLabel/>")] public SubField notFoundField;
-        [FieldRichLabel("<field._noSuch/>"), GetComponentInChildren] public SubField notFoundField2;
+        [FieldLabelText("<field._subLabel/>")] public SubField notFoundField;
+        [FieldLabelText("<field._noSuch/>"), GetComponentInChildren] public SubField notFoundField2;
 
         [FieldSeparator("Formatter")]
         // format as percent
-        [FieldRichLabel("<field=P2/>"), PropRange(0f, 1f)] public float percent;
+        [FieldLabelText("<field=P2/>"), PropRange(0f, 1f)] public float percent;
         // format `doubleVal` field as exponential
-        [FieldRichLabel("<field.doubleVal=E/>")] public SubField subFieldCurrency;
+        [FieldLabelText("<field.doubleVal=E/>")] public SubField subFieldCurrency;
     }
 }

@@ -118,7 +118,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string hv2Item1;
 
         [Ordered]
-        [Layout("Root/V2/H", ELayout.Horizontal), FieldRichLabel(null)]
+        [Layout("Root/V2/H", ELayout.Horizontal), FieldLabelText(null)]
         public string hv2Item2, hv2Item3;
 
         [Ordered]
@@ -127,7 +127,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [Ordered]
         [Layout("Root/V3", ELayout.Horizontal)]
-        [ResizableTextArea, FieldRichLabel(null)]
+        [ResizableTextArea, FieldLabelText(null)]
         public string hv3Item1, hv3Item2;
 
         [Ordered]

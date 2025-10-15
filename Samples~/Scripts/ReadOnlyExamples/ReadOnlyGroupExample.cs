@@ -14,18 +14,18 @@ namespace SaintsField.Samples.Scripts.ReadOnlyExamples
         [SerializeField]
         [ReadOnly(nameof(_bool1))]
         [ReadOnly(nameof(_bool2))]
-        [FieldRichLabel("readonly=1||2")]
+        [FieldLabelText("readonly=1||2")]
         private string _ro1and2;
 
         [SerializeField]
         [ReadOnly(nameof(_bool1), nameof(_bool2))]
-        [FieldRichLabel("readonly=1&&2")]
+        [FieldLabelText("readonly=1&&2")]
         private string _ro1or2;
 
         [SerializeField]
         [ReadOnly(nameof(_bool1), nameof(_bool2))]
         [ReadOnly(nameof(_bool3), nameof(_bool4))]
-        [FieldRichLabel("readonly=(1&&2)||(3&&4)")]
+        [FieldLabelText("readonly=(1&&2)||(3&&4)")]
         private string _ro1234;
     }
 }

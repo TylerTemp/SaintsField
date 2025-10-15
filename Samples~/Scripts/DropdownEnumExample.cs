@@ -8,15 +8,15 @@ namespace SaintsField.Samples.Scripts
         [Serializable, Flags]
         public enum MyEnum
         {
-            [FieldRichLabel("1")]
+            [FieldLabelText("1")]
             First,
-            [FieldRichLabel("2")]
+            [FieldLabelText("2")]
             Second,
-            [FieldRichLabel("3")]
+            [FieldLabelText("3")]
             Third,
-            [FieldRichLabel("4/0")]
+            [FieldLabelText("4/0")]
             ForthZero,
-            [FieldRichLabel("4/1")]
+            [FieldLabelText("4/1")]
             ForthOne,
         }
 

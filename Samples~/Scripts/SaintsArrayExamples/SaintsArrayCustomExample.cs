@@ -24,13 +24,13 @@ namespace SaintsField.Samples.Scripts.SaintsArrayExamples
         [Serializable]
         public struct MyArr
         {
-            [FieldRichLabel(nameof(MyInnerRichLabel), true)]
+            [FieldLabelText(nameof(MyInnerRichLabel), true)]
             public int[] myArray;
 
             private string MyInnerRichLabel(object _, int index) => $"<color=pink> Inner [{(char)('A' + index)}]";
         }
 
-        [FieldRichLabel(nameof(MyOuterLabel), true), SaintsArray("myArray")]
+        [FieldLabelText(nameof(MyOuterLabel), true), SaintsArray("myArray")]
         public MyArr[] myArr;
 
         private string MyOuterLabel(object _, int index) => $"<color=Lime> Outer {index}";

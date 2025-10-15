@@ -9,13 +9,13 @@ namespace SaintsField.Samples.Scripts
         public enum BitMask
         {
             None = 0,  // this will be replaced for all/none button
-            [FieldRichLabel("M<color=red>1</color>")]
+            [FieldLabelText("M<color=red>1</color>")]
             Mask1 = 1,
-            [FieldRichLabel("M<color=green>2</color>")]
+            [FieldLabelText("M<color=green>2</color>")]
             Mask2 = 1 << 1,
-            [FieldRichLabel("M<color=blue>3</color>")]
+            [FieldLabelText("M<color=blue>3</color>")]
             Mask3 = 1 << 2,
-            [FieldRichLabel("M4")]
+            [FieldLabelText("M4")]
             Mask4 = 1 << 3,
             Mask5 = 1 << 4,
             MaskLongLongLongLong = 1 << 5,
@@ -30,7 +30,7 @@ namespace SaintsField.Samples.Scripts
 
         // [Space(60)]
 
-        [EnumToggleButtons, FieldRichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
+        [EnumToggleButtons, FieldLabelText(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
         private void ValueChanged() => Debug.Log(myMask2);
 
         [Serializable]
@@ -47,7 +47,7 @@ namespace SaintsField.Samples.Scripts
 
         [ReadOnly]
         [EnumToggleButtons]
-        [FieldRichLabel("<icon=star.png /><label />")]
+        [FieldLabelText("<icon=star.png /><label />")]
         public BitMask myMaskDisabledLabel;
 
         [Serializable]
@@ -55,7 +55,7 @@ namespace SaintsField.Samples.Scripts
         {
             First,
             Second,
-            [FieldRichLabel("<color=lime><label /></color>")]
+            [FieldLabelText("<color=lime><label /></color>")]
             Third,
         }
 
@@ -76,19 +76,19 @@ namespace SaintsField.Samples.Scripts
             Value10,
         }
 
-        [EnumToggleButtons, DefaultExpand] public EnumExpand enumExpand;
+        [EnumToggleButtons, FieldDefaultExpand] public EnumExpand enumExpand;
 
         [Serializable]
         public enum EnumLabelField
         {
-            [FieldRichLabel("<color=red><label/></color>")]
+            [FieldLabelText("<color=red><label/></color>")]
             None,
-            [FieldRichLabel("<color=blue>1st</color> (<label/>)")]
+            [FieldLabelText("<color=blue>1st</color> (<label/>)")]
             First,
             [InspectorName("<color=green>2nd</color> (<label/>)")]
             Second,
         }
 
-        [EnumToggleButtons, DefaultExpand] public EnumLabelField labelField;
+        [EnumToggleButtons, FieldDefaultExpand] public EnumLabelField labelField;
     }
 }

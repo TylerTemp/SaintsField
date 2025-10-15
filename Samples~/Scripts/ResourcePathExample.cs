@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts
     {
         // resource: display as a MonoScript, requires a BoxCollider
         [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
-        [FieldRichLabel("<icon=star.png /><label />")]
+        [FieldLabelText("<icon=star.png /><label />")]
         [FieldBelowText("<color=gray>resource: <field />")]
         public string myResource;
 

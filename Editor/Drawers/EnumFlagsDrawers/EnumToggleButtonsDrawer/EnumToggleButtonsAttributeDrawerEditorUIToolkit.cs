@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             {
                 DrawInfo = drawInfo,
                 Value = value,
-                Expanded = allAttributes.Any(each => each is DefaultExpandAttribute or ArrayDefaultExpandAttribute),
+                Expanded = allAttributes.Any(each => each is FieldDefaultExpandAttribute or DefaultExpandAttribute),
             };
 
             VisualElement container = new VisualElement

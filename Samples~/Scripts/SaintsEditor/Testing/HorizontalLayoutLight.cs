@@ -38,9 +38,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [LayoutStart("../Right Hand")]
         [Separator("Right Hand", EAlign.Center)]
         public string g21;
-        [FieldRichLabel("<color=lime><label/>")]
+        [FieldLabelText("<color=lime><label/>")]
         public string g22;
-        [FieldRichLabel("$" + nameof(g23))]
+        [FieldLabelText("$" + nameof(g23))]
         public string g23;
 
         public bool toggle;

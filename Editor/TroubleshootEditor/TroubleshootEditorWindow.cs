@@ -34,7 +34,7 @@ namespace SaintsField.Editor.TroubleshootEditor
         private string ProgressLabel() => _inProgress ? "Checking..." : "Done";
 
         [DebugTool.WhichFramework]
-        [Ordered, FieldRichLabel("$" + nameof(ProgressLabel)), ReadOnly, ProgressBar(maxCallback: nameof(_maxCount))]
+        [Ordered, FieldLabelText("$" + nameof(ProgressLabel)), ReadOnly, ProgressBar(maxCallback: nameof(_maxCount))]
         public int progress;
 
         [Serializable]

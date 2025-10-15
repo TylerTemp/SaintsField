@@ -9,7 +9,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field)]
-    public class FieldRichLabelAttribute: PropertyAttribute, ISaintsAttribute
+    public class FieldLabelTextAttribute: PropertyAttribute, ISaintsAttribute
     {
         public virtual SaintsAttributeType AttributeType => SaintsAttributeType.Label;
         public virtual string GroupBy => "__LABEL_FIELD__";
@@ -19,7 +19,7 @@ namespace SaintsField
         public readonly bool IsCallback;
         // ReSharper enable InconsistentNaming
 
-        public FieldRichLabelAttribute(string richTextXml, bool isCallback=false)
+        public FieldLabelTextAttribute(string richTextXml, bool isCallback=false)
         {
             (string parsedContent, bool parsedIsCallback) = RuntimeUtil.ParseCallback(richTextXml, isCallback);
 

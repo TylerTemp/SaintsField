@@ -5,7 +5,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field)]
-    public class PostFieldRichLabelAttribute: FieldRichLabelAttribute
+    public class PostFieldRichLabelAttribute: FieldLabelTextAttribute
     {
         public override SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public override string GroupBy { get; }

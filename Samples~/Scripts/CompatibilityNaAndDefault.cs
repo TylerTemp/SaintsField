@@ -7,10 +7,10 @@ namespace SaintsField.Samples.Scripts
 {
     public class CompatibilityNaAndDefault : MonoBehaviour
     {
-        [FieldRichLabel("<color=green>+Native</color>"), Range(0, 5)]
+        [FieldLabelText("<color=green>+Native</color>"), Range(0, 5)]
         public float nativeRange;
         // this wont work. Please put `SaintsField` before other drawers
-        [Range(0, 5), FieldRichLabel("<color=green>+Native</color>")]
+        [Range(0, 5), FieldLabelText("<color=green>+Native</color>")]
         public float nativeRangeHandled;
 
 #if SAINTSFIELD_SAMPLE_NAUGHYTATTRIBUTES

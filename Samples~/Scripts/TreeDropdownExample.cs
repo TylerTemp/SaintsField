@@ -47,7 +47,7 @@ namespace SaintsField.Samples.Scripts
             [PostFieldButton(nameof(ShowNewValue), "Click")]
             [OnValueChanged(nameof(ShowNewValue))]
             [FieldAboveText(nameof(selectIt), true)]
-            [FieldRichLabel("<icon=star.png /><label />")]
+            [FieldLabelText("<icon=star.png /><label />")]
             [TreeDropdown(nameof(AdvDropdown))] public int selectIt;
 
             public AdvancedDropdownList<int> AdvDropdown()
@@ -97,7 +97,7 @@ namespace SaintsField.Samples.Scripts
         }
 
         [AdvancedDropdown(nameof(ListEnumDropdown))]
-        [FieldRichLabel("$" + nameof(ListEnumLabel))]
+        [FieldLabelText("$" + nameof(ListEnumLabel))]
         public ListEnum[] listEnum;
 
         private AdvancedDropdownList<ListEnum> ListEnumDropdown()
@@ -117,13 +117,13 @@ namespace SaintsField.Samples.Scripts
         public enum F
         {
             Zero,
-            [FieldRichLabel("Opt/1")]
+            [FieldLabelText("Opt/1")]
             One = 1,
-            [FieldRichLabel("Opt/2")]
+            [FieldLabelText("Opt/2")]
             Two = 1 << 1,
-            [FieldRichLabel("Opt/3")]
+            [FieldLabelText("Opt/3")]
             Three = 1 << 2,
-            [FieldRichLabel("Opt/4")]
+            [FieldLabelText("Opt/4")]
             Four = 1 << 3,
             Five = 1 << 4,
         }

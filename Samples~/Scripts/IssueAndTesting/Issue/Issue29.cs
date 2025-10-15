@@ -31,7 +31,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 
             [FieldBelowText(nameof(toggle), true)]
             [FieldAboveText(nameof(toggle), true)]
-            [FieldRichLabel(nameof(toggle), true)]
+            [FieldLabelText(nameof(toggle), true)]
             [OverlayRichLabel(nameof(toggle), true)]
             [PostFieldRichLabel(nameof(toggle), true)]
             [FieldInfoBox(nameof(toggle), true)]

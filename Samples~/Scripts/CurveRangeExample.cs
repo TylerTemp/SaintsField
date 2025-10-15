@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class CurveRangeExample: MonoBehaviour
     {
-        [CurveRange(-1, -1, 1, 1)][FieldRichLabel("<icon=star.png /><label />")]
+        [CurveRange(-1, -1, 1, 1)][FieldLabelText("<icon=star.png /><label />")]
         public AnimationCurve curve;
 
         [CurveRange(EColor.Orange)]

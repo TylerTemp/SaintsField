@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts
     {
         [SerializeField] private string _label;
 
-        [Dropdown(nameof(GetDropdownItems)), FieldRichLabel(nameof(GetLabel), true)]
+        [Dropdown(nameof(GetDropdownItems)), FieldLabelText(nameof(GetLabel), true)]
         public float floatV;
 
         private string GetLabel() => string.IsNullOrEmpty(_label) ? null : _label;
@@ -26,7 +26,7 @@ namespace SaintsField.Samples.Scripts
 
         public GameObject go1;
         public GameObject go2;
-        [Dropdown(nameof(GetDropdownRefs))][FieldRichLabel("<icon=star.png /><label />")]
+        [Dropdown(nameof(GetDropdownRefs))][FieldLabelText("<icon=star.png /><label />")]
         public GameObject refs;
 
         private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
@@ -198,7 +198,7 @@ namespace SaintsField.Samples.Scripts
 
 
         [Dropdown(nameof(ListEnumDropdown))]
-        [FieldRichLabel("$" + nameof(ListEnumLabel))]
+        [FieldLabelText("$" + nameof(ListEnumLabel))]
         public ListEnum[] listEnum;
 
         private DropdownList<ListEnum> ListEnumDropdown()

@@ -9,12 +9,12 @@ namespace SaintsField.Samples.Scripts
         [Rate(1, 5)] public int rate1To5;
         [Rate(2, 5)] public int rate3To5;
 
-        [Rate(1, 5)][FieldRichLabel(null), PostFieldRichLabel("<--")] public int rate0To5Rich;
+        [Rate(1, 5)][FieldLabelText(null), PostFieldRichLabel("<--")] public int rate0To5Rich;
 
         [Serializable]
         public struct MyRate
         {
-            [Rate(1, 5), FieldBelowText(nameof(rate), true), FieldRichLabel("<icon=star.png /><label />")] public int rate;
+            [Rate(1, 5), FieldBelowText(nameof(rate), true), FieldLabelText("<icon=star.png /><label />")] public int rate;
         }
 
         public MyRate rate;

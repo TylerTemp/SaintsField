@@ -21,15 +21,15 @@ namespace SaintsField.Editor.AutoRunner
 #if !UNITY_2019_4_OR_NEWER
         [ListDrawerSettings]
 #endif
-        [Ordered, ArrayDefaultExpand] public SceneAsset[] sceneList = {};
+        [Ordered, DefaultExpand] public SceneAsset[] sceneList = {};
 
         protected override IEnumerable<SceneAsset> GetSceneList() => sceneList;
 
-        [Ordered, FieldRichLabel("$" + nameof(FolderSearchLabel)), ArrayDefaultExpand, DefaultExpand] public FolderSearch[] folderSearches = {};
+        [Ordered, FieldLabelText("$" + nameof(FolderSearchLabel)), DefaultExpand, FieldDefaultExpand] public FolderSearch[] folderSearches = {};
 
         protected override IEnumerable<FolderSearch> GetFolderSearches() => folderSearches;
 
-        [Ordered, LabelText("Extra Resources"), ArrayDefaultExpand, Expandable]
+        [Ordered, LabelText("Extra Resources"), DefaultExpand, Expandable]
         public Object[] extraResources = Array.Empty<Object>();
 
         protected override IEnumerable<Object> GetExtraAssets() => extraResources;

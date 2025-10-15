@@ -5,10 +5,10 @@ namespace SaintsField.Samples.Scripts
 {
     public class ResizableTextAreaExample : MonoBehaviour
     {
-        [ResizableTextArea, FieldRichLabel("<icon=star.png /><label />"), BelowButton(nameof(ChangeValue))] public string shortValue;
+        [ResizableTextArea, FieldLabelText("<icon=star.png /><label />"), BelowButton(nameof(ChangeValue))] public string shortValue;
         [ResizableTextArea] public string _long;
-        [FieldRichLabel(null), ResizableTextArea] public string _noLabel;
-        [FieldRichLabel("long long long long long long long long long long long long long label"), ResizableTextArea] public string longLabel;
+        [FieldLabelText(null), ResizableTextArea] public string _noLabel;
+        [FieldLabelText("long long long long long long long long long long long long long label"), ResizableTextArea] public string longLabel;
 
         // [ResizableTextArea(false)] public string _inlineShort;
         // [ResizableTextArea(false)] public string _inlineLong;
@@ -24,7 +24,7 @@ namespace SaintsField.Samples.Scripts
         public MyStruct[] structArr;
 
         [ReadOnly]
-        [ResizableTextArea, FieldRichLabel("<icon=star.png /><label />")] public string shortDisabled;
+        [ResizableTextArea, FieldLabelText("<icon=star.png /><label />")] public string shortDisabled;
 
         private void ChangeValue(string oldValue)
         {

@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue3
 {
     public class Issue3Problem: MonoBehaviour
     {
-        [FieldRichLabel("<icon=star.png/>")] public string richIcon;
+        [FieldLabelText("<icon=star.png/>")] public string richIcon;
         [FieldAboveText("<icon=star.png/>")]
         [FieldAboveText("<icon=star.png/>")]
         public string richAboveIcon;

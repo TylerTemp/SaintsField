@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
         [PropRange(nameof(min), nameof(max))]
         [FieldInfoBox("Test")]
         [SepTitle("Test", EColor.Green)]
-        [FieldRichLabel("<icon=star.png /><label/>")]
+        [FieldLabelText("<icon=star.png /><label/>")]
         public float rangeFloat;
 
         [MinMaxSlider(nameof(min), nameof(max))]

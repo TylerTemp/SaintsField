@@ -23,6 +23,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         public Bldg_DestructState original;
 
         [EnumToggleButtons] public Bldg_DestructState autoDefaultNoExpand;
-        [EnumToggleButtons, DefaultExpand] public Bldg_DestructState autoDefaultExpanded;
+        [EnumToggleButtons, FieldDefaultExpand] public Bldg_DestructState autoDefaultExpanded;
     }
 }

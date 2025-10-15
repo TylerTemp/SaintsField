@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
     public class LeftToggleH : SaintsMonoBehaviour
     {
-        [SaintsDictionary(numberOfItemsPerPage: 1), DefaultExpand]
+        [SaintsDictionary(numberOfItemsPerPage: 1), FieldDefaultExpand]
         public SaintsDictionary<bool, bool> toggleDict;
 
         [Serializable]

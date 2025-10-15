@@ -48,10 +48,10 @@ namespace SaintsField.Samples.Scripts.TableExampleS
             [ShowInInspector] private int _showI;
         }
 
-        [Table, DefaultExpand]
+        [Table, FieldDefaultExpand]
         public MyValueStruct[] myStructs;
 
-        [Table, DefaultExpand]
+        [Table, FieldDefaultExpand]
         // [GetScriptableObject]
         public Scriptable[] scriptableArray;
     }

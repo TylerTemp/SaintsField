@@ -10,22 +10,22 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             Neg3,
             Neg2,
             Neg1,
-            [FieldRichLabel("0")]
+            [FieldLabelText("0")]
             Zero,
 
-            [FieldRichLabel("Single/1")]
+            [FieldLabelText("Single/1")]
             One,
-            [FieldRichLabel("Plural/2")]
+            [FieldLabelText("Plural/2")]
             Two,
-            [FieldRichLabel("Plural/3")]
+            [FieldLabelText("Plural/3")]
             Three,
-            [FieldRichLabel("Few/4")]
+            [FieldLabelText("Few/4")]
             Four,
-            [FieldRichLabel("Few/5")]
+            [FieldLabelText("Few/5")]
             Five,
-            [FieldRichLabel("Few/6")]
+            [FieldLabelText("Few/6")]
             Sex,
-            [FieldRichLabel("Few/7")]
+            [FieldLabelText("Few/7")]
             Seven,
         }
 
@@ -47,13 +47,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             Bottom = 1 << 2,
             Left = 1 << 3,
 
-            [FieldRichLabel("Group/TopLeft")]
+            [FieldLabelText("Group/TopLeft")]
             TopLeft = Top | Left,
-            [FieldRichLabel("Group/TopRight")]
+            [FieldLabelText("Group/TopRight")]
             TopRight = Top | Right,
-            [FieldRichLabel("Group/BottomRight")]
+            [FieldLabelText("Group/BottomRight")]
             BottomRight = Bottom | Right,
-            [FieldRichLabel("Group/BottomLeft")]
+            [FieldLabelText("Group/BottomLeft")]
             BottomLeft = Bottom | Left,
         }
 

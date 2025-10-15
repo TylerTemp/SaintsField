@@ -21,7 +21,7 @@ namespace SaintsField.Samples.Scripts
         private Shader GetShader() => targetRenderer.sharedMaterial.shader;
         [ShaderParam(nameof(GetShader))] public int shaderParamShader;
 
-        [ReadOnly, FieldRichLabel("<icon=star.png/><label/>"), ShaderParam]
+        [ReadOnly, FieldLabelText("<icon=star.png/><label/>"), ShaderParam]
         public string readOnlyField;
 #endif
     }
