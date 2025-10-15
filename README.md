@@ -94,15 +94,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.33.1**
+**4.34.0**
 
-1.  UI Toolkit: Add `DateTime` for "Extended Serialization". You can now serialize a `DateTime` field/property.
-2.  UI Toolkit: Add `[DateTime]` attribute to allow you pick a datetime using `long` type
-3.  UI Toolkit: Fix `ShowInInspector` can not show a `DateTime` type
-4.  UI Toolkit: Add `[ShowInInspector][DateTime]` for `long` to allow showing a `long` value as a `DateTime`
-5.  Improve the document for installing `Microsoft.CodeAnalysis.CSharp`
-
-Since this version, IMGUI support is now deprecated.
+1.  UI Toolkit: Add `TimeSpan` for "Extended Serialization". You can now serialize a `TimeSpan` field/property.
+2.  UI Toolkit: Add `[TimeSpan]` attribute to allow you pick a datetime using `long` type
+3.  UI Toolkit: Add `[ShowInInspector][TimeSpan]` for `long` to allow showing a `long` value as a `TimeSpan`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2021,26 +2017,6 @@ private void DictExternalAdd()
 
 [![video](https://github.com/user-attachments/assets/dd3e7add-36f3-4f59-918c-58022d68cac6)](https://github.com/user-attachments/assets/57baefa0-144c-4c7f-8100-dd7b102d3935)
 
-#### `DateTime` ####
-
-Allows you to pick a datetime while using `long` type.
-
-> [!TIPS]
-> This will requires you to manually convert `long` to `DateTime`. 
-> You may want to see [Extended Serialization](https://saintsfield.comes.today/extended-serialization) to directly serialize a `DateTime` type
-
-```csharp
-using SaintsField;
-
-[DateTime]  // Save value in this
-public long dt;
-// Use this in script
-public DateTime MyDateTime => new DateTime(dt);
-
-[ShowInInspector] private long v => dt;
-```
-
-[![video](https://github.com/user-attachments/assets/2d3bdbce-c00e-4045-9efa-a825bedf0ad0)](https://github.com/user-attachments/assets/96441a7c-8cee-4614-b1e6-3843a193a1e4)
 
 ### Numerical ###
 
@@ -4841,6 +4817,50 @@ public class SearchableMono : MonoBehaviour
 
 [![video](https://github.com/user-attachments/assets/b8273285-d24e-441d-9ceb-f277685372f3)](https://github.com/user-attachments/assets/5a6b9aae-481d-4898-9cbe-6634c51cb3e4)
 
+#### `DateTime` ####
+
+Allows you to pick a datetime using `long` type.
+
+> [!TIPS]
+> This will requires you to manually convert `long` to `DateTime`.
+> You may want to see [Extended Serialization](https://saintsfield.comes.today/extended-serialization) to directly serialize a `DateTime` type
+
+```csharp
+using SaintsField;
+
+[DateTime]  // Save value in this
+public long dt;
+// Use this in script
+public DateTime MyDateTime => new DateTime(dt);
+
+[ShowInInspector] private long v => dt;
+```
+
+[![video](https://github.com/user-attachments/assets/2d3bdbce-c00e-4045-9efa-a825bedf0ad0)](https://github.com/user-attachments/assets/96441a7c-8cee-4614-b1e6-3843a193a1e4)
+
+#### `TimeSpan` #### 
+
+Allows you to set a timespan using `long` type.
+
+> [!TIPS]
+> This will requires you to manually convert `long` to `TimeSpan`.
+> You may want to see [Extended Serialization](https://saintsfield.comes.today/extended-serialization) to directly serialize a `TimeSpan` type
+
+```csharp
+using SaintsField;
+
+[DateTime]  // Save value in this
+public long ts;
+// Use this in script
+public TimeSpan MyTimeSpan => new TimeSpan(dt);
+
+[ShowInInspector] private long v => dt;
+
+[ShowInInspector, TimeSpan]  // Show This as TimeSpan
+private long _showTsLong;
+```
+
+![](https://github.com/user-attachments/assets/995de9da-0493-45b7-9b60-7d382b9efcb1)
 
 ## Layout System ##
 
@@ -7381,6 +7401,45 @@ public partial class SerDateTimeExample : MonoBehaviour
 ```
 
 [![video](https://github.com/user-attachments/assets/4acd7add-0f25-4f79-aa12-4112157e503d)](https://github.com/user-attachments/assets/7f7ba667-681b-48ff-86ae-171623204636)
+
+### `TimeSpan`  ###
+
+> [!WARNING]
+> This feature is still experimental
+
+Serialize a `TimeSpan` type.
+
+**IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set all parent class/struct to `partial`
+
+```csharp
+using SaintsField;
+
+// note the partial
+public partial class SerTimeSpanExample : SaintsMonoBehaviour
+{
+    [SaintsSerialized]
+    private TimeSpan _dt;
+
+    [SaintsSerialized]
+    private List<TimeSpan> _dtList;
+}
+
+// use in a normal class/struct, set parents partial recursively
+public partial class SerTimeSpanExample : SaintsMonoBehaviour
+{
+    [Serializable]
+    public partial class MyClass
+    {
+        [SaintsSerialized]
+        private TimeSpan[] _dtArray;
+    }
+
+    // No SaintsSerialized here
+    public MyClass myClass;
+}
+```
+
+![](https://github.com/user-attachments/assets/cd6b1135-6935-4366-940a-6f0c2a550c2f)
 
 ## `SaintsEditorWindow` ##
 

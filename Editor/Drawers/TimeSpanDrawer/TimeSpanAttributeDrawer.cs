@@ -1,8 +1,10 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -10,46 +12,46 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.DateTimeDrawer
+namespace SaintsField.Editor.Drawers.TimeSpanDrawer
 {
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
-    [CustomPropertyDrawer(typeof(DateTimeAttribute), true)]
-    public class DateTimeAttributeDrawer: SaintsPropertyDrawer
+    [CustomPropertyDrawer(typeof(TimeSpanAttribute), true)]
+    public class TimeSpanAttributeDrawer: SaintsPropertyDrawer
     {
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement r = MakeElement(property, GetPreferredLabel(property));
-            r.AddToClassList(DateTimeField.alignedFieldUssClassName);
+            VisualElement r = MakeElement(property, GetPreferredLabel(property), allAttributes.Any(each => each is DefaultExpandAttribute));
+            r.AddToClassList(TimeSpanField.alignedFieldUssClassName);
             return r;
         }
 
-        public static VisualElement RenderSerializedActual(ISaintsAttribute dateTimeAttribute, string label, SerializedProperty property, Type type, bool inHorizontal)
+        public static VisualElement RenderSerializedActual(ISaintsAttribute timeSpanAttribute, string label, SerializedProperty property, Type type, IReadOnlyList<Attribute> allAttributes, bool inHorizontal)
         {
-            VisualElement r = MakeElement(property, label);
+            VisualElement r = MakeElement(property, label, allAttributes.Any(each => each is DefaultExpandAttribute));
             if (inHorizontal)
             {
                 r.style.flexDirection = FlexDirection.Column;
             }
             else
             {
-                r.AddToClassList(DateTimeField.alignedFieldUssClassName);
+                r.AddToClassList(TimeSpanField.alignedFieldUssClassName);
             }
 
             return r;
         }
 
-        private static VisualElement MakeElement(SerializedProperty property, string label)
+        private static VisualElement MakeElement(SerializedProperty property, string label, bool defaultExpanded)
         {
-            DateTimeElement dateTimeElement = new DateTimeElement();
-            dateTimeElement.BindPath(property.propertyPath);
-            dateTimeElement.Bind(property.serializedObject);
+            TimeSpanElement timeSpanElement = new TimeSpanElement(defaultExpanded);
+            timeSpanElement.BindPath(property.propertyPath);
+            timeSpanElement.Bind(property.serializedObject);
 
-            DateTimeField element = new DateTimeField(label, dateTimeElement);
+            TimeSpanField element = new TimeSpanField(label, timeSpanElement);
 
             element.AddToClassList(ClassAllowDisable);
 
@@ -60,20 +62,20 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
         {
             bool isLong = valueType == typeof(long) || value is long;
 
-            long ticks = isLong? (long) value: ((DateTime)value).Ticks;
-            if (oldElement is DateTimeField dtField)
+            long ticks = isLong? (long) value: ((TimeSpan)value).Ticks;
+            if (oldElement is TimeSpanField dtField)
             {
                 // Debug.Log($"old element set ticks {ticks}");
                 dtField.SetValueWithoutNotify(ticks);
                 return null;
             }
 
-            DateTimeElement dateTimeElement = new DateTimeElement
+            TimeSpanElement timeSpanElement = new TimeSpanElement
             {
                 value = ticks,
             };
 
-            DateTimeField element = new DateTimeField(label, dateTimeElement);
+            TimeSpanField element = new TimeSpanField(label, timeSpanElement);
 
             element.AddToClassList(ClassAllowDisable);
 
@@ -87,7 +89,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             }
             else
             {
-                element.AddToClassList(DateTimeField.alignedFieldUssClassName);
+                element.AddToClassList(TimeSpanField.alignedFieldUssClassName);
             }
             if (setterOrNull == null)
             {
@@ -106,7 +108,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                     }
                     else
                     {
-                        invokeValue = new DateTime(evt.newValue);
+                        invokeValue = new TimeSpan(evt.newValue);
                     }
                     beforeSet?.Invoke(invokeValue);
                     setterOrNull.Invoke(invokeValue);

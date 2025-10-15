@@ -5,9 +5,9 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
+using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa;
-using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -245,7 +245,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 {
                     label = label[..^"__Saints Serialized__".Length];
                 }
-                VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, info, saintsSerializedActual.ElementType, SerializedUtils.GetFieldInfoAndDirectParent(property).parent);
+                VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, info, saintsSerializedActual.ElementType, inHorizontalLayout, SerializedUtils.GetFieldInfoAndDirectParent(property).parent);
                 root.Add(renderSerializedActual);
                 return;
             }
@@ -334,7 +334,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         }
 
         private static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual,
-            string label, SerializedProperty property, MemberInfo serInfo, Type targetType, object parent)
+            string label, SerializedProperty property, MemberInfo serInfo, Type targetType, bool inHorizontalLayout, object parent)
         {
             // Debug.Log(property.propertyPath);
             Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);
@@ -342,7 +342,6 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             EnumToggleButtonsAttribute enumToggle = null;
             FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
             FlagsDropdownAttribute flagsDropdownAttribute = null;
-            DateTimeAttribute dateTimeAttribute = null;
             foreach (Attribute attribute in attributes)
             {
                 switch (attribute)
@@ -357,14 +356,10 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         flagsDropdownAttribute = fd;
                         break;
                     case DateTimeAttribute dt:
-                        dateTimeAttribute ??= dt;
-                        break;
+                        return DateTimeAttributeDrawer.RenderSerializedActual(dt, label, property, typeof(DateTime), inHorizontalLayout);
+                    case TimeSpanAttribute ts:
+                        return TimeSpanAttributeDrawer.RenderSerializedActual(ts, label, property, typeof(DateTime), attributes, inHorizontalLayout);
                 }
-            }
-
-            if (dateTimeAttribute != null)
-            {
-                return DateTimeAttributeDrawer.RenderSerializedActual(dateTimeAttribute, label, property, typeof(DateTime), true);
             }
 
             SaintsPropertyType propertyType = (SaintsPropertyType)property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;

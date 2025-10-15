@@ -9,6 +9,7 @@ using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
+using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
@@ -590,7 +591,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
-            if ((valueType == typeof(long) || value is long) && allAttributes.All(each => each is not DateTimeAttribute))
+            if ((valueType == typeof(long) || value is long) && allAttributes.All(each => each is not DateTimeAttribute && each is not TimeSpanAttribute))
             {
                 if (oldElement is LongField oldLongField)
                 {
@@ -1540,39 +1541,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     labelGrayColor,
                     inHorizontalLayout,
                     allAttributes), false);
-
-                // GradientField element = new GradientField(label)
-                // {
-                //     value = value as Gradient,
-                // };
-                //
-                // if (labelGrayColor)
-                // {
-                //     element.labelElement.style.color = ReColor;
-                // }
-                // if (inHorizontalLayout)
-                // {
-                //     element.style.flexDirection = FlexDirection.Column;
-                // }
-                // else
-                // {
-                //     element.AddToClassList(GradientField.alignedFieldUssClassName);
-                // }
-                // if (setterOrNull == null)
-                // {
-                //     element.SetEnabled(false);
-                //     element.AddToClassList(ClassSaintsFieldEditingDisabled);
-                // }
-                // else
-                // {
-                //     element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
-                //     element.RegisterValueChangedCallback(evt =>
-                //     {
-                //         beforeSet?.Invoke(value);
-                //         setterOrNull(evt.newValue);
-                //     });
-                // }
-                // return (element, false);
+            }
+            if (valueType == typeof(TimeSpan) || value is TimeSpan || allAttributes.Any(each => each is TimeSpanAttribute))
+            {
+                return (TimeSpanAttributeDrawer.UIToolkitValueEdit(
+                    oldElement,
+                    label,
+                    valueType,
+                    value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes), false);
             }
 
             bool valueIsNull = RuntimeUtil.IsNull(value);

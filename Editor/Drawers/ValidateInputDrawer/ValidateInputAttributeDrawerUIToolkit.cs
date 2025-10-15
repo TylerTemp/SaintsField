@@ -45,12 +45,12 @@ namespace SaintsField.Editor.Drawers.ValidateInputDrawer
             helpBox.TrackSerializedObjectValue(property.serializedObject, _ => CallValidate(helpBox, property, callback, info));
 
             helpBox.RegisterCallback<AttachToPanelEvent>(_ => {
-                SaintsAssetPostprocessor.OnAnyEvent.AddListener(OnUnityEventCallback);
+                // SaintsAssetPostprocessor.OnAnyEvent.AddListener(OnUnityEventCallback);
                 SaintsEditorApplicationChanged.OnAnyEvent.AddListener(OnUnityEventCallback);
             });
             helpBox.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
-                SaintsAssetPostprocessor.OnAnyEvent.RemoveListener(OnUnityEventCallback);
+                // SaintsAssetPostprocessor.OnAnyEvent.RemoveListener(OnUnityEventCallback);
                 SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(OnUnityEventCallback);
             });
             return;
