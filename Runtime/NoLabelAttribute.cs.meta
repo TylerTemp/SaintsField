@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: feb2984b589a4f569c861425206720a9
 timeCreated: 1739502415
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Runtime/NoLabelAttribute.cs
+  uploadId: 0

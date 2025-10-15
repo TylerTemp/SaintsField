@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 3613e37eda63433784f6f35f6c904794
 timeCreated: 1705477845
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/ProgressBarAttribute.cs
+  uploadId: 802314

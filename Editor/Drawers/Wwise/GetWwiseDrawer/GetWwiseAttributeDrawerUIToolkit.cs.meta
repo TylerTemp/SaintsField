@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 45c4c4d924424776bc7d7d5d7d849756
 timeCreated: 1747638618
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Wwise/GetWwiseDrawer/GetWwiseAttributeDrawerUIToolkit.cs
+  uploadId: 802314

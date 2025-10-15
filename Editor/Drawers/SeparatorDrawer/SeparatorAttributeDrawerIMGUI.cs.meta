@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 5c8e92cae6d14defbdfce457a7c48ad6
 timeCreated: 1744116437
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/Drawers/SeparatorDrawer/SeparatorAttributeDrawerIMGUI.cs
+  uploadId: 0

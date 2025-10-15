@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: a986b9b8c1b4452cb99c99033b2c718f
 timeCreated: 1743418665
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/MinMaxSliderDrawer/MinMaxSliderAttributeDrawerUIToolkit.cs
+  uploadId: 802314

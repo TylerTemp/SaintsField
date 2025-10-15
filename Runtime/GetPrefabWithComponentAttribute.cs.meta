@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ed4ce6a4b74a4e5cb224f9f12bc993c3
 timeCreated: 1702291679
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/GetPrefabWithComponentAttribute.cs
+  uploadId: 802314

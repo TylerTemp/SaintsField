@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 91f3106caf1244f986018f9c95d93277
 timeCreated: 1739003951
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/I2Setup/I2SetupWindow.cs
+  uploadId: 0

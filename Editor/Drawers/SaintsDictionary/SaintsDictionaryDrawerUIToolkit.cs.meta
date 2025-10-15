@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: fd8e0d869a5545c6b19520314fb6298a
 timeCreated: 1740121641
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SaintsDictionary/SaintsDictionaryDrawerUIToolkit.cs
+  uploadId: 802314

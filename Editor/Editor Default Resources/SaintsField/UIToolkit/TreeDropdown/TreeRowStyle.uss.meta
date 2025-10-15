@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f36a8875b37d3184c91ada8597ffba9e
 timeCreated: 1705657202
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/TreeDropdown/TreeRowStyle.uss
+  uploadId: 802314

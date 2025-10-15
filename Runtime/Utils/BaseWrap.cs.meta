@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: e167feb58a3a47779fe28e073c9f19f7
 timeCreated: 1751628074
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Utils/BaseWrap.cs
+  uploadId: 802314

@@ -8,6 +8,8 @@ namespace SaintsField.Playa
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
     public class PlayaAboveRichLabelAttribute: AboveTextAttribute
     {
-
+        public PlayaAboveRichLabelAttribute(string content = "<color=gray><label/>") : base(content)
+        {
+        }
     }
 }

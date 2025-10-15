@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 209b22bce465472485d03366002c7517
 timeCreated: 1734407419
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/HandleDrawers/DrawLabel/DrawLabelAttributeDrawerUIToolkit.cs
+  uploadId: 802314

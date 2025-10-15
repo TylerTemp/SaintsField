@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 4fd9c09e5e57481db311619b02d549df
 timeCreated: 1726565344
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/SaintsXPathParser/XPathFilter/FilterComparerInt.cs
+  uploadId: 802314

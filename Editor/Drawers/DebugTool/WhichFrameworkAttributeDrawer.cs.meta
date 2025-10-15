@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: ce3831c009c64bf7b72942773f727cfb
 timeCreated: 1733217565
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/DebugTool/WhichFrameworkAttributeDrawer.cs
+  uploadId: 802314

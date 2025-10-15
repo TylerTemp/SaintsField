@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 2c925ea219a449bd9ceec5dad6d9e7f2
 timeCreated: 1698896511
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/MaterialToggleAttribute.cs
+  uploadId: 802314

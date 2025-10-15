@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f94484b7e510448d89b0b14a8d4e51ec
 timeCreated: 1754470069
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Spine/SpineSlotPickerDrawer/SpineSlotElement.cs
+  uploadId: 802314

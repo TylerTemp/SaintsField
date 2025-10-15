@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ab5845ceb70b46449e1c7ace97ade41a
 timeCreated: 1737023187
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ColorPaletteDrawer/ColorPaletteAttributeDrawer.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: c98bf08b60ba479e9c399dbc94f1d972
 timeCreated: 1698647553
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ButtonDrawers/PostFieldButtonDrawer/PostFieldButtonAttributeDrawer.cs
+  uploadId: 802314

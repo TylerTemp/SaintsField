@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 6e2be4f2c43e46199199c8798171c4a8
 timeCreated: 1750406950
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/HandleDrawers/HandleVisibility.cs
+  uploadId: 802314

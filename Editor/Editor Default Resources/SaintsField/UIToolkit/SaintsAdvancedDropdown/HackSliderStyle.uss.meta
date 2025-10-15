@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: b0db5c7117234a22ae3b477a6d8477ec
 timeCreated: 1705998726
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/HackSliderStyle.uss
+  uploadId: 802314

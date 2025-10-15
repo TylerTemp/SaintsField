@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ce502cfb1cb14fb3a814989924a652af
 timeCreated: 1750919936
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/DualButtonChip.cs
+  uploadId: 802314

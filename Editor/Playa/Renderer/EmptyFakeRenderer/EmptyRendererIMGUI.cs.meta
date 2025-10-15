@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f21c2d76c6314c6a996d7314ed9cd729
 timeCreated: 1758594559
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/EmptyFakeRenderer/EmptyRendererIMGUI.cs
+  uploadId: 802314

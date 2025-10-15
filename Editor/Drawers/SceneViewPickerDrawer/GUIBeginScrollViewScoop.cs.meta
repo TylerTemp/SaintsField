@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 79e80d73835549bab80da1840e7057b8
 timeCreated: 1748583177
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SceneViewPickerDrawer/GUIBeginScrollViewScoop.cs
+  uploadId: 802314

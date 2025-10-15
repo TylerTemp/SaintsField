@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: de2c818f55cb4cc9899896d3b56fd1fc
 timeCreated: 1741055548
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ProgressBarDrawer/ProgressBarAttributeDrawerUIToolkit.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 2217d6c2ba9f465eb8022110d2258ed1
 timeCreated: 1716170550
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SaintsInterfacePropertyDrawer/SaintsInterfaceDrawer.cs
+  uploadId: 802314

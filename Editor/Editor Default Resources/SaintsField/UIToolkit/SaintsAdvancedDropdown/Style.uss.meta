@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 4e2105b6386f41248d925fc9e28e3d5a
 timeCreated: 1705657202
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsAdvancedDropdown/Style.uss
+  uploadId: 802314

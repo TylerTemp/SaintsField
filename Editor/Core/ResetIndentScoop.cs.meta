@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: ec3048ea24cd4f29888cf16251f2e031
 timeCreated: 1698999768
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Core/ResetIndentScoop.cs
+  uploadId: 802314

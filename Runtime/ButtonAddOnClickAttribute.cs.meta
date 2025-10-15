@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ff00430b710248d2970ad987dcc79b2c
 timeCreated: 1703817893
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/ButtonAddOnClickAttribute.cs
+  uploadId: 802314

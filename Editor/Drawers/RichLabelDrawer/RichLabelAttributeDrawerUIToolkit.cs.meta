@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 5e586b4cbcc347a09384714813834d80
 timeCreated: 1741675696
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/Drawers/RichLabelDrawer/RichLabelAttributeDrawerUIToolkit.cs
+  uploadId: 0

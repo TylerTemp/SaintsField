@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 168d675ce9e44572b7ede0f4a7caf0dc
 timeCreated: 1698736569
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/SpriteToggleAttribute.cs
+  uploadId: 802314

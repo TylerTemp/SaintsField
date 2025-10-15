@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 7a085a48d4c147229881aa9232cafbce
 timeCreated: 1734081792
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/HandleDrawers/SaintsArrowAttributeDrawer.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: e9a7ffa3ddda446bb5dcdef9c6ba851d
 timeCreated: 1717743216
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Playa/ListDrawerSettingsAttribute.cs
+  uploadId: 802314

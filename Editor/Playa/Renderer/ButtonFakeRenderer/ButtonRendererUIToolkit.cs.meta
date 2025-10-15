@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: db0548a3fc914ca293a43b3d6bfc9e92
 timeCreated: 1750061500
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/ButtonFakeRenderer/ButtonRendererUIToolkit.cs
+  uploadId: 802314

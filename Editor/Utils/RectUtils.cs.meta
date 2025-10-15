@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: e0917bbd1bae4e4eada4f93853c9adb9
 timeCreated: 1692955281
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/RectUtils.cs
+  uploadId: 802314

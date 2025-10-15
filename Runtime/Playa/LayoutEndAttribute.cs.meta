@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 371f8d4a3b63490a81ef6dcde79330e8
 timeCreated: 1718160902
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Runtime/Playa/LayoutEndAttribute.cs
+  uploadId: 0

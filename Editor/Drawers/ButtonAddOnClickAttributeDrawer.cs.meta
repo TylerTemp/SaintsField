@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 6de6880d07c24c9b9edff4b42015f744
 timeCreated: 1703817967
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ButtonAddOnClickAttributeDrawer.cs
+  uploadId: 802314

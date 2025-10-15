@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 69417ae4560a4200ae2ba0425d942c21
 timeCreated: 1742550797
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/LayerDrawer/LayerAttributeDrawerUIToolkit.cs
+  uploadId: 802314

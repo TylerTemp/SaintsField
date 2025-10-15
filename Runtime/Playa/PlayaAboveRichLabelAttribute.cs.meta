@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f549cb0707d64b4b8a765fa21d7bbfab
 timeCreated: 1760494301
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Runtime/Playa/PlayaAboveRichLabelAttribute.cs
+  uploadId: 0

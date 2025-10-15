@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: c5d098ac52d94606a6f3d11c08c3a595
 timeCreated: 1739788617
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/DrawWireDiscAttribute.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 3a7f407f325c4dc4b5d650d84b424f3a
 timeCreated: 1747296828
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/ComponentHeader/HeaderGhostLeftButtonAttribute.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 34769c96367d4a8b9b981e699c15db59
 timeCreated: 1750905639
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/ColorPalette/ColorPaletteEditorWindow.cs
+  uploadId: 0

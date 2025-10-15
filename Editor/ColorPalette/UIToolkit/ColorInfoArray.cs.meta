@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ada554f89be0485ca0179400e6b37634
 timeCreated: 1751440035
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/ColorPalette/UIToolkit/ColorInfoArray.cs
+  uploadId: 0

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 290f890f9b334a8b967e13cec103f8da
 timeCreated: 1740045468
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/SphereHandleCapAttribute.cs
+  uploadId: 802314

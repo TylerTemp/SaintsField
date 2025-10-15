@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 80c08e2a89a44145ab66a5c749fb1689
 timeCreated: 1704872132
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Linq/LinqExtend.cs
+  uploadId: 802314

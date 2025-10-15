@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 04522160cb3643fd8d8b7659e4ab2aba
 timeCreated: 1757732705
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/GetMainCameraAttribute.cs
+  uploadId: 802314

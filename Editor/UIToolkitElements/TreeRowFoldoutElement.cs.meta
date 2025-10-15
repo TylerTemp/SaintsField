@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: b364b02161f94da59cd416aa87c27a91
 timeCreated: 1755843125
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/TreeRowFoldoutElement.cs
+  uploadId: 802314

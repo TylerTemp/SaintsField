@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 39e8f7cf91874c419d58a5ff8fc694be
 timeCreated: 1734588623
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/HandleDrawers/ArrowHandleCapAttributeDrawer.cs
+  uploadId: 802314

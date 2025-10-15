@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 5e57e01627374c23b071828bd6355118
 timeCreated: 1738832269
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Addressable/AddressableSceneDrawer/AddressableSceneAttributeDrawerIMGUI.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 0ea73a535ec24cc6845d436eb0f55c1d
 timeCreated: 1701331231
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/BelowImageAttribute.cs
+  uploadId: 802314

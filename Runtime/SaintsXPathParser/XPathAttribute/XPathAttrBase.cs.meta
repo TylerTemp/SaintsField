@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 5683af184e6b43c1bd587802c6a205fc
 timeCreated: 1726556655
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/SaintsXPathParser/XPathAttribute/XPathAttrBase.cs
+  uploadId: 802314

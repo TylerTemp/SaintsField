@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: fb5ba2c662a14da1a0e088e265cd4525
 timeCreated: 1754034450
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/TagDrawer/TagElement.cs
+  uploadId: 802314

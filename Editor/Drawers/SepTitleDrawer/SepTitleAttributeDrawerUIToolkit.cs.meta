@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 79ea87cea53a4f1bbc810697bed3f013
 timeCreated: 1744178094
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SepTitleDrawer/SepTitleAttributeDrawerUIToolkit.cs
+  uploadId: 802314

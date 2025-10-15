@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: cc05ba4d5efe45ddb6798e8fec397006
 timeCreated: 1754471601
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Spine/SpineAttachmentPickerDrawer/SpineAttachmentElement.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 697c39f9796d466888ff3197a6bf49c6
 timeCreated: 1747364135
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/HeaderGUI/Drawer/HeaderLabelDrawer.cs
+  uploadId: 802314

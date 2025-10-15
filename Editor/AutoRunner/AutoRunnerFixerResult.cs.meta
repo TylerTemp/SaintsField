@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: b53f4a5f1dc741329fa9fdd8e62db353
 timeCreated: 1735897956
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/AutoRunner/AutoRunnerFixerResult.cs
+  uploadId: 802314

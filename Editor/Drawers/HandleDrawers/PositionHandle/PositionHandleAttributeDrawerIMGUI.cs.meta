@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 10843b04b91445c6be6c9dbdf7438946
 timeCreated: 1734405540
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/HandleDrawers/PositionHandle/PositionHandleAttributeDrawerIMGUI.cs
+  uploadId: 802314

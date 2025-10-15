@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 04754759fd0745afa82bb931b63cce5d
 timeCreated: 1734504688
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ReferencePicker/ReferencePickerAttributeDrawerUIToolkit.cs
+  uploadId: 802314

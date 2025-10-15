@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 3118db89808849cb89a6838bfea7ef88
 timeCreated: 1750062345
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/MethodBindFakeRenderer/MethodBindRendererIMGUI.cs
+  uploadId: 802314

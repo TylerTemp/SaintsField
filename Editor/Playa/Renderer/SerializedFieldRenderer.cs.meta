@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 24842485100f444ab7c8dfb5585ecc0b
 timeCreated: 1703752014
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/SerializedFieldRenderer.cs
+  uploadId: 802314

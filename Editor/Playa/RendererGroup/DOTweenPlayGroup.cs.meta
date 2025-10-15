@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ddfbd2f04f2143eebfc0516ec501e3cb
 timeCreated: 1706596494
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Playa/RendererGroup/DOTweenPlayGroup.cs
+  uploadId: 802314

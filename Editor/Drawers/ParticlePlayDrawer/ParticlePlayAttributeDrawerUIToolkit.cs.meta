@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: bb18d890888243c6bf7315255508dcd7
 timeCreated: 1740710453
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ParticlePlayDrawer/ParticlePlayAttributeDrawerUIToolkit.cs
+  uploadId: 802314

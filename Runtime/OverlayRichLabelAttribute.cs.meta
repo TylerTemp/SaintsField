@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f3395e76ce6545ffae4949328d31b7e3
 timeCreated: 1701244900
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Runtime/OverlayRichLabelAttribute.cs
+  uploadId: 0

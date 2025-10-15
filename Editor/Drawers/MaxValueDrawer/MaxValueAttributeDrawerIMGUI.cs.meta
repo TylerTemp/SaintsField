@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 930a7c0ffdee4a97a2d10ed6dbafde3a
 timeCreated: 1740645647
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/MaxValueDrawer/MaxValueAttributeDrawerIMGUI.cs
+  uploadId: 802314

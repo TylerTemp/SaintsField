@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 77351c9860c5408abdc99b443778bd36
 timeCreated: 1703751682
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Playa/ButtonAttribute.cs
+  uploadId: 802314

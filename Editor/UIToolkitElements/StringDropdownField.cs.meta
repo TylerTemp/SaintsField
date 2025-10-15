@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: c9d955a9c0494ada8f8508ec65874fc2
 timeCreated: 1753962945
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/StringDropdownField.cs
+  uploadId: 802314

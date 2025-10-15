@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: b24221a7468446809d6ef322679a6c7b
 timeCreated: 1754292781
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/CurveRangeDrawer/CurveRangeAttributeDrawerUIToolkit.cs
+  uploadId: 802314

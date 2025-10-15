@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 8cd5343fd7b24629b0f25ed184524008
 timeCreated: 1737543133
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Spine/SpineUtils.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 24daa6c778584ba6a83d1fa90d794f65
 timeCreated: 1747397204
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/PlayaFullWidthRichLabelFakeRenderer/PlayaFullWidthRichLabelRenderer.cs
+  uploadId: 0

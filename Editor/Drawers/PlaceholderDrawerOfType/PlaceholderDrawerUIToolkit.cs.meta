@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: dbd9a58c947e480a8a5ab0c3338acbaf
 timeCreated: 1746675127
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/PlaceholderDrawerOfType/PlaceholderDrawerUIToolkit.cs
+  uploadId: 802314

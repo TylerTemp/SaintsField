@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ffa335f7d2874ab199492bf5d23fb6ca
 timeCreated: 1751266655
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/ColorPalette/UIToolkit/LabelPointerManipulator.cs
+  uploadId: 802314

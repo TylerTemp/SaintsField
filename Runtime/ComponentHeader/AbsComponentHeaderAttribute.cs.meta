@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 6fcde064ba974be3bff57700c545dc89
 timeCreated: 1747275607
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/ComponentHeader/AbsComponentHeaderAttribute.cs
+  uploadId: 802314

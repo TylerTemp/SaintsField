@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 81c02d1fd58242a28b2e2160a29c1fe8
 timeCreated: 1744115905
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/PlayaSeparatorSemiRenderer/PlayaSeparatorRendererIMGUI.cs
+  uploadId: 802314

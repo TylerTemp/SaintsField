@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 3e523cef0f6b4a27bb23b9ecd787d129
 timeCreated: 1748264661
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/TableHeadersHideAttribute.cs
+  uploadId: 802314

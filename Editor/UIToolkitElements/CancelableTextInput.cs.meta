@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: c7681e16b3d94bebb0f95f07c565e059
 timeCreated: 1750930042
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/CancelableTextInput.cs
+  uploadId: 802314

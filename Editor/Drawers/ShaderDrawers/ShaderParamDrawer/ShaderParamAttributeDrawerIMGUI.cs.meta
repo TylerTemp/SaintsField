@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 502fdec5dd1347b6a44aa9387fc5229f
 timeCreated: 1737439082
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ShaderDrawers/ShaderParamDrawer/ShaderParamAttributeDrawerIMGUI.cs
+  uploadId: 802314

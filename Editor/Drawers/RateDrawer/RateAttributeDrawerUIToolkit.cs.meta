@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: d9e86090ec5b4b31815598f984da86b2
 timeCreated: 1743418211
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/RateDrawer/RateAttributeDrawerUIToolkit.cs
+  uploadId: 802314

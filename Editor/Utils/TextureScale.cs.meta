@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: cee521b5f81f47e6aa7bdb278a09785b
 timeCreated: 1683860988
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/TextureScale.cs
+  uploadId: 802314

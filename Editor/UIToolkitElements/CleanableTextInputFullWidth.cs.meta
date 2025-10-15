@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 72a5ae5d3cf8409fb9c18fed58596ef6
 timeCreated: 1755496556
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/CleanableTextInputFullWidth.cs
+  uploadId: 802314

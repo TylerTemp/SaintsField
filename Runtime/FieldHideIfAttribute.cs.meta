@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 276ad9d59e984aa0af009bd11e7a3035
 timeCreated: 1699093886
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/FieldHideIfAttribute.cs
+  uploadId: 802314

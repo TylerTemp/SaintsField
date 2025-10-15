@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: bf0f170e76c044b590d38a1b07c30fc2
 timeCreated: 1701400872
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/EAlign.cs
+  uploadId: 802314

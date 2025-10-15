@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f9d83219dc894961bd24808fddff7ba5
 timeCreated: 1709013847
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/AiNavigationUtils.cs
+  uploadId: 802314

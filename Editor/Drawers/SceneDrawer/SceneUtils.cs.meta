@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: be9b1f68f9604346a7f840d6113cce31
 timeCreated: 1754020122
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SceneDrawer/SceneUtils.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: a24689a4ec8644298e13a88cb615a895
 timeCreated: 1735120973
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Playa/IMakeRenderer.cs
+  uploadId: 802314

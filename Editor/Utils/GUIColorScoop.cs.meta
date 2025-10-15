@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 550603a60b3646e593879b410e9a5c99
 timeCreated: 1740466548
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/GUIColorScoop.cs
+  uploadId: 802314

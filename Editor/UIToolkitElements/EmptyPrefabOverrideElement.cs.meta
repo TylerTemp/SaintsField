@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 0470e6eec63048af804d8e067b5b431f
 timeCreated: 1754496525
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/EmptyPrefabOverrideElement.cs
+  uploadId: 802314

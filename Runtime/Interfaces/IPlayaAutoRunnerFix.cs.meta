@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ae6b36c769f04dfca28d3e68136d4eda
 timeCreated: 1750216068
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Interfaces/IPlayaAutoRunnerFix.cs
+  uploadId: 802314

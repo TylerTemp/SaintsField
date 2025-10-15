@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 50fefac67da34480abd3e872c3aaec50
 timeCreated: 1716962579
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/DOTweenDetectPanel/DOTweenHelperPanel.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: c29e357099304609b95b0c328c722a9d
 timeCreated: 1742450188
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/EnumFlagsAttribute.cs
+  uploadId: 802314

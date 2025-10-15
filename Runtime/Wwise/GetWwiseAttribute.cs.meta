@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 7a88200f22854a27b7c9df8016b1bb11
 timeCreated: 1747726920
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Wwise/GetWwiseAttribute.cs
+  uploadId: 802314

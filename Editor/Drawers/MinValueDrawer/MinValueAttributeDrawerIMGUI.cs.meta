@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: d4b112535976437695b0aa840ba40ff7
 timeCreated: 1740643323
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/MinValueDrawer/MinValueAttributeDrawerIMGUI.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 79c5c2f90b2d407291c7538f16c81fa4
 timeCreated: 1698809571
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/Drawers/InfoBoxDrawer/InfoBoxAttributeDrawer.cs
+  uploadId: 0

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 40e2de7a907544aa99d3219c04298af4
 timeCreated: 1757701496
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/RealTimeCalculatorFakeRenderer/RealTimeCalculatorRenderer.cs
+  uploadId: 802314

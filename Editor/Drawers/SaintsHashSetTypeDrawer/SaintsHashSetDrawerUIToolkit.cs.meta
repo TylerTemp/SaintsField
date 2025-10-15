@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 9ff4dbaa57c64639b98899cf125d527b
 timeCreated: 1751629543
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SaintsHashSetTypeDrawer/SaintsHashSetDrawerUIToolkit.cs
+  uploadId: 802314

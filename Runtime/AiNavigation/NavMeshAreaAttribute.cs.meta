@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 99c6808311bf4c7893bcc1da17e4fed2
 timeCreated: 1709006040
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/AiNavigation/NavMeshAreaAttribute.cs
+  uploadId: 802314

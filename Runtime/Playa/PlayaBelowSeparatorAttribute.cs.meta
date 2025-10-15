@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 615095c2c2f64b8fb19cd2edc94e2e56
 timeCreated: 1760495297
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Runtime/Playa/PlayaBelowSeparatorAttribute.cs
+  uploadId: 0

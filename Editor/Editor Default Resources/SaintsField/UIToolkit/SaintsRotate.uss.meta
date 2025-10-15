@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 2ab8c04876944150b2df065c28e1dd66
 timeCreated: 1739780854
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/SaintsRotate.uss
+  uploadId: 802314

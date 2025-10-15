@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 4d2b9a87d9e64199908e325e25ba0049
 timeCreated: 1711007936
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/PropertyFieldHideSelector.uss
+  uploadId: 802314
