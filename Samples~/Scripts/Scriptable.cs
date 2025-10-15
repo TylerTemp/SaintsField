@@ -18,7 +18,7 @@ namespace SaintsField.Samples.Scripts
         private const int HideMeGroup2 = 2;
 
         [SerializeField]
-        [RichLabel("<color=red><label /></color>")]
+        [FieldRichLabel("<color=red><label /></color>")]
         [PropRange(0, 100)]
         private int _intRange;
 

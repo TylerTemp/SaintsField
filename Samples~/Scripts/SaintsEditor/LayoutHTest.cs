@@ -11,10 +11,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         {
             [LayoutStart("root", ELayout.Horizontal)]
 
-            [RichLabel(null)] public Gradient gradient;
-            [RichLabel(null)]
+            [FieldRichLabel(null)] public Gradient gradient;
+            [FieldRichLabel(null)]
             public int i;
-            [RichLabel(null)]
+            [FieldRichLabel(null)]
             public string thisIsALongDriveForPeopleWithNothingToThinkAbout;
         }
 

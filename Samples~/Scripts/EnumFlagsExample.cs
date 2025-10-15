@@ -9,13 +9,13 @@ namespace SaintsField.Samples.Scripts
         public enum BitMask
         {
             None = 0,  // this will be replaced for all/none button
-            [RichLabel("M<color=red>1</color>")]
+            [FieldRichLabel("M<color=red>1</color>")]
             Mask1 = 1,
-            [RichLabel("M<color=green>2</color>")]
+            [FieldRichLabel("M<color=green>2</color>")]
             Mask2 = 1 << 1,
-            [RichLabel("M<color=blue>3</color>")]
+            [FieldRichLabel("M<color=blue>3</color>")]
             Mask3 = 1 << 2,
-            [RichLabel("M4")]
+            [FieldRichLabel("M4")]
             Mask4 = 1 << 3,
             Mask5 = 1 << 4,
             MaskLongLongLongLong = 1 << 5,
@@ -30,7 +30,7 @@ namespace SaintsField.Samples.Scripts
 
         // [Space(60)]
 
-        [EnumToggleButtons, RichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
+        [EnumToggleButtons, FieldRichLabel(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
         private void ValueChanged() => Debug.Log(myMask2);
 
         [Serializable]
@@ -47,7 +47,7 @@ namespace SaintsField.Samples.Scripts
 
         [ReadOnly]
         [EnumToggleButtons]
-        [RichLabel("<icon=star.png /><label />")]
+        [FieldRichLabel("<icon=star.png /><label />")]
         public BitMask myMaskDisabledLabel;
 
         [Serializable]
@@ -55,7 +55,7 @@ namespace SaintsField.Samples.Scripts
         {
             First,
             Second,
-            [RichLabel("<color=lime><label /></color>")]
+            [FieldRichLabel("<color=lime><label /></color>")]
             Third,
         }
 
@@ -81,9 +81,9 @@ namespace SaintsField.Samples.Scripts
         [Serializable]
         public enum EnumLabelField
         {
-            [RichLabel("<color=red><label/></color>")]
+            [FieldRichLabel("<color=red><label/></color>")]
             None,
-            [RichLabel("<color=blue>1st</color> (<label/>)")]
+            [FieldRichLabel("<color=blue>1st</color> (<label/>)")]
             First,
             [InspectorName("<color=green>2nd</color> (<label/>)")]
             Second,

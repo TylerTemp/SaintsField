@@ -513,7 +513,7 @@ namespace SaintsField.Editor.Utils
             {
                 switch (attribute)
                 {
-                    case RichLabelAttribute r:
+                    case FieldRichLabelAttribute r:
                         return (true, r.RichTextXml);
                     case InspectorNameAttribute i:
                         return (true, i.displayName);

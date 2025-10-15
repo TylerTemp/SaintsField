@@ -14,7 +14,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
 
         public TestStruct[] fixedInNewVersion;
 
-        [RichLabel("<field.name/>")]
+        [FieldRichLabel("<field.name/>")]
         public TestStruct[] workaroundForOldVersion;
     }
 }

@@ -8,9 +8,9 @@ namespace SaintsField.Samples.Scripts
         [System.Serializable]
         public class SimpleObject
         {
-            [RichLabel("Dec")] public string myDecString;
+            [FieldRichLabel("Dec")] public string myDecString;
             public string myNormalString;
-            [field: SerializeField, RichLabel(null), Scene]
+            [field: SerializeField, FieldRichLabel(null), Scene]
             public List<string> mySubStrings { get; private set; }
 
             public List<string> myNoDecStrings;

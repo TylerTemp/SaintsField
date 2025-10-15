@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts
     {
         // FIXED: list above/below incorrect height when item height is not the same
 
-        [RichLabel(nameof(IntsLabel), true)]
+        [FieldRichLabel(nameof(IntsLabel), true)]
         [AboveRichLabel(nameof(IntsLabel), true)]
         [BelowRichLabel(nameof(IntsLabel), true)]
         public int[] ints;
@@ -26,7 +26,7 @@ namespace SaintsField.Samples.Scripts
         public struct MyStruct
         {
             // this works
-            [RichLabel("HI"), MinMaxSlider(0f, 1f)] public Vector2 minMax;
+            [FieldRichLabel("HI"), MinMaxSlider(0f, 1f)] public Vector2 minMax;
             public float normalFloat;
         }
 
@@ -35,7 +35,7 @@ namespace SaintsField.Samples.Scripts
         [Serializable]
         public struct StructNested
         {
-            [RichLabel(nameof(IntsLabel), true)]
+            [FieldRichLabel(nameof(IntsLabel), true)]
             [AboveRichLabel(nameof(IntsLabel), true)]
             [BelowRichLabel(nameof(IntsLabel), true)]
             public int[] ints;

@@ -26,13 +26,13 @@ namespace SaintsField.Samples.Scripts
         public enum BitMask
         {
             None = 0,  // this will be replaced for all/none button
-            [RichLabel("M<color=red>1</color>")]
+            [FieldRichLabel("M<color=red>1</color>")]
             Mask1 = 1,
-            [RichLabel("M<color=green>2</color>")]
+            [FieldRichLabel("M<color=green>2</color>")]
             Mask2 = 1 << 1,
-            [RichLabel("M<color=blue>3</color>")]
+            [FieldRichLabel("M<color=blue>3</color>")]
             Mask3 = 1 << 2,
-            [RichLabel("M4")]
+            [FieldRichLabel("M4")]
             Mask4 = 1 << 3,
             Mask5 = 1 << 4,
         }

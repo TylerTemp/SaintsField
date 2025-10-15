@@ -4,10 +4,10 @@ namespace SaintsField.Samples.Scripts
 {
     public class TagExample: MonoBehaviour
     {
-        [SerializeField, Tag][RichLabel("<icon=star.png /><label/>")] private string _tag;
+        [SerializeField, Tag][FieldRichLabel("<icon=star.png /><label/>")] private string _tag;
         [SerializeField, Tag] private string _tag2;
 
         [ReadOnly]
-        [SerializeField, Tag][RichLabel("<icon=star.png /><label/>")] private string _tagDisabled;
+        [SerializeField, Tag][FieldRichLabel("<icon=star.png /><label/>")] private string _tagDisabled;
     }
 }

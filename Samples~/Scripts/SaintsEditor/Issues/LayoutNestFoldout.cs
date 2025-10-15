@@ -39,7 +39,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
         [EnumToggleButtons]
         public MyEnum l2Enum;
 
-        [EnumToggleButtons, RichLabel("<color=red><label/>")]
+        [EnumToggleButtons, FieldRichLabel("<color=red><label/>")]
         public MyEnum l2EnumLabel;
     }
 }

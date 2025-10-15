@@ -1,29 +1,15 @@
-﻿using System;
+using System;
 using System.Diagnostics;
-using SaintsField.Interfaces;
-using SaintsField.Utils;
-using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field)]
-    public class RichLabelAttribute: PropertyAttribute, ISaintsAttribute
+    public class RichLabelAttribute: FieldRichLabelAttribute
     {
-        public virtual SaintsAttributeType AttributeType => SaintsAttributeType.Label;
-        public virtual string GroupBy => "__LABEL_FIELD__";
-
-        // ReSharper disable InconsistentNaming
-        public readonly string RichTextXml;
-        public readonly bool IsCallback;
-        // ReSharper enable InconsistentNaming
-
-        public RichLabelAttribute(string richTextXml, bool isCallback=false)
+        public RichLabelAttribute(string richTextXml, bool isCallback = false) : base(richTextXml, isCallback)
         {
-            (string parsedContent, bool parsedIsCallback) = RuntimeUtil.ParseCallback(richTextXml, isCallback);
-
-            RichTextXml = parsedContent;
-            IsCallback = parsedIsCallback;
         }
     }
 }

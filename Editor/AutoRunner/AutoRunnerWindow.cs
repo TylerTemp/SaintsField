@@ -25,7 +25,7 @@ namespace SaintsField.Editor.AutoRunner
 
         protected override IEnumerable<SceneAsset> GetSceneList() => sceneList;
 
-        [Ordered, RichLabel("$" + nameof(FolderSearchLabel)), ArrayDefaultExpand, DefaultExpand] public FolderSearch[] folderSearches = {};
+        [Ordered, FieldRichLabel("$" + nameof(FolderSearchLabel)), ArrayDefaultExpand, DefaultExpand] public FolderSearch[] folderSearches = {};
 
         protected override IEnumerable<FolderSearch> GetFolderSearches() => folderSearches;
 

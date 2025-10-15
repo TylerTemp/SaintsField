@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
             FieldInfo info,
             object parent)
         {
-            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
+            FieldRichLabelAttribute targetAttribute = (FieldRichLabelAttribute)saintsAttribute;
             (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml,
                 targetAttribute.IsCallback, info, parent);
             // bool result = GetLabelXml(property, targetAttribute) != null;
@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
         protected override void DrawLabel(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            RichLabelAttribute targetAttribute = (RichLabelAttribute)saintsAttribute;
+            FieldRichLabelAttribute targetAttribute = (FieldRichLabelAttribute)saintsAttribute;
 
             ImGuiEnsureDispose(property.serializedObject.targetObject);
             (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml,

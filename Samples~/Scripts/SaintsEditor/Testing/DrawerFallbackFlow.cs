@@ -52,7 +52,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public enum MyEnum
         {
             None,
-            [RichLabel("Number1")]
+            [FieldRichLabel("Number1")]
             One,
             Two,
         }

@@ -6,7 +6,7 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
-    [CustomPropertyDrawer(typeof(RichLabelAttribute), true)]
+    [CustomPropertyDrawer(typeof(FieldRichLabelAttribute), true)]
     public partial class RichLabelAttributeDrawer: SaintsPropertyDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();

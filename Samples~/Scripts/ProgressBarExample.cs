@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class ProgressBarExample: MonoBehaviour
     {
-        [ProgressBar(10)][RichLabel("<icon=star.png /><label/>")]
+        [ProgressBar(10)][FieldRichLabel("<icon=star.png /><label/>")]
         public int myHp;
         [ProgressBar(0, 100f, step: 0.05f, color: EColor.Blue)]
         public float myMp;
@@ -21,7 +21,7 @@ namespace SaintsField.Samples.Scripts
                 , titleCallback: nameof(Title)
             ),
         ]
-        [RichLabel(null)]
+        [FieldRichLabel(null)]
         public float fValue;
 
         private EColor BackgroundColor() => fValue <= 0? EColor.Brown: EColor.CharcoalGray;
@@ -31,7 +31,7 @@ namespace SaintsField.Samples.Scripts
         private string Title(float curValue, float min, float max, string label) => curValue < 0 ? $"[{label}] Game Over: {curValue}" : $"[{label}] {curValue / max:P}";
 
         [ProgressBar(0, nameof(maxStamina), colorCallback: nameof(StaminaColor), titleCallback: nameof(StaminaTitle))]
-        [RichLabel(null)]
+        [FieldRichLabel(null)]
         public int stamina = 50;
         public int highStamina = 150;
         public int maxStamina = 200;
@@ -48,7 +48,7 @@ namespace SaintsField.Samples.Scripts
         private string StaminaTitle(float curValue, float min, float max, string label) => $"[{label}] {curValue / max:P}";
 
         [ReadOnly]
-        [ProgressBar(10)][RichLabel("<icon=star.png /><label/>")]
+        [ProgressBar(10)][FieldRichLabel("<icon=star.png /><label/>")]
         public int myHpDisabled;
     }
 }

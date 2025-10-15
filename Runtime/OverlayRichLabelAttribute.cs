@@ -3,7 +3,7 @@
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class OverlayRichLabelAttribute: RichLabelAttribute
+    public class OverlayRichLabelAttribute: FieldRichLabelAttribute
     {
         public override SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public override string GroupBy { get; }

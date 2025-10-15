@@ -27,7 +27,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [PropRange(0, 1)]
         public float[] floatArr;
 
-        [RichLabel("$" + nameof(ItemValue))]
+        [FieldRichLabel("$" + nameof(ItemValue))]
         public string[] g23;
 
         private string ItemValue(string v) => v;

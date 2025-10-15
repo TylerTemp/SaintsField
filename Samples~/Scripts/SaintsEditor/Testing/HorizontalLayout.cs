@@ -36,9 +36,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [LayoutStart("../Right Hand", ELayout.TitleBox)]
         public string g21;
-        [RichLabel("<color=lime><label/>")]
+        [FieldRichLabel("<color=lime><label/>")]
         public string g22;
-        [RichLabel("$" + nameof(g22))]
+        [FieldRichLabel("$" + nameof(g22))]
         public string[] g23;
 
         public bool toggle;

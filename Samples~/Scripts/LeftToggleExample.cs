@@ -7,8 +7,8 @@ namespace SaintsField.Samples.Scripts
     {
         [LeftToggle] public bool myToggle;
         // To use with `RichLabel` in IMGUI, you need to add 5 spaces ahead as a hack
-        [LeftToggle, RichLabel("<color=green><label />")] public bool richToggle;
-        [LeftToggle, RichLabel(null)] public bool richToggle2;
+        [LeftToggle, FieldRichLabel("<color=green><label />")] public bool richToggle;
+        [LeftToggle, FieldRichLabel(null)] public bool richToggle2;
 
         public bool normalToggle;
 
