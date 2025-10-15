@@ -9,10 +9,8 @@ namespace SaintsField
         public override SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public override string GroupBy { get; }
 
-        // ReSharper disable InconsistentNaming
         public readonly bool End;
         public readonly float Padding;
-        // ReSharper enable InconsistentNaming
 
         public OverlayTextAttribute(string richTextXml, bool isCallback=false, bool end=false, float padding=5f, string groupBy=""): base(richTextXml, isCallback)
         {
