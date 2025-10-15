@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.Separator
         [FieldSeparator("Start")]
         [FieldSeparator("Center", EAlign.Center)]
         [FieldSeparator("End", EAlign.End)]
-        [BelowSeparator("$" + nameof(Callback))]
+        [FieldBelowSeparator("$" + nameof(Callback))]
         public string s3;
         public string Callback() => s3;
 
@@ -20,11 +20,11 @@ namespace SaintsField.Samples.Scripts.Separator
 
         [FieldSeparator(10)]  // this behaves like a space
         [FieldSeparator("[ Hi <color=LightBlue>Above</color> ]", EColor.Aqua, EAlign.Center)]
-        [BelowSeparator("[ Hi <color=Silver>Below</color> ]", EColor.Brown, EAlign.Center)]
-        [BelowSeparator(10)]
+        [FieldBelowSeparator("[ Hi <color=Silver>Below</color> ]", EColor.Brown, EAlign.Center)]
+        [FieldBelowSeparator(10)]
         public string hi;
 
-        [BelowSeparator]
+        [FieldBelowSeparator]
         public string s2;
     }
 }

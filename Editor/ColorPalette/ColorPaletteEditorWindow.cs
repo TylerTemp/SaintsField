@@ -38,7 +38,7 @@ namespace SaintsField.Editor.ColorPalette
         private SerializedObject _so;
 
         [Button("Add")]
-        [PlayaBelowSeparator(5), PlayaBelowSeparator(EColor.Gray), PlayaBelowSeparator(5)]
+        [BelowSeparator(5), BelowSeparator(EColor.Gray), BelowSeparator(5)]
         private void AddNew()
         {
             SerializedProperty prop = _so?.FindProperty(nameof(ColorPaletteArray.colorInfoArray));

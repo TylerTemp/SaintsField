@@ -7,7 +7,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(FieldSeparatorAttribute), true)]
-    [CustomPropertyDrawer(typeof(BelowSeparatorAttribute), true)]
+    [CustomPropertyDrawer(typeof(FieldBelowSeparatorAttribute), true)]
     public partial class SeparatorAttributeDrawer: SaintsPropertyDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();

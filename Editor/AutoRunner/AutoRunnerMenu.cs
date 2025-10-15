@@ -27,7 +27,7 @@ namespace SaintsField.Editor.AutoRunner
             AdvancedDropdown(nameof(ShowDropdown)),
             OnValueChanged(nameof(TargetChanged)),
             FieldRichLabel("Select Target"),
-            BelowSeparator,
+            FieldBelowSeparator,
         ]
         public AutoRunnerWindow inspectTarget;
 
