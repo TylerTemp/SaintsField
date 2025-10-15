@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.RichLabelExamples
     public class FullWidthRichLabelExample: MonoBehaviour
     {
         [SerializeField]
-        [AboveRichLabel("┌<icon=eye.png/><label />┐")]
+        [FieldAboveText("┌<icon=eye.png/><label />┐")]
         [FieldRichLabel("├<icon=eye.png/><label />┤")]
         [BelowRichLabel("$" + nameof(BelowLabel))]
         [BelowRichLabel("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]

@@ -46,7 +46,7 @@ namespace SaintsField.Samples.Scripts
         {
             [PostFieldButton(nameof(ShowNewValue), "Click")]
             [OnValueChanged(nameof(ShowNewValue))]
-            [AboveRichLabel(nameof(selectIt), true)]
+            [FieldAboveText(nameof(selectIt), true)]
             [FieldRichLabel("<icon=star.png /><label />")]
             [TreeDropdown(nameof(AdvDropdown))] public int selectIt;
 

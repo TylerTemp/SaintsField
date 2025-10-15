@@ -16,7 +16,7 @@ namespace SaintsField.Samples.Scripts
             public List<string> myNoDecStrings;
         }
 
-        [field: SerializeField, AboveRichLabel("This will go on every element :(")]
+        [field: SerializeField, FieldAboveText("This will go on every element :(")]
         public List<SimpleObject> myArrField2 { get; private set; }
 
         // [System.Serializable]

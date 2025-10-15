@@ -239,8 +239,8 @@ namespace SaintsField.Editor.Core
                         else
                         {
                             alreadyHasRichLabel = true;
-                            AboveRichLabelAttribute aboveRichLabelAttribute =
-                                new AboveRichLabelAttribute(richLabel.RichTextXml, richLabel.IsCallback);
+                            FieldAboveTextAttribute aboveRichLabelAttribute =
+                                new FieldAboveTextAttribute(richLabel.RichTextXml, richLabel.IsCallback);
 
                             FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
                                 (FullWidthRichLabelAttributeDrawer)
@@ -271,9 +271,9 @@ namespace SaintsField.Editor.Core
 
                 if (!alreadyHasRichLabel)
                 {
-                    AboveRichLabelAttribute aboveRichLabelAttribute =
+                    FieldAboveTextAttribute aboveRichLabelAttribute =
                         // ReSharper disable once RedundantArgumentDefaultValue
-                        new AboveRichLabelAttribute("<label />");
+                        new FieldAboveTextAttribute("<label />");
 
                     FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
                         (FullWidthRichLabelAttributeDrawer)

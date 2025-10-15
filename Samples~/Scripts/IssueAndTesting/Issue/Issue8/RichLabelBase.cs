@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
     public class RichLabelBase : MonoBehaviour
     {
         [FieldRichLabel("$" + nameof(ArrayLabels))]
-        [AboveRichLabel("$" + nameof(ArrayLabels))]
+        [FieldAboveText("$" + nameof(ArrayLabels))]
         [BelowRichLabel("$" + nameof(ArrayLabels))]
         [OverlayRichLabel("$" + nameof(ArrayLabels))]
         [PostFieldRichLabel("$" + nameof(ArrayLabels))]

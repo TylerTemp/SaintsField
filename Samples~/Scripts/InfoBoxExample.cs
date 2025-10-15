@@ -23,7 +23,7 @@ namespace SaintsField.Samples.Scripts
 
         [FieldInfoBox("Can not be sold", show: nameof(canSell))]
         [LeftToggle]
-        [AboveRichLabel(nameof(canSell), isCallback:true)]
+        [FieldAboveText(nameof(canSell), isCallback:true)]
         public bool canSell;
 
         [ReadOnly]

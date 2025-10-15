@@ -1,13 +1,17 @@
 using System;
 using System.Diagnostics;
+using SaintsField.Playa;
 
 // ReSharper disable once CheckNamespace
-namespace SaintsField.Playa
+namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-    public class PlayaAboveRichLabelAttribute: AboveTextAttribute
+    public class AboveTextAttribute: PlayaBelowRichLabelAttribute
     {
-
+        public AboveTextAttribute(string content = "<color=gray><label/>"): base(content)
+        {
+            Below = false;
+        }
     }
 }

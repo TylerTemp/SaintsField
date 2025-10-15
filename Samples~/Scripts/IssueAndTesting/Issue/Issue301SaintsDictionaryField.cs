@@ -37,7 +37,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         [Serializable]
         public struct OneFieldLabel
         {
-            [NoLabel, AboveRichLabel]
+            [NoLabel, FieldAboveText]
             public string f1;
         }
 

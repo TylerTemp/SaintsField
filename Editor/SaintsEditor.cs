@@ -168,7 +168,7 @@ namespace SaintsField.Editor
                         }, infoBox);
                     }
                         break;
-                    case PlayaAboveRichLabelAttribute playaAboveRichLabelAttribute:
+                    case AboveTextAttribute playaAboveRichLabelAttribute:
                     {
                         yield return new PlayaFullWidthRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
                         {

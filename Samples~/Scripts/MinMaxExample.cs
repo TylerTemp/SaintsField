@@ -11,17 +11,17 @@ namespace SaintsField.Samples.Scripts
         [field: SerializeField, MaxValue(nameof(_maxValue))]
         public int _minValue { get; private set; }
 
-        [field: SerializeField, MinMaxSlider(nameof(_minValue), nameof(_maxValue)), AboveRichLabel("$" + nameof(_range)), FieldRichLabel("<icon=star.png /><label />")]
+        [field: SerializeField, MinMaxSlider(nameof(_minValue), nameof(_maxValue)), FieldAboveText("$" + nameof(_range)), FieldRichLabel("<icon=star.png /><label />")]
         public Vector2 _range { get; private set; }
 
-        [field: SerializeField, MinMaxSlider(nameof(_minValue), nameof(_maxValue)), AboveRichLabel(nameof(intRange), true)]
+        [field: SerializeField, MinMaxSlider(nameof(_minValue), nameof(_maxValue)), FieldAboveText(nameof(intRange), true)]
         public Vector2Int intRange { get; private set; }
 
         // test broken
         public int wrongMin;
         public int wrongMax;
 
-        [MinMaxSlider(nameof(wrongMin), nameof(wrongMax)), AboveRichLabel(nameof(errorRange), true)]
+        [MinMaxSlider(nameof(wrongMin), nameof(wrongMax)), FieldAboveText(nameof(errorRange), true)]
         public Vector2 errorRange;
 
         [Serializable]

@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts
         // FIXED: list above/below incorrect height when item height is not the same
 
         [FieldRichLabel(nameof(IntsLabel), true)]
-        [AboveRichLabel(nameof(IntsLabel), true)]
+        [FieldAboveText(nameof(IntsLabel), true)]
         [BelowRichLabel(nameof(IntsLabel), true)]
         public int[] ints;
 
@@ -36,7 +36,7 @@ namespace SaintsField.Samples.Scripts
         public struct StructNested
         {
             [FieldRichLabel(nameof(IntsLabel), true)]
-            [AboveRichLabel(nameof(IntsLabel), true)]
+            [FieldAboveText(nameof(IntsLabel), true)]
             [BelowRichLabel(nameof(IntsLabel), true)]
             public int[] ints;
 

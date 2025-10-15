@@ -64,9 +64,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         {
             public int myInt;
 
-            [TableColumn("Value"), AboveRichLabel]
+            [TableColumn("Value"), FieldAboveText]
             public string myString;
-            [TableColumn("Value"), AboveRichLabel]
+            [TableColumn("Value"), FieldAboveText]
             public GameObject myObject;
         }
 

@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts.CustomPropDrawer
 {
     public class CustomPropExample: MonoBehaviour
     {
-        [AboveRichLabel("Above")]
+        [FieldAboveText("Above")]
         [FieldInfoBox("Below")]
         [CustomProp]
         [SepTitle(EColor.Gray)]

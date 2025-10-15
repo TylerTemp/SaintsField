@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts
         private const string ConstString = "This is a constant string";
 
         // using full type name
-        [AboveRichLabel("$:SaintsField.Samples.Scripts." + nameof(StaticCallback) + "." + nameof(StaticString))]
+        [FieldAboveText("$:SaintsField.Samples.Scripts." + nameof(StaticCallback) + "." + nameof(StaticString))]
         // using only type name. This is slow and might find the incorrect target.
         // We'll first search the assembly of this object. If not found, then search all assemblies.
         [FieldInfoBox("$:" + nameof(StaticCallback) + "." + nameof(ConstString))]

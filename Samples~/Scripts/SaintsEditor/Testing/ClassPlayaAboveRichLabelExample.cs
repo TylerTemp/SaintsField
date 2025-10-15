@@ -3,15 +3,15 @@ using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
-    [PlayaAboveRichLabel("<color=gray>This is a class message")]
-    [PlayaAboveRichLabel("$" + nameof(dynamicContent))]
+    [AboveText("<color=gray>This is a class message")]
+    [AboveText("$" + nameof(dynamicContent))]
     public class ClassPlayaAboveRichLabelExample : SaintsMonoBehaviour
     {
         [ResizableTextArea]
         public string dynamicContent;
 
         [Serializable]
-        [PlayaAboveRichLabel("<color=gray>--This is a struct message--")]
+        [AboveText("<color=gray>--This is a struct message--")]
         public struct MyStruct
         {
             public string structString;
