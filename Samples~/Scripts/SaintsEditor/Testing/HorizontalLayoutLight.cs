@@ -17,7 +17,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [LayoutStart("Equipment", ELayout.TitleBox)]
 
         [LayoutStart("./Head")]
-        [PlayaSeparator("Head", EAlign.Center)]
+        [Separator("Head", EAlign.Center)]
         public string st;
         [LayoutCloseHere]
         public MyStruct inOneStruct;
@@ -29,14 +29,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [LayoutStart("./Horizontal", ELayout.Horizontal)]
 
         [LayoutStart("./Left Hand")]
-        [PlayaSeparator("Left Hand", EAlign.Center)]
+        [Separator("Left Hand", EAlign.Center)]
         public string g11;
         public string g12;
         public MyStruct myStruct;
         public string g13;
 
         [LayoutStart("../Right Hand")]
-        [PlayaSeparator("Right Hand", EAlign.Center)]
+        [Separator("Right Hand", EAlign.Center)]
         public string g21;
         [FieldRichLabel("<color=lime><label/>")]
         public string g22;

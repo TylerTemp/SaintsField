@@ -1,25 +1,23 @@
 using System;
 using System.Diagnostics;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class SeparatorAttribute : PropertyAttribute, ISaintsAttribute, ISeparatorAttribute
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
+    public class SeparatorAttribute: Attribute, IPlayaAttribute, ISeparatorAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy => "";
-
         public string Title { get; }
         public Color Color { get; }
         public EAlign EAlign { get; }
         public bool IsCallback { get; }
         public int Space { get; }
-
         public bool Below { get; }
 
         public SeparatorAttribute(): this(null) {}

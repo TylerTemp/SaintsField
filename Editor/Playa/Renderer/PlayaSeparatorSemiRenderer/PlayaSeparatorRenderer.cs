@@ -6,9 +6,9 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
 {
     public partial class PlayaSeparatorRenderer: AbsRenderer
     {
-        private readonly PlayaSeparatorAttribute _playaSeparatorAttribute;
+        private readonly SeparatorAttribute _playaSeparatorAttribute;
 
-        public PlayaSeparatorRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, PlayaSeparatorAttribute playaSeparatorAttribute) : base(serializedObject, fieldWithInfo)
+        public PlayaSeparatorRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, SeparatorAttribute playaSeparatorAttribute) : base(serializedObject, fieldWithInfo)
         {
             _playaSeparatorAttribute = playaSeparatorAttribute;
         }

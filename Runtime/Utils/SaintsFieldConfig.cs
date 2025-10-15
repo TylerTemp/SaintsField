@@ -11,7 +11,7 @@ namespace SaintsField.Utils
         public const int UpdateLoopDefaultMs = 100;
 
         [DebugTool.WhichFramework]
-        [Separator(10)]
+        [FieldSeparator(10)]
 
         [FieldInfoBox("The minimum row of resizable text area", EMessageType.None)]
         [MinValue(1)] public int resizableTextAreaMinRow = 3;

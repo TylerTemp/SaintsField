@@ -6,7 +6,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
-    [CustomPropertyDrawer(typeof(SeparatorAttribute), true)]
+    [CustomPropertyDrawer(typeof(FieldSeparatorAttribute), true)]
     [CustomPropertyDrawer(typeof(BelowSeparatorAttribute), true)]
     public partial class SeparatorAttributeDrawer: SaintsPropertyDrawer
     {

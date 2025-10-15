@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts
         [ShaderKeyword] public string shaderKeywordString;
         [ShaderKeyword(0)] public string shaderKeywordIndex;
 
-        [Separator("By Target")]
+        [FieldSeparator("By Target")]
         [GetComponent] public Renderer targetRenderer;
 
         [ShaderKeyword(nameof(targetRenderer))] public string shaderKeywordRenderer;

@@ -45,7 +45,7 @@ namespace SaintsField.Samples.Scripts
         [MinMaxSlider(-1f, 3f, 0.3f)]
         public Vector2 vector2Step03Disabled;
 
-        [Separator("Free")]
+        [FieldSeparator("Free")]
 
         [MinMaxSlider(-5, 5, free: true)] public Vector2Int freeInt;
         [MinMaxSlider(-5, 5, free: true), FieldBelowText("$" + nameof(freeFloat))] public Vector2 freeFloat;

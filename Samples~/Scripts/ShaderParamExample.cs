@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts
         [ShaderParam(0)] public int shaderParamInt;
         [ShaderParam(ShaderPropertyType.Texture)] public int shaderParamFilter;
 
-        [Separator("By Target")]
+        [FieldSeparator("By Target")]
         [GetComponent] public Renderer targetRenderer;
 
         [ShaderParam(nameof(targetRenderer))] public int shaderParamRenderer;

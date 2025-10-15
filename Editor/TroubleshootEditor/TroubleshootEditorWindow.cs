@@ -181,7 +181,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         private bool NotInProcess => !_inProgress;
 
-        [Ordered, Separator(5), Separator, Separator(5),
+        [Ordered, FieldSeparator(5), FieldSeparator, FieldSeparator(5),
 
          FieldInfoBox("Please wait the checking process to finish", show: nameof(NotInProcess)),
 

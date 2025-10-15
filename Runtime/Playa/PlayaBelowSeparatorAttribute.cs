@@ -5,7 +5,7 @@ namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class PlayaBelowSeparatorAttribute: PlayaSeparatorAttribute
+    public class PlayaBelowSeparatorAttribute: SeparatorAttribute
     {
         public PlayaBelowSeparatorAttribute() : base(null, below: true) {}
 

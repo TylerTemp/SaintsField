@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, FieldInfo info, object parent)
         {
-            SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
+            FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (!separatorAttribute.Below)
             {
                 return CreateSeparatorUIToolkit(separatorAttribute, NameTitleText(property, index)).target;
@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                 },
             };
 
-            SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
+            FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (separatorAttribute.Below)
             {
                 root.Add(CreateSeparatorUIToolkit(separatorAttribute, NameTitleText(property, index)).target);
@@ -181,7 +181,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChanged, FieldInfo info)
         {
-            SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
+            FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (separatorAttribute.Title == null)
             {
                 return;

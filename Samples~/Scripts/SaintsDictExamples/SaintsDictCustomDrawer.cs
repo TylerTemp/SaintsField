@@ -33,7 +33,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         {
             public string key;
 
-            [PlayaSeparator("Key List")]
+            [Separator("Key List")]
             public string[] ks;
 
             public bool Equals(MyKeyStruct other)

@@ -1185,7 +1185,7 @@ namespace SaintsField.Editor
                         }
                     }
                         break;
-                    case PlayaSeparatorAttribute playaSeparatorAttribute:
+                    case SeparatorAttribute playaSeparatorAttribute:
                     {
                         PlayaSeparatorRenderer separatorRenderer = new PlayaSeparatorRenderer(serializedObject, fieldWithInfo, playaSeparatorAttribute);
                         SaintsFieldWithRenderer separatorFieldWithRenderer =

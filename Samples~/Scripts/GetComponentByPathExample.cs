@@ -27,7 +27,7 @@ namespace SaintsField.Samples.Scripts
         [ReadOnly]
         [GetComponentByPath("/no", "./DirectSub1")] public GameObject directSubMultiDisabled;
 
-        [Separator("GetByXPath")]
+        [FieldSeparator("GetByXPath")]
         [GetByXPath("scene:://Dummy")] public GameObject dummyXPath;
         [GetByXPath("./*[1]")] public GameObject direct1XPath;
         [GetByXPath("./*[index() > 1]")] public GameObject directPosTg1XPath;

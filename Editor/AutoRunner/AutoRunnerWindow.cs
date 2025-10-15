@@ -241,7 +241,7 @@ namespace SaintsField.Editor.AutoRunner
         [LayoutEnd]
 
         // ReSharper disable once UnusedMember.Global
-        [PlayaSeparator(5), PlayaSeparator(EColor.Gray), PlayaSeparator(5)]
+        [Separator(5), Separator(EColor.Gray), Separator(5)]
         [Ordered, AutoRunnerWindowResults] public List<AutoRunnerResult> ShowResults => Results;
 
         public override void OnEditorEnable()

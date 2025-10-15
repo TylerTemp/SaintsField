@@ -5,7 +5,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    public class BelowSeparatorAttribute: SeparatorAttribute
+    public class BelowSeparatorAttribute: FieldSeparatorAttribute
     {
         public BelowSeparatorAttribute(): this(null) {}
 

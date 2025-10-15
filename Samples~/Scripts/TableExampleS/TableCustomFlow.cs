@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts.TableExampleS
         {
             public string key;
 
-            [PlayaSeparator("Key List")]
+            [Separator("Key List")]
             public string[] ks;
         }
 
