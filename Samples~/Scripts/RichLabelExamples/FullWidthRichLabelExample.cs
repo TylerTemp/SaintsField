@@ -7,9 +7,9 @@ namespace SaintsField.Samples.Scripts.RichLabelExamples
         [SerializeField]
         [FieldAboveText("┌<icon=eye.png/><label />┐")]
         [FieldRichLabel("├<icon=eye.png/><label />┤")]
-        [BelowRichLabel("$" + nameof(BelowLabel))]
-        [BelowRichLabel("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
-        [BelowRichLabel("==================================", groupBy: "example")]
+        [FieldBelowText("$" + nameof(BelowLabel))]
+        [FieldBelowText("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
+        [FieldBelowText("==================================", groupBy: "example")]
         private int _intValue;
 
         [SerializeField]

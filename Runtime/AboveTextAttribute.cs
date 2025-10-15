@@ -7,7 +7,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-    public class AboveTextAttribute: PlayaBelowRichLabelAttribute
+    public class AboveTextAttribute: BelowTextAttribute
     {
         public AboveTextAttribute(string content = "<color=gray><label/>"): base(content)
         {

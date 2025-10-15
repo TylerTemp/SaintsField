@@ -22,9 +22,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
         [PropRange(0, 10)] public float propR;
 
-        [Layer, PostFieldButton(nameof(SetToUI), "U"), BelowRichLabel("<field/>")] public string layerString;
+        [Layer, PostFieldButton(nameof(SetToUI), "U"), FieldBelowText("<field/>")] public string layerString;
         private void SetToUI() => layerString = "UIX";
-        [Layer, PostFieldButton(nameof(SetToNumber), "U"), BelowRichLabel("<field/>")] public int layerInt;
+        [Layer, PostFieldButton(nameof(SetToNumber), "U"), FieldBelowText("<field/>")] public int layerInt;
         private void SetToNumber() => layerInt = -1;
 
         [Serializable]

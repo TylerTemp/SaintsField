@@ -14,7 +14,7 @@ namespace SaintsField.Samples.Scripts
         [Serializable]
         public struct MyRate
         {
-            [Rate(1, 5), BelowRichLabel(nameof(rate), true), FieldRichLabel("<icon=star.png /><label />")] public int rate;
+            [Rate(1, 5), FieldBelowText(nameof(rate), true), FieldRichLabel("<icon=star.png /><label />")] public int rate;
         }
 
         public MyRate rate;

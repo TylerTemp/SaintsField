@@ -7,9 +7,9 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 {
     public partial class PlayaFullWidthRichLabelRenderer: AbsRenderer
     {
-        private readonly PlayaBelowRichLabelAttribute _playaBelowRichLabelAttribute;
+        private readonly BelowTextAttribute _playaBelowRichLabelAttribute;
 
-        public PlayaFullWidthRichLabelRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute) : base(serializedObject, fieldWithInfo)
+        public PlayaFullWidthRichLabelRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, BelowTextAttribute playaBelowRichLabelAttribute) : base(serializedObject, fieldWithInfo)
         {
             _playaBelowRichLabelAttribute = playaBelowRichLabelAttribute;
         }

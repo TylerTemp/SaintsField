@@ -95,7 +95,7 @@ namespace SaintsField.Samples.Scripts
 
             // [OnValueChanged(nameof(OnChanged))]
             [Dropdown(nameof(MyStructValues))]
-            [BelowRichLabel(nameof(myInt), true)]
+            [FieldBelowText(nameof(myInt), true)]
             public int myInt;
 
             private DropdownList<int> MyStructValues => new DropdownList<int>

@@ -29,7 +29,7 @@ namespace SaintsField.Samples.Scripts
             public int max;
 
             [PropRange(nameof(min), nameof(max))]
-            [BelowRichLabel(nameof(rangeFloat), true)]
+            [FieldBelowText(nameof(rangeFloat), true)]
             [SepTitle("Test", EColor.Green)]
             public float rangeFloat;
         }

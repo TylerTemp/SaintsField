@@ -29,7 +29,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             [OnValueChanged(nameof(Log))]
             public Toggle toggle;
 
-            [BelowRichLabel(nameof(toggle), true)]
+            [FieldBelowText(nameof(toggle), true)]
             [FieldAboveText(nameof(toggle), true)]
             [FieldRichLabel(nameof(toggle), true)]
             [OverlayRichLabel(nameof(toggle), true)]

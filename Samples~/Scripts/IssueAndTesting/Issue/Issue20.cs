@@ -17,9 +17,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         }
         // ReSharper restore InconsistentNaming
 
-        [BelowRichLabel(nameof(wrapped), true)]
+        [FieldBelowText(nameof(wrapped), true)]
         [EnumToggleButtons] public Bldg_DestructState wrapped;
-        [BelowRichLabel(nameof(original), true)]
+        [FieldBelowText(nameof(original), true)]
         public Bldg_DestructState original;
 
         [EnumToggleButtons] public Bldg_DestructState autoDefaultNoExpand;

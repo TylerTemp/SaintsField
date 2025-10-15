@@ -8,8 +8,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue3
         [FieldAboveText("<icon=star.png/>")]
         [FieldAboveText("<icon=star.png/>")]
         public string richAboveIcon;
-        [BelowRichLabel("<icon=star.png/>")]
-        [BelowRichLabel("<icon=star.png/>")]
+        [FieldBelowText("<icon=star.png/>")]
+        [FieldBelowText("<icon=star.png/>")]
         public string richBelowIcon;
 
         [OverlayRichLabel("<icon=star.png/>")]

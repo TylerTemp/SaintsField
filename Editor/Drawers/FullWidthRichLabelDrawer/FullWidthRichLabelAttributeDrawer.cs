@@ -7,7 +7,7 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(FieldAboveTextAttribute), true)]
-    [CustomPropertyDrawer(typeof(BelowRichLabelAttribute), true)]
+    [CustomPropertyDrawer(typeof(FieldBelowTextAttribute), true)]
     [CustomPropertyDrawer(typeof(FullWidthRichLabelAttribute), true)]
     public partial class FullWidthRichLabelAttributeDrawer: SaintsPropertyDrawer
     {

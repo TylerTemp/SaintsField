@@ -1169,7 +1169,7 @@ namespace SaintsField.Editor
                         }
                     }
                         break;
-                    case PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute:
+                    case BelowTextAttribute playaBelowRichLabelAttribute:
                     {
                         PlayaFullWidthRichLabelRenderer playaFullWidthRichLabelRenderer = new PlayaFullWidthRichLabelRenderer(serializedObject, fieldWithInfo, playaBelowRichLabelAttribute);
 

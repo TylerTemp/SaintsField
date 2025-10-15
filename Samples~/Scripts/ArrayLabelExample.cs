@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts
 
         [FieldRichLabel(nameof(IntsLabel), true)]
         [FieldAboveText(nameof(IntsLabel), true)]
-        [BelowRichLabel(nameof(IntsLabel), true)]
+        [FieldBelowText(nameof(IntsLabel), true)]
         public int[] ints;
 
         private string IntsLabel(int value, int index)
@@ -37,7 +37,7 @@ namespace SaintsField.Samples.Scripts
         {
             [FieldRichLabel(nameof(IntsLabel), true)]
             [FieldAboveText(nameof(IntsLabel), true)]
-            [BelowRichLabel(nameof(IntsLabel), true)]
+            [FieldBelowText(nameof(IntsLabel), true)]
             public int[] ints;
 
             private string IntsLabel(int value, int index)

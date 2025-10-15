@@ -30,7 +30,7 @@ namespace SaintsField.Samples.Scripts
             public int minV;
             public int maxV;
 
-            [MinMaxSlider(nameof(minV), nameof(maxV)), BelowRichLabel(nameof(rV), true)]
+            [MinMaxSlider(nameof(minV), nameof(maxV)), FieldBelowText(nameof(rV), true)]
             public Vector2Int rV;
         }
 

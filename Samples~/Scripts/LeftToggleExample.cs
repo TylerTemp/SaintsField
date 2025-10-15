@@ -15,10 +15,10 @@ namespace SaintsField.Samples.Scripts
         [Serializable]
         public struct MyStruct
         {
-            [LeftToggle, BelowRichLabel(nameof(myToggle), true)]
+            [LeftToggle, FieldBelowText(nameof(myToggle), true)]
             public bool myToggle;
 
-            [LeftToggle, BelowRichLabel(nameof(TogglesLabel), true)]
+            [LeftToggle, FieldBelowText(nameof(TogglesLabel), true)]
             public bool[] myToggles;
 
             public string TogglesLabel(bool _, int index) => myToggles[index].ToString();

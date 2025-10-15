@@ -33,7 +33,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         }
 
         public string myOtherFieldUnderneath;
-        [BelowRichLabel(nameof(_testEnum), true)]
+        [FieldBelowText(nameof(_testEnum), true)]
         public string other;
 
         private enum TestEnum

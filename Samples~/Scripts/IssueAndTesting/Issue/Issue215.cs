@@ -11,10 +11,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         // [BelowRichLabel("<field />")]
         // public double d;
 
-        [BelowRichLabel("<field />")]
+        [FieldBelowText("<field />")]
         public float[] fs;
 
-        [BelowRichLabel("<field />")]
+        [FieldBelowText("<field />")]
         public double[] ds;
 
 

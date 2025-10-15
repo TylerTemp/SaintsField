@@ -36,7 +36,7 @@ namespace SaintsField.Samples.Scripts
         [Serializable]
         public struct MyStruct
         {
-            [EnumToggleButtons, BelowRichLabel(nameof(myMask), true)] public BitMask myMask;
+            [EnumToggleButtons, FieldBelowText(nameof(myMask), true)] public BitMask myMask;
         }
 
         public MyStruct myStruct;

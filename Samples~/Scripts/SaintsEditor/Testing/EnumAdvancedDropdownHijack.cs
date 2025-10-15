@@ -31,12 +31,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         public EnumNormal enumNormalPure;
 
-        [BelowRichLabel("<color=gray><field/>")]
+        [FieldBelowText("<color=gray><field/>")]
         public EnumNormal enumNormalFall;
 
         public EnumNormal[] enumNormalPures;
 
-        [BelowRichLabel("<color=gray><field/>")]
+        [FieldBelowText("<color=gray><field/>")]
         public EnumNormal[] enumNormalFalls;
 
         [Serializable, Flags]
@@ -58,12 +58,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
         public EnumFlags enumFlagsPure;
-        [BelowRichLabel("<color=gray><field=B/>")]
-        [BelowRichLabel("<color=gray><field=B4/>")]
+        [FieldBelowText("<color=gray><field=B/>")]
+        [FieldBelowText("<color=gray><field=B4/>")]
         public EnumFlags enumFlagsDec;
 
         public EnumFlags[] enumFlagsPures;
-        [BelowRichLabel("<color=gray><field=B/>")]
+        [FieldBelowText("<color=gray><field=B/>")]
         public EnumFlags[] enumFlagsDecs;
     }
 }

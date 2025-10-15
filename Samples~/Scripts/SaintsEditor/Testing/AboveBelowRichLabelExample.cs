@@ -7,8 +7,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
     {
         [AboveText("<color=gray>-- Above --")]
         [AboveText("$" + nameof(dynamicContent))]
-        [PlayaBelowRichLabel("$" + nameof(dynamicContent))]
-        [PlayaBelowRichLabel("<color=gray>-- Below --")]
+        [BelowText("$" + nameof(dynamicContent))]
+        [BelowText("<color=gray>-- Below --")]
         public string[] s;
 
         [Space(20)]
