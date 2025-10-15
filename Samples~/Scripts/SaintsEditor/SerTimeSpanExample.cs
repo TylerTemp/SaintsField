@@ -25,6 +25,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [SaintsSerialized]
         public TimeSpan dt;
-        public string s;
+        [SaintsSerialized]
+        public TimeSpan s;
     }
 }

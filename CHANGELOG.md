@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.34.0 ##
+
+1.  UI Toolkit: Add `TimeSpan` for "Extended Serialization". You can now serialize a `TimeSpan` field/property.
+2.  UI Toolkit: Add `[TimeSpan]` attribute to allow you pick a datetime using `long` type
+3.  UI Toolkit: Add `[ShowInInspector][TimeSpan]` for `long` to allow showing a `long` value as a `TimeSpan`
+
 ## 4.33.1 ##
 
 1.  UI Toolkit: Add `DateTime` for "Extended Serialization". You can now serialize a `DateTime` field/property.

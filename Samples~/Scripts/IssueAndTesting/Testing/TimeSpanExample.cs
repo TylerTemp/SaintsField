@@ -1,5 +1,6 @@
 using System;
 using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
@@ -12,14 +13,15 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
         [ShowInInspector] private long v => dt;
 
-        [TimeSpan, DefaultExpand]  // let it expand
+        [Space]
+        [TimeSpan, DefaultExpand]  // default use expand mode
         public long expanded;
 
         [ShowInInspector]
-        private TimeSpan _showDt;
+        private TimeSpan _showTs;
 
         [ShowInInspector, TimeSpan]
-        private long _showDtLong;
+        private long _showTsLong;
 
         [LayoutStart("H", ELayout.Horizontal | ELayout.TitleBox)]
         [TimeSpan]

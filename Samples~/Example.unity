@@ -13906,7 +13906,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.TimeSpanExample
   dt: 1692123560000
-  expanded: 0
+  expanded: 1692123560000
+  d1: 0
+  l: 0
 --- !u!1 &847311490
 GameObject:
   m_ObjectHideFlags: 0
