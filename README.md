@@ -6436,50 +6436,54 @@ See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samp
 
 [![video](https://github.com/user-attachments/assets/ce2efb49-2723-4e43-a3a7-9969f229f591)](https://github.com/user-attachments/assets/38dcb22c-d30f-40d4-bd6b-420aa1b41588)
 
-### `SaintsInterface<,>`/`SaintsObjInterface<>` ###
+### `SaintsInterface<>` ###
 
-`SaintsInterface` is a simple tool to serialize a `UnityEngine.Object` (usually your script component) with a required interface.
+`SaintsInterface` is a simple tool to serialize a `UnityEngine.Object` (usually your script component) or a serializable struct/class with a required interface.
 
-You can access the interface with the `.I` field, and actual object with `.V` field.
+You can access the interface with the `.I` field, actual unity object with `.V` field, and actual serializable class/struct with `.VRef` field.
 
 It provides a drawer to let you only select the object that implements the interface.
 
-For `SaintsInterface<TObject, TInterface>`:
-
-*   `TObject` a serializable type. Use `Component` (for your `MonoBehavior`), `ScriptableObject` or even `UnityEngine.Object` (for any serializable object) if you only want any limitation. Don't use `GameObject`.
-*   `TInterface` the interface type.
-*   `.I`: the interface value, which is the instance of `TInterface`
-*   `.V`: the actual object value, which is the instance of `TObject`
-
-`SaintsObjInterface<>` is a shortcut for `SaintsInterface<UnityEngine.Object, TInterface>`.
+You can toggle the button at left to toggle either you want an unity instance (object, prefab, scriptableObject etc) or a serializable class/struct.
 
 ```csharp
 using SaintsField;
 
-public SaintsObjInterface<IInterface1> myInter1;
-
-// for old unity
 [Serializable]
-public class Interface1 : SaintsInterface<Component, IInterface1>
+private struct NorStructInterface1 : IInterface1
 {
+    public int common;
+    public string structString;
 }
 
-public Interface1 myInherentInterface1;
+[Serializable]
+private struct NorClassInterface1 : IInterface1
+{
+    public int common;
+    public string classString;
+}
+
+public SaintsInterface<IInterface1> myInter1;
 
 private void Awake()
 {
     Debug.Log(myInter1.I);  // the actual interface
-    Debug.Log(myInter1.V);  // the actual serialized object
 }
 ```
 
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/e7ea662d-34d2-4d4b-88b9-0c4bbbbdee33)
+Result of unity object:
 
-This component is inspired by [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/utilities/serialize-interfaces-187505), you may go there and support him!
+![image](https://github.com/user-attachments/assets/34d0ef6f-e3e9-4217-b309-3d4da5b80f1e)
+
+Result of serializable class/struct:
+
+![image](https://github.com/user-attachments/assets/43e729ab-9404-41af-b4a1-f0643b0f2c86)
+
+This component is inspired by [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/utilities/serialize-interfaces-187505) and [Unity3D-SerializableInterface](https://github.com/Thundernerd/Unity3D-SerializableInterface), please go give them a star!
 
 Compared to [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/utilities/serialize-interfaces-187505), this version has several differences:
 
-*   It supports UI Toolkits too.
+*   It supports UI Toolkit too.
 *   Many SaintsField attributes can work together with this one, especially these auto getters, validators etc.
 
 ### `SaintsHashSet<>` / `ReferenceHashSet<>` ###

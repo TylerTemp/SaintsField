@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.35.0 ##
+
+1.  `SaintsInterface<>` now support serializable class/struct, together with unity object. [#275](https://github.com/TylerTemp/SaintsField/issues/275)
+2.  Improve the look of `ReferencePicker`
+
 ## 4.34.0 ##
 
 1.  UI Toolkit: Add `TimeSpan` for "Extended Serialization". You can now serialize a `TimeSpan` field/property.
