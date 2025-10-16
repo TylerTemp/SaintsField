@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
     {
 #if !UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
         public new class UxmlTraits : BindableElement.UxmlTraits { }
-        public new class UxmlFactory : UxmlFactory<SerializedTypeButton, UxmlTraits> { }
+        public new class UxmlFactory : UxmlFactory<IsVRefButton, UxmlTraits> { }
 #endif
 
         private static VisualTreeAsset _treeAsset;
