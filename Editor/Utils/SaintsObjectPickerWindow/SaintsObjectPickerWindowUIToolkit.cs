@@ -234,7 +234,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             _listScrollView = _listView.Q<ScrollView>();
 
 // #if UNITY_2021_3 || UNITY_2022_3 || UNITY_6000_OR_NEWER
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_3_OR_NEWER
             _listScrollViewScrollSize = _listScrollView.mouseWheelScrollSize;
 #endif
 
@@ -264,7 +264,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             _blockView.focusable = true;
             // _blockViewContent.focusable = true;
 
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_3_OR_NEWER
             _blockScrollViewScrollSize = _blockView.mouseWheelScrollSize;
 #endif
 
@@ -283,7 +283,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 if (ctrl)
                 {
                     _ctrlDown = true;
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_3_OR_NEWER
                     _listScrollView.mouseWheelScrollSize = 0;
                     _blockView.mouseWheelScrollSize = 0;
 #endif
@@ -296,7 +296,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 if (ctrl)
                 {
                     _ctrlDown = false;
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_3_OR_NEWER
                     _listScrollView.mouseWheelScrollSize = _listScrollViewScrollSize;
                     _blockView.mouseWheelScrollSize = _blockScrollViewScrollSize;
 #endif
@@ -586,13 +586,14 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         private void SetCtrl(bool down)
         {
+            // ReSharper disable once RedundantCheckBeforeAssignment
             if (_ctrlDown == down)
             {
                 return;
             }
 
             _ctrlDown = down;
-#if UNITY_2022_2_OR_NEWER
+#if UNITY_2022_3_OR_NEWER
             if (down)
             {
                 _listScrollView.mouseWheelScrollSize = 0;

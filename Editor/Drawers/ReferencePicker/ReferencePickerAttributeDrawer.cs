@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
     [CustomPropertyDrawer(typeof(ReferencePickerAttribute), true)]
     public partial class ReferencePickerAttributeDrawer : SaintsPropertyDrawer
     {
-        private static IEnumerable<Type> GetTypes(SerializedProperty property)
+        public static IEnumerable<Type> GetTypes(SerializedProperty property)
         {
             string typename = property.managedReferenceFieldTypename;
             // Debug.Log(typename);

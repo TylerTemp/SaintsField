@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         protected override bool UseCreateFieldUIToolKit => true;
 
         public const string SaintsRowClass = "saints-field--saintsrow";
-        private static string NameActualContainer(SerializedProperty property) => $"${property.propertyPath}__saints_row";
+        // private static string NameActualContainer(SerializedProperty property) => $"{property.propertyPath}__saints_row";
 
         public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
@@ -61,26 +61,19 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
             if (inline)
             {
-                root = new EmptyPrefabOverrideElement(property)
+                // root = new EmptyPrefabOverrideElement(property)
+                root = new VisualElement
                 {
                     style =
                     {
                         flexGrow = 1,
                     },
-                    name = NameActualContainer(property),
+                    // name = NameActualContainer(property),
                 };
             }
             else
             {
-                VisualElement foldoutWrapper = new VisualElement
-                {
-                    style =
-                    {
-                        flexGrow = 1,
-                    },
-                };
-
-                Foldout foldout = new Foldout
+                Foldout foldout = new FoldoutPrefabOverrideElement(property)
                 {
                     text = label,
                     value = property.isExpanded,
@@ -88,82 +81,17 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     {
                         flexGrow = 1,
                     },
-                    name = NameActualContainer(property),
+                    // name = NameActualContainer(property),
+                    viewDataKey = property.propertyPath,
                 };
                 foldout.RegisterValueChangedCallback(evt =>
                 {
                     property.isExpanded = evt.newValue;
                 });
 
-                foldoutWrapper.Add(foldout);
-                foldoutWrapper.Add(new EmptyPrefabOverrideElement(property)
-                {
-                    style =
-                    {
-                        position = Position.Absolute,
-                        top = 0,
-                        bottom = 0,
-                        left = 0,
-                        right = 0,
-                        height = 18,
-                    },
-                    pickingMode = PickingMode.Ignore,
-                });
-
-                // foldout.Add(new EmptyPrefabOverrideElement(property)
-                // {
-                //     style =
-                //     {
-                //         position = Position.Absolute,
-                //         top = -20,
-                //         bottom = 0,
-                //         left = -15,
-                //         right = 0,
-                //         height = 18,
-                //     },
-                //     pickingMode = PickingMode.Ignore,
-                // });
-
-                // Toggle toggle = foldout.Q<Toggle>();
-                // if (toggle != null)
-                // {
-                //     toggle.Add(
-                //         new EmptyPrefabOverrideElement(property)
-                //         {
-                //             style =
-                //             {
-                //                 position = Position.Absolute,
-                //                 top = 0,
-                //                 bottom = 0,
-                //                 left = 0,
-                //                 right = 0,
-                //             },
-                //             pickingMode = PickingMode.Ignore,
-                //         });
-                //     // Label toggleLabel = toggle.Q<Label>();
-                //     // if (toggleLabel != null)
-                //     // {
-                //     //     // EmptyPrefabOverrideElement emptyPrefabOverrideElement =
-                //     //     //     new EmptyPrefabOverrideElement(property)
-                //     //     //     {
-                //     //     //         style =
-                //     //     //         {
-                //     //     //             position = Position.Absolute,
-                //     //     //             top = 0,
-                //     //     //             bottom = 0,
-                //     //     //             left = 0,
-                //     //     //             right = 0,
-                //     //     //         },
-                //     //     //         pickingMode = PickingMode.Ignore,
-                //     //     //     };
-                //     //     // toggleLabel.Add(emptyPrefabOverrideElement);
-                //     // }
-                // }
-
                 UIToolkitUtils.AddContextualMenuManipulator(foldout, property, () => {});
 
-                // root = foldout;
-                root = foldoutWrapper;
+                root = foldout;
             }
 
             root.AddToClassList(SaintsRowClass);
@@ -181,6 +109,10 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         long curId = (long) root.userData;
                         // ReSharper disable once InvertIf
                         long newId;
+                        if (!SerializedUtils.IsOk(property))
+                        {
+                            return;
+                        }
                         try
                         {
                             newId = property.managedReferenceId;
@@ -195,8 +127,8 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                             // Debug.Log($"{property.propertyPath} Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
                             root.userData = property.managedReferenceId;
 
-                            VisualElement actualContainer = root.Q<VisualElement>(NameActualContainer(property));
-                            actualContainer.Clear();
+                            // VisualElement actualContainer = root.Q<VisualElement>(NameActualContainer(property));
+                            root.Clear();
 
                             SerializedProperty newProp = property.serializedObject.FindProperty(propPath);
 
@@ -324,9 +256,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 }
             }
 
-            VisualElement actualContainer = root.Q<VisualElement>(NameActualContainer(property));
+            // VisualElement actualContainer = root.Q<VisualElement>(NameActualContainer(property));
 
-            actualContainer.Add(bodyElement);
+            root.Add(bodyElement);
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
             bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(doTweenPlayRecorder));
             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));

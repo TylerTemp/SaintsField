@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Interfaces;
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
@@ -246,6 +247,10 @@ namespace SaintsField.Editor.Utils
             button.style.flexGrow = 1;
 
             Label buttonLabel = button.Q<Label>();
+            buttonLabel.style.overflow = Overflow.Hidden;
+            buttonLabel.style.textOverflow = TextOverflow.Ellipsis;
+            buttonLabel.style.marginRight = 0;
+            buttonLabel.style.marginLeft = 4;
 
             // Label buttonLabel = new Label
             // {
@@ -274,7 +279,7 @@ namespace SaintsField.Editor.Utils
             };
 
             // dropdownButtonField.AddToClassList("unity-base-field__aligned");
-            dropdownButtonField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
+            dropdownButtonField.AddToClassList(DropdownButtonField.alignedFieldUssClassName);
 
             // dropdownButtonField.Add(new Image
             // {
@@ -2590,6 +2595,102 @@ namespace SaintsField.Editor.Utils
             // {
             //     textElement.style.
             // }
+        }
+
+        public static DropdownButtonField ReferenceDropdownButtonField(string label, SerializedProperty property, VisualElement worldBoundElement, Func<IEnumerable<Type>> getTypes)
+        {
+            DropdownButtonField dropdownBtn = MakeDropdownButtonUIToolkit(label);
+
+            dropdownBtn.ButtonLabelElement.text = GetReferencePropertyLabel(property);
+
+            dropdownBtn.ButtonElement.clicked += () =>
+            {
+                (Rect dropBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(worldBoundElement.worldBound);
+                // dropBound.height = SaintsPropertyDrawer.SingleLineHeight;
+
+                object managedReferenceValue = property.managedReferenceValue;
+                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>
+                {
+                    {"[Null]", null},
+                };
+                Dictionary<string, List<Type>> nameSpaceToTypes = new Dictionary<string, List<Type>>();
+                foreach (Type type in getTypes())
+                {
+                    string typeNamespace = type.Namespace;
+                    if (string.IsNullOrEmpty(typeNamespace))
+                    {
+                        typeNamespace = "";
+                    }
+                    if (!nameSpaceToTypes.TryGetValue(typeNamespace, out List<Type> list))
+                    {
+                        nameSpaceToTypes[typeNamespace] = list = new List<Type>();
+                    }
+                    list.Add(type);
+                    // string displayName = FormatTypeName(type);
+                    // dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
+                }
+
+                IOrderedEnumerable<string> nameSpaceToTypesSorted = nameSpaceToTypes.Keys.OrderBy(each => each);
+                foreach (string @namespace in nameSpaceToTypesSorted)
+                {
+                    List<Type> types = nameSpaceToTypes[@namespace];
+                    // types.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+                    AdvancedDropdownList<Type> namespaceTypes = new AdvancedDropdownList<Type>(@namespace == ""? "[No Namespace]": @namespace);
+                    foreach (Type eachType in types)
+                    {
+                        namespaceTypes.Add(eachType.Name, eachType);
+                    }
+                    dropdownList.Add(namespaceTypes);
+                }
+
+                AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+                {
+                    Error = "",
+                    CurDisplay = managedReferenceValue == null
+                        ? "-"
+                        : managedReferenceValue.GetType().Name,
+                    CurValues = managedReferenceValue == null? Array.Empty<object>(): new []{managedReferenceValue.GetType()},
+                    DropdownListValue = dropdownList,
+                    SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                };
+
+                UnityEditor.PopupWindow.Show(dropBound, new SaintsTreeDropdownUIToolkit(
+                    metaInfo,
+                    worldBoundElement.worldBound.width,
+                    maxHeight,
+                    false,
+                    (curItem, _) =>
+                    {
+                        object instance = curItem == null
+                            ? null
+                            : ReferencePickerAttributeDrawer.CopyObj(managedReferenceValue, Activator.CreateInstance((Type)curItem));
+
+                        property.managedReferenceValue = instance;
+                        property.serializedObject.ApplyModifiedProperties();
+                        return null;
+                    }
+                ));
+            };
+
+            return dropdownBtn;
+        }
+
+        public static string GetReferencePropertyLabel(SerializedProperty property)
+        {
+            if (!SerializedUtils.IsOk(property))
+            {
+                return "";
+            }
+
+            object v = property.managedReferenceValue;
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (v == null)
+            {
+                return "-";
+            }
+
+            Type type = v.GetType();
+            return $"{type.Name} <color=#{ColorUtility.ToHtmlStringRGB(Color.gray)}>{type.Namespace}</color>";
         }
     }
 #endif

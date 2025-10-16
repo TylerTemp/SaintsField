@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
@@ -11,12 +12,13 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 {
-#if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
-#endif
+// #if ODIN_INSPECTOR
+//     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
+// #endif
     [CustomPropertyDrawer(typeof(SaintsObjInterface<>), true)]
     [CustomPropertyDrawer(typeof(SaintsInterface<,>), true)]
-    public partial class SaintsInterfaceDrawer: PropertyDrawer
+    [CustomPropertyDrawer(typeof(SaintsInterface<>), true)]
+    public partial class SaintsInterfaceDrawer: SaintsPropertyDrawer
     {
         public static (Type valueType, Type interfaceType) GetTypes(SerializedProperty property, FieldInfo info)
         {

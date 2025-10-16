@@ -18,6 +18,28 @@ namespace SaintsField.Samples.Scripts.Interface
             }
         }
 
+        [Serializable]
+        private struct NorStructInterface1 : IInterface1
+        {
+            public int common;
+            public string structString;
+
+            public void Method1()
+            {
+            }
+        }
+
+        [Serializable]
+        private struct NorClassInterface1 : IInterface1
+        {
+            public int common;
+            public string classString;
+
+            public void Method1()
+            {
+            }
+        }
+
         public Interface1 myInherentInterface1;
         [FieldLabelText("<label />")]
         public Interface1[] myInherentInterface1Lis;

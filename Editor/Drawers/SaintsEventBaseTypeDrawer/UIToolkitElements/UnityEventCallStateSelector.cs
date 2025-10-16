@@ -7,14 +7,16 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
 {
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
     [UxmlElement]
 #endif
     // ReSharper disable once PartialTypeWithSinglePart
     public partial class UnityEventCallStateSelector: BindableElement, INotifyValueChanged<int>
     {
+#if !UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
         public new class UxmlTraits : BindableElement.UxmlTraits { }
         public new class UxmlFactory : UxmlFactory<UnityEventCallStateSelector, UxmlTraits> { }
+#endif
 
         private static VisualTreeAsset _treeAsset;
         private const string ClassBoth = "call-state-button-both";
