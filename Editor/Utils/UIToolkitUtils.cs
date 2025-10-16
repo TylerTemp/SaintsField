@@ -246,6 +246,10 @@ namespace SaintsField.Editor.Utils
             button.style.flexGrow = 1;
 
             Label buttonLabel = button.Q<Label>();
+            buttonLabel.style.overflow = Overflow.Hidden;
+            buttonLabel.style.textOverflow = TextOverflow.Ellipsis;
+            buttonLabel.style.marginRight = 0;
+            buttonLabel.style.marginLeft = 4;
 
             // Label buttonLabel = new Label
             // {
@@ -274,7 +278,7 @@ namespace SaintsField.Editor.Utils
             };
 
             // dropdownButtonField.AddToClassList("unity-base-field__aligned");
-            dropdownButtonField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
+            dropdownButtonField.AddToClassList(DropdownButtonField.alignedFieldUssClassName);
 
             // dropdownButtonField.Add(new Image
             // {

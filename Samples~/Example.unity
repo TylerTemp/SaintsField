@@ -23391,71 +23391,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: 
   targetTransform: {fileID: 0}
---- !u!1 &1638446594
+--- !u!1 &1638446594 stripped
 GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 3429928782357957042, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+  m_PrefabInstance: {fileID: 4340211207502076047}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1638446596}
-  - component: {fileID: 1638446597}
-  m_Layer: 0
-  m_Name: Reference
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1638446596
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1638446594}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1638446597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1638446594}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c441f544051b481cb7b304e48b2db074, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  item:
-    rid: -2
-  structImpl:
-    rid: -2
-  myInterface:
-    rid: -2
-  myInterfaces: []
-  myInterfaceDisabled:
-    rid: 8650581525933064258
-  wrongType:
-    <V>k__BackingField: {fileID: 0}
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 8650581525933064258
-      type: {class: ReferenceExample/ClassSub2, ns: SaintsField.Samples.Scripts.ReferenceExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        <TheInt>k__BackingField: 0
-        sub2: 
 --- !u!1 &1639647309
 GameObject:
   m_ObjectHideFlags: 0
@@ -34991,6 +34931,87 @@ MonoBehaviour:
   prefabInstance: Instances of regular prefabs, and prefab variants in scenes or
     nested in other prefabs
   prefabAsset: Prefab assets and prefab variant assets
+--- !u!1001 &4340211207502076047
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1158735429291002563, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3429928782357957042, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: m_Name
+      value: Reference
+      objectReference: {fileID: 0}
+    - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: item
+      value: 6921583294834278523
+      objectReference: {fileID: 0}
+    - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: 'managedReferences[6921583294834278523]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.ReferenceExamples.ReferenceExample/Orange3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: managedReferences[6921583294834278523].base1
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: managedReferences[6921583294834278523].base2
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: managedReferences[6921583294834278523].orange3
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
+      propertyPath: managedReferences[6921583294834278525].<TheInt>k__BackingField
+      value: 7
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
 --- !u!1001 &4398206394473841023
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -36035,7 +36056,7 @@ SceneRoots:
   - {fileID: 308851078}
   - {fileID: 1881364801}
   - {fileID: 1730412121}
-  - {fileID: 1638446596}
+  - {fileID: 4340211207502076047}
   - {fileID: 768079761}
   - {fileID: 539722466}
   - {fileID: 7004483782313389038}

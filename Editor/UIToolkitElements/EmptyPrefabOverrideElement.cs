@@ -1,4 +1,5 @@
 #if UNITY_2021_3_OR_NEWER
+using SaintsField.Editor.Core;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -6,6 +7,22 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
+    public class BlueBar : VisualElement
+    {
+        public BlueBar()
+        {
+            pickingMode = PickingMode.Ignore;
+            style.position = Position.Absolute;
+            style.display = DisplayStyle.None;
+            style.width = 2;
+            // backgroundColor = Color.cyan,
+            style.backgroundColor = new Color(5/255f, 147/255f, 224/255f);
+            style.top = 1;
+            style.bottom = 1;
+            style.left = -15;
+        }
+    }
+
     public class EmptyPrefabOverrideElement: VisualElement
     {
         private bool _overrideStyled;
@@ -16,48 +33,62 @@ namespace SaintsField.Editor.UIToolkitElements
         {
             this.TrackPropertyValue(property, p =>
             {
-                OverrideStyle(p.prefabOverride);
+                _overrideStyled = OverrideStyle(p, _overrideStyled, this, _blueBar);
             });
 
-            _blueBar = new VisualElement
-            {
-                pickingMode = PickingMode.Ignore,
-                style =
-                {
-                    position = Position.Absolute,
-                    display = DisplayStyle.None,
-                    width = 2,
-                    // backgroundColor = Color.cyan,
-                    backgroundColor = new Color(5/255f, 147/255f, 224/255f),
-                    top = 1,
-                    bottom = 1,
-                    left = -15,
-                },
-            };
+            _blueBar = new BlueBar();
 
             Add(_blueBar);
 
-            OverrideStyle(property.prefabOverride);
+            _overrideStyled = OverrideStyle(property, _overrideStyled, this, _blueBar);
         }
 
-        private void OverrideStyle(bool isOverride)
+        public static bool OverrideStyle(SerializedProperty property, bool currentOverride, VisualElement container, VisualElement blueBar)
         {
-            if (_overrideStyled == isOverride)
+            bool isOverride = property.prefabOverride;
+            if (currentOverride == isOverride)
             {
-                return;
+                return isOverride;
             }
 
             if (isOverride)
             {
-                AddToClassList(BindingExtensions.prefabOverrideUssClassName);
+                container.AddToClassList(BindingExtensions.prefabOverrideUssClassName);
             }
             else
             {
-                RemoveFromClassList(BindingExtensions.prefabOverrideUssClassName);
+                container.RemoveFromClassList(BindingExtensions.prefabOverrideUssClassName);
             }
 
-            _overrideStyled = isOverride;
-            _blueBar.style.display = isOverride ? DisplayStyle.Flex : DisplayStyle.None;
+            blueBar.style.display = isOverride ? DisplayStyle.Flex : DisplayStyle.None;
+            return isOverride;
+        }
+    }
+
+    public class FoldoutPrefabOverrideElement: Foldout
+    {
+        private bool _overrideStyled;
+
+        private readonly VisualElement _blueBar;
+
+        public FoldoutPrefabOverrideElement(SerializedProperty property)
+        {
+            this.TrackPropertyValue(property, p =>
+            {
+                _overrideStyled = EmptyPrefabOverrideElement.OverrideStyle(p, _overrideStyled, this, _blueBar);
+            });
+
+            _blueBar = new BlueBar
+            {
+                style =
+                {
+                    height = SaintsPropertyDrawer.SingleLineHeight,
+                },
+            };
+
+            hierarchy.Add(_blueBar);
+
+            _overrideStyled = EmptyPrefabOverrideElement.OverrideStyle(property, _overrideStyled, this, _blueBar);
         }
     }
 }
