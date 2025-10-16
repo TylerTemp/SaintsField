@@ -109,6 +109,10 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         long curId = (long) root.userData;
                         // ReSharper disable once InvertIf
                         long newId;
+                        if (!SerializedUtils.IsOk(property))
+                        {
+                            return;
+                        }
                         try
                         {
                             newId = property.managedReferenceId;

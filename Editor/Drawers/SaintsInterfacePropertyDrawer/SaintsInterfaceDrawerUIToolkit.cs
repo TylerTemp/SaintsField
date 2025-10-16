@@ -3,9 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
+using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -17,6 +20,8 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 {
     public partial class SaintsInterfaceDrawer
     {
+        protected override bool UseCreateFieldUIToolKit => true;
+
         private class SaintsInterfaceField : BaseField<Object>
         {
             public SaintsInterfaceField(string label, VisualElement visualInput) : base(label, visualInput)
@@ -28,7 +33,8 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
         private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _assetsObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
         private List<SaintsObjectPickerWindowUIToolkit.ObjectInfo> _sceneObjectInfos = new List<SaintsObjectPickerWindowUIToolkit.ObjectInfo>();
 
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             (string error, IWrapProp saintsInterfaceProp, int curInArrayIndex, object _) =
                 GetSerName(property, fieldInfo);
@@ -36,6 +42,43 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             {
                 return new HelpBox(error, HelpBoxMessageType.Error);
             }
+
+            (Type valueType, Type interfaceType) = GetTypes(property, fieldInfo);
+
+            VisualElement mainContainer = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                },
+            };
+
+            SerializedProperty isVRef = SerializedUtils.FindPropertyByAutoPropertyName(property, "IsVRef");
+            IsVRefButton isVRefButton = new IsVRefButton
+            {
+                bindingPath = isVRef.propertyPath,
+            };
+            mainContainer.Add(isVRefButton);
+
+            VisualElement columnContainer = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1,
+                    flexShrink = 1,
+                },
+            };
+            mainContainer.Add(columnContainer);
+
+            VisualElement objectContainer = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+
+                },
+            };
+            columnContainer.Add(objectContainer);
 
             SerializedProperty valueProp =
                 property.FindPropertyRelative(ReflectUtils.GetIWrapPropName(saintsInterfaceProp.GetType())) ??
@@ -80,20 +123,71 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 },
             };
 
-            VisualElement container = new VisualElement
+            objectContainer.Add(propertyField);
+            objectContainer.Add(selectButton);
+
+            VisualElement referenceContainer = new VisualElement();
+            columnContainer.Add(referenceContainer);
+            VisualElement referenceHContainer = new VisualElement
             {
                 style =
                 {
                     flexDirection = FlexDirection.Row,
-                    flexGrow = 1,
-                    flexShrink = 1,
                 },
             };
+            referenceContainer.Add(referenceHContainer);
 
-            container.Add(propertyField);
-            container.Add(selectButton);
+            SerializedProperty vRef = SerializedUtils.FindPropertyByAutoPropertyName(property, "VRef");
 
-            SaintsInterfaceField saintsInterfaceField = new SaintsInterfaceField(displayLabel, container)
+            Texture2D dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
+            Texture2D dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
+            bool expand = allAttributes.Any(each => each is DefaultExpandAttribute)
+                          || vRef.isExpanded;
+
+            Button referenceExpandButton = new Button
+            {
+                // text = "▶",
+                style =
+                {
+                    width = 18,
+                    marginLeft = 0,
+                    marginRight = 0,
+                    flexGrow = 0,
+                    flexShrink = 0,
+                    backgroundImage = expand? dropdownIcon :dropdownRightIcon,
+                    borderTopLeftRadius = 0,
+                    borderBottomLeftRadius = 0,
+#if UNITY_2022_2_OR_NEWER
+                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                    backgroundSize  = new BackgroundSize(12, 12),
+#else
+                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+                },
+            };
+            referenceHContainer.Add(referenceExpandButton);
+
+            UIToolkitUtils.DropdownButtonField dropdownBtn = UIToolkitUtils.ReferenceDropdownButtonField("", vRef, mainContainer, () => GetTypesImplementingInterface(interfaceType));
+            referenceHContainer.Add(dropdownBtn);
+            dropdownBtn.style.marginLeft = 0;
+            dropdownBtn.ButtonElement.style.borderTopLeftRadius = 0;
+            dropdownBtn.ButtonElement.style.borderBottomLeftRadius = 0;
+            dropdownBtn.labelElement.style.marginLeft = 0;
+            dropdownBtn.TrackPropertyValue(vRef, vr => dropdownBtn.ButtonLabelElement.text = UIToolkitUtils.GetReferencePropertyLabel(vr));
+
+            VisualElement saintsRowElement = SaintsRowAttributeDrawer.CreateElement(vRef, GetPreferredLabel(vRef), info,
+                true, new SaintsRowAttribute(inline: true), this, this, parent);
+            referenceContainer.Add(saintsRowElement);
+
+            UpdateExpand();
+            referenceExpandButton.clicked += UpdateExpand;
+
+            UpdateVRefChange();
+            mainContainer.TrackPropertyValue(isVRef, _ => UpdateVRefChange());
+
+            SaintsInterfaceField saintsInterfaceField = new SaintsInterfaceField(displayLabel, mainContainer)
             {
                 style =
                 {
@@ -101,11 +195,10 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                     flexShrink = 1,
                 },
             };
-            saintsInterfaceField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+            saintsInterfaceField.AddToClassList(ClassAllowDisable);
             saintsInterfaceField.AddToClassList(SaintsInterfaceField.alignedFieldUssClassName);
             saintsInterfaceField.SetValueWithoutNotify(valueProp.objectReferenceValue);
 
-            (Type valueType, Type interfaceType) = GetTypes(property, fieldInfo);
             Debug.Assert(valueType != null);
             Debug.Assert(interfaceType != null);
 
@@ -260,12 +353,74 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             saintsInterfaceField.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
                 SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshResults);
+                if(SerializedUtils.IsOk(isVRef))
+                {
+                    if (isVRef.boolValue)
+                    {
+                        if (valueProp.objectReferenceValue != null) // Don't keep a reference
+                        {
+                            valueProp.objectReferenceValue = null;
+                            valueProp.serializedObject.ApplyModifiedProperties();
+                        }
+                    }
+                    else
+                    {
+                        if (vRef.managedReferenceValue != null)
+                        {
+                            vRef.managedReferenceValue = null;
+                            vRef.serializedObject.ApplyModifiedProperties();
+                        }
+                    }
+                }
             });
 
-            UIToolkitUtils.AddContextualMenuManipulator(saintsInterfaceField, property,
-                () => {});
+            UIToolkitUtils.AddContextualMenuManipulator(saintsInterfaceField, property, () => {});
 
             return saintsInterfaceField;
+
+            void UpdateExpand()
+            {
+                vRef.isExpanded = !vRef.isExpanded;
+                vRef.serializedObject.ApplyModifiedProperties();
+                referenceExpandButton.style.backgroundImage = vRef.isExpanded ? dropdownIcon : dropdownRightIcon;
+                saintsRowElement.style.display = vRef.isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
+            void UpdateVRefChange()
+            {
+                if (isVRef.boolValue)
+                {
+                    objectContainer.style.display = DisplayStyle.None;
+                    referenceContainer.style.display = DisplayStyle.Flex;
+                    if (valueProp.objectReferenceValue != null)  // Don't keep a reference
+                    {
+                        valueProp.objectReferenceValue = null;
+                        valueProp.serializedObject.ApplyModifiedProperties();
+                    }
+                }
+                else
+                {
+                    objectContainer.style.display = DisplayStyle.Flex;
+                    referenceContainer.style.display = DisplayStyle.None;
+                    if (vRef.managedReferenceValue != null)
+                    {
+                        vRef.managedReferenceValue = null;
+                        vRef.serializedObject.ApplyModifiedProperties();
+                    }
+                }
+            }
+        }
+
+        private IReadOnlyList<Type> _cachedTypesImplementingInterface;
+
+        private IReadOnlyList<Type> GetTypesImplementingInterface(Type interfaceType)
+        {
+            return _cachedTypesImplementingInterface ??= AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => !type.IsAbstract
+                               &&!typeof(Object).IsAssignableFrom(type)
+                               && interfaceType.IsAssignableFrom(type))
+                .ToArray();
         }
 
         private bool _useCache;
@@ -436,8 +591,6 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 }
             }
         }
-
-
 
         private static IEnumerable<(Component, Type, int)> RevertComponents(GameObject go, Type fieldType, Type interfaceType)
         {
