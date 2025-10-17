@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
     [UxmlElement]
 #endif
     // ReSharper disable once PartialTypeWithSinglePart
-    public partial class IsVRefButton: VisualElement, INotifyValueChanged<bool>
+    public partial class IsVRefButton: BindableElement, INotifyValueChanged<bool>
     {
 #if !UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
         public new class UxmlTraits : BindableElement.UxmlTraits { }

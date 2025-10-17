@@ -49,12 +49,13 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             IsVRefButton isVRefButton = new IsVRefButton
             {
-                // this will trigger change twice for SaintsSerialized, do I bind the property twice?
-                // bindingPath = isVRef.propertyPath,
-                value = isVRef.boolValue,
+                bindingPath = isVRef.propertyPath,
             };
-            // isVRefButton.value = isVRef.boolValue;
             Add(isVRefButton);
+            isVRefButton.RegisterValueChangedCallback(v =>
+            {
+                UpdateVRefChange(v.newValue);
+            });
 
             VisualElement columnContainer = new VisualElement
             {
@@ -186,11 +187,6 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             _referenceExpandButton.clicked += UpdateExpand;
 
             UpdateVRefChange(isVRef.boolValue);
-            isVRefButton.RegisterValueChangedCallback(v =>
-            {
-                property.serializedObject.ApplyModifiedProperties();
-                UpdateVRefChange(v.newValue);
-            });
 
             Debug.Assert(valueType != null);
             Debug.Assert(interfaceType != null);

@@ -6,6 +6,7 @@ using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -51,6 +52,8 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 helper,
                 parent
             );
+
+            saintsInterfaceElement.Bind(property.serializedObject);
 
             // string displayLabel = curInArrayIndex == -1 ? property.displayName : $"Element {curInArrayIndex}";
             SaintsInterfaceField saintsInterfaceField = new SaintsInterfaceField(label, saintsInterfaceElement)

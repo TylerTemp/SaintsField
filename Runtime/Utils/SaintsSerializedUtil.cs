@@ -11,7 +11,7 @@ namespace SaintsField.Utils
         public static long OnBeforeSerializeDateTime(DateTime dt) => dt.Ticks;
         public static long OnBeforeSerializeTimeSpan(TimeSpan dt) => dt.Ticks;
 
-        public static SaintsSerializedProperty OnBeforeSerialize(object obj, Type type)
+        public static SaintsSerializedProperty OnBeforeSerialize(SaintsSerializedProperty serializedProp, object obj, Type type)
         {
             if (type.IsEnum)
             {
@@ -43,10 +43,16 @@ namespace SaintsField.Utils
             // ReSharper disable once InvertIf
             if (type.IsInterface)
             {
+                bool isVRef = false;
+                if(serializedProp.propertyType == SaintsPropertyType.Interface)
+                {
+                    isVRef = serializedProp.IsVRef;
+                }
                 if (RuntimeUtil.IsNull(obj))
                 {
                     return new SaintsSerializedProperty
                     {
+                        IsVRef = isVRef,
                         propertyType = SaintsPropertyType.Interface,
                     };
                 }
@@ -54,10 +60,10 @@ namespace SaintsField.Utils
                 // ReSharper disable once InvertIf
                 if (obj is UnityEngine.Object uObj)
                 {
-
                     return new SaintsSerializedProperty
                     {
                         propertyType = SaintsPropertyType.Interface,
+                        IsVRef =  false,
                         V = uObj,
                     };
                 }
@@ -113,15 +119,25 @@ namespace SaintsField.Utils
                 results = new SaintsSerializedProperty[objList.Count];
             }
 
+            List<SaintsSerializedProperty> serRef =
+                new List<SaintsSerializedProperty>(toFill ?? Array.Empty<SaintsSerializedProperty>());
+            if(serRef.Count < objList.Count)
+            {
+                for(int i = serRef.Count; i < objList.Count; i++)
+                {
+                    serRef.Add(new SaintsSerializedProperty());
+                }
+            }
+
             for (int i = 0; i < objList.Count; i++)
             {
                 if (inPlace)
                 {
-                    toFill[i]  = OnBeforeSerialize(objList[i], elementType);
+                    toFill[i]  = OnBeforeSerialize(serRef[i], objList[i], elementType);
                 }
                 else
                 {
-                    results[i] = OnBeforeSerialize(objList[i], elementType);
+                    results[i] = OnBeforeSerialize(serRef[i], objList[i], elementType);
                 }
             }
 

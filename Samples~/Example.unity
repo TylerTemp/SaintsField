@@ -34506,7 +34506,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: myInter1.<VRef>k__BackingField
-      value: 6921583314869157974
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: myInter2.<IsVRef>k__BackingField

@@ -2667,6 +2667,7 @@ namespace SaintsField.Editor.Utils
 
                         property.managedReferenceValue = instance;
                         property.serializedObject.ApplyModifiedProperties();
+                        Debug.Log($"set managedReferenceValue to {property.managedReferenceValue}");
                         return null;
                     }
                 ));
