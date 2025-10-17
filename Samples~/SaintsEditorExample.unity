@@ -2990,6 +2990,64 @@ MonoBehaviour:
     structString: 
   l2Enum: 0
   l2EnumLabel: 0
+--- !u!1 &936236851
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 936236852}
+  - component: {fileID: 936236853}
+  m_Layer: 0
+  m_Name: FixUsing
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &936236852
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 936236851}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &936236853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 936236851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 258b420de7d240649aef7882a2dd9fa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.FixUsing
+  _interface1__SaintsSerialized__:
+    propertyType: 4
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &938571252
 GameObject:
   m_ObjectHideFlags: 0
@@ -3837,6 +3895,7 @@ Transform:
   - {fileID: 1559042046}
   - {fileID: 889525105}
   - {fileID: 458616577}
+  - {fileID: 936236852}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1196999815
@@ -4517,10 +4576,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerDateTimeExample
   myClass:
-    _dtArray__SaintsSerialized__: 309ce08c3d0bde08
+    _dtArray__SaintsSerialized__: 
   s: 
-  _dt__SaintsSerialized__: 638960538196290000
-  _dtList__SaintsSerialized__: 504f0c60390bde08
+  _dt__SaintsSerialized__: 0
+  _dtList__SaintsSerialized__: 
   dt__SaintsSerialized__: 0
 --- !u!4 &1353093774
 Transform:
@@ -4567,9 +4626,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SerTimeSpanExample
   myClass:
-    _dtArray__SaintsSerialized__: 0000000000000000
-  _dt__SaintsSerialized__: 1080123300000
-  _dtList__SaintsSerialized__: 0000000000000000
+    _dtArray__SaintsSerialized__: 
+  _dt__SaintsSerialized__: 0
+  _dtList__SaintsSerialized__: 
   dt__SaintsSerialized__: 0
   s__SaintsSerialized__: 0
 --- !u!4 &1359646099
@@ -6352,7 +6411,7 @@ MonoBehaviour:
       propertyPath: 
       longValue: 0
       uLongValue: 0
-      V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
+      V: {fileID: 0}
       VRef:
         rid: -2
       IsVRef: 0
@@ -6363,41 +6422,15 @@ MonoBehaviour:
     uLongValue: 0
     V: {fileID: 0}
     VRef:
-      rid: 6921583314869157985
-    IsVRef: 1
-  _interface1Arr__SaintsSerialized__:
-  - propertyType: 4
-    propertyPath: 
-    longValue: 0
-    uLongValue: 0
-    V: {fileID: 0}
-    VRef:
-      rid: 6921583314869157986
-    IsVRef: 1
-  _interface1Lis__SaintsSerialized__:
-  - propertyType: 4
-    propertyPath: 
-    longValue: 0
-    uLongValue: 0
-    V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
-    VRef:
       rid: -2
     IsVRef: 0
+  _interface1Arr__SaintsSerialized__: []
+  _interface1Lis__SaintsSerialized__: []
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6921583314869157985
-      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: today.comes.saintsfield.Samples}
-      data:
-        common: 0
-        structString: A Serializable Struct!
-    - rid: 6921583314869157986
-      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: today.comes.saintsfield.Samples}
-      data:
-        common: 0
-        structString: 
 --- !u!4 &1956168136
 Transform:
   m_ObjectHideFlags: 0
