@@ -94,11 +94,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.34.0**
+**4.36.0**
 
-1.  UI Toolkit: Add `TimeSpan` for "Extended Serialization". You can now serialize a `TimeSpan` field/property.
-2.  UI Toolkit: Add `[TimeSpan]` attribute to allow you pick a datetime using `long` type
-3.  UI Toolkit: Add `[ShowInInspector][TimeSpan]` for `long` to allow showing a `long` value as a `TimeSpan`
+1.  You can now directly serialize an interface field with extended serialization.
+2.  Fix `EnumToggleButtons` expand issue in extended serialization.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4790,7 +4789,7 @@ public DateTime MyDateTime => new DateTime(dt);
 
 [![video](https://github.com/user-attachments/assets/2d3bdbce-c00e-4045-9efa-a825bedf0ad0)](https://github.com/user-attachments/assets/96441a7c-8cee-4614-b1e6-3843a193a1e4)
 
-#### `TimeSpan` #### 
+#### `TimeSpan` ####
 
 Allows you to set a timespan using `long` type.
 
@@ -4876,7 +4875,7 @@ You can install it using any method below:
 [**OpenUPM Uplink**](https://openupm.com/nuget/#using-uplinked-unitynuget)
 
 ```bash
-openupm add org.nuget.microsoft.codeanalysis.csharp 
+openupm add org.nuget.microsoft.codeanalysis.csharp
 ```
 
 Then go `Window` - `Saints` - `Enable Code Analysis...`
@@ -7297,7 +7296,7 @@ public partial class MyBehavior: MonoBehaviour
         Second,
         Third,
     }
-    
+
     [FormerlySerializedAs("MyOldName")]  // FormerlySerializedAs works too
     [NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumPub;
     [NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalPub;
@@ -7309,7 +7308,7 @@ public partial class MyBehavior: MonoBehaviour
     {
         [NonSerialized, SaintsSerialized]  // This work inside a normal class/struct. Note the `partial`!
         public MyULongEmun myEnum;
-    } 
+    }
 
     // We don't need `SaintsSerialized` for this field
     public MyClass myClass;
@@ -7333,7 +7332,7 @@ Serialize a `DateTime` type.
 ```csharp
 using SaintsField;
 
-// set as partial 
+// set as partial
 public partial class SerDateTimeExample : MonoBehaviour
 {
     [SaintsSerialized]
