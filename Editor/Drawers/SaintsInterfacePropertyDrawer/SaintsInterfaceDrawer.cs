@@ -168,7 +168,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
         }
 
-        private static (bool isMatch, Object result) GetSerializedObject(Object selectedObject, Type fieldType,
+        public static (bool isMatch, Object result) GetSerializedObject(Object selectedObject, Type fieldType,
             Type interfaceType)
         {
             bool fieldTypeIsComponent = typeof(Component).IsAssignableFrom(fieldType);
@@ -241,7 +241,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
         }
 
-        private static (string error, IWrapProp propInfo, int index, object parent) GetSerName(SerializedProperty property, FieldInfo fieldInfo)
+        private static (string error, IWrapProp propInfo, int index, object parent) GetSerName(SerializedProperty property, MemberInfo fieldInfo)
         {
             (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(property);
 

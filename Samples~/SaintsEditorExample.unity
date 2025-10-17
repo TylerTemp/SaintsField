@@ -1336,8 +1336,24 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: _uLongEnumPri__SaintsSerialized__.uLongValue
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: LongEnumPubArr__SaintsSerialized__.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[0].VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[1].VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: LongEnumPubArr__SaintsSerialized__.Array.data[0].VRef
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: LongEnumPubArr__SaintsSerialized__.Array.data[0].longValue
@@ -6301,6 +6317,64 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1956168134
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1956168136}
+  - component: {fileID: 1956168135}
+  m_Layer: 0
+  m_Name: SerInterface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1956168135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956168134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80dd50fa08b0f5245b54953641a16dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerInterfaceExample
+  _interface1__SaintsSerialized__:
+    propertyType: 4
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!4 &1956168136
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956168134}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1961094008
 GameObject:
   m_ObjectHideFlags: 0
@@ -6901,3 +6975,4 @@ SceneRoots:
   - {fileID: 1353093774}
   - {fileID: 1359646099}
   - {fileID: 315419262}
+  - {fileID: 1956168136}

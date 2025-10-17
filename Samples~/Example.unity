@@ -34501,21 +34501,25 @@ PrefabInstance:
     m_TransformParent: {fileID: 867320293}
     m_Modifications:
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: i1.<V>k__BackingField
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: i1.<VRef>k__BackingField
-      value: 6921583294834278615
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: i1.<IsVRef>k__BackingField
+      propertyPath: myInter1.<VRef>k__BackingField
+      value: 6921583314869157974
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: myInter2.<IsVRef>k__BackingField
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: myInter1.<V>k__BackingField
-      value: 
-      objectReference: {fileID: 910818279}
+      propertyPath: mySoInter2.<IsVRef>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: myAnyInter2.<IsVRef>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: 'managedReferences[6921583294834278585]'
       value: Unity.VisualScripting.YamlDotNet Unity.VisualScripting.YamlDotNet.Core.Emitter/TagData
@@ -34625,9 +34629,25 @@ PrefabInstance:
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: myInherentInterface1.<V>k__BackingField
-      value: 
-      objectReference: {fileID: 1389853056}
+      propertyPath: 'managedReferences[6921583314869157966]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: 'managedReferences[6921583314869157971]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: 'managedReferences[6921583314869157972]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: 'managedReferences[6921583314869157973]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: 'managedReferences[6921583314869157974]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
+      objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: managedReferences[6921583294834278585].handle
       value: 
@@ -34741,6 +34761,26 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157966].common
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157971].common
+      value: 132
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157972].common
+      value: 222
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157973].common
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157974].common
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: managedReferences[6921583294834278591].classString
       value: 
       objectReference: {fileID: 0}
@@ -34786,6 +34826,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: managedReferences[6921583294834278614].classString
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157972].classString
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
@@ -34844,9 +34888,25 @@ PrefabInstance:
       propertyPath: managedReferences[6921583294834278615].structString
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157966].structString
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157971].structString
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157973].structString
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[6921583314869157974].structString
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 936262743411558942, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: m_Name
-      value: InterfaceExample
+      value: SaintsInterfaceExample
       objectReference: {fileID: 0}
     - target: {fileID: 1316916096917999234, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: m_LocalPosition.x

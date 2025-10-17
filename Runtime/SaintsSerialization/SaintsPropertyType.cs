@@ -12,5 +12,6 @@ namespace SaintsField.SaintsSerialization
         EnumULong = 2,
 #endif
         ClassOrStruct = 3,
+        Interface = 4,
     }
 }
