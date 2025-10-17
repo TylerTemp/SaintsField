@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.36.0 ##
+
+1.  You can now directly serialize an interface field with extended serialization.
+2.  Fix `EnumToggleButtons` expand issue in extended serialization.
+
 ## 4.35.0 ##
 
 1.  `SaintsInterface<>` now support serializable class/struct, together with unity object. [#275](https://github.com/TylerTemp/SaintsField/issues/275)

@@ -94,11 +94,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.34.0**
+**4.36.0**
 
-1.  UI Toolkit: Add `TimeSpan` for "Extended Serialization". You can now serialize a `TimeSpan` field/property.
-2.  UI Toolkit: Add `[TimeSpan]` attribute to allow you pick a datetime using `long` type
-3.  UI Toolkit: Add `[ShowInInspector][TimeSpan]` for `long` to allow showing a `long` value as a `TimeSpan`
+1.  You can now directly serialize an interface field with extended serialization.
+2.  Fix `EnumToggleButtons` expand issue in extended serialization.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4838,7 +4837,7 @@ public DateTime MyDateTime => new DateTime(dt);
 
 [![video](https://github.com/user-attachments/assets/2d3bdbce-c00e-4045-9efa-a825bedf0ad0)](https://github.com/user-attachments/assets/96441a7c-8cee-4614-b1e6-3843a193a1e4)
 
-#### `TimeSpan` #### 
+#### `TimeSpan` ####
 
 Allows you to set a timespan using `long` type.
 
@@ -4924,7 +4923,7 @@ You can install it using any method below:
 [**OpenUPM Uplink**](https://openupm.com/nuget/#using-uplinked-unitynuget)
 
 ```bash
-openupm add org.nuget.microsoft.codeanalysis.csharp 
+openupm add org.nuget.microsoft.codeanalysis.csharp
 ```
 
 Then go `Window` - `Saints` - `Enable Code Analysis...`
@@ -6490,6 +6489,11 @@ See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samp
 
 You can access the interface with the `.I` field, actual unity object with `.V` field, and actual serializable class/struct with `.VRef` field.
 
+> [!TIPS]
+> This will requires you to use `.I` to access the interface.
+> You may want to see [Extended Serialization](https://saintsfield.comes.today/extended-serialization) to directly serialize a `interface` type.
+
+
 It provides a drawer to let you only select the object that implements the interface.
 
 You can toggle the button at left to toggle either you want an unity instance (object, prefab, scriptableObject etc) or a serializable class/struct.
@@ -7299,8 +7303,6 @@ If you are interested, here is how to use it.
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
 
-
-
 ## Extended Serialization ##
 
 > [!WARNING]
@@ -7345,7 +7347,7 @@ public partial class MyBehavior: MonoBehaviour
         Second,
         Third,
     }
-    
+
     [FormerlySerializedAs("MyOldName")]  // FormerlySerializedAs works too
     [NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumPub;
     [NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalPub;
@@ -7357,7 +7359,7 @@ public partial class MyBehavior: MonoBehaviour
     {
         [NonSerialized, SaintsSerialized]  // This work inside a normal class/struct. Note the `partial`!
         public MyULongEmun myEnum;
-    } 
+    }
 
     // We don't need `SaintsSerialized` for this field
     public MyClass myClass;
@@ -7381,7 +7383,7 @@ Serialize a `DateTime` type.
 ```csharp
 using SaintsField;
 
-// set as partial 
+// set as partial
 public partial class SerDateTimeExample : MonoBehaviour
 {
     [SaintsSerialized]
@@ -7444,6 +7446,42 @@ public partial class SerTimeSpanExample : SaintsMonoBehaviour
 ```
 
 ![](https://github.com/user-attachments/assets/cd6b1135-6935-4366-940a-6f0c2a550c2f)
+
+### `interface`  ###
+
+> [!WARNING]
+> This feature is still experimental
+
+Serialize any interface type, either of a Unity Object, or a serializable class/struct.
+
+This is the same as `SaintsInterface<>`, but now you can simply use the interface type directly.
+
+**IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set all parent class/struct to `partial`
+
+```csharp
+using SaintsField;
+
+// Note the `partial`!
+public partial class SerInterfaceExample : SaintsMonoBehaviour
+{
+    [SaintsSerialized] private IInterface1 _interface1;
+}
+
+// use in a normal class/struct, set parents partial recursively
+public partial class SerInterfaceExample : SaintsMonoBehaviour
+{
+    // Use inside class/struct, you need to set as `partial`, together with all it's container
+    [Serializable]
+    public partial struct SerInterfaceStruct
+    {
+        [SaintsSerialized] private IInterface1 _interface1InStruct;
+    }
+
+    public SerInterfaceStruct structWithInterface;
+}
+```
+
+![](https://github.com/user-attachments/assets/73f25e31-affb-43c5-a7c6-0bc0c47e3a8f)
 
 ## `SaintsEditorWindow` ##
 

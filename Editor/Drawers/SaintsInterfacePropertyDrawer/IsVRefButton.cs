@@ -1,5 +1,6 @@
 #if UNITY_2022_2_OR_NEWER
 using SaintsField.Editor.Utils;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
@@ -36,13 +37,18 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             _button.tooltip = "Unity Instance";
             // _styleBackground = _button.style.backgroundImage;
 
-            _button.clicked += () => value = !value;
+            _button.clicked += () =>
+            {
+                // Debug.Log($"clicked on {value}");
+                value = !value;
+            };
         }
 
         private bool _curValue;
 
         public void SetValueWithoutNotify(bool newValue)
         {
+            // Debug.Log($"SetValueWithoutNotify {newValue}");
             _curValue = newValue;
             string newText;
             string tooltipText;
@@ -72,6 +78,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             get => _curValue;
             set
             {
+                // Debug.Log($"set value {value}");
                 if (value == _curValue)
                 {
                     return;

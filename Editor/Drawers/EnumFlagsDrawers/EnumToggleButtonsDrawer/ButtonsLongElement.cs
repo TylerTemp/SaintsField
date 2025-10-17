@@ -16,7 +16,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
     public class ButtonsLongField : ButtonsGenField<ulong>
     {
-        public ButtonsLongField(string label, ButtonsGenElement<ulong> visualInput, UnityEvent<bool> onExpandChanged) : base(label, visualInput, onExpandChanged)
+        public ButtonsLongField(string label, ExpandableButtonsElement visualInput) : base(label, visualInput)
         {
         }
     }

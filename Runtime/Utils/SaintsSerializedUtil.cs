@@ -11,35 +11,72 @@ namespace SaintsField.Utils
         public static long OnBeforeSerializeDateTime(DateTime dt) => dt.Ticks;
         public static long OnBeforeSerializeTimeSpan(TimeSpan dt) => dt.Ticks;
 
-        public static SaintsSerializedProperty OnBeforeSerialize(object obj, Type type)
+        public static SaintsSerializedProperty OnBeforeSerialize(SaintsSerializedProperty serializedProp, object obj, Type type)
         {
-            if (!type.IsEnum)
+            if (type.IsEnum)
             {
-                return new SaintsSerializedProperty();
-            }
-
-            Type underType = Enum.GetUnderlyingType(type);
-            if (underType == typeof(long))
-            {
-                return new SaintsSerializedProperty
+                Type underType = Enum.GetUnderlyingType(type);
+                if (underType == typeof(long))
                 {
-                    propertyType = SaintsPropertyType.EnumLong,
-                    longValue = Convert.ToInt64(obj)
-                };
-            }
+                    return new SaintsSerializedProperty
+                    {
+                        propertyType = SaintsPropertyType.EnumLong,
+                        longValue = Convert.ToInt64(obj),
+                    };
+                }
 
 #if UNITY_2022_1_OR_NEWER
-            if (underType == typeof(ulong))
-            {
-                return new SaintsSerializedProperty
+                if (underType == typeof(ulong))
                 {
-                    propertyType = SaintsPropertyType.EnumULong,
-                    uLongValue = Convert.ToUInt64(obj)
-                };
-            }
+                    return new SaintsSerializedProperty
+                    {
+                        propertyType = SaintsPropertyType.EnumULong,
+                        uLongValue = Convert.ToUInt64(obj)
+                    };
+                }
 #endif
 
-            throw new NotSupportedException($"SaintsSerializedUtil OnBeforeSerialize not support enum underlying type {underType.FullName}");
+                throw new NotSupportedException(
+                    $"SaintsSerializedUtil OnBeforeSerialize not support enum underlying type {underType.FullName}");
+            }
+
+            // ReSharper disable once InvertIf
+            if (type.IsInterface)
+            {
+                bool isVRef = false;
+                if(serializedProp.propertyType == SaintsPropertyType.Interface)
+                {
+                    isVRef = serializedProp.IsVRef;
+                }
+                if (RuntimeUtil.IsNull(obj))
+                {
+                    return new SaintsSerializedProperty
+                    {
+                        IsVRef = isVRef,
+                        propertyType = SaintsPropertyType.Interface,
+                    };
+                }
+
+                // ReSharper disable once InvertIf
+                if (obj is UnityEngine.Object uObj)
+                {
+                    return new SaintsSerializedProperty
+                    {
+                        propertyType = SaintsPropertyType.Interface,
+                        IsVRef =  false,
+                        V = uObj,
+                    };
+                }
+
+                return new SaintsSerializedProperty
+                {
+                    propertyType = SaintsPropertyType.Interface,
+                    VRef = obj,
+                    IsVRef = true,
+                };
+            }
+
+            return new SaintsSerializedProperty();
         }
 
         // public static void OnBeforeSerializeArray<T>(ref SaintsSerializedProperty[] toFill, ref T[] objList, Type elementType)
@@ -82,15 +119,25 @@ namespace SaintsField.Utils
                 results = new SaintsSerializedProperty[objList.Count];
             }
 
+            List<SaintsSerializedProperty> serRef =
+                new List<SaintsSerializedProperty>(toFill ?? Array.Empty<SaintsSerializedProperty>());
+            if(serRef.Count < objList.Count)
+            {
+                for(int i = serRef.Count; i < objList.Count; i++)
+                {
+                    serRef.Add(new SaintsSerializedProperty());
+                }
+            }
+
             for (int i = 0; i < objList.Count; i++)
             {
                 if (inPlace)
                 {
-                    toFill[i]  = OnBeforeSerialize(objList[i], elementType);
+                    toFill[i]  = OnBeforeSerialize(serRef[i], objList[i], elementType);
                 }
                 else
                 {
-                    results[i] = OnBeforeSerialize(objList[i], elementType);
+                    results[i] = OnBeforeSerialize(serRef[i], objList[i], elementType);
                 }
             }
 
@@ -189,6 +236,20 @@ namespace SaintsField.Utils
                     }
                     return (T)Convert.ChangeType(saintsSerializedProperty.uLongValue, targetType);
 #endif
+                case SaintsPropertyType.Interface:
+                {
+                    if (saintsSerializedProperty.IsVRef)
+                    {
+                        return (T)saintsSerializedProperty.VRef;
+                    }
+
+                    if (RuntimeUtil.IsNull(saintsSerializedProperty.V))
+                    {
+                        return default;
+                    }
+
+                    return (T)(object)saintsSerializedProperty.V;
+                }
                 case SaintsPropertyType.Undefined:
                     return targetType.IsValueType ? (T)Activator.CreateInstance(targetType) : default;
                 default:

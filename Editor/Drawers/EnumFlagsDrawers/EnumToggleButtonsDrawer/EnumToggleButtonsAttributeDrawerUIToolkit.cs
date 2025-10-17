@@ -261,51 +261,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
-            Button expandButton = CreateExpandButtonUIToolkit();
+            Button expandButton = new ExpandButton();
             expandButton.name = NameFoldout(property);
-            return expandButton;
-        }
-
-        public static Button CreateExpandButtonUIToolkit()
-        {
-            Button expandButton = new Button
-            {
-                style =
-                {
-                    width = EditorGUIUtility.singleLineHeight,
-                    height = EditorGUIUtility.singleLineHeight,
-                    paddingTop = 0,
-                    paddingBottom = 0,
-                    paddingLeft = 0,
-                    paddingRight = 0,
-                    backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-left.png"),
-                    position = Position.Absolute,
-                    top = 0,
-                    right = 0,
-                    bottom = 0,
-
-                    backgroundColor = Color.clear,
-                    borderLeftWidth = 0,
-                    borderRightWidth = 0,
-                    borderTopWidth = 0,
-                    borderBottomWidth = 0,
-
-#if UNITY_2022_2_OR_NEWER
-                    backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                    backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                    backgroundSize  = new BackgroundSize(EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight),
-#else
-                    unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                },
-
-            };
-
-            StyleSheet rotateUss = Util.LoadResource<StyleSheet>("UIToolkit/RightFoldoutRotate.uss");
-            expandButton.styleSheets.Add(rotateUss);
-            expandButton.AddToClassList("saints-right-foldout-rotate");
-
             return expandButton;
         }
 
