@@ -112,7 +112,7 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-Change the label text of a field. (To change element label of an array/list, use `RichLabel` instead.)
+Change the label text of a field. (To change element label of an array/list, use `FieldLabelText` instead.)
 
 Parameters:
 
@@ -170,10 +170,10 @@ Parameters:
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
-[RichLabel("<color=lame>It's Labeled!")]
+[LabelText("<color=lame>It's Labeled!")]
 public List<string> myList;
 
-[RichLabel("$" + nameof(MethodLabel))]
+[LabelText("$" + nameof(MethodLabel))]
 public string[] myArray;
 
 private string MethodLabel(string[] values)
@@ -183,6 +183,50 @@ private string MethodLabel(string[] values)
 ```
 
 ![PlayaRichLabel](https://github.com/TylerTemp/SaintsField/assets/6391063/fbc132fc-978a-4b35-9a69-91fcb72db55a)
+
+Example of using `<field />` to display field value/propery value:
+
+```csharp
+using SaintsField;
+
+public class SubField : MonoBehaviour
+{
+    [SerializeField] private string _subLabel;
+
+    public double doubleVal;
+}
+
+[Separator("Field")]
+// read field value
+[LabelText("<color=lime><field/>")] public string fieldLabel;
+// read the `_subLabel` field/function from the field
+[LabelText("<field._subLabel/>"), GetComponentInChildren, Expandable] public SubField subField;
+// again read the property
+[LabelText("<color=lime><field.gameObject.name/>")] public SubField subFieldName;
+
+[Separator("Field Null")]
+// not found target will be rendered as empty string
+[LabelText("<field._subLabel/>")] public SubField notFoundField;
+[LabelText("<field._noSuch/>"), GetComponentInChildren] public SubField notFoundField2;
+
+[Separator("Formatter")]
+// format as percent
+[LabelText("<field=P2/>"), PropRange(0f, 1f)] public float percent;
+// format `doubleVal` field as exponential
+[LabelText("<field.doubleVal=E/>")] public SubField subFieldCurrency;
+```
+
+[![video](https://github.com/user-attachments/assets/dc65d897-fcbf-4a40-b4aa-d99a8a4975a7)](https://github.com/user-attachments/assets/a6d93600-500b-4a0e-bf2d-9f2e8fb8bc32)
+
+Example of quoted fancy formatting:
+
+```csharp
+[LabelText("<field=\">><color=yellow>{0}</color><<\"/> <index=\"[<color=blue>>></color>{0}<color=blue><<</color>]\"/>")]
+public string[] sindices;
+```
+
+![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
+
 
 #### `FieldLabelText`/`NoLabel` ####
 
@@ -240,11 +284,9 @@ Like `LabelText`, but it can be applied to an array/list to change the element l
 
     This is override to be `true` when `richLabelXml` starts with `$`
 
-*   AllowMultiple: No. A field can only have one `RichLabel`
+*   AllowMultiple: No. A field can only have one `LabelText`
 
-`[NoLabel]` is a shortcut for `[RichLabel(null)]`
-
-Special Note:
+`[NoLabel]` is a shortcut for `[FieldLabelText(null)]`
 
 Use it on an array/list will apply it to all the direct child element instead of the field label itself.
 You can use this to modify elements of an array/list field, in this way:
@@ -253,41 +295,12 @@ You can use this to modify elements of an array/list field, in this way:
 2.  It'll pass the element value and index to your function
 3.  Return the desired label content from the function
 
-```csharp
-using SaintsField;
-
-[LabelText("<color=indigo><icon=eye.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
-public string _rainbow;
-
-[LabelText("$" + nameof(LabelCallback))]
-public bool _callbackToggle;
-private string LabelCallback() => _callbackToggle ? "<color=green><icon=eye.png /></color> <label/>" : "<icon=eye-slash.png /> <label/>";
-
-[Space]
-[LabelText("$" + nameof(_propertyLabel))]
-public string _propertyLabel;
-private string _rainbow;
-
-[Serializable]
-private struct MyStruct
-{
-    [LabelText("<color=green>HI!</color>")]
-    public float LabelFloat;
-}
-
-[SerializeField]
-[LabelText("<color=green>Fixed For Struct!</color>")]
-private MyStruct _myStructWorkAround;
-```
-
-[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/5e865350-6eeb-4f2a-8305-c7d8b8720eac)](https://github.com/TylerTemp/SaintsField/assets/6391063/25f6c7cc-ee7e-444e-b078-007dd6df499e)
-
 Here is an example of using on an array:
 
 ```csharp
 using SaintsField;
 
-[RichLabel(nameof(ArrayLabels), true)]
+[FieldLabelText("$" + nameof(ArrayLabels))]
 public string[] arrayLabels;
 
 // if you do not care about the actual value, use `object` as the first parameter
@@ -296,48 +309,6 @@ private string ArrayLabels(object _, int index) => $"<color=pink>[{(char)('A' + 
 
 ![label_array](https://github.com/TylerTemp/SaintsField/assets/6391063/232da62c-9e31-4415-a09a-8e1e95ae9441)
 
-Example of using `<field />` to display field value/propery value:
-
-```csharp
-using SaintsField;
-
-public class SubField : MonoBehaviour
-{
-    [SerializeField] private string _subLabel;
-
-    public double doubleVal;
-}
-
-[Separator("Field")]
-// read field value
-[RichLabel("<color=lime><field/>")] public string fieldLabel;
-// read the `_subLabel` field/function from the field
-[RichLabel("<field._subLabel/>"), GetComponentInChildren, Expandable] public SubField subField;
-// again read the property
-[RichLabel("<color=lime><field.gameObject.name/>")] public SubField subFieldName;
-
-[Separator("Field Null")]
-// not found target will be rendered as empty string
-[RichLabel("<field._subLabel/>")] public SubField notFoundField;
-[RichLabel("<field._noSuch/>"), GetComponentInChildren] public SubField notFoundField2;
-
-[Separator("Formatter")]
-// format as percent
-[RichLabel("<field=P2/>"), PropRange(0f, 1f)] public float percent;
-// format `doubleVal` field as exponential
-[RichLabel("<field.doubleVal=E/>")] public SubField subFieldCurrency;
-```
-
-[![video](https://github.com/user-attachments/assets/dc65d897-fcbf-4a40-b4aa-d99a8a4975a7)](https://github.com/user-attachments/assets/a6d93600-500b-4a0e-bf2d-9f2e8fb8bc32)
-
-Example of quoted fancy formatting:
-
-```csharp
-[RichLabel("<field=\">><color=yellow>{0}</color><<\"/> <index=\"[<color=blue>>></color>{0}<color=blue><<</color>]\"/>")]
-public string[] sindices;
-```
-
-![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
 
 #### `FieldAboveText` / `FieldBelowText` ####
 
