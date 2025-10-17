@@ -6346,12 +6346,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80dd50fa08b0f5245b54953641a16dd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerInterfaceExample
+  structWithInterface:
+    _interface1InStruct__SaintsSerialized__:
+      propertyType: 4
+      propertyPath: 
+      longValue: 0
+      uLongValue: 0
+      V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
+      VRef:
+        rid: -2
+      IsVRef: 0
   _interface1__SaintsSerialized__:
     propertyType: 4
     propertyPath: 
     longValue: 0
     uLongValue: 0
     V: {fileID: 0}
+    VRef:
+      rid: 6921583314869157985
+    IsVRef: 1
+  _interface1Arr__SaintsSerialized__:
+  - propertyType: 4
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: 6921583314869157986
+    IsVRef: 1
+  _interface1Lis__SaintsSerialized__:
+  - propertyType: 4
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
     VRef:
       rid: -2
     IsVRef: 0
@@ -6360,6 +6388,16 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 6921583314869157985
+      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: today.comes.saintsfield.Samples}
+      data:
+        common: 0
+        structString: A Serializable Struct!
+    - rid: 6921583314869157986
+      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: today.comes.saintsfield.Samples}
+      data:
+        common: 0
+        structString: 
 --- !u!4 &1956168136
 Transform:
   m_ObjectHideFlags: 0

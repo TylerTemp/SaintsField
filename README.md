@@ -6441,6 +6441,11 @@ See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samp
 
 You can access the interface with the `.I` field, actual unity object with `.V` field, and actual serializable class/struct with `.VRef` field.
 
+> [!TIPS]
+> This will requires you to use `.I` to access the interface.
+> You may want to see [Extended Serialization](https://saintsfield.comes.today/extended-serialization) to directly serialize a `interface` type.
+
+
 It provides a drawer to let you only select the object that implements the interface.
 
 You can toggle the button at left to toggle either you want an unity instance (object, prefab, scriptableObject etc) or a serializable class/struct.
@@ -7250,8 +7255,6 @@ If you are interested, here is how to use it.
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
 
-
-
 ## Extended Serialization ##
 
 > [!WARNING]
@@ -7395,6 +7398,42 @@ public partial class SerTimeSpanExample : SaintsMonoBehaviour
 ```
 
 ![](https://github.com/user-attachments/assets/cd6b1135-6935-4366-940a-6f0c2a550c2f)
+
+### `interface`  ###
+
+> [!WARNING]
+> This feature is still experimental
+
+Serialize any interface type, either of a Unity Object, or a serializable class/struct.
+
+This is the same as `SaintsInterface<>`, but now you can simply use the interface type directly.
+
+**IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set all parent class/struct to `partial`
+
+```csharp
+using SaintsField;
+
+// Note the `partial`!
+public partial class SerInterfaceExample : SaintsMonoBehaviour
+{
+    [SaintsSerialized] private IInterface1 _interface1;
+}
+
+// use in a normal class/struct, set parents partial recursively
+public partial class SerInterfaceExample : SaintsMonoBehaviour
+{
+    // Use inside class/struct, you need to set as `partial`, together with all it's container
+    [Serializable]
+    public partial struct SerInterfaceStruct
+    {
+        [SaintsSerialized] private IInterface1 _interface1InStruct;
+    }
+
+    public SerInterfaceStruct structWithInterface;
+}
+```
+
+![](https://github.com/user-attachments/assets/73f25e31-affb-43c5-a7c6-0bc0c47e3a8f)
 
 ## `SaintsEditorWindow` ##
 
