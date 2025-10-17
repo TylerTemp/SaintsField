@@ -69,7 +69,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             Debug.Assert(fieldType.IsEnum, fieldType);
             bool isFlags = Attribute.IsDefined(fieldType, typeof(FlagsAttribute));
 
-
             // const string nameFillEmpty = DrawEnumClassName + "-fill-empty";
             DrawPayload refDrawPayload;
             if(oldElement != null && oldElement.ClassListContains(DrawEnumClassName))
@@ -360,7 +359,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             }
             container.Add(enumFlagsField);
 
-            Button expandButton = CreateExpandButtonUIToolkit();
+            Button expandButton = new ExpandButton();
             container.Add(expandButton);
 
             VisualElement belowContainer = new VisualElement

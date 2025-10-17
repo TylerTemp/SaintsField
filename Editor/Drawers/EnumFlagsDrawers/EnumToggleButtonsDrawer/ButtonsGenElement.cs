@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
         public readonly Button hToggleButton;
         public readonly Button hCheckAllButton;
         public readonly Button hEmptyButton;
-        public readonly IReadOnlyList<Button> ToggleButtons = new List<Button>();
+        public readonly IReadOnlyList<Button> ToggleButtons;
         public readonly Button fillEmptyButton;
 
         // private readonly Action<object> SetValue;
@@ -62,6 +62,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 style =
                 {
                     flexDirection = FlexDirection.Row,
+                    flexShrink = 0,
+                    flexGrow = 0,
                 },
             };
             Add(quickCheckButtons);
@@ -360,17 +362,89 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
     }
 
-    public class ButtonsGenField<T> : BaseField<T>
+    public class ExpandButton: Button
     {
-        public readonly Button ExpandButton;
-
-        public ButtonsGenField(string label, ButtonsGenElement<T> visualInput, UnityEvent<bool> onExpandButtonClicked) : base(label, visualInput)
+        public ExpandButton()
         {
-            visualInput.style.paddingRight = 22;
-            ExpandButton = EnumToggleButtonsAttributeDrawer.CreateExpandButtonUIToolkit();
-            visualInput.Add(ExpandButton);
+            style.width = EditorGUIUtility.singleLineHeight;
+            style.height = EditorGUIUtility.singleLineHeight;
+            style.paddingTop = 0;
+            style.paddingBottom = 0;
+            style.paddingLeft = 0;
+            style.paddingRight = 0;
+            style.backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown-left.png");
+            style.position = Position.Absolute;
+            style.top = 0;
+            style.right = 0;
+            style.bottom = 0;
+
+            style.backgroundColor = Color.clear;
+            style.borderLeftWidth = 0;
+            style.borderRightWidth = 0;
+            style.borderTopWidth = 0;
+            style.borderBottomWidth = 0;
+
+#if UNITY_2022_2_OR_NEWER
+            style.backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center);
+            style.backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center);
+            style.backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat);
+            style.backgroundSize  = new BackgroundSize(EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight);
+#else
+            style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+#endif
+            StyleSheet rotateUss = Util.LoadResource<StyleSheet>("UIToolkit/RightFoldoutRotate.uss");
+            styleSheets.Add(rotateUss);
+            AddToClassList("saints-right-foldout-rotate");
+        }
+
+    }
+
+    public class ExpandableButtonsElement: VisualElement
+    {
+        public readonly ExpandButton ExpandButton;
+
+        public ExpandableButtonsElement(VisualElement visualInput, UnityEvent<bool> onExpandButtonClicked)
+        {
+            // VisualElement wrapper = new VisualElement();
+            Add(visualInput);
+
+            visualInput.style.marginRight = 20;
+            visualInput.style.overflow = Overflow.Hidden;
+            // visualInput.style.paddingRight = 22;
+            ExpandButton = new ExpandButton();
+            Add(ExpandButton);
 
             onExpandButtonClicked.AddListener(expanded => ExpandButton.style.rotate = new StyleRotate(new Rotate(expanded ? -90 : 0)));
+            // visualInput.Add(ExpandButton);
+        }
+    }
+
+    public class ButtonsGenField<T> : BaseField<T>
+    {
+        // public readonly Button ExpandButton;
+
+        // private static VisualElement MakeInput(ButtonsGenElement<T> visualInput, UnityEvent<bool> onExpandButtonClicked)
+        // {
+        //     VisualElement wrapper = new VisualElement();
+        //     wrapper.Add(visualInput);
+        //
+        //     visualInput.style.marginRight = 20;
+        //     visualInput.style.overflow = Overflow.Hidden;
+        //     // visualInput.style.paddingRight = 22;
+        //     var ExpandButton = new ExpandButton();
+        //     wrapper.Add(ExpandButton);
+        //
+        //     onExpandButtonClicked.AddListener(expanded => ExpandButton.style.rotate = new StyleRotate(new Rotate(expanded ? -90 : 0)));
+        //     return wrapper;
+        //     // visualInput.Add(ExpandButton);
+        // }
+
+        public ButtonsGenField(string label, ExpandableButtonsElement visualInput) : base(label, visualInput)
+        {
+            // ExpandButton = this.visualInput.Q<ExpandButton>();
+            // visualInput.Add(ExpandButton);
+            //
+            // onExpandButtonClicked.AddListener(expanded => ExpandButton.style.rotate = new StyleRotate(new Rotate(expanded ? -90 : 0)));
         }
     }
 }

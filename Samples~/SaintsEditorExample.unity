@@ -1290,12 +1290,128 @@ MonoBehaviour:
   - {fileID: 282662863}
   getComponentIArray:
   - <V>k__BackingField: {fileID: 282662869}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 282662869}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 282662869}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   getComponentIList:
   - <V>k__BackingField: {fileID: 282662869}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 282662869}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 282662869}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!1001 &315419262
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: ULongEnumPub__SaintsSerialized__.uLongValue
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: ULongEnumPubs__SaintsSerialized__.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: LongEnumPubArr__SaintsSerialized__.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: LongEnumPubArr__SaintsSerialized__.Array.data[0].longValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[0].uLongValue
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[1].uLongValue
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[0].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[1].propertyType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: LongEnumPubArr__SaintsSerialized__.Array.data[0].propertyType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6266862509457590421, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9197686314578733395, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: m_Name
+      value: SerEnumULong
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
 --- !u!1 &349489353
 GameObject:
   m_ObjectHideFlags: 0
@@ -4436,10 +4552,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SerTimeSpanExample
   myClass:
     _dtArray__SaintsSerialized__: 0000000000000000
-  s: 
   _dt__SaintsSerialized__: 1080123300000
   _dtList__SaintsSerialized__: 0000000000000000
   dt__SaintsSerialized__: 0
+  s__SaintsSerialized__: 0
 --- !u!4 &1359646099
 Transform:
   m_ObjectHideFlags: 0
@@ -5572,10 +5688,27 @@ MonoBehaviour:
   - {fileID: 187152646}
   getComponentIArray:
   - <V>k__BackingField: {fileID: 1704623437}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 1704623436}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   getComponentIList:
   - <V>k__BackingField: {fileID: 0}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 0}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!114 &1704623441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5612,8 +5745,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   getSoIArray:
   - <V>k__BackingField: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 11400000, guid: b2e57ce1d7fbe5345a38f4feb30cdc6f, type: 2}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 11400000, guid: 11616eb928903e14ba9efde4e1a0e90a, type: 2}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &1757007196
 GameObject:
   m_ObjectHideFlags: 0
@@ -5987,15 +6134,47 @@ MonoBehaviour:
   - {fileID: 1704623436}
   getComponentIArray:
   - <V>k__BackingField: {fileID: 1872824174}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 1872824174}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   getComponentIList:
   - <V>k__BackingField: {fileID: 1872824174}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 1872824174}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 282662869}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 282662869}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 282662869}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 1704623437}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
   - <V>k__BackingField: {fileID: 1704623437}
+    <VRef>k__BackingField:
+      rid: -2
+    <IsVRef>k__BackingField: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &1882026370
 GameObject:
   m_ObjectHideFlags: 0
@@ -6721,3 +6900,4 @@ SceneRoots:
   - {fileID: 1175289511}
   - {fileID: 1353093774}
   - {fileID: 1359646099}
+  - {fileID: 315419262}

@@ -33,8 +33,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     ele.BindProperty(subProp);
 
                     UnityEvent<bool> expandEvent = new UnityEvent<bool>();
+                    ExpandableButtonsElement wrap = new ExpandableButtonsElement(ele, expandEvent);
 
-                    ButtonsULongField r = new ButtonsULongField(label, ele, expandEvent);
+                    ButtonsULongField r = new ButtonsULongField(label, wrap);
                     r.AddToClassList(DropdownFieldULong.alignedFieldUssClassName);
 
                     UIToolkitUtils.AddContextualMenuManipulator(r, subProp, () => { });
@@ -60,7 +61,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
                     bool expanded = false;
                     ele.fillEmptyButton.clicked += OnExpandedChanged;
-                    r.ExpandButton.clicked += OnExpandedChanged;
+                    wrap.ExpandButton.clicked += OnExpandedChanged;
 
                     return root;
 
@@ -92,7 +93,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
                     UnityEvent<bool> expandEvent = new UnityEvent<bool>();
 
-                    ButtonsULongField r = new ButtonsULongField(label, ele, expandEvent);
+                    ExpandableButtonsElement wrap = new ExpandableButtonsElement(ele, expandEvent);
+                    ButtonsULongField r = new ButtonsULongField(label, wrap);
                     r.AddToClassList(DropdownFieldULong.alignedFieldUssClassName);
 
                     UIToolkitUtils.AddContextualMenuManipulator(r, subProp, () => { });
@@ -118,7 +120,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
                     bool expanded = false;
                     ele.fillEmptyButton.clicked += OnExpandedChanged;
-                    r.ExpandButton.clicked += OnExpandedChanged;
+                    wrap.ExpandButton.clicked += OnExpandedChanged;
 
                     return root;
 
