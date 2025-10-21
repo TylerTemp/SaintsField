@@ -242,6 +242,39 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 0
+  valueInject:
+    _keys: []
+    _values: []
+    _saintsKeys:
+    - value:
+        absC: 
+        sub1: 
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
+    _saintsValues:
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
   references:
     version: 2
     RefIds:

@@ -46,7 +46,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         // [ValueAttribute(typeof(SerializeReference))]
         public SaintsDictionary<Sub1, Sub1> dymDict;
 
-        // // [KeyAttribute(typeof(SerializeReference))]
+        // [ValueAttribute(typeof(ExpandableAttribute))]
         // public SaintsDictionary<Sub1, SpriteRenderer> valueInject;
     }
 }
