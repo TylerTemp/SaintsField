@@ -1,30 +1,16 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Serializable]
     public class SaintsDictionary<TKey, TValue>: SaintsDictionaryBase<TKey, TValue>
     {
-        [Serializable]
-        public class SaintsWrap<T> : BaseWrap<T>
-        {
-            [SerializeField] public T value;
-            public override T Value { get => value; set => this.value = value; }
-
-#if UNITY_EDITOR
-            // ReSharper disable once StaticMemberInGenericType
-            public static readonly string EditorPropertyName = nameof(value);
-#endif
-
-            public SaintsWrap(T v)
-            {
-                value = v;
-            }
-        }
-
         [SerializeField, Obsolete]
         private List<TKey> _keys = new List<TKey>();
 
@@ -50,7 +36,7 @@ namespace SaintsField
 
         protected override TKey SerializedKeyGetAt(int index)
         {
-            return _saintsKeys[index].value;
+            return _saintsKeys[index].Value;
         }
 
         protected override void SerializedKeysClear()
@@ -70,7 +56,7 @@ namespace SaintsField
 
         protected override TValue SerializedValueGetAt(int index)
         {
-            return _saintsValues[index].value;
+            return _saintsValues[index].Value;
         }
 
         protected override void SerializedValuesClear()
@@ -80,10 +66,10 @@ namespace SaintsField
 
         protected override void SerializedSetKeyValue(TKey tKey, TValue tValue)
         {
-            int index = _saintsKeys.FindIndex(wrap => wrap.value.Equals(tKey));
+            int index = _saintsKeys.FindIndex(wrap => wrap.valueField.Equals(tKey));
             if (index >= 0)
             {
-                _saintsValues[index].value = tValue;
+                _saintsValues[index].Value = tValue;
             }
             else
             {
@@ -94,7 +80,7 @@ namespace SaintsField
 
         protected override void SerializedRemoveKeyValue(TKey key)
         {
-            int index = _saintsKeys.FindIndex(wrap => wrap.value.Equals(key));
+            int index = _saintsKeys.FindIndex(wrap => wrap.valueField.Equals(key));
             if (index >= 0)
             {
                 _saintsKeys.RemoveAt(index);

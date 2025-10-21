@@ -38,6 +38,11 @@ namespace SaintsField.Samples.Scripts.Interface
             public void Method1()
             {
             }
+
+            public override string ToString()
+            {
+                return $"<NorClassInterface1 common={common} classString={classString}>";
+            }
         }
 
         public Interface1 myInherentInterface1;

@@ -6420,7 +6420,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
-    V: {fileID: 0}
+    V: {fileID: 4190710479621803396, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
     VRef:
       rid: -2
     IsVRef: 0

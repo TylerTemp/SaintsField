@@ -599,5 +599,60 @@ namespace SaintsField.Utils
             }
             throw new ArgumentException($"{content} is not a valid pixel length");
         }
+
+        public static bool IsSubFieldUnitySerializable(Type t)
+        {
+            if (t == null)
+            {
+                return false;
+            }
+
+            if (t.IsAbstract || t.IsInterface)
+            {
+                return false;
+            }
+
+            // UnityEngine.Object (MonoBehaviour, ScriptableObject, Texture, etc.) are serialized as references
+            if (typeof(UnityEngine.Object).IsAssignableFrom(t))
+            {
+                return true;
+            }
+
+            // primitives, strings and enums
+            if (t.IsPrimitive || t == typeof(string))
+            {
+                return true;
+            }
+
+            if (t.IsEnum)
+            {
+                Type underType = t.GetEnumUnderlyingType();
+                if(underType == typeof(long) || underType == typeof(ulong))
+                {
+                    return false; // Unity does not support long/ulong enums
+                }
+                return true;
+            }
+
+
+            if (t.IsArray)
+            {
+                return false;
+            }
+
+            // List<T> is supported if T is serializable
+            // if (t.IsGenericType)
+            // {
+            //     var def = t.GetGenericTypeDefinition();
+            //     if (def == typeof(List<>))
+            //     {
+            //         return false;
+            //     }
+            //     return false; // Unity does not serialize arbitrary generic types
+            // }
+
+            // types marked [Serializable] (includes built-in structs like Vector3, Rect, etc.)
+            return t.IsSerializable;
+        }
     }
 }
