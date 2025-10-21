@@ -50,7 +50,7 @@ namespace SaintsField.Utils
                     {
                         _runtimeResult = (T) (object)Array.CreateInstance(_subType, 0);
                         valueArray = Array.Empty<SaintsSerializedProperty>();
-                        Debug.Log("init valueArray to empty");
+                        // Debug.Log("init valueArray to empty");
                     }
                     else
                     {
@@ -110,13 +110,13 @@ namespace SaintsField.Utils
                             {
                                 if (!SaintsSerializedPropertyEqual(o, valueList[index], isVRef))
                                 {
-                                    Debug.Log($"on before ser not equal {index} {valueList[index].VRef}->{thisSer.VRef}: {o}");
+                                    // Debug.Log($"on before ser not equal {index} {valueList[index].VRef}->{thisSer.VRef}: {o}");
                                     valueList[index] = thisSer;
                                 }
                             }
                             else
                             {
-                                Debug.Log($"on before ser add {index} {thisSer.VRef}: {o}");
+                                // Debug.Log($"on before ser add {index} {thisSer.VRef}: {o}");
                                 valueList.Add(thisSer);
                             }
 
