@@ -81,9 +81,13 @@ namespace SaintsField
                 TValue value = SerializedValuesCount() > index ? SerializedValueGetAt(index) : default;
 #if UNITY_EDITOR
                 // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
-                if (!RuntimeUtil.IsNull(key) && !Dictionary.ContainsKey(key))
+                // if (!RuntimeUtil.IsNull(key) && !Dictionary.ContainsKey(key))
+                // {
+                //     Dictionary.Add(key, value);
+                // }
+                if(!RuntimeUtil.IsNull(key))
                 {
-                    Dictionary.Add(key, value);
+                    Dictionary[key] = value;
                 }
 #else
                 Dictionary.Add(key, value);

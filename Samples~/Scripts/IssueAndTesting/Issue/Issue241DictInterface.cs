@@ -8,108 +8,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
     public class Issue241DictInterface : MonoBehaviour
     {
 #if UNITY_2021_3_OR_NEWER
-        [Serializable]
-        public class InterfaceDictionary<TKey, TValue> : SaintsDictionaryBase<TKey, TValue>
-        {
-            [Serializable]
-            public class SaintsWrap<T> : BaseWrap<T>
-            {
-                [SerializeReference, SaintsRow(inline: true), ReferencePicker(hideLabel: true)] public T value;
-
-                public override T Value
-                {
-                    get => value;
-                    set => this.value = value;
-                }
-
-#if UNITY_EDITOR
-                // ReSharper disable once StaticMemberInGenericType
-                public static readonly string EditorPropertyName = nameof(value);
-#endif
-
-                public SaintsWrap(T v)
-                {
-                    value = v;
-                }
-            }
-
-            [SerializeField]
-            private List<SaintsWrap<TKey>> _saintsKeys = new List<SaintsWrap<TKey>>();
-
-            [SerializeField]
-            private List<SaintsWrap<TValue>> _saintsValues = new List<SaintsWrap<TValue>>();
-#if UNITY_EDITOR
-            // ReSharper disable once UnusedMember.Local
-            private static string EditorPropKeys => nameof(_saintsKeys);
-            // ReSharper disable once UnusedMember.Local
-            private static string EditorPropValues => nameof(_saintsValues);
-#endif
-
-            protected override int SerializedKeysCount()
-            {
-                return _saintsKeys.Count;
-            }
-
-            protected override void SerializedKeyAdd(TKey key)
-            {
-                _saintsKeys.Add(new SaintsWrap<TKey>(key));
-            }
-
-            protected override TKey SerializedKeyGetAt(int index)
-            {
-                return _saintsKeys[index].value;
-            }
-
-            protected override void SerializedKeysClear()
-            {
-                _saintsKeys.Clear();
-            }
-
-            protected override int SerializedValuesCount()
-            {
-                return _saintsValues.Count;
-            }
-
-            protected override void SerializedValueAdd(TValue value)
-            {
-                _saintsValues.Add(new SaintsWrap<TValue>(value));
-            }
-
-            protected override TValue SerializedValueGetAt(int index)
-            {
-                return _saintsValues[index].value;
-            }
-
-            protected override void SerializedValuesClear()
-            {
-                _saintsValues.Clear();
-            }
-
-            protected override void SerializedSetKeyValue(TKey tKey, TValue tValue)
-            {
-                int index = _saintsKeys.FindIndex(wrap => wrap.value.Equals(tKey));
-                if (index >= 0)
-                {
-                    _saintsValues[index].value = tValue;
-                }
-                else
-                {
-                    _saintsKeys.Add(new SaintsWrap<TKey>(tKey));
-                    _saintsValues.Add(new SaintsWrap<TValue>(tValue));
-                }
-            }
-
-            protected override void SerializedRemoveKeyValue(TKey key)
-            {
-                int index = _saintsKeys.FindIndex(wrap => wrap.value.Equals(key));
-                if (index >= 0)
-                {
-                    _saintsKeys.RemoveAt(index);
-                    _saintsValues.RemoveAt(index);
-                }
-            }
-        }
-
         public interface IMyKey: IEquatable<IMyKey>
         {
         }
@@ -175,7 +73,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             public string v2;
         }
 
-        public InterfaceDictionary<IMyKey, IMyValue> iDict;
+        public SaintsDictionary<IMyKey, IMyValue> iDict;
 #endif
     }
 }

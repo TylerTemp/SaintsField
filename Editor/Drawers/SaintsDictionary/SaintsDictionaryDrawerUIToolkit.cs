@@ -1306,7 +1306,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
             {
                 saintsPropertyDrawer.InHorizontalLayout = true;
-                saintsPropertyDrawer.AppendPropertyAttributes = injectedAttributes.Concat(allPropertyAttributes).OfType<PropertyAttribute>().ToArray();
+                saintsPropertyDrawer.AppendPropertyAttributes = allPropertyAttributes;
                 // Debug.Log($"{needUseRef}{saintsPropertyDrawer is BaseWrapDrawer}/{saintsPropertyDrawer}");
                 // Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath} -> {string.Join(", ", saintsPropertyDrawer.AppendPropertyAttributes)}");
             }

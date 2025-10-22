@@ -36,6 +36,7 @@ namespace SaintsField.Utils
 
         public void OnBeforeSerialize()
         {
+#if UNITY_EDITOR
             EnsureInit();
             switch (wrapType)
             {
@@ -138,6 +139,7 @@ namespace SaintsField.Utils
                 }
                     break;
             }
+#endif
         }
 
         private bool SaintsSerializedPropertyEqual(object o, SaintsSerializedProperty thisSer, bool isVRef)
@@ -243,7 +245,7 @@ namespace SaintsField.Utils
                         object runtimeValue = runtimeArray.GetValue(index);
                         if(!SaintsSerializedPropertyEqual(runtimeValue, serObj, serObj.IsVRef))
                         {
-                            object getActualValue = GetFromSaintsSerializedProperty(serObj, _subType);
+                            object getActualValue = GetObjectFromSaintsSerializedProperty(serObj, _subType);
                             // Debug.Log($"after ser {index}={serObj.V?.GetType()}/{serObj.VRef?.GetType()}->{getActualValue}");
                             runtimeArray.SetValue(getActualValue, index);
                         }
@@ -258,7 +260,7 @@ namespace SaintsField.Utils
                     IList lis = (IList)Activator.CreateInstance(_listType, valueList.Count);
                     foreach (SaintsSerializedProperty serObj in valueList)
                     {
-                        lis.Add(GetFromSaintsSerializedProperty(serObj, _subType));
+                        lis.Add(GetObjectFromSaintsSerializedProperty(serObj, _subType));
                     }
 
                     _runtimeResult = (T) lis;
@@ -267,7 +269,7 @@ namespace SaintsField.Utils
 
                 case WrapType.Field:
                 {
-                    _runtimeResult = GetFromSaintsSerializedProperty<T>(valueField);
+                    _runtimeResult = GetFromSaintsSerializedProperty(valueField);
                 }
                     break;
                 default:
@@ -275,9 +277,17 @@ namespace SaintsField.Utils
             }
 
             // Debug.Log("OnAfterDeserialize done");
+#if UNITY_EDITOR
+            // do nothing
+#else
+            value = default;
+            valueField = default;
+            valueArray = Array.Empty<SaintsSerializedProperty>();
+            valueList.Clear();
+#endif
         }
 
-        private object GetFromSaintsSerializedProperty(SaintsSerializedProperty serObj, Type targetType)
+        private static object GetObjectFromSaintsSerializedProperty(SaintsSerializedProperty serObj, Type targetType)
         {
             if (serObj.IsVRef)
             {
@@ -300,7 +310,7 @@ namespace SaintsField.Utils
             return serObj.V;
         }
 
-        private T GetFromSaintsSerializedProperty<T>(SaintsSerializedProperty serObj)
+        private static T GetFromSaintsSerializedProperty(SaintsSerializedProperty serObj)
         {
             if (serObj.IsVRef)
             {

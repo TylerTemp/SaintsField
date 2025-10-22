@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
-using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsDictExamples
@@ -10,15 +9,17 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
     {
         public SaintsDictionary<string, GameObject> genDict;
 
-        [Button]
-        private void DebugKey(string key)
+        [ShowInInspector]
+        private GameObject DebugKey(string key)
         {
-            if(!genDict.TryGetValue(key, out GameObject go))
+            GameObject go = null;
+            if(key != null && !genDict.TryGetValue(key, out go))
             {
                 Debug.LogWarning($"Key {key} not found in dictionary");
-                return;
+                return null;
             }
-            Debug.Log(go);
+
+            return go;
         }
 
         [Serializable]
@@ -50,7 +51,6 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
 
         [SaintsDictionary(keyWidth: "30%")] public SaintsDictionary<int, string> keyWidthControl;
         [SaintsDictionary(valueWidth: "120px")] public SaintsDictionary<int, string> valueWidthControl;
-
 
         private void Awake()
         {

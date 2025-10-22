@@ -613,7 +613,20 @@ namespace SaintsField.Utils
             }
 
             // UnityEngine.Object (MonoBehaviour, ScriptableObject, Texture, etc.) are serialized as references
-            if (typeof(UnityEngine.Object).IsAssignableFrom(t))
+            if (typeof(Object).IsAssignableFrom(t) || typeof(AnimationCurve).IsAssignableFrom(t) || typeof(Gradient).IsAssignableFrom(t) || typeof(RectOffset).IsAssignableFrom(t))
+            {
+                return true;
+            }
+
+            // Unity built-in structs
+            if(t == typeof(Vector2) || t == typeof(Vector2Int)
+               || t == typeof(Vector3) || t == typeof(Vector3Int)
+               || t == typeof(Vector4)
+               || t == typeof(Quaternion) || t == typeof(Matrix4x4)
+               || t == typeof(Color) || t == typeof(Color32)
+               || t == typeof(Rect) || t == typeof(RectInt)
+               || t == typeof(Bounds) || t == typeof(BoundsInt)
+               || t == typeof(LayerMask))
             {
                 return true;
             }
