@@ -2,7 +2,7 @@
 
 ## 4.37.0 ##
 
-1.  `SaintsDictionary<,>` not support `interface` type & `abstruct` type directly 
+1.  `SaintsDictionary<,>` now support `interface` type & `abstruct` type directly 
 2.  Add `[KeyAttribute(type, arguments...)]` and `[ValueAttribute(type, arguments...)]` to inject attributes to key/value for `SaintsDictionary<,>`
 
 ## 4.36.0 ##
