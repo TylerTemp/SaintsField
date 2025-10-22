@@ -1090,8 +1090,20 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 Attribute injectedAttribute;
                 try
                 {
-                    injectedAttribute =
-                        Activator.CreateInstance(injectBase.Decorator, injectBase.Parameters) as Attribute;
+                    if(injectBase.Parameters.Length > 0)
+                    {
+                        // Debug.Log($"{injectBase.Decorator}: {string.Join(", ", injectBase.Parameters)}");
+                        injectedAttribute =
+                            Activator.CreateInstance(injectBase.Decorator, injectBase.Parameters) as Attribute;
+                    }
+                    else
+                    {
+                        // Debug.Log($"{injectBase.Decorator}");
+                        injectedAttribute= Activator.CreateInstance(injectBase.Decorator, true) as Attribute;
+                    }
+                    // injectedAttribute = Activator.CreateInstance(injectBase.Decorator,
+                    //     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.CreateInstance, null, injectBase.Parameters,
+                    //     null, null) as Attribute;
                 }
                 catch (Exception e)
                 {

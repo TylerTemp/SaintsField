@@ -33,20 +33,22 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
 
         // -----------------
 
-        // public SaintsDictionary<IInterface1, IInterface1> interfaceDict;
-        //
-        // public SaintsDictionary<IInterface1, List<IInterface1>> interfaceDictLis;
-        //
-        // public SaintsDictionary<MyS, MyS[]> serializableDictArrVal;
-        // public SaintsDictionary<MyS, MyS> serializableDict;
-        //
-        // public SaintsDictionary<BaseC, BaseC> absDict;
-        //
-        // [KeyAttribute(typeof(SerializeReference))]
-        // // [ValueAttribute(typeof(SerializeReference))]
-        // public SaintsDictionary<Sub1, Sub1> dymDict;
+        public SaintsDictionary<IInterface1, IInterface1> interfaceDict;
 
+        public SaintsDictionary<IInterface1, List<IInterface1>> interfaceDictLis;
+
+        public SaintsDictionary<MyS, MyS[]> serializableDictArrVal;
+        public SaintsDictionary<MyS, MyS> serializableDict;
+
+        public SaintsDictionary<BaseC, BaseC> absDict;
+
+        [KeyAttribute(typeof(SerializeReference))]
+        // [ValueAttribute(typeof(SerializeReference))]
+        public SaintsDictionary<Sub1, Sub1> dymDict;
+
+        [KeyAttribute(typeof(PropRangeAttribute), 0f, 10f, -1f)]
         [ValueAttribute(typeof(ExpandableAttribute))]
-        public SaintsDictionary<Sub1, SpriteRenderer> valueInject;
+        [ValueAttribute(typeof(RequiredAttribute))]
+        public SaintsDictionary<int, SpriteRenderer> valueInject;
     }
 }

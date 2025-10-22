@@ -26,7 +26,7 @@ namespace SaintsField.Utils
 
 #if UNITY_EDITOR
         // ReSharper disable once StaticMemberInGenericType
-        public static readonly string EditorPropertyName = nameof(valueField);
+        public static readonly string EditorPropertyName = nameof(value);
 #endif
 
         public SaintsWrap(T v)

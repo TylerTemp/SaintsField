@@ -118,7 +118,7 @@ namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
             referenceExpandButton.SetViewDataKey(vRef.propertyPath);
             referenceHContainer.Add(referenceExpandButton);
 
-            UIToolkitUtils.DropdownButtonField dropdownBtn = UIToolkitUtils.ReferenceDropdownButtonField("", vRef, this, () => GetTypesImplementingInterface(nonUnityType));
+            UIToolkitUtils.DropdownButtonField dropdownBtn = UIToolkitUtils.ReferenceDropdownButtonField("", vRef, referenceHContainer, () => GetTypesImplementingInterface(nonUnityType));
             referenceHContainer.Add(dropdownBtn);
             dropdownBtn.style.marginLeft = 0;
             dropdownBtn.ButtonElement.style.borderTopLeftRadius = 0;

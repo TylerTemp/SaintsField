@@ -94,10 +94,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.36.0**
+**4.37.0**
 
-1.  You can now directly serialize an interface field with extended serialization.
-2.  Fix `EnumToggleButtons` expand issue in extended serialization.
+1.  `SaintsDictionary<,>` not support `interface` type & `abstruct` type directly
+2.  Add `[KeyAttribute(type, arguments...)]` and `[ValueAttribute(type, arguments...)]` to inject attributes to key/value for `SaintsDictionary<,>`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -6356,10 +6356,6 @@ A simple dictionary serialization tool. It allows:
 4.  Allow paging for large dictionary
 5.  Allow inherence to add some custom attributes, especually with auto getters to gain the auto-fulfill ability.
 
-This is very like [Serialized Dictionary](https://assetstore.unity.com/packages/tools/utilities/serialized-dictionary-243052) with differences: `SaintsDictionaryBase` allows you to customize the dictionary behavior, for example, together with `GetComponentInChildren`, you can allow auto-fulfill.
-
-In short, if you don't need the custom attributes ability, it's suggested to use [Serialized Dictionary](https://assetstore.unity.com/packages/tools/utilities/serialized-dictionary-243052) instead.
-
 Basic usage:
 
 ```csharp
@@ -6367,6 +6363,69 @@ public SaintsDictionary<string, GameObject> genDict;
 ```
 
 ![image](https://github.com/user-attachments/assets/a0d087fd-98ba-4419-82ef-1acf0d0a5243)
+
+Interface is also supported. You can pick a Unity Object or a serializable class/struct for it, just like a normal interface.
+
+```csharp
+public SaintsDictionary<string, IInterface1> interfaceDictValue;
+// You can also use it as key
+public SaintsDictionary<IInterface1, IInterface1> interfaceDict;
+
+// list/array is also supported
+public SaintsDictionary<IInterface1, List<IInterface1>> interfaceDictLis;
+```
+
+![](https://github.com/user-attachments/assets/3b48b77d-05aa-4b8c-b05f-31d77a680897)
+
+If the type is `abstruct`, an `SerializeReference` will be automatically used:
+
+```csharp
+[Serializable]
+public abstract class BaseC
+{
+    public string absC;
+}
+
+// Derived classes...
+
+public SaintsDictionary<BaseC, BaseC> absDict;
+```
+
+![](https://github.com/user-attachments/assets/4d4d996c-8b54-40f8-9cbc-91284217d4ea)
+
+If you want to explicitly use `SerializeReference`, use `KeyAttribute(typeof(SerializeReference))` and `ValueAttribute(typeof(SerializeReference))`
+to inject the attribute to key/value:
+
+```csharp
+[Serializable]
+public class Sub1
+{
+    public string sub1;
+}
+
+[Serializable]
+public class Sub2 : Sub1
+{
+    public string sub2;
+}
+
+[KeyAttribute(typeof(SerializeReference))]  // Key will be polymorphism
+// [ValueAttribute(typeof(SerializeReference))]  // committed out so value will only be `Sub1` type
+public SaintsDictionary<Sub1, Sub1> dymDict;
+```
+
+![](https://github.com/user-attachments/assets/58a8632e-033c-44cf-ad5c-64f858552fd6)
+
+You can use `KeyAttribute(type, arguments...)` and `ValueAttribute(type, arguments...)` to add extra attributes to key/value fields.
+
+```csharp
+[KeyAttribute(typeof(PropRangeAttribute), 0f, 10f, -1f)]
+[ValueAttribute(typeof(ExpandableAttribute))]
+[ValueAttribute(typeof(RequiredAttribute))]
+public SaintsDictionary<int, SpriteRenderer> valueInject;
+```
+
+![](https://github.com/user-attachments/assets/8c8ae6ce-f402-48f1-b280-9bb65293eca5)
 
 Add `SaintsDictionary` attribute to control:
 
@@ -6420,12 +6479,6 @@ using SaintsField;
 ```
 
 ![](https://github.com/user-attachments/assets/8ef121c0-9762-49ad-915b-cf83e1ef79f9)
-
-You can also inherit `SaintsDictionaryBase<TKey, TValue>` to create your own custom dictionary.
-
-> [!WARNING]
-> Custom Dictionary is still under some test and need some API changes. Please avoid inherit a custom dictionary, but use `SaintsDictionary` directly.
-> If you still need it, please fork this project, use the forked one, and carefully exam the project when you upgrade, as it might break your inherence.
 
 See [DictInterface](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/IssueAndTesting/Issue/Issue241DictInterface.cs) as an example of making an `SerializedReference` dictionary.
 

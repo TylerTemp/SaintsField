@@ -6125,8 +6125,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toggleDict:
-    _keys: 
-    _values: 
     _saintsKeys:
     - value: 0
       valueField:
@@ -12825,8 +12823,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eToState:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -12896,8 +12892,6 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   eToV3:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -12953,8 +12947,6 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   eToStateOld:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -12991,8 +12983,6 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   eToV3Old:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -13022,8 +13012,6 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   myStructToGameObject:
-    _keys: []
-    _values: []
     _saintsKeys:
     - value:
         key: 
@@ -18114,8 +18102,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   oneField:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -18146,7 +18132,6 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   oneFields:
-    _keys: 
     _saintsKeys:
     - value: 0
       valueField:
@@ -18177,8 +18162,6 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   twoField:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -18210,7 +18193,6 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   twoFields:
-    _keys: 
     _saintsKeys:
     - value: 0
       valueField:
@@ -18242,8 +18224,6 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   oneFieldAttr:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -18274,8 +18254,6 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   oneFieldLabel:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -24545,8 +24523,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colors:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 3
       valueField:
@@ -25533,8 +25509,6 @@ MonoBehaviour:
   treeEnums: 0
   flagsTreeEnums: 0
   namedEnumDict:
-    _keys: 
-    _values: 
     _saintsKeys:
     - value: 0
       valueField:
@@ -33386,8 +33360,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   genDict:
-    _keys: []
-    _values: []
     _saintsKeys:
     - value: a
       valueField:
@@ -33443,21 +33415,15 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   dict:
-    _keys: 
-    _values: []
     _saintsKeys: []
     _saintsValues: []
   genDictValueArray:
-    _keys: []
     _saintsKeys: []
     _saintsValues: []
   genDictValueList:
-    _keys: []
     _saintsKeys: []
     _saintsValues: []
   kvPagin10:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -33721,13 +33687,9 @@ MonoBehaviour:
       valueList: []
       wrapType: 0
   keyWidthControl:
-    _keys: 
-    _values: []
     _saintsKeys: []
     _saintsValues: []
   valueWidthControl:
-    _keys: 
-    _values: []
     _saintsKeys: []
     _saintsValues: []
   references:
@@ -33968,8 +33930,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.Issue314ExpandableDictionary
   expand:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
       valueField:
@@ -36220,12 +36180,32 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsKeys.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDict._saintsKeys.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsValues.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDict._saintsValues.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583431157285792]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/Sub1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583431157285793]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/Sub1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583431157285794]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/Sub2
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDictLis._saintsKeys.Array.size
@@ -36236,12 +36216,56 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285792].absC
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285792].sub1
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285793].absC
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285793].sub1
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285794].absC
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285794].sub1
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285794].sub2
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsKeys.Array.data[0].value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsKeys.Array.data[1].value
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: valueInject._saintsValues.Array.data[0].value
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsValues.Array.data[1].value
       value: 
       objectReference: {fileID: 4190710478443201291}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDict._saintsKeys.Array.data[0].wrapType
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: dymDict._saintsKeys.Array.data[0].valueField.VRef
+      value: 6921583431157285794
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDict._saintsValues.Array.data[0].wrapType
@@ -36256,7 +36280,15 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsKeys.Array.data[1].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDict._saintsKeys.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsValues.Array.data[1].valueField.VRef
       value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
@@ -37511,7 +37543,7 @@ PrefabInstance:
       objectReference: {fileID: 6004775636325262730}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsDict._saintsKeys.Array.data[0].wrapType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsHashSet._saintsList.Array.data[0].value
@@ -37527,7 +37559,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsDict._saintsValues.Array.data[0].wrapType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsDict._saintsKeys.Array.data[0].value.IsVRef
