@@ -96,7 +96,7 @@ namespace: `SaintsField`
 
 **4.37.0**
 
-1.  `SaintsDictionary<,>` not support `interface` type & `abstruct` type directly
+1.  `SaintsDictionary<,>` now support `interface` type & `abstruct` type directly
 2.  Add `[KeyAttribute(type, arguments...)]` and `[ValueAttribute(type, arguments...)]` to inject attributes to key/value for `SaintsDictionary<,>`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
@@ -2279,7 +2279,7 @@ Note: You can change the default behavior of these attributes using `Window/Sain
 
 #### `GetComponent` ####
 
-Automatically sign a component to a field, if the field value is null and the component is already attached to current target. (First one found will be used)
+Automatically assign a component to a field, if the field value is null and the component is already attached to current target. (First one found will be used)
 
 *   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 
@@ -2287,7 +2287,7 @@ Automatically sign a component to a field, if the field value is null and the co
 
 *   `Type compType = null`
 
-    The component type to sign. If null, it'll use the field type.
+    The component type to assign. If null, it'll use the field type.
 
 *   `string groupBy = ""`
 
@@ -2310,7 +2310,7 @@ using SaintsField;
 
 #### `GetComponentInChildren` ####
 
-Automatically sign a component to a field, if the field value is null and the component is already attached to itself or its child GameObjects. (First one found will be used)
+Automatically assign a component to a field, if the field value is null and the component is already attached to itself or its child GameObjects. (First one found will be used)
 
 NOTE: Like `GetComponentInChildren` by Unity, this **will** check the target object itself.
 
@@ -2340,7 +2340,7 @@ NOTE: Like `GetComponentInChildren` by Unity, this **will** check the target obj
 using SaintsField;
 
 [GetComponentInChildren] public BoxCollider childBoxCollider;
-// by setting compType, you can sign it as a different type
+// by setting compType, you can assign it as a different type
 [GetComponentInChildren(compType: typeof(Dummy))] public BoxCollider childAnotherType;
 // and GameObject field works too
 [GetComponentInChildren(compType: typeof(BoxCollider))] public GameObject childBoxColliderGo;
@@ -2350,7 +2350,7 @@ using SaintsField;
 
 #### `GetComponentInParent` / `GetComponentInParents` ####
 
-Automatically sign a component to a field, if the field value is null and the component is already attached to its parent GameObject(s). (First one found will be used)
+Automatically assign a component to a field, if the field value is null and the component is already attached to its parent GameObject(s). (First one found will be used)
 
 Note:
 
@@ -2395,7 +2395,7 @@ using SaintsField;
 
 #### `GetComponentInScene` ####
 
-Automatically sign a component to a field, if the field value is null and the component is in the currently opened scene. (First one found will be used)
+Automatically assign a component to a field, if the field value is null and the component is in the currently opened scene. (First one found will be used)
 
 *   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 
@@ -2419,7 +2419,7 @@ Automatically sign a component to a field, if the field value is null and the co
 using SaintsField;
 
 [GetComponentInScene] public Dummy dummy;
-// by setting compType, you can sign it as a different type
+// by setting compType, you can assign it as a different type
 [GetComponentInScene(compType: typeof(Dummy))] public RectTransform dummyTrans;
 // and GameObject field works too
 [GetComponentInScene(compType: typeof(Dummy))] public GameObject dummyGo;
@@ -2429,7 +2429,7 @@ using SaintsField;
 
 #### `GetPrefabWithComponent` ####
 
-Automatically sign a prefab to a field, if the field value is null and the prefab has the component. (First one found will be used)
+Automatically assign a prefab to a field, if the field value is null and the prefab has the component. (First one found will be used)
 
 Recommended to use it with `FieldType`!
 
@@ -2461,7 +2461,7 @@ using SaintsField;
 
 #### `GetScriptableObject` ####
 
-Automatically sign a `ScriptableObject` file to this field. (First one found will be used)
+Automatically assign a `ScriptableObject` file to this field. (First one found will be used)
 
 Recommended to use it with `Expandable`!
 
@@ -2469,7 +2469,7 @@ Recommended to use it with `Expandable`!
 
     Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
 
-*   `string pathSuffix=null` the path suffix for this `ScriptableObject`. `null` for no limit. for example: if it's `/Resources/mySo`, it will only sign the file whose path is ends with `/Resources/mySo.asset`, like `Assets/proj/Resources/mySo.asset`
+*   `string pathSuffix=null` the path suffix for this `ScriptableObject`. `null` for no limit. for example: if it's `/Resources/mySo`, it will only assign the file whose path is ends with `/Resources/mySo.asset`, like `Assets/proj/Resources/mySo.asset`
 *   AllowMultiple: No
 
 ```csharp
@@ -2538,7 +2538,7 @@ using SaintsField;
 
 #### `AddComponent` ####
 
-Automatically add a component to the current target if the target does not have this component. (This will not sign the component added)
+Automatically add a component to the current target if the target does not have this component. (This will not assign the component added)
 
 Recommended to use it with `GetComponent`!
 
@@ -2586,7 +2586,7 @@ using SaintsField;
 
 **Deprecated**: use `GetByXPath` instead.
 
-Automatically sign a component to a field by a given path.
+Automatically assign a component to a field by a given path.
 
 *   (Optional)`EGetComp config`
 
@@ -2653,7 +2653,7 @@ using SaintsField;
 
 Ask the inspector to display another type of field rather than the field's original type.
 
-This is useful when you want to have a `GameObject` prefab, but you want this target prefab to have a specific component (e.g. your own `MonoScript`, or a `ParticalSystem`). By using this you force the inspector to sign the required object that has your expected component but still gives you the original typed value to field.
+This is useful when you want to have a `GameObject` prefab, but you want this target prefab to have a specific component (e.g. your own `MonoScript`, or a `ParticalSystem`). By using this you force the inspector to assign the required object that has your expected component but still gives you the original typed value to field.
 
 This can also be used when you just want a type reference to a prefab, but Unity does not allow you to pick a prefab because "performance consideration".
 
@@ -3352,7 +3352,7 @@ Reminding a given reference type field to be required.
 This will check if the field value is a `truly` value, which means:
 
 1.  `ValuedType` like `struct` will always be `truly` because `struct` is not nullable and Unity will fill a default value for it no matter what
-2.  It works on reference type and will NOT skip Unity's life-circle null check
+2.  It works on reference type and will NOT skip Unity's life-cycle null check
 3.  You may not want to use it on `int`, `float` (because only `0` is not `truly`) or `bool`, but it's still allowed if you insist
 
 If you have addressable installed, using `Required` on addressable's `AssetReference` will check if the target asset is valid
@@ -3566,7 +3566,7 @@ For each argument:
 
 *   `bool freeSign=false`
 
-    If true, it'll allow you to sign any object to this field, and display an error message if it does not meet the requirement(s).
+    If true, it'll allow you to assign any object to this field, and display an error message if it does not meet the requirement(s).
 
     Otherwise, it will try to prevent the change.
 
@@ -4272,16 +4272,16 @@ Parameters:
     *  `Guid`: the GUID of the target object. You should NOT use this unless you know what you are doing.
 *   `bool freeSign=false`:
 
-    `true` to allow to sign any object, and gives a message if the signed value does not match.
+    `true` to allow to assign any object, and gives a message if the signed value does not match.
 
-    `false` to only allow to sign matched object, and trying to prevent the change if it's illegal.
+    `false` to only allow to assign matched object, and trying to prevent the change if it's illegal.
 
 *   `bool customPicker=true`: use a custom object pick that only display objects which meet the requirements
 *   `Type compType`: the type of the component. It can be a component, or an object like `GameObject`, `Sprite`. The field will be this type. It can NOT be an interface
 *   `params Type[] requiredTypes`: a list of required components or interfaces you want. Only objects with all the types can be signed.
 *   AllowMultiple: No
 
-**Known Issue**: IMGUI, manually sign a null object by using Unity's default pick will sign an empty string instead of null. Use custom pick to avoid this inconsistency.
+**Known Issue**: IMGUI, manually assign a null object by using Unity's default pick will assign an empty string instead of null. Use custom pick to avoid this inconsistency.
 
 ```csharp
 using SaintsField;
@@ -5468,7 +5468,7 @@ When using handles (except `SceneViewPicker` and `DrawLabel`), you can use right
 
 ### `SceneViewPicker` ###
 
-Allow you to pick a target from a scene view, then sign it into your field.
+Allow you to pick a target from a scene view, then assign it into your field.
 
 Once clicked the picking icon, use left mouse to choose a target. Once a popup is displayed, choose the target you want.
 
@@ -7518,7 +7518,7 @@ public class ExamplePanel: SaintsEditorWindow
 
     [ProgressBar(100f)] public float myProgress;
 
-    // life-circle: OnUpdate function
+    // life-cycle: OnUpdate function
     public override void OnEditorUpdate()
     {
         myProgress = (myProgress + 1f) % 100;
@@ -7560,7 +7560,7 @@ public class ExamplePanel: SaintsEditorWindow
         }
     }
 
-    // Other life-circle
+    // Other life-cycle
     public override void OnEditorEnable()
     {
         Debug.Log("Enable");
@@ -7641,9 +7641,9 @@ public class ExampleSo: SaintsEditorWindow
 
 [![video](https://github.com/user-attachments/assets/855b628a-0c3a-4cc1-90b7-115d401f1cfa)](https://github.com/user-attachments/assets/665ebe8a-22b1-4df8-8f20-47fa8b23e3b9)
 
-### Life Circle & Functions ###
+### Life Cycle & Functions ###
 
-The following are the life circle functions, some are wrapped around Unity EditorWindow's default life circle callback:
+The following are the life cycle functions, some are wrapped around Unity EditorWindow's default life cycle callback:
 
 *   `public virtual void OnEditorDestroy()` -> [OnDestroy](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/EditorWindow.OnDestroy.html)
 *   `public virtual void OnEditorEnable()` -> [OnEnable](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/ScriptableObject.OnEnable.html)
@@ -8017,9 +8017,9 @@ using multiple filters means all conditions must be met. Otherwise, use the keyw
 
 `EXP` is how all the auto getters works, behaviors in the inspector. The values are:
 
-*   `NoInitSign`: do not sign the value if the value is null on firsts rendering.
-*   `NoAutoResignToValue`: do not sign the value to the correct value on the following renderings.
-*   `NoAutoResignToNull`: do not sign the value to null value if the target disappears on the following renderings.
+*   `NoInitSign`: do not assign the value if the value is null on firsts rendering.
+*   `NoAutoResignToValue`: do not assign the value to the correct value on the following renderings.
+*   `NoAutoResignToNull`: do not assign the value to null value if the target disappears on the following renderings.
 *   `NoResignButton`: when `NoAutoResign` is on, by default there will be a `reload` button when value is mismatched. Turn this on to hide the `reload` button.
 *   `NoMessage`: when `NoAutoResign` and `NOResignButton` is on, by default there will be an error box when value is mismatched. Turn this on to hide the error message.
 *   `NoPicker`: this will remove the custom picker. This is on by default (if you do not pass `EXP` as first argument) to keep the consistency.
@@ -8029,7 +8029,7 @@ using multiple filters means all conditions must be met. Otherwise, use the keyw
 And some shortcut:
 
 *   `NoAutoResign` = `NoAutoResignToValue | NoAutoResignToNull`
-*   `Silent` = `NoAutoResign | NoMessage`. Useful if you want to allow you to manually sign a different value with no buttons and error box.
+*   `Silent` = `NoAutoResign | NoMessage`. Useful if you want to allow you to manually assign a different value with no buttons and error box.
 *   `JustPicker` = `NoInitSign | NoAutoResignToValue | NoAutoResignToNull | NoResignButton | NoMessage`. Do nothing but just give you a picker with matched targets.
 *   `Message` = `NoAutoResignToValue | NoAutoResignToNull | NoResignButton`. Just give an error message if target is mismatched.
 
