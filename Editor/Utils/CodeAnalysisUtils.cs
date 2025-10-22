@@ -19,8 +19,9 @@ namespace SaintsField.Editor.Utils
         public enum MemberType
         {
             Field,
-            Propoerty,
+            Property,
             Method,
+            Event,
         }
 
         public readonly struct MemberContainer
@@ -54,7 +55,7 @@ namespace SaintsField.Editor.Utils
                 {
                     case MemberType.Field:
                         return $"<Field Name={Name}/>";
-                    case MemberType.Propoerty:
+                    case MemberType.Property:
                         return $"<Property Name={Name}/>";
                     case MemberType.Method:
                         return $"<Method Name={Name} Arguments=[{string.Join(", ", Arguments)}] ReturnType={ReturnType}/>";
@@ -259,6 +260,9 @@ namespace SaintsField.Editor.Utils
                     case SyntaxKind.MethodDeclaration:
                         members.Add(ParseMethod((MethodDeclarationSyntax)memberDeclarationSyntax, index));
                         break;
+                    case SyntaxKind.EventFieldDeclaration:
+                        members.AddRange(ParseEvent((EventFieldDeclarationSyntax)memberDeclarationSyntax, index));
+                        break;
                 }
             }
 
@@ -296,7 +300,7 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
             Debug.Log($"[{index}]  Property : {propertyDeclarationSyntax.Type} {propertyDeclarationSyntax.Identifier.Text}");
 #endif
-            return new MemberContainer(MemberType.Propoerty, propertyDeclarationSyntax.Identifier.Text);
+            return new MemberContainer(MemberType.Property, propertyDeclarationSyntax.Identifier.Text);
             // foreach (AttributeListSyntax attributeList in propertyDeclarationSyntax.AttributeLists)
             // {
             //     foreach (AttributeSyntax attribute in attributeList.Attributes)
@@ -318,6 +322,32 @@ namespace SaintsField.Editor.Utils
                     .Select(each => each.Type.ToString()),
                 memberDeclarationSyntax.ReturnType.ToString());
             // foreach (AttributeListSyntax attributeList in memberDeclarationSyntax.AttributeLists)
+            // {
+            //     foreach (AttributeSyntax attribute in attributeList.Attributes)
+            //     {
+            //         Debug.Log($"[{index}]    Attribute: {attribute.Name}({string.Join(", ", attribute.ArgumentList?.Arguments.Select(a => a.ToString()) ?? Array.Empty<string>())})");
+            //     }
+            // }
+        }
+
+        private static IEnumerable<MemberContainer> ParseEvent(EventFieldDeclarationSyntax fieldDeclarationSyntax, int index)
+        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_CODE_ANALYSIS_DEBUG
+            Debug.Log(
+                $"[{index}]  Field : {fieldDeclarationSyntax.Declaration.Type} {string.Join(", ", fieldDeclarationSyntax.Declaration.Variables.Select(v => v.Identifier.Text))}");
+#endif
+            foreach (VariableDeclaratorSyntax variable in fieldDeclarationSyntax.Declaration.Variables)
+            {
+                yield return new MemberContainer(MemberType.Event, variable.Identifier.Text);
+            }
+
+            // (new MemberContainer(MemberType.Field,
+            //     string.Join(", ",
+            //         fieldDeclarationSyntax.Declaration.Variables.Select(v =>
+            //             v.Identifier.Text)));
+
+            // Debug.Log($"[{index}]  Field : {fieldDeclarationSyntax.Declaration.Type} {string.Join(", ", fieldDeclarationSyntax.Declaration.Variables.Select(v => v.Identifier.Text))}");
+            // foreach (AttributeListSyntax attributeList in fieldDeclarationSyntax.AttributeLists)
             // {
             //     foreach (AttributeSyntax attribute in attributeList.Attributes)
             //     {

@@ -19,10 +19,8 @@ using SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
-using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
-using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -409,6 +407,7 @@ namespace SaintsField.Editor
                     // foreach (KeyValuePair<MemberInfo, IPlayaAttribute[]> kv in memberInfoToPlaya)
                     foreach (MemberInfo memberInfo in usedMemberInfos)
                     {
+                        Debug.Log($"{memberInfo.Name}/{memberInfo.GetType()}/{memberInfo is EventInfo}");
                         // MemberInfo memberInfo = kv.Key;
                         // IReadOnlyList<IPlayaAttribute> playaAttributes = kv.Value;
                         IReadOnlyList<IPlayaAttribute> playaAttributes = memberInfoToPlaya[memberInfo];
@@ -631,6 +630,44 @@ namespace SaintsField.Editor
                                 #endregion
                             }
                                 break;
+                            case EventInfo eventInfo:
+                            {
+                                #region event
+                                if (playaAttributes.Count == 0)
+                                {
+                                    break;
+                                }
+
+                                // ReSharper disable once UseNegatedPatternInIsExpression
+                                if (playaAttributes.All(each => !(each is ISaintsLayout)))
+                                {
+                                    break;
+                                }
+
+                                OrderedAttribute orderProp =
+                                    playaAttributes.FirstOrDefault(each =>
+                                        each is OrderedAttribute) as OrderedAttribute;
+                                int order = orderProp?.Order ?? int.MinValue;
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD
+                                Debug.Log($"[{systemType}] event: {eventInfo.Name}");
+#endif
+                                thisDepthInfos.Add(new SaintsFieldWithInfo
+                                {
+                                    PlayaAttributes = playaAttributes,
+                                    // PlayaAttributesQueue = playaAttributes,
+                                    // LayoutBases = layoutBases,
+                                    Targets = targets,
+
+                                    // memberType = MemberTypes.Method,
+                                    RenderType = SaintsRenderType.Event,
+                                    MemberId = eventInfo.Name,
+                                    InherentDepth = inherentDepth,
+                                    Order = order,
+                                });
+                                break;
+                                #endregion
+                            }
                         }
                     }
 
@@ -1433,7 +1470,17 @@ namespace SaintsField.Editor
                         {
                             yield return new RealTimeCalculatorRenderer(serializedObject, fieldWithInfo);
                         }
-                        else if (playaAttribute is LayoutAttribute)
+                        // ReSharper disable once MergeIntoLogicalPattern
+                        else if (playaAttribute is ISaintsLayout)
+                        {
+                            yield return new EmptyRenderer();
+                        }
+                    }
+                    yield break;
+                case SaintsRenderType.Event:
+                    foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
+                    {
+                        if (playaAttribute is ISaintsLayout)
                         {
                             yield return new EmptyRenderer();
                         }
