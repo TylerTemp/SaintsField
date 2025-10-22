@@ -289,7 +289,10 @@ namespace SaintsField.Editor.Utils
                 do
                 {
                     SerializedProperty childProperty = property.FindPropertyRelative(iterator.name);
-                    yield return childProperty;
+                    if(childProperty != null)
+                    {
+                        yield return childProperty;
+                    }
                 } while (iterator.NextVisible(false));
             }
         }

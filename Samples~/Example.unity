@@ -713,60 +713,6 @@ MonoBehaviour:
   destroySelfUnit: 0
   destroyThisComponent: 0
   unparent: 0
---- !u!1 &59883450
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 59883452}
-  - component: {fileID: 59883453}
-  m_Layer: 0
-  m_Name: SaintsDictFiller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &59883452
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 59883450}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1649096654}
-  - {fileID: 177648927}
-  - {fileID: 691523131}
-  - {fileID: 1829989615}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &59883453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 59883450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d8104be554c34f4e9eeb7d789bd5901, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  valueFillerDict:
-    _intKeys: []
-    _objValues: []
-  decValueFillerDict:
-    _intKeys: []
-    _objValues: []
 --- !u!1 &61780217
 GameObject:
   m_ObjectHideFlags: 0
@@ -1566,37 +1512,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   number: 170000000d00000002000000f9ffffff
---- !u!1 &177648926
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 177648927}
-  m_Layer: 0
-  m_Name: GameObject_1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &177648927
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 177648926}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 59883452}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &185648490
 GameObject:
   m_ObjectHideFlags: 0
@@ -6210,14 +6125,60 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toggleDict:
-    _keys: 
-    _values: 
     _saintsKeys:
     - value: 0
-    - value: 1
-    _saintsValues:
-    - value: 1
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652835
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652836
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
+    _saintsValues:
+    - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652837
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
+    - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652838
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
   toggleTable:
   - b1: 0
     b2: 0
@@ -6225,6 +6186,21 @@ MonoBehaviour:
   - b1: 0
     b2: 0
     b3: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6921583410868652835
+      type: {class: Boolean, ns: System, asm: mscorlib}
+      data: 
+    - rid: 6921583410868652836
+      type: {class: Boolean, ns: System, asm: mscorlib}
+      data: 
+    - rid: 6921583410868652837
+      type: {class: Boolean, ns: System, asm: mscorlib}
+      data: 
+    - rid: 6921583410868652838
+      type: {class: Boolean, ns: System, asm: mscorlib}
+      data: 
 --- !u!1 &622173741
 GameObject:
   m_ObjectHideFlags: 0
@@ -11997,37 +11973,6 @@ MonoBehaviour:
   - level: 0
     missionsToUnlock:
     - 0
---- !u!1 &691523130
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 691523131}
-  m_Layer: 0
-  m_Name: GameObject_2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &691523131
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 691523130}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 59883452}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &698893325
 GameObject:
   m_ObjectHideFlags: 0
@@ -12792,11 +12737,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iDict:
-    _saintsKeys: []
-    _saintsValues: []
+    _saintsKeys:
+    - valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583427232728040
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 1
+    _saintsValues:
+    - valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583427232728041
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 1
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 6921583427232728040
+      type: {class: Issue241DictInterface/Key1, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        k1: 
+    - rid: 6921583427232728041
+      type: {class: Issue241DictInterface/Value2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        v2: 
 --- !u!1 &787857617
 GameObject:
   m_ObjectHideFlags: 0
@@ -12846,11 +12823,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eToState:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652843
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 1
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652844
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value:
         <layerIndex>k__BackingField: 0
@@ -12860,6 +12859,18 @@ MonoBehaviour:
         <stateTag>k__BackingField: 
         <animationClip>k__BackingField: {fileID: 0}
         <subStateMachineNameChain>k__BackingField: []
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652845
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value:
         <layerIndex>k__BackingField: 0
         <stateNameHash>k__BackingField: 0
@@ -12868,20 +12879,88 @@ MonoBehaviour:
         <stateTag>k__BackingField: 
         <animationClip>k__BackingField: {fileID: 0}
         <subStateMachineNameChain>k__BackingField: []
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652846
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
   eToV3:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652847
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 1
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652848
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value: {x: 0, y: 0, z: 0}
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583431157285789
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: {x: 0, y: 0, z: 0}
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583431157285790
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
   eToStateOld:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652851
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value:
         <layerIndex>k__BackingField: 0
@@ -12891,24 +12970,165 @@ MonoBehaviour:
         <stateTag>k__BackingField: 
         <animationClip>k__BackingField: {fileID: 0}
         <subStateMachineNameChain>k__BackingField: []
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652852
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
   eToV3Old:
-    _keys: 
-    _values: []
     _saintsKeys:
-    - value: 1
+    - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652853
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value: {x: 0, y: 0, z: 0}
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583431157285791
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
   myStructToGameObject:
-    _keys: []
-    _values: []
     _saintsKeys:
     - value:
-        key: 432
+        key: 
         ks: []
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652855
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value:
         ss: 
         si: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652856
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6921583410868652843
+      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        value__: 0
+    - rid: 6921583410868652844
+      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        value__: 0
+    - rid: 6921583410868652845
+      type: {class: AnimatorState, ns: SaintsField, asm: today.comes.saintsfield.Runtime}
+      data:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
+    - rid: 6921583410868652846
+      type: {class: AnimatorState, ns: SaintsField, asm: today.comes.saintsfield.Runtime}
+      data:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
+    - rid: 6921583410868652847
+      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        value__: 0
+    - rid: 6921583410868652848
+      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        value__: 0
+    - rid: 6921583410868652851
+      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        value__: 0
+    - rid: 6921583410868652852
+      type: {class: AnimatorState, ns: SaintsField, asm: today.comes.saintsfield.Runtime}
+      data:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
+    - rid: 6921583410868652853
+      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        value__: 0
+    - rid: 6921583410868652855
+      type: {class: SaintsDictCustomDrawer/MyKeyStruct, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        key: 
+        ks: []
+    - rid: 6921583410868652856
+      type: {class: SaintsDictCustomDrawer/MyValueStruct, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        ss: 
+        si: 0
+    - rid: 6921583431157285789
+      type: {class: Vector3, ns: UnityEngine, asm: UnityEngine.CoreModule}
+      data:
+        x: 0
+        y: 0
+        z: 0
+    - rid: 6921583431157285790
+      type: {class: Vector3, ns: UnityEngine, asm: UnityEngine.CoreModule}
+      data:
+        x: 0
+        y: 0
+        z: 0
+    - rid: 6921583431157285791
+      type: {class: Vector3, ns: UnityEngine, asm: UnityEngine.CoreModule}
+      data:
+        x: 0
+        y: 0
+        z: 0
 --- !u!1 &788337258 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2922177853963676715, guid: b0b472ae658b67548b06851d1d8a93e1, type: 3}
@@ -17882,49 +18102,223 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   oneField:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652857
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value:
         f1: 
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652858
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
   oneFields:
-    _keys: 
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652859
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value:
       - f1: 
-      - f1: 
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
   twoField:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652860
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value:
         f1: 
         f2: 
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652861
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
   twoFields:
-    _keys: 
-    _saintsKeys: []
-    _saintsValues: []
-  oneFieldAttr:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
+    _saintsValues:
+    - value:
+      - f1: 
+        f2: 
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
+  oneFieldAttr:
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652862
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value:
         f1: 
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652863
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
   oneFieldLabel:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652864
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value:
+        f1: 
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652865
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6921583410868652857
+      type: {class: Int32, ns: System, asm: mscorlib}
+      data: 
+    - rid: 6921583410868652858
+      type: {class: Issue301SaintsDictionaryField/OneField, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        f1: 
+    - rid: 6921583410868652859
+      type: {class: Int32, ns: System, asm: mscorlib}
+      data: 
+    - rid: 6921583410868652860
+      type: {class: Int32, ns: System, asm: mscorlib}
+      data: 
+    - rid: 6921583410868652861
+      type: {class: Issue301SaintsDictionaryField/TwoField, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        f1: 
+        f2: 
+    - rid: 6921583410868652862
+      type: {class: Int32, ns: System, asm: mscorlib}
+      data: 
+    - rid: 6921583410868652863
+      type: {class: Issue301SaintsDictionaryField/OneFieldAttr, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        f1: 
+    - rid: 6921583410868652864
+      type: {class: Int32, ns: System, asm: mscorlib}
+      data: 
+    - rid: 6921583410868652865
+      type: {class: Issue301SaintsDictionaryField/OneFieldLabel, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
         f1: 
 --- !u!1 &1171136839
 GameObject:
@@ -23551,37 +23945,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hvrTeleporter: {fileID: 831760790}
   hvrTeleporterInactive: {fileID: 1597261715}
---- !u!1 &1649096653
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1649096654}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1649096654
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1649096653}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 59883452}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1649546546
 GameObject:
   m_ObjectHideFlags: 0
@@ -24160,12 +24523,48 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colors:
-    _keys: 
-    _values: []
     _saintsKeys:
-    - value: 1
+    - value: 3
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652841
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
-    - value: {r: 0.5188679, g: 0.3054789, b: 0.13950694, a: 1}
+    - value: {r: 0, g: 0, b: 0, a: 0}
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583431157285788
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6921583410868652841
+      type: {class: Issue236DictionaryEnum/CollectableType, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+      data:
+        value__: 0
+    - rid: 6921583431157285788
+      type: {class: Color, ns: UnityEngine, asm: UnityEngine.CoreModule}
+      data:
+        r: 0
+        g: 0
+        b: 0
+        a: 0
 --- !u!1 &1700820806 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6492530958215482544, guid: b0b472ae658b67548b06851d1d8a93e1, type: 3}
@@ -25110,12 +25509,45 @@ MonoBehaviour:
   treeEnums: 0
   flagsTreeEnums: 0
   namedEnumDict:
-    _keys: 
-    _values: 
     _saintsKeys:
-    - value: 1
+    - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652839
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
-    - value: 2
+    - value: 0
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652840
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6921583410868652839
+      type: {class: DictionaryEnumLabel/GuildHintID, ns: SaintsField.Samples.Scripts.IssueAndTesting.Testing, asm: today.comes.saintsfield.Samples}
+      data:
+        value__: 0
+    - rid: 6921583410868652840
+      type: {class: DictionaryEnumLabel/GuildHintID, ns: SaintsField.Samples.Scripts.IssueAndTesting.Testing, asm: today.comes.saintsfield.Samples}
+      data:
+        value__: 0
 --- !u!1 &1780388858
 GameObject:
   m_ObjectHideFlags: 0
@@ -25972,11 +26404,11 @@ MonoBehaviour:
   - {fileID: 955802933}
   - {fileID: 1055384895}
   - {fileID: 139617676}
-  - {fileID: 59883450}
-  - {fileID: 1649096653}
-  - {fileID: 177648926}
-  - {fileID: 691523130}
-  - {fileID: 1829989614}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 867320292}
   - {fileID: 911544252560597303}
   - {fileID: 911544252560597302}
@@ -26066,37 +26498,6 @@ MonoBehaviour:
   percentRange: 0
   stepRange: 0
   v: 0
---- !u!1 &1829989614
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1829989615}
-  m_Layer: 0
-  m_Name: GameObject_3
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1829989615
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1829989614}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 59883452}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1830778823
 GameObject:
   m_ObjectHideFlags: 0
@@ -32959,78 +33360,343 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   genDict:
-    _keys: []
-    _values: []
     _saintsKeys:
-    - value: 1
-    - value: 2
+    - value: a
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
+    - value: b
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
-    - value: {fileID: 787857617}
     - value: {fileID: 2137894679}
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
   dict:
-    _keys: 
-    _values: []
-    _saintsKeys:
-    - value: 0
-    - value: 1
-    _saintsValues:
-    - value:
-        myStringField: 0
-        myIntField: 
-    - value:
-        myStringField: 1
-        myIntField: 
+    _saintsKeys: []
+    _saintsValues: []
   genDictValueArray:
-    _keys: []
-    _saintsKeys:
-    - value: 
-    _saintsValues:
-    - value:
-      - {fileID: 2009324526}
-      - {fileID: 787857617}
+    _saintsKeys: []
+    _saintsValues: []
   genDictValueList:
-    _keys: []
-    _saintsKeys:
-    - value: 
-    _saintsValues:
-    - value:
-      - {fileID: 2009324526}
-      - {fileID: 787857617}
+    _saintsKeys: []
+    _saintsValues: []
   kvPagin10:
-    _keys: 
-    _values: []
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 1
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 2
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 3
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 4
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 5
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 6
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 7
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 8
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 9
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 1
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 2
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 3
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 4
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 5
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 6
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 7
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 8
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     - value: 9
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
   keyWidthControl:
-    _keys: 
-    _values: []
     _saintsKeys: []
     _saintsValues: []
   valueWidthControl:
-    _keys: 
-    _values: []
     _saintsKeys: []
     _saintsValues: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &2009356786
 GameObject:
   m_ObjectHideFlags: 0
@@ -33266,8 +33932,37 @@ MonoBehaviour:
   expand:
     _saintsKeys:
     - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
     _saintsValues:
     - value: {fileID: 1131818498}
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &2043659985
 GameObject:
   m_ObjectHideFlags: 0
@@ -35084,6 +35779,547 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1001 &1951425805536394670
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2720543415014595850, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_Name
+      value: SaintsDictReference
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524437337241258050, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583409857299263]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410441093729]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410441617613]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410447909529]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410447909543]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410447909549]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410447909578]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410452104390]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410452104391]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410452630250]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410452630251]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410452630252]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410454200531]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410454463887]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410468356639]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410471239826]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410479890810]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410479891191]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410488279356]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410488279833]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410494833226]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410572165747]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410574263159]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410581079378]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410586322628]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410597331846]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410607292489]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410610177958]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410632458916]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410643206155]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410643206319]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410644254941]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410647662722]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410647662956]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410649236135]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410766415150]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410766415337]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410768775008]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410776637688]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410778735966]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583410778735967]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583409857299263].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410441093729].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410441617613].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410447909529].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410447909543].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410447909549].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410447909578].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410452104390].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410452104391].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410452630250].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410452630251].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410452630252].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410454200531].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410454463887].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410468356639].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410471239826].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410479890810].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410479891191].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410488279356].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410488279833].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410494833226].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410572165747].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410574263159].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410581079378].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410586322628].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410597331846].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410607292489].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410610177958].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410632458916].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410643206155].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410643206319].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410644254941].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410647662722].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410647662956].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410649236135].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410766415150].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410766415337].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410768775008].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410776637688].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410778735966].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583410778735967].s
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDict._saintsKeys.Array.data[0].value.VRef
+      value: 6921583410649236135
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDict._saintsKeys.Array.data[0].valueField.VRef
+      value: 6921583410778735966
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDict._saintsValues.Array.data[0].valueArray.Array.data[0].VRef
+      value: 6921583410778735967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDict._saintsValues.Array.data[0].valueArray.Array.data[1].VRef
+      value: 6921583410452630252
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[-2]'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsKeys.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._saintsKeys.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsValues.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._saintsValues.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583431157285792]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/Sub1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583431157285793]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/Sub1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: 'managedReferences[6921583431157285794]'
+      value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/Sub2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._saintsKeys.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._saintsValues.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285792].absC
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285792].sub1
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285793].absC
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285793].sub1
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285794].absC
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285794].sub1
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: managedReferences[6921583431157285794].sub2
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsKeys.Array.data[0].value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsKeys.Array.data[1].value
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsValues.Array.data[0].value
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsValues.Array.data[1].value
+      value: 
+      objectReference: {fileID: 4190710478443201291}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._saintsKeys.Array.data[0].wrapType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: dymDict._saintsKeys.Array.data[0].valueField.VRef
+      value: 6921583431157285794
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._saintsValues.Array.data[0].wrapType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._saintsKeys.Array.data[0].wrapType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._saintsValues.Array.data[0].wrapType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsKeys.Array.data[1].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._saintsKeys.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._saintsValues.Array.data[1].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._saintsValues.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._saintsKeys.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._saintsValues.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._saintsKeys.Array.data[0].valueField.propertyType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._saintsValues.Array.data[0].valueField.propertyType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._saintsKeys.Array.data[0].valueField.propertyType
+      value: 4
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
 --- !u!1001 &2088148948144400106
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35368,6 +36604,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fee20865f0f492592fd834d63a10f5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!212 &4190710478443201291 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: -1184629234431764471, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+  m_PrefabInstance: {fileID: 4190710478443201288}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4273993127172390032
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -36265,6 +37506,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: 'managedReferences[6921583409857299213]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: 'managedReferences[6921583410766415151]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: curve1.m_Curve.Array.data[0].tangentMode
       value: 0
       objectReference: {fileID: 0}
@@ -36293,6 +37542,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6004775636325262730}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsKeys.Array.data[0].wrapType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsHashSet._saintsList.Array.data[0].value
       value: 123
       objectReference: {fileID: 0}
@@ -36301,12 +37554,56 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsKeys.Array.data[0].value.VRef
+      value: 6921583409857299213
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsValues.Array.data[0].wrapType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsKeys.Array.data[0].value.IsVRef
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsValues.Array.data[0].value.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsKeys.Array.data[0].valueField.VRef
+      value: 6921583410766415151
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsKeys.Array.data[0].valueField.IsVRef
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsValues.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsKeys.Array.data[0].value.propertyType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsValues.Array.data[0].value.propertyType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: state.<subStateMachineNameChain>k__BackingField.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsKeys.Array.data[0].valueField.propertyType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: 'state.<subStateMachineNameChain>k__BackingField.Array.data[0]'
       value: SubStateMachine2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsDict._saintsValues.Array.data[0].valueField.propertyType
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: stateBase.<subStateMachineNameChain>k__BackingField.Array.size
@@ -36655,7 +37952,7 @@ SceneRoots:
   - {fileID: 2137894681}
   - {fileID: 2009324527}
   - {fileID: 787857618}
-  - {fileID: 59883452}
+  - {fileID: 1951425805536394670}
   - {fileID: 1294877703}
   - {fileID: 867320293}
   - {fileID: 1088717878633889117}

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property, AllowMultiple = true)]
+    [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property)]
     public class DateTimeAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;

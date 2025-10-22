@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.BaseWrapTypeDrawer;
+using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
@@ -392,6 +394,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
             Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);
 
+            IReadOnlyList<Attribute> injectedKeyAttributes = GetInjectedPropertyAttributes(info, typeof(KeyAttributeAttribute));
+            IReadOnlyList<Attribute> injectedValueAttributes = GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
+
             IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
             totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
             IntegerField totalCountBottomField = container.Q<IntegerField>(name: NameTotalCountBottom(property));
@@ -678,7 +683,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     };
                     element.Add(keyContainer);
 
-                    VisualElement resultElement = CreateCellElement(keysField, keyType, elementProp, this, this, keysParent);
+                    VisualElement resultElement = CreateCellElement(keysField, keyType, elementProp, injectedKeyAttributes, this, this, keysParent);
                     keyContainer.Add(resultElement);
 
                     keyContainer.TrackPropertyValue(keysProp, _ =>
@@ -800,7 +805,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                     // Debug.Log($"elementProp={elementProp.propertyPath}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
 
-                    VisualElement resultElement = CreateCellElement(valuesField, valueType, elementProp, this, this, valuesParent);
+                    VisualElement resultElement = CreateCellElement(valuesField, valueType, elementProp, injectedValueAttributes, this, this, valuesParent);
 
                     element.Add(resultElement);
 
@@ -1070,16 +1075,153 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         //     return Enumerable.Range(0, property.arraySize).ToList();
         // }
 
-        private static VisualElement CreateCellElement(FieldInfo info, Type rawType, SerializedProperty serializedProperty, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
+        private static IReadOnlyList<Attribute> GetInjectedPropertyAttributes(FieldInfo info, Type expectedInjector)
         {
+            List<Attribute> result = new List<Attribute>();
 
-            PropertyAttribute[] allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(info);
+            foreach (Attribute propertyAttribute in ReflectCache.GetCustomAttributes<Attribute>(info))
+            {
+                if (propertyAttribute is not InjectAttributeBase injectBase ||
+                    !expectedInjector.IsAssignableFrom(propertyAttribute.GetType()))
+                {
+                    continue;
+                }
+
+                Attribute injectedAttribute;
+                try
+                {
+                    if(injectBase.Parameters.Length > 0)
+                    {
+                        // Debug.Log($"{injectBase.Decorator}: {string.Join(", ", injectBase.Parameters)}");
+                        injectedAttribute =
+                            Activator.CreateInstance(injectBase.Decorator, injectBase.Parameters) as Attribute;
+                    }
+                    else
+                    {
+                        // Debug.Log($"{injectBase.Decorator}");
+                        injectedAttribute= Activator.CreateInstance(injectBase.Decorator, true) as Attribute;
+                    }
+                    // injectedAttribute = Activator.CreateInstance(injectBase.Decorator,
+                    //     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.CreateInstance, null, injectBase.Parameters,
+                    //     null, null) as Attribute;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                    continue;
+                }
+
+                if (injectedAttribute != null)
+                {
+                    result.Add(injectedAttribute);
+                }
+            }
+
+            return result;
+        }
+
+        private VisualElement CreateCellElement(FieldInfo info, Type rawType, SerializedProperty serializedProperty, IReadOnlyList<Attribute> injectedAttributes, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
+        {
+            Attribute[] allCustomAttributes = ReflectCache.GetCustomAttributes<Attribute>(info);
             // Debug.Log($"{info.Name}: {string.Join<PropertyAttribute>(", ", allAttributes)}");
+
+            // List<Attribute> allAttributes = new List<Attribute>();
+            List<PropertyAttribute> allPropertyAttributes = new List<PropertyAttribute>();
+
+            foreach (Attribute attr in injectedAttributes.Concat(allCustomAttributes))
+            {
+                // allAttributes.Add(attr);
+                if (attr is PropertyAttribute propAttr)
+                {
+                    allPropertyAttributes.Add(propAttr);
+                }
+
+            }
 
             Type useDrawerType = null;
             Attribute useAttribute = null;
-            IReadOnlyList<PropertyAttribute> appendPropertyAttributes = allAttributes;
-            string wrapName = ReflectUtils.GetIWrapPropName(rawType);
+
+            // string wrapName = ReflectUtils.GetIWrapPropName(rawType);
+            // Type wrapType = ReflectUtils.GetIWrapPropType(rawType, wrapName);
+            // FieldInfo wrapInfo = (FieldInfo)ReflectUtils.GetProp(rawType, wrapName).fieldOrMethodInfo;
+            Type wrapInstanceType = info.FieldType.GetGenericArguments()[0];
+            Type underType = wrapInstanceType.GetGenericArguments()[0];
+
+            bool needUseRef;
+            bool targetIsArrayOrList = false;
+            if (underType.IsArray)
+            {
+                targetIsArrayOrList = true;
+                needUseRef = !RuntimeUtil.IsSubFieldUnitySerializable(underType.GetElementType());
+            }
+            else if(underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                targetIsArrayOrList = true;
+                needUseRef = !RuntimeUtil.IsSubFieldUnitySerializable(underType.GetGenericArguments()[0]);
+            }
+            else
+            {
+                needUseRef = injectedAttributes.Any(each => each is SerializeReference)
+                             || !RuntimeUtil.IsSubFieldUnitySerializable(underType);
+            }
+
+            // Debug.Log($"needUseRef={needUseRef}/{serializedProperty.propertyPath}");
+            if (!needUseRef)
+            {
+                if (underType.IsArray)
+                {
+                    Type arrayElement = underType.GetElementType();
+                    Debug.Assert(arrayElement != null);
+                    needUseRef = arrayElement.IsInterface || arrayElement.IsAbstract;
+                }
+                else if (underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    Type listElement = underType.GetGenericArguments()[0];
+                    needUseRef = listElement.IsInterface || listElement.IsAbstract;
+                }
+            }
+            SerializedProperty wrapTypeProp = serializedProperty.FindPropertyRelative("wrapType");
+            Debug.Assert(wrapTypeProp != null);
+            string wrapName;
+            if (needUseRef)
+            {
+                if (underType.IsArray)
+                {
+                    wrapName = "valueArray";
+                    if (wrapTypeProp.intValue != (int)WrapType.Array)
+                    {
+                        wrapTypeProp.intValue = (int)WrapType.Array;
+                        serializedProperty.serializedObject.ApplyModifiedProperties();
+                    }
+                }
+                else if (underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    wrapName = "valueList";
+                    if (wrapTypeProp.intValue != (int)WrapType.List)
+                    {
+                        wrapTypeProp.intValue = (int)WrapType.List;
+                        serializedProperty.serializedObject.ApplyModifiedProperties();
+                    }
+                }
+                else
+                {
+                    wrapName = "valueField";
+                    if (wrapTypeProp.intValue != (int)WrapType.Field)
+                    {
+                        wrapTypeProp.intValue = (int)WrapType.Field;
+                        serializedProperty.serializedObject.ApplyModifiedProperties();
+                    }
+                }
+            }
+            else
+            {
+                wrapName = "value";
+                if (wrapTypeProp.intValue != (int)WrapType.Field)
+                {
+                    wrapTypeProp.intValue = (int)WrapType.Field;
+                    serializedProperty.serializedObject.ApplyModifiedProperties();
+                }
+            }
             Type wrapType = ReflectUtils.GetIWrapPropType(rawType, wrapName);
             FieldInfo wrapInfo = (FieldInfo)ReflectUtils.GetProp(rawType, wrapName).fieldOrMethodInfo;
 
@@ -1088,38 +1230,48 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             SerializedProperty serializedBaseProperty = serializedProperty.FindPropertyRelative(wrapName) ??
                                                         SerializedUtils.FindPropertyByAutoPropertyName(
                                                             serializedProperty, wrapName);
-            bool isArray = serializedBaseProperty.propertyType == SerializedPropertyType.Generic
-                           && serializedBaseProperty.isArray;
-            if(!isArray)
+            // bool isArray = serializedBaseProperty.propertyType == SerializedPropertyType.Generic
+            //                && serializedBaseProperty.isArray;
+            if(!needUseRef)
             {
-                ISaintsAttribute saintsAttr = allAttributes
-                    .OfType<ISaintsAttribute>()
-                    .FirstOrDefault();
-
-                // Debug.Log(saintsAttr);
-
-                useAttribute = saintsAttr as Attribute;
-                if (saintsAttr != null)
+                if (!targetIsArrayOrList)
                 {
-                    useDrawerType = GetFirstSaintsDrawerType(saintsAttr.GetType());
-                }
-                else
-                {
-                    (Attribute attrOrNull, Type drawerType) =
-                        GetFallbackDrawerType(wrapInfo, serializedBaseProperty, allAttributes);
-                    // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
-                    useAttribute = attrOrNull;
-                    useDrawerType = drawerType;
+                    ISaintsAttribute saintsAttr = allPropertyAttributes
+                        .OfType<ISaintsAttribute>()
+                        .FirstOrDefault();
 
-                    if (useDrawerType == null &&
-                        serializedBaseProperty.propertyType == SerializedPropertyType.Generic)
+                    // Debug.Log(saintsAttr);
+
+                    useAttribute = saintsAttr as Attribute;
+                    if (saintsAttr != null)
                     {
-                        PropertyAttribute prop = new SaintsRowAttribute(inline: true);
-                        useAttribute = prop;
-                        useDrawerType = typeof(SaintsRowAttributeDrawer);
-                        appendPropertyAttributes = allAttributes.Prepend(prop).ToArray();
+                        useDrawerType = GetFirstSaintsDrawerType(saintsAttr.GetType());
+                    }
+                    else
+                    {
+                        (Attribute attrOrNull, Type drawerType) =
+                            GetFallbackDrawerType(wrapInfo, serializedBaseProperty, allCustomAttributes);
+                        // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
+                        useAttribute = attrOrNull;
+                        useDrawerType = drawerType;
+
+                        if (useDrawerType == null &&
+                            serializedBaseProperty.propertyType == SerializedPropertyType.Generic)
+                        {
+                            PropertyAttribute prop = new SaintsRowAttribute(inline: true);
+                            useAttribute = prop;
+                            useDrawerType = typeof(SaintsRowAttributeDrawer);
+                            allPropertyAttributes.Insert(0, prop);
+                            // appendPropertyAttributes = allCustomAttributes.Prepend(prop).ToArray();
+                        }
                     }
                 }
+
+                // Debug.Log($"useDrawerType={useDrawerType}, {serializedProperty.propertyPath}");
+            }
+            else
+            {
+                useDrawerType = typeof(BaseWrapDrawer);
             }
 
             // Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath}/{useDrawerType}");
@@ -1128,7 +1280,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             {
                 VisualElement r = UIToolkitUtils.CreateOrUpdateFieldRawFallback(
                     serializedBaseProperty,
-                    allAttributes,
+                    allPropertyAttributes,
                     wrapType,
                     null,
                     wrapInfo,
@@ -1138,7 +1290,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     null,
                     parent
                 );
-                VisualElement merged = UIToolkitCache.MergeWithDec(r, allAttributes);
+                VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
                 SaintsRendererGroup.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
                 return merged;
             }
@@ -1159,12 +1311,15 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             // Debug.Log($"{useAttribute}/{useDrawerType}: {serializedProperty.propertyPath}");
 
-            PropertyDrawer propertyDrawer = MakePropertyDrawer(useDrawerType, wrapInfo, useAttribute, null);
-            // Debug.Log(saintsPropertyDrawer);
+            PropertyDrawer propertyDrawer = useDrawerType == typeof(BaseWrapDrawer)
+                ? MakePropertyDrawer(useDrawerType, info, null, null)  // baseWrap itself will looking into the wrap
+                : MakePropertyDrawer(useDrawerType, wrapInfo, useAttribute, null);
+            // Debug.Log(propertyDrawer);
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
             {
                 saintsPropertyDrawer.InHorizontalLayout = true;
-                saintsPropertyDrawer.AppendPropertyAttributes = appendPropertyAttributes;
+                saintsPropertyDrawer.AppendPropertyAttributes = allPropertyAttributes;
+                // Debug.Log($"{needUseRef}{saintsPropertyDrawer is BaseWrapDrawer}/{saintsPropertyDrawer}");
                 // Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath} -> {string.Join(", ", saintsPropertyDrawer.AppendPropertyAttributes)}");
             }
 
@@ -1180,22 +1335,24 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             if (!useImGui)
             {
                 // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}");
-                VisualElement r = propertyDrawer.CreatePropertyGUI(serializedBaseProperty);
-                VisualElement merged = UIToolkitCache.MergeWithDec(r, allAttributes);
+                VisualElement r = propertyDrawer.CreatePropertyGUI(propertyDrawer is BaseWrapDrawer? serializedProperty: serializedBaseProperty);
+                VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
                 SaintsRendererGroup.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
                 return merged;
             }
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
             // We don't need to handle decorators either
-            PropertyField result = new PropertyField(serializedBaseProperty, string.Empty)
+            // Debug.Log(serializedProperty.propertyPath);
+            // Debug.Log(info.FieldType);
+            PropertyField result = new PropertyField(serializedProperty, string.Empty)
             {
                 style =
                 {
                     flexGrow = 1,
                 },
             };
-            result.Bind(serializedBaseProperty.serializedObject);
+            result.Bind(serializedProperty.serializedObject);
             return result;
         }
 

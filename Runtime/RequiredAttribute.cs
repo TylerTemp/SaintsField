@@ -13,6 +13,10 @@ namespace SaintsField
         public readonly string ErrorMessage;
         public readonly EMessageType MessageType;
 
+        public RequiredAttribute(): this(null)
+        {
+        }
+
         public RequiredAttribute(string errorMessage = null, EMessageType messageType = EMessageType.Error)
         {
             ErrorMessage = errorMessage;

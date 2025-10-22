@@ -2665,6 +2665,7 @@ namespace SaintsField.Editor.Utils
                             ? null
                             : ReferencePickerAttributeDrawer.CopyObj(managedReferenceValue, Activator.CreateInstance((Type)curItem));
 
+                        // Debug.Log($"set ref to {instance} for {property.propertyPath}");
                         property.managedReferenceValue = instance;
                         property.serializedObject.ApplyModifiedProperties();
                         return null;

@@ -1,47 +1,68 @@
-#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
+using SaintsField.SaintsSerialization;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
+namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
 {
-    public class SaintsInterfaceElement: VisualElement
+    public class SaintsWrapElement: VisualElement
     {
-        private readonly SerializedProperty _valueProp;
-        private readonly SerializedProperty _vRef;
-        private readonly ExpandButtonElement _referenceExpandButton;
+        private readonly SerializedProperty _unityProp;
         private readonly VisualElement _saintsRowElement;
         private readonly GeneralUObjectPicker _objectContainer;
         private readonly VisualElement _referenceContainer;
+        private readonly SerializedProperty _vRef;
 
-
-        public SaintsInterfaceElement(Type valueType, Type interfaceType, SerializedProperty property, SerializedProperty valueProp, IReadOnlyList<Attribute> allAttributes, FieldInfo info, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parentObj)
+        public SaintsWrapElement(bool manuallySave, Type nonUnityType, SerializedProperty property, IReadOnlyList<Attribute> allAttributes, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parentObj)
         {
-            _valueProp = valueProp;
+            _unityProp = property.FindPropertyRelative("V");
             SerializedProperty isVRef = property.FindPropertyRelative("IsVRef") ?? SerializedUtils.FindPropertyByAutoPropertyName(property, "IsVRef");
-            _vRef = property.FindPropertyRelative("VRef") ?? SerializedUtils.FindPropertyByAutoPropertyName(property, "VRef");
+            SerializedProperty vRef = property.FindPropertyRelative("VRef") ?? SerializedUtils.FindPropertyByAutoPropertyName(property, "VRef");
+            _vRef = vRef;
 
             style.flexDirection = FlexDirection.Row;
 
             IsVRefButton isVRefButton = new IsVRefButton
             {
                 bindingPath = isVRef.propertyPath,
+                value = isVRef.boolValue,
             };
             Add(isVRefButton);
             isVRefButton.RegisterValueChangedCallback(v =>
             {
+                // Debug.Log($"isVRefButton={v.newValue}");
                 UpdateVRefChange(v.newValue);
+                if (manuallySave)
+                {
+                    isVRef.boolValue = v.newValue;
+                    isVRef.serializedObject.ApplyModifiedProperties();
+                }
             });
+
+            bool canNotAssignUnityObject =
+                nonUnityType.IsClass && !typeof(UnityEngine.Object).IsAssignableFrom(nonUnityType)
+                || nonUnityType.IsValueType;
+
+            if (canNotAssignUnityObject)
+            {
+                isVRefButton.style.display = DisplayStyle.None;
+                if (!isVRef.boolValue)
+                {
+                    isVRef.boolValue = true;
+                    isVRef.serializedObject.ApplyModifiedProperties();
+                }
+            }
 
             VisualElement columnContainer = new VisualElement
             {
@@ -54,12 +75,24 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             Add(columnContainer);
 
             _objectContainer =
-                new GeneralUObjectPicker(valueProp.propertyPath, valueProp.objectReferenceValue, valueType, interfaceType, property.serializedObject.targetObject)
+                new GeneralUObjectPicker(_unityProp.propertyPath, _unityProp.objectReferenceValue, typeof(UnityEngine.Object), nonUnityType, property.serializedObject.targetObject)
                     {
-                        // bindingPath = valueProp.propertyPath,
-                        // value = valueProp.objectReferenceValue,
+                        // bindingPath = _unityProp.propertyPath,
+                        // value = _unityProp.objectReferenceValue,
                     };
+            // Debug.Log($"_unityProp.objectReferenceValue={_unityProp.objectReferenceValue}");
+            // Auto bind is broken for some reason... manually assign it
 
+            // _objectContainer.TrackPropertyValue(_unityProp, u => Debug.Log(u.objectReferenceValue));
+            if(manuallySave)
+            {
+                _objectContainer.RegisterValueChangedCallback(v =>
+                {
+                    // Debug.Log($"_objectContainer={v.newValue}");
+                    _unityProp.objectReferenceValue = v.newValue;
+                    _unityProp.serializedObject.ApplyModifiedProperties();
+                });
+            }
             columnContainer.Add(_objectContainer);
 
             _referenceContainer = new VisualElement();
@@ -76,47 +109,44 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             // _dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
             // _dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
             bool expand = allAttributes.Any(each => each is DefaultExpandAttribute)
-                          || _vRef.isExpanded;
+                          || vRef.isExpanded;
 
-            _referenceExpandButton = new ExpandButtonElement
+            ExpandButtonElement referenceExpandButton = new ExpandButtonElement
             {
                 value = expand,
             };
-            _referenceExpandButton.SetViewDataKey(_vRef.propertyPath);
-            referenceHContainer.Add(_referenceExpandButton);
+            referenceExpandButton.SetViewDataKey(vRef.propertyPath);
+            referenceHContainer.Add(referenceExpandButton);
 
-            UIToolkitUtils.DropdownButtonField dropdownBtn = UIToolkitUtils.ReferenceDropdownButtonField("", _vRef, this, () => GetTypesImplementingInterface(interfaceType));
+            UIToolkitUtils.DropdownButtonField dropdownBtn = UIToolkitUtils.ReferenceDropdownButtonField("", vRef, referenceHContainer, () => GetTypesImplementingInterface(nonUnityType));
             referenceHContainer.Add(dropdownBtn);
             dropdownBtn.style.marginLeft = 0;
             dropdownBtn.ButtonElement.style.borderTopLeftRadius = 0;
             dropdownBtn.ButtonElement.style.borderBottomLeftRadius = 0;
             dropdownBtn.labelElement.style.marginLeft = 0;
-            dropdownBtn.TrackPropertyValue(_vRef, vr => dropdownBtn.ButtonLabelElement.text = UIToolkitUtils.GetReferencePropertyLabel(vr));
+            dropdownBtn.TrackPropertyValue(vRef, vr => dropdownBtn.ButtonLabelElement.text = UIToolkitUtils.GetReferencePropertyLabel(vr));
 
             // var g = SerializedUtils.GetFileOrProp(parentObj, "VRef");
-            Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
-                ? ReflectUtils.GetElementType(info.FieldType)
-                : info.FieldType;
-            MemberInfo vPropInfo = fieldType.GetField("VRef", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            if (vPropInfo == null)
-            {
-                vPropInfo = fieldType.GetProperty("VRef", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            }
 
-            Debug.Assert(vPropInfo != null, fieldType);
+            FieldInfo vPropInfo = typeof(SaintsSerializedProperty).GetField("VRef", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            // if (vPropInfo == null)
+            // {
+            //     vPropInfo = wrappedType.GetProperty("VRef", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            // }
 
-            _saintsRowElement = SaintsRowAttributeDrawer.CreateElement(_vRef, "", vPropInfo,
+            Debug.Assert(vPropInfo != null, nonUnityType);
+
+            _saintsRowElement = SaintsRowAttributeDrawer.CreateElement(vRef, "", vPropInfo,
                 true, new SaintsRowAttribute(inline: true), makeRenderer, doTweenPlayRecorder, parentObj);
             _referenceContainer.Add(_saintsRowElement);
 
-            UpdateExpand(_referenceExpandButton.value);
+            UpdateExpand(referenceExpandButton.value);
             // _referenceExpandButton.clicked += UpdateExpand;
-            _referenceExpandButton.OnValueChanged.AddListener(UpdateExpand);
+            referenceExpandButton.OnValueChanged.AddListener(UpdateExpand);
 
             UpdateVRefChange(isVRef.boolValue);
 
-            Debug.Assert(valueType != null);
-            Debug.Assert(interfaceType != null);
+            Debug.Assert(nonUnityType != null);
         }
 
         private void UpdateVRefChange(bool boolValue)
@@ -125,10 +155,10 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             {
                 _objectContainer.style.display = DisplayStyle.None;
                 _referenceContainer.style.display = DisplayStyle.Flex;
-                if (_valueProp.objectReferenceValue != null)  // Don't keep a reference
+                if (_unityProp.objectReferenceValue != null)  // Don't keep a reference
                 {
-                    _valueProp.objectReferenceValue = null;
-                    _valueProp.serializedObject.ApplyModifiedProperties();
+                    _unityProp.objectReferenceValue = null;
+                    _unityProp.serializedObject.ApplyModifiedProperties();
                 }
             }
             else
@@ -150,16 +180,14 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             return _cachedTypesImplementingInterface ??= AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
                 .Where(type => !type.IsAbstract
-                               &&!typeof(Object).IsAssignableFrom(type)
+                               &&!typeof(UnityEngine.Object).IsAssignableFrom(type)
                                && interfaceType.IsAssignableFrom(type))
                 .ToArray();
         }
 
         private void UpdateExpand(bool isExpanded)
         {
-            _vRef.serializedObject.ApplyModifiedProperties();
             _saintsRowElement.style.display = isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
 }
-#endif
