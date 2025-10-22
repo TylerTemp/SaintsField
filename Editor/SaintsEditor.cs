@@ -407,7 +407,7 @@ namespace SaintsField.Editor
                     // foreach (KeyValuePair<MemberInfo, IPlayaAttribute[]> kv in memberInfoToPlaya)
                     foreach (MemberInfo memberInfo in usedMemberInfos)
                     {
-                        Debug.Log($"{memberInfo.Name}/{memberInfo.GetType()}/{memberInfo is EventInfo}");
+                        // Debug.Log($"{memberInfo.Name}/{memberInfo.GetType()}/{memberInfo is EventInfo}");
                         // MemberInfo memberInfo = kv.Key;
                         // IReadOnlyList<IPlayaAttribute> playaAttributes = kv.Value;
                         IReadOnlyList<IPlayaAttribute> playaAttributes = memberInfoToPlaya[memberInfo];
@@ -630,9 +630,9 @@ namespace SaintsField.Editor
                                 #endregion
                             }
                                 break;
-                            case EventInfo eventInfo:
+                            default:
                             {
-                                #region event
+                                #region whatever
                                 if (playaAttributes.Count == 0)
                                 {
                                     break;
@@ -660,8 +660,8 @@ namespace SaintsField.Editor
                                     Targets = targets,
 
                                     // memberType = MemberTypes.Method,
-                                    RenderType = SaintsRenderType.Event,
-                                    MemberId = eventInfo.Name,
+                                    RenderType = SaintsRenderType.Other,
+                                    MemberId = $"?:{memberInfo.Name}",
                                     InherentDepth = inherentDepth,
                                     Order = order,
                                 });
@@ -1477,7 +1477,7 @@ namespace SaintsField.Editor
                         }
                     }
                     yield break;
-                case SaintsRenderType.Event:
+                default:
                     foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
                     {
                         if (playaAttribute is ISaintsLayout)
@@ -1486,8 +1486,8 @@ namespace SaintsField.Editor
                         }
                     }
                     yield break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
+                // default:
+                //     throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
             }
         }
 

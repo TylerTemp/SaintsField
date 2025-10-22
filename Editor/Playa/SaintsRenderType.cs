@@ -10,6 +10,6 @@
         // DOTweenMethod,
         NativeProperty,
         ClassStruct,
-        Event,  // event keyword
+        Other,  // event keyword
     }
 }
