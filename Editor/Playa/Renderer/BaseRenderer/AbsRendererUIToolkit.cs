@@ -2402,7 +2402,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             Foldout foldout = oldElement;
             if (foldout != null && !foldout.ClassListContains("saintsfield-list"))
             {
+#if SAINTSFIELD_DEBUG
                 Debug.Log($"foldout mismatch for {rawListValue}, recreate");
+#endif
                 foldout = null;
             }
             if (foldout == null)

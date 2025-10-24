@@ -57,43 +57,6 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             return _propName;
         }
 
-        private static bool GetNeedFlatten(SerializedProperty elementProp, Type baseType)
-        {
-            if (elementProp.propertyType != SerializedPropertyType.Generic)
-            {
-                return false;
-            }
-
-            (PropertyAttribute[] valuesAttributes, object _) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(elementProp);
-            // Debug.Log($"{string.Join<PropertyAttribute>(",", valuesAttributes)}");
-            // AboveRichLabelAttribute aboveRichLabelAttributes = valuesAttributes.OfType<AboveRichLabelAttribute>().FirstOrDefault();
-            SaintsRowAttribute saintsRowAttribute =
-                valuesAttributes.OfType<SaintsRowAttribute>().FirstOrDefault();
-
-            if (saintsRowAttribute is null)
-            {
-                // check if it has a 3rd party drawer
-                bool drawer = valuesAttributes.Any(eachAttr =>
-                    PropertyAttributeToPropertyDrawers.TryGetValue(eachAttr.GetType(), out IReadOnlyList<PropertyDrawerInfo> d) &&
-                    d.Any(each => !each.IsSaints));
-
-                if (drawer)
-                {
-                    return false;
-                }
-
-                // check if it has a type drawer
-                Type typeDrawer = FindTypeDrawerAny(baseType);
-                // Debug.Log($"{baseType}:{typeDrawer}");
-                if (typeDrawer != null)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         private static SerializedProperty FindPropertyCompact(SerializedProperty property, string propValuesNameCompact)
         {
             SerializedProperty prop = property.FindPropertyRelative(propValuesNameCompact);

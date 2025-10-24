@@ -1,5 +1,5 @@
-using System;
-using SaintsField.Playa;
+using SaintsField.Samples.Scripts.Interface;
+using SaintsField.Samples.Scripts.SaintsDictExamples;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsHashSetExamples
@@ -7,37 +7,11 @@ namespace SaintsField.Samples.Scripts.SaintsHashSetExamples
     public class ReferenceHashSetExample : MonoBehaviour
     {
 #if UNITY_2021_3_OR_NEWER
-        public interface IReference
-        {
-            string Name { get; }
-        }
 
-        [Serializable]
-        public class ClassRef: IReference
-        {
-            [field: SerializeField]
-            public string Name { get; private set; }
+        public SaintsHashSet<IInterface1> refHashSet;
 
-            public override string ToString()
-            {
-                return $"<ClassRef: {Name}/>";
-            }
-        }
-
-        [Serializable]
-        public struct StructRef: IReference
-        {
-            [SerializeField] public int i;
-
-            [ShowInInspector]
-            public string Name => $"int:{i}";
-
-            public override string ToString()
-            {
-                return $"<StructRef: {Name}/>";
-            }
-        }
-        public ReferenceHashSet<IReference> refHashSet;
+        public SaintsHashSet<SaintsDictReference.Sub1> noPolymorphism;
+        public ReferenceHashSet<SaintsDictReference.Sub1> polymorphism;
 #endif
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
+using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.UIToolkitElements;
@@ -573,7 +574,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 },
             };
 
-            Func<ToolbarSearchField> makeHeader = () =>
+            ToolbarSearchField MakeHeader()
             {
                 ToolbarSearchField wrapSearch = new ToolbarSearchField
                 {
@@ -592,8 +593,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
                 searchTextField.Add(loadingImage);
                 UIToolkitUtils.KeepRotate(loadingImage);
-                loadingImage.RegisterCallback<AttachToPanelEvent>(_ =>
-                    loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage)));
+                loadingImage.RegisterCallback<AttachToPanelEvent>(_ => loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage)));
                 // _asyncSearchItems.LoadingImage = loadingImage;
 
                 wrapSearch.RegisterValueChangedCallback(evt =>
@@ -615,15 +615,21 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                     }
                 }, TrickleDown.TrickleDown);
                 return wrapSearch;
-            };
+            }
 
 #if UNITY_6000_0_OR_NEWER
-            listView.makeHeader = makeHeader;
+            listView.makeHeader = (Func<ToolbarSearchField>)MakeHeader;
 #else
             listView.parent?.Insert(listView.parent.IndexOf(listView), makeHeader());
 #endif
 
             listView.makeItem = () => new VisualElement();
+
+            bool needUseRef = typeof(ReferenceHashSet<>).IsAssignableFrom(rawType.GetGenericTypeDefinition());
+            IReadOnlyList<Attribute> injectedKeyAttributes = needUseRef
+                ? new[]{new SerializeReference()}
+                : Array.Empty<Attribute>();
+
             listView.bindItem = (element, elementIndex) =>
             {
                 int propIndex = itemIndexToPropertyIndex[elementIndex];
@@ -642,7 +648,11 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 element.Add(wrapContainer);
 
                 VisualElement resultElement =
-                    CreateCellElement(wrapField, wrapType, elementProp, this, this, wrapParent);
+                    SaintsWrapUtils.CreateCellElement(
+                        wrapField,
+                        wrapType,
+                        elementProp, injectedKeyAttributes, this, this, wrapParent
+                    );
                 wrapContainer.Add(resultElement);
 
                 wrapContainer.TrackPropertyValue(wrapProp, _ =>
