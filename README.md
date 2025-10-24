@@ -94,10 +94,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.37.0**
+**5.0.0-preview.5**
 
-1.  `SaintsDictionary<,>` now support `interface` type & `abstruct` type directly
-2.  Add `[KeyAttribute(type, arguments...)]` and `[ValueAttribute(type, arguments...)]` to inject attributes to key/value for `SaintsDictionary<,>`
+1.  Fix `SaintsDictionary` might failed on deserialization and result in an empty dictionary
+2.  Fix `LayoutEnd` attribute get ignore if it's used on a bare function or `event` keyword
+3.  Fix `SaintsDictionary` falling-back to IMGUI drawer get extra field displayed
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
