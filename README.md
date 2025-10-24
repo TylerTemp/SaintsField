@@ -5723,7 +5723,7 @@ You can specify which parent you want the circle be, the rotate/offset/facing of
 Parameters:
 
 *   `float radius = 1f`: radis of the disk. If the target field is a number, use the field's value instead
-*   `string radisCallback = null`: use a callback or a field value as the radius. If the target field is a number, use the field's value instead
+*   `string radiusCallback = null`: use a callback or a field value as the radius. If the target field is a number, use the field's value instead
 *   `string space = "this"`: the containing space of the disc. `this` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `float norX = 0f, float norY = 0f, float norZ = 1f`: `Vector3` direction for the `normal` (facing) of the disc. It's facing forward by default
 *   `string norCallback = null`: use a callback or a field value as the normal direction, the value must be a `Vector3`
@@ -5763,7 +5763,7 @@ A simple example to show debugging a player's alert/idle range:
 
 ```csharp
 [GetComponent]
-[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -1f, color: nameof(curColor), radisCallback: nameof(curRadius))]
+[DrawWireDisc(norY: 1, norZ: 0, posYOffset: -1f, color: nameof(curColor), radiusCallback: nameof(curRadius))]
 [DrawLabel(EColor.Brown, "$" + nameof(curStatus))]
 public Transform player;
 
