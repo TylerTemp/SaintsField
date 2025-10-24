@@ -232,60 +232,6 @@ public string[] sindices;
 
 Like `LabelText`, but it can be applied to an array/list to change the element label (instead of the label of array/list itself)
 
-*   `string|null richTextXml` the content of the label, supported tag:
-
-    *   All Unity rich label tag, like `<color=#ff0000>red</color>`
-    *   `<icon=path/to/image.png />` for icon
-    *   `<label />` for current field name
-    *   `<field />`, `<field.subField/>`, `<field.subField=formatControl />` read the value from the field first, if tag has sub-field, continue to read, then use `string.Format` if there is a `formatControl`. See the example below.
-    *   `<container.Type />` for the class/struct name of the container of the field
-    *   `<container.Type.BaseType />` for the class/struct name of the field's container's parent
-    *   `<index />`, `<index=formatControl />` for the index if the target is an array/list
-
-    Note about format control:
-
-    *   If the format contains `{}`, it will be used like a `string.Format`. E.g. `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
-    *   Otherwise, it will be rewritten to `{0:formatControl}`. E.g., `<index=D4/>` will be interpreted like `string.Format("{0:D4}", index)`.
-
-    `null` means no label
-
-    for `icon`, it will search the following path:
-
-    *   `"Assets/Editor Default Resources/SaintsField/"`  (You can override things here)
-    *   `"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `unitypackage`)
-    *   `"Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/"` (this is most likely to be when installed using `upm`)
-    *   `Assets/Editor Default Resources/`, then fallback to built-in editor resources by name (using [`EditorGUIUtility.Load`](https://docs.unity3d.com/ScriptReference/EditorGUIUtility.Load.html))
-
-    You can also use Unity Editor's built-in icons. See [UnityEditorIcons](https://github.com/nukadelic/UnityEditorIcons). e.g. `<icon=d_AudioListener Icon/>`
-
-    for `color` it supports:
-
-    *   Standard [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) colors:
-
-        `aqua`, `black`, `blue`, `brown`, `cyan`, `darkblue`, `fuchsia`, `green`, `gray`, `grey`, `lightblue`, `lime`, `magenta`, `maroon`, `navy`, `olive`, `orange`, `purple`, `red`, `silver`, `teal`, `white`, `yellow`
-
-    *   Some extra colors from [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes/blob/master/Assets/NaughtyAttributes/Scripts/Core/Utility/EColor.cs):
-
-        `clear`, `pink`, `indigo`, `violet`
-
-    *   Some extra colors from UI Toolkit:
-
-        `charcoalGray`, `oceanicSlate`
-
-    *   html color which is supported by [`ColorUtility.TryParseHtmlString`](https://docs.unity3d.com/ScriptReference/ColorUtility.TryParseHtmlString.html), like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
-
-    ![color_list_ui_toolkit_add](https://github.com/TylerTemp/SaintsField/assets/6391063/50ec511b-b914-4395-8b42-793a4389c8da)
-
-    If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
-
-*   `bool isCallback=false`
-
-    if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content.
-
-    This is override to be `true` when `richLabelXml` starts with `$`
-
-*   AllowMultiple: No. A field can only have one `LabelText`
-
 `[NoLabel]` is a shortcut for `[FieldLabelText(null)]`
 
 Use it on an array/list will apply it to all the direct child element instead of the field label itself.
@@ -309,6 +255,61 @@ private string ArrayLabels(object _, int index) => $"<color=pink>[{(char)('A' + 
 
 ![label_array](https://github.com/TylerTemp/SaintsField/assets/6391063/232da62c-9e31-4415-a09a-8e1e95ae9441)
 
+#### `AboveText` / `BelowText` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Like `RichLabel`, but it's rendered above/below the field in full width of view instead.
+
+For `AboveText`, it can also be applied on a class/struct.
+
+Parameters:
+
+*   `string content` the content to show. If it starts with `$`, then a callback/propery/field value is used. When a callback gives null or empty string, the label will be hidden.
+    For `AboveText` the default value for this parameter is `"<color=gray><label/>"`. For `BelowText` this parameter is required.
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+
+[AboveText("<color=gray>-- Above --")]
+[AboveText("$" + nameof(dynamicContent))]
+[AboveText("$" + nameof(dynamicContent))]
+[BelowText("<color=gray>-- Below --")]
+public string[] s;
+
+[Space(20)]
+public string dynamicContent;
+```
+
+![Image](https://github.com/user-attachments/assets/5c29a43b-7276-488a-98fa-da133e77edc4)
+
+Example of using on a class/struct like a data comment:
+
+```csharp
+using SaintsField;
+using SaintsField.Playa;
+
+[AboveText("<color=gray>This is a class message")]
+[AboveText("$" + nameof(dynamicContent))]
+public class ClassPlayaAboveRichLabelExample : MonoBehaviour
+{
+    [ResizableTextArea]
+    public string dynamicContent;
+
+    [Serializable]
+    [PlayaAboveRichLabel("<color=gray>--This is a struct message--")]
+    public struct MyStruct
+    {
+        public string structString;
+    }
+
+    public MyStruct myStruct;
+}
+```
+
+![Image](https://github.com/user-attachments/assets/de9e6bf2-5e7b-4a4a-92f5-66801984544e)
 
 #### `FieldAboveText` / `FieldBelowText` ####
 
@@ -407,61 +408,6 @@ public string TakeAGuess()
 
 ![post_field_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bdd9446b-97fe-4cd2-900a-f5ed5f1ccb56)
 
-#### `AboveText` /  `BelowText` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-Like `RichLabel`, but it's rendered above/below the field in full width of view instead.
-
-For `AboveText`, it can also be applied on a class/struct.
-
-Parameters:
-
-*   `string content` the content to show. If it starts with `$`, then a callback/propery/field value is used. When a callback gives null or empty string, the label will be hidden.
-    For `AboveText` the default value for this parameter is `"<color=gray><label/>"`. For `BelowText` this parameter is required.
-
-```csharp
-using SaintsField;
-using SaintsField.Playa;
-
-[AboveText("<color=gray>-- Above --")]
-[AboveText("$" + nameof(dynamicContent))]
-[AboveText("$" + nameof(dynamicContent))]
-[BelowText("<color=gray>-- Below --")]
-public string[] s;
-
-[Space(20)]
-public string dynamicContent;
-```
-
-![Image](https://github.com/user-attachments/assets/5c29a43b-7276-488a-98fa-da133e77edc4)
-
-Example of using on a class/struct like a data comment:
-
-```csharp
-using SaintsField;
-using SaintsField.Playa;
-
-[AboveText("<color=gray>This is a class message")]
-[AboveText("$" + nameof(dynamicContent))]
-public class ClassPlayaAboveRichLabelExample : MonoBehaviour
-{
-    [ResizableTextArea]
-    public string dynamicContent;
-
-    [Serializable]
-    [PlayaAboveRichLabel("<color=gray>--This is a struct message--")]
-    public struct MyStruct
-    {
-        public string structString;
-    }
-
-    public MyStruct myStruct;
-}
-```
-
-![Image](https://github.com/user-attachments/assets/de9e6bf2-5e7b-4a4a-92f5-66801984544e)
 
 #### `InfoBox`/`BelowInfoBox` ####
 
