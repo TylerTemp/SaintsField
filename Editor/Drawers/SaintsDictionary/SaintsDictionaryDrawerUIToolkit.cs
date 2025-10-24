@@ -1345,14 +1345,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             // We don't need to handle decorators either
             // Debug.Log(serializedProperty.propertyPath);
             // Debug.Log(info.FieldType);
-            PropertyField result = new PropertyField(serializedProperty, string.Empty)
+            PropertyField result = new PropertyField(serializedBaseProperty, string.Empty)
             {
                 style =
                 {
                     flexGrow = 1,
                 },
             };
-            result.Bind(serializedProperty.serializedObject);
+            result.Bind(serializedBaseProperty.serializedObject);
             return result;
         }
 
