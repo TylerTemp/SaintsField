@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.37.1 ##
+
+1.  Fix `SaintsDictionary` might failed on deserialization and result in an empty dictionary
+2.  Fix `LayoutEnd` attribute get ignore if it's used on a bare function or `event` keyword
+3.  Fix `SaintsDictionary` falling-back to IMGUI drawer get extra field displayed
+
 ## 4.37.0 ##
 
 1.  `SaintsDictionary<,>` now support `interface` type & `abstruct` type directly 
