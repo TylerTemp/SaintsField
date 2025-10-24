@@ -1071,6 +1071,95 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: d1
   targetTransform: {fileID: 0}
+--- !u!1 &203542842
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 203542844}
+  - component: {fileID: 203542843}
+  m_Layer: 0
+  m_Name: SerNotSupported
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &203542843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203542842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f303033349347643a0de755f59c0284, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerNotSupported
+  letUnitySerInt: 64
+  letUnitySerString: fdsfds
+  customTypeInt:
+    value: fsfds
+  letUnitySerInt__SaintsSerialized__:
+    propertyType: 0
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  letUnitySerString__SaintsSerialized__:
+    propertyType: 0
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  customTypeInt__SaintsSerialized__:
+    propertyType: 0
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  customTypeDateTime__SaintsSerialized__:
+    propertyType: 0
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!4 &203542844
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203542842}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &208780081
 GameObject:
   m_ObjectHideFlags: 0
@@ -4577,11 +4666,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerDateTimeExample
   myClass:
-    _dtArray__SaintsSerialized__: 
+    _dtArray__SaintsSerialized__: []
   s: 
-  _dt__SaintsSerialized__: 0
-  _dtList__SaintsSerialized__: 
-  dt__SaintsSerialized__: 0
+  _dt__SaintsSerialized__:
+    propertyType: 5
+    propertyPath: 
+    longValue: 638969269593770000
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  _dtList__SaintsSerialized__: []
+  dt__SaintsSerialized__:
+    propertyType: 5
+    propertyPath: 
+    longValue: 638969269628720000
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!4 &1353093774
 Transform:
   m_ObjectHideFlags: 0
@@ -4627,11 +4737,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SerTimeSpanExample
   myClass:
-    _dtArray__SaintsSerialized__: 
-  _dt__SaintsSerialized__: 0
-  _dtList__SaintsSerialized__: 
-  dt__SaintsSerialized__: 0
-  s__SaintsSerialized__: 0
+    _dtArray__SaintsSerialized__: []
+  _dt__SaintsSerialized__:
+    propertyType: 6
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  _dtList__SaintsSerialized__: []
+  dt__SaintsSerialized__:
+    propertyType: 6
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  s__SaintsSerialized__:
+    propertyType: 6
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!4 &1359646099
 Transform:
   m_ObjectHideFlags: 0
@@ -6920,6 +7059,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 479bd26f80a34004ba51a39ab3a1e990, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::MixOrderBroken
+  _go: {fileID: 0}
+  _e1: {fileID: 0}
 --- !u!1 &2117085778
 GameObject:
   m_ObjectHideFlags: 0
@@ -7092,3 +7233,4 @@ SceneRoots:
   - {fileID: 1359646099}
   - {fileID: 315419262}
   - {fileID: 1956168136}
+  - {fileID: 203542844}

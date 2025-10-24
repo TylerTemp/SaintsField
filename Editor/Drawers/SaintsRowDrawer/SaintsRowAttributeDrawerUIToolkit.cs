@@ -179,7 +179,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     label = label[..^"__Saints Serialized__".Length];
                 }
                 // Debug.Log($"{info.Name}/{property.propertyPath}/{saintsSerializedActual.Name}/{saintsSerializedActual.ElementType}");
-                VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, (FieldInfo)info, saintsSerializedActual.ElementType, inHorizontalLayout, SerializedUtils.GetFieldInfoAndDirectParent(property).parent);
+                VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, (FieldInfo)info, inHorizontalLayout, SerializedUtils.GetFieldInfoAndDirectParent(property).parent);
                 root.Add(renderSerializedActual);
                 return;
             }
@@ -276,6 +276,8 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             EnumToggleButtonsAttribute enumToggle = null;
             FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
             FlagsDropdownAttribute flagsDropdownAttribute = null;
+            DateTimeAttribute dateTimeAttribute = null;
+            TimeSpanAttribute timeSpanAttribute = null;
             foreach (Attribute attribute in attributes)
             {
                 switch (attribute)
@@ -290,9 +292,11 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         flagsDropdownAttribute = fd;
                         break;
                     case DateTimeAttribute dt:
-                        return DateTimeAttributeDrawer.RenderSerializedActual(dt, label, property, typeof(DateTime), inHorizontalLayout);
+                        dateTimeAttribute = dt;
+                        break;
                     case TimeSpanAttribute ts:
-                        return TimeSpanAttributeDrawer.RenderSerializedActual(ts, label, property, typeof(DateTime), attributes, inHorizontalLayout);
+                        timeSpanAttribute = ts;
+                        break;
                 }
             }
 
@@ -320,6 +324,10 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 {
                     return SaintsInterfaceDrawer.RenderSerializedActual(label, property, targetType, attributes, inHorizontalLayout, serInfo, parent);
                 }
+                case SaintsPropertyType.DateTime:
+                    return DateTimeAttributeDrawer.RenderSerializedActual(dateTimeAttribute, label, property, targetType, inHorizontalLayout);
+                case SaintsPropertyType.TimeSpan:
+                    return TimeSpanAttributeDrawer.RenderSerializedActual(timeSpanAttribute, label, property, targetType, attributes, inHorizontalLayout);
                 case SaintsPropertyType.Undefined:
                 case SaintsPropertyType.ClassOrStruct:
                 default:

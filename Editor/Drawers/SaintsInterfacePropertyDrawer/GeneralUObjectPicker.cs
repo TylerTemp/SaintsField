@@ -74,10 +74,10 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             _objectField.RegisterValueChangedCallback(v =>
             {
-                Debug.Log($"RegisterValueChangedCallback={v.newValue}");
+                // Debug.Log($"RegisterValueChangedCallback={v.newValue}");
                 if (v.newValue == null)
                 {
-                    Debug.Log($"_objectField=null");
+                    // Debug.Log($"_objectField=null");
                     value = null;
                     return;
                 }
@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 {
                     Object fitResult = Util.GetTypeFromObj(v.newValue, uObjectType);
                     value = fitResult;
-                    Debug.Log($"_objectField={fitResult}");
+                    // Debug.Log($"_objectField={fitResult}");
                     return;
                 }
 
@@ -101,12 +101,12 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                         uObjectType, serializableType);
                     if (findMatch)
                     {
-                        Debug.Log($"_objectField={findResult}");
+                        // Debug.Log($"_objectField={findResult}");
                         value = findResult;
                     }
                     else
                     {
-                        Debug.Log($"_objectField reset={value}");
+                        // Debug.Log($"_objectField reset={value}");
                         _objectField.SetValueWithoutNotify(value);
                     }
                 }

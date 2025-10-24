@@ -7,6 +7,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Interfaces;
+using SaintsField.SaintsSerialization;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
 
         public static VisualElement RenderSerializedActual(ISaintsAttribute timeSpanAttribute, string label, SerializedProperty property, Type type, IReadOnlyList<Attribute> allAttributes, bool inHorizontal)
         {
-            VisualElement r = MakeElement(property, label, allAttributes.Any(each => each is DefaultExpandAttribute));
+            VisualElement r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)), label, allAttributes.Any(each => each is DefaultExpandAttribute));
             if (inHorizontal)
             {
                 r.style.flexDirection = FlexDirection.Column;

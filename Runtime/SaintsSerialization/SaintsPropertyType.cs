@@ -13,5 +13,7 @@ namespace SaintsField.SaintsSerialization
 #endif
         ClassOrStruct = 3,
         Interface = 4,
+        DateTime = 5,
+        TimeSpan = 6,
     }
 }
