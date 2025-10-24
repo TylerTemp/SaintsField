@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.38.0 ##
+
+1.  `SaintsHashSet<>` now support `interface` type & `abstruct` type directly
+2.  If you want to enforce a `SerializedReference` type, use `ReferenceHashSet<>`
+
 ## 4.37.1 ##
 
 1.  Fix `SaintsDictionary` might failed on deserialization and result in an empty dictionary

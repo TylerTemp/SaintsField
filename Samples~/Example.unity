@@ -19835,6 +19835,34 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+  trans:
+    _saintsList:
+    - value: {fileID: 1294877703}
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: {fileID: 867320293}
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
   references:
     version: 2
     RefIds:
@@ -19922,7 +19950,22 @@ MonoBehaviour:
         uLongValue: 0
         V: {fileID: 0}
         VRef:
-          rid: -2
+          rid: 6921583477705932884
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 1
+    - value:
+        absC: 
+        sub1: 
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583477705932885
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -19937,6 +19980,17 @@ MonoBehaviour:
       data:
         common: 0
         structString: 
+    - rid: 6921583477705932884
+      type: {class: SaintsDictReference/Sub1, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        absC: 
+        sub1: 
+    - rid: 6921583477705932885
+      type: {class: SaintsDictReference/Sub2, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        absC: 
+        sub1: 
+        sub2: 
 --- !u!1 &1299589590
 GameObject:
   m_ObjectHideFlags: 0
