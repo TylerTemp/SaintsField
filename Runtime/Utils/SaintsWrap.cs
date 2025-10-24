@@ -20,7 +20,11 @@ namespace SaintsField.Utils
 
         public override T Value
         {
-            get => _runtimeResult;
+            get
+            {
+                EnsureOnAfterDeserializeOnce();
+                return _runtimeResult;
+            }
             set => _runtimeResult = value;
         }
 
@@ -213,8 +217,20 @@ namespace SaintsField.Utils
             };
         }
 
+        // public bool OnAfterDeserializeReady { get; private set; }
+        private bool _onAfterDeserializeOnce;
+
+        private void EnsureOnAfterDeserializeOnce()
+        {
+            if (!_onAfterDeserializeOnce)
+            {
+                OnAfterDeserialize();
+            }
+        }
+
         public void OnAfterDeserialize()
         {
+            _onAfterDeserializeOnce = true;
             // return;
             EnsureInit();
             switch (wrapType)
@@ -222,6 +238,7 @@ namespace SaintsField.Utils
                 case WrapType.Default:
                 {
                     _runtimeResult = value;
+                    // Debug.Log($"set runtime to {_runtimeResult}");
                 }
                     break;
                 case WrapType.Array:

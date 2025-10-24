@@ -1216,9 +1216,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             else
             {
                 wrapName = "value";
-                if (wrapTypeProp.intValue != (int)WrapType.Field)
+                if (wrapTypeProp.intValue != (int)WrapType.Default)
                 {
-                    wrapTypeProp.intValue = (int)WrapType.Field;
+                    wrapTypeProp.intValue = (int)WrapType.Default;
                     serializedProperty.serializedObject.ApplyModifiedProperties();
                 }
             }

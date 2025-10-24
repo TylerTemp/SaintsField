@@ -17,7 +17,6 @@ namespace SaintsField
         [SerializeField]
         private List<SaintsWrap<TValue>> _saintsValues = new List<SaintsWrap<TValue>>();
 
-
         protected override int SerializedKeysCount()
         {
             return _saintsKeys.Count;
@@ -60,7 +59,7 @@ namespace SaintsField
 
         protected override void SerializedSetKeyValue(TKey tKey, TValue tValue)
         {
-            int index = _saintsKeys.FindIndex(wrap => wrap.valueField.Equals(tKey));
+            int index = _saintsKeys.FindIndex(wrap => wrap.Value.Equals(tKey));
             if (index >= 0)
             {
                 _saintsValues[index].Value = tValue;
@@ -74,7 +73,7 @@ namespace SaintsField
 
         protected override void SerializedRemoveKeyValue(TKey key)
         {
-            int index = _saintsKeys.FindIndex(wrap => wrap.valueField.Equals(key));
+            int index = _saintsKeys.FindIndex(wrap => wrap.Value.Equals(key));
             if (index >= 0)
             {
                 _saintsKeys.RemoveAt(index);
