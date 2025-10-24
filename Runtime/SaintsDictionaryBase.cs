@@ -85,7 +85,6 @@ namespace SaintsField
                 // {
                 //     Dictionary.Add(key, value);
                 // }
-                Debug.Log($"try add key {key}@[{index}:{RuntimeUtil.IsNull(key)}]: {value} to dictionary {GetType()}");
                 if(!RuntimeUtil.IsNull(key))
                 {
                     Dictionary[key] = value;
