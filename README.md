@@ -94,11 +94,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.0.0-preview.5**
+**5.0.0-preview.6**
 
-1.  Fix `SaintsDictionary` might failed on deserialization and result in an empty dictionary
-2.  Fix `LayoutEnd` attribute get ignore if it's used on a bare function or `event` keyword
-3.  Fix `SaintsDictionary` falling-back to IMGUI drawer get extra field displayed
+1.  `SaintsHashSet<>` now support `interface` type & `abstruct` type directly
+2.  If you want to enforce a `SerializedReference` type, use `ReferenceHashSet<>`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4792,7 +4791,7 @@ public class SearchableMono : MonoBehaviour
 
 Allows you to pick a datetime using `long` type.
 
-> [!TIPS]
+> [!TIP]
 > This will requires you to manually convert `long` to `DateTime`.
 > You may want to see [Extended Serialization](https://saintsfield.comes.today/extended-serialization) to directly serialize a `DateTime` type
 
@@ -4813,7 +4812,7 @@ public DateTime MyDateTime => new DateTime(dt);
 
 Allows you to set a timespan using `long` type.
 
-> [!TIPS]
+> [!TIP]
 > This will requires you to manually convert `long` to `TimeSpan`.
 > You may want to see [Extended Serialization](https://saintsfield.comes.today/extended-serialization) to directly serialize a `TimeSpan` type
 
@@ -6514,7 +6513,7 @@ See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samp
 
 You can access the interface with the `.I` field, actual unity object with `.V` field, and actual serializable class/struct with `.VRef` field.
 
-> [!TIPS]
+> [!TIP]
 > This will requires you to use `.I` to access the interface.
 > You may want to see [Extended Serialization](https://saintsfield.comes.today/extended-serialization) to directly serialize a `interface` type.
 
@@ -6565,10 +6564,9 @@ Compared to [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/
 
 ### `SaintsHashSet<>` / `ReferenceHashSet<>` ###
 
-> [!WARNING]
-> UI Toolkit only. (IMGUI will have only default drawer)
+A serializable `HashSet<>` for serializable type, `SerializedReference` type & interface type. Duplicated element will have a warning color.
 
-A serializable `HashSet<>` for normal type and `SerializedReference` type. Duplicated element will have a warning color.
+If the type is an interface or an abstruct class, the polymorphism picker will be used.
 
 You can use `SaintsHashSet` attribute to control paging & searching
 
@@ -6593,10 +6591,37 @@ public interface IReference
 
 // ... implement of IReference omited here
 
-public ReferenceHashSet<IReference> refHashSet;
+public SaintsHashSet<IReference> refHashSet;
 ```
 
 [![video](https://github.com/user-attachments/assets/0ff1ce5a-6432-4aba-bfda-d71f5f56a54f)](https://github.com/user-attachments/assets/8e01cb94-b8bb-49fb-ac58-384ec3c9c2a4)
+
+Example of using on interface where you can pick either Unity Object or serializable class/struct:
+
+![](https://github.com/user-attachments/assets/118de19e-1751-4da1-a74f-a0e14f1773f3)
+
+`ReferenceHashSet` is used if you want to pick a polymorphism type (while the type itself is not abstruct)
+
+```csharp
+[Serializable]
+public class Sub1 : BaseC
+{
+    public string sub1;
+}
+
+[Serializable]
+public class Sub2 : Sub1
+{
+    public string sub2;
+}
+
+// SaintsHashSet will treat it as a serializable type
+public SaintsHashSet<Sub1> noPolymorphism;
+// ReferenceHashSet will treat it as a reference type, allows you to pick polymorphism types
+public ReferenceHashSet<Sub1> polymorphism;
+```
+
+![](https://github.com/user-attachments/assets/46ec96a6-bd11-447e-bb16-85f1b99deec8)
 
 ### `TypeReference` ###
 

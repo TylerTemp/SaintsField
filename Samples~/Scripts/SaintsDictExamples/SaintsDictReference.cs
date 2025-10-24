@@ -7,6 +7,7 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
 {
     public class SaintsDictReference : SaintsMonoBehaviour
     {
+#if UNITY_2021_3_OR_NEWER
         [Serializable]
         public abstract class BaseC
         {
@@ -50,5 +51,6 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
         [ValueAttribute(typeof(ExpandableAttribute))]
         [ValueAttribute(typeof(RequiredAttribute))]
         public SaintsDictionary<int, SpriteRenderer> valueInject;
+#endif
     }
 }

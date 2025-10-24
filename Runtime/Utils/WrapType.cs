@@ -2,9 +2,10 @@ namespace SaintsField.Utils
 {
     public enum WrapType
     {
-        Default,
+        Undefined,
         Field,
         Array,
         List,
+        T,  // Use the T type that user passed in
     }
 }

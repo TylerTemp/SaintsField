@@ -130,7 +130,7 @@ namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
                     listView.BindProperty(arrayProp);
                     return listView;
                 }
-                case (int)WrapType.Default:
+                case (int)WrapType.T:
                 {
                     // (SerializedProperty realProp, FieldInfo realInfo) = GetBasicInfo(property, info);
                     // PropertyAttribute[] fieldAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(info);

@@ -4,31 +4,15 @@ using System.Collections.Generic;
 using SaintsField.Utils;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Serializable]
     public class SaintsHashSet<T>: SaintsHashSetBase<T>
     {
-        [Serializable]
-        public class SaintsWrap : BaseWrap<T>
-        {
-            [SerializeField] public T value;
-            public override T Value { get => value; set => this.value = value; }
-
-#if UNITY_EDITOR
-            // ReSharper disable once StaticMemberInGenericType
-            // ReSharper disable once MemberHidesStaticFromOuterClass
-            public static readonly string EditorPropertyName = nameof(value);
-#endif
-
-            public SaintsWrap(T v)
-            {
-                value = v;
-            }
-        }
 
         [SerializeField]
-        private List<SaintsWrap> _saintsList = new List<SaintsWrap>();
+        private List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
 
 #if UNITY_EDITOR
         // ReSharper disable once UnusedMember.Local
@@ -41,7 +25,7 @@ namespace SaintsField
 
         protected override void SerializedAdd(T key)
         {
-            _saintsList.Add(new SaintsWrap(key));
+            _saintsList.Add(new SaintsWrap<T>(key));
         }
 
         protected override bool SerializedRemove(T key)

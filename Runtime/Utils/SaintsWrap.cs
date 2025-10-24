@@ -44,7 +44,8 @@ namespace SaintsField.Utils
             EnsureInit();
             switch (wrapType)
             {
-                case WrapType.Default:
+                case WrapType.Undefined:
+                case WrapType.T:
                 {
                     value = _runtimeResult;
                 }
@@ -235,7 +236,7 @@ namespace SaintsField.Utils
             EnsureInit();
             switch (wrapType)
             {
-                case WrapType.Default:
+                case WrapType.T:
                 {
                     _runtimeResult = value;
                     // Debug.Log($"set runtime to {_runtimeResult}");
@@ -288,6 +289,8 @@ namespace SaintsField.Utils
                 {
                     _runtimeResult = GetFromSaintsSerializedProperty(valueField);
                 }
+                    break;
+                case WrapType.Undefined:  // Never inspected, ignore
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(wrapType), wrapType, null);
@@ -376,7 +379,7 @@ namespace SaintsField.Utils
                     _subType = t.GetElementType();
                 }
 
-                wrapT = RuntimeUtil.IsSubFieldUnitySerializable(_subType)? WrapType.Default: WrapType.Array;
+                wrapT = RuntimeUtil.IsSubFieldUnitySerializable(_subType)? WrapType.T: WrapType.Array;
             }
             else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>))
             {
@@ -392,17 +395,20 @@ namespace SaintsField.Utils
                     _listType = typeof(List<>).MakeGenericType(_subType);
                 }
 
-                wrapT = RuntimeUtil.IsSubFieldUnitySerializable(_subType)? WrapType.Default: WrapType.List;
+                wrapT = RuntimeUtil.IsSubFieldUnitySerializable(_subType)? WrapType.T: WrapType.List;
                 // Debug.Log($"_listType={_listType}");
             }
             else
             {
-                wrapT = RuntimeUtil.IsSubFieldUnitySerializable(t)? WrapType.Default: WrapType.Field;
+                wrapT = RuntimeUtil.IsSubFieldUnitySerializable(t)? WrapType.T: WrapType.Field;
             }
 
             // ReSharper disable once RedundantCheckBeforeAssignment
-            if (wrapType != wrapT)
+            if (wrapType == WrapType.Undefined)
             {
+#if SAINTSFIELD_DEBUG
+                Debug.Log($"SaintsWrap reset wrapType {wrapType} -> {wrapT} for {t}");
+#endif
                 wrapType = wrapT;
             }
 
