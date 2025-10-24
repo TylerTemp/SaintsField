@@ -32,7 +32,7 @@ namespace SaintsField
         public readonly string ColorCallback;
 
         public DrawWireDiscAttribute(
-            float radius = 1f, string radisCallback = null,
+            float radius = 1f, string radiusCallback = null,
             string space = "this",
             float norX = 0f, float norY = 0f, float norZ = 1f, string norCallback = null,
             float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f, string posOffsetCallback = null,
@@ -41,7 +41,7 @@ namespace SaintsField
         )
         {
             Radius = radius;
-            RadiusCallback = radisCallback;
+            RadiusCallback = radiusCallback;
             Space = space;
             Normal = new Vector3(norX, norY, norZ);
             NormalCallback = norCallback;

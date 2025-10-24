@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
     {
         [GetComponent]
         [DrawWireDisc(
-            radisCallback: nameof(radius),
+            radiusCallback: nameof(radius),
             color: nameof(color),
             posOffsetCallback: nameof(positionOffset),
             norCallback: nameof(normal),
@@ -15,7 +15,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples
         public GameObject curObj;
 
         [DrawWireDisc(
-            radisCallback: nameof(radius),
+            radiusCallback: nameof(radius),
             eColor: EColor.Red,
             alpha: 0.3f,
             posOffsetCallback: nameof(positionOffset),

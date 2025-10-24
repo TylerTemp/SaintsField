@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts.WireDiscPlayerExample
     public class CapsulePlayer : SaintsMonoBehaviour
     {
         [GetComponent]
-        [DrawWireDisc(norY: 1, norZ: 0, posYOffset: -1f, color: nameof(curColor), radisCallback: nameof(curRadius))]
+        [DrawWireDisc(norY: 1, norZ: 0, posYOffset: -1f, color: nameof(curColor), radiusCallback: nameof(curRadius))]
         [DrawLabel(EColor.Brown, "$" + nameof(curStatus))]
         public Transform player;
 

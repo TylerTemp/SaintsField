@@ -620,7 +620,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 #if UNITY_6000_0_OR_NEWER
             listView.makeHeader = (Func<ToolbarSearchField>)MakeHeader;
 #else
-            listView.parent?.Insert(listView.parent.IndexOf(listView), makeHeader());
+            listView.parent?.Insert(listView.parent.IndexOf(listView), MakeHeader());
 #endif
 
             listView.makeItem = () => new VisualElement();
