@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -22,8 +23,14 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
         }
 
-        public static VisualElement RenderSerializedActual(string label, SerializedProperty property, Type targetType, Attribute[] allAttributes, bool inHorizontalLayout, FieldInfo info, object parent)
+        public static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual, string label, SerializedProperty property, Attribute[] allAttributes, bool inHorizontalLayout, FieldInfo info, object parent)
         {
+            Type targetType = ReflectUtils.SaintsSerializedActualGetType(saintsSerializedActual, parent);
+            if (targetType == null)
+            {
+                return new HelpBox($"Failed to get type for {property.propertyPath}", HelpBoxMessageType.Error);
+            }
+
             (string error, IWrapProp saintsInterfaceProp, int curInArrayIndex, object _) =
                 GetSerName(property, info);
             if (error != "")

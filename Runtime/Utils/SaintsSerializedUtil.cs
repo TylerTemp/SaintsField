@@ -8,36 +8,37 @@ namespace SaintsField.Utils
 {
     public static class SaintsSerializedUtil
     {
-        public static long OnBeforeSerializeDateTime(DateTime dt) => dt.Ticks;
-        public static long OnBeforeSerializeTimeSpan(TimeSpan dt) => dt.Ticks;
+        // public static long OnBeforeSerializeDateTime(DateTime dt) => dt.Ticks;
+        // public static long OnBeforeSerializeTimeSpan(TimeSpan dt) => dt.Ticks;
 
-        public static SaintsSerializedProperty OnBeforeSerialize(SaintsSerializedProperty serializedProp, object obj, Type type)
+        public static (bool ok, SaintsSerializedProperty result) OnBeforeSerialize(SaintsSerializedProperty serializedProp, object obj, Type type)
         {
             if (type.IsEnum)
             {
                 Type underType = Enum.GetUnderlyingType(type);
                 if (underType == typeof(long))
                 {
-                    return new SaintsSerializedProperty
+                    return (true, new SaintsSerializedProperty
                     {
                         propertyType = SaintsPropertyType.EnumLong,
                         longValue = Convert.ToInt64(obj),
-                    };
+                    });
                 }
 
 #if UNITY_2022_1_OR_NEWER
                 if (underType == typeof(ulong))
                 {
-                    return new SaintsSerializedProperty
+                    return (true, new SaintsSerializedProperty
                     {
                         propertyType = SaintsPropertyType.EnumULong,
                         uLongValue = Convert.ToUInt64(obj)
-                    };
+                    });
                 }
 #endif
 
-                throw new NotSupportedException(
-                    $"SaintsSerializedUtil OnBeforeSerialize not support enum underlying type {underType.FullName}");
+                // throw new NotSupportedException(
+                //     $"SaintsSerializedUtil OnBeforeSerialize not support enum underlying type {underType.FullName}");
+                return (false, default);
             }
 
             // ReSharper disable once InvertIf
@@ -50,33 +51,50 @@ namespace SaintsField.Utils
                 }
                 if (RuntimeUtil.IsNull(obj))
                 {
-                    return new SaintsSerializedProperty
+                    return (true, new SaintsSerializedProperty
                     {
                         IsVRef = isVRef,
                         propertyType = SaintsPropertyType.Interface,
-                    };
+                    });
                 }
 
                 // ReSharper disable once InvertIf
                 if (obj is UnityEngine.Object uObj)
                 {
-                    return new SaintsSerializedProperty
+                    return (true, new SaintsSerializedProperty
                     {
                         propertyType = SaintsPropertyType.Interface,
-                        IsVRef =  false,
+                        IsVRef = false,
                         V = uObj,
-                    };
+                    });
                 }
 
-                return new SaintsSerializedProperty
+                return (true, new SaintsSerializedProperty
                 {
                     propertyType = SaintsPropertyType.Interface,
                     VRef = obj,
                     IsVRef = true,
-                };
+                });
             }
 
-            return new SaintsSerializedProperty();
+            if (obj is DateTime dt)
+            {
+                return (true, new SaintsSerializedProperty
+                {
+                    propertyType = SaintsPropertyType.DateTime,
+                    longValue = dt.Ticks,
+                });
+            }
+            if (obj is TimeSpan ts)
+            {
+                return (true, new SaintsSerializedProperty
+                {
+                    propertyType = SaintsPropertyType.TimeSpan,
+                    longValue = ts.Ticks,
+                });
+            }
+
+            return (false, default);
         }
 
         // public static void OnBeforeSerializeArray<T>(ref SaintsSerializedProperty[] toFill, ref T[] objList, Type elementType)
@@ -131,47 +149,18 @@ namespace SaintsField.Utils
 
             for (int i = 0; i < objList.Count; i++)
             {
-                if (inPlace)
+                (bool ok, SaintsSerializedProperty result) = OnBeforeSerialize(serRef[i], objList[i], elementType);
+                // ReSharper disable once InvertIf
+                if(ok)
                 {
-                    toFill[i]  = OnBeforeSerialize(serRef[i], objList[i], elementType);
-                }
-                else
-                {
-                    results[i] = OnBeforeSerialize(serRef[i], objList[i], elementType);
-                }
-            }
-
-            if (!inPlace)
-            {
-                toFill = results;
-            }
-        }
-
-        public static void OnBeforeSerializeCollectionDateTime(ref long[] toFill, IReadOnlyList<DateTime> objList)
-        {
-            Debug.Assert(objList != null);
-            bool inPlace = toFill != null && toFill.Length == objList.Count;
-
-            long[] results;
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (inPlace)
-            {
-                results = Array.Empty<long>();
-            }
-            else
-            {
-                results = new long[objList.Count];
-            }
-
-            for (int i = 0; i < objList.Count; i++)
-            {
-                if (inPlace)
-                {
-                    toFill[i]  = OnBeforeSerializeDateTime(objList[i]);
-                }
-                else
-                {
-                    results[i] = OnBeforeSerializeDateTime(objList[i]);
+                    if (inPlace)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
                 }
             }
 
@@ -181,66 +170,100 @@ namespace SaintsField.Utils
             }
         }
 
-        public static void OnBeforeSerializeCollectionTimeSpan(ref long[] toFill, IReadOnlyList<TimeSpan> objList)
-        {
-            Debug.Assert(objList != null);
-            bool inPlace = toFill != null && toFill.Length == objList.Count;
+        // public static void OnBeforeSerializeCollectionDateTime(ref long[] toFill, IReadOnlyList<DateTime> objList)
+        // {
+        //     Debug.Assert(objList != null);
+        //     bool inPlace = toFill != null && toFill.Length == objList.Count;
+        //
+        //     long[] results;
+        //     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+        //     if (inPlace)
+        //     {
+        //         results = Array.Empty<long>();
+        //     }
+        //     else
+        //     {
+        //         results = new long[objList.Count];
+        //     }
+        //
+        //     for (int i = 0; i < objList.Count; i++)
+        //     {
+        //         if (inPlace)
+        //         {
+        //             toFill[i]  = OnBeforeSerializeDateTime(objList[i]);
+        //         }
+        //         else
+        //         {
+        //             results[i] = OnBeforeSerializeDateTime(objList[i]);
+        //         }
+        //     }
+        //
+        //     if (!inPlace)
+        //     {
+        //         toFill = results;
+        //     }
+        // }
+        //
+        // public static void OnBeforeSerializeCollectionTimeSpan(ref long[] toFill, IReadOnlyList<TimeSpan> objList)
+        // {
+        //     Debug.Assert(objList != null);
+        //     bool inPlace = toFill != null && toFill.Length == objList.Count;
+        //
+        //     long[] results;
+        //     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+        //     if (inPlace)
+        //     {
+        //         results = Array.Empty<long>();
+        //     }
+        //     else
+        //     {
+        //         results = new long[objList.Count];
+        //     }
+        //
+        //     for (int i = 0; i < objList.Count; i++)
+        //     {
+        //         if (inPlace)
+        //         {
+        //             toFill[i]  = OnBeforeSerializeTimeSpan(objList[i]);
+        //         }
+        //         else
+        //         {
+        //             results[i] = OnBeforeSerializeTimeSpan(objList[i]);
+        //         }
+        //     }
+        //
+        //     if (!inPlace)
+        //     {
+        //         toFill = results;
+        //     }
+        // }
 
-            long[] results;
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (inPlace)
-            {
-                results = Array.Empty<long>();
-            }
-            else
-            {
-                results = new long[objList.Count];
-            }
+        // public static DateTime OnAfterDeserializeDateTime(long tick) => new DateTime(tick);
+        // public static TimeSpan OnAfterDeserializeTimeSpan(long tick) => new TimeSpan(tick);
 
-            for (int i = 0; i < objList.Count; i++)
-            {
-                if (inPlace)
-                {
-                    toFill[i]  = OnBeforeSerializeTimeSpan(objList[i]);
-                }
-                else
-                {
-                    results[i] = OnBeforeSerializeTimeSpan(objList[i]);
-                }
-            }
-
-            if (!inPlace)
-            {
-                toFill = results;
-            }
-        }
-
-        public static DateTime OnAfterDeserializeDateTime(long tick) => new DateTime(tick);
-        public static TimeSpan OnAfterDeserializeTimeSpan(long tick) => new TimeSpan(tick);
-
-        public static T OnAfterDeserialize<T>(SaintsSerializedProperty saintsSerializedProperty, Type targetType)
+        public static (bool ok, T result) OnAfterDeserialize<T>(SaintsSerializedProperty saintsSerializedProperty, Type targetType)
         {
             switch (saintsSerializedProperty.propertyType)
             {
                 case SaintsPropertyType.EnumLong:
                     if (targetType.IsEnum)
                     {
-                        return (T)Enum.ToObject(targetType, saintsSerializedProperty.longValue);
+                        return (true, (T)Enum.ToObject(targetType, saintsSerializedProperty.longValue));
                     }
-                    return (T)Convert.ChangeType(saintsSerializedProperty.longValue, targetType);
+                    return (true, (T)Convert.ChangeType(saintsSerializedProperty.longValue, targetType));
 #if UNITY_2022_1_OR_NEWER
                 case SaintsPropertyType.EnumULong:
                     if (targetType.IsEnum)
                     {
-                        return (T)Enum.ToObject(targetType, saintsSerializedProperty.uLongValue);
+                        return (true, (T)Enum.ToObject(targetType, saintsSerializedProperty.uLongValue));
                     }
-                    return (T)Convert.ChangeType(saintsSerializedProperty.uLongValue, targetType);
+                    return (true, (T)Convert.ChangeType(saintsSerializedProperty.uLongValue, targetType));
 #endif
                 case SaintsPropertyType.Interface:
                 {
                     if (saintsSerializedProperty.IsVRef)
                     {
-                        return (T)saintsSerializedProperty.VRef;
+                        return (true, (T)saintsSerializedProperty.VRef);
                     }
 
                     if (RuntimeUtil.IsNull(saintsSerializedProperty.V))
@@ -248,12 +271,17 @@ namespace SaintsField.Utils
                         return default;
                     }
 
-                    return (T)(object)saintsSerializedProperty.V;
+                    return (true, (T)(object)saintsSerializedProperty.V);
                 }
+                case SaintsPropertyType.DateTime:
+                    return (true, (T)(object)new DateTime(saintsSerializedProperty.longValue));
+                case SaintsPropertyType.TimeSpan:
+                    return (true, (T)(object)new TimeSpan(saintsSerializedProperty.longValue));
                 case SaintsPropertyType.Undefined:
-                    return targetType.IsValueType ? (T)Activator.CreateInstance(targetType) : default;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(saintsSerializedProperty.propertyType), saintsSerializedProperty.propertyType, null);
+                    return (false, targetType.IsValueType ? (T)Activator.CreateInstance(targetType) : default);
+
+                    // throw new ArgumentOutOfRangeException(nameof(saintsSerializedProperty.propertyType), saintsSerializedProperty.propertyType, null);
             }
         }
 
@@ -265,59 +293,63 @@ namespace SaintsField.Utils
             T[] results = new T[saintsSerializedProperties.Length];
             for (int i = 0; i < saintsSerializedProperties.Length; i++)
             {
-                if (canFill)
+                (bool ok, T result) = OnAfterDeserialize<T>(saintsSerializedProperties[i], elementType);
+                if(ok)
                 {
-                    toFill[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], elementType);
-                }
-                else
-                {
-                    results[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], elementType);
-                }
-            }
-
-            return (canFill, results);
-        }
-
-        public static (bool filled, DateTime[] result) OnAfterDeserializeArrayDateTime(DateTime[] toFill, long[] saintsSerializedProperties)
-        {
-            // Debug.Log($"OnAfterDeserializeArray toFill={toFill}, serArr={saintsSerializedProperties}, elementType={elementType}");
-
-            bool canFill = toFill != null && toFill.Length == saintsSerializedProperties.Length;
-            DateTime[] results = new DateTime[saintsSerializedProperties.Length];
-            for (int i = 0; i < saintsSerializedProperties.Length; i++)
-            {
-                if (canFill)
-                {
-                    toFill[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
-                }
-                else
-                {
-                    results[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
+                    if (canFill)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
                 }
             }
 
             return (canFill, results);
         }
-        public static (bool filled, TimeSpan[] result) OnAfterDeserializeArrayTimeSpan(TimeSpan[] toFill, long[] saintsSerializedProperties)
-        {
-            // Debug.Log($"OnAfterDeserializeArray toFill={toFill}, serArr={saintsSerializedProperties}, elementType={elementType}");
 
-            bool canFill = toFill != null && toFill.Length == saintsSerializedProperties.Length;
-            TimeSpan[] results = new TimeSpan[saintsSerializedProperties.Length];
-            for (int i = 0; i < saintsSerializedProperties.Length; i++)
-            {
-                if (canFill)
-                {
-                    toFill[i] = OnAfterDeserializeTimeSpan(saintsSerializedProperties[i]);
-                }
-                else
-                {
-                    results[i] = OnAfterDeserializeTimeSpan(saintsSerializedProperties[i]);
-                }
-            }
-
-            return (canFill, results);
-        }
+        // public static (bool filled, DateTime[] result) OnAfterDeserializeArrayDateTime(DateTime[] toFill, long[] saintsSerializedProperties)
+        // {
+        //     // Debug.Log($"OnAfterDeserializeArray toFill={toFill}, serArr={saintsSerializedProperties}, elementType={elementType}");
+        //
+        //     bool canFill = toFill != null && toFill.Length == saintsSerializedProperties.Length;
+        //     DateTime[] results = new DateTime[saintsSerializedProperties.Length];
+        //     for (int i = 0; i < saintsSerializedProperties.Length; i++)
+        //     {
+        //         if (canFill)
+        //         {
+        //             toFill[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
+        //         }
+        //         else
+        //         {
+        //             results[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
+        //         }
+        //     }
+        //
+        //     return (canFill, results);
+        // }
+        // public static (bool filled, TimeSpan[] result) OnAfterDeserializeArrayTimeSpan(TimeSpan[] toFill, long[] saintsSerializedProperties)
+        // {
+        //     // Debug.Log($"OnAfterDeserializeArray toFill={toFill}, serArr={saintsSerializedProperties}, elementType={elementType}");
+        //
+        //     bool canFill = toFill != null && toFill.Length == saintsSerializedProperties.Length;
+        //     TimeSpan[] results = new TimeSpan[saintsSerializedProperties.Length];
+        //     for (int i = 0; i < saintsSerializedProperties.Length; i++)
+        //     {
+        //         if (canFill)
+        //         {
+        //             toFill[i] = OnAfterDeserializeTimeSpan(saintsSerializedProperties[i]);
+        //         }
+        //         else
+        //         {
+        //             results[i] = OnAfterDeserializeTimeSpan(saintsSerializedProperties[i]);
+        //         }
+        //     }
+        //
+        //     return (canFill, results);
+        // }
 
         public static (bool filled, List<T> result) OnAfterDeserializeList<T>(List<T> toFill, SaintsSerializedProperty[] saintsSerializedProperties, Type targetType)
         {
@@ -327,38 +359,18 @@ namespace SaintsField.Utils
             List<T> results = new List<T>(new T[saintsSerializedProperties.Length]);
             for (int i = 0; i < saintsSerializedProperties.Length; i++)
             {
-                if (canFill)
+                (bool ok, T result) = OnAfterDeserialize<T>(saintsSerializedProperties[i], targetType);
+                // ReSharper disable once InvertIf
+                if(ok)
                 {
-                    toFill[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], targetType);
-                }
-                else
-                {
-                    results[i] = OnAfterDeserialize<T>(saintsSerializedProperties[i], targetType);
-                }
-            }
-
-            // if (!canFill)
-            // {
-            //     toFill = results;
-            // }
-            return (canFill, results);
-        }
-
-        public static (bool filled, List<DateTime> result) OnAfterDeserializeListDateTime(List<DateTime> toFill, long[] saintsSerializedProperties)
-        {
-            // Debug.Log($"toFill={toFill}, serArr={saintsSerializedProperties}, targetType={targetType}");
-            bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
-            // Debug.Log($"canFill={canFill}");
-            List<DateTime> results = new List<DateTime>(new DateTime[saintsSerializedProperties.Length]);
-            for (int i = 0; i < saintsSerializedProperties.Length; i++)
-            {
-                if (canFill)
-                {
-                    toFill[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
-                }
-                else
-                {
-                    results[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
+                    if (canFill)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
                 }
             }
 
@@ -368,24 +380,49 @@ namespace SaintsField.Utils
             // }
             return (canFill, results);
         }
-        public static (bool filled, List<TimeSpan> result) OnAfterDeserializeListTimeSpan(List<TimeSpan> toFill, long[] saintsSerializedProperties)
-        {
-            bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
-            List<TimeSpan> results = new List<TimeSpan>(new TimeSpan[saintsSerializedProperties.Length]);
-            for (int i = 0; i < saintsSerializedProperties.Length; i++)
-            {
-                if (canFill)
-                {
-                    toFill[i] = OnAfterDeserializeTimeSpan(saintsSerializedProperties[i]);
-                }
-                else
-                {
-                    results[i] = OnAfterDeserializeTimeSpan(saintsSerializedProperties[i]);
-                }
-            }
 
-            return (canFill, results);
-        }
+        // public static (bool filled, List<DateTime> result) OnAfterDeserializeListDateTime(List<DateTime> toFill, long[] saintsSerializedProperties)
+        // {
+        //     // Debug.Log($"toFill={toFill}, serArr={saintsSerializedProperties}, targetType={targetType}");
+        //     bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
+        //     // Debug.Log($"canFill={canFill}");
+        //     List<DateTime> results = new List<DateTime>(new DateTime[saintsSerializedProperties.Length]);
+        //     for (int i = 0; i < saintsSerializedProperties.Length; i++)
+        //     {
+        //         if (canFill)
+        //         {
+        //             toFill[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
+        //         }
+        //         else
+        //         {
+        //             results[i] = OnAfterDeserializeDateTime(saintsSerializedProperties[i]);
+        //         }
+        //     }
+        //
+        //     // if (!canFill)
+        //     // {
+        //     //     toFill = results;
+        //     // }
+        //     return (canFill, results);
+        // }
+        // public static (bool filled, List<TimeSpan> result) OnAfterDeserializeListTimeSpan(List<TimeSpan> toFill, long[] saintsSerializedProperties)
+        // {
+        //     bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
+        //     List<TimeSpan> results = new List<TimeSpan>(new TimeSpan[saintsSerializedProperties.Length]);
+        //     for (int i = 0; i < saintsSerializedProperties.Length; i++)
+        //     {
+        //         if (canFill)
+        //         {
+        //             toFill[i] = OnAfterDeserializeTimeSpan(saintsSerializedProperties[i]);
+        //         }
+        //         else
+        //         {
+        //             results[i] = OnAfterDeserializeTimeSpan(saintsSerializedProperties[i]);
+        //         }
+        //     }
+        //
+        //     return (canFill, results);
+        // }
 
 //         public static void OnBeforeSerialize(List<SaintsSerializedProperty> saintsSerializedProperties, Type serContainerType)
 //         {

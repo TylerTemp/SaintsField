@@ -4,6 +4,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
+
 namespace SaintsField.Editor.Drawers.DateTimeDrawer
 {
 #if UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
@@ -14,7 +15,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
     {
         private readonly YearInputElement _yearInputElement;
         private readonly MonthInputElement _monthInputElement;
-        private readonly TimeSpanDrawer.DayInputElement _dayInputElement;
+        private readonly DayInputElement _dayInputElement;
 
         public DateTimeElement()
         {
@@ -71,7 +72,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 },
             });
 
-            _dayInputElement = new TimeSpanDrawer.DayInputElement
+            _dayInputElement = new DayInputElement
             {
                 style =
                 {

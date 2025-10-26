@@ -7,6 +7,7 @@ using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -22,9 +23,15 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             public object Value;
         }
 
-        public static VisualElement RenderSerializedActual(ISaintsAttribute _, string label, SerializedProperty saintsProperty, Type targetType)
+        public static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual, ISaintsAttribute _, string label, SerializedProperty property, object parent)
         {
-            SaintsPropertyType propertyType = (SaintsPropertyType)saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
+            Type targetType = ReflectUtils.SaintsSerializedActualGetType(saintsSerializedActual, parent);
+            if (targetType == null)
+            {
+                return new HelpBox($"Failed to get type for {property.propertyPath}", HelpBoxMessageType.Error);
+            }
+
+            SaintsPropertyType propertyType = (SaintsPropertyType)property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
 
             switch (propertyType)
             {
@@ -32,7 +39,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 {
                     EnumMetaInfo enumMetaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
                     DropdownButtonLongElement ele = new DropdownButtonLongElement(enumMetaInfo);
-                    SerializedProperty subProp = saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
+                    SerializedProperty subProp = property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
                     // ele.BindProperty(subProp);
                     ele.bindingPath = subProp.propertyPath;
 
@@ -55,7 +62,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 {
                     EnumMetaInfo enumMetaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
                     DropdownButtonULongElement ele = new DropdownButtonULongElement(enumMetaInfo);
-                    SerializedProperty subProp = saintsProperty.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
+                    SerializedProperty subProp = property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
                     Debug.Log($"bind {targetType} to {subProp.propertyPath}");
 #endif

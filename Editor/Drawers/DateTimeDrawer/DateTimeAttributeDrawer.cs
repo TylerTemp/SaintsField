@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Interfaces;
+using SaintsField.SaintsSerialization;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -28,9 +29,9 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             return r;
         }
 
-        public static VisualElement RenderSerializedActual(ISaintsAttribute dateTimeAttribute, string label, SerializedProperty property, Type type, bool inHorizontal)
+        public static VisualElement RenderSerializedActual(ISaintsAttribute dateTimeAttribute, string label, SerializedProperty property, bool inHorizontal)
         {
-            VisualElement r = MakeElement(property, label);
+            VisualElement r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)), label);
             if (inHorizontal)
             {
                 r.style.flexDirection = FlexDirection.Column;

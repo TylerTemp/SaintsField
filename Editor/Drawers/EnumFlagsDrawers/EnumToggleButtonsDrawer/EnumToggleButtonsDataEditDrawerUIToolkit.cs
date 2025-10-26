@@ -1,12 +1,15 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
@@ -14,8 +17,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 {
     public partial class EnumToggleButtonsAttributeDrawer: ISaintsSerializedPropertyDrawer
     {
-        public static VisualElement RenderSerializedActual(ISaintsAttribute enumToggle, string label, SerializedProperty property, MemberInfo info, Type targetType, object parent)
+        public static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual, ISaintsAttribute enumToggle, string label, SerializedProperty property, MemberInfo info, object parent)
         {
+            Type targetType = ReflectUtils.SaintsSerializedActualGetType(saintsSerializedActual, parent);
+            if (targetType == null)
+            {
+                return new HelpBox($"Failed to get type for {property.propertyPath}", HelpBoxMessageType.Error);
+            }
+
             SaintsPropertyType propertyType = (SaintsPropertyType)property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
 
             switch (propertyType)
