@@ -8,11 +8,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [SaintsSerialized] public int letUnitySerInt;
         [SaintsSerialized] public string letUnitySerString;
 
-        // [Serializable]
-        // public partial struct CustomType<T>
-        // {
-        //     [SaintsSerialized]
-        //     public T value;
-        // }
+        [Serializable]
+        public partial struct CustomType<T>
+        {
+            [SaintsSerialized]
+            public T value;
+        }
+
+        public CustomType<DateTime> customDt;
+        public CustomType<int> customInt;
     }
 }

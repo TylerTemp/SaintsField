@@ -1102,8 +1102,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerNotSupported
   letUnitySerInt: 64
   letUnitySerString: fdsfds
-  customTypeInt:
-    value: fsfds
+  customDt:
+    value__SaintsSerialized__:
+      propertyType: 5
+      propertyPath: 
+      longValue: 638970960738670000
+      uLongValue: 0
+      V: {fileID: 0}
+      VRef:
+        rid: -2
+      IsVRef: 0
+  customInt:
+    value: 67
+    value__SaintsSerialized__:
+      propertyType: 0
+      propertyPath: 
+      longValue: 0
+      uLongValue: 0
+      V: {fileID: 0}
+      VRef:
+        rid: -2
+      IsVRef: 0
   letUnitySerInt__SaintsSerialized__:
     propertyType: 0
     propertyPath: 
@@ -1114,24 +1133,6 @@ MonoBehaviour:
       rid: -2
     IsVRef: 0
   letUnitySerString__SaintsSerialized__:
-    propertyType: 0
-    propertyPath: 
-    longValue: 0
-    uLongValue: 0
-    V: {fileID: 0}
-    VRef:
-      rid: -2
-    IsVRef: 0
-  customTypeInt__SaintsSerialized__:
-    propertyType: 0
-    propertyPath: 
-    longValue: 0
-    uLongValue: 0
-    V: {fileID: 0}
-    VRef:
-      rid: -2
-    IsVRef: 0
-  customTypeDateTime__SaintsSerialized__:
     propertyType: 0
     propertyPath: 
     longValue: 0
@@ -4737,11 +4738,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SerTimeSpanExample
   myClass:
-    _dtArray__SaintsSerialized__: []
+    _dtArray__SaintsSerialized__:
+    - propertyType: 6
+      propertyPath: 
+      longValue: 409530000000
+      uLongValue: 0
+      V: {fileID: 0}
+      VRef:
+        rid: -2
+      IsVRef: 0
   _dt__SaintsSerialized__:
     propertyType: 6
     propertyPath: 
-    longValue: 0
+    longValue: 433910000000
     uLongValue: 0
     V: {fileID: 0}
     VRef:
@@ -4751,7 +4760,7 @@ MonoBehaviour:
   dt__SaintsSerialized__:
     propertyType: 6
     propertyPath: 
-    longValue: 0
+    longValue: 2232000000000
     uLongValue: 0
     V: {fileID: 0}
     VRef:
@@ -4760,7 +4769,7 @@ MonoBehaviour:
   s__SaintsSerialized__:
     propertyType: 6
     propertyPath: 
-    longValue: 0
+    longValue: 39997535660000
     uLongValue: 0
     V: {fileID: 0}
     VRef:
@@ -5253,7 +5262,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue315.GatheringResourceFromWorld
   gatherings:
-  - cell:
+  - cellStruct:
+      type: 0
+      worldObject: {fileID: 0}
+    cellClass:
       type: 0
       worldObject: {fileID: 0}
 --- !u!1 &1533286423

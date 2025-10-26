@@ -11,12 +11,14 @@ namespace SaintsField.Utils
     public class SaintsSerializedActualAttribute: Attribute, IPlayaAttribute
     {
         public readonly string Name;
-        public readonly Type ElementType;
+        // public readonly Type ElementType;
 
-        public SaintsSerializedActualAttribute(string name, Type elementType)
+        public SaintsSerializedActualAttribute(string name
+            // , Type elementType
+        )
         {
             Name = name;
-            ElementType = elementType;
+            // ElementType = elementType;
             // Paths = objPaths.Select(ConvertSaintsSerializedPath).ToArray();
         }
 
