@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
             return r;
         }
 
-        public static VisualElement RenderSerializedActual(ISaintsAttribute timeSpanAttribute, string label, SerializedProperty property, Type type, IReadOnlyList<Attribute> allAttributes, bool inHorizontal)
+        public static VisualElement RenderSerializedActual(ISaintsAttribute timeSpanAttribute, string label, SerializedProperty property, IReadOnlyList<Attribute> allAttributes, bool inHorizontal)
         {
             VisualElement r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)), label, allAttributes.Any(each => each is DefaultExpandAttribute));
             if (inHorizontal)

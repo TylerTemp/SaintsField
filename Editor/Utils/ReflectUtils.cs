@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -594,6 +595,49 @@ namespace SaintsField.Editor.Utils
             return s.StartsWith("UnityEngine.")
                 ? s.Substring("UnityEngine.".Length)
                 : s;
+        }
+
+        public static Type SaintsSerializedActualGetType(SaintsSerializedActualAttribute saintsSerializedActual, object parent)
+        {
+            // Type targetType = null;
+
+            foreach (Type type in GetSelfAndBaseTypesFromInstance(parent))
+            {
+                Type revType = null;
+                FieldInfo originFieldInfo = type.GetField(saintsSerializedActual.Name,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+                // Debug.Log($"{type}: {saintsSerializedActual.Name}/{originFieldInfo?.Name}");
+                if (originFieldInfo == null)
+                {
+                    PropertyInfo originPropInfo = type.GetProperty(saintsSerializedActual.Name,
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (originPropInfo != null)
+                    {
+                        revType = originPropInfo.PropertyType;
+                    }
+                }
+                else
+                {
+                    revType = originFieldInfo.FieldType;
+                }
+
+                if (revType != null)
+                {
+                    if (revType.IsArray)
+                    {
+                        return revType.GetElementType();
+                    }
+                    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+                    {
+                        return type.GetGenericArguments()[0];
+                    }
+
+                    return revType;
+                }
+            }
+
+            return null;
         }
     }
 }

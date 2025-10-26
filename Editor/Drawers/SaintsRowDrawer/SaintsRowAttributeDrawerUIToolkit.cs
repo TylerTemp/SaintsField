@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             root.AddToClassList(SaintsRowClass);
             root.AddToClassList(ClassAllowDisable);
 
-            FillElement(root, label, property, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder);
+            FillElement(root, label, property, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, parent);
 
             // ReSharper disable once InvertIf
             if (property.propertyType == SerializedPropertyType.ManagedReference)
@@ -133,7 +133,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
                             SerializedProperty newProp = property.serializedObject.FindProperty(propPath);
 
-                            FillElement(root, label, newProp, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder);
+                            FillElement(root, label, newProp, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, parent);
                         }
                         // Debug.Log(property.managedReferenceId);
                     })
@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         //         : ((FieldInfo) member).FieldType;
         // }
 
-        private static void FillElement(VisualElement root, string label, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
+        private static void FillElement(VisualElement root, string label, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
             // Debug.Log(info.Name);
             // Debug.Log(info.DeclaringType);
@@ -179,7 +179,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     label = label[..^"__Saints Serialized__".Length];
                 }
                 // Debug.Log($"{info.Name}/{property.propertyPath}/{saintsSerializedActual.Name}/{saintsSerializedActual.ElementType}");
-                VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, (FieldInfo)info, inHorizontalLayout, SerializedUtils.GetFieldInfoAndDirectParent(property).parent);
+                VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, (FieldInfo)info, inHorizontalLayout, parent);
                 root.Add(renderSerializedActual);
                 return;
             }
@@ -268,7 +268,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         }
 
         private static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual,
-            string label, SerializedProperty property, FieldInfo serInfo, Type targetType, bool inHorizontalLayout, object parent)
+            string label, SerializedProperty property, FieldInfo serInfo, bool inHorizontalLayout, object parent)
         {
             // Debug.Log(property.propertyPath);
             Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);
@@ -315,19 +315,19 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
                     if (enumToggle != null)
                     {
-                        return EnumToggleButtonsAttributeDrawer.RenderSerializedActual(enumToggle, label, property, serInfo, targetType, parent);
+                        return EnumToggleButtonsAttributeDrawer.RenderSerializedActual(saintsSerializedActual, enumToggle, label, property, serInfo, parent);
                     }
-                    return TreeDropdownAttributeDrawer.RenderSerializedActual((ISaintsAttribute)flagsTreeDropdownAttribute ?? flagsDropdownAttribute, label, property, targetType);
+                    return TreeDropdownAttributeDrawer.RenderSerializedActual(saintsSerializedActual, (ISaintsAttribute)flagsTreeDropdownAttribute ?? flagsDropdownAttribute, label, property, parent);
                     // return null;
                 }
                 case SaintsPropertyType.Interface:
                 {
-                    return SaintsInterfaceDrawer.RenderSerializedActual(label, property, targetType, attributes, inHorizontalLayout, serInfo, parent);
+                    return SaintsInterfaceDrawer.RenderSerializedActual(saintsSerializedActual, label, property, attributes, inHorizontalLayout, serInfo, parent);
                 }
                 case SaintsPropertyType.DateTime:
-                    return DateTimeAttributeDrawer.RenderSerializedActual(dateTimeAttribute, label, property, targetType, inHorizontalLayout);
+                    return DateTimeAttributeDrawer.RenderSerializedActual(dateTimeAttribute, label, property, inHorizontalLayout);
                 case SaintsPropertyType.TimeSpan:
-                    return TimeSpanAttributeDrawer.RenderSerializedActual(timeSpanAttribute, label, property, targetType, attributes, inHorizontalLayout);
+                    return TimeSpanAttributeDrawer.RenderSerializedActual(timeSpanAttribute, label, property, attributes, inHorizontalLayout);
                 case SaintsPropertyType.Undefined:
                 case SaintsPropertyType.ClassOrStruct:
                 default:

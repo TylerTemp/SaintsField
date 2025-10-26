@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             return r;
         }
 
-        public static VisualElement RenderSerializedActual(ISaintsAttribute dateTimeAttribute, string label, SerializedProperty property, Type type, bool inHorizontal)
+        public static VisualElement RenderSerializedActual(ISaintsAttribute dateTimeAttribute, string label, SerializedProperty property, bool inHorizontal)
         {
             VisualElement r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)), label);
             if (inHorizontal)
