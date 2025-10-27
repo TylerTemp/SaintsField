@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using SaintsField.SaintsSerialization;
+using System.Linq;
 using SaintsField.Utils;
 using UnityEngine;
 
@@ -62,10 +61,12 @@ namespace SaintsField
             int index = _saintsKeys.FindIndex(wrap => wrap.Value.Equals(tKey));
             if (index >= 0)
             {
+                // Debug.Log($"serialized set value {tKey}:{tValue}");
                 _saintsValues[index].Value = tValue;
             }
             else
             {
+                // Debug.Log($"serialized add value {tKey}:{tValue}");
                 _saintsKeys.Add(new SaintsWrap<TKey>(tKey));
                 _saintsValues.Add(new SaintsWrap<TValue>(tValue));
             }
@@ -80,6 +81,31 @@ namespace SaintsField
                 _saintsValues.RemoveAt(index);
             }
         }
+
+#if UNITY_EDITOR
+        private HashSet<SaintsWrap<TKey>> _editorWatchedKeys = new HashSet<SaintsWrap<TKey>>();
+        private HashSet<SaintsWrap<TValue>> _editorWatchedValues = new HashSet<SaintsWrap<TValue>>();
+        protected override void OnAfterDeserializeProcess()
+        {
+            IEnumerable<SaintsWrap<TKey>> extraKeys = _saintsKeys.Except(_editorWatchedKeys);
+            IEnumerable<SaintsWrap<TValue>> extraValues = _saintsValues.Except(_editorWatchedValues);
+            foreach (SaintsWrap<TKey> keyWrap in extraKeys)
+            {
+                // Debug.Log($"add key listener");
+                keyWrap.onAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                _editorWatchedKeys.Add(keyWrap);
+            }
+
+            foreach (SaintsWrap<TValue> valueWrap in extraValues)
+            {
+                // Debug.Log($"add value listener");
+                valueWrap.onAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                _editorWatchedValues.Add(valueWrap);
+            }
+
+            base.OnAfterDeserializeProcess();
+        }
+#endif
 
 #if UNITY_EDITOR
         // ReSharper disable once UnusedMember.Local
@@ -144,5 +170,15 @@ namespace SaintsField
                 _saintsValues.Add(new SaintsWrap<TValue>(kv.Value));
             }
         }
+
+        #region Convert
+
+        // Implicit conversion operator: Converts SaintsDictionary<,> to Dictionary<,>
+        public static implicit operator Dictionary<TKey, TValue>(SaintsDictionary<TKey, TValue> saintsDict) => saintsDict.Dictionary;
+
+        // Explicit conversion operator: Converts T[] to SaintsArray<T>
+        public static explicit operator SaintsDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict) => new SaintsDictionary<TKey, TValue>(dict);
+
+        #endregion
     }
 }

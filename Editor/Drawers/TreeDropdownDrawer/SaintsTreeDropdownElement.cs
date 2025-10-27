@@ -257,7 +257,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
         public int GetMaxHeight()
         {
-            int result = SaintsPropertyDrawer.SingleLineHeight + 2;  // search bar height + border
+            int result = SaintsPropertyDrawer.SingleLineHeight + 2 + 18;  // search bar height + border + scroller
             foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
             {
                 if (treeRowAbsElement is TreeRowSepElement)

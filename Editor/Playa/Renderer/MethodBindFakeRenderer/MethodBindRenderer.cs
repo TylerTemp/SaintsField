@@ -88,7 +88,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 List<string> attrNames = new List<string>();
                 if (eventTarget.Contains("."))
                 {
-                    attrNames.AddRange(eventTarget.Split(SerializedUtils.pathSplitSeparator));
+                    attrNames.AddRange(eventTarget.Split(SerializedUtils.PathSplitSeparator));
                 }
                 else
                 {

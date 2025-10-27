@@ -286,12 +286,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             return root;
         }
 
-        private static (FieldInfo targetInfo, object targetParent) GetTargetInfo(string propNameCompact, FieldInfo info, Type type, object parent)
+        private static (FieldInfo targetInfo, object targetParent) GetTargetInfo(string propNameCompact, Type type, object saintsDictionaryValue)
         {
-            object keysIterTarget = info.GetValue(parent);
+
+            // object keysIterTarget = info.GetValue(parent);
+            object keysIterTarget = saintsDictionaryValue;
             List<object> keysParents = new List<object>(3)
             {
-                keysIterTarget,
+                saintsDictionaryValue,
             };
             Type keysParentType = type;
             FieldInfo keysField = null;
@@ -362,8 +364,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             foldout.RegisterValueChangedCallback(newValue => property.isExpanded = newValue.newValue);
 
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            bool insideArray = arrayIndex != -1;
 
-            Type rawType = arrayIndex == -1 ? info.FieldType : ReflectUtils.GetElementType(info.FieldType);
+            Type rawType = insideArray ? ReflectUtils.GetElementType(info.FieldType) : info.FieldType;
             Debug.Assert(rawType != null, $"Failed to get element type from {property.propertyPath}");
             // Debug.Log(info.FieldType);
             (string propKeysNameCompact, string propValuesNameCompact) = GetKeysValuesPropName(rawType);
@@ -379,12 +382,18 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             // property.FindPropertyRelative(propValuesNameCompact) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propValuesNameCompact);
             Debug.Assert(valuesProp != null, $"Failed to get values prop from {propValuesNameCompact}");
 
-            (FieldInfo keysField, object keysParent) = GetTargetInfo(propKeysNameCompact, info, rawType, parent);
+            object fieldValue = info.GetValue(parent);
+            if (insideArray)
+            {
+                fieldValue = ((IEnumerable)fieldValue).Cast<object>().ElementAt(arrayIndex);
+            }
+
+            (FieldInfo keysField, object keysParent) = GetTargetInfo(propKeysNameCompact, rawType, fieldValue);
 
             Debug.Assert(keysField != null, $"Failed to get keys field {propKeysNameCompact} from {property.propertyPath}");
             Type keyType = ReflectUtils.GetElementType(keysField.FieldType);
 
-            (FieldInfo valuesField, object valuesParent) = GetTargetInfo(propValuesNameCompact, info, rawType, parent);
+            (FieldInfo valuesField, object valuesParent) = GetTargetInfo(propValuesNameCompact, rawType, fieldValue);
 
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
             Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);

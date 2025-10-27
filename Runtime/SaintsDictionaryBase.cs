@@ -22,7 +22,21 @@ namespace SaintsField
         protected abstract void SerializedSetKeyValue(TKey tKey, TValue tValue);
         protected abstract void SerializedRemoveKeyValue(TKey key);
 
-        protected Dictionary<TKey, TValue> Dictionary = new Dictionary<TKey, TValue>();
+        [SerializeField]
+        protected int saintsSerializedVersion;
+
+        private Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
+
+        protected Dictionary<TKey, TValue> Dictionary
+        {
+            get
+            {
+                EnsureOnAfterDeserializeOnce();
+                return _dictionary;
+            }
+            set => _dictionary = value;
+        }
+
         private ICollection _keys;
         private ICollection _values;
 
@@ -33,6 +47,11 @@ namespace SaintsField
 
         protected virtual void OnBeforeSerializeProcesser()
         {
+            if (saintsSerializedVersion == 0)
+            {
+                saintsSerializedVersion = 1;
+            }
+
 #if UNITY_EDITOR
             int keyCount = SerializedKeysCount();
             int valueCount = SerializedValuesCount();
@@ -65,8 +84,19 @@ namespace SaintsField
 #endif
         }
 
+        private bool _onAfterDeserializeOnce = false;
+
+        private void EnsureOnAfterDeserializeOnce()
+        {
+            if (!_onAfterDeserializeOnce)
+            {
+                OnAfterDeserialize();
+            }
+        }
+
         public void OnAfterDeserialize()
         {
+            _onAfterDeserializeOnce = true;
             OnAfterDeserializeProcess();
         }
 
@@ -81,14 +111,14 @@ namespace SaintsField
                 TValue value = SerializedValuesCount() > index ? SerializedValueGetAt(index) : default;
 #if UNITY_EDITOR
                 // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
-                // if (!RuntimeUtil.IsNull(key) && !Dictionary.ContainsKey(key))
-                // {
-                //     Dictionary.Add(key, value);
-                // }
-                if(!RuntimeUtil.IsNull(key))
+                if (!RuntimeUtil.IsNull(key) && !Dictionary.ContainsKey(key))
                 {
-                    Dictionary[key] = value;
+                    Dictionary.Add(key, value);
                 }
+                // if(!RuntimeUtil.IsNull(key))
+                // {
+                //     Dictionary[key] = value;
+                // }
 #else
                 Dictionary.Add(key, value);
 #endif
@@ -101,6 +131,8 @@ namespace SaintsField
             SerializedKeysClear();
             SerializedValuesClear();
 #endif
+
+            // Debug.Log($"dictionary OnAfterDeserializeProcess finished");
         }
 
         public void Add(TKey key, TValue value)

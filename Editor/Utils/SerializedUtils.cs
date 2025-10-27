@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Utils
 {
     public static class SerializedUtils
     {
-        public static readonly char[] pathSplitSeparator = { '.' };
+        public static readonly char[] PathSplitSeparator = { '.' };
 
         public static SerializedProperty FindPropertyByAutoPropertyName(SerializedObject obj, string propName)
         {
@@ -65,7 +65,7 @@ namespace SaintsField.Editor.Utils
         public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParent(SerializedProperty property)
         {
             string originPath = property.propertyPath;
-            string[] propPaths = originPath.Split(pathSplitSeparator);
+            string[] propPaths = originPath.Split(PathSplitSeparator);
             (bool arrayTrim, string[] propPathSegments) = TrimEndArray(propPaths);
             if (arrayTrim)
             {
@@ -155,7 +155,7 @@ namespace SaintsField.Editor.Utils
 
         public static string GetUniqueIdArray(SerializedProperty property)
         {
-            string[] paths = property.propertyPath.Split(pathSplitSeparator);
+            string[] paths = property.propertyPath.Split(PathSplitSeparator);
 
             (bool _, string[] propPathSegments) = TrimEndArray(paths);
             return $"{property.serializedObject.targetObject.GetInstanceID()}_{string.Join(".", propPathSegments)}";
@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Utils
         public static (string error, SerializedProperty property) GetArrayProperty(SerializedProperty property)
         {
             // Debug.Log(property.propertyPath);
-            string[] paths = property.propertyPath.Split(pathSplitSeparator);
+            string[] paths = property.propertyPath.Split(PathSplitSeparator);
 
             (bool arrayTrim, string[] propPathSegments) = TrimEndArray(paths);
             if (!arrayTrim)
@@ -260,7 +260,7 @@ namespace SaintsField.Editor.Utils
 
         public static int PropertyPathIndex(string propertyPath)
         {
-            string[] propPaths = propertyPath.Split(pathSplitSeparator);
+            string[] propPaths = propertyPath.Split(PathSplitSeparator);
             // ReSharper disable once UseIndexFromEndExpression
             string lastPropPath = propPaths[propPaths.Length - 1];
             if (lastPropPath.StartsWith("data[") && lastPropPath.EndsWith("]"))

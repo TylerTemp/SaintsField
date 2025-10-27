@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SaintsField.SaintsSerialization;
 using UnityEngine;
 
@@ -97,6 +98,49 @@ namespace SaintsField.Utils
             return (false, default);
         }
 
+        public static (bool assign, SaintsDictionary<TKey, TValue> result) OnBeforeSerializeDictionary<TKey, TValue>(SaintsDictionary<TKey, TValue> serializedProp, object obj)
+        {
+            if (obj == null)
+            {
+                // Debug.Log("OnBeforeSerializeDictionary skip null");
+                // return (true, new SaintsDictionary<TKey, TValue>());
+                return (false, null);
+            }
+
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(obj is IDictionary<TKey, TValue> originDic))
+            {
+                // Debug.Log("OnBeforeSerializeDictionary not dictionary");
+                return (false, null);
+            }
+
+            foreach (KeyValuePair<TKey, TValue> originKv in originDic)
+            {
+                if (serializedProp.TryGetValue(originKv.Key, out TValue value))
+                {
+                    if((object)value != (object)originKv.Value)
+                    {
+                        // Debug.Log($"Update serialized kv {value} -> {originKv.Value}");
+                        serializedProp[originKv.Key] = originKv.Value;
+                    }
+                }
+                else
+                {
+                    // Debug.Log("Update serialized kv");
+                    serializedProp[originKv.Key] = originKv.Value;
+                }
+            }
+
+            foreach (TKey removeKey in serializedProp.Keys.Except(originDic.Keys).ToArray())
+            {
+                serializedProp.Remove(removeKey);
+            }
+
+            // Debug.Log($"OnBeforeSerializeDictionary inplace modified {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))} to {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))}");
+
+            return (true, serializedProp);
+        }
+
         // public static void OnBeforeSerializeArray<T>(ref SaintsSerializedProperty[] toFill, ref T[] objList, Type elementType)
         // {
         //     // Debug.Log($"OnBeforeSerializeArray toFill={toFill}, objList={objList}, elementType={elementType}");
@@ -152,6 +196,104 @@ namespace SaintsField.Utils
                 (bool ok, SaintsSerializedProperty result) = OnBeforeSerialize(serRef[i], objList[i], elementType);
                 // ReSharper disable once InvertIf
                 if(ok)
+                {
+                    if (inPlace)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            if (!inPlace)
+            {
+                toFill = results;
+            }
+        }
+
+        public static void OnBeforeSerializeCollectionDictionary<TKey, TValue>(ref SaintsDictionary<TKey, TValue>[] toFill, Dictionary<TKey, TValue>[] objList)
+        {
+            Debug.Assert(objList != null);
+            bool inPlace = toFill != null && toFill.Length == objList.Length;
+
+            SaintsDictionary<TKey, TValue>[] results;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (inPlace)
+            {
+                results = Array.Empty<SaintsDictionary<TKey, TValue>>();
+            }
+            else
+            {
+                results = new SaintsDictionary<TKey, TValue>[objList.Length];
+            }
+
+            List<SaintsDictionary<TKey, TValue>> serRef =
+                new List<SaintsDictionary<TKey, TValue>>(toFill ?? Array.Empty<SaintsDictionary<TKey, TValue>>());
+            if(serRef.Count < objList.Length)
+            {
+                for(int i = serRef.Count; i < objList.Length; i++)
+                {
+                    serRef.Add(new SaintsDictionary<TKey, TValue>());
+                }
+            }
+
+            for (int i = 0; i < objList.Length; i++)
+            {
+                (bool assign, SaintsDictionary<TKey, TValue> result) = OnBeforeSerializeDictionary(serRef[i], objList[i]);
+                // ReSharper disable once InvertIf
+                if(assign)
+                {
+                    if (inPlace)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            if (!inPlace)
+            {
+                toFill = results;
+            }
+        }
+
+        public static void OnBeforeSerializeCollectionDictionary<TKey, TValue>(ref SaintsDictionary<TKey, TValue>[] toFill, List<Dictionary<TKey, TValue>> objList)
+        {
+            Debug.Assert(objList != null);
+            bool inPlace = toFill != null && toFill.Length == objList.Count;
+
+            SaintsDictionary<TKey, TValue>[] results;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (inPlace)
+            {
+                results = Array.Empty<SaintsDictionary<TKey, TValue>>();
+            }
+            else
+            {
+                results = new SaintsDictionary<TKey, TValue>[objList.Count];
+            }
+
+            List<SaintsDictionary<TKey, TValue>> serRef =
+                new List<SaintsDictionary<TKey, TValue>>(toFill ?? Array.Empty<SaintsDictionary<TKey, TValue>>());
+            if(serRef.Count < objList.Count)
+            {
+                for(int i = serRef.Count; i < objList.Count; i++)
+                {
+                    serRef.Add(new SaintsDictionary<TKey, TValue>());
+                }
+            }
+
+            for (int i = 0; i < objList.Count; i++)
+            {
+                (bool assign, SaintsDictionary<TKey, TValue> result) = OnBeforeSerializeDictionary(serRef[i], objList[i]);
+                // ReSharper disable once InvertIf
+                if(assign)
                 {
                     if (inPlace)
                     {
@@ -285,6 +427,47 @@ namespace SaintsField.Utils
             }
         }
 
+        public static (bool assign, Dictionary<TKey, TValue> result) OnAfterDeserializeDictionary<TKey, TValue>(object originValue, SaintsDictionary<TKey, TValue> saintsSerializedProperty)
+        {
+            switch (originValue)
+            {
+                case null:
+                {
+                    // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
+                    return (false, null);
+                }
+                case Dictionary<TKey, TValue> originDictionary:
+                {
+                    foreach (KeyValuePair<TKey, TValue> kv in saintsSerializedProperty)
+                    {
+                        if (originDictionary.TryGetValue(kv.Key, out TValue value))
+                        {
+                            if((object)value != (object)kv.Value)
+                            {
+                                originDictionary[kv.Key] = kv.Value;
+                            }
+                        }
+                        else
+                        {
+                            originDictionary[kv.Key] = kv.Value;
+                        }
+                    }
+
+                    foreach (TKey removeKey in originDictionary.Keys.Except(saintsSerializedProperty.Keys).ToArray())
+                    {
+                        originDictionary.Remove(removeKey);
+                    }
+
+                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}");
+                    return (true, originDictionary);
+                }
+                default:
+                    // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
+                    return (false, null);
+            }
+        }
+
+
         public static (bool filled, T[] result) OnAfterDeserializeArray<T>(T[] toFill, SaintsSerializedProperty[] saintsSerializedProperties, Type elementType)
         {
             // Debug.Log($"OnAfterDeserializeArray toFill={toFill}, serArr={saintsSerializedProperties}, elementType={elementType}");
@@ -310,6 +493,54 @@ namespace SaintsField.Utils
             return (canFill, results);
         }
 
+        public static (bool filled, Dictionary<TKey, TValue>[] result) OnAfterDeserializeDictionaryArray<TKey, TValue>(Dictionary<TKey, TValue>[] toFill, SaintsDictionary<TKey, TValue>[] saintsSerializedProperties)
+        {
+            bool canFill = toFill != null && toFill.Length == saintsSerializedProperties.Length;
+            Dictionary<TKey, TValue>[] results = new Dictionary<TKey, TValue>[saintsSerializedProperties.Length];
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                (bool assign, Dictionary<TKey, TValue> result) = OnAfterDeserializeDictionary(canFill? toFill[i]: results[i], saintsSerializedProperties[i]);
+                if(assign)
+                {
+                    if (canFill)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            return (canFill, results);
+        }
+
+        public static (bool filled, List<Dictionary<TKey, TValue>> result) OnAfterDeserializeDictionaryList<TKey, TValue>(List<Dictionary<TKey, TValue>> toFill, SaintsDictionary<TKey, TValue>[] saintsSerializedProperties)
+        {
+            bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
+            List<Dictionary<TKey, TValue>> results = Enumerable.Range(0, saintsSerializedProperties.Length)
+                .Select(_ => new Dictionary<TKey, TValue>())
+                .ToList();
+
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                (bool assign, Dictionary<TKey, TValue> result) = OnAfterDeserializeDictionary(canFill? toFill[i]: results[i], saintsSerializedProperties[i]);
+                if(assign)
+                {
+                    if (canFill)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            return (canFill, results);
+        }
         // public static (bool filled, DateTime[] result) OnAfterDeserializeArrayDateTime(DateTime[] toFill, long[] saintsSerializedProperties)
         // {
         //     // Debug.Log($"OnAfterDeserializeArray toFill={toFill}, serArr={saintsSerializedProperties}, elementType={elementType}");
