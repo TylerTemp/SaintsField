@@ -94,10 +94,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.0.0-preview.6**
+**5.0.0-preview.7**
 
-1.  `SaintsHashSet<>` now support `interface` type & `abstruct` type directly
-2.  If you want to enforce a `SerializedReference` type, use `ReferenceHashSet<>`
+1.  `Dictionary` is now supported directly by using extended serialization
+2.  Fix `SaintsDictionary` didn't reflect the edited value var inspector until a domain reload or play mode changed
+3.  Fix `SaintsDictionary` not work inside array/list
+4.  If a field is not supported by extended serialization, Unity's default behavior will be the fallback
+5.  Fix extended serialization not support generic types
+
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -7305,7 +7309,77 @@ If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/T
 > This feature is still experimental
 > This feature is UI Toolkit only
 
-`SaintsEditor` supports some types that usually can not be serialized.
+`SaintsEditor` supports some types that usually can not be serialized. To use this function:
+
+1.  Ensure the type is supported by this functionality
+2.  Add `[SaintsSerialized]` for these fields or properties. Does not matter if the field is public/private etc.
+3.  ensure the containing class/struct (and its containing parent classes/structs) of these fields/properties is marked with keyword `partial`
+
+If a field is not supported, the default serialization provided by Unity will be used.
+
+### `Dictionary<,>` ###
+
+You can mark a `dictionary` directly for serialization. SaintsField will internally use `SaintsDictionary` to serialize it.
+
+```csharp
+// Note the `partial`!
+public partial class SerDictionaryExample : MonoBehaviour
+{
+    [Serializable]
+    public struct Sub
+    {
+        public string subString;
+        public int subInt;
+    }
+
+    // normal serializable
+    [SaintsSerialized] public Dictionary<int, Sub> dictIntToStruct;
+    // interface is also supported, just like SaintsDictionary
+    [SaintsSerialized] private Dictionary<int, IInterface1> _dictInterface;
+
+    // can be nested inside array/list, just like a normal serializable type
+    [SaintsSerialized] private Dictionary<IInterface1, int>[] _dictInterfaceArr;
+    [SaintsSerialized] private List<Dictionary<IInterface1, IInterface1>> _dictInterfaceLis;
+}
+```
+
+![](https://github.com/user-attachments/assets/37166a71-cd58-4765-aec4-5c9aabdb02b1)
+
+### `interface`  ###
+
+> [!WARNING]
+> This feature is still experimental
+
+Serialize any interface type, either of a Unity Object, or a serializable class/struct.
+
+This is the same as `SaintsInterface<>`, but now you can simply use the interface type directly.
+
+**IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set all parent class/struct to `partial`
+
+```csharp
+using SaintsField;
+
+// Note the `partial`!
+public partial class SerInterfaceExample : SaintsMonoBehaviour
+{
+    [SaintsSerialized] private IInterface1 _interface1;
+}
+
+// use in a normal class/struct, set parents partial recursively
+public partial class SerInterfaceExample : SaintsMonoBehaviour
+{
+    // Use inside class/struct, you need to set as `partial`, together with all it's container
+    [Serializable]
+    public partial struct SerInterfaceStruct
+    {
+        [SaintsSerialized] private IInterface1 _interface1InStruct;
+    }
+
+    public SerInterfaceStruct structWithInterface;
+}
+```
+
+![](https://github.com/user-attachments/assets/73f25e31-affb-43c5-a7c6-0bc0c47e3a8f)
 
 ### `long`/`ulong` Enum ###
 
@@ -7443,41 +7517,7 @@ public partial class SerTimeSpanExample : SaintsMonoBehaviour
 
 ![](https://github.com/user-attachments/assets/cd6b1135-6935-4366-940a-6f0c2a550c2f)
 
-### `interface`  ###
 
-> [!WARNING]
-> This feature is still experimental
-
-Serialize any interface type, either of a Unity Object, or a serializable class/struct.
-
-This is the same as `SaintsInterface<>`, but now you can simply use the interface type directly.
-
-**IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set all parent class/struct to `partial`
-
-```csharp
-using SaintsField;
-
-// Note the `partial`!
-public partial class SerInterfaceExample : SaintsMonoBehaviour
-{
-    [SaintsSerialized] private IInterface1 _interface1;
-}
-
-// use in a normal class/struct, set parents partial recursively
-public partial class SerInterfaceExample : SaintsMonoBehaviour
-{
-    // Use inside class/struct, you need to set as `partial`, together with all it's container
-    [Serializable]
-    public partial struct SerInterfaceStruct
-    {
-        [SaintsSerialized] private IInterface1 _interface1InStruct;
-    }
-
-    public SerInterfaceStruct structWithInterface;
-}
-```
-
-![](https://github.com/user-attachments/assets/73f25e31-affb-43c5-a7c6-0bc0c47e3a8f)
 
 ## `SaintsEditorWindow` ##
 

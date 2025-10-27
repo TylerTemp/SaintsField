@@ -1531,7 +1531,7 @@ namespace SaintsField.Editor.Utils
             // MemberInfo accMemberInfo = memberInfo;
             (string error, T result) thisResult = ("No Attributes", defaultValue);
 
-            foreach (string attrName in by.Split(SerializedUtils.pathSplitSeparator))
+            foreach (string attrName in by.Split(SerializedUtils.PathSplitSeparator))
             {
                 MemberInfo accMemberInfo = null;
                 foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))

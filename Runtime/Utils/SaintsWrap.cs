@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using SaintsField.SaintsSerialization;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 // ReSharper disable once CheckNamespace
 using System;
 
@@ -47,6 +49,7 @@ namespace SaintsField.Utils
                 case WrapType.Undefined:
                 case WrapType.T:
                 {
+                    // Debug.Log($"SaintsWrap OnBeforeSerialize value to {_runtimeResult}");
                     value = _runtimeResult;
                 }
                     break;
@@ -225,9 +228,15 @@ namespace SaintsField.Utils
         {
             if (!_onAfterDeserializeOnce)
             {
+                // Debug.Log("SaintsWrap Once OnAfterDeserialize");
                 OnAfterDeserialize();
             }
         }
+
+#if UNITY_EDITOR
+        // This will be null if it's not serializable.
+        public UnityEvent onAfterDeserializeChanged = new UnityEvent();
+#endif
 
         public void OnAfterDeserialize()
         {
@@ -238,20 +247,30 @@ namespace SaintsField.Utils
             {
                 case WrapType.T:
                 {
-                    _runtimeResult = value;
+                    if((object)_runtimeResult != (object)value)
+                    {
+                        _runtimeResult = value;
+#if UNITY_EDITOR
+                        // Debug.Log("SaintsWrap invoke changed");
+                        onAfterDeserializeChanged.Invoke();
+#endif
+                    }
                     // Debug.Log($"set runtime to {_runtimeResult}");
                 }
                     break;
                 case WrapType.Array:
                 {
+                    bool changed = false;
                     if (_runtimeResult == null)
                     {
+                        changed = true;
                         _runtimeResult = (T) (object)Array.CreateInstance(_subType, valueArray.Length);
                     }
                     Array runtimeArray = (Array)(object)_runtimeResult;
 
                     if (runtimeArray.Length != valueArray.Length)
                     {
+                        changed = true;
                         runtimeArray = Array.CreateInstance(_subType, valueArray.Length);
                         _runtimeResult = (T) (object)runtimeArray;
                     }
@@ -263,6 +282,7 @@ namespace SaintsField.Utils
                         object runtimeValue = runtimeArray.GetValue(index);
                         if(!SaintsSerializedPropertyEqual(runtimeValue, serObj, serObj.IsVRef))
                         {
+                            changed = true;
                             object getActualValue = GetObjectFromSaintsSerializedProperty(serObj, _subType);
                             // Debug.Log($"after ser {index}={serObj.V?.GetType()}/{serObj.VRef?.GetType()}->{getActualValue}");
                             runtimeArray.SetValue(getActualValue, index);
@@ -270,24 +290,76 @@ namespace SaintsField.Utils
                         // Debug.Log($"after ser {index} done");
                     }
 
+                    if (changed)
+                    {
+#if UNITY_EDITOR
+                        onAfterDeserializeChanged.Invoke();
+#endif
+                    }
+
                     // runtimeResult = (T) (object)arr;
                 }
                     break;
                 case WrapType.List:
                 {
-                    IList lis = (IList)Activator.CreateInstance(_listType, valueList.Count);
-                    foreach (SaintsSerializedProperty serObj in valueList)
+                    bool changed = false;
+                    if (_runtimeResult == null)
                     {
-                        lis.Add(GetObjectFromSaintsSerializedProperty(serObj, _subType));
+                        changed = true;
+                        _runtimeResult = (T) Activator.CreateInstance(_listType, valueList.Count);
+                    }
+                    IList runtimeArray = (IList)_runtimeResult;
+
+                    if (runtimeArray.Count != valueArray.Length)
+                    {
+                        changed = true;
+                        runtimeArray = (IList)Activator.CreateInstance(_listType, valueList.Count);
+                        _runtimeResult = (T) runtimeArray;
                     }
 
-                    _runtimeResult = (T) lis;
+                    // Array arr = Array.CreateInstance(_subType, valueArray.Length);
+                    for (int index = 0; index < valueArray.Length; index++)
+                    {
+                        SaintsSerializedProperty serObj = valueArray[index];
+                        object runtimeValue = runtimeArray[index];
+
+                        // ReSharper disable once InvertIf
+                        if(!SaintsSerializedPropertyEqual(runtimeValue, serObj, serObj.IsVRef))
+                        {
+                            changed = true;
+                            object getActualValue = GetObjectFromSaintsSerializedProperty(serObj, _subType);
+                            // Debug.Log($"after ser {index}={serObj.V?.GetType()}/{serObj.VRef?.GetType()}->{getActualValue}");
+                            runtimeArray[index] = getActualValue;
+                        }
+                        // Debug.Log($"after ser {index} done");
+                    }
+
+                    if (changed)
+                    {
+#if UNITY_EDITOR
+                        onAfterDeserializeChanged.Invoke();
+#endif
+                    }
+
+                    // IList lis = (IList)Activator.CreateInstance(_listType, valueList.Count);
+                    // foreach (SaintsSerializedProperty serObj in valueList)
+                    // {
+                    //     lis.Add(GetObjectFromSaintsSerializedProperty(serObj, _subType));
+                    // }
+                    //
+                    // _runtimeResult = (T) lis;
                 }
                     break;
 
                 case WrapType.Field:
                 {
-                    _runtimeResult = GetFromSaintsSerializedProperty(valueField);
+                    if(!SaintsSerializedPropertyEqual(_runtimeResult, valueField, valueField.IsVRef))
+                    {
+                        _runtimeResult = GetFromSaintsSerializedProperty(valueField);
+#if UNITY_EDITOR
+                        onAfterDeserializeChanged.Invoke();
+#endif
+                    }
                 }
                     break;
                 case WrapType.Undefined:  // Never inspected, ignore
@@ -305,6 +377,8 @@ namespace SaintsField.Utils
             valueArray = Array.Empty<SaintsSerializedProperty>();
             valueList.Clear();
 #endif
+
+            // Debug.Log("SaintsWrap OnAfterDeserialize finished");
         }
 
         private static object GetObjectFromSaintsSerializedProperty(SaintsSerializedProperty serObj, Type targetType)
@@ -415,5 +489,57 @@ namespace SaintsField.Utils
             // Debug.Log($"{t}: {wrapType}");
 
         }
+
+        #region Base Functions
+
+        public override int GetHashCode()
+        {
+            EnsureInit();
+            switch (wrapType)
+            {
+                case WrapType.T:
+                {
+                    return EqualityComparer<T>.Default.GetHashCode(value);
+                }
+                case WrapType.Array:
+                case WrapType.List:
+                case WrapType.Field:
+                    return EqualityComparer<T>.Default.GetHashCode(_runtimeResult);
+                case WrapType.Undefined:  // Never inspected, ignore
+                    return 0;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(wrapType), wrapType, null);
+            }
+        }
+
+        public bool Equals(SaintsWrap<T> other)
+        {
+            EnsureInit();
+            switch (wrapType)
+            {
+                case WrapType.T:
+                {
+                    return value == null? other == null: (object)value == (object)other.value;
+                }
+                case WrapType.Array:
+                case WrapType.List:
+                case WrapType.Field:
+                    return (object)_runtimeResult == (object)other._runtimeResult;
+                case WrapType.Undefined:  // Never inspected, ignore
+                    return other.wrapType == WrapType.Undefined;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(wrapType), wrapType, null);
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((SaintsWrap<T>)obj);
+        }
+
+        #endregion
     }
 }

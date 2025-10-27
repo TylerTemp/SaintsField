@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.39.0 ##
+
+1.  `Dictionary` is now supported directly by using extended serialization
+2.  Fix `SaintsDictionary` didn't reflect the edited value var inspector until a domain reload or play mode changed
+3.  Fix `SaintsDictionary` not work inside array/list
+4.  If a field is not supported by extended serialization, Unity's default behavior will be the fallback
+5.  Fix extended serialization not support generic types
+
 ## 4.38.0 ##
 
 1.  `SaintsHashSet<>` now support `interface` type & `abstruct` type directly

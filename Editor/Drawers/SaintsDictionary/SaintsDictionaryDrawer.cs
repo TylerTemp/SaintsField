@@ -14,6 +14,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.ValuePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SaintsDictionaryBase<,>), true)]
+    [CustomPropertyDrawer(typeof(SaintsDictionary<,>), true)]
     [CustomPropertyDrawer(typeof(SaintsDictionaryAttribute), true)]
     public partial class SaintsDictionaryDrawer: SaintsPropertyDrawer
     {

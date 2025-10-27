@@ -1106,7 +1106,7 @@ MonoBehaviour:
     value__SaintsSerialized__:
       propertyType: 5
       propertyPath: 
-      longValue: 638970960738670000
+      longValue: 0
       uLongValue: 0
       V: {fileID: 0}
       VRef:
@@ -3132,7 +3132,7 @@ MonoBehaviour:
     V: {fileID: 0}
     VRef:
       rid: -2
-    IsVRef: 1
+    IsVRef: 0
   references:
     version: 2
     RefIds:
@@ -4672,7 +4672,7 @@ MonoBehaviour:
   _dt__SaintsSerialized__:
     propertyType: 5
     propertyPath: 
-    longValue: 638969269593770000
+    longValue: 0
     uLongValue: 0
     V: {fileID: 0}
     VRef:
@@ -4682,7 +4682,7 @@ MonoBehaviour:
   dt__SaintsSerialized__:
     propertyType: 5
     propertyPath: 
-    longValue: 638969269628720000
+    longValue: 0
     uLongValue: 0
     V: {fileID: 0}
     VRef:
@@ -4738,19 +4738,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SerTimeSpanExample
   myClass:
-    _dtArray__SaintsSerialized__:
-    - propertyType: 6
-      propertyPath: 
-      longValue: 409530000000
-      uLongValue: 0
-      V: {fileID: 0}
-      VRef:
-        rid: -2
-      IsVRef: 0
+    _dtArray__SaintsSerialized__: []
   _dt__SaintsSerialized__:
     propertyType: 6
     propertyPath: 
-    longValue: 433910000000
+    longValue: 0
     uLongValue: 0
     V: {fileID: 0}
     VRef:
@@ -4760,7 +4752,7 @@ MonoBehaviour:
   dt__SaintsSerialized__:
     propertyType: 6
     propertyPath: 
-    longValue: 2232000000000
+    longValue: 0
     uLongValue: 0
     V: {fileID: 0}
     VRef:
@@ -4769,7 +4761,7 @@ MonoBehaviour:
   s__SaintsSerialized__:
     propertyType: 6
     propertyPath: 
-    longValue: 39997535660000
+    longValue: 0
     uLongValue: 0
     V: {fileID: 0}
     VRef:
@@ -6528,76 +6520,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1956168134
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1956168136}
-  - component: {fileID: 1956168135}
-  m_Layer: 0
-  m_Name: SerInterface
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1956168135
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1956168134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80dd50fa08b0f5245b54953641a16dd0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerInterfaceExample
-  structWithInterface:
-    _interface1InStruct__SaintsSerialized__:
-      propertyType: 4
-      propertyPath: 
-      longValue: 0
-      uLongValue: 0
-      V: {fileID: 0}
-      VRef:
-        rid: -2
-      IsVRef: 0
-  _interface1__SaintsSerialized__:
-    propertyType: 4
-    propertyPath: 
-    longValue: 0
-    uLongValue: 0
-    V: {fileID: 4190710479621803396, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
-    VRef:
-      rid: -2
-    IsVRef: 0
-  _interface1Arr__SaintsSerialized__: []
-  _interface1Lis__SaintsSerialized__: []
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
---- !u!4 &1956168136
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1956168134}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1961094008
 GameObject:
   m_ObjectHideFlags: 0
@@ -7207,6 +7129,160 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 276f5131026be6641b983ee4760efb1c, type: 3}
+--- !u!1001 &3442031997421319485
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 173335424543569994, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2370357191292358950, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: m_Name
+      value: SerDictionary
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[-2]'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _saintsDictInterfaceArr.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: dictIntToStruct__SaintsSerialized__._saintsKeys.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: dictIntToStruct__SaintsSerialized__._saintsValues.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _saintsDictInterfaceArr.Array.data[0].saintsSerializedVersion
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: dictIntToStruct__SaintsSerialized__._saintsKeys.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: dictIntToStruct__SaintsSerialized__._saintsKeys.Array.data[0].wrapType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: dictIntToStruct__SaintsSerialized__._saintsValues.Array.data[0].wrapType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: dictIntToStruct__SaintsSerialized__._saintsKeys.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: dictIntToStruct__SaintsSerialized__._saintsValues.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+--- !u!1001 &8813428999584467601
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4762349325708223181, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_Name
+      value: SerInterface
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284487716103389549, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8d6f0cb5abfff0a4bba262950c9230e6, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -7244,5 +7320,6 @@ SceneRoots:
   - {fileID: 1353093774}
   - {fileID: 1359646099}
   - {fileID: 315419262}
-  - {fileID: 1956168136}
+  - {fileID: 8813428999584467601}
+  - {fileID: 3442031997421319485}
   - {fileID: 203542844}
