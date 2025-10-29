@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Utils;
@@ -18,3 +19,4 @@ namespace SaintsField.Samples.EditorTest
 #endif
     }
 }
+#endif

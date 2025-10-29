@@ -94,7 +94,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.0.0-preview.8**
+**5.0.0-preview.9**
 
 1.  `SaintsArray`/`SaintsList` now support interface & abstract type
 2.  Fix `SaintsHashSet` might failed to deserialization and resulted in empty set
