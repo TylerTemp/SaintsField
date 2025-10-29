@@ -11,5 +11,7 @@ namespace SaintsField.Samples.Scripts.SaintsHashSetExamples
         {
             1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
         };
+
+        public SaintsHashSet<int>[] _arr;
     }
 }

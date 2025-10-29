@@ -6,15 +6,15 @@ namespace SaintsField
     public class SaintsArrayAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
-        public string GroupBy { get; }
+        public string GroupBy => "";
 
-        // ReSharper disable once InconsistentNaming
-        public readonly string PropertyName;
+        public readonly int NumberOfItemsPerPage;
+        public readonly bool Searchable;
 
-        public SaintsArrayAttribute(string propertyName=null, string groupBy="")
+        public SaintsArrayAttribute(bool searchable = true, int numberOfItemsPerPage = 0)
         {
-            PropertyName = propertyName;
-            GroupBy = groupBy;
+            NumberOfItemsPerPage = numberOfItemsPerPage;
+            Searchable = searchable;
         }
     }
 }

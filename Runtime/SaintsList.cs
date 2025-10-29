@@ -5,22 +5,111 @@ using System.Collections.Generic;
 using SaintsField.Utils;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Serializable]
-    public class SaintsList<T>: IWrapProp, IList<T>
+    public class SaintsList<T>: IList<T>, ISerializationCallbackReceiver
     {
+        [SerializeField, Obsolete]
+        public List<T> value = new List<T>();
+
         [SerializeField]
-        public List<SaintsWrap<T>> value = new List<SaintsWrap<T>>();
+        private List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
+        [SerializeField] private int _saintsSerializedVersion;
+
+        private List<T> _list = new List<T>();
+
+        #region Serialization
+
+        public void OnBeforeSerialize()
+        {
+#if UNITY_EDITOR
+            // ReSharper disable once InvertIf
+            if (_saintsSerializedVersion == 0)
+            {
+                _saintsSerializedVersion = 1;
+                _saintsList.Clear();
+#pragma warning disable CS0612 // Type or member is obsolete
+                foreach (T oldValue in value)
+#pragma warning restore CS0612 // Type or member is obsolete
+                {
+                    _saintsList.Add(new SaintsWrap<T>(oldValue));
+                }
+
+                // ReSharper disable once RedundantJumpStatement
+                return;
+            }
+#endif
 
 #if UNITY_EDITOR
-        // ReSharper disable once StaticMemberInGenericType
-        public static readonly string EditorPropertyName = nameof(value);
+            // do nothing
+#else
+            _saintsList.Clear();
+            foreach (T v in _list)
+            {
+                _saintsList.Add(new SaintsWrap<T>(v));
+            }
+
+#endif
+        }
+
+#if UNITY_EDITOR
+        private HashSet<SaintsWrap<T>> _editorWatchedKeys = new HashSet<SaintsWrap<T>>();
+#endif
+        public void OnAfterDeserialize()
+        {
+#if UNITY_EDITOR
+            if (_saintsSerializedVersion == 0)
+            {
+                _saintsSerializedVersion = 1;
+#pragma warning disable CS0612 // Type or member is obsolete
+                _list = value;
+#pragma warning restore CS0612 // Type or member is obsolete
+                return;
+            }
+#endif
+
+#if UNITY_EDITOR
+            IEnumerable<SaintsWrap<T>> extraKeys = _saintsList.Except(_editorWatchedKeys);
+            foreach (SaintsWrap<T> keyWrap in extraKeys)
+            {
+                // Debug.Log($"add key listener");
+                keyWrap.onAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                _editorWatchedKeys.Add(keyWrap);
+            }
+#endif
+            OnAfterDeserializeProcess();
+        }
+
+        private void OnAfterDeserializeProcess()
+        {
+            _list.Clear();
+
+            int serCount = _saintsList.Count;
+            for (int index = 0; index < serCount; index++)
+            {
+                T v = _saintsList[index].Value;
+                _list.Add(v);
+            }
+
+#if UNITY_EDITOR
+            // do nothing
+#else
+            _saintsList.Clear();
+#endif
+        }
+
+        #endregion
+
+#if UNITY_EDITOR
+        // ReSharper disable once UnusedMember.Local
+        private static string EditorPropertyName => nameof(_saintsList);
 #endif
 
         public override string ToString()
         {
-            return value.ToString();
+            return _list.ToString();
         }
 
         public SaintsList()
@@ -28,20 +117,23 @@ namespace SaintsField
         }
         public SaintsList(IEnumerable<T> ie)
         {
-            foreach (T element in ie)
+            _list = new List<T>(ie);
+#if UNITY_EDITOR
+            foreach (T element in _list)
             {
-                value.Add(new SaintsWrap<T>(element));
+                _saintsList.Add(new SaintsWrap<T>(element));
             }
+#endif
         }
         public SaintsList(int capacity)
         {
-            value = new List<SaintsWrap<T>>(capacity);
+            _list = new List<T>(capacity);
         }
 
         // Implicit conversion operator: Converts SaintsArray<T> to T[]
-        public static implicit operator List<T>(SaintsList<T> saintsArray)
+        public static implicit operator List<T>(SaintsList<T> saintsList)
         {
-            return saintsArray.value.Select(each => each.Value).ToList();
+            return saintsList._list;
         }
 
         // Explicit conversion operator: Converts T[] to SaintsArray<T>
@@ -52,72 +144,108 @@ namespace SaintsField
 
         #region IList
 
-        public IEnumerator<T> GetEnumerator() => value.Select(each => each.Value).GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => _list.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public void Add(T item) => value.Add(new SaintsWrap<T>(item));
+        public void Add(T item)
+        {
+#if UNITY_EDITOR
+            _saintsList.Add(new SaintsWrap<T>(item));
+#endif
+            _list.Add(item);
+        }
 
-        public void Clear() => value.Clear();
+        public void Clear()
+        {
+#if UNITY_EDITOR
+            _saintsList.Clear();
+#endif
+            _list.Clear();
+        }
 
-        public bool Contains(T item) => value.Any(each => (object)each.Value == (object)item);
+        public bool Contains(T item) => _list.Contains(item);
 
-        public void CopyTo(T[] array, int arrayIndex) => value.Select(each => each.Value).ToArray().CopyTo(array, arrayIndex);
+        public void CopyTo(T[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
 
         public bool Remove(T item)
         {
-            bool found = false;
-            int removeAtLess1 = -1;
-            foreach (SaintsWrap<T> wrap in value)
+            bool result = _list.Remove(item);
+
+#if UNITY_EDITOR
+            if (result)
             {
-                if ((object)wrap.Value == (object)item)
+                int foundIndex = -1;
+
+                for (int index = 0; index < _saintsList.Count; index++)
                 {
-                    found = true;
-                    break;
+                    T v = _saintsList[index].Value;
+                    // ReSharper disable once InvertIf
+                    if (EqualityComparer<T>.Default.Equals(v, item))
+                    {
+                        foundIndex = index;
+                        break;
+                    }
                 }
 
-                removeAtLess1 += 1;
+                if (foundIndex != -1)
+                {
+                    _saintsList.RemoveAt(foundIndex);
+                }
             }
+#endif
 
-            if (!found)
-            {
-                return false;
-            }
-
-            value.RemoveAt(removeAtLess1 + 1);
-            return true;
+            return result;
         }
 
-        public int Count => value.Count;
+        public int Count => _list.Count;
         public bool IsReadOnly => false;
         public int IndexOf(T item)
         {
-            int index = 0;
-            foreach (SaintsWrap<T> saintsWrap in value)
-            {
-                if ((object)saintsWrap.Value == (object)item)
-                {
-                    return index;
-                }
-
-                index++;
-            }
-
-            return -1;
+            return _list.IndexOf(item);
         }
 
-        public void Insert(int index, T item) => value.Insert(index, new SaintsWrap<T>(item));
+        public void Insert(int index, T item)
+        {
+            _list.Insert(index, item);
+#if UNITY_EDITOR
+            _saintsList.Insert(index, new SaintsWrap<T>(item));
+#endif
+        }
 
-        public void RemoveAt(int index) => value.RemoveAt(index);
+        public void RemoveAt(int index)
+        {
+            _list.RemoveAt(index);
+#if UNITY_EDITOR
+            _saintsList.RemoveAt(index);
+#endif
+        }
 
         public T this[int index]
         {
-            get => value[index].Value;
-            set => this.value[index] = new SaintsWrap<T>(value);
+            get => _list[index];
+            set
+            {
+                _list[index] = value;
+#if UNITY_EDITOR
+                _saintsList[index] = new SaintsWrap<T>(value);
+#endif
+            }
         }
 
         #endregion
 
-        public void AddRange(IEnumerable<T> collection) => value.AddRange(collection.Select(each => new SaintsWrap<T>(each)));
+        public void AddRange(IEnumerable<T> collection)
+        {
+#if UNITY_EDITOR
+            foreach (T v in collection)
+            {
+                _list.Add(v);
+                _saintsList.Add(new SaintsWrap<T>(v));
+            }
+#else
+            List.AddRange(collection);
+#endif
+        }
     }
 }

@@ -3,11 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
 using SaintsField.Editor.Linq;
-using SaintsField.Editor.Playa;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -15,6 +12,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 #if UNITY_2022_2_OR_NEWER
 namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
@@ -44,6 +42,13 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
         private static string NameNumberOfItemsPerPage(SerializedProperty property) =>
             $"{property.propertyPath}__SaintsHashSet_NameNumberOfItemsPerPage";
+
+        private class ElementField: BaseField<Object>
+        {
+            public ElementField(string label, VisualElement visualInput) : base(label, visualInput)
+            {
+            }
+        }
 
         protected override bool UseCreateFieldUIToolKit => true;
 
@@ -277,12 +282,14 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             return root;
         }
 
-        private static (FieldInfo targetInfo, object targetParent) GetTargetInfo(string propNameCompact, FieldInfo info, Type type, object parent)
+        private static (FieldInfo targetInfo, object targetParent) GetTargetInfo(string propNameCompact, Type type, object saintsSerValue)
         {
-            object keysIterTarget = info.GetValue(parent);
+
+            // object keysIterTarget = info.GetValue(parent);
+            object keysIterTarget = saintsSerValue;
             List<object> keysParents = new List<object>(3)
             {
-                keysIterTarget,
+                saintsSerValue,
             };
             Type keysParentType = type;
             FieldInfo keysField = null;
@@ -349,6 +356,9 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
         {
             SaintsHashSetAttribute saintsHashSetAttribute = saintsAttribute as SaintsHashSetAttribute;
 
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            bool insideArray = arrayIndex != -1;
+
             Foldout foldout = container.Q<Foldout>(name: NameFoldout(property));
             UIToolkitUtils.AddContextualMenuManipulator(foldout, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             foldout.RegisterValueChangedCallback(newValue => property.isExpanded = newValue.newValue);
@@ -365,7 +375,12 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             // property.FindPropertyRelative(propKeysNameCompact) ?? SerializedUtils.FindPropertyByAutoPropertyName(property, propKeysNameCompact);
             Debug.Assert(wrapProp != null, $"Failed to get prop from {propNameCompact}");
             // Debug.Log($"keysProp={keysProp.propertyPath}");
-            (FieldInfo wrapField, object wrapParent) = GetTargetInfo(propNameCompact, info, rawType, parent);
+            object fieldValue = info.GetValue(parent);
+            if (insideArray)
+            {
+                fieldValue = ((IEnumerable)fieldValue).Cast<object>().ElementAt(arrayIndex);
+            }
+            (FieldInfo wrapField, object wrapParent) = GetTargetInfo(propNameCompact, rawType, fieldValue);
 
             Debug.Assert(wrapField != null, $"Failed to get field {propNameCompact} from {property.propertyPath}");
             Type wrapType = ReflectUtils.GetElementType(wrapField.FieldType);
@@ -638,14 +653,14 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 elementProp.isExpanded = true;
                 element.Clear();
 
-                VisualElement wrapContainer = new VisualElement
-                {
-                    style =
-                    {
-                        marginRight = 3,
-                    },
-                };
-                element.Add(wrapContainer);
+                // VisualElement wrapContainer = new VisualElement
+                // {
+                //     style =
+                //     {
+                //         marginRight = 3,
+                //     },
+                // };
+                // element.Add(wrapContainer);
 
                 VisualElement resultElement =
                     SaintsWrapUtils.CreateCellElement(
@@ -653,9 +668,11 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                         wrapType,
                         elementProp, injectedKeyAttributes, this, this, wrapParent
                     );
-                wrapContainer.Add(resultElement);
+                ElementField elementField = new ElementField($"Element {elementIndex}", resultElement);
+                element.Add(elementField);
+                // wrapContainer.Add(elementField);
 
-                wrapContainer.TrackPropertyValue(wrapProp, _ =>
+                elementField.TrackPropertyValue(wrapProp, _ =>
                 {
                     RefreshConflict();
                 });
@@ -681,12 +698,12 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                         // ReSharper disable once InvertIf
                         if (Util.GetIsEqual(existKey, thisKey))
                         {
-                            wrapContainer.style.backgroundColor = WarningColor;
+                            elementField.style.backgroundColor = WarningColor;
                             return;
                         }
                     }
 
-                    wrapContainer.style.backgroundColor = Color.clear;
+                    elementField.style.backgroundColor = Color.clear;
                 }
             };
 
@@ -907,119 +924,6 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
         // {
         //     return Enumerable.Range(0, property.arraySize).ToList();
         // }
-
-        private static VisualElement CreateCellElement(FieldInfo info, Type rawType, SerializedProperty serializedProperty, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
-        {
-            PropertyAttribute[] allAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(info);
-
-            Type useDrawerType = null;
-            Attribute useAttribute = null;
-            IReadOnlyList<PropertyAttribute> appendPropertyAttributes = null;
-            bool isArray = serializedProperty.propertyType == SerializedPropertyType.Generic
-                && serializedProperty.isArray;
-            if(!isArray)
-            {
-                ISaintsAttribute saintsAttr = allAttributes
-                    .OfType<ISaintsAttribute>()
-                    .FirstOrDefault();
-
-                // Debug.Log(saintsAttr);
-
-                useAttribute = saintsAttr as Attribute;
-                if (saintsAttr != null)
-                {
-                    useDrawerType = GetFirstSaintsDrawerType(saintsAttr.GetType());
-                }
-                else
-                {
-                    (Attribute attrOrNull, Type drawerType) =
-                        GetFallbackDrawerType(info, serializedProperty, allAttributes);
-                    // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
-                    useAttribute = attrOrNull;
-                    useDrawerType = drawerType;
-
-                    if (useDrawerType == null &&
-                        serializedProperty.propertyType == SerializedPropertyType.Generic)
-                    {
-                        PropertyAttribute prop = new SaintsRowAttribute(inline: true);
-                        useAttribute = prop;
-                        useDrawerType = typeof(SaintsRowAttributeDrawer);
-                        appendPropertyAttributes = new[] { prop };
-                    }
-                }
-            }
-
-            // Debug.Log($"{serializedProperty.propertyPath}/{useDrawerType}");
-
-            if (useDrawerType == null)
-            {
-                VisualElement r = UIToolkitUtils.CreateOrUpdateFieldRawFallback(
-                    serializedProperty,
-                    allAttributes,
-                    rawType,
-                    null,
-                    info,
-                    true,
-                    makeRenderer,
-                    doTweenPlayRecorder,
-                    null,
-                    parent
-                );
-                return UIToolkitCache.MergeWithDec(r, allAttributes);
-            }
-
-            // Nah... This didn't handle for mis-ordered case
-            // // Above situation will handle all including SaintsRow for general class/struct/interface.
-            // // At this point we only need to let Unity handle it
-            // PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
-            // {
-            //     style =
-            //     {
-            //         flexGrow = 1,
-            //     },
-            //     name = FieldWithInfo.SerializedProperty.propertyPath,
-            // };
-            // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
-            // return (result, false);
-
-            // Debug.Log($"{useAttribute}/{useDrawerType}: {serializedProperty.propertyPath}");
-
-            PropertyDrawer propertyDrawer = MakePropertyDrawer(useDrawerType, info, useAttribute, null);
-            // Debug.Log(saintsPropertyDrawer);
-            if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
-            {
-                saintsPropertyDrawer.InHorizontalLayout = true;
-                saintsPropertyDrawer.AppendPropertyAttributes = appendPropertyAttributes;
-            }
-
-            MethodInfo uiToolkitMethod = useDrawerType.GetMethod("CreatePropertyGUI");
-
-            // bool isSaintsDrawer = useDrawerType.IsSubclassOf(typeof(SaintsPropertyDrawer)) || useDrawerType == typeof(SaintsPropertyDrawer);
-
-            bool useImGui = uiToolkitMethod == null ||
-                            uiToolkitMethod.DeclaringType == typeof(PropertyDrawer);  // null: old Unity || did not override
-
-            // Debug.Log($"{useDrawerType}/{uiToolkitMethod.DeclaringType}/{FieldWithInfo.SerializedProperty.propertyPath}");
-
-            if (!useImGui)
-            {
-                // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}");
-                VisualElement r = propertyDrawer.CreatePropertyGUI(serializedProperty);
-                return UIToolkitCache.MergeWithDec(r, allAttributes);
-            }
-
-            // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
-            // We don't need to handle decorators either
-            PropertyField result = new PropertyField(serializedProperty, string.Empty)
-            {
-                style =
-                {
-                    flexGrow = 1,
-                },
-            };
-            result.Bind(serializedProperty.serializedObject);
-            return result;
-        }
 
         private static void ListSwapValue(IList<int> lis, int a, int b)
         {
