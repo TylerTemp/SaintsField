@@ -244,7 +244,7 @@ namespace SaintsField
                 _saintsList.Add(new SaintsWrap<T>(v));
             }
 #else
-            List.AddRange(collection);
+            _list.AddRange(collection);
 #endif
         }
     }

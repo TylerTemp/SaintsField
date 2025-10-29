@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.40.0 ##
+## 4.40.1 ##
 
 1.  `SaintsArray`/`SaintsList` now support interface & abstract type
 2.  Fix `SaintsHashSet` might failed to deserialization and resulted in empty set
