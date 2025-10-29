@@ -369,9 +369,9 @@ using SaintsField;
 
 ![overlay_rich_label](https://github.com/TylerTemp/SaintsField/assets/6391063/bd85b5c8-3ef2-4899-9bc3-b9799e3331ed)
 
-#### `PostFieldRichLabel` ####
+#### `EndText` ####
 
-Like `RichLabel`, but it's rendered at the end of the field.
+Like `LabelText`, but it's rendered at the end of the field.
 
 Parameters:
 
@@ -387,9 +387,9 @@ Parameters:
 ```csharp
 using SaintsField;
 
-[PostFieldRichLabel("<color=grey>km/s")] public float speed;
-[PostFieldRichLabel("<icon=eye.png/>", padding: 0)] public GameObject eye;
-[PostFieldRichLabel("$" + nameof(TakeAGuess))] public int guess;
+[EndText("<color=grey>km/s")] public float speed;
+[EndText("<icon=eye.png/>", padding: 0)] public GameObject eye;
+[EndText("$" + nameof(TakeAGuess))] public int guess;
 
 public string TakeAGuess()
 {
