@@ -12,7 +12,7 @@
 
 Developed by: [TylerTemp](https://github.com/TylerTemp), [墨瞳](https://github.com/xc13308)
 
-Unity: 2019.1 or higher
+Unity: 2022.2 or higher
 
 > [!TIP]
 > A better document with TOC & Search: [saintsfield.comes.today](https://saintsfield.comes.today/)

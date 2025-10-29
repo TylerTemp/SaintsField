@@ -208,9 +208,9 @@ namespace SaintsField.Editor
                 }
 
                 int aIndex = FindMemberIndex(a, _codeAnalysisMembers);
-                // Debug.Log($"{a.Name} index {aIndex}");
+                // Debug.Log($"MemberOrderComparer {a.Name} index {aIndex}");
                 int bIndex = FindMemberIndex(b, _codeAnalysisMembers);
-                // Debug.Log($"{b.Name} index {bIndex}");
+                // Debug.Log($"MemberOrderComparer {b.Name} index {bIndex}");
 
                 // if (aIndex == -1 || bIndex == -1)
                 // {
@@ -231,7 +231,7 @@ namespace SaintsField.Editor
                     return -1;
                 }
 
-                // Debug.Log($"{a.Name} -> {aIndex}; {b.Name} -> {bIndex}");
+                // Debug.Log($"MemberOrderComparer {a.Name} -> {aIndex}; {b.Name} -> {bIndex}");
                 return aIndex - bIndex;
                 // return bIndex - aIndex;
             }
@@ -247,6 +247,7 @@ namespace SaintsField.Editor
 
                     if (memberContainer.Name != memberInfo.Name && RuntimeUtil.GetAutoPropertyName(memberContainer.Name) != memberInfo.Name)
                     {
+                        // Debug.Log($"{memberInfo.Name} not found, continue");
                         continue;
                     }
 
@@ -258,19 +259,23 @@ namespace SaintsField.Editor
 
                     if (memberContainer.Type != CodeAnalysisUtils.MemberType.Method)
                     {
+                        // Debug.Log($"{memberInfo.Name} not method ({memberContainer.Type}), continue");
                         continue;
                     }
 
                     MethodInfo methodInfo = (MethodInfo)memberInfo;
 
-                    string methodInfoReturnTypeString = ReflectUtils.StringifyType(methodInfo.ReturnType);
-                    if (methodInfoReturnTypeString != memberContainer.ReturnType)
+                    // string methodInfoReturnTypeString = ReflectUtils.StringifyType(methodInfo.ReturnType);
+                    // if (methodInfoReturnTypeString != memberContainer.ReturnType)
+                    if (!TypeStringEqual(methodInfo.ReturnType, memberContainer.ReturnType))
                     {
+                        // Debug.Log($"{memberInfo.Name} not matched return type {methodInfoReturnTypeString}->{memberContainer.ReturnType}, continue");
                         continue;
                     }
 
                     if (methodInfo.GetParameters().Length != memberContainer.Arguments.Count)
                     {
+                        // Debug.Log($"{memberInfo.Name} not matched argument length {string.Join<ParameterInfo>(", ", methodInfo.GetParameters())}->{string.Join(", ", memberContainer.Arguments)}, continue");
                         continue;
                     }
 
@@ -278,10 +283,11 @@ namespace SaintsField.Editor
                     ParameterInfo[] parameterInfos = methodInfo.GetParameters();
                     for (int paramIndex = 0; paramIndex < parameterInfos.Length; paramIndex++)
                     {
-                        string methodInfoParamTypeString = ReflectUtils.StringifyType(parameterInfos[paramIndex].ParameterType);
-                        string containerParamTypeString = memberContainer.Arguments[paramIndex];
+                        // string methodInfoParamTypeString = ReflectUtils.StringifyType(parameterInfos[paramIndex].ParameterType);
+                        // string containerParamTypeString = memberContainer.Arguments[paramIndex];
                         // Debug.Log($"[{paramIndex}] methodInfoParamTypeString={methodInfoParamTypeString}, containerParamTypeString={containerParamTypeString}");
-                        if(methodInfoParamTypeString != containerParamTypeString)
+                        // if(methodInfoParamTypeString != containerParamTypeString)
+                        if(!TypeStringEqual(parameterInfos[paramIndex].ParameterType, memberContainer.Arguments[paramIndex]))
                         {
                             allMatch = false;
                             break;
@@ -306,6 +312,55 @@ namespace SaintsField.Editor
                 }
 
                 return 0;
+            }
+
+            private static bool TypeStringEqual(Type type, string str)
+            {
+                if (type.ToString() == str)
+                {
+                    return true;
+                }
+
+                if (type.IsArray)
+                {
+                    if (!str.EndsWith("[]"))
+                    {
+                        return false;
+                    }
+
+                    Type elementType = type.GetElementType();
+                    string subStr = str.Substring(0, str.Length - 2);
+                    // Debug.Log($"{elementType}, {subStr}");
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                    return TypeStringEqual(elementType, subStr);
+                }
+
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    if(str.StartsWith("List<") && str.EndsWith(">"))
+                    {
+                        string subStr = str.Substring("List<".Length, str.Length - "List<".Length - 1);
+                        Type elementType = type.GetGenericArguments()[0];
+                        return TypeStringEqual(elementType, subStr);
+                    }
+
+                    return false;
+                }
+
+                string reparsedTypeString = ReflectUtils.StringifyType(type);
+                if (reparsedTypeString == str)
+                {
+                    return true;
+                }
+
+                string prefixDot = $".{str}";
+                // Debug.Log($"Dot: {type} -> {prefixDot}: {type.ToString().EndsWith(prefixDot)}");
+                if (type.ToString().EndsWith(prefixDot))
+                {
+                    return true;
+                }
+
+                return false;
             }
         }
 
@@ -407,7 +462,7 @@ namespace SaintsField.Editor
                     // foreach (KeyValuePair<MemberInfo, IPlayaAttribute[]> kv in memberInfoToPlaya)
                     foreach (MemberInfo memberInfo in usedMemberInfos)
                     {
-                        // Debug.Log($"{memberInfo.Name}/{memberInfo.GetType()}/{memberInfo is EventInfo}");
+                        // Debug.Log($"{systemType}: {memberInfo.Name}/{memberInfo.MemberType}");
                         // MemberInfo memberInfo = kv.Key;
                         // IReadOnlyList<IPlayaAttribute> playaAttributes = kv.Value;
                         IReadOnlyList<IPlayaAttribute> playaAttributes = memberInfoToPlaya[memberInfo];

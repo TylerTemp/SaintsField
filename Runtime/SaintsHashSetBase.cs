@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
@@ -38,6 +39,11 @@ namespace SaintsField
         }
 
         public void OnAfterDeserialize()
+        {
+            OnAfterDeserializeProcess();
+        }
+
+        protected virtual void OnAfterDeserializeProcess()
         {
             HashSet.Clear();
 

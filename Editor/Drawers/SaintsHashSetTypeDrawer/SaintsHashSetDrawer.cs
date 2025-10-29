@@ -12,6 +12,8 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.ValuePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SaintsHashSetBase<>), true)]
+    [CustomPropertyDrawer(typeof(ReferenceHashSet<>), true)]
+    [CustomPropertyDrawer(typeof(SaintsHashSet<>), true)]
     [CustomPropertyDrawer(typeof(SaintsHashSetAttribute), true)]
     public partial class SaintsHashSetDrawer: SaintsPropertyDrawer
     {

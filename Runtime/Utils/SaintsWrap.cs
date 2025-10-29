@@ -37,6 +37,7 @@ namespace SaintsField.Utils
 
         public SaintsWrap(T v)
         {
+            EnsureInit();
             _runtimeResult = v;
         }
 
@@ -431,7 +432,7 @@ namespace SaintsField.Utils
         private bool _isArray;
         private bool _isList;
 
-        private void EnsureInit()
+        public void EnsureInit()
         {
             // if (_init)
             // {
