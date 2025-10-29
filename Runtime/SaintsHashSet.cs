@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 // using System.Runtime.Serialization;
 using SaintsField.Utils;
 using UnityEngine;
@@ -30,7 +31,7 @@ namespace SaintsField
 
         protected override bool SerializedRemove(T key)
         {
-            int index = _saintsList.FindIndex(each => EqualityComparer<T>.Default.Equals(each.value, key));
+            int index = _saintsList.FindIndex(each => EqualityComparer<T>.Default.Equals(each.Value, key));
             if (index >= 0)
             {
                 _saintsList.RemoveAt(index);
@@ -40,10 +41,25 @@ namespace SaintsField
             return false;
         }
 
-        protected override T SerializedGetAt(int index) => _saintsList[index].value;
+        protected override T SerializedGetAt(int index) => _saintsList[index].Value;
 
         protected override void SerializedClear() => _saintsList.Clear();
         #endregion
+
+#if UNITY_EDITOR
+        private HashSet<SaintsWrap<T>> _editorWatchedKeys = new HashSet<SaintsWrap<T>>();
+        protected override void OnAfterDeserializeProcess()
+        {
+            IEnumerable<SaintsWrap<T>> extraKeys = _saintsList.Except(_editorWatchedKeys);
+            foreach (SaintsWrap<T> keyWrap in extraKeys)
+            {
+                // Debug.Log($"add key listener");
+                keyWrap.onAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                _editorWatchedKeys.Add(keyWrap);
+            }
+            base.OnAfterDeserializeProcess();
+        }
+#endif
 
         #region Constructor
 

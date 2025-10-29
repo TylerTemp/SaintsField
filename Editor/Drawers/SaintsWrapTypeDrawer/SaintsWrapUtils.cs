@@ -271,5 +271,49 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
         }
 
 
+        public static IReadOnlyList<Attribute> GetInjectedPropertyAttributes(FieldInfo info, Type expectedInjector)
+        {
+            List<Attribute> result = new List<Attribute>();
+
+            foreach (Attribute propertyAttribute in ReflectCache.GetCustomAttributes<Attribute>(info))
+            {
+                if (propertyAttribute is not InjectAttributeBase injectBase ||
+                    !expectedInjector.IsAssignableFrom(propertyAttribute.GetType()))
+                {
+                    continue;
+                }
+
+                Attribute injectedAttribute;
+                try
+                {
+                    if(injectBase.Parameters.Length > 0)
+                    {
+                        // Debug.Log($"{injectBase.Decorator}: {string.Join(", ", injectBase.Parameters)}");
+                        injectedAttribute =
+                            Activator.CreateInstance(injectBase.Decorator, injectBase.Parameters) as Attribute;
+                    }
+                    else
+                    {
+                        // Debug.Log($"{injectBase.Decorator}");
+                        injectedAttribute= Activator.CreateInstance(injectBase.Decorator, true) as Attribute;
+                    }
+                    // injectedAttribute = Activator.CreateInstance(injectBase.Decorator,
+                    //     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.CreateInstance, null, injectBase.Parameters,
+                    //     null, null) as Attribute;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                    continue;
+                }
+
+                if (injectedAttribute != null)
+                {
+                    result.Add(injectedAttribute);
+                }
+            }
+
+            return result;
+        }
     }
 }

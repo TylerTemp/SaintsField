@@ -551,6 +551,16 @@ namespace SaintsField.Editor.Utils
 
         public static string StringifyType(Type type)
         {
+            if (type.IsArray)
+            {
+                return $"{StringifyType(type.GetElementType())}[]";
+            }
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                return $"List<{StringifyType(type.GetGenericArguments()[0])}>";
+            }
+
             if (type == typeof(void))
             {
                 return "void";

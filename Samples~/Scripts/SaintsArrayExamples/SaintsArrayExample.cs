@@ -14,6 +14,8 @@ namespace SaintsField.Samples.Scripts.SaintsArrayExamples
 
         [ArraySize(2)] public SaintsArray<int> _arrSize;
 
+        [SaintsArray(numberOfItemsPerPage: 5)] public SaintsArray<int[]> pagging;
+
         // private void Start()
         // {
         //     GameObject[] impArrDirect = saintsArrayGo;

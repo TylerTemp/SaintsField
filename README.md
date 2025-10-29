@@ -12,7 +12,7 @@
 
 Developed by: [TylerTemp](https://github.com/TylerTemp), [墨瞳](https://github.com/xc13308)
 
-Unity: 2019.1 or higher
+Unity: 2022.2 or higher
 
 > [!TIP]
 > A better document with TOC & Search: [saintsfield.comes.today](https://saintsfield.comes.today/)
@@ -94,14 +94,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.0.0-preview.7**
+**5.0.0-preview.8**
 
-1.  `Dictionary` is now supported directly by using extended serialization
-2.  Fix `SaintsDictionary` didn't reflect the edited value var inspector until a domain reload or play mode changed
-3.  Fix `SaintsDictionary` not work inside array/list
-4.  If a field is not supported by extended serialization, Unity's default behavior will be the fallback
-5.  Fix extended serialization not support generic types
-
+1.  `SaintsArray`/`SaintsList` now support interface & abstract type
+2.  Fix `SaintsHashSet` might failed to deserialization and resulted in empty set
+3.  Fix `SaintsHashSet` elements have no label
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1324,7 +1321,7 @@ public class ClassDirect: IRefInterface
     public int TheInt { get; set; }
 }
 
-// abstruct type will be skipped
+// abstract type will be skipped
 public abstract class ClassSubAbs : ClassDirect
 {
     public abstract string AbsValue { get; }
@@ -6221,6 +6218,8 @@ private void AfterBotton()
 
 Unity does not allow to serialize two-dimensional array or list. `SaintsArray` and `SaintsList` are there to help.
 
+The target can also be interface / abstract type.
+
 ```csharp
 using SaintsField;
 
@@ -6228,7 +6227,6 @@ using SaintsField;
 public SaintsArray<GameObject>[] gameObjects2;
 public SaintsArray<SaintsArray<GameObject>> gameObjects2Nest;
 // four dimensional array, if you like.
-// it can be used with array, but ensure the `[]` is always at the end.
 public SaintsArray<SaintsArray<SaintsArray<GameObject>>>[] gameObjects4;
 ```
 
@@ -6265,55 +6263,28 @@ List<GameObject> ListGo = saintsListGo;
 SaintsList<GameObject> expSaintsListGo = (SaintsList<GameObject>)ListGo;
 ```
 
-Because it's actually a struct, you can also implement your own Array/List, using `[SaintsArray]`. Here is an example of customize your own struct:
+**SaintsArray** Attribute
+
+This allows you to set search and paging.
+
+*   `bool searchable = true`: make it searchable
+*   `int numberOfItemsPerPage = 0`: items per page
 
 ```csharp
-using SaintsField;
-
-// example: using IWrapProp so you don't need to specify the type name everytime
-[Serializable]
-public class MyList : IWrapProp
-{
-    [SerializeField] public List<string> myStrings;
-
-#if UNITY_EDITOR
-    private static readonly string EditorPropertyName = nameof(myStrings);
-#endif
-}
-
-[SaintsArray]
-public MyList[] myLis;
-
-
-// example: any Serializable which hold a serialized array/list is fine
-[Serializable]
-public struct MyArr
-{
-    [RichLabel(nameof(MyInnerRichLabel), true)]
-    public int[] myArray;
-
-    private string MyInnerRichLabel(object _, int index) => $"<color=pink> Inner [{(char)('A' + index)}]";
-}
-
-[RichLabel(nameof(MyOuterLabel), true), SaintsArray("myArray")]
-public MyArr[] myArr;
-
-private string MyOuterLabel(object _, int index) => $"<color=Lime> Outer {index}";
+[SaintsArray(numberOfItemsPerPage: 5)] public SaintsArray<int[]> pagging;
 ```
 
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/ff4bcdef-f3e6-4ece-8204-d4ba8798e164)
+![](https://github.com/user-attachments/assets/8fee876d-db0e-40a8-85b4-802f8ca0f2b3)
 
-alternatively, you can make a custom drawer for your data type to avoid adding `[SaintsArray]` to every field:
+**Reference Type**
+
+Example of using interface
 
 ```csharp
-// Put it under an Editor folder, or with UNITY_EDITOR
-#if UNITY_EDITOR
-using SaintsField.Editor.Drawers.TypeDrawers;
-
-[CustomPropertyDrawer(typeof(MyList))]
-public class MyArrayDrawer: SaintsArrayDrawer {}
-#endif
+public SaintsArray<IInterface1[]> inters;
 ```
+
+![](https://github.com/user-attachments/assets/e2002b81-ee55-4e08-991c-c0857f3df4be)
 
 ### `SaintsDictionary<,>` ###
 
@@ -6346,7 +6317,7 @@ public SaintsDictionary<IInterface1, List<IInterface1>> interfaceDictLis;
 
 ![](https://github.com/user-attachments/assets/3b48b77d-05aa-4b8c-b05f-31d77a680897)
 
-If the type is `abstruct`, an `SerializeReference` will be automatically used:
+If the type is `abstract`, an `SerializeReference` will be automatically used:
 
 ```csharp
 [Serializable]
@@ -6516,7 +6487,7 @@ Compared to [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/
 
 A serializable `HashSet<>` for serializable type, `SerializedReference` type & interface type. Duplicated element will have a warning color.
 
-If the type is an interface or an abstruct class, the polymorphism picker will be used.
+If the type is an interface or an abstract class, the polymorphism picker will be used.
 
 You can use `SaintsHashSet` attribute to control paging & searching
 
@@ -6550,7 +6521,7 @@ Example of using on interface where you can pick either Unity Object or serializ
 
 ![](https://github.com/user-attachments/assets/118de19e-1751-4da1-a74f-a0e14f1773f3)
 
-`ReferenceHashSet` is used if you want to pick a polymorphism type (while the type itself is not abstruct)
+`ReferenceHashSet` is used if you want to pick a polymorphism type (while the type itself is not abstract)
 
 ```csharp
 [Serializable]

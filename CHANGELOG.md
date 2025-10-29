@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.40.0 ##
+
+1.  `SaintsArray`/`SaintsList` now support interface & abstract type
+2.  Fix `SaintsHashSet` might failed to deserialization and resulted in empty set
+3.  Fix `SaintsHashSet` elements have no label
+
 ## 4.39.0 ##
 
 1.  `Dictionary` is now supported directly by using extended serialization
@@ -10,7 +16,7 @@
 
 ## 4.38.0 ##
 
-1.  `SaintsHashSet<>` now support `interface` type & `abstruct` type directly
+1.  `SaintsHashSet<>` now support `interface` type & `abstract` type directly
 2.  If you want to enforce a `SerializedReference` type, use `ReferenceHashSet<>`
 
 ## 4.37.1 ##
@@ -21,7 +27,7 @@
 
 ## 4.37.0 ##
 
-1.  `SaintsDictionary<,>` now support `interface` type & `abstruct` type directly 
+1.  `SaintsDictionary<,>` now support `interface` type & `abstract` type directly 
 2.  Add `[KeyAttribute(type, arguments...)]` and `[ValueAttribute(type, arguments...)]` to inject attributes to key/value for `SaintsDictionary<,>`
 
 ## 4.36.0 ##
@@ -1309,7 +1315,7 @@ This upgrade **CONTAINS BREAKING CHANGES**, read before you upgrade.
 
 1.  **Breaking Changes**: `InfoBox` now default at top. parameter `above` has been renamed to `below`. If you use `[InfoBox(..., above: true)]`, you will need to remove the `above`, or change it to `below`
 2.  Add `BelowInfoBox` to show at below.
-3.  Fix `Attribute`-s finding error when there is an `abstruct class` in inherent, related to [#79](https://github.com/TylerTemp/SaintsField/issues/79)
+3.  Fix `Attribute`-s finding error when there is an `abstract class` in inherent, related to [#79](https://github.com/TylerTemp/SaintsField/issues/79)
 4.  Add `LayoutStart` as an alias of `LayoutGroup`. `LayoutGroup` is now deprecated (not removed).
 5.  Add `PlayaInfoBox` for any property/field/method with rich text supports, implements [#71](https://github.com/TylerTemp/SaintsField/issues/71)
 6.  IMGUI: fix incorrect display for `Separator` when `EAlign` is `End`.
