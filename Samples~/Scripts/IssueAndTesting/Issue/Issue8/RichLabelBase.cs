@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
         [FieldAboveText("$" + nameof(ArrayLabels))]
         [FieldBelowText("$" + nameof(ArrayLabels))]
         [OverlayText("$" + nameof(ArrayLabels))]
-        [PostFieldRichLabel("$" + nameof(ArrayLabels))]
+        [EndText("$" + nameof(ArrayLabels))]
         public string[] arrayLabels;
 
         private string ArrayLabels(int index) => $"<color=pink>[{(char)('A' + index)}]";

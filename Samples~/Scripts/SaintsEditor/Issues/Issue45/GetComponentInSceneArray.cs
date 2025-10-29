@@ -6,8 +6,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
     public class GetComponentInSceneArray : SaintsMonoBehaviour
     {
-        [GetComponentInScene, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInSceneArray;
-        [GetComponentInScene, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInSceneList;
+        [GetComponentInScene, EndText(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInSceneArray;
+        [GetComponentInScene, EndText(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInSceneList;
 
         private string DummyNumber(Dummy dummy)
         {
@@ -22,10 +22,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
             }
         }
 
-        [GetComponentInScene, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
+        [GetComponentInScene, EndText(nameof(DummyNumberI), isCallback: true)]
         public GeneralInterface[] getComponentIArray;
 
-        [GetComponentInScene, PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
+        [GetComponentInScene, EndText(nameof(DummyNumberG), isCallback: true)]
         public List<SaintsInterface<Object, IDummy>> getComponentIList;
 
         private string DummyNumberI(GeneralInterface dummyInter)

@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Drawers.PostFieldRichLabelDrawer
                 {
                     flexDirection = FlexDirection.Row,
                     height = EditorGUIUtility.singleLineHeight,
-                    marginLeft = LabelLeftSpace + ((PostFieldRichLabelAttribute)saintsAttribute).Padding,
+                    marginLeft = LabelLeftSpace + ((EndTextAttribute)saintsAttribute).Padding,
                     unityTextAlign = TextAnchor.MiddleLeft,
 
                     flexShrink = 0,
@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Drawers.PostFieldRichLabelDrawer
         {
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 
-            PostFieldRichLabelAttribute targetAttribute = (PostFieldRichLabelAttribute)saintsAttribute;
+            EndTextAttribute targetAttribute = (EndTextAttribute)saintsAttribute;
             (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml,
                 targetAttribute.IsCallback, info, parent);
 

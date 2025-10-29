@@ -5,8 +5,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
 {
     public class GetComponentInParentArray : MonoBehaviour
     {
-        [GetComponentInParent, PostFieldRichLabel("$" + nameof(DummyNumber)), OnValueChanged(nameof(OnChange))] public Dummy[] getComponentInParentArray;
-        [GetComponentInParents, PostFieldRichLabel("$" + nameof(DummyNumber)), OnValueChanged(nameof(OnChange))] public List<Dummy> getComponentInParentsList;
+        [GetComponentInParent, EndText("$" + nameof(DummyNumber)), OnValueChanged(nameof(OnChange))] public Dummy[] getComponentInParentArray;
+        [GetComponentInParents, EndText("$" + nameof(DummyNumber)), OnValueChanged(nameof(OnChange))] public List<Dummy> getComponentInParentsList;
 
         [GetComponentInParents] public Dummy getComponentInParents;
 

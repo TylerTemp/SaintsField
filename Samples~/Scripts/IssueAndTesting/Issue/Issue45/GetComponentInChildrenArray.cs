@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
     public class GetComponentInChildrenArray : SaintsMonoBehaviour
     {
         // [GetComponentInChildren, PostFieldRichLabel("$" + nameof(DummyNumber))] public Dummy getComponentInChildren;
-        [GetComponentInChildren, PostFieldRichLabel("$" + nameof(DummyNumber))] public Dummy[] getComponentInChildrenArray;
+        [GetComponentInChildren, EndText("$" + nameof(DummyNumber))] public Dummy[] getComponentInChildrenArray;
         // [GetByXPath("@{GetComponents(Dummy)}", ".//*@{GetComponents(Dummy)}"), PostFieldRichLabel("$" + nameof(DummyNumber))] public Dummy[] getComponentInChildrenArrayXPath;
         // [GetComponentInChildren, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInChildrenList;
 

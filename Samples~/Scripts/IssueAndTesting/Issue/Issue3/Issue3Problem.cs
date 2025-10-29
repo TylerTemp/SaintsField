@@ -14,7 +14,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue3
 
         [OverlayText("<icon=star.png/>")]
         public string richOverlayIcon;
-        [PostFieldRichLabel("<icon=star.png/>")]
+        [EndText("<icon=star.png/>")]
         public string richPostIcon;
 
         [PostFieldButton(nameof(ButtonCallback), "<icon=star.png/>")]

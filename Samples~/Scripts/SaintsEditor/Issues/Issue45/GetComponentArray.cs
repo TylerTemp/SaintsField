@@ -19,13 +19,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
             }
         }
 
-        [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentArray;
-        [GetComponent, PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentList;
+        [GetComponent, EndText(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentArray;
+        [GetComponent, EndText(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentList;
 
-        [GetComponent, PostFieldRichLabel(nameof(DummyNumberI))]
+        [GetComponent, EndText(nameof(DummyNumberI))]
         public GeneralInterface[] getComponentIArray;
 
-        [GetComponent, PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
+        [GetComponent, EndText(nameof(DummyNumberG), isCallback: true)]
         public List<SaintsInterface<UnityEngine.Object, IDummy>> getComponentIList;
 
         private string DummyNumber(Dummy dummy)

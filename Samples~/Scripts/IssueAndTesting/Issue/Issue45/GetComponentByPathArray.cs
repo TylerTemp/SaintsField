@@ -6,9 +6,9 @@ namespace SaintsField.Samples.IssueAndTesting.Issue.Issue45
 {
     public class GetComponentByPathArray : MonoBehaviour
     {
-        [GetComponentByPath("*"), PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy getComponentByPath;
-        [GetComponentByPath("*"), PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentByPathArray;
-        [GetComponentByPath("*[1]"), PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentByPathList;
+        [GetComponentByPath("*"), EndText(nameof(DummyNumber), isCallback: true)] public Dummy getComponentByPath;
+        [GetComponentByPath("*"), EndText(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentByPathArray;
+        [GetComponentByPath("*[1]"), EndText(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentByPathList;
 
         private string DummyNumber(Dummy dummy)
         {

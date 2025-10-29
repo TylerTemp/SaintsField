@@ -20,9 +20,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
             }
         }
 
-        [GetPrefabWithComponent, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
+        [GetPrefabWithComponent, EndText(nameof(DummyNumberI), isCallback: true)]
         public GeneralInterface[] getComponentIArray;
-        [GetPrefabWithComponent(typeof(Dummy)), PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
+        [GetPrefabWithComponent(typeof(Dummy)), EndText(nameof(DummyNumberG), isCallback: true)]
         public List<SaintsInterface<Object, IDummy>> getComponentIList;
 
         private string DummyNumberI(GeneralInterface dummyInter)

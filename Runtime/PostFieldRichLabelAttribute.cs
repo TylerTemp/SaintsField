@@ -1,21 +1,14 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field)]
-    public class PostFieldRichLabelAttribute: FieldLabelTextAttribute
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
+    public class PostFieldRichLabelAttribute: EndTextAttribute
     {
-        public override SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public override string GroupBy { get; }
-
-        public readonly float Padding;
-
-        public PostFieldRichLabelAttribute(string richTextXml, bool isCallback=false, float padding=5f, string groupBy=""): base(richTextXml, isCallback)
+        public PostFieldRichLabelAttribute(string richTextXml, bool isCallback = false, float padding = 5, string groupBy = "") : base(richTextXml, isCallback, padding, groupBy)
         {
-            Padding = padding;
-            GroupBy = groupBy;
         }
     }
 }

@@ -20,10 +20,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
             }
         }
 
-        [GetScriptableObject, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
+        [GetScriptableObject, EndText(nameof(DummyNumberI), isCallback: true)]
         public GeneralInterface[] getComponentIArray;
 
-        [GetScriptableObject, PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]
+        [GetScriptableObject, EndText(nameof(DummyNumberG), isCallback: true)]
         public List<SaintsInterface<Object, IDummy>> getComponentIList;
 
         private string DummyNumberI(GeneralInterface dummyInter)
