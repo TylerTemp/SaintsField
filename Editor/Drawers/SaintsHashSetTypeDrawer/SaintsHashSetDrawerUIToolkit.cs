@@ -354,6 +354,13 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            SerializedProperty propVersion = property.FindPropertyRelative("_saintsSerializedVersion");
+            if (propVersion.intValue != 1)
+            {
+                propVersion.intValue = 1;
+                propVersion.serializedObject.ApplyModifiedProperties();
+            }
+
             SaintsHashSetAttribute saintsHashSetAttribute = saintsAttribute as SaintsHashSetAttribute;
 
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -668,7 +675,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                         wrapType,
                         elementProp, injectedKeyAttributes, this, this, wrapParent
                     );
-                ElementField elementField = new ElementField($"Element {elementIndex}", resultElement);
+                ElementField elementField = new ElementField($"Element {propIndex}", resultElement);
                 element.Add(elementField);
                 // wrapContainer.Add(elementField);
 

@@ -1175,11 +1175,61 @@ MonoBehaviour:
     - {fileID: 0}
     - {fileID: 0}
     - {fileID: 0}
-    _saintsList: []
-    _saintsSerializedVersion: 0
+    _saintsList:
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    _saintsSerializedVersion: 1
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &98296081
 GameObject:
   m_ObjectHideFlags: 0
@@ -4101,6 +4151,131 @@ MonoBehaviour:
   bool12OrEnum1Hide: 
   bool12OrEnum12Hide: 
   bool123OrEnum1Hide: 
+--- !u!1 &422743031
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 422743032}
+  - component: {fileID: 422743033}
+  m_Layer: 0
+  m_Name: SaintsArrayRef
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &422743032
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422743031}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2137894681}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &422743033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422743031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b95dd2a9a1143674188d99e54bd6979a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsArrayRefExample
+  inters:
+    _saintsList:
+    - valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray:
+      - propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 4190710479621803396, guid: 804afec2a40739d4a9fd3a36e70f6788, type: 3}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      - propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583590514360401
+        IsVRef: 1
+      valueList: []
+      wrapType: 2
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    _saintsSerializedVersion: 1
+  refSub1:
+    _saintsList:
+    - value:
+      - absC: 
+        sub1: 
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: []
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    _saintsSerializedVersion: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6921583590514360401
+      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: today.comes.saintsfield.Samples}
+      data:
+        common: 0
+        structString: 
 --- !u!1 &428673597
 GameObject:
   m_ObjectHideFlags: 0
@@ -15680,17 +15855,49 @@ MonoBehaviour:
   saintsArrayGo:
     value: []
     _saintsList: []
-    _saintsSerializedVersion: 0
+    _saintsSerializedVersion: 1
   gameObjects2:
   - value:
     - {fileID: 0}
     - {fileID: 0}
-    _saintsList: []
-    _saintsSerializedVersion: 0
+    _saintsList:
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: {fileID: 0}
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    _saintsSerializedVersion: 1
   gameObjects2Nest:
     value: []
     _saintsList: []
-    _saintsSerializedVersion: 0
+    _saintsSerializedVersion: 1
   gameObjects4: []
   _arrSize:
     value: 0000000000000000
@@ -15727,7 +15934,138 @@ MonoBehaviour:
       onAfterDeserializeChanged:
         m_PersistentCalls:
           m_Calls: []
-    _saintsSerializedVersion: 0
+    _saintsSerializedVersion: 1
+  pagging:
+    _saintsList:
+    - value: 
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: 0000000000000000
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: 0000000000000000
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: 0000000000000000
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: 0000000000000000
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: 0000000000000000
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: 0000000000000000
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: 0000000000000000
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    _saintsSerializedVersion: 1
   references:
     version: 2
     RefIds:
@@ -16397,60 +16735,6 @@ MonoBehaviour:
   - {fileID: 1171136840}
   - {fileID: 336739298}
   - {fileID: 1625509857}
---- !u!1 &1025258025
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1025258026}
-  - component: {fileID: 1025258027}
-  m_Layer: 0
-  m_Name: SaintsArrayCustom
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1025258026
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1025258025}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2137894681}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1025258027
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1025258025}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdcb53deb0646044bb612926ff1969a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  myLis:
-  - myStrings:
-    - 
-    - 
-    - 
-  - myStrings:
-    - 
-  myArr:
-  - myArray: 00000000
-  - myArray: 110000007b000000
 --- !u!1 &1030583575
 GameObject:
   m_ObjectHideFlags: 0
@@ -20040,6 +20324,8 @@ MonoBehaviour:
       onAfterDeserializeChanged:
         m_PersistentCalls:
           m_Calls: []
+  _arr:
+  - _saintsList: []
   references:
     version: 2
     RefIds:
@@ -26908,7 +27194,7 @@ MonoBehaviour:
   - {fileID: 2137894679}
   - {fileID: 964163564}
   - {fileID: 344717669}
-  - {fileID: 1025258025}
+  - {fileID: 0}
   - {fileID: 94709949}
   - {fileID: 1755597643}
   - {fileID: 2009324526}
@@ -35565,8 +35851,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 964163565}
+  - {fileID: 422743032}
   - {fileID: 344717670}
-  - {fileID: 1025258026}
   - {fileID: 94709950}
   - {fileID: 1755597644}
   m_Father: {fileID: 0}

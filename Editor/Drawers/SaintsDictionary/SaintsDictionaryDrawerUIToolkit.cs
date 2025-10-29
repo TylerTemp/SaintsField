@@ -398,8 +398,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
             Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);
 
-            IReadOnlyList<Attribute> injectedKeyAttributes = GetInjectedPropertyAttributes(info, typeof(KeyAttributeAttribute));
-            IReadOnlyList<Attribute> injectedValueAttributes = GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
+            IReadOnlyList<Attribute> injectedKeyAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(KeyAttributeAttribute));
+            IReadOnlyList<Attribute> injectedValueAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
 
             IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
             totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
@@ -1078,51 +1078,6 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         // {
         //     return Enumerable.Range(0, property.arraySize).ToList();
         // }
-
-        private static IReadOnlyList<Attribute> GetInjectedPropertyAttributes(FieldInfo info, Type expectedInjector)
-        {
-            List<Attribute> result = new List<Attribute>();
-
-            foreach (Attribute propertyAttribute in ReflectCache.GetCustomAttributes<Attribute>(info))
-            {
-                if (propertyAttribute is not InjectAttributeBase injectBase ||
-                    !expectedInjector.IsAssignableFrom(propertyAttribute.GetType()))
-                {
-                    continue;
-                }
-
-                Attribute injectedAttribute;
-                try
-                {
-                    if(injectBase.Parameters.Length > 0)
-                    {
-                        // Debug.Log($"{injectBase.Decorator}: {string.Join(", ", injectBase.Parameters)}");
-                        injectedAttribute =
-                            Activator.CreateInstance(injectBase.Decorator, injectBase.Parameters) as Attribute;
-                    }
-                    else
-                    {
-                        // Debug.Log($"{injectBase.Decorator}");
-                        injectedAttribute= Activator.CreateInstance(injectBase.Decorator, true) as Attribute;
-                    }
-                    // injectedAttribute = Activator.CreateInstance(injectBase.Decorator,
-                    //     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.CreateInstance, null, injectBase.Parameters,
-                    //     null, null) as Attribute;
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e);
-                    continue;
-                }
-
-                if (injectedAttribute != null)
-                {
-                    result.Add(injectedAttribute);
-                }
-            }
-
-            return result;
-        }
 
 
         private static void ListSwapValue(IList<int> lis, int a, int b)

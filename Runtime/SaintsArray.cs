@@ -16,6 +16,8 @@ namespace SaintsField
         // , IList  this is so fucked up. MS need this for index. Ignore this because IReadOnlyList solved it
         // , IEnumerable  IReadOnlyList has this
         , IStructuralComparable
+
+        , ISerializationCallbackReceiver
     {
         [SerializeField, Obsolete]
         public T[] value = {};
@@ -101,6 +103,7 @@ namespace SaintsField
             for (int index = 0; index < serCount; index++)
             {
                 T v = _saintsList[index].Value;
+                // Debug.Log($"OnAfterDeserializeProcess {v}");
                 _array[index] = v;
             }
 

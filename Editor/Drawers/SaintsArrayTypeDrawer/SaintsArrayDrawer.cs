@@ -650,10 +650,12 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
             // TODO: reference type
             // bool needUseRef = typeof(ReferenceHashSet<>).IsAssignableFrom(rawType.GetGenericTypeDefinition());
-            // IReadOnlyList<Attribute> injectedKeyAttributes = needUseRef
-            //     ? new[]{new SerializeReference()}
-            //     : Array.Empty<Attribute>();
-            IReadOnlyList<Attribute> injectedKeyAttributes = new List<Attribute>();
+            IReadOnlyList<Attribute> r = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
+            SerializeReference serRef = r.OfType<SerializeReference>().FirstOrDefault();
+            IReadOnlyList<Attribute> injectedKeyAttributes = serRef == null
+                ? Array.Empty<Attribute>()
+                : new[]{serRef};
+            // IReadOnlyList<Attribute> injectedKeyAttributes = new List<Attribute>();
 
             listView.bindItem = (element, elementIndex) =>
             {
@@ -670,7 +672,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                         elementProp, injectedKeyAttributes, this, this, wrapParent
                     );
 
-                ElementField wrapContainer = new ElementField($"Element {elementIndex}", resultElement)
+                ElementField wrapContainer = new ElementField($"Element {propIndex}", resultElement)
                 {
                     // style =
                     // {
