@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class LayerAttributeExample: MonoBehaviour
+    public class LayerAttributeExample: SaintsMonoBehaviour
     {
         [Layer][FieldLabelText("<icon=star.png /><label />")] public string layerString;
         [Layer] public int layerInt;
@@ -11,5 +12,8 @@ namespace SaintsField.Samples.Scripts
         [Layer] public int layerIntDisabled;
 
         public LayerMask myLayerMask;
+
+        [Layer]
+        public LayerMask lm;
     }
 }

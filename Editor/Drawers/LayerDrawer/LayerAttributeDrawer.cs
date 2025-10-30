@@ -4,7 +4,6 @@ using System.Reflection;
 using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 
@@ -19,36 +18,60 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
         private static string GetErrorMessage(SerializedProperty property)
         {
             IReadOnlyList<LayerUtils.LayerInfo> allLayers = LayerUtils.GetAllLayers();
-            if (property.propertyType == SerializedPropertyType.Integer)
+
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            switch (property.propertyType)
             {
-                int curValue = property.intValue;
-                // ReSharper disable once LoopCanBeConvertedToQuery
-                foreach (LayerUtils.LayerInfo layerInfo in allLayers)
+                case SerializedPropertyType.Integer:
                 {
-                    // ReSharper disable once InvertIf
-                    if(layerInfo.Value == curValue)
+                    int curValue = property.intValue;
+                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    foreach (LayerUtils.LayerInfo layerInfo in allLayers)
+                    {
+                        // ReSharper disable once InvertIf
+                        if(layerInfo.Value == curValue)
+                        {
+                            return string.Empty;
+                        }
+                    }
+                    return $"Layer {curValue} is not a valid layer number";
+                }
+                case SerializedPropertyType.String:
+                {
+                    string curName = property.stringValue;
+                    if (string.IsNullOrEmpty(curName))
                     {
                         return string.Empty;
                     }
+                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    foreach (LayerUtils.LayerInfo layerInfo in allLayers)
+                    {
+                        // ReSharper disable once InvertIf
+                        if(layerInfo.Name == curName)
+                        {
+                            return string.Empty;
+                        }
+                    }
+                    return $"Layer {curName} is not a valid layer name";
                 }
-                return $"Layer {curValue} is not a valid layer number";
-            }
-
-            string curName = property.stringValue;
-            if (string.IsNullOrEmpty(curName))
-            {
-                return string.Empty;
-            }
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (LayerUtils.LayerInfo layerInfo in allLayers)
-            {
-                // ReSharper disable once InvertIf
-                if(layerInfo.Name == curName)
+                case SerializedPropertyType.LayerMask:
                 {
-                    return string.Empty;
+                    int curMask = property.intValue;
+                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    foreach (LayerUtils.LayerInfo layerInfo in allLayers)
+                    {
+                        // ReSharper disable once InvertIf
+                        if(layerInfo.Mask == curMask)
+                        {
+                            return string.Empty;
+                        }
+                    }
+
+                    return $"Layer {curMask} is not a valid single layer";
                 }
+                default:
+                    return $"Layer {property.propertyType} is not a supported type ({property.propertyPath})";
             }
-            return $"Layer {curName} is not a valid layer name";
         }
 
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,

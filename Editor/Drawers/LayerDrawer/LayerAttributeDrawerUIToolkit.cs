@@ -16,7 +16,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
     public partial class LayerAttributeDrawer
     {
         // private static string NameLayer(SerializedProperty property) => $"{property.propertyPath}__Layer";
-        private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Layer_HelpBox";
+        // private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Layer_HelpBox";
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
@@ -28,15 +28,42 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    LayerIntDropdownElement intDropdownElement = new LayerIntDropdownElement();
-                    intDropdownElement.BindProperty(property);
-                    return new IntDropdownField(GetPreferredLabel(property), intDropdownElement);
+                    LayerIntDropdownElement intDropdownElement = new LayerIntDropdownElement
+                    {
+                        bindingPath = property.propertyPath
+                    };
+                    IntDropdownField field = new IntDropdownField(GetPreferredLabel(property), intDropdownElement);
+                    field.AddToClassList(IntDropdownField.alignedFieldUssClassName);
+                    field.AddToClassList(ClassAllowDisable);
+                    return field;
                 }
                 case SerializedPropertyType.String:
                 {
-                    LayerStringDropdownElement layerStringStringDropdown = new LayerStringDropdownElement();
-                    layerStringStringDropdown.BindProperty(property);
-                    return new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
+                    LayerStringDropdownElement layerStringStringDropdown = new LayerStringDropdownElement
+                    {
+                        bindingPath = property.propertyPath
+                    };
+                    StringDropdownField field = new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
+                    field.AddToClassList(IntDropdownField.alignedFieldUssClassName);
+                    field.AddToClassList(ClassAllowDisable);
+                    return field;
+                }
+                case SerializedPropertyType.LayerMask:
+                {
+                    LayerMaskDropdownElement layerMaskDropdownElement = new LayerMaskDropdownElement
+                        {
+                            bindingPath = property.propertyPath
+                        };
+                    LayerMaskDropdownField field =
+                        new LayerMaskDropdownField(GetPreferredLabel(property), layerMaskDropdownElement)
+                        {
+                            bindingPath = property.propertyPath
+                        };
+                    field.AddToClassList(LayerMaskDropdownField.alignedFieldUssClassName);
+                    field.AddToClassList(ClassAllowDisable);
+                    // layerMaskDropdownElement.BindProperty(property);
+                    // Debug.Log($"return {layerMaskDropdownElement}");
+                    return field;
                 }
                 default:
                     return new VisualElement();
@@ -55,28 +82,28 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             // return layerField;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, FieldInfo info, object parent)
-        {
-            return new HelpBox("", HelpBoxMessageType.Error)
-            {
-                style =
-                {
-                    display = DisplayStyle.None,
-                    flexGrow = 1,
-                },
-                name = NameHelpBox(property),
-            };
-        }
+        // protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+        //     ISaintsAttribute saintsAttribute, int index,
+        //     IReadOnlyList<PropertyAttribute> allAttributes,
+        //     VisualElement container, FieldInfo info, object parent)
+        // {
+        //     return new HelpBox("", HelpBoxMessageType.Error)
+        //     {
+        //         style =
+        //         {
+        //             display = DisplayStyle.None,
+        //             flexGrow = 1,
+        //         },
+        //         name = NameHelpBox(property),
+        //     };
+        // }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-            RefreshHelpBox(property, helpBox);
+            // HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+            // RefreshHelpBox(property, helpBox);
 
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
@@ -85,6 +112,9 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 {
                     IntDropdownField intDropdownField = container.Q<IntDropdownField>();
                     AddContextualMenuManipulator(intDropdownField, property, onValueChangedCallback, info, parent);
+                    LayerIntDropdownElement layerIntDropdownElement = intDropdownField.Q<LayerIntDropdownElement>();
+                    layerIntDropdownElement.BindDrop(intDropdownField);
+                    layerIntDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
 
                     intDropdownField.Button.clicked += () => MakeDropdown(property, intDropdownField, onValueChangedCallback, info, parent);
                 }
@@ -93,234 +123,28 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 {
                     StringDropdownField layerStringField = container.Q<StringDropdownField>();
                     AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
+                    LayerStringDropdownElement layerStringDropdownElement = layerStringField.Q<LayerStringDropdownElement>();
+                    layerStringDropdownElement.BindDrop(layerStringField);
+                    layerStringDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
 
                     layerStringField.Button.clicked += () => MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
+                }
+                    break;
+                case SerializedPropertyType.LayerMask:
+                {
+                    LayerMaskDropdownField layerMaskField = container.Q<LayerMaskDropdownField>();
+                    AddContextualMenuManipulator(layerMaskField, property, onValueChangedCallback, info, parent);
+                    layerMaskField.LayerMaskDropdownElement.BindDrop(layerMaskField);
+                    layerMaskField.LayerMaskDropdownElement.RegisterValueChangedCallback(v =>
+                        onValueChangedCallback(new LayerMask
+                        {
+                            value = v.newValue,
+                        }));
                 }
                     break;
                 default:
                     return;
             }
-
-            // LayerField layerField = container.Q<LayerField>(NameLayer(property));
-            //
-            // layerField.labelElement.AddManipulator(new ContextualMenuManipulator(evt =>
-            // {
-            //     evt.menu.AppendAction("Copy Property Path", _ => EditorGUIUtility.systemCopyBuffer = property.propertyPath);
-            //
-            //     bool separator = false;
-            //
-            //     if (property.propertyType == SerializedPropertyType.String)
-            //     {
-            //         if (ClipboardHelper.CanCopySerializedProperty(SerializedPropertyType.String))
-            //         {
-            //             separator = true;
-            //             evt.menu.AppendSeparator();
-            //             evt.menu.AppendAction("Copy Layer Name", _ => EditorGUIUtility.systemCopyBuffer = property.stringValue,
-            //                 string.IsNullOrEmpty(property.stringValue)
-            //                     ? DropdownMenuAction.Status.Disabled
-            //                     : DropdownMenuAction.Status.Normal);
-            //         }
-            //
-            //         (bool hasStringReflectionPaste, bool hasStringValuePaste) = ClipboardHelper.CanPasteSerializedProperty(SerializedPropertyType.String);
-            //         if (hasStringReflectionPaste)
-            //         {
-            //             if (!separator)
-            //             {
-            //                 evt.menu.AppendSeparator();
-            //                 separator = true;
-            //             }
-            //
-            //             if (hasStringValuePaste)
-            //             {
-            //                 PropertyInfo propertyInfo = ClipboardHelper.EnsurePropertyInfo(SerializedPropertyType.String);
-            //                 bool canPasteAsLayerName = false;
-            //                 string canPasteValue = string.Empty;
-            //                 if (propertyInfo != null && propertyInfo.CanRead)
-            //                 {
-            //                     canPasteValue = (string)propertyInfo.GetValue(null);
-            //                     if (!string.IsNullOrEmpty(canPasteValue))
-            //                     {
-            //                         foreach (LayerUtils.LayerInfo layerInfo in LayerUtils.GetAllLayers())
-            //                         {
-            //                             if (layerInfo.Name == canPasteValue)
-            //                             {
-            //                                 canPasteAsLayerName = true;
-            //                                 break;
-            //                             }
-            //                         }
-            //                     }
-            //                 }
-            //                 evt.menu.AppendAction("Paste Layer Name", _ =>
-            //                 {
-            //                     property.stringValue = canPasteValue;
-            //                     property.serializedObject.ApplyModifiedProperties();
-            //                     onValueChangedCallback(property.stringValue);
-            //                 }, canPasteAsLayerName? DropdownMenuAction.Status.Normal: DropdownMenuAction.Status.Disabled);
-            //             }
-            //         }
-            //
-            //         (bool hasIntReflectionPaste, bool hasIntValuePaste) = ClipboardHelper.CanPasteSerializedProperty(SerializedPropertyType.Integer);
-            //         if (hasIntReflectionPaste)
-            //         {
-            //             if (!separator)
-            //             {
-            //                 evt.menu.AppendSeparator();
-            //                 separator = true;
-            //             }
-            //
-            //             if (hasIntValuePaste)
-            //             {
-            //                 PropertyInfo propertyInfo = ClipboardHelper.EnsurePropertyInfo(SerializedPropertyType.Integer);
-            //                 bool canPasteAsLayerValue = false;
-            //                 string canPasteValue = string.Empty;
-            //                 if (propertyInfo != null && propertyInfo.CanRead)
-            //                 {
-            //                     int canPasteNumber = (int)(long)propertyInfo.GetValue(null);
-            //                     foreach (LayerUtils.LayerInfo layerInfo in LayerUtils.GetAllLayers())
-            //                     {
-            //                         if (layerInfo.Value == canPasteNumber)
-            //                         {
-            //                             canPasteAsLayerValue = true;
-            //                             canPasteValue = layerInfo.Name;
-            //                             break;
-            //                         }
-            //                     }
-            //                 }
-            //                 evt.menu.AppendAction("Paste Layer Number", _ =>
-            //                 {
-            //                     property.stringValue = canPasteValue;
-            //                     property.serializedObject.ApplyModifiedProperties();
-            //                     onValueChangedCallback(canPasteValue);
-            //                 }, canPasteAsLayerValue ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-            //             }
-            //         }
-            //     }
-            //     else if (property.propertyType == SerializedPropertyType.Integer)
-            //     {
-            //         PropertyInfo propertyInfoInteger = ClipboardHelper.EnsurePropertyInfo(SerializedPropertyType.Integer);
-            //         if (ClipboardHelper.CanCopySerializedProperty(SerializedPropertyType.Integer))
-            //         {
-            //             bool canPaste = propertyInfoInteger != null && propertyInfoInteger.CanWrite;
-            //
-            //             separator = true;
-            //             evt.menu.AppendSeparator();
-            //             evt.menu.AppendAction("Copy Layer Number", _ => propertyInfoInteger?.SetValue(null, property.intValue),
-            //                 canPaste
-            //                     ? DropdownMenuAction.Status.Normal
-            //                     : DropdownMenuAction.Status.Disabled);
-            //         }
-            //
-            //         (bool hasStringReflectionPaste, bool hasStringValuePaste) = ClipboardHelper.CanPasteSerializedProperty(SerializedPropertyType.String);
-            //         if (hasStringReflectionPaste)
-            //         {
-            //             if (!separator)
-            //             {
-            //                 evt.menu.AppendSeparator();
-            //                 separator = true;
-            //             }
-            //
-            //             if (hasStringValuePaste)
-            //             {
-            //                 PropertyInfo propertyInfo = ClipboardHelper.EnsurePropertyInfo(SerializedPropertyType.String);
-            //                 bool canPasteAsLayerName = false;
-            //                 int canPasteValue = 0;
-            //                 if (propertyInfo != null && propertyInfo.CanRead)
-            //                 {
-            //                     string clipboardValue = (string)propertyInfo.GetValue(null);
-            //                     if (!string.IsNullOrEmpty(clipboardValue))
-            //                     {
-            //                         foreach (LayerUtils.LayerInfo layerInfo in GetAllLayers())
-            //                         {
-            //                             if (layerInfo.Name == clipboardValue)
-            //                             {
-            //                                 canPasteAsLayerName = true;
-            //                                 canPasteValue = layerInfo.Value;
-            //                                 break;
-            //                             }
-            //                         }
-            //                     }
-            //                 }
-            //                 evt.menu.AppendAction("Paste Layer Name", _ =>
-            //                 {
-            //                     property.intValue = canPasteValue;
-            //                     property.serializedObject.ApplyModifiedProperties();
-            //                     onValueChangedCallback(canPasteValue);
-            //                 }, canPasteAsLayerName? DropdownMenuAction.Status.Normal: DropdownMenuAction.Status.Disabled);
-            //             }
-            //         }
-            //
-            //         (bool hasIntReflectionPaste, bool hasIntValuePaste) = ClipboardHelper.CanPasteSerializedProperty(SerializedPropertyType.Integer);
-            //         if (hasIntReflectionPaste)
-            //         {
-            //             if (!separator)
-            //             {
-            //                 evt.menu.AppendSeparator();
-            //                 separator = true;
-            //             }
-            //
-            //             if (hasIntValuePaste)
-            //             {
-            //                 PropertyInfo propertyInfo = ClipboardHelper.EnsurePropertyInfo(SerializedPropertyType.Integer);
-            //                 bool canPasteAsLayerValue = false;
-            //                 int canPasteValue = 0;
-            //                 if (propertyInfo != null && propertyInfo.CanRead)
-            //                 {
-            //                     int clipboardValue = (int)(long)propertyInfo.GetValue(null);
-            //                     foreach (LayerUtils.LayerInfo layerInfo in GetAllLayers())
-            //                     {
-            //                         if (layerInfo.Value == clipboardValue)
-            //                         {
-            //                             canPasteAsLayerValue = true;
-            //                             canPasteValue = layerInfo.Value;
-            //                             break;
-            //                         }
-            //                     }
-            //                 }
-            //                 evt.menu.AppendAction("Paste Layer Number", _ =>
-            //                 {
-            //                     property.intValue = canPasteValue;
-            //                     property.serializedObject.ApplyModifiedProperties();
-            //                     onValueChangedCallback(canPasteValue);
-            //                 }, canPasteAsLayerValue ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
-            //             }
-            //         }
-            //     }
-            // }));
-            //
-            // layerField.RegisterValueChangedCallback(evt =>
-            // {
-            //     if (property.propertyType == SerializedPropertyType.Integer)
-            //     {
-            //         property.intValue = evt.newValue;
-            //         property.serializedObject.ApplyModifiedProperties();
-            //         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent,
-            //             evt.newValue);
-            //         onValueChangedCallback.Invoke(evt.newValue);
-            //     }
-            //     else
-            //     {
-            //         string newValue = LayerMask.LayerToName(evt.newValue);
-            //         property.stringValue = newValue;
-            //         property.serializedObject.ApplyModifiedProperties();
-            //         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent,
-            //             newValue);
-            //         onValueChangedCallback.Invoke(newValue);
-            //     }
-            // });
-
-
-            // layerField.TrackPropertyValue(property, newProp =>
-            // {
-            //     bool noError = RefreshHelpBox(newProp, helpBox);
-            //     // ReSharper disable once InvertIf
-            //     if (noError)
-            //     {
-            //         int curSelected = property.propertyType == SerializedPropertyType.Integer
-            //             ? property.intValue
-            //             : LayerMask.NameToLayer(property.stringValue);
-            //         layerField.SetValueWithoutNotify(curSelected);
-            //     }
-            // });
         }
 
         private static void AddContextualMenuManipulator(VisualElement root, SerializedProperty property,
@@ -470,19 +294,19 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             UnityEditor.PopupWindow.Show(worldBound, sa);
         }
 
-        private static void RefreshHelpBox(SerializedProperty property, HelpBox helpBox)
-        {
-            string errorMessage = GetErrorMessage(property);
-            // bool noError = string.IsNullOrEmpty(errorMessage);
-            if (helpBox.text == errorMessage)
-            {
-                return;
-            }
-
-            helpBox.text = errorMessage;
-            helpBox.style.display = string.IsNullOrEmpty(errorMessage)? DisplayStyle.None: DisplayStyle.Flex;
-            // return;
-        }
+        // private static void RefreshHelpBox(SerializedProperty property, HelpBox helpBox)
+        // {
+        //     string errorMessage = GetErrorMessage(property);
+        //     // bool noError = string.IsNullOrEmpty(errorMessage);
+        //     if (helpBox.text == errorMessage)
+        //     {
+        //         return;
+        //     }
+        //
+        //     helpBox.text = errorMessage;
+        //     helpBox.style.display = string.IsNullOrEmpty(errorMessage)? DisplayStyle.None: DisplayStyle.Flex;
+        //     // return;
+        // }
 
 //         private static (bool found, LayerUtils.LayerInfo info) FindLayerFromCopy()
 //         {
