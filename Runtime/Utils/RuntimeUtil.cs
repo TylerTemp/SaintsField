@@ -42,7 +42,14 @@ namespace SaintsField.Utils
         {
             if (obj is Object uObject)
             {
-                return !uObject;
+                try
+                {
+                    return !uObject;
+                }
+                catch (InvalidOperationException)
+                {
+                    // ignore
+                }
             }
 
             return obj == null;
