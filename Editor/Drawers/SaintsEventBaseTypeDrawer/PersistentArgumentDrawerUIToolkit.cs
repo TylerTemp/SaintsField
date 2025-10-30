@@ -61,14 +61,14 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             label.TrackPropertyValue(property, TrackLabelDisplay);
 
             // dynamic
-            string[] splited = property.propertyPath.Split('.').SkipLast(6).ToArray();
+            string[] split = property.propertyPath.Split('.').SkipLast(6).ToArray();
             bool selfInsideArray = false;
-            if (splited[^1].EndsWith("]"))
+            if (split[^1].EndsWith("]"))
             {
-                splited = splited.SkipLast(2).ToArray();
+                split = split.SkipLast(2).ToArray();
                 selfInsideArray = true;
             }
-            (SerializedUtils.FieldOrProp rootFieldOrProp, object _) = SerializedUtils.GetFieldInfoAndDirectParentByPathSegments(property, splited);
+            (SerializedUtils.FieldOrProp rootFieldOrProp, object _) = SerializedUtils.GetFieldInfoAndDirectParentByPathSegments(property, split);
             Type rawType;
             MemberInfo rawMemberInfo;
             if (rootFieldOrProp.IsField)
@@ -111,15 +111,28 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     Type type = eventParamTypes[eventParamIndex];
                     string labelText = $"<color=#808080>[{eventParamIndex}]</color> {useName} <color=#808080>({SaintsEventUtils.StringifyType(type)})</color>";
                     int thisIndex = eventParamIndex;
-                    genericDropdownMenu.AddItem(labelText, invokedParameterIndexProp.intValue == eventParamIndex, () =>
+
+                    Type callbackArgumentType = GetArgumentType(property);
+
+                    bool canAssign = callbackArgumentType != null && callbackArgumentType.IsAssignableFrom(type);
+                    if(canAssign)
                     {
-                        invokedParameterIndexProp.intValue = thisIndex;
-                        if (valueTypeProp.intValue != (int)PersistentArgument.CallType.Dynamic)
-                        {
-                            valueTypeProp.intValue = (int)PersistentArgument.CallType.Dynamic;
-                        }
-                        property.serializedObject.ApplyModifiedProperties();
-                    });
+                        genericDropdownMenu.AddItem(labelText, invokedParameterIndexProp.intValue == eventParamIndex,
+                            () =>
+                            {
+                                invokedParameterIndexProp.intValue = thisIndex;
+                                if (valueTypeProp.intValue != (int)PersistentArgument.CallType.Dynamic)
+                                {
+                                    valueTypeProp.intValue = (int)PersistentArgument.CallType.Dynamic;
+                                }
+
+                                property.serializedObject.ApplyModifiedProperties();
+                            });
+                    }
+                    else
+                    {
+                        genericDropdownMenu.AddDisabledItem(labelText, invokedParameterIndexProp.intValue == eventParamIndex);
+                    }
                 }
 
                 Rect bound = dropdownButton.worldBound;
@@ -599,9 +612,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             void TrackLabelDisplay(SerializedProperty p)
             {
-                string argTypeStr = property
-                    .FindPropertyRelative(nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly").stringValue;
-                Type argType = string.IsNullOrEmpty(argTypeStr) ? null : Type.GetType(argTypeStr);
+                Type argType = GetArgumentType(property);
                 string argTypeName = argType == null
                     ? ""
                     : $" <color=#808080>({SaintsEventUtils.StringifyType(argType)})</color>";
@@ -610,11 +621,29 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
             void SetDynamicButtonLabel(SerializedProperty prop)
             {
+                Type callbackArgumentType = GetArgumentType(property);
+
+                int eventParamIndex = invokedParameterIndexProp.intValue;
+                Type type = eventParamTypes[eventParamIndex];
+                bool canAssign = callbackArgumentType != null && callbackArgumentType.IsAssignableFrom(type);
+
+                string prefixString = "";
+                if (!canAssign)
+                {
+                    prefixString = "<color=red>x</color>";
+                    dropdownButton.tooltip = $"Type {callbackArgumentType} can not be assigned to {type}";
+                }
+                else
+                {
+                    dropdownButton.tooltip = "";
+                }
+
                 int curIndex = prop.intValue;
                 string curType;
                 if (curIndex < 0 || curIndex >= eventParamTypes.Length)
                 {
                     curType = "?";
+                    dropdownButton.tooltip = $"{curIndex} is not in range";
                 }
                 else
                 {
@@ -623,11 +652,18 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         : "Arg";
 
                     curType =
-                        $"<color=#808080>[{curIndex}]</color> {useName} <color=#808080>({SaintsEventUtils.StringifyType(eventParamTypes[curIndex])})</color>";
+                        $"{prefixString} <color=#808080>[{curIndex}]</color> {useName} <color=#808080>({SaintsEventUtils.StringifyType(eventParamTypes[curIndex])})</color>";
                 }
 
                 dropdownButtonLabel.text = curType;
             }
+        }
+
+        private static Type GetArgumentType(SerializedProperty p)
+        {
+            string argTypeStr = p
+                .FindPropertyRelative(nameof(PersistentArgument.typeReference) + "._typeNameAndAssembly").stringValue;
+            return string.IsNullOrEmpty(argTypeStr) ? null : Type.GetType(argTypeStr);
         }
 
         private static object ActivatorCreateInstance(Type serializedFieldType)

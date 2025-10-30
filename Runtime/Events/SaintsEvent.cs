@@ -8,9 +8,9 @@ namespace SaintsField.Events
     {
         public void Invoke()
         {
-            foreach (PersistentCall presistentCall in _persistentCalls)
+            foreach (PersistentCall persistentCall in _persistentCalls)
             {
-                presistentCall.Invoke(Array.Empty<object>());
+                persistentCall.Invoke(Array.Empty<object>());
             }
         }
     }

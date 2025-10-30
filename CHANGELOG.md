@@ -1,10 +1,8 @@
 # Changelog
 
-## 4.40.1 ##
+## 4.40.2 ##
 
-1.  `SaintsArray`/`SaintsList` now support interface & abstract type
-2.  Fix `SaintsHashSet` might failed to deserialization and resulted in empty set
-3.  Fix `SaintsHashSet` elements have no label
+`SaintsEvent` now gray out the arguements that can not be assigned
 
 ## 4.39.0 ##
 
@@ -257,7 +255,7 @@ Introduce `SaintsEvent`. `SaintsEvent` is an alternative to Unity's `UnityEvent`
 2.  Fix `EnumToogleButtons` expanded button not get disabled with `DisableIf`/`EnableIf`/`ReadOnly`
 3.  Add support for Unity's [`InspectorNameAttribute`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/InspectorNameAttribute.html) for `enum` type
 4.  IMGUI: fix `Table` foldout clicking on label didn't expand the field [#265](https://github.com/TylerTemp/SaintsField/issues/265)
-
+E
 ## 4.22.0 ##
 
 1.  Add `TypeReference` type to serialize a `System.Type`

@@ -44,7 +44,7 @@ namespace SaintsField.Editor.TroubleshootEditor
             public string drawerType;
         }
 
-        [Ordered, ListDrawerSettings(searchable: true, numberOfItemsPerPage: 20, delayedSearch: true)]
+        [Ordered, ListDrawerSettings(searchable: true, numberOfItemsPerPage: 20)]
         [SerializeField]
         private List<PropertyTypeToDrawer> _propertyTypeToDrawers = new List<PropertyTypeToDrawer>();
 

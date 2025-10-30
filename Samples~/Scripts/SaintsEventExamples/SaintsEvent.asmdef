@@ -1,0 +1,24 @@
+{
+    "name": "SaintsEvent",
+    "rootNamespace": "",
+    "references": [
+        "today.comes.saintsfield.Runtime.Events"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_SERIALIZATION"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.serialization",
+            "expression": "",
+            "define": "SAINTSFIELD_SERIALIZATION"
+        }
+    ],
+    "noEngineReferences": false
+}

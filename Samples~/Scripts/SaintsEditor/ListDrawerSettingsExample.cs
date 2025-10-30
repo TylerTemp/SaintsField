@@ -32,7 +32,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [ListDrawerSettings(searchable: true), Expandable] public Scriptable[] searchScriptable;
 
 
-        [ListDrawerSettings(searchable: true, delayedSearch: true), Expandable]
+        [ListDrawerSettings(searchable: true), Expandable]
         [OnArraySizeChanged(nameof(SizeChanged))]
         public Scriptable[] searchDelayScriptable;
 

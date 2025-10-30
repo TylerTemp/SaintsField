@@ -17,10 +17,10 @@ namespace SaintsField.Playa
         public readonly string ExtraSearch;
         public readonly string OverrideSearch;
 
-        public ListDrawerSettingsAttribute(bool searchable = false, int numberOfItemsPerPage = 0, bool delayedSearch = false, string extraSearch = null, string overrideSearch = null)
+        public ListDrawerSettingsAttribute(bool searchable = false, int numberOfItemsPerPage = 0, string extraSearch = null, string overrideSearch = null)
         {
             NumberOfItemsPerPage = numberOfItemsPerPage;
-            Delayed = delayedSearch;
+            // Delayed = delayedSearch;
             Searchable = Delayed || searchable;
 
             ExtraSearch = RuntimeUtil.ParseCallback(extraSearch).content;

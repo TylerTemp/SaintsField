@@ -6530,6 +6530,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1961094009}
   - component: {fileID: 1961094010}
+  - component: {fileID: 1961094011}
+  - component: {fileID: 1961094012}
   m_Layer: 0
   m_Name: Layout
   m_TagString: Untagged
@@ -6608,6 +6610,42 @@ MonoBehaviour:
   allTogetherG21: 
   allTogetherG12: 
   allTogetherG22: 
+--- !u!114 &1961094011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961094008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86bc379ff6974a4cb3a02e87bb598c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.LayoutDoc
+  i1: 0
+  i2: 0
+  s1: 
+  s2: 
+  i3: 0
+  i4: 0
+  out1: {fileID: 0}
+  out2: {fileID: 0}
+--- !u!114 &1961094012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961094008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98237d03249ec0a45b6ce4ad0f99696e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.LayoutDoc2
+  leftEquipment: {fileID: 0}
+  leftAttack: 0
+  rightEquipment: {fileID: 0}
+  rightAttack: 0
 --- !u!1 &1982681066
 GameObject:
   m_ObjectHideFlags: 0

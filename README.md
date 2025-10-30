@@ -94,11 +94,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.40.1**
+**4.40.2**
 
-1.  `SaintsArray`/`SaintsList` now support interface & abstract type
-2.  Fix `SaintsHashSet` might failed to deserialization and resulted in empty set
-3.  Fix `SaintsHashSet` elements have no label
+`SaintsEvent` now gray out the arguements that can not be assigned
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1270,16 +1268,12 @@ using SaintsField;
 Make serializable object expandable. (E.g. `ScriptableObject`, `MonoBehavior`)
 
 Known issues:
-1.  IMGUI: if the target itself has a custom editor drawer, the drawer will not be used, because `PropertyDrawer` is not allowed to create an `Editor` class. Instead, it will use `SaintsEditor` regardless whatever the actual editor is.
-
-    For more information about why this is impossible under IMGUI, see [Issue 25](https://github.com/TylerTemp/SaintsField/issues/25)
-
-2.  IMGUI: the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside the rect will make the target non-interactable.
+1.  the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside the rect will make the target non-interactable.
     But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect on top leve, but not on array/list level... so you may see different outcomes on different Unity version.
 
     If you see unexpected space or overlap between foldout and label, use `Window` - `Saints` - `Create or Edit SaintsField Config` to change the config.
 
-3.  UI Toolkit: `ReadOnly` (and `DisableIf`, `EnableIf`) can NOT disable the expanded fields. This is because `InspectorElement` does not work with `SetEnable(false)`, neither with `pickingMode=Ignore`. This can not be fixed unless Unity fixes it.
+2.  `ReadOnly` (and `DisableIf`, `EnableIf`) can NOT disable the expanded fields. This is because `InspectorElement` does not work with `SetEnable(false)`, neither with `pickingMode=Ignore`. This can not be fixed unless Unity fixes it.
 
 *   Allow Multiple: No
 
@@ -1387,12 +1381,10 @@ public IRefInterface myInterface;
 
 #### `SaintsRow` ####
 
-`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc. (all `SaintsEditor` attributes) in a `Serializable` object (usually a class or a struct).
+`SaintsRow` attribute allows you to draw `Button`, `Layout`, `ShowInInspector`, `DOTweenPlay` etc. (all `SaintsEditor` specific attributes) in a `Serializable` object (usually a class or a struct).
 
 > [!TIP]
-> If you're using `UI Toolkit`, you do not need this attribute at all. It'll kickin by default.
-
-This attribute does NOT need `SaintsEditor` enabled. It's an out-of-box tool.
+> If you've enabled `SaintsEditor`, you do not need this attribute at all. It'll kickin by default.
 
 Parameters:
 
@@ -1400,12 +1392,11 @@ Parameters:
 
     If true, it'll draw the `Serializable` inline like it's directly in the `MonoBehavior`
 
-*   AllowMultiple: No
+*   Allow Multiple: No
 
 Special Note:
 
-1.  After applying this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, using third party's `PropertyDrawer` is fine, but decorator of Editor level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
-2.  IMGUI: `DOTweenPlay` might be a bit buggy displaying the playing/pause/stop status for each function.
+After applying this attribute, only pure `PropertyDrawer`, and decorators from `SaintsEditor` works on this target. Which means, using third party's `PropertyDrawer` is fine, but decorator of Editor level (e.g. Odin's `Button`, NaughtyAttributes' `Button`) will not work.
 
 ```csharp
 using SaintsField;
@@ -1526,7 +1517,6 @@ Parameters:
 
 *   `bool searchable = false`: allow search in the list/array
 *   `int numberOfItemsPerPage = 0`: how many items per page by default. `<=0` means no paging
-*   [IMGUI] `bool delayedSearch = false`: when `true`, delay the search until you hit enter or blur the search field
 *   `string extraSearch = null`: set a callback function to use your custom search. If not match, use the default search.
 *   `string overrideSearch = null`: set a callback function as a custom search. When present, ignore `extraSearch` and default search.
 
@@ -4825,29 +4815,57 @@ Layout system allows you to group severral target (field, property, button etc) 
 
 You can use this system once `SaintsEditor` is enabled in your project. However, because C# reflection can not give a correct order of targets between fields, properties, and method, the layout could gather targets incorrectly. Thus, it's highly recommended to install [Microsoft.CodeAnalysis.CSharp](https://www.nuget.org/packages/microsoft.codeanalysis.csharp/). This dependency will NOT be included in your build.
 
-To know the difference, see this code piece:
+Which means, though it works 90% of the time:
 
 ```csharp
 using SaintsField.Playa;
 
-[Button] private void OutFirstBtn() {}
+[LayoutStart("Group", ELayout.FoldoutBox)] 
+public int i1;
+public int i2;
 
-[LayoutStart("Group", ELayout.TitleBox)]
-public void Btn() {}
-[field: SerializeField] public int AutoPropLayout { get; private set; }
+[LayoutStart("./Sub", ELayout.FoldoutBox)]
+public string s1;
+public string s2;
 
-[Button] private void MiddleButton() {}
+[LayoutEnd(".")]
+public int i3;
+public int i4;
 
-public int norFieldLayout;
+[LayoutEnd]
+public GameObjct out1;
+public GameObjct out2;
 ```
 
-❌ Without `Microsoft.CodeAnalysis.CSharp`, it uses the default reflection order, which is field first, then property, then method:
+![](https://github.com/user-attachments/assets/8b8342c0-166c-4df6-a345-0ec0c91b22c2)
 
-![](https://github.com/user-attachments/assets/329b142e-8e45-42dc-93fe-6c7f5e5a6f62)
+But if you mix some method, the method will not be placed where it anounced, because the limitation from C\# language
+
+```csharp
+[LayoutStart("Left Hand", ELayout.FoldoutBox)]
+public GameObject leftEquipment;
+public int leftAttack;
+[Button]
+public void SetLeftHand() {}
+
+[LayoutStart("Right Hand", ELayout.FoldoutBox)]
+public GameObject rightEquipment;
+public int rightAttack;
+[Button]
+public void SetRightHand() {}
+
+[LayoutEnd]
+public int hp;
+public int mp;
+```
+
+❌ Without `Microsoft.CodeAnalysis.CSharp`, it uses the default reflection order, which is field & property, then method:
+
+![](https://github.com/user-attachments/assets/0d019562-c10f-44c6-9597-e6957ee70342)
 
 ✅ With `Microsoft.CodeAnalysis.CSharp`, it uses the source code declaration order:
 
-![](https://github.com/user-attachments/assets/86678cfa-1c9c-413f-8c5a-47f0b52208d4)
+![](https://github.com/user-attachments/assets/1368d7df-7505-44d3-8c03-703dce2f6fea)
 
 You can install it using any method below:
 
@@ -6708,13 +6726,11 @@ Features:
 
 Here are some features that is supported by other plugins:
 
-*   IMGUI is not supported yet, while `UltEvents` & `ExtEvents` does
+*   IMGUI is not supported, while `UltEvents` & `ExtEvents` does
 *   Chained call (use one callback's result as another one's input) is not supported and will not be added, while `UltEvents` does
 *   Renamed type is partly supported. If a renamed type is a `MonoBehavior`, then rename works as expected. However, `ExtEvent` will try to find a general type's rename
 *   Implicit conversions for arguments is not supported, while `ExtEvents` does
 *   Performance optimization is limited to first-time cache, while `ExtEvents` using code generator to make the runtime much more fast. So in general, speed comparison is (fast to slow) `UnityEvent` - `ExtEvent` - `SaintsEvent` - `UltEvent`
-
-I'm not sure if I want to back-port the IMGUI support yet. If you really love this feature, please open an [issue](https://github.com/TylerTemp/SaintsField/issues) or [discussions](https://github.com/TylerTemp/SaintsField/discussions)
 
 > [!WARNING]
 > This component is quite heavy and might not be stable for using (compare to others), and I understand a callback can be very wildly used in project.
@@ -6729,7 +6745,6 @@ public SaintsEvent sEvent;
 ```
 
 ![image](https://github.com/user-attachments/assets/7a5b87b2-a999-494f-9795-d38bbed6fca1)
-
 
 Here, `+s` to add a static callback, `+i` for an instance's callback, `-` to remove a callback.
 
@@ -8101,12 +8116,6 @@ Go to `Window` - `Saints` to enable/disable functions you want
     #"Enable SaintsEditor project wide"
     -define:SAINTSFIELD_SAINTS_EDITOR_APPLY
 
-    #"Disable SaintsEditor IMGUI constant repaint"
-    -define:SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
-
-    #"Enable IMGUI duplicated decorators drawing fix"
-    -define:SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
-
     #"Enable the code analysis"
     -define:SAINTSFIELD_CODE_ANALYSIS
     ```
@@ -8133,88 +8142,15 @@ See [Auto Validator example code](https://github.com/TylerTemp/SaintsField/blob/
 
 [![video](https://github.com/user-attachments/assets/bf5e7b7a-c15c-4fa4-92b9-53621d41ccb4)](https://github.com/user-attachments/assets/76683bc3-cfea-4952-9377-788e02d7e075)
 
-### Common Pitfalls & Compatibility ###
-
-#### List/Array & Nesting ####
-
-Directly using on list/array will apply to every direct element of the list, this is a limit from Unity.
-
-Unlike NaughtyAttributes, `SaintsField` does not need a `AllowNesting` attribute to work on nested element.
-
-```csharp
-public class ArrayLabelExample : MonoBehaviour
-{
-    // works for list/array
-    [Scene] public int[] myScenes;
-
-    [System.Serializable]
-    public struct MyStruct
-    {
-        public bool enableFlag;
-
-        [AboveRichLabel("No need for `[AllowNesting]`, it just works")]
-        public int integer;
-    }
-
-    public MyStruct myStruct;
-}
-```
-
-#### Order Matters ####
-
-`SaintsField` only uses `PropertyDrawer` to draw the field, and will properly fall back to the rest drawers if there is one.
-This works for both 3rd party drawer, your custom drawer, and Unity's default drawer.
-
-However, Unity only allows decorators to be loaded from top to bottom, left to right. Any drawer that does not properly handle the fallback
-will override `PropertyDrawer` follows by. Thus, ensure `SaintsField` is always the first decorator.
-
-An example of working with NaughtyAttributes:
-
-```csharp
-using SaintsField;
-
-[RichLabel("<color=green>+NA</color>"),
- NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green),
- NaughtyAttributes.Label(" ")  // a little hack for label issue
-]
-public AnimationCurve naCurve;
-
-[RichLabel("<color=green>+Native</color>"), Range(0, 5)]
-public float nativeRange;
-
-// this wont work. Please put `SaintsField` before other drawers
-[Range(0, 5), RichLabel("<color=green>+Native</color>")]
-public float nativeRangeHandled;
-
-// this wont work too. Please put `SaintsField` before other drawers
-[NaughtyAttributes.CurveRange(0, 0, 1, 1, NaughtyAttributes.EColor.Green)]
-[RichLabel("<color=green>+NA</color>")]
-public AnimationCurve naCurveHandled;
-```
-
-#### Fallback To Other Drawers ####
+### Use With Other Drawers ###
 
 `SaintsField` is designed to be compatible with other drawers if
 
-1.  the drawer itself respects the `GUIContent` argument in `OnGUI` for IMGUI, or add `unity-label` class to Label for UI Toolkit
+1.  The attribute in SaintsField does not says "Enable `SaintsEditor` before using"
+2.  the drawer itself respects `unity-label` class to Label for UI Toolkit
+3.  if the drawer hijacks the `CustomEditor`, it must fall to the rest drawers
 
-    NOTE: `NaughtyAttributes` (IMGUI) uses `property.displayName` instead of `GUIContent`. You need to set `Label(" ")` if you want to use `RichLabel`.
-    Might not work very well with `NaughtyAttributes`'s meta attributes because they are editor level components.
-
-2.  if the drawer hijacks the `CustomEditor`, it must fall to the rest drawers
-
-    NOTE: In many cases `Odin` does not fall back to the rest drawers, but only to `Odin` and Unity's default drawers. So sometimes things will not work with `Odin`
-
-Special Note:
-
-NaughtyAttributes uses only IMGUI. If you're using Unity 2022.2+, `NaughtyAttributes`'s editor will try fallback default drawers and Unity will decide to use UI Toolkit rendering `SaintsField` and cause troubles.
-Please disable `SaintsField`'s UI Toolkit ability by `Window` - `Saints` - `Disable UI Toolkit Support` (See "Add a Macro" section for more information)
-
-My (not full) test about compatibility:
-
-*   [Markup-Attributes](https://github.com/gasgiant/Markup-Attributes): Works very well.
-*   [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes): Works well, need that `Label` hack.
-*   [OdinInspector](https://odininspector.com/): Works mostly well for MonoBehavior/ScriptableObject. Not so good when it's inside Odin's own serializer.
+Note about [OdinInspector](https://odininspector.com/): Odin is IMGUI based with UI Toolkit partly supported. It has label align issue with UI Toolkit. I asked them in discord but never get response. Using `SaintsField` with `Odin`, you might see incorrect label width. 
 
 ## Donation ##
 
