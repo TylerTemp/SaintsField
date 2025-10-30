@@ -112,6 +112,8 @@ Old Name (Alias) | New Name
 `OverlayRichLabel` | `OverlayText`
 `PostFieldRichLabel` | `EndText`
 
+Please read [Migrate From 4 To 5](https://github.com/TylerTemp/SaintsField/wiki/MigrateTo5) to know how to migrate.
+
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
