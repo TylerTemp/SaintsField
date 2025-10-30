@@ -413,7 +413,14 @@ namespace SaintsField.Utils
                         return default;
                     }
 
-                    return (true, (T)(object)saintsSerializedProperty.V);
+                    try
+                    {
+                        return (true, (T)(object)saintsSerializedProperty.V);
+                    }
+                    catch (InvalidCastException)
+                    {
+                        return (false, default);
+                    }
                 }
                 case SaintsPropertyType.DateTime:
                     return (true, (T)(object)new DateTime(saintsSerializedProperty.longValue));
