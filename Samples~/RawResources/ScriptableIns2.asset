@@ -66,7 +66,7 @@ MonoBehaviour:
     atime5: 0
     atime6: 0
     atime7: 0
-    m_Mode: 0
+    m_Mode: 2
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2

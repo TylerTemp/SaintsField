@@ -21,8 +21,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [SaintsRow] public SaintsRow row;
 
+
         public string dynamicLabel;
 
+        [LayoutStart("Buttons", ELayout.Horizontal)]
         [Button("$" + nameof(dynamicLabel))]
         private void ButtonWithDynamicLabel()
         {
@@ -32,10 +34,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         private void ButtonWithNormalLabel()
         {
         }
+        [LayoutEnd]
 
         [Button]
-        private void ButtonWithoutLabel()
+        private Vector3 ButtonWithParamsAndReturn(GameObject o1, string s)
         {
+            return o1.transform.position;
         }
     }
 }

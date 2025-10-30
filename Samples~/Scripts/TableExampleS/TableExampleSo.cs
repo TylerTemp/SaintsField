@@ -9,19 +9,8 @@ namespace SaintsField.Samples.Scripts.TableExampleS
 {
     public class TableExampleSo : SaintsMonoBehaviour
     {
-        [Table]
-        // [GetScriptableObject]
-        public Scriptable[] scriptableArray;
-        // public Scriptable scriptable;
-        // public Scriptable[] scriptables;
+        [Table] public Scriptable[] scriptableArray;
 
-        [Button]
-        private void Button()
-        {
-#if UNITY_EDITOR
-            Debug.Log(EditorGUIUtility.systemCopyBuffer);
-#endif
-        }
 
         [Serializable]
         public struct MyStruct
@@ -38,6 +27,22 @@ namespace SaintsField.Samples.Scripts.TableExampleS
             public Animator animator;
             public AnimationCurve curve;
         }
+
+        [Table] public MyStruct[] myStructs;
+
+        // [GetScriptableObject]
+        // public Scriptable scriptable;
+        // public Scriptable[] scriptables;
+
+        [Button]
+        private void Button()
+        {
+#if UNITY_EDITOR
+            Debug.Log(EditorGUIUtility.systemCopyBuffer);
+#endif
+        }
+
+
 
         public MyStruct myStruct;
 

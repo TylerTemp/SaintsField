@@ -1141,11 +1141,118 @@ MonoBehaviour:
     VRef:
       rid: -2
     IsVRef: 0
+  interfaceType__SaintsSerialized__:
+    propertyType: 4
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  dictType__SaintsSerialized__:
+    saintsSerializedVersion: 1
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - value: 1
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    _saintsValues:
+    - valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 1
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+    - valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583612233515131
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 1
+      onAfterDeserializeChanged:
+        m_PersistentCalls:
+          m_Calls: []
+  hashSetType__SaintsSerialized__:
+    propertyType: 0
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  dateTimeType__SaintsSerialized__:
+    propertyType: 5
+    propertyPath: 
+    longValue: 638973792000000000
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
+  timeSpanType__SaintsSerialized__:
+    propertyType: 6
+    propertyPath: 
+    longValue: 0
+    uLongValue: 0
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+    - rid: 6921583612233515131
+      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: today.comes.saintsfield.Samples}
+      data:
+        common: 0
+        structString: This is a struct!
 --- !u!4 &203542844
 Transform:
   m_ObjectHideFlags: 0
@@ -2927,7 +3034,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce80c99e8ba440c580d745ce53147594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples.EditorTest::SaintsField.CodeAnalTest
-  ms: {fileID: 11500000, guid: 6a164796a7d21d4459f293d07b9abfa3, type: 3}
+  ms: {fileID: 11500000, guid: 452cdf6963e577a448280ca711ba798b, type: 3}
 --- !u!114 &889525107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3842,23 +3949,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452cdf6963e577a448280ca711ba798b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ot: 
-  st: 
-  inOneStruct:
-    ss: 
-    si: 0
-  g11: 
-  g12: 
-  myStruct:
-    ss: 
-    si: 0
-  g13: 
-  g21: 
-  g22: fdsfds
-  g23:
-  - 
-  - 
+  hp: 100
+  mp: 65
+  helmet: 
+  g11: {fileID: 21300000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}
+  g23: []
   toggle: 0
+  g22: {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   soV: {fileID: 0}
   animBaseV:
     <layerIndex>k__BackingField: 0
@@ -6646,6 +6743,8 @@ MonoBehaviour:
   leftAttack: 0
   rightEquipment: {fileID: 0}
   rightAttack: 0
+  hp: 0
+  mp: 0
 --- !u!1 &1982681066
 GameObject:
   m_ObjectHideFlags: 0

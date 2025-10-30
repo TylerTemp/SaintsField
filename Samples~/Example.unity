@@ -3888,6 +3888,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+  myStructs: []
   myStruct:
     vector2: {x: 0, y: 0}
     vector2Int: {x: 0, y: 0}
@@ -13906,6 +13907,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
   - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
+  myStructs: []
   myStruct:
     vector2: {x: 0, y: 0}
     vector2Int: {x: 0, y: 0}
@@ -13922,7 +13924,11 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  rawScriptableArray: []
+  rawScriptableArray:
+  - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
+  - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
 --- !u!1001 &834960804
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public class Issue224TableReadOnly : MonoBehaviour
+    public class Issue224TableReadOnly : SaintsMonoBehaviour
     {
         [Serializable]
         public struct LootDrop

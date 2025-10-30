@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public bool TableHasSize;
         }
 
-        private VisualElement _fieldElement;
+        private VisualElement _container;
         private bool _arraySizeCondition;
         private bool _richLabelCondition;
         private bool _tableCondition;
@@ -42,7 +42,15 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if(result != null)
             {
-                result.userData = userDataPayload;
+                _container = new VisualElement
+                {
+                    userData = userDataPayload
+                };
+                _container.Add(result);
+            }
+            else
+            {
+                _container = null;
             }
 
             OnArraySizeChangedAttribute onArraySizeChangedAttribute = FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
@@ -64,9 +72,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 $"SerField: {FieldWithInfo.SerializedProperty.displayName}({FieldWithInfo.SerializedProperty.propertyPath}); if={ifCondition}; arraySize={_arraySizeCondition}, richLabel={_richLabelCondition}");
 #endif
 
-            bool needUpdate = serializedUpdate || ifCondition || _arraySizeCondition || _richLabelCondition || _tableCondition;
+            bool needUpdate = result != null && (
+                serializedUpdate || ifCondition || _arraySizeCondition || _richLabelCondition || _tableCondition
+            );
 
-            return (_fieldElement = result, needUpdate);
+            return (_container, needUpdate);
         }
 
         protected abstract (VisualElement target, bool needUpdate) CreateSerializedUIToolkit();
@@ -113,6 +123,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         // private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition, FieldInfo info, object parent)
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
+            if (_container == null)
+            {
+                return preCheckResult;
+            }
 
             if(_arraySizeCondition)
             {
@@ -152,7 +166,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 string xml = preCheckResult.RichLabelXml;
                 // Debug.Log(xml);
-                UserDataPayload userDataPayload = (UserDataPayload) _fieldElement.userData;
+                UserDataPayload userDataPayload = (UserDataPayload) _container.userData;
                 if (xml != userDataPayload.XML)
                 {
                     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -163,10 +177,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     if(userDataPayload.Label == null)
                     {
                         UIToolkitUtils.WaitUntilThenDo(
-                            _fieldElement,
+                            _container,
                             () =>
                             {
-                                Label label = _fieldElement.Q<Label>(className: "unity-label");
+                                Label label = _container.Q<Label>(className: "unity-label");
                                 if (label == null)
                                 {
                                     return (false, null);

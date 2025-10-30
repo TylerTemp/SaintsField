@@ -13,37 +13,32 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public int si;
         }
 
-        // [PlayaSeparator("上身装备", EAlign.Center)]
-        public string ot;
+        [ProgressBar(min: 0, max: 100, color: EColor.Red)] public int hp;
+        [ProgressBar(min: 0, max: 100, color: EColor.Blue)] public int mp;
 
         [LayoutStart("Equipment", ELayout.TitleBox | ELayout.Vertical)]
         [LayoutStart("./Head", ELayout.TitleBox)]
-        public string st;
-        [LayoutCloseHere]
-        public MyStruct inOneStruct;
+        public string helmet;
 
-        [LayoutStart("./Upper Body", ELayout.TitleBox)]
+        [LayoutStart("../Upper Body", ELayout.TitleBox)]
 
-        [InfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
+        [InfoBox("Note：left hand can be empty, but not right hand")]
 
         [LayoutStart("./Horizontal", ELayout.Horizontal)]
 
         [LayoutStart("./Left Hand", ELayout.TitleBox)]
-        public string g11;
-        public string g12;
-        public MyStruct myStruct;
-        public string g13;
-
-        [LayoutStart("../Right Hand", ELayout.TitleBox)]
-        public string g21;
-        [FieldLabelText("<color=lime><label/>")]
-        public string g22;
+        [BelowImage]
+        public Sprite g11;
         [FieldLabelText("$" + nameof(g22))]
         public string[] g23;
-
         public bool toggle;
 
+        [LayoutStart("../Right Hand", ELayout.TitleBox)]
+        [Expandable]
+        public Scriptable g22;
+
         [LayoutEnd]
+
         [InfoBox("Buttons!")]
         [LayoutStart("Buttons", ELayout.Horizontal)]
         [Button]

@@ -28,6 +28,8 @@ Unity: 2022.2 or higher
 3.  Use and only use `PropertyDrawer` and `DecoratorDrawer` (except `SaintsEditor`, which is disabled by default), thus it will be compatible with most Unity Inspector enhancements like `NaughtyAttributes` and your custom drawer.
 4.  Allow stack on many cases. Only attributes that modified the label itself, and the field itself can not be stacked. All other attributes can mostly be stacked.
 5.  Allow dynamic arguments in many cases
+6.  Directly serialize dictionary, interface, hashset and more
+7.  Easily group different fields with box
 
 ### Installation ###
 

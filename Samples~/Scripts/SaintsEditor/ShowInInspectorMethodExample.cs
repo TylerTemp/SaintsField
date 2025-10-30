@@ -18,14 +18,17 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [GetComponentInChildren] public Transform[] childrenTrans;
 
-        private class ClassType
-        {
-            public Transform Value;
-        }
+        [Separator(20)]
+        // ReSharper disable InconsistentNaming
 
-        // class, struct and unity object are supported too
+        [ShowInInspector] private Transform trans;
+
         [ShowInInspector]
-        private ClassType GetClassType(int index) => new ClassType { Value = childrenTrans[(index % childrenTrans.Length + childrenTrans.Length) % childrenTrans.Length] };
+        private Transform GetClassType(int index) =>
+            childrenTrans[(index % childrenTrans.Length + childrenTrans.Length) % childrenTrans.Length];
+
+        [Button]
+        private void S() => trans = transform;
 
         // [ShowInInspector]
         // private ClassType _showTrans;

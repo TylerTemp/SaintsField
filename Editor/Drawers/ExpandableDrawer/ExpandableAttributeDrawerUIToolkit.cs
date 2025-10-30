@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -36,7 +37,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                     width = LabelBaseWidth - IndentWidth,
                 },
                 name = NameFoldout(property),
-                value = property.isExpanded,
+                viewDataKey = property.propertyPath,
                 userData = container,
             };
             Toggle toggle = foldOut.Q<Toggle>();
@@ -145,7 +146,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 }
 
                 // wtf Unity you can not inspect GameObject?
-                foreach (Component comp in go.GetComponents<Component>())
+                foreach ((Component comp, int compIndex) in go.GetComponents<Component>().WithIndex())
                 {
                     VisualElement subContainer = new VisualElement
                     {
@@ -166,6 +167,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                         {
                             marginLeft = 15,
                         },
+                        viewDataKey = $"{property.propertyPath}_{comp}{compIndex}"
                     };
                     InspectorElement inspectorElement = new InspectorElement(comp);
 

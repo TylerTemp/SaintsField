@@ -269,7 +269,7 @@ namespace SaintsField.Editor
                     // if (methodInfoReturnTypeString != memberContainer.ReturnType)
                     if (!TypeStringEqual(methodInfo.ReturnType, memberContainer.ReturnType))
                     {
-                        // Debug.Log($"{memberInfo.Name} not matched return type {methodInfoReturnTypeString}->{memberContainer.ReturnType}, continue");
+                        // Debug.Log($"{memberInfo.Name} not matched return type {methodInfo.ReturnType}->{memberContainer.ReturnType}, continue");
                         continue;
                     }
 
@@ -289,6 +289,7 @@ namespace SaintsField.Editor
                         // if(methodInfoParamTypeString != containerParamTypeString)
                         if(!TypeStringEqual(parameterInfos[paramIndex].ParameterType, memberContainer.Arguments[paramIndex]))
                         {
+                            // Debug.Log($"{memberInfo.Name} [{paramIndex}] not matched argument {parameterInfos[paramIndex].ParameterType} -> {memberContainer.Arguments[paramIndex]}, continue");
                             allMatch = false;
                             break;
                         }
@@ -356,6 +357,13 @@ namespace SaintsField.Editor
                 string prefixDot = $".{str}";
                 // Debug.Log($"Dot: {type} -> {prefixDot}: {type.ToString().EndsWith(prefixDot)}");
                 if (type.ToString().EndsWith(prefixDot))
+                {
+                    return true;
+                }
+
+                string prefixPlus = $"+{str}";
+                // ReSharper disable once ConvertIfStatementToReturnStatement
+                if (type.ToString().EndsWith(prefixPlus))
                 {
                     return true;
                 }
@@ -1229,9 +1237,14 @@ namespace SaintsField.Editor
         {
             foreach (AbsRenderer baseRenderer in makeRenderer.MakeRenderer(serializedObject, fieldWithInfo))
             {
+                // Debug.Log($"baseRenderer={baseRenderer}; id={fieldWithInfo.MemberId}");
                 foreach (SaintsFieldWithRenderer renderer in WrapAroundSaintsRenderer(baseRenderer, fieldWithInfo,
                              serializedObject))
                 {
+                    // if (renderer.Renderer is not EmptyRenderer && renderer.Renderer != null)
+                    // {
+                    //     Debug.Log(renderer.Renderer);
+                    // }
                     yield return renderer;
                 }
             }
@@ -1511,34 +1524,41 @@ namespace SaintsField.Editor
                     yield break;
 
                 case SaintsRenderType.Method:
+                    bool hasRenderer = false;
+                    bool hasLayout = false;
                     foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
                     {
                         if (playaAttribute is IPlayaMethodBindAttribute methodBindAttribute)
                         {
+                            hasRenderer = true;
                             yield return new MethodBindRenderer(methodBindAttribute, serializedObject, fieldWithInfo);
                         }
                         else if (playaAttribute is ButtonAttribute buttonAttribute)
                         {
+                            hasRenderer = true;
                             yield return new ButtonRenderer(buttonAttribute, serializedObject, fieldWithInfo);
                         }
                         else if(playaAttribute is ShowInInspectorAttribute _)
                         {
+                            hasRenderer = true;
                             yield return new RealTimeCalculatorRenderer(serializedObject, fieldWithInfo);
                         }
-                        // ReSharper disable once MergeIntoLogicalPattern
                         else if (playaAttribute is ISaintsLayout)
                         {
-                            yield return new EmptyRenderer();
+                            hasLayout = true;
+                            // yield return new EmptyRenderer();
                         }
+                    }
+
+                    if (hasLayout && !hasRenderer)
+                    {
+                        yield return new EmptyRenderer();
                     }
                     yield break;
                 default:
-                    foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
+                    if (fieldWithInfo.PlayaAttributes.OfType<ISaintsLayout>().Any())
                     {
-                        if (playaAttribute is ISaintsLayout)
-                        {
-                            yield return new EmptyRenderer();
-                        }
+                        yield return new EmptyRenderer();
                     }
                     yield break;
                 // default:
