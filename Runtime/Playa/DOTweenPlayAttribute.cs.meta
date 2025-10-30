@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 8f5ad0edaae04d22a8526f9a72a7c62a
 timeCreated: 1706596655
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Playa/DOTweenPlayAttribute.cs
+  uploadId: 802314

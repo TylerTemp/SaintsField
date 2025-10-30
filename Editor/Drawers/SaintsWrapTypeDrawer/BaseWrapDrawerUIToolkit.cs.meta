@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 4f19ee74cdd44e2c8f095d44a327554a
 timeCreated: 1745490676
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/BaseWrapTypeDrawer/BaseWrapDrawerUIToolkit.cs
+  uploadId: 802314

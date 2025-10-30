@@ -21,15 +21,15 @@ namespace SaintsField.Editor.AutoRunner
 #if !UNITY_2019_4_OR_NEWER
         [ListDrawerSettings]
 #endif
-        [Ordered, ArrayDefaultExpand] public SceneAsset[] sceneList = {};
+        [Ordered, DefaultExpand] public SceneAsset[] sceneList = {};
 
         protected override IEnumerable<SceneAsset> GetSceneList() => sceneList;
 
-        [Ordered, RichLabel("$" + nameof(FolderSearchLabel)), ArrayDefaultExpand, DefaultExpand] public FolderSearch[] folderSearches = {};
+        [Ordered, FieldLabelText("$" + nameof(FolderSearchLabel)), DefaultExpand, FieldDefaultExpand] public FolderSearch[] folderSearches = {};
 
         protected override IEnumerable<FolderSearch> GetFolderSearches() => folderSearches;
 
-        [Ordered, PlayaRichLabel("Extra Resources"), ArrayDefaultExpand, Expandable]
+        [Ordered, LabelText("Extra Resources"), DefaultExpand, Expandable]
         public Object[] extraResources = Array.Empty<Object>();
 
         protected override IEnumerable<Object> GetExtraAssets() => extraResources;
@@ -43,7 +43,7 @@ namespace SaintsField.Editor.AutoRunner
         protected override bool CheckOnValidate() => checkOnValidate;
 
 
-        [Ordered, ReadOnly, ProgressBar(maxCallback: nameof(_resourceTotal)), BelowInfoBox("$" + nameof(_processingMessage))] public int processing;
+        [Ordered, ReadOnly, ProgressBar(maxCallback: nameof(_resourceTotal)), FieldBelowInfoBox("$" + nameof(_processingMessage))] public int processing;
 
         private string _processingMessage;
 
@@ -241,7 +241,7 @@ namespace SaintsField.Editor.AutoRunner
         [LayoutEnd]
 
         // ReSharper disable once UnusedMember.Global
-        [PlayaSeparator(5), PlayaSeparator(EColor.Gray), PlayaSeparator(5)]
+        [Separator(5), Separator(EColor.Gray), Separator(5)]
         [Ordered, AutoRunnerWindowResults] public List<AutoRunnerResult> ShowResults => Results;
 
         public override void OnEditorEnable()

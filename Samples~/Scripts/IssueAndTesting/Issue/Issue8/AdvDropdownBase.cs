@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
 
         [PostFieldButton(nameof(ShowNewValue), "Click")]
         [OnValueChanged(nameof(ShowNewValue))]
-        [AboveRichLabel(nameof(selectIt), true)]
+        [FieldAboveText(nameof(selectIt), true)]
         [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
 
         public AdvancedDropdownList<int> AdvDropdown()

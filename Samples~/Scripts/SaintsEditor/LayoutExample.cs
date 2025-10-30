@@ -118,7 +118,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string hv2Item1;
 
         [Ordered]
-        [Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
+        [Layout("Root/V2/H", ELayout.Horizontal), FieldLabelText(null)]
         public string hv2Item2, hv2Item3;
 
         [Ordered]
@@ -127,12 +127,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [Ordered]
         [Layout("Root/V3", ELayout.Horizontal)]
-        [ResizableTextArea, RichLabel(null)]
+        [ResizableTextArea, FieldLabelText(null)]
         public string hv3Item1, hv3Item2;
 
         [Ordered]
         [Layout("Root/Buggy")]
-        [InfoBox("Sadly, Horizontal is buggy in IMGUI")]
+        [FieldInfoBox("Sadly, Horizontal is buggy in IMGUI")]
         public string buggy = "See below:";
 
         [Ordered]

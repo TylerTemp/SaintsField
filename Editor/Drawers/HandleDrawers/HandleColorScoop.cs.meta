@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ef3486824ec04578815ff77a519691bc
 timeCreated: 1734084329
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/HandleDrawers/HandleColorScoop.cs
+  uploadId: 802314

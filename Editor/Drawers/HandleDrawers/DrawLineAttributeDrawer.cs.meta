@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 97d31d8a14574ecd852051e608491afe
 timeCreated: 1734587112
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/HandleDrawers/DrawLineAttributeDrawer.cs
+  uploadId: 802314

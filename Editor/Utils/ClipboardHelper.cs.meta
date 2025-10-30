@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 5402a3dadd6445a4ad0c62f85163d37a
 timeCreated: 1743065052
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/ClipboardHelper.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: e76f3beee2ee4976bc343f6618fde2d4
 timeCreated: 1698403097
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/DecButtonAttribute.cs
+  uploadId: 802314

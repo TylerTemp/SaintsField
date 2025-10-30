@@ -6,7 +6,7 @@ using UnityEditor;
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue182
 {
 
-    public class Comment2Attribute : BelowRichLabelAttribute
+    public class Comment2Attribute : FieldBelowTextAttribute
     {
         public Comment2Attribute(string comment) : base($"  <color=gray><size=10%>{comment}</size></color>") { }
     }

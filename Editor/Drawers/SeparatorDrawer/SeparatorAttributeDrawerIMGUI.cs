@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             FieldInfo info,
             object parent)
         {
-            SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
+            FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (separatorAttribute.Below)
             {
                 return false;
@@ -60,7 +60,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
+            FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (separatorAttribute.Below)
             {
                 return 0;
@@ -72,7 +72,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
         {
-            SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
+            FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (separatorAttribute.Below)
             {
                 return position;
@@ -93,7 +93,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             FieldInfo info,
             object parent)
         {
-            SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
+            FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (!separatorAttribute.Below)
             {
                 return _error != "";
@@ -130,7 +130,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
+            FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             float errorHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
             if (!separatorAttribute.Below)
             {
@@ -144,7 +144,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGuiPayload, FieldInfo info, object parent)
         {
-            SeparatorAttribute separatorAttribute = (SeparatorAttribute)saintsAttribute;
+            FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (!separatorAttribute.Below)
             {
                 return _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
@@ -164,7 +164,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
         }
 
         private Rect DrawImGui(Rect position, SerializedProperty property, GUIContent label,
-            SeparatorAttribute separatorAttribute, FieldInfo info, object parent)
+            FieldSeparatorAttribute separatorAttribute, FieldInfo info, object parent)
         {
             if (separatorAttribute.Title == null)
             {
@@ -285,7 +285,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
         }
 
         private float GetExtraHeight(SerializedProperty property,
-            SeparatorAttribute separatorAttribute, FieldInfo info, object parent)
+            FieldSeparatorAttribute separatorAttribute, FieldInfo info, object parent)
         {
             (string error, string xml) =
                 RichTextDrawer.GetLabelXml(property, separatorAttribute.Title, separatorAttribute.IsCallback, info,

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
-guid: f8c69c339c88414b838a32f15fc1ed5b
-timeCreated: 1698808693
+guid: 6a9c06b9d2de400ca30964f191bcd6ac
+timeCreated: 1724404612
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Runtime/InfoBoxAttribute.cs
+  uploadId: 0

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 013da77ca6614e1ebacdeb2b34ebd049
 timeCreated: 1739527107
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ExpandableDrawer/ExpandableAttributeDrawerIMGUI.cs
+  uploadId: 802314

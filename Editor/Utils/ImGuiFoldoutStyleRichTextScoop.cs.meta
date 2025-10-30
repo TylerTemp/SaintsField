@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: a81e105f04bc47b987cdb2c07da1d144
 timeCreated: 1726052028
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/ImGuiFoldoutStyleRichTextScoop.cs
+  uploadId: 802314

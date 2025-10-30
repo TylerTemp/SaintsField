@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 0ebbc6ac3e4a455fb8e520cf9c5599bc
 timeCreated: 1742523584
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/ClassSaintsFieldEditingDisabledHide.uss
+  uploadId: 802314

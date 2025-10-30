@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 5b5661ee744b413189b0e0cb1612a17a
 timeCreated: 1701672284
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/EnumToggleButtonsAttribute.cs
+  uploadId: 802314

@@ -6,13 +6,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class ArrayDefaultExpandExample : SaintsMonoBehaviour
     {
-        [ArrayDefaultExpand]
+        [DefaultExpand]
         public string[] arrayDefault;
 
-        [ArrayDefaultExpand]
+        [DefaultExpand]
         public List<string> listDefault;
 
-        [ArrayDefaultExpand, ListDrawerSettings]
+        [DefaultExpand, ListDrawerSettings]
         public string[] arrayDrawer;
 
         [Serializable]
@@ -22,7 +22,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             public int value;
         }
 
-        [ArrayDefaultExpand, Table] public TableStruct[] table;
+        [DefaultExpand, Table] public TableStruct[] table;
 
         private int[] _myInts = new []{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
     }

@@ -4,17 +4,17 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue3
 {
     public class Issue3Problem: MonoBehaviour
     {
-        [RichLabel("<icon=star.png/>")] public string richIcon;
-        [AboveRichLabel("<icon=star.png/>")]
-        [AboveRichLabel("<icon=star.png/>")]
+        [FieldLabelText("<icon=star.png/>")] public string richIcon;
+        [FieldAboveText("<icon=star.png/>")]
+        [FieldAboveText("<icon=star.png/>")]
         public string richAboveIcon;
-        [BelowRichLabel("<icon=star.png/>")]
-        [BelowRichLabel("<icon=star.png/>")]
+        [FieldBelowText("<icon=star.png/>")]
+        [FieldBelowText("<icon=star.png/>")]
         public string richBelowIcon;
 
-        [OverlayRichLabel("<icon=star.png/>")]
+        [OverlayText("<icon=star.png/>")]
         public string richOverlayIcon;
-        [PostFieldRichLabel("<icon=star.png/>")]
+        [EndText("<icon=star.png/>")]
         public string richPostIcon;
 
         [PostFieldButton(nameof(ButtonCallback), "<icon=star.png/>")]

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ba5c2afd03514389828a3c639deda285
 timeCreated: 1744787736
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/OnValueChangedDrawer/OnValueChangedAttributeDrawerIMGUI.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f5744a2689d44c61bedebe60ee8ef73a
 timeCreated: 1726050265
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/IMGUILabelHelper.cs
+  uploadId: 802314

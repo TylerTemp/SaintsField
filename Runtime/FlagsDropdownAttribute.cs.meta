@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 0b31920b3dd641088078ea88b9392438
 timeCreated: 1734685099
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/FlagsDropdownAttribute.cs
+  uploadId: 802314

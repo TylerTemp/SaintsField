@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 09930ebb6c354b1a9240b80c771a2299
 timeCreated: 1736502389
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/XPathDrawers/GetByXPathDrawer/GetByXPathAttributeDrawerPickerWindowIMGUI.cs
+  uploadId: 802314

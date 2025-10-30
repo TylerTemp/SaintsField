@@ -14,12 +14,12 @@ namespace SaintsField.Editor.I2Setup
             window.Show();
         }
 
-        [InfoBox("Please select the root folder of your I2 Localization plugin.")]
+        [FieldInfoBox("Please select the root folder of your I2 Localization plugin.")]
         [Required]
         [AssetFolder("Assets/I2", "Choose your I2 Localization folder")]
         public string i2LocFolder;
 
-        [InfoBox("asmdef file name, must endswith .asmdef")]
+        [FieldInfoBox("asmdef file name, must endswith .asmdef")]
         [ValidateInput(nameof(ValidateAsmdefName))]
         public string i2LocAsdmefName = "I2AsmDef.asmdef";
 

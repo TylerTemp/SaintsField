@@ -24,7 +24,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue200
             public Sub1 sub1;
         }
 
-        [BelowInfoBox("$" + nameof(D)), PostFieldButton(nameof(R))] public string debugHolder;
+        [FieldBelowInfoBox("$" + nameof(D)), PostFieldButton(nameof(R))] public string debugHolder;
 
         // [SaintsRow]
         public MainC mainC;

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 8dd99d015a9a43829b9cca4295d852f8
 timeCreated: 1740710427
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ParticlePlayDrawer/ParticlePlayAttributeDrawerIMGUI.cs
+  uploadId: 802314

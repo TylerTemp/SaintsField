@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 4730b4e566724ef2a8fc565cc77a1d2e
 timeCreated: 1713000845
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/AnimatorStateChanged.cs
+  uploadId: 802314

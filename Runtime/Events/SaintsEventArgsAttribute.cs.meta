@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ad494fab90fe40139b6d398578a769a0
 timeCreated: 1753684104
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Events/SaintsEventArgsAttribute.cs
+  uploadId: 802314

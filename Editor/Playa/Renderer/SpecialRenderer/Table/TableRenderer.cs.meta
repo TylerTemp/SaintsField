@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: a910f123276e4bc8995b7aa88cd1d0e3
 timeCreated: 1739346189
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/SpecialRenderer/Table/TableRenderer.cs
+  uploadId: 802314

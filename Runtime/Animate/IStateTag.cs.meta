@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: f2dda55db19b448b81c4bd7bef6f6a28
 timeCreated: 1712993784
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Animate/IStateTag.cs
+  uploadId: 802314

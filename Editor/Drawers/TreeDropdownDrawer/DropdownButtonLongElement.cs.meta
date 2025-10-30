@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f701e2fe94194c75ac2e5808f95bc2d2
 timeCreated: 1758785517
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/TreeDropdownDrawer/DropdownButtonLongElement.cs
+  uploadId: 802314

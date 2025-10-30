@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
     {
         public bool _complete;
 
-        [PlayaBelowInfoBox("Upload Completed", show: nameof(_complete))]
+        [BelowInfoBox("Upload Completed", show: nameof(_complete))]
         private IEnumerator UploadAndGetExcel()
         {
             _complete = false;

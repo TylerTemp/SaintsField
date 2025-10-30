@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 8e4fc658f62d47a6b939c9e354671bde
 timeCreated: 1738824483
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Addressable/AddressableAddressDrawer/AddressableAddressAttributeDrawerUIToolkit.cs
+  uploadId: 802314

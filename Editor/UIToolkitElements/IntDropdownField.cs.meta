@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 80b183539283406fbb5305928baa72f3
 timeCreated: 1753958981
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/IntDropdownField.cs
+  uploadId: 802314

@@ -34,7 +34,7 @@ namespace SaintsField.Editor.TroubleshootEditor
         private string ProgressLabel() => _inProgress ? "Checking..." : "Done";
 
         [DebugTool.WhichFramework]
-        [Ordered, RichLabel("$" + nameof(ProgressLabel)), ReadOnly, ProgressBar(maxCallback: nameof(_maxCount))]
+        [Ordered, FieldLabelText("$" + nameof(ProgressLabel)), ReadOnly, ProgressBar(maxCallback: nameof(_maxCount))]
         public int progress;
 
         [Serializable]
@@ -57,10 +57,10 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         // [Button("Check")]
         [Ordered]
-        [PlayaInfoBox("$" + nameof(_uObjectMessage))]
-        [PlayaInfoBox("$" + nameof(_uComp))]
-        [PlayaInfoBox("$" + nameof(_uMono))]
-        [PlayaInfoBox("$" + nameof(_uScriptableObject))]
+        [InfoBox("$" + nameof(_uObjectMessage))]
+        [InfoBox("$" + nameof(_uComp))]
+        [InfoBox("$" + nameof(_uMono))]
+        [InfoBox("$" + nameof(_uScriptableObject))]
         private IEnumerator Check()
         {
             _inProgress = true;
@@ -181,13 +181,13 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         private bool NotInProcess => !_inProgress;
 
-        [Ordered, Separator(5), Separator, Separator(5),
+        [Ordered, FieldSeparator(5), FieldSeparator, FieldSeparator(5),
 
-         InfoBox("Please wait the checking process to finish", show: nameof(NotInProcess)),
+         FieldInfoBox("Please wait the checking process to finish", show: nameof(NotInProcess)),
 
          Required("Pick a target to troubleshoot"),
          OnValueChanged(nameof(TroubleShootTargetChanged)),
-         BelowInfoBox("$" + nameof(GetDrawerInfo)),
+         FieldBelowInfoBox("$" + nameof(GetDrawerInfo)),
         ]
         public Object troubleshootTarget;
 
@@ -227,7 +227,7 @@ namespace SaintsField.Editor.TroubleshootEditor
          FieldShowIf(nameof(NeedPickComponent)),
          AdvancedDropdown(nameof(PickComponent)),
          OnValueChanged(nameof(TroubleshootComponentChanged)),
-         BelowInfoBox("$" + nameof(GetDrawerInfo)),
+         FieldBelowInfoBox("$" + nameof(GetDrawerInfo)),
         ]
         public Component troubleshootComponent;
 
@@ -258,7 +258,7 @@ namespace SaintsField.Editor.TroubleshootEditor
          AdvancedDropdown(nameof(PickFieldName)),
          FieldShowIf(nameof(GetTroubleshootSerTarget)), DisableIf(nameof(_inProgress)),
          OnValueChanged(nameof(RunTargetChecker)),
-         BelowInfoBox("$" + nameof(_targetMessage)), BelowInfoBox("$" + nameof(_fieldMessage))]
+         FieldBelowInfoBox("$" + nameof(_targetMessage)), FieldBelowInfoBox("$" + nameof(_fieldMessage))]
         public int field;
 
         private Object GetTroubleshootSerTarget()

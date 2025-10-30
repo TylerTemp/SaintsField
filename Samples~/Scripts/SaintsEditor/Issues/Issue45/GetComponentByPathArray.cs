@@ -6,8 +6,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
 {
     public class GetComponentByPathArray : SaintsMonoBehaviour
     {
-        [GetComponentByPath("*"), PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentByPathArray;
-        [GetComponentByPath("*[1]"), PostFieldRichLabel(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentByPathList;
+        [GetComponentByPath("*"), EndText(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentByPathArray;
+        [GetComponentByPath("*[1]"), EndText(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentByPathList;
 
         private string DummyNumber(Dummy dummy)
         {

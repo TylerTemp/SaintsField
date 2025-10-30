@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts
         {
             [PostFieldButton(nameof(ShowNewValue), "Click")]
             [OnValueChanged(nameof(ShowNewValue))]
-            [AboveRichLabel(nameof(selectIt), true)]
+            [FieldAboveText(nameof(selectIt), true)]
             [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
             [AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdown;
             [ReadOnly][AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdownDisable;

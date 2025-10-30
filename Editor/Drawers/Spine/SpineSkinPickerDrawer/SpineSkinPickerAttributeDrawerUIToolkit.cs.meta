@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 0a11892a53d2425da06936e4bec188f9
 timeCreated: 1739241960
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Spine/SpineSkinPickerDrawer/SpineSkinPickerAttributeDrawerUIToolkit.cs
+  uploadId: 802314

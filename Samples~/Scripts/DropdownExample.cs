@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts
     {
         [SerializeField] private string _label;
 
-        [Dropdown(nameof(GetDropdownItems)), RichLabel(nameof(GetLabel), true)]
+        [Dropdown(nameof(GetDropdownItems)), FieldLabelText(nameof(GetLabel), true)]
         public float floatV;
 
         private string GetLabel() => string.IsNullOrEmpty(_label) ? null : _label;
@@ -26,7 +26,7 @@ namespace SaintsField.Samples.Scripts
 
         public GameObject go1;
         public GameObject go2;
-        [Dropdown(nameof(GetDropdownRefs))][RichLabel("<icon=star.png /><label />")]
+        [Dropdown(nameof(GetDropdownRefs))][FieldLabelText("<icon=star.png /><label />")]
         public GameObject refs;
 
         private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
@@ -95,7 +95,7 @@ namespace SaintsField.Samples.Scripts
 
             // [OnValueChanged(nameof(OnChanged))]
             [Dropdown(nameof(MyStructValues))]
-            [BelowRichLabel(nameof(myInt), true)]
+            [FieldBelowText(nameof(myInt), true)]
             public int myInt;
 
             private DropdownList<int> MyStructValues => new DropdownList<int>
@@ -133,7 +133,7 @@ namespace SaintsField.Samples.Scripts
             public MyStruct[] myStructs;
         }
 
-        [InfoBox("This works fine, but because we use Equal to compare the struct, it will by default not equal, and does not know when it's actually the same struct")]
+        [FieldInfoBox("This works fine, but because we use Equal to compare the struct, it will by default not equal, and does not know when it's actually the same struct")]
         [Dropdown(nameof(MyStructParentDropdown))]
         public MyStructParent nestedStruct;
 
@@ -198,7 +198,7 @@ namespace SaintsField.Samples.Scripts
 
 
         [Dropdown(nameof(ListEnumDropdown))]
-        [RichLabel("$" + nameof(ListEnumLabel))]
+        [FieldLabelText("$" + nameof(ListEnumLabel))]
         public ListEnum[] listEnum;
 
         private DropdownList<ListEnum> ListEnumDropdown()

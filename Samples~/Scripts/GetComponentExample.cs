@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts
         [GetComponent] public Dummy otherScript;  // other script
         [GetComponent] public SpriteRenderer noSuch;  // other script
 
-        [Separator("GetByXPath")]
+        [FieldSeparator("GetByXPath")]
         // alternative
         [GetByXPath(".")] public BoxCollider otherComponentAlternative;
         [GetByXPath(".")] public GameObject selfGameObjectAlternative;  // get the GameObject itself

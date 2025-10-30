@@ -149,7 +149,7 @@ namespace SaintsField.Editor
                 switch (playaClassAttribute)
                 {
 
-                    case PlayaInfoBoxAttribute infoBox:
+                    case InfoBoxAttribute infoBox:
                     {
                         yield return new PlayaInfoBoxRenderer(serializedObject, new SaintsFieldWithInfo
                         {
@@ -166,7 +166,7 @@ namespace SaintsField.Editor
                         }, infoBox);
                     }
                         break;
-                    case PlayaAboveRichLabelAttribute playaAboveRichLabelAttribute:
+                    case AboveTextAttribute playaAboveRichLabelAttribute:
                     {
                         yield return new PlayaFullWidthRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
                         {
@@ -1245,7 +1245,7 @@ namespace SaintsField.Editor
             {
                 switch (playaAttribute)
                 {
-                    case PlayaInfoBoxAttribute playaInfoBoxAttribute:
+                    case InfoBoxAttribute playaInfoBoxAttribute:
                     {
                         PlayaInfoBoxRenderer infoBoxRenderer = new PlayaInfoBoxRenderer(serializedObject, fieldWithInfo, playaInfoBoxAttribute);
 
@@ -1261,7 +1261,7 @@ namespace SaintsField.Editor
                         }
                     }
                         break;
-                    case PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute:
+                    case BelowTextAttribute playaBelowRichLabelAttribute:
                     {
                         PlayaFullWidthRichLabelRenderer playaFullWidthRichLabelRenderer = new PlayaFullWidthRichLabelRenderer(serializedObject, fieldWithInfo, playaBelowRichLabelAttribute);
 
@@ -1277,7 +1277,7 @@ namespace SaintsField.Editor
                         }
                     }
                         break;
-                    case PlayaSeparatorAttribute playaSeparatorAttribute:
+                    case SeparatorAttribute playaSeparatorAttribute:
                     {
                         PlayaSeparatorRenderer separatorRenderer = new PlayaSeparatorRenderer(serializedObject, fieldWithInfo, playaSeparatorAttribute);
                         SaintsFieldWithRenderer separatorFieldWithRenderer =

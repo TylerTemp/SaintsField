@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ef9c621de57a4815aaed14585770c2d3
 timeCreated: 1758789993
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/TreeDropdownDrawer/EnumMetaInfo.cs
+  uploadId: 802314

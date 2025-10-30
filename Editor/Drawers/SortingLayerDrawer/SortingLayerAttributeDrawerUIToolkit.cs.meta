@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 00e53275941a4f46b94a589bd3c17843
 timeCreated: 1743414727
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SortingLayerDrawer/SortingLayerAttributeDrawerUIToolkit.cs
+  uploadId: 802314

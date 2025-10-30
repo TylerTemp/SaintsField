@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 62ea548afeed46bea7ba375fc3097268
 timeCreated: 1712993481
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Animate/IStateSpeed.cs
+  uploadId: 802314

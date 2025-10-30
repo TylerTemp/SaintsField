@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts
         [ShaderParam(0)] public int shaderParamInt;
         [ShaderParam(ShaderPropertyType.Texture)] public int shaderParamFilter;
 
-        [Separator("By Target")]
+        [FieldSeparator("By Target")]
         [GetComponent] public Renderer targetRenderer;
 
         [ShaderParam(nameof(targetRenderer))] public int shaderParamRenderer;
@@ -21,7 +21,7 @@ namespace SaintsField.Samples.Scripts
         private Shader GetShader() => targetRenderer.sharedMaterial.shader;
         [ShaderParam(nameof(GetShader))] public int shaderParamShader;
 
-        [ReadOnly, RichLabel("<icon=star.png/><label/>"), ShaderParam]
+        [ReadOnly, FieldLabelText("<icon=star.png/><label/>"), ShaderParam]
         public string readOnlyField;
 #endif
     }

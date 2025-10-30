@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: bbe5d77f33c24425ab5212d3ecfb4ff8
 timeCreated: 1710401952
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Playa/PlayaDisableIfAttribute.cs
+  uploadId: 802314

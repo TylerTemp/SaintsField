@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: a90c0302500441ec9136440682a48e73
 timeCreated: 1744015861
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/PlayaInfoBoxFakeRenderer/PlayaInfoBoxRenderer.cs
+  uploadId: 0

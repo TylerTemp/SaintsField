@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f6e6c90d2e394b7a8baffcd9e0e8e6d2
 timeCreated: 1738994217
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/I2Loc/LocalizedStringPickerDrawer/LocalizedStringPickerAttributeDrawerUIToolkit.cs
+  uploadId: 802314

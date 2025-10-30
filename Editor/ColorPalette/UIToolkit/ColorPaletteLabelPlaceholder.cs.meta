@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 9057770a208a4c1ea6407421ac77d40d
 timeCreated: 1751270576
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/ColorPalette/UIToolkit/ColorPaletteLabelPlaceholder.cs
+  uploadId: 802314

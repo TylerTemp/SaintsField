@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [Serializable, Flags]
         public enum NamedEnums
         {
-            [RichLabel("--> <color=gray><label />")]
+            [FieldLabelText("--> <color=gray><label />")]
             Tag1  = 1,
             Tag2 = 1 << 1,
             Tag3 = 1 << 2,
@@ -31,7 +31,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         public NamedEnums flagsTreeEnums;
 
         [Conditional("UNITY_EDITOR")]
-        public class GuildLabelAttribute : RichLabelAttribute
+        public class GuildLabelAttribute : FieldLabelTextAttribute
         {
             public GuildLabelAttribute(string label) : base($"{label} <color=gray><label/>")
             {
@@ -46,7 +46,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             Second = 2,
         }
 
-        [DefaultExpand]
+        [FieldDefaultExpand]
         public SaintsDictionary<GuildHintID, GuildHintID> namedEnumDict;
 
     }

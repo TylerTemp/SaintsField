@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting
     public class DupDecImGui : MonoBehaviour
     {
         [SepTitle(EColor.Green)]
-        [InfoBox("one SepTitle")]
+        [FieldInfoBox("one SepTitle")]
         [OnValueChanged(nameof(Changed))]
         [Range(0, 10)]
         public int value;
@@ -14,12 +14,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting
         [Header("One Header")]
         [SepTitle("Two", EColor.Green)]
         [Header("Two Header")]
-        [InfoBox("two SepTitle")]
+        [FieldInfoBox("two SepTitle")]
         [OnValueChanged(nameof(Changed))]
         [Range(0, 10)]
         public int value2;
 
-        [InfoBox("No SepTitle")]
+        [FieldInfoBox("No SepTitle")]
         [OnValueChanged(nameof(Changed))]
         [Range(0, 10)]
         public int value3;

@@ -149,7 +149,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public string XmlContent;
             public EMessageType MessageType;
 
-            public PlayaInfoBoxAttribute InfoBoxAttribute;
+            public InfoBoxAttribute InfoBoxAttribute;
             public SaintsFieldWithInfo FieldWithInfo;
             public RichTextDrawer RichTextDrawer;
         }

@@ -4,13 +4,13 @@ namespace SaintsField.Samples.Scripts
 {
     public class PostFieldRichLabelExample: MonoBehaviour
     {
-        [PostFieldRichLabel("<color=grey>km/s")] public float speed;
-        [PostFieldRichLabel("<icon=eye.png/>", padding: 0)] public Sprite eye;
-        [PostFieldRichLabel("$" + nameof(TakeAGuess))] public int guess;
+        [EndText("<color=grey>km/s")] public float speed;
+        [EndText("<icon=eye.png/>", padding: 0)] public Sprite eye;
+        [EndText("$" + nameof(TakeAGuess))] public int guess;
         // [PostFieldRichLabel(nameof(Error), isCallback: true)] public GameObject errorCallback;
 
         [ReadOnly]
-        [PostFieldRichLabel("<icon=star.png/>", padding: 0)] public Sprite starDisabled;
+        [EndText("<icon=star.png/>", padding: 0)] public Sprite starDisabled;
 
         public string TakeAGuess()
         {

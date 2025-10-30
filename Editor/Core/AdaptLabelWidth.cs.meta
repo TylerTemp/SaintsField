@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 0ebaccaf25374b47ab240da5a031a20c
 timeCreated: 1700450209
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Core/AdaptLabelWidth.cs
+  uploadId: 802314

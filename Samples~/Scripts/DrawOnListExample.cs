@@ -8,15 +8,15 @@ namespace SaintsField.Samples.Scripts
         [System.Serializable]
         public class SimpleObject
         {
-            [RichLabel("Dec")] public string myDecString;
+            [FieldLabelText("Dec")] public string myDecString;
             public string myNormalString;
-            [field: SerializeField, RichLabel(null), Scene]
+            [field: SerializeField, FieldLabelText(null), Scene]
             public List<string> mySubStrings { get; private set; }
 
             public List<string> myNoDecStrings;
         }
 
-        [field: SerializeField, AboveRichLabel("This will go on every element :(")]
+        [field: SerializeField, FieldAboveText("This will go on every element :(")]
         public List<SimpleObject> myArrField2 { get; private set; }
 
         // [System.Serializable]

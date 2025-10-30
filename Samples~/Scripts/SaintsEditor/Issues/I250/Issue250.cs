@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.I250
             [SerializeField, Expandable] private SearchObj1 _searchObj;
         }
 
-        [ListDrawerSettings(searchable: true), RichLabel("<field._searchObj.name /> <color=gray><index=[{0:D3}]/>")] public SearchListItem[] loopedRefs;
+        [ListDrawerSettings(searchable: true), FieldLabelText("<field._searchObj.name /> <color=gray><index=[{0:D3}]/>")] public SearchListItem[] loopedRefs;
 
     }
 }

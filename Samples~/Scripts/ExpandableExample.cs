@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts
     {
         [SerializeField]
         // [ReadOnly]
-        [InfoBox("Hi")]
+        [FieldInfoBox("Hi")]
         [Expandable, GetScriptableObject]
         private Scriptable _scriptable;
 

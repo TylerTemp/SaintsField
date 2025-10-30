@@ -10,33 +10,33 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             Neg3,
             Neg2,
             Neg1,
-            [RichLabel("0")]
+            [FieldLabelText("0")]
             Zero,
 
-            [RichLabel("Single/1")]
+            [FieldLabelText("Single/1")]
             One,
-            [RichLabel("Plural/2")]
+            [FieldLabelText("Plural/2")]
             Two,
-            [RichLabel("Plural/3")]
+            [FieldLabelText("Plural/3")]
             Three,
-            [RichLabel("Few/4")]
+            [FieldLabelText("Few/4")]
             Four,
-            [RichLabel("Few/5")]
+            [FieldLabelText("Few/5")]
             Five,
-            [RichLabel("Few/6")]
+            [FieldLabelText("Few/6")]
             Sex,
-            [RichLabel("Few/7")]
+            [FieldLabelText("Few/7")]
             Seven,
         }
 
         public EnumNormal enumNormalPure;
 
-        [BelowRichLabel("<color=gray><field/>")]
+        [FieldBelowText("<color=gray><field/>")]
         public EnumNormal enumNormalFall;
 
         public EnumNormal[] enumNormalPures;
 
-        [BelowRichLabel("<color=gray><field/>")]
+        [FieldBelowText("<color=gray><field/>")]
         public EnumNormal[] enumNormalFalls;
 
         [Serializable, Flags]
@@ -47,23 +47,23 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             Bottom = 1 << 2,
             Left = 1 << 3,
 
-            [RichLabel("Group/TopLeft")]
+            [FieldLabelText("Group/TopLeft")]
             TopLeft = Top | Left,
-            [RichLabel("Group/TopRight")]
+            [FieldLabelText("Group/TopRight")]
             TopRight = Top | Right,
-            [RichLabel("Group/BottomRight")]
+            [FieldLabelText("Group/BottomRight")]
             BottomRight = Bottom | Right,
-            [RichLabel("Group/BottomLeft")]
+            [FieldLabelText("Group/BottomLeft")]
             BottomLeft = Bottom | Left,
         }
 
         public EnumFlags enumFlagsPure;
-        [BelowRichLabel("<color=gray><field=B/>")]
-        [BelowRichLabel("<color=gray><field=B4/>")]
+        [FieldBelowText("<color=gray><field=B/>")]
+        [FieldBelowText("<color=gray><field=B4/>")]
         public EnumFlags enumFlagsDec;
 
         public EnumFlags[] enumFlagsPures;
-        [BelowRichLabel("<color=gray><field=B/>")]
+        [FieldBelowText("<color=gray><field=B/>")]
         public EnumFlags[] enumFlagsDecs;
     }
 }

@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class FieldTypeExample: MonoBehaviour
     {
-        [SerializeField, FieldType(typeof(Dummy))][RichLabel("<icon=star.png /><label />")]
+        [SerializeField, FieldType(typeof(Dummy))][FieldLabelText("<icon=star.png /><label />")]
         private GameObject _go;
 
         [SerializeField, FieldType(typeof(SpriteRenderer))]

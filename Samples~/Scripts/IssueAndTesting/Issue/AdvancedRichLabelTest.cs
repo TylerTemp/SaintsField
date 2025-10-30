@@ -25,21 +25,21 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         [Serializable]
         public enum MyEnum
         {
-            [RichLabel("<color=red>Root</color> Option/1")]
+            [FieldLabelText("<color=red>Root</color> Option/1")]
             E1,
-            [RichLabel("<color=red>Root</color> Option/<color=brown>2")]
+            [FieldLabelText("<color=red>Root</color> Option/<color=brown>2")]
             E2,
-            [RichLabel("<color=red>Root</color> Option/3")]
+            [FieldLabelText("<color=red>Root</color> Option/3")]
             E3,
-            [RichLabel("<color=lime>Sub/1")]
+            [FieldLabelText("<color=lime>Sub/1")]
             E4,
-            [RichLabel("<color=lime>Sub/<b>2</b>")]
+            [FieldLabelText("<color=lime>Sub/<b>2</b>")]
             E5,
-            [RichLabel("<color=lime>Sub/3")]
+            [FieldLabelText("<color=lime>Sub/3")]
             E6,
-            [RichLabel("<color=lime>Sub/<color=blue>4")]
+            [FieldLabelText("<color=lime>Sub/<color=blue>4")]
             E7,
-            [RichLabel("<color=lime>Sub/5")]
+            [FieldLabelText("<color=lime>Sub/5")]
             E8,
         }
 

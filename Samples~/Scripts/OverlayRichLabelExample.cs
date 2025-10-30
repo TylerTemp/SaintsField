@@ -4,17 +4,17 @@ namespace SaintsField.Samples.Scripts
 {
     public class OverlayRichLabelExample: MonoBehaviour
     {
-        [OverlayRichLabel("<color=grey>km/s")] public double speed = double.MinValue;
-        [OverlayRichLabel("<icon=eye.png/>")] public string text;
-        [OverlayRichLabel("<color=grey>/int")] public int count = int.MinValue;
-        [OverlayRichLabel("<color=grey>/long")] public long longInt = long.MinValue;
-        [OverlayRichLabel("<color=grey>suffix", end: true)] public string atEnd;
-        [OverlayRichLabel("$" + nameof(TakeAGuess))] public int guess;
+        [OverlayText("<color=grey>km/s")] public double speed = double.MinValue;
+        [OverlayText("<icon=eye.png/>")] public string text;
+        [OverlayText("<color=grey>/int")] public int count = int.MinValue;
+        [OverlayText("<color=grey>/long")] public long longInt = long.MinValue;
+        [OverlayText("<color=grey>suffix", end: true)] public string atEnd;
+        [OverlayText("$" + nameof(TakeAGuess))] public int guess;
         [Space]
-        [OverlayRichLabel("not ok", end: true)] public GameObject notSupported;
+        [OverlayText("not ok", end: true)] public GameObject notSupported;
 
         [ReadOnly]
-        [OverlayRichLabel("<icon=eye.png/>", padding: 1)] public string textDisabled;
+        [OverlayText("<icon=eye.png/>", padding: 1)] public string textDisabled;
 
         public string TakeAGuess()
         {

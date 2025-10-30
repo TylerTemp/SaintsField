@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 72d9fd097f6a43449e34c9078b4b3bbb
 timeCreated: 1710486227
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/SaintsObjectPickerWindow/SaintsObjectPickerWindowIMGUI.cs
+  uploadId: 802314

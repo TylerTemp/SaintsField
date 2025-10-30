@@ -23,7 +23,7 @@ namespace SaintsField.Samples.Scripts.SaintsRowExamples
             [ListDrawerSettings(
                 searchable: true
                 , numberOfItemsPerPage: 3
-            ), PlayaRichLabel("<color=green><icon=star.png/><label/>")]
+            ), LabelText("<color=green><icon=star.png/><label/>")]
             public MyData[] myDataArr;
 
             public string below;

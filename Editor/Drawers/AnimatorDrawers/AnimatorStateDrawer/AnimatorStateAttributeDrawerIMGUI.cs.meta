@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 55b2aae45ebd4fb4aea298b6c0478ef5
 timeCreated: 1737515727
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/AnimatorDrawers/AnimatorStateDrawer/AnimatorStateAttributeDrawerIMGUI.cs
+  uploadId: 802314

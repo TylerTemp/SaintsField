@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: a9f7c9aee07c4323a24bf831e4a7c622
 timeCreated: 1700548357
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/InputAxisAttribute.cs
+  uploadId: 802314

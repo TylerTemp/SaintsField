@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 3e27a88aef9a46318495bc9b8855704b
 timeCreated: 1754562112
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/TreeDropdownDrawer/TreeDropdownAttributeDrawerUIToolkit.cs
+  uploadId: 802314

@@ -16,7 +16,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue45
             }
         }
 
-        [GetScriptableObject, PostFieldRichLabel(nameof(DummyNumberI), isCallback: true)]
+        [GetScriptableObject, EndText(nameof(DummyNumberI), isCallback: true)]
         public GeneralInterface[] getSoIArray;
 
         // [GetScriptableObject, PostFieldRichLabel(nameof(DummyNumberG), isCallback: true)]

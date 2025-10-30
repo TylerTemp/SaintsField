@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ca657abeba5b4aff873597ba442f2f32
 timeCreated: 1692958269
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Core/RichTextDrawer.cs
+  uploadId: 802314

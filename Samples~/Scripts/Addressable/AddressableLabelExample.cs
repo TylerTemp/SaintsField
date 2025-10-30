@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.Addressable
     public class AddressableLabelExample : MonoBehaviour
     {
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
-        [AddressableLabel][RichLabel("<icon=star.png /><label />")]
+        [AddressableLabel][FieldLabelText("<icon=star.png /><label />")]
 #else
         [InfoBox("Please install Addressable to see this feature.", EMessageType.Error)]
 #endif
@@ -17,7 +17,7 @@ namespace SaintsField.Samples.Scripts.Addressable
         [ReadOnly]
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
         [AddressableLabel]
-        [RichLabel("<icon=star.png /><label />")]
+        [FieldLabelText("<icon=star.png /><label />")]
 #else
         [InfoBox("Please install Addressable to see this feature.", EMessageType.Error)]
 #endif

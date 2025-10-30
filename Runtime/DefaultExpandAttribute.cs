@@ -1,15 +1,14 @@
 using System;
 using System.Diagnostics;
-using SaintsField.Interfaces;
-using UnityEngine;
+using SaintsField.Playa;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class DefaultExpandAttribute: PropertyAttribute, ISaintsAttribute
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
+    public class DefaultExpandAttribute: Attribute, IPlayaAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
-        public string GroupBy => "";
+
     }
 }

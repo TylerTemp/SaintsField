@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 2364a584ddbc4369b8bc23cc2b608a76
 timeCreated: 1695723836
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Utils/Colors.cs
+  uploadId: 802314

@@ -154,7 +154,7 @@ namespace SaintsField.Editor.Core
             // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
             if (string.IsNullOrEmpty(GetPreferredLabel(property)))
             {
-                SaintsPropertyDrawers.RemoveAll(each => each.Attribute is RichLabelAttribute rl && string.IsNullOrEmpty(rl.RichTextXml));
+                SaintsPropertyDrawers.RemoveAll(each => each.Attribute is FieldLabelTextAttribute rl && string.IsNullOrEmpty(rl.RichTextXml));
 
                 NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
 
@@ -200,7 +200,7 @@ namespace SaintsField.Editor.Core
                 }
                 else if (SaintsPropertyDrawers.Any(each => each.Drawer is SaintsRowAttributeDrawer
                                                            || each.Attribute is NoLabelAttribute
-                                                           || (each.Attribute is RichLabelAttribute rl &&
+                                                           || (each.Attribute is FieldLabelTextAttribute rl &&
                                                                string.IsNullOrEmpty(rl.RichTextXml))))
                 {
                     needAboveProcessor = false;
@@ -232,7 +232,7 @@ namespace SaintsField.Editor.Core
                 bool alreadyHasNoLabel = false;
                 foreach ((SaintsPropertyInfo saintsPropertyInfo, int index) in SaintsPropertyDrawers.WithIndex())
                 {
-                    if (saintsPropertyInfo.Attribute is RichLabelAttribute richLabel)
+                    if (saintsPropertyInfo.Attribute is FieldLabelTextAttribute richLabel)
                     {
                         if (string.IsNullOrEmpty(richLabel.RichTextXml))
                         {
@@ -241,8 +241,8 @@ namespace SaintsField.Editor.Core
                         else
                         {
                             alreadyHasRichLabel = true;
-                            AboveRichLabelAttribute aboveRichLabelAttribute =
-                                new AboveRichLabelAttribute(richLabel.RichTextXml, richLabel.IsCallback);
+                            FieldAboveTextAttribute aboveRichLabelAttribute =
+                                new FieldAboveTextAttribute(richLabel.RichTextXml, richLabel.IsCallback);
 
                             FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
                                 (FullWidthRichLabelAttributeDrawer)
@@ -273,9 +273,9 @@ namespace SaintsField.Editor.Core
 
                 if (!alreadyHasRichLabel)
                 {
-                    AboveRichLabelAttribute aboveRichLabelAttribute =
+                    FieldAboveTextAttribute aboveRichLabelAttribute =
                         // ReSharper disable once RedundantArgumentDefaultValue
-                        new AboveRichLabelAttribute("<label />");
+                        new FieldAboveTextAttribute("<label />");
 
                     FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
                         (FullWidthRichLabelAttributeDrawer)

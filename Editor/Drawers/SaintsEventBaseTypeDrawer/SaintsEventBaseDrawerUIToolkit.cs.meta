@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 89c7cf60c62f461f829116c331484d76
 timeCreated: 1752461134
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SaintsEventBaseTypeDrawer/SaintsEventBaseDrawerUIToolkit.cs
+  uploadId: 802314

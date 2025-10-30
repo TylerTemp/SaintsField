@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: a0705a1cf2b84889aa14beb70427cdf8
 timeCreated: 1703751621
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Playa/ShowInInspectorAttribute.cs
+  uploadId: 802314

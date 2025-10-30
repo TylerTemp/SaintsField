@@ -24,7 +24,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [LayoutStart("./Upper Body", ELayout.TitleBox)]
 
-        [PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
+        [InfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
 
         [LayoutStart("./Horizontal", ELayout.Horizontal)]
 
@@ -36,15 +36,15 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [LayoutStart("../Right Hand", ELayout.TitleBox)]
         public string g21;
-        [RichLabel("<color=lime><label/>")]
+        [FieldLabelText("<color=lime><label/>")]
         public string g22;
-        [RichLabel("$" + nameof(g22))]
+        [FieldLabelText("$" + nameof(g22))]
         public string[] g23;
 
         public bool toggle;
 
         [LayoutEnd]
-        [PlayaInfoBox("Buttons!")]
+        [InfoBox("Buttons!")]
         [LayoutStart("Buttons", ELayout.Horizontal)]
         [Button]
         public void B1(string strV, bool bv, Vector2 v2)

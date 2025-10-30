@@ -11,22 +11,22 @@ namespace SaintsField.Utils
         public const int UpdateLoopDefaultMs = 100;
 
         [DebugTool.WhichFramework]
-        [Separator(10)]
+        [FieldSeparator(10)]
 
-        [InfoBox("The minimum row of resizable text area", EMessageType.None)]
+        [FieldInfoBox("The minimum row of resizable text area", EMessageType.None)]
         [MinValue(1)] public int resizableTextAreaMinRow = 3;
 
-        [InfoBox("Should the ValidateInput use loop check? <color=green><b>(UI Toolkit)")]
+        [FieldInfoBox("Should the ValidateInput use loop check? <color=green><b>(UI Toolkit)")]
         public bool validateInputLoopCheckUIToolkit = ValidateInputLoopCheckDefault;
         public const bool ValidateInputLoopCheckDefault = false;
 
         [Space]
 
-        [InfoBox("UI Toolkit: Aggressive OnValueChanged watcher\n\nThis allows UI Toolkit to monitor changes inside fields of `SerializedReference` or a `Serializable` generic class. In some Unity versions, if the target is an array/list of SerializedReferences, it will give errors when removing an item from the list. Set it to `true` if you faces the error when removing items from list", EMessageType.None)]
+        [FieldInfoBox("UI Toolkit: Aggressive OnValueChanged watcher\n\nThis allows UI Toolkit to monitor changes inside fields of `SerializedReference` or a `Serializable` generic class. In some Unity versions, if the target is an array/list of SerializedReferences, it will give errors when removing an item from the list. Set it to `true` if you faces the error when removing items from list", EMessageType.None)]
         [LeftToggle] public bool disableOnValueChangedWatchArrayFieldUIToolkit;
 
         [Space]
-        [InfoBox("IMGUI: Space for foldout. If you see overlap in expandable, set this value to 13, otherwise 0")]
+        [FieldInfoBox("IMGUI: Space for foldout. If you see overlap in expandable, set this value to 13, otherwise 0")]
         [MinValue(0)] public int foldoutSpaceImGui = FoldoutSpaceImGuiDefault;
         public const int FoldoutSpaceImGuiDefault = 13;
 
@@ -66,19 +66,19 @@ namespace SaintsField.Utils
 
         // [Space]
 
-        [EnumToggleButtons, DefaultExpand] public EXP getComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumToggleButtons, DefaultExpand] public EXP getComponentInChildrenExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumToggleButtons, DefaultExpand] public EXP getComponentInParentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumToggleButtons, DefaultExpand] public EXP getComponentInParentsExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumToggleButtons, DefaultExpand] public EXP getComponentInSceneExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumToggleButtons, DefaultExpand] public EXP getPrefabWithComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumToggleButtons, DefaultExpand] public EXP getScriptableObjectExp = EXP.NoPicker | EXP.NoAutoResignToNull;
-        [EnumToggleButtons, DefaultExpand] public EXP getByXPathExp = EXP.None;
+        [EnumToggleButtons, FieldDefaultExpand] public EXP getComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, FieldDefaultExpand] public EXP getComponentInChildrenExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, FieldDefaultExpand] public EXP getComponentInParentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, FieldDefaultExpand] public EXP getComponentInParentsExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, FieldDefaultExpand] public EXP getComponentInSceneExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, FieldDefaultExpand] public EXP getPrefabWithComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, FieldDefaultExpand] public EXP getScriptableObjectExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [EnumToggleButtons, FieldDefaultExpand] public EXP getByXPathExp = EXP.None;
 
         [LayoutStart("./Deprecated", ELayout.CollapseBox)]
-        [InfoBox("Deprecated", EMessageType.Warning)]
-        [EnumToggleButtons, DefaultExpand] public EXP getComponentByPathExp = EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker;
-        [InfoBox("Deprecated", EMessageType.Warning)]
-        [EnumToggleButtons, DefaultExpand] public EXP findComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
+        [FieldInfoBox("Deprecated", EMessageType.Warning)]
+        [EnumToggleButtons, FieldDefaultExpand] public EXP getComponentByPathExp = EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker;
+        [FieldInfoBox("Deprecated", EMessageType.Warning)]
+        [EnumToggleButtons, FieldDefaultExpand] public EXP findComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
     }
 }

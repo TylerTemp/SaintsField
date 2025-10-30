@@ -29,12 +29,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             [OnValueChanged(nameof(Log))]
             public Toggle toggle;
 
-            [BelowRichLabel(nameof(toggle), true)]
-            [AboveRichLabel(nameof(toggle), true)]
-            [RichLabel(nameof(toggle), true)]
-            [OverlayRichLabel(nameof(toggle), true)]
-            [PostFieldRichLabel(nameof(toggle), true)]
-            [InfoBox(nameof(toggle), true)]
+            [FieldBelowText(nameof(toggle), true)]
+            [FieldAboveText(nameof(toggle), true)]
+            [FieldLabelText(nameof(toggle), true)]
+            [OverlayText(nameof(toggle), true)]
+            [EndText(nameof(toggle), true)]
+            [FieldInfoBox(nameof(toggle), true)]
             [AboveButton(nameof(Log), nameof(toggle), true)]
             [BelowButton(nameof(Log), nameof(toggle), true)]
             [PostFieldButton(nameof(Log), nameof(toggle), true)]

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 3cb968bc12fc4260a43b09657e805e0e
 timeCreated: 1753179089
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Events/InvokableCall`3.cs
+  uploadId: 802314

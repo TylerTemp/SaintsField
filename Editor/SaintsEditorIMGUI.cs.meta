@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: d50dfeaaf90645ea9462a5e507c17a94
 timeCreated: 1735120247
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/SaintsEditorIMGUI.cs
+  uploadId: 802314

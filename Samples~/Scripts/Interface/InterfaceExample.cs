@@ -46,13 +46,13 @@ namespace SaintsField.Samples.Scripts.Interface
         }
 
         public Interface1 myInherentInterface1;
-        [RichLabel("<label />")]
+        [FieldLabelText("<label />")]
         public Interface1[] myInherentInterface1Lis;
 
         public SaintsInterface<Component, IInterface2> myInter2;
         public SaintsInterface<ScriptableObject, IInterface2> mySoInter2;
 
-        [RichLabel("<color=green><label/>")]
+        [FieldLabelText("<color=green><label/>")]
         public SaintsInterface<UnityEngine.Object, IInterface2> myAnyInter2;
 
         private void Awake()

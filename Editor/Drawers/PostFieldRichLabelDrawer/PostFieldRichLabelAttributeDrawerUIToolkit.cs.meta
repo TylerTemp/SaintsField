@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 89d15ddec2bb4f2b9b9f156d0ef29952
 timeCreated: 1742985245
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/PostFieldRichLabelDrawer/PostFieldRichLabelAttributeDrawerUIToolkit.cs
+  uploadId: 802314

@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
     {
         [LayoutStart("Main", ELayout.Horizontal | ELayout.TitleBox)]
 
-        [PlayaInfoBox("This is the main section")]
+        [InfoBox("This is the main section")]
 
         [LayoutStart("./1")]
 

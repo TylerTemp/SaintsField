@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 47b4b0bc67394d08862d7181d30b55a4
 timeCreated: 1734591711
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/GUIColor/GUIColorAttributeDrawerUIToolkit.cs
+  uploadId: 802314

@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
     {
         [SerializeField] private string label;
 
-        [Dropdown(nameof(GetDropdownItems)), RichLabel(nameof(GetLabel), true)]
+        [Dropdown(nameof(GetDropdownItems)), FieldLabelText(nameof(GetLabel), true)]
         public float floatV;
 
         private string GetLabel() => string.IsNullOrEmpty(label) ? null : label;

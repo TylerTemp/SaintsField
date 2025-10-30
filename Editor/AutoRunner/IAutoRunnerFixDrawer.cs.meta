@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: b91c07c84c9046879754651c6c5693f8
 timeCreated: 1735896979
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/AutoRunner/IAutoRunnerFixDrawer.cs
+  uploadId: 802314

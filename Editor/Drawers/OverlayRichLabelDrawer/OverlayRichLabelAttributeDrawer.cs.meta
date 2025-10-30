@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 71d3b4d440b345bc92677faf3c5330c8
 timeCreated: 1701245119
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/OverlayRichLabelDrawer/OverlayRichLabelAttributeDrawer.cs
+  uploadId: 802314

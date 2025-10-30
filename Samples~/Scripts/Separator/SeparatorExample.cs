@@ -6,25 +6,25 @@ namespace SaintsField.Samples.Scripts.Separator
     {
         [Space(50)]
 
-        [Separator("Start")]
-        [Separator("Center", EAlign.Center)]
-        [Separator("End", EAlign.End)]
-        [BelowSeparator("$" + nameof(Callback))]
+        [FieldSeparator("Start")]
+        [FieldSeparator("Center", EAlign.Center)]
+        [FieldSeparator("End", EAlign.End)]
+        [FieldBelowSeparator("$" + nameof(Callback))]
         public string s3;
         public string Callback() => s3;
 
         [Space(50)]
 
-        [Separator]
+        [FieldSeparator]
         public string s1;
 
-        [Separator(10)]  // this behaves like a space
-        [Separator("[ Hi <color=LightBlue>Above</color> ]", EColor.Aqua, EAlign.Center)]
-        [BelowSeparator("[ Hi <color=Silver>Below</color> ]", EColor.Brown, EAlign.Center)]
-        [BelowSeparator(10)]
+        [FieldSeparator(10)]  // this behaves like a space
+        [FieldSeparator("[ Hi <color=LightBlue>Above</color> ]", EColor.Aqua, EAlign.Center)]
+        [FieldBelowSeparator("[ Hi <color=Silver>Below</color> ]", EColor.Brown, EAlign.Center)]
+        [FieldBelowSeparator(10)]
         public string hi;
 
-        [BelowSeparator]
+        [FieldBelowSeparator]
         public string s2;
     }
 }

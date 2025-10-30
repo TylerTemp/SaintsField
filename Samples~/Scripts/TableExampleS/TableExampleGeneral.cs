@@ -53,7 +53,7 @@ namespace SaintsField.Samples.Scripts.TableExampleS
 
         private void SizeChanged(List<MyStruct> newLis) => Debug.Log(newLis.Count);
 
-        [ArrayDefaultExpand, Table] public MyStruct[] defaultExpanded2;
-        [ArrayDefaultExpand, Table(hideAddButton: true, hideRemoveButton: true)] public MyStruct[] hideButtons;
+        [DefaultExpand, Table] public MyStruct[] defaultExpanded2;
+        [DefaultExpand, Table(hideAddButton: true, hideRemoveButton: true)] public MyStruct[] hideButtons;
     }
 }

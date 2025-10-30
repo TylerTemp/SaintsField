@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: b1b8544ad1f1424183b577090d534b3c
 timeCreated: 1748587372
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SceneViewPickerDrawer/SceneViewPickerAttributeDrawerIMGUI.cs
+  uploadId: 802314

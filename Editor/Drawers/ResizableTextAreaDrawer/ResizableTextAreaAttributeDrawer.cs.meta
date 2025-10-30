@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 3cb2cd49d2b7413bb057fa7fc177a385
 timeCreated: 1698740308
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ResizableTextAreaDrawer/ResizableTextAreaAttributeDrawer.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 1cd48f50fb684e7ebb89dde538154748
 timeCreated: 1710317027
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/VisibilityDrawers/HideIfAttributeDrawer.cs
+  uploadId: 802314

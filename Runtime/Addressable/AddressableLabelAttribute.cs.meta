@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 216915ec91a64d0f96b53ccaa05d6543
 timeCreated: 1702882477
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Addressable/AddressableLabelAttribute.cs
+  uploadId: 802314

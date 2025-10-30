@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: e67d61730d6348daadefb573625ea212
 timeCreated: 1734588497
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/ArrowHandleCapAttribute.cs
+  uploadId: 802314

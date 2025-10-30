@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 7bd5ee9add8a4f21aab8929eefb8db59
 timeCreated: 1703144674
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/AdvancedDropdownDrawer/AdvancedDropdownAttributeDrawer.cs
+  uploadId: 802314

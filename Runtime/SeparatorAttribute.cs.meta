@@ -1,11 +1,10 @@
 fileFormatVersion: 2
-guid: 93d3608633361804aa02e8fc8e70176b
-MonoImporter:
-  externalObjects: {}
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+guid: c83b50669f2b4b04b7a062d0ed312573
+timeCreated: 1744115980
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Runtime/SeparatorAttribute.cs
+  uploadId: 0

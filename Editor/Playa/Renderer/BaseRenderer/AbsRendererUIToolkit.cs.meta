@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: cdfd48a7f184429089915539ab767c3e
 timeCreated: 1736008087
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/Playa/Renderer/BaseRenderer/AbsRendererUIToolkit.cs
+  uploadId: 0

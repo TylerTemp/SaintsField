@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: b3d407cde6a041329a7bcb7525854934
 timeCreated: 1709190747
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/UnityTextInputElementWarning.uss
+  uploadId: 802314

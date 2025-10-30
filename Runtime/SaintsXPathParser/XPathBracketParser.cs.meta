@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: d25d97f67bb94c3f9b1e76248eb1fdae
 timeCreated: 1726568614
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/SaintsXPathParser/XPathBracketParser.cs
+  uploadId: 802314

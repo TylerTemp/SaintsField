@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 1a6aba0f24bb4546874958e68f970dbf
 timeCreated: 1735271841
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/CustomPicker/RequireTypeDrawer/RequireTypeAttributeDrawerUIToolkit.cs
+  uploadId: 802314

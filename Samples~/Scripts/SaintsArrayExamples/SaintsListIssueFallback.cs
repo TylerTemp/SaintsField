@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts.SaintsArrayExamples
 {
     public class SaintsListIssueFallback : MonoBehaviour
     {
-        [RichLabel("<color=cyan><label /><icon=star.png />"), BelowRichLabel("Hi")]
+        [FieldLabelText("<color=cyan><label /><icon=star.png />"), FieldBelowText("Hi")]
         public SaintsList<GameObject> noAttrFallback;
     }
 }

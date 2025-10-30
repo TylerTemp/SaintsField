@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 35dd0375619e4cdabd4f61b2f91a0191
 timeCreated: 1702630076
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/LeftToggleAttribute.cs
+  uploadId: 802314

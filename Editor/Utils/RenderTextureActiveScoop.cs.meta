@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 338bef515ab84b0db0f8058b984a6dc4
 timeCreated: 1703644796
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/RenderTextureActiveScoop.cs
+  uploadId: 802314

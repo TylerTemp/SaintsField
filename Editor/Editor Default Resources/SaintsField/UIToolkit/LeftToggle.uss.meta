@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 65d822e9b1f6421b9b427c5cb1c5794f
 timeCreated: 1712285705
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/LeftToggle.uss
+  uploadId: 802314

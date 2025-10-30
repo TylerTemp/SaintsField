@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: e67509504b714459acf5c9d364d963a6
 timeCreated: 1708595233
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/EGetComp.cs
+  uploadId: 802314

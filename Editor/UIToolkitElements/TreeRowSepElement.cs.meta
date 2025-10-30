@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: ed3af80b97cd43998711092c861f31fe
 timeCreated: 1755845389
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/TreeRowSepElement.cs
+  uploadId: 802314

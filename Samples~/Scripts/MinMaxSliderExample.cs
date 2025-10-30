@@ -45,10 +45,10 @@ namespace SaintsField.Samples.Scripts
         [MinMaxSlider(-1f, 3f, 0.3f)]
         public Vector2 vector2Step03Disabled;
 
-        [Separator("Free")]
+        [FieldSeparator("Free")]
 
         [MinMaxSlider(-5, 5, free: true)] public Vector2Int freeInt;
-        [MinMaxSlider(-5, 5, free: true), BelowRichLabel("$" + nameof(freeFloat))] public Vector2 freeFloat;
+        [MinMaxSlider(-5, 5, free: true), FieldBelowText("$" + nameof(freeFloat))] public Vector2 freeFloat;
 
         [MinMaxSlider(-5, 6, step: 2, free: true), BelowButton(nameof(C))] public Vector2Int stepInt;
         [MinMaxSlider(-5, 6, step: 0.5f, free: true)] public Vector2 stepFloat;
@@ -64,8 +64,8 @@ namespace SaintsField.Samples.Scripts
         [MinMaxSlider(nameof(freeMin), nameof(freeMax), step: 0.2f, free: true)] public Vector2 freeMinMax;
         [MinMaxSlider(nameof(freeMin), nameof(freeMax), step: 0.2f)] public Vector2 nonFreeMinMax;
 
-        [MinMaxSlider(0, 10, free: true), BelowRichLabel("$" + nameof(freeInput))] public Vector2 freeInput;
-        [MinMaxSlider(0, 10, free: true), BelowRichLabel("$" + nameof(freeInputInt))] public Vector2Int freeInputInt;
+        [MinMaxSlider(0, 10, free: true), FieldBelowText("$" + nameof(freeInput))] public Vector2 freeInput;
+        [MinMaxSlider(0, 10, free: true), FieldBelowText("$" + nameof(freeInputInt))] public Vector2Int freeInputInt;
 
         [MinMaxSlider(0, 1f)] public float incorrectType;
     }

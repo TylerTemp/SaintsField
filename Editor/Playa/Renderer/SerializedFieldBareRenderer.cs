@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Playa.Renderer
     {
         public SerializedFieldBareRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
-            if (fieldWithInfo.PlayaAttributes.Any(each => each is ArrayDefaultExpandAttribute))
+            if (fieldWithInfo.PlayaAttributes.Any(each => each is DefaultExpandAttribute))
             {
                 fieldWithInfo.SerializedProperty.isExpanded = true;
             }

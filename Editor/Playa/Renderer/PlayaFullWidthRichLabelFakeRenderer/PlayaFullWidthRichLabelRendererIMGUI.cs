@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             return GetTextHeightIMGUI(width, _playaBelowRichLabelAttribute);
         }
 
-        private float GetTextHeightIMGUI(float width, PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute)
+        private float GetTextHeightIMGUI(float width, BelowTextAttribute playaBelowRichLabelAttribute)
         {
             (string error, string content) = GetLabelRawContent(FieldWithInfo, playaBelowRichLabelAttribute);
             if (error != "")
@@ -130,7 +130,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             }
         }
 
-        private static (string error, string content) GetLabelRawContent(SaintsFieldWithInfo fieldWithInfo, PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute)
+        private static (string error, string content) GetLabelRawContent(SaintsFieldWithInfo fieldWithInfo, BelowTextAttribute playaBelowRichLabelAttribute)
         {
             string xmlContent = playaBelowRichLabelAttribute.Content;
 

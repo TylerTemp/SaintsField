@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 5e7d6594ed694e15993648d5b02e1816
 timeCreated: 1699094724
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/VisibilityDrawers/VisibilityDrawer/VisibilityAttributeDrawer.cs
+  uploadId: 802314

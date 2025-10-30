@@ -52,7 +52,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public enum MyEnum
         {
             None,
-            [RichLabel("Number1")]
+            [FieldLabelText("Number1")]
             One,
             Two,
         }
@@ -85,7 +85,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         public string f1;
 
-        [InfoBox("Test Info")]
+        [FieldInfoBox("Test Info")]
         public string f2;
 
         [PropRange(0, 10)] public int pRange;
@@ -115,10 +115,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public SaintsStruct structWithoutRaw;
         // this won't work ATM for SaintsRow
         public SaintsStruct[] structWithoutRaws;
-        [InfoBox("Prop without SaintsRow")]
+        [FieldInfoBox("Prop without SaintsRow")]
         public SaintsStruct structWithOtherProp;
 
-        [Range(0, 1), InfoBox("Order no longer matters with SaintsEditor")]
+        [Range(0, 1), FieldInfoBox("Order no longer matters with SaintsEditor")]
         public float f3;
 
         public int[] intArr;

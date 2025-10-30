@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 62d392871497423cbfc696df07b3c018
 timeCreated: 1698736692
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SpriteToggleAttributeDrawer.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 6b7ca61b0d77471a99bfff53c4c6be00
 timeCreated: 1710384013
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/EMode.cs
+  uploadId: 802314

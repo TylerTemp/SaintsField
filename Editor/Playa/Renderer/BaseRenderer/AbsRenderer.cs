@@ -135,7 +135,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #endif
 
 
-            PlayaRichLabelAttribute richLabelAttribute = fieldWithInfo.PlayaAttributes.OfType<PlayaRichLabelAttribute>().FirstOrDefault();
+            LabelTextAttribute richLabelAttribute = fieldWithInfo.PlayaAttributes.OfType<LabelTextAttribute>().FirstOrDefault();
             bool hasRichLabel = richLabelAttribute != null;
 
             string richLabelXml = "";

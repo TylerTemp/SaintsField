@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             return GetInfoBoxHeightIMGUI(width, _playaInfoBoxAttribute);
         }
 
-        private float GetInfoBoxHeightIMGUI(float width, PlayaInfoBoxAttribute infoBoxAttribute)
+        private float GetInfoBoxHeightIMGUI(float width, InfoBoxAttribute infoBoxAttribute)
         {
             (MessageType messageType, string content) = GetInfoBoxRawContent(FieldWithInfo, infoBoxAttribute);
             return ImGuiHelpBox.GetHeight(content, width, messageType);
@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             }
         }
 
-        private static (MessageType messageType, string content) GetInfoBoxRawContent(SaintsFieldWithInfo fieldWithInfo, PlayaInfoBoxAttribute infoBoxAttribute)
+        private static (MessageType messageType, string content) GetInfoBoxRawContent(SaintsFieldWithInfo fieldWithInfo, InfoBoxAttribute infoBoxAttribute)
         {
             string xmlContent = infoBoxAttribute.Content;
             MessageType helpBoxType = infoBoxAttribute.MessageType.GetMessageType();

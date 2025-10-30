@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 22a76ffb835d4b088c83bb2f024651b8
 timeCreated: 1734586685
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/HandleDrawers/OneDirectionHandle/OneDirectionHandleIMGUI.cs
+  uploadId: 802314

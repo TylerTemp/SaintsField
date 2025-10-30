@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 0a3ebc4f4793a5d48ba5bfc122a7eda4
 timeCreated: 1739780854
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Editor Default Resources/SaintsField/UIToolkit/RightFoldoutRotate.uss
+  uploadId: 802314

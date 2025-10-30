@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
     {
         protected SerializedFieldBaseRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
-            if (fieldWithInfo.PlayaAttributes.Any(each => each is ArrayDefaultExpandAttribute))
+            if (fieldWithInfo.PlayaAttributes.Any(each => each is DefaultExpandAttribute))
             {
                 fieldWithInfo.SerializedProperty.isExpanded = true;
             }

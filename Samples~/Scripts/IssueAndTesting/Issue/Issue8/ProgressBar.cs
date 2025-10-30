@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
                 , titleCallback: nameof(Title)
             ),
         ]
-        [RichLabel(null)]
+        [FieldLabelText(null)]
         public float fValue;
     }
 }

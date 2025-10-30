@@ -16,7 +16,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         {
             public string XmlContent;
 
-            public PlayaBelowRichLabelAttribute PlayaBelowRichLabelAttribute;
+            public BelowTextAttribute PlayaBelowRichLabelAttribute;
             public SaintsFieldWithInfo FieldWithInfo;
             public RichTextDrawer RichTextDrawer;
         }
@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             return result;
         }
 
-        private (VisualElement labelContainer, bool needUpdate) CreateRichLabelContainer(SaintsFieldWithInfo fieldWithInfo, PlayaBelowRichLabelAttribute playaAboveRichLabelAttribute)
+        private (VisualElement labelContainer, bool needUpdate) CreateRichLabelContainer(SaintsFieldWithInfo fieldWithInfo, BelowTextAttribute playaAboveRichLabelAttribute)
         {
             RichTextDrawer richTextDrawer = new RichTextDrawer();
             AboveRichLabelUserData aboveRichLabelUserData = new AboveRichLabelUserData

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: cb90e8076d44481887c9aef3fd04cbba
 timeCreated: 1703644664
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/RenderTextureTemporaryScoop.cs
+  uploadId: 802314

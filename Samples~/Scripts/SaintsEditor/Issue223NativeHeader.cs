@@ -11,11 +11,11 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public int value2;
 
         [Header("Title 3")]
-        [RichLabel("Value 3")]
+        [FieldLabelText("Value 3")]
         public int value3;
 
         [SepTitle("Title 4")]
-        [RichLabel("Value 4")]
+        [FieldLabelText("Value 4")]
         public int value4;
     }
 }

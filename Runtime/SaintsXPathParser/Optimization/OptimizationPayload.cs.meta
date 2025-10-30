@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: d76d455ad0b34aaaa0c61de09ba81623
 timeCreated: 1739167732
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/SaintsXPathParser/Optimization/OptimizationPayload.cs
+  uploadId: 802314

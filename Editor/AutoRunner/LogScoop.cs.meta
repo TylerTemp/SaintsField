@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 7e2a086d51264359abae97fefaaaf706
 timeCreated: 1736861210
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/AutoRunner/LogScoop.cs
+  uploadId: 802314

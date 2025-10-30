@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: e1934463ba1448ac9611bc0734c79fc4
 timeCreated: 1742316019
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Utils/ReflectCache.cs
+  uploadId: 802314

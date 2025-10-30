@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: c2a33629b348484e88b0ffc03a4419a7
 timeCreated: 1703039458
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/GetScriptableObjectAttribute.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: c0f74812127b49ff99f8487329fa2624
 timeCreated: 1736405058
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ButtonDrawers/DecButtonDrawer/DecButtonAttributeDrawerIMGUI.cs
+  uploadId: 802314

@@ -12,15 +12,15 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
             // PostFieldRichLabel("$" + nameof(DummyNumber))
         ]
         public Dummy getComponent;
-        [GetComponent, PostFieldRichLabel("$" + nameof(DummyNumber))] public Dummy[] getComponentArray;
-        [GetComponent, PostFieldRichLabel("$" + nameof(DummyNumber))] public List<Dummy> getComponentList;
+        [GetComponent, EndText("$" + nameof(DummyNumber))] public Dummy[] getComponentArray;
+        [GetComponent, EndText("$" + nameof(DummyNumber))] public List<Dummy> getComponentList;
 
         private string DummyNumber(Dummy dummy)
         {
             return dummy? $"{dummy.comment}": "NULL";
         }
 
-        [GetByXPath("@{GetComponents(Dummy)}"), PostFieldRichLabel("$" + nameof(DummyNumber))] public Dummy[] getComponentArrayXPath;
+        [GetByXPath("@{GetComponents(Dummy)}"), EndText("$" + nameof(DummyNumber))] public Dummy[] getComponentArrayXPath;
         [Button]
         private void DebugButton()
         {

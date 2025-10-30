@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: f1e3321471d140bfaefaad98f4458b96
 timeCreated: 1698896548
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/MaterialToggleAttributeDrawer.cs
+  uploadId: 802314

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 34e6546fb7db4b238bd7bb8756956911
 timeCreated: 1754495349
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/EmptyBinderField.cs
+  uploadId: 802314

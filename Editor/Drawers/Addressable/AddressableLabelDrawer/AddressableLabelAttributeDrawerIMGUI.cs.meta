@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: e4fb7fc0ea764c8dac244e35ef7765ea
 timeCreated: 1736159609
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Addressable/AddressableLabelDrawer/AddressableLabelAttributeDrawerIMGUI.cs
+  uploadId: 802314

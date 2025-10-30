@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts
         [ShaderKeyword] public string shaderKeywordString;
         [ShaderKeyword(0)] public string shaderKeywordIndex;
 
-        [Separator("By Target")]
+        [FieldSeparator("By Target")]
         [GetComponent] public Renderer targetRenderer;
 
         [ShaderKeyword(nameof(targetRenderer))] public string shaderKeywordRenderer;
@@ -19,7 +19,7 @@ namespace SaintsField.Samples.Scripts
         private Shader GetShader() => targetRenderer.sharedMaterial.shader;
         [ShaderKeyword(nameof(GetShader))] public string shaderKeywordShader;
 
-        [ReadOnly, RichLabel("<icon=star.png/><label/>"), ShaderKeyword]
+        [ReadOnly, FieldLabelText("<icon=star.png/><label/>"), ShaderKeyword]
         public string readOnlyField;
 #endif
     }

@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 73c93dad829a48409bfde1aa825e8426
 timeCreated: 1703148004
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/DropdownBase/IAdvancedDropdownList.cs
+  uploadId: 802314

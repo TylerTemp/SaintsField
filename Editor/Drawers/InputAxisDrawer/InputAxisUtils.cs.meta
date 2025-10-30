@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 9ed96f787dc444c0af84e92c95b953a0
 timeCreated: 1754036994
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/InputAxisDrawer/InputAxisUtils.cs
+  uploadId: 802314

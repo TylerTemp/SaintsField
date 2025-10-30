@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: b91e4e4873f14aac9d117e84c61e84d9
 timeCreated: 1740985607
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/PropRangeDrawer/PropRangeAttributeDrawerIMGUI.cs
+  uploadId: 802314

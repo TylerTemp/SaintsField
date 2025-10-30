@@ -5,15 +5,15 @@ namespace SaintsField.Samples.Scripts.RichLabelExamples
     public class FullWidthRichLabelExample: MonoBehaviour
     {
         [SerializeField]
-        [AboveRichLabel("┌<icon=eye.png/><label />┐")]
-        [RichLabel("├<icon=eye.png/><label />┤")]
-        [BelowRichLabel("$" + nameof(BelowLabel))]
-        [BelowRichLabel("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
-        [BelowRichLabel("==================================", groupBy: "example")]
+        [FieldAboveText("┌<icon=eye.png/><label />┐")]
+        [FieldLabelText("├<icon=eye.png/><label />┤")]
+        [FieldBelowText("$" + nameof(BelowLabel))]
+        [FieldBelowText("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
+        [FieldBelowText("==================================", groupBy: "example")]
         private int _intValue;
 
         [SerializeField]
-        [RichLabel("Int Value<icon=eye.png/><label />")]
+        [FieldLabelText("Int Value<icon=eye.png/><label />")]
         private int _int2Value;
 
         private string BelowLabel() => "└<icon=eye.png/><label />┘";

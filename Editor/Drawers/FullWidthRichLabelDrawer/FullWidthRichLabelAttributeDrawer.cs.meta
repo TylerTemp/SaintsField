@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: c6fd1a63014842919524e3b305951583
 timeCreated: 1698983991
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Editor/Drawers/FullWidthRichLabelDrawer/FullWidthRichLabelAttributeDrawer.cs
+  uploadId: 0

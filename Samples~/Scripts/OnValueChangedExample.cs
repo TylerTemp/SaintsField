@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts
             Debug.Log($"changed={dir}");
         }
 
-        [OnValueChanged(nameof(ChangedParam)), InfoBox("$" + nameof(_belowText), EMessageType.Info, nameof(_belowText))]
+        [OnValueChanged(nameof(ChangedParam)), FieldInfoBox("$" + nameof(_belowText), EMessageType.Info, nameof(_belowText))]
         public int value;
 
         private string _belowText;

@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
 
             VisualElement richContainer = container.Q<VisualElement>(richLabelContainerName);
             PayloadUIToolkit payload = (PayloadUIToolkit)richContainer.userData;
-            RichLabelAttribute richLabelAttribute = (RichLabelAttribute)saintsAttribute;
+            FieldLabelTextAttribute richLabelAttribute = (FieldLabelTextAttribute)saintsAttribute;
 
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
 

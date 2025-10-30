@@ -8,9 +8,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
         public int max;
 
         [PropRange(nameof(min), nameof(max))]
-        [InfoBox("Test")]
+        [FieldInfoBox("Test")]
         [SepTitle("Test", EColor.Green)]
-        [RichLabel("<icon=star.png /><label/>")]
+        [FieldLabelText("<icon=star.png /><label/>")]
         public float rangeFloat;
 
         [MinMaxSlider(nameof(min), nameof(max))]

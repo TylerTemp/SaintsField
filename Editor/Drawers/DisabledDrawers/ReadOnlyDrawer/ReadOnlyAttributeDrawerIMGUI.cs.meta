@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 3f3a0017fe2b4a12ae229e8ad462d421
 timeCreated: 1746190820
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/DisabledDrawers/ReadOnlyDrawer/ReadOnlyAttributeDrawerIMGUI.cs
+  uploadId: 802314

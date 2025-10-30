@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: db2be1e626c64ad99112ffd07c4bf0df
 timeCreated: 1758270719
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Runtime/Utils/SaintsSerializedUtil.cs
+  uploadId: 0

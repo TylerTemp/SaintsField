@@ -1,3 +1,10 @@
 ﻿fileFormatVersion: 2
 guid: 9a90ade9dd27448c898cf500adb0e266
 timeCreated: 1713496526
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/ArraySizeDrawer/ArraySizeAttributeDrawer.cs
+  uploadId: 802314

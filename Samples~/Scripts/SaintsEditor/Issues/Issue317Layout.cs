@@ -42,7 +42,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
         public float safetyDetectionRadius = .5f;
 
 #if UNITY_EDITOR
-        [PlayaInfoBox("1. Choose the local axis the button will move on.2. Save the start position of the button.3. Save the end position of the button.4. Save the down and reset positions. 5. Return the transform to start by pressing the return button.6. If the Connected Body is left blank, the button will be jointed to the world and cannot be moved.")]
+        [InfoBox("1. Choose the local axis the button will move on.2. Save the start position of the button.3. Save the end position of the button.4. Save the down and reset positions. 5. Return the transform to start by pressing the return button.6. If the Connected Body is left blank, the button will be jointed to the world and cannot be moved.")]
         // [ShowInInspector]
         Vector3 dir => default;
 

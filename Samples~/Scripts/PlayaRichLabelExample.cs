@@ -7,10 +7,10 @@ namespace SaintsField.Samples.Scripts
 {
     public class PlayaRichLabelExample : SaintsMonoBehaviour
     {
-        [PlayaRichLabel("<color=lime>It's Labeled!")]
+        [LabelText("<color=lime>It's Labeled!")]
         public List<string> myList;
 
-        [PlayaRichLabel(nameof(MethodLabel), true)]
+        [LabelText(nameof(MethodLabel), true)]
         public string[] myArray;
 
         // ReSharper disable once ParameterTypeCanBeEnumerable.Local

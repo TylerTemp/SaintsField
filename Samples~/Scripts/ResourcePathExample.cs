@@ -8,45 +8,45 @@ namespace SaintsField.Samples.Scripts
     {
         // resource: display as a MonoScript, requires a BoxCollider
         [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
-        [RichLabel("<icon=star.png /><label />")]
-        [BelowRichLabel("<color=gray>resource: <field />")]
+        [FieldLabelText("<icon=star.png /><label />")]
+        [FieldBelowText("<color=gray>resource: <field />")]
         public string myResource;
 
         // AssetDatabase path
         [Space]
         [ResourcePath(EStr.AssetDatabase, typeof(Dummy), typeof(BoxCollider))]
-        [BelowRichLabel("<color=gray>assets: <field />")]
+        [FieldBelowText("<color=gray>assets: <field />")]
         public string myAssetPath;
 
         // GUID
         [Space]
         [ResourcePath(EStr.Guid, typeof(Dummy), typeof(BoxCollider))]
-        [BelowRichLabel("<color=gray>guid: <field />")]
+        [FieldBelowText("<color=gray>guid: <field />")]
         public string myGuid;
 
         // prefab resource
         [ResourcePath(typeof(GameObject))]
-        [BelowRichLabel("<color=gray>resource: <field />")]
+        [FieldBelowText("<color=gray>resource: <field />")]
         public string resourceNoRequire;
 
         // requires to have a Dummy script attached, and has interface IMyInterface
         [ResourcePath(typeof(Dummy), typeof(IMyInterface))]
-        [BelowRichLabel("<color=gray>interface: <field />")]
+        [FieldBelowText("<color=gray>interface: <field />")]
         public string myInterface;
 
         [Serializable]
         public struct MyStruct
         {
             [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
-            [InfoBox(nameof(myResource), true)]
-            [BelowRichLabel(nameof(myResource), true)]
+            [FieldInfoBox(nameof(myResource), true)]
+            [FieldBelowText(nameof(myResource), true)]
             [OnValueChanged(nameof(OnChange))]
             public string myResource;
 
             [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
             [OnValueChanged(nameof(OnChange))]
-            [InfoBox(nameof(OnLabel), true)]
-            [BelowRichLabel(nameof(OnLabel), true)]
+            [FieldInfoBox(nameof(OnLabel), true)]
+            [FieldBelowText(nameof(OnLabel), true)]
             public string[] myResources;
 
             [ReadOnly]

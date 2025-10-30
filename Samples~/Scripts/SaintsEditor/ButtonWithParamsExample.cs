@@ -55,7 +55,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             }
         }
 
-        [PlayaSeparator(10)]
+        [Separator(10)]
 
         [Button]  // Display the returned value when clicked
         private int AddCalculator(int a, int b) => a + b;
@@ -67,7 +67,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             public GameObject Go;
         }
 
-        [PlayaSeparator(10)]
+        [Separator(10)]
 
         [Button]  // A struct, class, UnityObject return type is supported too
         private ResultClass ReturnClass(int v) => new ResultClass
@@ -75,7 +75,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             Go = goLis[v % goLis.Length]
         };
 
-        [PlayaSeparator(10)]
+        [Separator(10)]
 
         [Button(hideReturnValue: true)]  // Hide the returned value
         private int ReturnIgnored() => Random.Range(0, 100);

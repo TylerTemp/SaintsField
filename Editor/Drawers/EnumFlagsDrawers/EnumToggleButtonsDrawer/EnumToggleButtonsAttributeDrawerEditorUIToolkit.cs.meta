@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 7e83785ef5ee4865aa274b4c63140850
 timeCreated: 1758271263
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/EnumFlagsDrawers/EnumToggleButtonsDrawer/EnumToggleButtonsAttributeDrawerEditorUIToolkit.cs
+  uploadId: 802314

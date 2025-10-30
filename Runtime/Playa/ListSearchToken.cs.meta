@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 4a0b1a1612f14f0f9e5bfba8327b2a03
 timeCreated: 1744963233
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Runtime/Playa/ListSearchToken.cs
+  uploadId: 802314

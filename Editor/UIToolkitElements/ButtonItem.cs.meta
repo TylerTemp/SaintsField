@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: 086c1160bfd846e4890d028eeec40235
 timeCreated: 1751361770
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/UIToolkitElements/ButtonItem.cs
+  uploadId: 802314

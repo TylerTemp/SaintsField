@@ -1,3 +1,10 @@
 fileFormatVersion: 2
 guid: cc456c115ba4471c9386e571d197bdbc
 timeCreated: 1752494492
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/SaintsEventBaseTypeDrawer/UIToolkitElements/UnityEventCallStateSelector.cs
+  uploadId: 802314
