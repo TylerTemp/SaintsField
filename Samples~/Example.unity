@@ -6602,7 +6602,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71aaeaf3bdd04306ba6b52810d6f241c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneS: AutoRunner
+  sceneI: 3
+  sceneS: 
+  fullPathScene: 
+  sceneDisabled: 
 --- !u!1 &639593449
 GameObject:
   m_ObjectHideFlags: 0

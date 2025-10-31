@@ -15,7 +15,19 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
         {
             messageType = HelpBoxMessageType.Error;
 
-            Add(EnableButton = new Button(EnableClicked.Invoke)
+            VisualElement buttonContainer = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    justifyContent = Justify.FlexEnd,
+                    flexGrow = 1,
+                    flexShrink = 0,
+                }
+            };
+            Add(buttonContainer);
+
+            buttonContainer.Add(EnableButton = new Button(EnableClicked.Invoke)
             {
                 text = "Enable",
                 style =
@@ -24,7 +36,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 },
             });
 
-            Add(AddButton = new Button(AddClicked.Invoke)
+            buttonContainer.Add(AddButton = new Button(AddClicked.Invoke)
             {
                 text = "Add",
                 style =

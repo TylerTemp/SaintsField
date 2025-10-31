@@ -8,17 +8,17 @@
             BelowText("<field/>")
         ]
         public int sceneI;
-        // [Scene,
-        //     BelowText("$" + nameof(sceneS))
-        // ]
-        // public string sceneS;
+        [Scene,
+            BelowText("$" + nameof(sceneS))
+        ]
+        public string sceneS;
 
-        // [Scene(true),
-        //     BelowText("$" + nameof(fullPathScene))
-        // ]
-        // public string fullPathScene;
+        [Scene(true),
+            BelowText("$" + nameof(fullPathScene))
+        ]
+        public string fullPathScene;
 
-        // [ReadOnly]
-        // [Scene] public string sceneDisabled;
+        [ReadOnly]
+        [Scene] public string sceneDisabled;
     }
 }
