@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 // .Select(scene => Path.GetFileNameWithoutExtension(scene.path))
                 .Select(scene => scene.path) ;
 
-        private static string TrimScenePath(string scenePath, bool fullPath)
+        public static string TrimScenePath(string scenePath, bool fullPath)
         {
             string preTrimScenePath = scenePath;
             if(preTrimScenePath.StartsWith("/Assets/"))
