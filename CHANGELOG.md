@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.1.0 ##
+
+1.  `Layer` now support `LayerMask` type to pick a single layer
+2.  `Layer` now support for `ShowInInspector` to show or edit a `string`/`int`/`LayerMask` field
+3.  `ShowInInspector` now use default drawer for `LayerMask` field
+
 ## 4.40.2 ##
 
 `SaintsEvent` now gray out the arguements that can not be assigned

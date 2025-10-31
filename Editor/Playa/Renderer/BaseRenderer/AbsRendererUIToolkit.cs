@@ -8,6 +8,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
+using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -466,6 +467,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(int) || value is int)
             {
+                if (allAttributes.Any(each => each is LayerAttribute))
+                {
+                    return (LayerAttributeDrawer.UIToolkitValueEditInt(
+                        oldElement,
+                        label,
+                        (int) value,
+                        beforeSet,
+                        setterOrNull,
+                        labelGrayColor,
+                        inHorizontalLayout,
+                        allAttributes), false);
+                }
+
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((int)value);
@@ -795,6 +809,20 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(string) || value is string)
             {
+                if (allAttributes.Any(each => each is LayerAttribute))
+                {
+                    return (LayerAttributeDrawer.UIToolkitValueEditString(
+                        oldElement,
+                        label,
+                        (string) value,
+                        beforeSet,
+                        setterOrNull,
+                        labelGrayColor,
+                        inHorizontalLayout,
+                        allAttributes), false);
+                }
+
+
                 if (oldElement is TextField oldTextField)
                 {
                     oldTextField.SetValueWithoutNotify((string)value);
@@ -1554,6 +1582,61 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     labelGrayColor,
                     inHorizontalLayout,
                     allAttributes), false);
+            }
+
+            if (valueType == typeof(LayerMask) || value is LayerMask)
+            {
+                if (allAttributes.Any(each => each is LayerAttribute))
+                {
+                    return (LayerAttributeDrawer.UIToolkitValueEditLayerMask(
+                        oldElement,
+                        label,
+                        (LayerMask) value,
+                        beforeSet,
+                        setterOrNull,
+                        labelGrayColor,
+                        inHorizontalLayout,
+                        allAttributes), false);
+                }
+
+                if (oldElement is LayerMaskField lmf)
+                {
+                    lmf.SetValueWithoutNotify((LayerMask)value);
+                    return (null, false);
+                }
+
+                LayerMaskField element = new LayerMaskField(label)
+                {
+                    value = (LayerMask)value,
+                };
+
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = ReColor;
+                }
+                if (inHorizontalLayout)
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                }
+                else
+                {
+                    element.AddToClassList(LayerMaskField.alignedFieldUssClassName);
+                }
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        setterOrNull((LayerMask)evt.newValue);
+                    });
+                }
+                return (element, false);
             }
 
             bool valueIsNull = RuntimeUtil.IsNull(value);

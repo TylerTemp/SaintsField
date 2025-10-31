@@ -96,25 +96,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.0.0**
+**5.1.0**
 
-1.  `SaintsEvent` now gray out the arguements that can not be assigned
-2.  `RichLabel` now works for the array/list's label itself, not element. Use `FieldLabelText` instead
-3.  `InfoBox`, `BelowInfoBox`, `AboveRichLabel`, `BelowRichLabel` no longer works on element of array/list, but array/list itself. Use `Field-*` version instead.
-4.  `DefaultExpand` now expand array/list itself. To expand each element, use `FieldDefaultExpand` instead.
-5.  There are some old names which are kept in project you can still use. But it's suggested to use the new name.
-
-Old Name (Alias) | New Name
-------------|--------------
-`PlayaRichLabel` | `LabelText`
-`RichLabel` | `FieldLabelText`
-`Separator` | `FieldSeparator`
-`PlayaBelowSeparator` | `BelowSeparator`
-`BelowSeparator` | `FieldBelowSeparator`
-`OverlayRichLabel` | `OverlayText`
-`PostFieldRichLabel` | `EndText`
-
-Please read [Migrate From 4 To 5](https://github.com/TylerTemp/SaintsField/wiki/MigrateTo5) to know how to migrate.
+1.  `Layer` now support `LayerMask` type to pick a single layer
+2.  `Layer` now support for `ShowInInspector` to show or edit a `string`/`int`/`LayerMask` field
+3.  `ShowInInspector` now use default drawer for `LayerMask` field
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -986,9 +972,13 @@ private void Toggle() => _errorOut = !_errorOut;
 
 #### `Layer` ####
 
-A dropdown selector for layer.
+A dropdown selector for layer. Allowed type:
 
-*   AllowMultiple: No
+*   `string`: to pick a layer name
+*   `int`: to pick a layer number. (use `1 << int` to get the mask value)
+*   `LayerMask`: to pick a single layer into the `LayerMask`
+
+*   Allow Multiple: No
 
 Note: want a bitmask layer selector? Unity already has it. Just use `public LayerMask myLayerMask;`
 
@@ -1000,6 +990,9 @@ using SaintsField;
 
 // Unity supports multiple layer selector
 public LayerMask myLayerMask;
+
+[Layer]  // But you can enforce a single layer picker instead
+public LayerMask singleLayerMask;
 ```
 
 ![layer](https://github.com/TylerTemp/SaintsField/assets/6391063/a7ff79a3-f7b8-48ca-8233-5facc975f5eb)
@@ -1808,22 +1801,19 @@ Results:
 
 Show a non-serialized target, be a field, property or a method.
 
-For UI Toolkit: this attribute allow you to edit the corresponding field like odin do. Limitation:
-
-1.  Only UI Toolkit support the editing feature
-2.  Does not use custom drawer even the type has one (Same as Odin)
+This attribute allow you to edit the corresponding field like odin do. It does not use custom drawer even the type has one (Same as Odin)
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
 // const
-[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
+[ShowInInspector] public const float MyConstFloat = 3.14f;
 // static
-[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
+[ShowInInspector] public static readonly Color MyColor = Color.green;
 
 // auto-property
-[ShowInInspector, Ordered]
+[ShowInInspector]
 public Color AutoColor
 {
     get => Color.green;
@@ -1833,7 +1823,7 @@ public Color AutoColor
 
 ![show_in_inspector](https://github.com/TylerTemp/SaintsField/assets/6391063/3e6158b4-6950-42b1-b102-3c8884a59899)
 
-UI Toolkit: You can use it on a function to show a computed value. If parameters / return value is provided, they'll be shown too.
+You can use it on a function to show a computed value. If parameters / return value is provided, they'll be shown too.
 
 ```csharp
 using SaintsField.Playa;
@@ -1859,7 +1849,7 @@ private ClassType GetClassType(int index) => new ClassType { Value = childrenTra
 [![video](https://github.com/user-attachments/assets/2331745f-f950-4b84-a06a-75264b2d2f24)](https://github.com/user-attachments/assets/9b6a8be1-acc3-4322-b6e5-76b596e736e3)
 
 
-UI Toolkit: A null-class can be created, edited and set to `null`:
+A null-class can be created, edited and set to `null`:
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -1879,7 +1869,7 @@ private class MyClass
 
 [![video](https://github.com/user-attachments/assets/b1c69072-76af-46ac-9c20-c3e8f6671e84)](https://github.com/user-attachments/assets/8928b38c-d756-4ff5-b924-e4b5a0f3543e)
 
-UI Toolkit: An array/list can be created, edited and set to `null`:
+An array/list can be created, edited and set to `null`:
 
 ```csharp
 using SaintsField;
@@ -1905,7 +1895,7 @@ private void ArrayChange0ToRed()
 
 [![video](https://github.com/user-attachments/assets/99201b88-439c-4508-a1cf-04cf32748ca7)](https://github.com/user-attachments/assets/0baed2e8-13ad-41f8-88e4-9a8bb32d0dd1)
 
-UI Toolkit: It can also create/edit an interface. Depending on the actual type is Unity Object or general class/struct, it'll show object picker or field editor accordingly.
+It can also create/edit an interface. Depending on the actual type is Unity Object or general class/struct, it'll show object picker or field editor accordingly.
 
 ```csharp
 public class GeneralDummyClass: IDummy
@@ -1928,7 +1918,7 @@ private void DebugDummy() => Debug.Log(_dummy);
 
 [![video](https://github.com/user-attachments/assets/ea978ef2-6c6f-492d-8c2d-1befffe014d9)](https://github.com/user-attachments/assets/ca9bc4e5-abb3-4635-b41b-96101d63d264)
 
-UI Toolkit: dictionary/`IReadOnlyDictionary` is now supported
+dictionary/`IReadOnlyDictionary` is now supported
 
 ```csharp
 [ShowInInspector] private Dictionary<string, int> _myDictionaryNull;
@@ -1942,6 +1932,11 @@ private void DictExternalAdd()
 
 [![video](https://github.com/user-attachments/assets/dd3e7add-36f3-4f59-918c-58022d68cac6)](https://github.com/user-attachments/assets/57baefa0-144c-4c7f-8100-dd7b102d3935)
 
+**Supported Attributes**
+
+*   `DateTime`
+*   `TimeSpan`
+*   `Layer`
 
 ### Numerical ###
 

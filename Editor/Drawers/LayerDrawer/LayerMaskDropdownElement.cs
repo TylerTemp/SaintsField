@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                     return;
                 }
 
-                LayerUtils.MakeDropdown(false, 1 << (int)CachedValue, root, newValue => value = newValue.Mask);
+                LayerUtils.MakeDropdown(false, (int)CachedValue, root, newValue => value = newValue.Mask);
             };
         }
 
@@ -69,12 +69,11 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
         }
     }
 
-    public class LayerMaskDropdownField : BaseField<LayerMask>
+    public class LayerMaskDropdownField : BaseField<int>
     {
-        public readonly LayerMaskDropdownElement LayerMaskDropdownElement;
         public LayerMaskDropdownField(string label, LayerMaskDropdownElement visualInput) : base(label, visualInput)
         {
-            LayerMaskDropdownElement = visualInput;
+            visualInput.BindDrop(this);
         }
     }
 }

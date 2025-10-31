@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 
 namespace SaintsField.Editor.Drawers.LayerDrawer
 {
@@ -116,7 +115,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                     layerIntDropdownElement.BindDrop(intDropdownField);
                     layerIntDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
 
-                    intDropdownField.Button.clicked += () => MakeDropdown(property, intDropdownField, onValueChangedCallback, info, parent);
+                    // intDropdownField.Button.clicked += () => MakeDropdown(property, intDropdownField, onValueChangedCallback, info, parent);
                 }
                     break;
                 case SerializedPropertyType.String:
@@ -127,15 +126,14 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                     layerStringDropdownElement.BindDrop(layerStringField);
                     layerStringDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
 
-                    layerStringField.Button.clicked += () => MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
+                    // layerStringField.Button.clicked += () => MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
                 }
                     break;
                 case SerializedPropertyType.LayerMask:
                 {
                     LayerMaskDropdownField layerMaskField = container.Q<LayerMaskDropdownField>();
                     AddContextualMenuManipulator(layerMaskField, property, onValueChangedCallback, info, parent);
-                    layerMaskField.LayerMaskDropdownElement.BindDrop(layerMaskField);
-                    layerMaskField.LayerMaskDropdownElement.RegisterValueChangedCallback(v =>
+                    layerMaskField.RegisterValueChangedCallback(v =>
                         onValueChangedCallback(new LayerMask
                         {
                             value = v.newValue,
@@ -154,6 +152,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
             bool isString = property.propertyType == SerializedPropertyType.String;
+            bool isMask = property.propertyType == SerializedPropertyType.LayerMask;
             root.AddManipulator(new ContextualMenuManipulator(evt =>
             {
                 string clipboardText = EditorGUIUtility.systemCopyBuffer;
@@ -187,162 +186,129 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                     foreach (LayerUtils.LayerInfo layerInfo in LayerUtils.GetAllLayers())
                     {
                         if (layerInfo.Name == clipboardText
-                            || canBeInt && layerInfo.Value == clipboardInt)
+                            || canBeInt && (
+                                    isMask
+                                        ? layerInfo.Mask == clipboardInt
+                                        : layerInfo.Value == clipboardInt
+                                ))
                         {
                             evt.menu.AppendAction($"Paste \"{layerInfo.Name}\"({layerInfo.Value})", _ =>
                             {
-                                property.intValue = layerInfo.Value;
-                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, layerInfo.Value);
+                                int targetValue = isMask ? layerInfo.Mask : layerInfo.Value;
+                                property.intValue = targetValue;
+                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, targetValue);
                                 property.serializedObject.ApplyModifiedProperties();
-                                onValueChangedCallback.Invoke(layerInfo.Value);
+                                onValueChangedCallback.Invoke(targetValue);
                             });
                             return;
                         }
                     }
                 }
             }));
-
-
         }
 
-        private static void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        public static VisualElement UIToolkitValueEditLayerMask(VisualElement oldElement, string label, LayerMask value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
         {
-            bool isString = property.propertyType == SerializedPropertyType.String;
-            AdvancedDropdownList<LayerUtils.LayerInfo> dropdown = new AdvancedDropdownList<LayerUtils.LayerInfo>();
-            if (isString)
+            if (oldElement is LayerMaskDropdownField lmdf)
             {
-                dropdown.Add("[Empty String]", new LayerUtils.LayerInfo(string.Empty, -1));
-                dropdown.AddSeparator();
+                lmdf.SetValueWithoutNotify(value.value);
+                return null;
             }
 
-            bool hasSelected = false;
-            LayerUtils.LayerInfo selected = new LayerUtils.LayerInfo("", -9999);
-            foreach (LayerUtils.LayerInfo layerInfo in LayerUtils.GetAllLayers())
+            LayerMaskDropdownElement layerMaskDropdownElement = new LayerMaskDropdownElement
             {
-                dropdown.Add(layerInfo.Name, layerInfo);
-                // ReSharper disable once InvertIf
-                if (isString && layerInfo.Name == property.stringValue
-                    || !isString && layerInfo.Value == property.intValue)
-                {
-                    hasSelected = true;
-                    selected = layerInfo;
-                }
-            }
-
-            dropdown.AddSeparator();
-            dropdown.Add("Edit Layers...", new LayerUtils.LayerInfo("", -2), false, "d_editicon.sml");
-
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
-            {
-                CurValues = hasSelected ? new object[] { selected } : Array.Empty<object>(),
-                DropdownListValue = dropdown,
-                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                value = value.value,
             };
-
-            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
-
-            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
-                metaInfo,
-                root.worldBound.width,
-                maxHeight,
-                false,
-                (_, curItem) =>
+            LayerMaskDropdownField element =
+                new LayerMaskDropdownField(label, layerMaskDropdownElement)
                 {
-                    LayerUtils.LayerInfo layerInfo = (LayerUtils.LayerInfo)curItem;
-                    switch (layerInfo.Value)
-                    {
-                        case -1:
-                        {
-                            Debug.Assert(isString);
-                            property.stringValue = "";
-                            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, "");
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback.Invoke("");
-                        }
-                            break;
-                        case -2:
-                        {
-                            Selection.activeObject = AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset");
-                        }
-                            break;
-                        default:
-                        {
-                            if (isString)
-                            {
-                                property.stringValue = layerInfo.Name;
-                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, layerInfo.Name);
-                                property.serializedObject.ApplyModifiedProperties();
-                                onValueChangedCallback.Invoke(layerInfo.Name);
-                            }
-                            else
-                            {
-                                property.intValue = layerInfo.Value;
-                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, layerInfo.Value);
-                                property.serializedObject.ApplyModifiedProperties();
-                                onValueChangedCallback.Invoke(layerInfo.Value);
-                            }
-                        }
-                            break;
-                    }
-                }
-            );
+                    value = value.value,
+                };
 
-            // DebugPopupExample.SaintsAdvancedDropdownUIToolkit = sa;
-            // var editorWindow = EditorWindow.GetWindow<DebugPopupExample>();
-            // editorWindow.Show();
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
 
-            UnityEditor.PopupWindow.Show(worldBound, sa);
+            if (setterOrNull != null)
+            {
+                layerMaskDropdownElement.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull((LayerMask)evt.newValue);
+                });
+            }
+            return element;
         }
 
-        // private static void RefreshHelpBox(SerializedProperty property, HelpBox helpBox)
-        // {
-        //     string errorMessage = GetErrorMessage(property);
-        //     // bool noError = string.IsNullOrEmpty(errorMessage);
-        //     if (helpBox.text == errorMessage)
-        //     {
-        //         return;
-        //     }
-        //
-        //     helpBox.text = errorMessage;
-        //     helpBox.style.display = string.IsNullOrEmpty(errorMessage)? DisplayStyle.None: DisplayStyle.Flex;
-        //     // return;
-        // }
 
-//         private static (bool found, LayerUtils.LayerInfo info) FindLayerFromCopy()
-//         {
-//             IReadOnlyList<LayerUtils.LayerInfo> allLayers = LayerUtils.GetAllLayers();
-//
-//             string pasteName = EditorGUIUtility.systemCopyBuffer;
-//
-//             foreach (LayerUtils.LayerInfo layerInfo in allLayers)
-//             {
-//                 if(layerInfo.Name == pasteName)
-//                 {
-//                     return (true, layerInfo);
-//                 }
-//             }
-// #if SAINTSFIELD_NEWTONSOFT_JSON
-//             int intValue;
-//             try
-//             {
-//                 intValue = JsonConvert.DeserializeObject<int>(pasteName);
-//             }
-//             catch (Exception)
-//             {
-//                 return (false, default);
-//             }
-//
-//             foreach (LayerUtils.LayerInfo layerInfo in allLayers)
-//             {
-//                 if (layerInfo.Value == intValue)
-//                 {
-//                     return (true, layerInfo);
-//                 }
-//             }
-// #endif
-//             return (false, default);
-//         }
+        public static VisualElement UIToolkitValueEditInt(VisualElement oldElement, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
+        {
+            if (oldElement is IntDropdownField intDropdownField)
+            {
+                LayerIntDropdownElement layerIntDropdownElement = intDropdownField.Q<LayerIntDropdownElement>();
+                if(layerIntDropdownElement != null)
+                {
+                    layerIntDropdownElement.SetValueWithoutNotify(value);
+                    return null;
+                }
+            }
 
+            LayerIntDropdownElement intDropdownElement = new LayerIntDropdownElement
+            {
+                value = value,
+            };
+            IntDropdownField element = new IntDropdownField(label, intDropdownElement);
+            intDropdownElement.BindDrop(element);
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                intDropdownElement.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return element;
+        }
+
+        public static VisualElement UIToolkitValueEditString(VisualElement oldElement, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
+        {
+            if (oldElement is StringDropdownField stringDropdownField)
+            {
+                LayerStringDropdownElement layerStringDropdownElement =
+                    stringDropdownField.Q<LayerStringDropdownElement>();
+                if(layerStringDropdownElement != null)
+                {
+                    // Debug.Log($"renderer update string {value}");
+                    layerStringDropdownElement.SetValueWithoutNotify(value);
+                    return null;
+                }
+            }
+
+            LayerStringDropdownElement stringDropdownElement = new LayerStringDropdownElement
+            {
+                value = value,
+            };
+            StringDropdownField element = new StringDropdownField(label, stringDropdownElement);
+            stringDropdownElement.BindDrop(element);
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                stringDropdownElement.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    // Debug.Log($"renderer set string {evt.newValue}");
+                    setterOrNull(evt.newValue);
+                });
+            }
+
+            return element;
+        }
     }
 }
 #endif

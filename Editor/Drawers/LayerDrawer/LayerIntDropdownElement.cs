@@ -29,12 +29,14 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 if (layerInfo.Value == newValue)
                 {
                     Label.text = LayerUtils.LayerInfoLabelUIToolkit(layerInfo);
+                    Button.tooltip = layerInfo.Name;
                     return;
                 }
             }
 
             Label.text =
                 LayerUtils.LayerInfoLabelUIToolkit(new LayerUtils.LayerInfo("<color=red>?</color>", newValue));
+            Button.tooltip = "Invalid layer";
         }
     }
 }

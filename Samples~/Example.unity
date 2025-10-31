@@ -17636,9 +17636,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00b403bd36614aacb791b2f4b7868665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  layerString: Ignore Raycast
+  layerInt: 4
+  layerIntDisabled: 0
+  myLayerMask:
+    serializedVersion: 2
+    m_Bits: 52
   lm:
     serializedVersion: 2
-    m_Bits: 20
+    m_Bits: 32
 --- !u!1 &1085780193
 GameObject:
   m_ObjectHideFlags: 0

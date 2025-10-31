@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using SaintsField.SaintsSerialization;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 // ReSharper disable once CheckNamespace
 using System;
 

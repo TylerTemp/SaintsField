@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer;
+using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Interfaces;
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
@@ -2692,6 +2694,41 @@ namespace SaintsField.Editor.Utils
 
             Type type = v.GetType();
             return $"{type.Name} <color=#{ColorUtility.ToHtmlStringRGB(Color.gray)}>{type.Namespace}</color>";
+        }
+
+        public static void UIToolkitValueEditAfterProcess<T>(
+            BaseField<T> element,
+            Action<object> setterOrNull,
+            bool labelGrayColor,
+            bool inHorizontalLayout)
+        {
+            if (labelGrayColor)
+            {
+                element.labelElement.style.color = AbsRenderer.ReColor;
+            }
+            if (inHorizontalLayout)
+            {
+                element.style.flexDirection = FlexDirection.Column;
+            }
+            else
+            {
+                element.AddToClassList(BaseField<T>.alignedFieldUssClassName);
+            }
+            if (setterOrNull == null)
+            {
+                element.SetEnabled(false);
+                element.AddToClassList(AbsRenderer.ClassSaintsFieldEditingDisabled);
+            }
+            else
+            {
+                element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                // element.RegisterValueChangedCallback(evt =>
+                // {
+                //     object newValue = transformer(evt.newValue);
+                //     beforeSet?.Invoke(newValue);
+                //     setterOrNull.Invoke(newValue);
+                // });
+            }
         }
     }
 #endif
