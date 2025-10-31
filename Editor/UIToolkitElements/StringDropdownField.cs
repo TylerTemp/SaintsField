@@ -23,22 +23,11 @@ namespace SaintsField.Editor.UIToolkitElements
             Button.style.flexGrow = 1;
 
             Label = Button.Q<Label>();
-            // You gotta be shitting me
-            Label.RegisterValueChangedCallback(e =>
-            {
-#if UNITY_2023_2_OR_NEWER
-                // e.PreventDefault();
-                Label.focusController.IgnoreEvent(e);
-                panel.focusController.IgnoreEvent(e);
-                Button.focusController.IgnoreEvent(e);
-#else
-                    e.PreventDefault()
-#endif
-            });
 
             Add(dropdownElement);
         }
 
+        // You gotta be shitting me
         public void SetLabelString(string v) => ((INotifyValueChanged<string>)Label).SetValueWithoutNotify(v);
 
         public abstract void SetValueWithoutNotify(string newValue);
