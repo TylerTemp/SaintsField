@@ -1,4 +1,6 @@
-﻿namespace SaintsField.Samples.Scripts
+﻿using SaintsField.Playa;
+
+namespace SaintsField.Samples.Scripts
 {
     public class SceneExample: SaintsMonoBehaviour
     {
@@ -20,5 +22,19 @@
 
         [ReadOnly]
         [Scene] public string sceneDisabled;
+
+        [ShowInInspector, Scene]
+        private string sceneSRaw
+        {
+            get => sceneS;
+            set => sceneS = value;
+        }
+
+        [ShowInInspector, Scene]
+        private int sceneIRaw
+        {
+            get => sceneI;
+            set => sceneI = value;
+        }
     }
 }
