@@ -6779,9 +6779,6 @@ In the picture
 *   `D` is dynamic, which allows you to bind its value to the event's value. In this example, it's binded to `T2 (string)` in `SaintsEvent<MyClass, int, string>`
 *   `X` is default, which uses function parameter's default value. In this example, `int i = -1`, so use `-1`
 
-> [!WARNING]
-> ATM it will not check if the parameter type can accept the corresponding value type. Please check it by yourself carefully.
-
 **Runtime**
 
 In runtime, you can use `SaintsEvent.Invoke()`, `SaintsEvent.AddListener(callback)` and `SaintsEvent.RemoveListener(callback)`, `SaintsEvent.RemoveAllListeners()` just like `UnityEvent`.
