@@ -25,21 +25,32 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
+            SceneAttribute sceneAttribute = saintsAttribute as SceneAttribute ?? new SceneAttribute();
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Integer:
                 {
-                    SceneIntDropdownElement intDropdownElement = new SceneIntDropdownElement();
-                    intDropdownElement.BindProperty(property);
-                    return new IntDropdownField(GetPreferredLabel(property), intDropdownElement);
+                    ScenePickerIntElement e = new ScenePickerIntElement(sceneAttribute)
+                    {
+                        bindingPath = property.propertyPath
+                    };
+                    e.BindProperty(property);
+                    ScenePickerIntField r = new ScenePickerIntField(GetPreferredLabel(property), e);
+                    r.AddToClassList(ClassAllowDisable);
+                    r.AddToClassList(ScenePickerIntField.alignedFieldUssClassName);
+                    return r;
                 }
                 case SerializedPropertyType.String:
                 {
-                    SceneStringDropdownElement layerStringStringDropdown = new SceneStringDropdownElement(
-                        ((SceneAttribute)saintsAttribute).FullPath);
-                    layerStringStringDropdown.BindProperty(property);
-                    return new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
+                    ScenePickerStringField r = new ScenePickerStringField(GetPreferredLabel(property),
+                        new ScenePickerStringElement(sceneAttribute)
+                        {
+                            bindingPath = property.propertyPath
+                        });
+                    r.AddToClassList(ClassAllowDisable);
+                    r.AddToClassList(ScenePickerStringField.alignedFieldUssClassName);
+                    return r;
                 }
                 default:
                     return new Label(GetPreferredLabel(property));
@@ -57,7 +68,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             {
                 case SerializedPropertyType.Integer:
                 case SerializedPropertyType.String:
-                    return null;
+                    return new SceneHelpBox();
                 default:
                     return new HelpBox($"Type {property.propertyType} is not int or string.", HelpBoxMessageType.Error)
                     {
@@ -75,22 +86,32 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             bool fullPath = ((SceneAttribute)saintsAttribute).FullPath;
+            SceneHelpBox helpBox = container.Q<SceneHelpBox>();
+
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Integer:
                 {
-                    IntDropdownField intDropdownField = container.Q<IntDropdownField>();
-                    AddContextualMenuManipulator(fullPath, intDropdownField, property, onValueChangedCallback, info, parent);
+                    ScenePickerIntField scenePickerIntField = container.Q<ScenePickerIntField>();
+                    AddContextualMenuManipulator(fullPath, scenePickerIntField, property, onValueChangedCallback, info, parent);
 
-                    intDropdownField.Button.clicked += () => MakeDropdown(fullPath, property, intDropdownField, onValueChangedCallback, info, parent);
+                    scenePickerIntField.ScenePickerIntElement.BindStringHelpBox(helpBox);
                 }
                     break;
                 case SerializedPropertyType.String:
                 {
-                    StringDropdownField layerStringField = container.Q<StringDropdownField>();
+                    ScenePickerStringField layerStringField = container.Q<ScenePickerStringField>();
                     AddContextualMenuManipulator(fullPath, layerStringField, property, onValueChangedCallback, info, parent);
 
-                    layerStringField.Button.clicked += () => MakeDropdown(fullPath, property, layerStringField, onValueChangedCallback, info, parent);
+                    layerStringField.ScenePickerStringElement.BindStringHelpBox(helpBox);
+                    // ScenePickerStringElement.HelpBoxErrorHandler(helpBox, helpBoxButton, layerStringField.ScenePickerStringElement.ErrorEventString, layerStringField.ScenePickerStringElement.ErrorEventScene);
+                    // layerStringField.ScenePickerStringElement.ErrorEvent.AddListener(
+                    //     (str, scene) =>
+                    //         ScenePickerStringElement.HelpBoxErrorHandler(helpBox, helpBoxButton, str, scene)
+                    // );
+                    // helpBoxButton.clicked += ()
+                    // layerStringField.Button.clicked += () => MakeDropdown(fullPath, property, layerStringField, onValueChangedCallback, info, parent);
                 }
                     break;
                 default:
@@ -153,95 +174,6 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             }));
         }
 
-        private static void MakeDropdown(bool isFullPath, SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            bool isString = property.propertyType == SerializedPropertyType.String;
-            AdvancedDropdownList<(string path, int index)> dropdown = new AdvancedDropdownList<(string path, int index)>();
-            if (isString)
-            {
-                dropdown.Add("[Empty String]", (string.Empty, -1));
-                dropdown.AddSeparator();
-            }
-
-            string selectedPath = null;
-            int selectedIndex = -1;
-            foreach ((string path, int index) in SceneUtils.GetTrimedScenePath(isFullPath).WithIndex())
-            {
-                // dropdown.Add(path, (path, index));
-                dropdown.Add(new AdvancedDropdownList<(string path, int index)>(path, (path, index)));
-                // ReSharper disable once InvertIf
-                if (isString && path == property.stringValue
-                    || !isString && index == property.intValue)
-                {
-                    selectedPath = path;
-                    selectedIndex = index;
-                }
-            }
-
-            dropdown.AddSeparator();
-            dropdown.Add("Edit Scenes In Build...", ("", -2), false, "d_editicon.sml");
-
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
-            {
-                CurValues = selectedIndex >= 0 ? new object[] { (selectedPath, selectedIndex) } : Array.Empty<object>(),
-                DropdownListValue = dropdown,
-                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
-            };
-
-            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
-
-            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
-                metaInfo,
-                root.worldBound.width,
-                maxHeight,
-                false,
-                (_, curItem) =>
-                {
-                    (string path, int index) = ((string path, int index))curItem;
-                    switch (index)
-                    {
-                        case -1:
-                        {
-                            Debug.Assert(isString);
-                            property.stringValue = "";
-                            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, "");
-                            property.serializedObject.ApplyModifiedProperties();
-                            onValueChangedCallback.Invoke("");
-                        }
-                            break;
-                        case -2:
-                        {
-                            SceneUtils.OpenBuildSettings();
-                        }
-                            break;
-                        default:
-                        {
-                            if (isString)
-                            {
-                                property.stringValue = path;
-                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, path);
-                                property.serializedObject.ApplyModifiedProperties();
-                                onValueChangedCallback.Invoke(path);
-                            }
-                            else
-                            {
-                                property.intValue = index;
-                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, index);
-                                property.serializedObject.ApplyModifiedProperties();
-                                onValueChangedCallback.Invoke(index);
-                            }
-                        }
-                            break;
-                    }
-                }
-            );
-
-            // DebugPopupExample.SaintsAdvancedDropdownUIToolkit = sa;
-            // var editorWindow = EditorWindow.GetWindow<DebugPopupExample>();
-            // editorWindow.Show();
-
-            UnityEditor.PopupWindow.Show(worldBound, sa);
-        }
     }
 }
 #endif
