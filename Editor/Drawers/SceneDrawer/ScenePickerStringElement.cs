@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -21,22 +20,23 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
             sceneHelpBox.EnableClicked.AddListener(() =>
             {
-                if (ErrorEditorScene == null)
+                if (_errorEditorScene == null)
                 {
                     return;
                 }
 
                 EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
-                string path = ErrorEditorScene.path;
+                string path = _errorEditorScene.path;
                 int index = Array.FindIndex(scenes, each => each.path == path);
+                // ReSharper disable once InvertIf
                 if (index != -1)
                 {
-                    ErrorEditorScene.enabled = true;
-                    scenes[index] = ErrorEditorScene;
+                    _errorEditorScene.enabled = true;
+                    scenes[index] = _errorEditorScene;
                     EditorBuildSettings.scenes = scenes;
 
-                    ErrorEventString = "";
-                    ErrorEditorScene = null;
+                    _errorEventString = "";
+                    _errorEditorScene = null;
 
                     value = SceneUtils.TrimScenePath(path, _fullPath);
                 }
@@ -44,14 +44,14 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
             sceneHelpBox.AddClicked.AddListener(() =>
             {
-                if (ErrorSceneAsset != null)
+                if (_errorSceneAsset != null)
                 {
-                    AddScenePath(AssetDatabase.GetAssetPath(ErrorSceneAsset));
+                    AddScenePath(AssetDatabase.GetAssetPath(_errorSceneAsset));
                 }
 
-                if (ErrorEventString != "")
+                if (_errorEventString != "")
                 {
-                    AddScenePath($"Assets/{ErrorEventString}.unity");
+                    AddScenePath($"Assets/{_errorEventString}.unity");
                 }
             });
         }
@@ -66,8 +66,8 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 EditorBuildSettingsScene[] newScenes = scenes.Append(
                     new EditorBuildSettingsScene(newPath,true)).ToArray();
                 EditorBuildSettings.scenes = newScenes;
-                ErrorEventString = "";
-                ErrorEditorScene = null;
+                _errorEventString = "";
+                _errorEditorScene = null;
 
                 value = SceneUtils.TrimScenePath(newPath, _fullPath);
             }
@@ -80,34 +80,34 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 return;
             }
 
-            if (ErrorEditorScene != null)
+            if (_errorEditorScene != null)
             {
-                _sceneHelpBox.text = $"{ErrorEditorScene.path} not enabled";
+                _sceneHelpBox.text = $"{_errorEditorScene.path} not enabled";
                 _sceneHelpBox.style.display = DisplayStyle.Flex;
                 _sceneHelpBox.EnableButton.style.display = DisplayStyle.Flex;
                 _sceneHelpBox.AddButton.style.display = DisplayStyle.None;
                 return;
             }
 
-            if (ErrorSceneAsset != null)
+            if (_errorSceneAsset != null)
             {
-                _sceneHelpBox.text = $"{ErrorEventString} not in build list";
+                _sceneHelpBox.text = $"{_errorEventString} not in build list";
                 _sceneHelpBox.style.display = DisplayStyle.Flex;
                 _sceneHelpBox.EnableButton.style.display = DisplayStyle.None;
                 _sceneHelpBox.AddButton.style.display = DisplayStyle.Flex;
                 return;
             }
 
-            if (ErrorEventString != "")
+            if (_errorEventString != "")
             {
                 if (_fullPath)
                 {
-                    _sceneHelpBox.text = $"{ErrorEventString} not in build list";
+                    _sceneHelpBox.text = $"{_errorEventString} not in build list";
                     _sceneHelpBox.AddButton.style.display = DisplayStyle.Flex;
                 }
                 else
                 {
-                    _sceneHelpBox.text = $"{ErrorEventString} not in build list and we can not find a correct location";
+                    _sceneHelpBox.text = $"{_errorEventString} not in build list and we can not find a correct location";
                     _sceneHelpBox.AddButton.style.display = DisplayStyle.None;
                 }
 
@@ -140,9 +140,9 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
         private readonly bool _fullPath;
 
-        public string ErrorEventString = "";
-        public EditorBuildSettingsScene ErrorEditorScene;
-        public SceneAsset ErrorSceneAsset;
+        private string _errorEventString = "";
+        private EditorBuildSettingsScene _errorEditorScene;
+        private SceneAsset _errorSceneAsset;
 
         public ScenePickerStringElement(SceneAttribute sceneAttribute)
         {
@@ -168,34 +168,34 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             foreach (EditorBuildSettingsScene editorScene in EditorBuildSettings.scenes)
             {
                 string trimPath = SceneUtils.TrimScenePath(editorScene.path, _fullPath);
-                Debug.Log($"{newValue} -> {trimPath}/{editorScene.enabled}");
+                // Debug.Log($"{newValue} -> {trimPath}/{editorScene.enabled}");
                 if (trimPath == newValue)
                 {
                     if (!editorScene.enabled)
                     {
-                        ErrorEventString = newValue;
-                        ErrorEditorScene = editorScene;
+                        _errorEventString = newValue;
+                        _errorEditorScene = editorScene;
                         UpdateHelpBoxError();
-                        Debug.Log("not enabled");
+                        // Debug.Log("not enabled");
                         return;
                     }
 
-                    Debug.Log($"found {editorScene.path}");
+                    // Debug.Log($"found {editorScene.path}");
                     SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(editorScene.path);
-                    Debug.Log($"set {sceneAsset}");
+                    // Debug.Log($"set {sceneAsset}");
                     _sceneField.SetValueWithoutNotify(sceneAsset);
-                    ErrorEventString = "";
-                    ErrorEditorScene = null;
-                    ErrorSceneAsset = null;
+                    _errorEventString = "";
+                    _errorEditorScene = null;
+                    _errorSceneAsset = null;
                     UpdateHelpBoxError();
                     return;
                 }
             }
 
             // not found
-            ErrorEventString = newValue;
-            ErrorEditorScene = null;
-            Debug.Log("not found");
+            _errorEventString = newValue;
+            _errorEditorScene = null;
+            // Debug.Log("not found");
             UpdateHelpBoxError();
         }
 
@@ -228,7 +228,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
         protected override void OnSceneFieldChanged(ChangeEvent<Object> evt)
         {
-            ErrorSceneAsset = null;
+            _errorSceneAsset = null;
 
             if (evt.newValue == null)
             {
@@ -245,8 +245,8 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 {
                     if (!inBuild.enabled)
                     {
-                        ErrorEventString = toValue;
-                        ErrorEditorScene = inBuild;
+                        _errorEventString = toValue;
+                        _errorEditorScene = inBuild;
                         UpdateHelpBoxError();
                         return;
                     }
@@ -258,8 +258,8 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
             // not found
             // Debug.Log($"OnSceneFieldChanged not found {toValue}");
-            ErrorEventString = toValue;
-            ErrorSceneAsset = sceneAsset;
+            _errorEventString = toValue;
+            _errorSceneAsset = sceneAsset;
             UpdateHelpBoxError();
             // value = SceneUtils.TrimScenePath(AssetDatabase.GetAssetPath(sceneAsset), _fullPath);
         }

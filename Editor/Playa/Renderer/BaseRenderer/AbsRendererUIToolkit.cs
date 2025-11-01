@@ -10,6 +10,7 @@ using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
+using SaintsField.Editor.Drawers.SceneDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
@@ -467,17 +468,24 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(int) || value is int)
             {
-                if (allAttributes.Any(each => each is LayerAttribute))
+                foreach (Attribute each in allAttributes)
                 {
-                    return (LayerAttributeDrawer.UIToolkitValueEditInt(
-                        oldElement,
-                        label,
-                        (int) value,
-                        beforeSet,
-                        setterOrNull,
-                        labelGrayColor,
-                        inHorizontalLayout,
-                        allAttributes), false);
+                    switch (each)
+                    {
+                        case LayerAttribute:
+                            return (LayerAttributeDrawer.UIToolkitValueEditInt(oldElement, label, (int)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, allAttributes), false);
+                        case SceneAttribute sceneAttribute:
+                            return (SceneAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                sceneAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                    }
                 }
 
                 if (oldElement is IntegerField oldIntegerField)
@@ -809,19 +817,33 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if (valueType == typeof(string) || value is string)
             {
-                if (allAttributes.Any(each => each is LayerAttribute))
+                foreach (Attribute attribute in allAttributes)
                 {
-                    return (LayerAttributeDrawer.UIToolkitValueEditString(
-                        oldElement,
-                        label,
-                        (string) value,
-                        beforeSet,
-                        setterOrNull,
-                        labelGrayColor,
-                        inHorizontalLayout,
-                        allAttributes), false);
+                    switch (attribute)
+                    {
+                        case LayerAttribute:
+                            return (LayerAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case SceneAttribute sceneAttribute:
+                            return (SceneAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                sceneAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                    }
                 }
-
 
                 if (oldElement is TextField oldTextField)
                 {
