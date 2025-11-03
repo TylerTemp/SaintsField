@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SaintsField.Utils;
 using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.SceneDrawer
@@ -9,7 +10,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
     public static class SceneUtils
     {
         public static IEnumerable<string> GetTrimedScenePath(bool fullPath) =>
-            GetScenePath().Select(scenePath => TrimScenePath(scenePath, fullPath));
+            GetScenePath().Select(scenePath => RuntimeUtil.TrimScenePath(scenePath, fullPath));
 
         public static void OpenBuildSettings()
         {
@@ -24,36 +25,5 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 .Where(scene => scene.enabled)
                 // .Select(scene => Path.GetFileNameWithoutExtension(scene.path))
                 .Select(scene => scene.path) ;
-
-        public static string TrimScenePath(string scenePath, bool fullPath)
-        {
-            string preTrimScenePath = scenePath;
-            if(preTrimScenePath.StartsWith("/Assets/"))
-            {
-                // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                preTrimScenePath = preTrimScenePath.Substring("/Assets/".Length);
-            }
-            else if(preTrimScenePath.StartsWith("Assets/"))
-            {
-                // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                preTrimScenePath = preTrimScenePath.Substring("Assets/".Length);
-            }
-
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            // ReSharper disable once InvertIf
-            if (preTrimScenePath.EndsWith(".unity"))
-            {
-                if(fullPath)
-                {
-                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                    return preTrimScenePath.Substring(0, preTrimScenePath.Length - ".unity".Length);
-                }
-                return Path.GetFileNameWithoutExtension(preTrimScenePath);
-            }
-
-            return fullPath? preTrimScenePath : Path.GetFileNameWithoutExtension(preTrimScenePath);
-        }
-
-
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -673,6 +674,35 @@ namespace SaintsField.Utils
 
             // types marked [Serializable] (includes built-in structs like Vector3, Rect, etc.)
             return t.IsSerializable;
+        }
+
+        public static string TrimScenePath(string scenePath, bool fullPath)
+        {
+            string preTrimScenePath = scenePath;
+            if(preTrimScenePath.StartsWith("/Assets/"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                preTrimScenePath = preTrimScenePath.Substring("/Assets/".Length);
+            }
+            else if(preTrimScenePath.StartsWith("Assets/"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                preTrimScenePath = preTrimScenePath.Substring("Assets/".Length);
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            // ReSharper disable once InvertIf
+            if (preTrimScenePath.EndsWith(".unity"))
+            {
+                if(fullPath)
+                {
+                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                    return preTrimScenePath.Substring(0, preTrimScenePath.Length - ".unity".Length);
+                }
+                return Path.GetFileNameWithoutExtension(preTrimScenePath);
+            }
+
+            return fullPath? preTrimScenePath : Path.GetFileNameWithoutExtension(preTrimScenePath);
         }
     }
 }

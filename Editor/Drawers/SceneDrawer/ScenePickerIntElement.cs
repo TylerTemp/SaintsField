@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.UIToolkitElements;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.VersionControl;
 using UnityEngine;
@@ -186,7 +187,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach ((EditorBuildSettingsScene editorScene, int index) in EditorBuildSettings.scenes.Where(each => each.enabled).WithIndex())
             {
-                result.Add(new ScenePickerIntPayload(SceneUtils.TrimScenePath(editorScene.path, _fullPath), index));
+                result.Add(new ScenePickerIntPayload(RuntimeUtil.TrimScenePath(editorScene.path, _fullPath), index));
             }
 
             return result;

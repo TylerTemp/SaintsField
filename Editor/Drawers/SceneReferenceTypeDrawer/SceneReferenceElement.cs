@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SaintsField.Editor.Drawers.SceneDrawer;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Drawers.SceneDrawer
+namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
 {
-    public class ScenePickerStringElement: ScenePickerBaseElement<string>
+    public class SceneReferenceElement: ScenePickerBaseElement<string>
     {
         private SceneHelpBox _sceneHelpBox;
 
@@ -39,7 +42,15 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                     _errorEventString = "";
                     _errorEditorScene = null;
 
-                    value = RuntimeUtil.TrimScenePath(path, _fullPath);
+                    string newGuid = AssetDatabase.AssetPathToGUID(path);
+                    if (value == newGuid)
+                    {
+                        SetValueWithoutNotify(newGuid);
+                    }
+                    else
+                    {
+                        value = newGuid;
+                    }
                 }
             });
 
@@ -70,7 +81,16 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 _errorEventString = "";
                 _errorEditorScene = null;
 
-                value = RuntimeUtil.TrimScenePath(newPath, _fullPath);
+                string newGuid = AssetDatabase.AssetPathToGUID(newPath);
+                // Debug.Log($"get guid {newGuid} from {newPath}");
+                if (CachedValue == newGuid)
+                {
+                    SetValueWithoutNotify(newGuid);
+                }
+                else
+                {
+                    value = newGuid;
+                }
             }
         }
 
@@ -101,16 +121,8 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
             if (_errorEventString != "")
             {
-                if (_fullPath)
-                {
-                    _sceneHelpBox.text = $"{_errorEventString} not in build list";
-                    _sceneHelpBox.AddButton.style.display = DisplayStyle.Flex;
-                }
-                else
-                {
-                    _sceneHelpBox.text = $"{_errorEventString} not in build list and we can not find a correct location";
-                    _sceneHelpBox.AddButton.style.display = DisplayStyle.None;
-                }
+                _sceneHelpBox.text = $"{_errorEventString} not in build list";
+                _sceneHelpBox.AddButton.style.display = DisplayStyle.Flex;
 
                 _sceneHelpBox.style.display = DisplayStyle.Flex;
                 _sceneHelpBox.EnableButton.style.display = DisplayStyle.None;
@@ -120,83 +132,123 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             _sceneHelpBox.style.display = DisplayStyle.None;
         }
 
-        private readonly struct ScenePickerStringPayload : IScenePickerPayload
+        private void SetHelpBoxErrorText(string text)
         {
-            public readonly bool IsNormalItem;
-
-            public string Name { get; }
-
-            private readonly bool _isFullPath;
-
-            public bool IsSceneAsset(SceneAsset sceneAsset) =>
-                Name == RuntimeUtil.TrimScenePath(AssetDatabase.GetAssetPath(sceneAsset), _isFullPath);
-
-            public ScenePickerStringPayload(bool isFullPath, string scenePath)
+            if (_sceneHelpBox == null)
             {
-                IsNormalItem = true;
-                _isFullPath = isFullPath;
-                Name = scenePath;
+                return;
             }
+
+            _sceneHelpBox.text = text;
+            _sceneHelpBox.style.display = DisplayStyle.Flex;
+            _sceneHelpBox.EnableButton.style.display = DisplayStyle.None;
+            _sceneHelpBox.AddButton.style.display = DisplayStyle.None;
         }
 
-        private readonly bool _fullPath;
+        private readonly struct SceneReferencePayload: IScenePickerPayload
+        {
+            public string Name { get; }
+
+            public readonly string Guid;
+            public readonly int Index;
+
+            public bool IsSceneAsset(SceneAsset sceneAsset)
+            {
+                if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(sceneAsset, out string guid, out long _))
+                {
+                    return false;
+                }
+
+                return guid == Guid;
+            }
+
+            public SceneReferencePayload(string guid, string name, int index)
+            {
+                Name = name;
+                Guid = guid;
+                Index = index;
+            }
+        }
 
         private string _errorEventString = "";
         private EditorBuildSettingsScene _errorEditorScene;
         private SceneAsset _errorSceneAsset;
 
-        public ScenePickerStringElement(SceneAttribute sceneAttribute)
+        protected override bool AllowEmpty() => false;
+
+        protected override IScenePickerPayload MakeEmpty()
         {
-            _fullPath = sceneAttribute.FullPath;
+            throw new NotSupportedException("Should not go here");
         }
 
-        protected override bool AllowEmpty() => true;
-
-        protected override IScenePickerPayload MakeEmpty() => new ScenePickerStringPayload(_fullPath, "");
-
-        protected override bool CurrentIsPayload(IScenePickerPayload payload) => payload.Name == value;
+        protected override bool CurrentIsPayload(IScenePickerPayload payload)
+        {
+            return ((SceneReferencePayload)payload).Guid == value;
+        }
 
         protected override void PostProcessDropdownList(AdvancedDropdownList<IScenePickerPayload> dropdown)
         {
             dropdown.AddSeparator();
-            dropdown.Add("Edit Scenes In Build...", new ScenePickerStringPayload(), false, "d_editicon.sml");
+            dropdown.Add("Edit Scenes In Build...", new SceneReferencePayload("", "", -1), false, "d_editicon.sml");
         }
 
         public override void SetValueWithoutNotify(string newValue)
         {
-            HasCachedValue = true;
-            CachedValue = newValue;
-            foreach (EditorBuildSettingsScene editorScene in EditorBuildSettings.scenes)
+            if (string.IsNullOrEmpty(newValue))
             {
-                string trimPath = RuntimeUtil.TrimScenePath(editorScene.path, _fullPath);
-                // Debug.Log($"{newValue} -> {trimPath}/{editorScene.enabled}");
-                if (trimPath == newValue)
+                SetHelpBoxErrorText("Guid is empty");
+                return;
+            }
+
+            // Debug.Log($"SetValueWithoutNotify {value} -> {newValue}");
+            if (!GUID.TryParse(newValue, out GUID guidResult))
+            {
+                // Debug.Log($"SetValueWithoutNotify failed to parse {newValue}");
+                SetHelpBoxErrorText($"Invalid guid {newValue}");
+                return;
+            }
+
+            SceneAsset asset = AssetDatabase.LoadAssetByGUID<SceneAsset>(guidResult);
+            if (asset == null)
+            {
+                SetHelpBoxErrorText($"Guid {guidResult} does not exists or is not SceneAsset");
+                return;
+            }
+
+            if (_sceneField.value != asset)
+            {
+                _sceneField.SetValueWithoutNotify(asset);
+            }
+
+            string scenePath = AssetDatabase.GetAssetPath(asset);
+            string toValue = RuntimeUtil.TrimScenePath(scenePath, true);
+            foreach (EditorBuildSettingsScene inBuild in EditorBuildSettings.scenes)
+            {
+                if (inBuild.path == scenePath)
                 {
-                    if (!editorScene.enabled)
+                    if (!inBuild.enabled)
                     {
-                        _errorEventString = newValue;
-                        _errorEditorScene = editorScene;
+                        _errorEventString = toValue;
+                        _errorEditorScene = inBuild;
+                        _errorSceneAsset = null;
                         UpdateHelpBoxError();
-                        // Debug.Log("not enabled");
                         return;
                     }
 
-                    // Debug.Log($"found {editorScene.path}");
-                    SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(editorScene.path);
-                    // Debug.Log($"set {sceneAsset}");
-                    _sceneField.SetValueWithoutNotify(sceneAsset);
+                    HasCachedValue = true;
+                    CachedValue = newValue;
+                    _sceneField.SetValueWithoutNotify(asset);
                     _errorEventString = "";
-                    _errorEditorScene = null;
                     _errorSceneAsset = null;
+                    _errorEditorScene = null;
                     UpdateHelpBoxError();
                     return;
                 }
             }
 
-            // not found
-            _errorEventString = newValue;
+            _errorEventString = toValue;
+            _errorSceneAsset = asset;
             _errorEditorScene = null;
-            // Debug.Log("not found");
             UpdateHelpBoxError();
         }
 
@@ -204,12 +256,12 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
         {
             List<IScenePickerPayload> result = new List<IScenePickerPayload>();
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (EditorBuildSettingsScene editorScene in EditorBuildSettings.scenes)
+            foreach ((EditorBuildSettingsScene editorScene, int index) in EditorBuildSettings.scenes.Where(each => each.enabled).WithIndex())
             {
-                if (editorScene.enabled)
-                {
-                    result.Add(new ScenePickerStringPayload(_fullPath, RuntimeUtil.TrimScenePath(editorScene.path, _fullPath)));
-                }
+                result.Add(new SceneReferencePayload(
+                    AssetDatabase.GUIDFromAssetPath(editorScene.path).ToString(),
+                    RuntimeUtil.TrimScenePath(editorScene.path, true),
+                    index));
             }
 
             return result;
@@ -217,13 +269,15 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
         protected override void SetSelectedPayload(IScenePickerPayload scenePickerPayload)
         {
-            if (!((ScenePickerStringPayload)scenePickerPayload).IsNormalItem)
+            SceneReferencePayload payload = (SceneReferencePayload)scenePickerPayload;
+            if (payload.Index == -1)
             {
                 SceneUtils.OpenBuildSettings();
             }
             else
             {
-                value = scenePickerPayload.Name;
+                // Debug.Log($"Set guid to {payload.Guid}");
+                value = payload.Guid;
             }
         }
 
@@ -238,7 +292,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             }
             SceneAsset sceneAsset = (SceneAsset)evt.newValue;
             string scenePath = AssetDatabase.GetAssetPath(sceneAsset);
-            string toValue = RuntimeUtil.TrimScenePath(scenePath, _fullPath);
+            string toValue = RuntimeUtil.TrimScenePath(scenePath, true);
 
             foreach (EditorBuildSettingsScene inBuild in EditorBuildSettings.scenes)
             {
@@ -262,29 +316,26 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
             _errorEventString = toValue;
             _errorSceneAsset = sceneAsset;
             UpdateHelpBoxError();
-            // value = SceneUtils.TrimScenePath(AssetDatabase.GetAssetPath(sceneAsset), _fullPath);
         }
     }
 
-    public class ScenePickerStringField : BaseField<string>
+    public class SceneReferenceField : BaseField<string>
     {
-        public readonly ScenePickerStringElement ScenePickerStringElement;
-
-        public ScenePickerStringField(string label, ScenePickerStringElement visualInput) : base(label, visualInput)
+        public readonly SceneReferenceElement SceneReferenceElement;
+        public SceneReferenceField(string label, SceneReferenceElement visualInput) : base(label, visualInput)
         {
-            visualInput.DropdownRoot = this;
-            ScenePickerStringElement = visualInput;
+            SceneReferenceElement = visualInput;
         }
 
         public override string value
         {
-            get => ScenePickerStringElement.value;
-            set => ScenePickerStringElement.value = value;
+            get => SceneReferenceElement.value;
+            set => SceneReferenceElement.value = value;
         }
 
         public override void SetValueWithoutNotify(string newValue)
         {
-            ScenePickerStringElement.SetValueWithoutNotify(newValue);
+            SceneReferenceElement.SetValueWithoutNotify(newValue);
         }
     }
 }
