@@ -18,6 +18,10 @@ namespace SaintsField
         public int index;
         public string path;
 
+        // Implicit conversion operator: Converts SaintsArray<T> to T[]
+        public static implicit operator string(SceneReference sceneReference) => sceneReference.path;
+        // public static implicit operator int(SceneReference sceneReference) => sceneReference.index;
+
 #if UNITY_EDITOR
 
         private bool _editorChecked;
@@ -40,7 +44,13 @@ namespace SaintsField
                 return;
             }
 
+#if UNITY_6000_0_OR_NEWER
             SceneAsset sceneAsset = AssetDatabase.LoadAssetByGUID<SceneAsset>(resultGuid);
+#else
+            SceneAsset sceneAsset =
+                AssetDatabase.LoadAssetAtPath<SceneAsset>(AssetDatabase.GUIDToAssetPath(resultGuid));
+#endif
+
             if (sceneAsset == null)
             {
                 Debug.Log($"guid {guid} asset is null");

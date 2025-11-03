@@ -31,7 +31,7 @@ namespace SaintsField
 
         protected override bool SerializedRemove(T key)
         {
-            int index = _saintsList.FindIndex(each => EqualityComparer<T>.Default.Equals(each.Value, key));
+            int index = _saintsList.FindIndex(each => EqualityComparer<T>.Default.Equals(each.GetValue(), key));
             if (index >= 0)
             {
                 _saintsList.RemoveAt(index);
@@ -41,7 +41,7 @@ namespace SaintsField
             return false;
         }
 
-        protected override T SerializedGetAt(int index) => _saintsList[index].Value;
+        protected override T SerializedGetAt(int index) => _saintsList[index].GetValue();
 
         protected override void SerializedClear() => _saintsList.Clear();
         #endregion
@@ -54,7 +54,7 @@ namespace SaintsField
             foreach (SaintsWrap<T> keyWrap in extraKeys)
             {
                 // Debug.Log($"add key listener");
-                keyWrap.onAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                keyWrap.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
                 _editorWatchedKeys.Add(keyWrap);
             }
             base.OnAfterDeserializeProcess();

@@ -7,16 +7,16 @@ namespace SaintsField.Samples.Scripts
         [
             Scene,
             // RichLabel("<icon=star.png /><label />")
-            BelowText("<field/>")
+            // BelowText("<field/>")
         ]
         public int sceneI;
         [Scene,
-            BelowText("$" + nameof(sceneS))
+            // BelowText("$" + nameof(sceneS))
         ]
         public string sceneS;
 
         [Scene(true),
-            BelowText("$" + nameof(fullPathScene))
+            // BelowText("$" + nameof(fullPathScene))
         ]
         public string fullPathScene;
 

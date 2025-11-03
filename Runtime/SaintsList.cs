@@ -75,7 +75,7 @@ namespace SaintsField
             foreach (SaintsWrap<T> keyWrap in extraKeys)
             {
                 // Debug.Log($"add key listener");
-                keyWrap.onAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                keyWrap.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
                 _editorWatchedKeys.Add(keyWrap);
             }
 #endif
@@ -89,7 +89,7 @@ namespace SaintsField
             int serCount = _saintsList.Count;
             for (int index = 0; index < serCount; index++)
             {
-                T v = _saintsList[index].Value;
+                T v = _saintsList[index].GetValue();
                 _list.Add(v);
             }
 
@@ -179,7 +179,7 @@ namespace SaintsField
 
                 for (int index = 0; index < _saintsList.Count; index++)
                 {
-                    T v = _saintsList[index].Value;
+                    T v = _saintsList[index].GetValue();
                     // ReSharper disable once InvertIf
                     if (EqualityComparer<T>.Default.Equals(v, item))
                     {

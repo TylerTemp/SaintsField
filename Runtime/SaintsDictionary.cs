@@ -28,7 +28,7 @@ namespace SaintsField
 
         protected override TKey SerializedKeyGetAt(int index)
         {
-            return _saintsKeys[index].Value;
+            return _saintsKeys[index].GetValue();
         }
 
         protected override void SerializedKeysClear()
@@ -48,7 +48,7 @@ namespace SaintsField
 
         protected override TValue SerializedValueGetAt(int index)
         {
-            return _saintsValues[index].Value;
+            return _saintsValues[index].GetValue();
         }
 
         protected override void SerializedValuesClear()
@@ -58,11 +58,11 @@ namespace SaintsField
 
         protected override void SerializedSetKeyValue(TKey tKey, TValue tValue)
         {
-            int index = _saintsKeys.FindIndex(wrap => wrap.Value.Equals(tKey));
+            int index = _saintsKeys.FindIndex(wrap => wrap.GetValue().Equals(tKey));
             if (index >= 0)
             {
                 // Debug.Log($"serialized set value {tKey}:{tValue}");
-                _saintsValues[index].Value = tValue;
+                _saintsValues[index].SetValue(tValue);
             }
             else
             {
@@ -74,7 +74,7 @@ namespace SaintsField
 
         protected override void SerializedRemoveKeyValue(TKey key)
         {
-            int index = _saintsKeys.FindIndex(wrap => wrap.Value.Equals(key));
+            int index = _saintsKeys.FindIndex(wrap => wrap.GetValue().Equals(key));
             if (index >= 0)
             {
                 _saintsKeys.RemoveAt(index);
@@ -92,14 +92,14 @@ namespace SaintsField
             foreach (SaintsWrap<TKey> keyWrap in extraKeys)
             {
                 // Debug.Log($"add key listener");
-                keyWrap.onAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                keyWrap.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
                 _editorWatchedKeys.Add(keyWrap);
             }
 
             foreach (SaintsWrap<TValue> valueWrap in extraValues)
             {
                 // Debug.Log($"add value listener");
-                valueWrap.onAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                valueWrap.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
                 _editorWatchedValues.Add(valueWrap);
             }
 

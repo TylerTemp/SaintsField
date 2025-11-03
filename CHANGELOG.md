@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.2.0 ##
+
+1.  **CRITICAL**: Fix dictionary serializtion theard might read un-allocated data and crash the game when boot
+2.  Add `SceneReference` to save scene asset GUID, and then visit the path & index of the scene
+3.  When using `[Scene]`, if the target is not in the build list or is disabled, now it'll give a button to fix it
+
 ## 5.1.0 ##
 
 1.  `Layer` now support `LayerMask` type to pick a single layer
@@ -31,7 +37,7 @@
 
 ## 4.37.0 ##
 
-1.  `SaintsDictionary<,>` now support `interface` type & `abstract` type directly 
+1.  `SaintsDictionary<,>` now support `interface` type & `abstract` type directly
 2.  Add `[KeyAttribute(type, arguments...)]` and `[ValueAttribute(type, arguments...)]` to inject attributes to key/value for `SaintsDictionary<,>`
 
 ## 4.36.0 ##

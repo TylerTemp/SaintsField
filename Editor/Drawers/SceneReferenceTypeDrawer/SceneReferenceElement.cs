@@ -208,7 +208,13 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
                 return;
             }
 
+#if UNITY_6000_0_OR_NEWER
             SceneAsset asset = AssetDatabase.LoadAssetByGUID<SceneAsset>(guidResult);
+#else
+            SceneAsset asset =
+                AssetDatabase.LoadAssetAtPath<SceneAsset>(AssetDatabase.GUIDToAssetPath(guidResult));
+#endif
+
             if (asset == null)
             {
                 SetHelpBoxErrorText($"Guid {guidResult} does not exists or is not SceneAsset");
@@ -325,6 +331,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
         public SceneReferenceField(string label, SceneReferenceElement visualInput) : base(label, visualInput)
         {
             SceneReferenceElement = visualInput;
+            visualInput.DropdownRoot = this;
         }
 
         public override string value

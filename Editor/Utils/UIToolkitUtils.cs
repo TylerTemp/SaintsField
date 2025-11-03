@@ -2098,7 +2098,18 @@ namespace SaintsField.Editor.Utils
         public static void Unbind(VisualElement element)
         {
 #if UNITY_2021_3_OR_NEWER
-            element.Unbind();
+            try
+            {
+                element.Unbind();
+            }
+            catch (NullReferenceException)
+            {
+                // ignore
+            }
+            catch (ObjectDisposedException)
+            {
+                // ignore
+            }
 // not working atm, comment out
 // #else
 //             if (_fallbackUnbindReflectionFailed)

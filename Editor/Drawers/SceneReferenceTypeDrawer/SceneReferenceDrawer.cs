@@ -74,12 +74,18 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
         private static void RefreshGuid(SerializedProperty sceneGuidProp, SerializedProperty scenePathProp, SerializedProperty sceneIndexProp)
         {
             string guid = sceneGuidProp.stringValue;
-            if (!GUID.TryParse(guid, out GUID guidResult))
+            if (!GUID.TryParse(guid, out GUID resultGuid))
             {
                 return;
             }
 
-            SceneAsset sceneAsset = AssetDatabase.LoadAssetByGUID<SceneAsset>(guidResult);
+#if UNITY_6000_0_OR_NEWER
+            SceneAsset sceneAsset = AssetDatabase.LoadAssetByGUID<SceneAsset>(resultGuid);
+#else
+            SceneAsset sceneAsset =
+                AssetDatabase.LoadAssetAtPath<SceneAsset>(AssetDatabase.GUIDToAssetPath(resultGuid));
+#endif
+
             if (sceneAsset == null)
             {
                 return;

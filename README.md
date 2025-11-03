@@ -1015,7 +1015,7 @@ using SaintsField;
 [Scene(true)] public string _sceneFullPath;
 ```
 
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/0da47bd1-0741-4707-b96b-6c08e4c5844c)
+![image](https://github.com/user-attachments/assets/4628d7a1-30cd-4025-b315-da5f8589f7cc)
 
 #### `SortingLayer` ####
 
@@ -4798,7 +4798,7 @@ Which means, though it works 90% of the time:
 ```csharp
 using SaintsField.Playa;
 
-[LayoutStart("Group", ELayout.FoldoutBox)] 
+[LayoutStart("Group", ELayout.FoldoutBox)]
 public int i1;
 public int i2;
 
@@ -6809,6 +6809,26 @@ public SaintsEvent sEvent;
 public SaintsEvent sEvent2;
 ```
 
+### `SceneReference` ###
+
+Serialize scene asset GUID, and then visit the path & index of the scene
+
+It'll give error & fixing button if the selected scene is not in build list or is disabled.
+
+```csharp
+using SaintsField;
+
+public SceneReference sceneRef;
+
+private void Load()
+{
+    SceneManager.LoadScene(sceneRef);  // load by scene path (name)
+    SceneManager.LoadScene(sceneRef.index);  // load by scene index
+}
+```
+
+![](https://github.com/user-attachments/assets/1691d670-7716-4acd-840a-7d2a8dfcce99)
+
 ## Addressable ##
 
 These tools are for [Unity Addressable](https://docs.unity3d.com/Packages/com.unity.addressables@latest). It's there only if you have `Addressable` installed.
@@ -8125,7 +8145,7 @@ See [Auto Validator example code](https://github.com/TylerTemp/SaintsField/blob/
 2.  the drawer itself respects `unity-label` class to Label for UI Toolkit
 3.  if the drawer hijacks the `CustomEditor`, it must fall to the rest drawers
 
-Note about [OdinInspector](https://odininspector.com/): Odin is IMGUI based with UI Toolkit partly supported. It has label align issue with UI Toolkit. I asked them in discord but never get response. Using `SaintsField` with `Odin`, you might see incorrect label width. 
+Note about [OdinInspector](https://odininspector.com/): Odin is IMGUI based with UI Toolkit partly supported. It has label align issue with UI Toolkit. I asked them in discord but never get response. Using `SaintsField` with `Odin`, you might see incorrect label width.
 
 ## Donation ##
 
