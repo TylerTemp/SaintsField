@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.2.1 ##
+
+1.  Fix compile error for Unity 6.0 & Unity 6.1
+2.  Reduce conditional field poping [#302](https://github.com/TylerTemp/SaintsField/issues/302)
+
 ## 5.2.0 ##
 
 1.  **CRITICAL**: Fix dictionary serializtion theard might read un-allocated data and crash the game when boot

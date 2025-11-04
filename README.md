@@ -96,11 +96,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.1.0**
+**5.2.1**
 
-1.  `Layer` now support `LayerMask` type to pick a single layer
-2.  `Layer` now support for `ShowInInspector` to show or edit a `string`/`int`/`LayerMask` field
-3.  `ShowInInspector` now use default drawer for `LayerMask` field
+1.  Fix compile error for Unity 6.0 & Unity 6.1
+2.  Reduce conditional field poping [#302](https://github.com/TylerTemp/SaintsField/issues/302)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
