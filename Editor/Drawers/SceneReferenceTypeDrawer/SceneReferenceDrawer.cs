@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
                 return;
             }
 
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_6000_2_OR_NEWER
             SceneAsset sceneAsset = AssetDatabase.LoadAssetByGUID<SceneAsset>(resultGuid);
 #else
             SceneAsset sceneAsset =
