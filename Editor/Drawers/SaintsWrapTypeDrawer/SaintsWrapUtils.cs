@@ -205,7 +205,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                     parent
                 );
                 VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
-                SaintsRendererGroup.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
+                UIToolkitUtils.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
                 return merged;
             }
 
@@ -251,7 +251,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}");
                 VisualElement r = propertyDrawer.CreatePropertyGUI(propertyDrawer is BaseWrapDrawer? serializedProperty: serializedBaseProperty);
                 VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
-                SaintsRendererGroup.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
+                UIToolkitUtils.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
                 return merged;
             }
 

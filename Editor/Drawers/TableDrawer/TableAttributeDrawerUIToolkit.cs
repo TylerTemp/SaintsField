@@ -367,11 +367,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         {
                             VisualElement itemContainer = new VisualElement();
 
-                            HashSet<Toggle> toggles = new HashSet<Toggle>();
-
-                            itemContainer.schedule
-                                .Execute(() => SaintsRendererGroup.CheckOutOfScoopFoldout(itemContainer, toggles))
-                                .Every(250);
+                            itemContainer.RegisterCallback<AttachToPanelEvent>(_ => UIToolkitUtils.LoopCheckOutOfScoopFoldout(itemContainer));
 
                             return itemContainer;
                         },
@@ -540,11 +536,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     {
                         VisualElement itemContainer = new VisualElement();
 
-                        HashSet<Toggle> toggles = new HashSet<Toggle>();
-
-                        itemContainer.schedule
-                            .Execute(() => SaintsRendererGroup.CheckOutOfScoopFoldout(itemContainer, toggles))
-                            .Every(250);
+                        itemContainer.RegisterCallback<AttachToPanelEvent>(_ => UIToolkitUtils.LoopCheckOutOfScoopFoldout(itemContainer));
 
                         return itemContainer;
                     };

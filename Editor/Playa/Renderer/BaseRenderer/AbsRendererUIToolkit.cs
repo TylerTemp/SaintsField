@@ -93,9 +93,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             bool anyNeedUpdate = aboveNeedUpdate || targetNeedUpdate || belowNeedUpdate;
             if (anyNeedUpdate)
             {
-                root.RegisterCallback<AttachToPanelEvent>(_ =>
+                UIToolkitUtils.OnAttachToPanelOnce(root, _ =>
                 {
-                    // OnUpdateUIToolKit();
                     root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement));
                     root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement)).Every(100);
                 });

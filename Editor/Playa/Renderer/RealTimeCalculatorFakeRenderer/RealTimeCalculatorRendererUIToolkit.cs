@@ -91,11 +91,7 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                 };
             }
 
-            HashSet<Toggle> savedToggles = new HashSet<Toggle>();
-            root.schedule.Execute(() =>
-            {
-                SaintsRendererGroup.CheckOutOfScoopFoldout(root, savedToggles);
-            }).Every(200);
+            root.RegisterCallback<AttachToPanelEvent>(_ => UIToolkitUtils.LoopCheckOutOfScoopFoldout(root));
 
             if (hasParameters)
             {

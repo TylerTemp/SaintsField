@@ -9,6 +9,7 @@ using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
@@ -311,7 +312,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             if (e.newValue)
                             {
                                 // Debug.Log("CheckOutOfScoopFoldout");
-                                CheckOutOfScoopFoldout(foldout, new HashSet<Toggle>());
+                                UIToolkitUtils.CheckOutOfScoopFoldout(foldout, new HashSet<Toggle>());
                             }
                         });
                     }
@@ -487,7 +488,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             if(NeedIndentCheck(_eLayout))
             {
                 // Debug.Log($"Check indent: {_eLayout}");
-                root.RegisterCallback<AttachToPanelEvent>(_ => StartToCheckOutOfScoopFoldout(root));
+                root.RegisterCallback<AttachToPanelEvent>(_ => UIToolkitUtils.LoopCheckOutOfScoopFoldout(root));
             }
 
             if(_toggleCheckInfos.Count > 0)
@@ -500,9 +501,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
             return root;
         }
 
-        private static void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> notFilledtoggleCheckInfos, VisualElement root, VisualElement body)
+        private static void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> notFilledToggleCheckInfos, VisualElement root, VisualElement body)
         {
-            List<ToggleCheckInfo> toggleCheckInfos = notFilledtoggleCheckInfos
+            List<ToggleCheckInfo> toggleCheckInfos = notFilledToggleCheckInfos
                 .Select(v => SaintsEditorUtils.FillResult(v, null))
                 .ToList();
 
@@ -523,109 +524,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         // private readonly HashSet<Toggle> _processedToggles = new HashSet<Toggle>();
 
-        private static void StartToCheckOutOfScoopFoldout(VisualElement root)
-        {
-            root.schedule
-                .Execute(() => LoopCheckOutOfScoopFoldout(root, 0))
-                .StartingIn(100);
-        }
 
-        private static void LoopCheckOutOfScoopFoldout(VisualElement root, int timeout)
-        {
-            if (timeout >= 3000)
-            {
-                // Debug.Log("Check indent stopped");
-                return;
-            }
-
-            CheckOutOfScoopFoldout(root, new HashSet<Toggle>());
-
-            root.schedule.Execute(() =>
-            {
-                LoopCheckOutOfScoopFoldout(root, timeout + 300);
-            }).StartingIn(300);
-        }
-
-        public static void CheckOutOfScoopFoldout(VisualElement root, HashSet<Toggle> processedToggles)
-        {
-            // foreach (VisualElement actualFieldContainer in root.Query<VisualElement>(className: AbsRenderer.ClassSaintsFieldPlayaContainer).ToList())
-            {
-                // Debug.Log(actualFieldContainer);
-                List<Foldout> foldouts = root.Query<Foldout>().ToList();
-                // Debug.Log($"foldouts {foldouts.Count}");
-                if (foldouts.Count == 0)
-                {
-                    return;
-                }
-
-                // Debug.Log(root.worldBound.x);
-
-                foreach (Foldout foldout in foldouts)
-                {
-                    // this class name is not consistent in different UI Toolkit versions. So just remove it...
-                    // Toggle toggle = actualFieldContainer.Q<Toggle>(className: "unity-foldout__toggle--inspector");
-                    Toggle toggle = foldout.Q<Toggle>();
-                    if (toggle == null)
-                    {
-                        continue;
-                    }
-
-                    if (!processedToggles.Add(toggle))  // already processed
-                    {
-                        continue;
-                    }
-
-                    if(toggle.style.marginLeft != 0)
-                    {
-                        if (toggle.userData is VisualElement moverTarget)
-                        {
-                            // Debug.Log($"moving {toggle} for {moverTarget}");
-                            if (moverTarget.style.paddingLeft != 12)
-                            {
-                                moverTarget.style.paddingLeft = 12;
-                            }
-                        }
-                        else
-                        {
-                            // Debug.Log($"moving {toggle} marginLeft");
-                            toggle.style.marginLeft = 0;
-                        }
-                    }
-
-                    // Yeah... I no longer need this...
-                    // if (double.IsNaN(toggle.resolvedStyle.width))
-                    // {
-                    //     continue;
-                    // }
-                    //
-                    //
-                    // float distance = toggle.worldBound.x - root.worldBound.x;
-                    // if(distance < 0)
-                    // {
-                    //     // Debug.Log($"process {toggle.worldBound.x} - {root.worldBound.x}: {distance}");
-                    //     float marginLeft = -distance + 4;
-                    //     // VisualElement saintsParent = UIToolkitUtils.FindParentClass(foldout, SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
-                    //     //     .FirstOrDefault();
-                    //     // if(saintsParent == null)
-                    //     // {
-                    //     //     Debug.Log(foldout);
-                    //     //     foldout.style.marginLeft = marginLeft;
-                    //     // }
-                    //     // else
-                    //     // {
-                    //     //     float ml = saintsParent.resolvedStyle.marginLeft;
-                    //     //     float useValue = double.IsNaN(ml) ? marginLeft : marginLeft + ml;
-                    //     //     saintsParent.style.marginLeft = useValue;
-                    //     // }
-                    //     VisualElement propertyParent = UIToolkitUtils.IterUpWithSelf(foldout).Skip(1).FirstOrDefault(each => each is PropertyField);
-                    //     if (propertyParent != null)
-                    //     {
-                    //         propertyParent.style.marginLeft = marginLeft;
-                    //     }
-                    // }
-                }
-            }
-        }
     }
 }
 #endif

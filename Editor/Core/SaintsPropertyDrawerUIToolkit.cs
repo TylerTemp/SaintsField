@@ -622,8 +622,11 @@ namespace SaintsField.Editor.Core
             // rootElement.AddToClassList(NameSaintsPropertyDrawerRoot(property));
             rootElement.Add(containerElement);
 
-            rootElement.schedule.Execute(() =>
-                OnAwakeUiToolKitInternal(property, containerElement, parent, SaintsPropertyDrawers, allAttributes, onChangeManuallyWatch));
+            UIToolkitUtils.OnAttachToPanelOnce(rootElement,
+                _ => OnAwakeUiToolKitInternal(property, containerElement, parent, SaintsPropertyDrawers, allAttributes,
+                    onChangeManuallyWatch));
+            // rootElement.schedule.Execute(() =>
+            //     OnAwakeUiToolKitInternal(property, containerElement, parent, SaintsPropertyDrawers, allAttributes, onChangeManuallyWatch));
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"Done property gui {property.propertyPath}/{this}");

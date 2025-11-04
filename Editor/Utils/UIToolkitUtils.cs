@@ -210,6 +210,21 @@ namespace SaintsField.Editor.Utils
             label.style.display = DisplayStyle.Flex;
         }
 
+        public static void OnAttachToPanelOnce(VisualElement rootElement, EventCallback<AttachToPanelEvent> callback)
+        {
+#if UNITY_2023_2_OR_NEWER || UNITY_6000_0_OR_NEWER
+// #if false
+            rootElement.RegisterCallbackOnce(callback);
+#else
+            void WrapCallback(AttachToPanelEvent evt)
+            {
+                rootElement.UnregisterCallback<AttachToPanelEvent>(WrapCallback);
+                callback(evt);
+            }
+            rootElement.RegisterCallback<AttachToPanelEvent>(WrapCallback);
+#endif
+        }
+
         private static VisualTreeAsset _dropdownButtonTree;
 
         public static TemplateContainer CloneDropdownButtonTree()
@@ -2740,6 +2755,98 @@ namespace SaintsField.Editor.Utils
                 //     setterOrNull.Invoke(newValue);
                 // });
             }
+        }
+
+        public static void CheckOutOfScoopFoldout(VisualElement root, HashSet<Toggle> processedToggles)
+        {
+            // foreach (VisualElement actualFieldContainer in root.Query<VisualElement>(className: AbsRenderer.ClassSaintsFieldPlayaContainer).ToList())
+            {
+                // Debug.Log(actualFieldContainer);
+                List<Foldout> foldouts = root.Query<Foldout>().ToList();
+                // Debug.Log($"foldouts {foldouts.Count}");
+                if (foldouts.Count == 0)
+                {
+                    return;
+                }
+
+                // Debug.Log(root.worldBound.x);
+
+                foreach (Foldout foldout in foldouts)
+                {
+                    // this class name is not consistent in different UI Toolkit versions. So just remove it...
+                    // Toggle toggle = actualFieldContainer.Q<Toggle>(className: "unity-foldout__toggle--inspector");
+                    Toggle toggle = foldout.Q<Toggle>();
+                    if (toggle == null)
+                    {
+                        continue;
+                    }
+
+                    if (!processedToggles.Add(toggle))  // already processed
+                    {
+                        continue;
+                    }
+
+                    if(toggle.style.marginLeft != 0)
+                    {
+                        if (toggle.userData is VisualElement moverTarget)
+                        {
+                            // Debug.Log($"moving {toggle} for {moverTarget}");
+                            if (moverTarget.style.paddingLeft != 12)
+                            {
+                                moverTarget.style.paddingLeft = 12;
+                            }
+                        }
+                        else
+                        {
+                            // Debug.Log($"moving {toggle} marginLeft");
+                            toggle.style.marginLeft = 0;
+                        }
+                    }
+
+                    // Yeah... I no longer need this...
+                    // if (double.IsNaN(toggle.resolvedStyle.width))
+                    // {
+                    //     continue;
+                    // }
+                    //
+                    //
+                    // float distance = toggle.worldBound.x - root.worldBound.x;
+                    // if(distance < 0)
+                    // {
+                    //     // Debug.Log($"process {toggle.worldBound.x} - {root.worldBound.x}: {distance}");
+                    //     float marginLeft = -distance + 4;
+                    //     // VisualElement saintsParent = UIToolkitUtils.FindParentClass(foldout, SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
+                    //     //     .FirstOrDefault();
+                    //     // if(saintsParent == null)
+                    //     // {
+                    //     //     Debug.Log(foldout);
+                    //     //     foldout.style.marginLeft = marginLeft;
+                    //     // }
+                    //     // else
+                    //     // {
+                    //     //     float ml = saintsParent.resolvedStyle.marginLeft;
+                    //     //     float useValue = double.IsNaN(ml) ? marginLeft : marginLeft + ml;
+                    //     //     saintsParent.style.marginLeft = useValue;
+                    //     // }
+                    //     VisualElement propertyParent = UIToolkitUtils.IterUpWithSelf(foldout).Skip(1).FirstOrDefault(each => each is PropertyField);
+                    //     if (propertyParent != null)
+                    //     {
+                    //         propertyParent.style.marginLeft = marginLeft;
+                    //     }
+                    // }
+                }
+            }
+        }
+
+        public static void LoopCheckOutOfScoopFoldout(VisualElement root)
+        {
+            HashSet<Toggle> processedToggles = new HashSet<Toggle>();
+
+            CheckOutOfScoopFoldout(root, processedToggles);
+
+            root.schedule
+                .Execute(() => CheckOutOfScoopFoldout(root, processedToggles))
+                .Every(150);
         }
     }
 #endif

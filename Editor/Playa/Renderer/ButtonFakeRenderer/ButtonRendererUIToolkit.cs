@@ -84,12 +84,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 _ussClassSaintsFieldEditingDisabledHide ??= Util.LoadResource<StyleSheet>("UIToolkit/ClassSaintsFieldEditingDisabledHide.uss");
                 root.styleSheets.Add(_ussClassSaintsFieldEditingDisabledHide);
 
-                HashSet<Toggle> savedToggles = new HashSet<Toggle>();
-                root.schedule.Execute(() =>
-                {
-                    // Debug.Log("check");
-                    SaintsRendererGroup.CheckOutOfScoopFoldout(root, savedToggles);
-                }).Every(200);
+                root.RegisterCallback<AttachToPanelEvent>(_ => UIToolkitUtils.LoopCheckOutOfScoopFoldout(root));
 
                 foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
                 {
