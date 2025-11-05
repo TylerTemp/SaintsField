@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
+using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -328,6 +329,8 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     return DateTimeAttributeDrawer.RenderSerializedActual(dateTimeAttribute, label, property, inHorizontalLayout);
                 case SaintsPropertyType.TimeSpan:
                     return TimeSpanAttributeDrawer.RenderSerializedActual(timeSpanAttribute, label, property, attributes, inHorizontalLayout);
+                case SaintsPropertyType.Guid:
+                    return GuidAttributeDrawer.RenderSerializedActual(label, property, inHorizontalLayout);
                 case SaintsPropertyType.Undefined:
                 case SaintsPropertyType.ClassOrStruct:
                 default:

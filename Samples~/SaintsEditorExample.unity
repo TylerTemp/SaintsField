@@ -1108,6 +1108,7 @@ MonoBehaviour:
       propertyPath: 
       longValue: 0
       uLongValue: 0
+      stringValue: 
       V: {fileID: 0}
       VRef:
         rid: -2
@@ -1119,6 +1120,7 @@ MonoBehaviour:
       propertyPath: 
       longValue: 0
       uLongValue: 0
+      stringValue: 
       V: {fileID: 0}
       VRef:
         rid: -2
@@ -1128,6 +1130,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -1137,6 +1140,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -1146,6 +1150,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
     VRef:
       rid: -2
@@ -1159,6 +1164,7 @@ MonoBehaviour:
         propertyPath: 
         longValue: 0
         uLongValue: 0
+        stringValue: 
         V: {fileID: 0}
         VRef:
           rid: -2
@@ -1166,15 +1172,13 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-      onAfterDeserializeChanged:
-        m_PersistentCalls:
-          m_Calls: []
     - value: 1
       valueField:
         propertyType: 0
         propertyPath: 
         longValue: 0
         uLongValue: 0
+        stringValue: 
         V: {fileID: 0}
         VRef:
           rid: -2
@@ -1182,15 +1186,13 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-      onAfterDeserializeChanged:
-        m_PersistentCalls:
-          m_Calls: []
     _saintsValues:
     - valueField:
         propertyType: 4
         propertyPath: 
         longValue: 0
         uLongValue: 0
+        stringValue: 
         V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
         VRef:
           rid: -2
@@ -1198,14 +1200,12 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
-      onAfterDeserializeChanged:
-        m_PersistentCalls:
-          m_Calls: []
     - valueField:
         propertyType: 4
         propertyPath: 
         longValue: 0
         uLongValue: 0
+        stringValue: 
         V: {fileID: 0}
         VRef:
           rid: 6921583612233515131
@@ -1213,14 +1213,12 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
-      onAfterDeserializeChanged:
-        m_PersistentCalls:
-          m_Calls: []
   hashSetType__SaintsSerialized__:
     propertyType: 0
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -1230,6 +1228,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 638973792000000000
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -1239,6 +1238,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -3236,6 +3236,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -4771,6 +4772,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -4781,6 +4783,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -4841,6 +4844,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -4851,6 +4855,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -4860,6 +4865,7 @@ MonoBehaviour:
     propertyPath: 
     longValue: 0
     uLongValue: 0
+    stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
@@ -7363,6 +7369,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+--- !u!1001 &5363600775475268543
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 799767565062741731, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_Name
+      value: SerGuid
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
 --- !u!1001 &8813428999584467601
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7460,3 +7523,4 @@ SceneRoots:
   - {fileID: 8813428999584467601}
   - {fileID: 3442031997421319485}
   - {fileID: 203542844}
+  - {fileID: 5363600775475268543}

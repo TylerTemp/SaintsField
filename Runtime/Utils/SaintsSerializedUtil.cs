@@ -95,6 +95,15 @@ namespace SaintsField.Utils
                 });
             }
 
+            if (obj is Guid guid)
+            {
+                return (true, new SaintsSerializedProperty
+                {
+                    propertyType = SaintsPropertyType.Guid,
+                    stringValue = guid.ToString(),
+                });
+            }
+
             return (false, default);
         }
 
@@ -426,6 +435,22 @@ namespace SaintsField.Utils
                     return (true, (T)(object)new DateTime(saintsSerializedProperty.longValue));
                 case SaintsPropertyType.TimeSpan:
                     return (true, (T)(object)new TimeSpan(saintsSerializedProperty.longValue));
+                case SaintsPropertyType.Guid:
+                {
+                    string stringValue = saintsSerializedProperty.stringValue;
+                    if (string.IsNullOrEmpty(stringValue))
+                    {
+                        return (true, (T)(object)Guid.Empty);
+                    }
+
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if (Guid.TryParse(stringValue, out Guid guid))
+                    {
+                        return (true, (T)(object)guid);
+                    }
+
+                    return (false, default);
+                }
                 case SaintsPropertyType.Undefined:
                 default:
                     return (false, targetType.IsValueType ? (T)Activator.CreateInstance(targetType) : default);

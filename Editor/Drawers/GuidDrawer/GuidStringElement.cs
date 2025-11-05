@@ -51,15 +51,17 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
 
         public void BindDropdownElement(VisualElement target) => _dropdownBoundElement = target;
 
-        private List<(string, Guid, bool, bool)> _extraOptions = new List<(string, Guid, bool, bool)>();
+        private readonly List<(string, Guid, bool, bool)> _extraOptions = new List<(string, Guid, bool, bool)>();
 
-        public static (bool, Guid) ParseUnityGuid(string cleaned)
+        private static (bool, Guid) ParseUnityGuid(string cleaned)
         {
             if (cleaned.Length != 32)
             {
                 return (false, Guid.Empty);
             }
-            string hyphenated = $"{cleaned.Substring(0,8)}-{cleaned.Substring(8,4)}-{cleaned.Substring(12,4)}-{cleaned.Substring(16,4)}-{cleaned.Substring(20,12)}";
+            string hyphenated = $"{cleaned[..8]}-{cleaned.Substring(8,4)}-{cleaned.Substring(12,4)}-{cleaned.Substring(16,4)}-{cleaned.Substring(20,12)}";
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
             if (Guid.TryParse(hyphenated, out Guid guid))
             {
                 return (true, guid);
@@ -101,14 +103,49 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
 
         private void TryAddPrefabGameObject(GameObject gameObject)
         {
-#if UNITY_2021_2_OR_NEWER
-            PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(gameObject);
-            if (prefabStage != null)
+            foreach (string assetPath in GetAllPrefabAssetPaths(gameObject))
             {
-                string path = prefabStage.assetPath;
-                TryAddByAssetPath(path);
+                TryAddByAssetPath(assetPath);
             }
-#endif
+        }
+
+        private static List<string> GetAllPrefabAssetPaths(GameObject go)
+        {
+            List<string> paths = new List<string>();
+            if (go == null) return paths;
+
+            void AddUnique(string p)
+            {
+                if (!string.IsNullOrEmpty(p) && !paths.Contains(p))
+                    paths.Add(p);
+            }
+
+            // Prefab stage (prefab mode / isolated view)
+            PrefabStage stage = PrefabStageUtility.GetPrefabStage(go);
+            if (stage != null)
+                AddUnique(stage.assetPath);
+
+            // Nearest instance root asset path (works for scene instances)
+            AddUnique(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go));
+
+            // Try the nearest instance root explicitly
+            GameObject root = PrefabUtility.GetNearestPrefabInstanceRoot(go);
+            if (root != null)
+                AddUnique(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(root));
+
+            // If object itself is part of a prefab asset (project view)
+            AddUnique(AssetDatabase.GetAssetPath(go));
+
+            // Walk corresponding source objects to collect nested prefab asset links
+            Object current = PrefabUtility.GetCorrespondingObjectFromSource(go);
+            int safety = 0;
+            while (current != null && safety++ < 64)
+            {
+                AddUnique(AssetDatabase.GetAssetPath(current));
+                current = PrefabUtility.GetCorrespondingObjectFromSource(current);
+            }
+
+            return paths;
         }
 
         private void TryAddGuidFromObject(Object uObject)

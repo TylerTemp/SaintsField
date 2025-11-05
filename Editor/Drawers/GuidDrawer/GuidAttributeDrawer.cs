@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Interfaces;
+using SaintsField.SaintsSerialization;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,16 +22,40 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            GuidStringElement element = new GuidStringElement
+            VisualElement field = MakeElement(property, GetPreferredLabel(property));
+            field.AddToClassList(GuidStringField.alignedFieldUssClassName);
+            return field;
+        }
+
+        private static VisualElement MakeElement(SerializedProperty property, string label)
+        {
+            GuidStringElement timeSpanElement = new GuidStringElement
             {
                 bindingPath = property.propertyPath,
             };
-            element.BindProp(property);
-            GuidStringField field = new GuidStringField(GetPreferredLabel(property), element);
-            field.AddToClassList(ClassAllowDisable);
-            field.AddToClassList(GuidStringField.alignedFieldUssClassName);
+            timeSpanElement.BindProp(property);
+            timeSpanElement.Bind(property.serializedObject);
 
-            return field;
+            GuidStringField element = new GuidStringField(label, timeSpanElement);
+
+            element.AddToClassList(ClassAllowDisable);
+
+            return element;
+        }
+
+        public static VisualElement RenderSerializedActual(string label, SerializedProperty property, bool inHorizontal)
+        {
+            VisualElement r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.stringValue)), label);
+            if (inHorizontal)
+            {
+                r.style.flexDirection = FlexDirection.Column;
+            }
+            else
+            {
+                r.AddToClassList(TimeSpanField.alignedFieldUssClassName);
+            }
+
+            return r;
         }
     }
 }

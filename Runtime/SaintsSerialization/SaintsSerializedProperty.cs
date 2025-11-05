@@ -14,14 +14,14 @@ namespace SaintsField.SaintsSerialization
         public ulong uLongValue;
         public string stringValue;
 
+        #region General Serialization
         // ReSharper disable once InconsistentNaming
         public UnityEngine.Object V;
         // ReSharper disable once InconsistentNaming
         [SerializeReference] public object VRef;
         // ReSharper disable once InconsistentNaming
         public bool IsVRef;
-
-        // public SaintsSerializedProperty[] subProperties;
+        #endregion
 
 #if UNITY_EDITOR
         // ReSharper disable once StaticMemberInGenericType
