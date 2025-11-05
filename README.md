@@ -7560,7 +7560,7 @@ public partial class SerTimeSpanExample : MonoBehaviour
 
 ![](https://github.com/user-attachments/assets/cd6b1135-6935-4366-940a-6f0c2a550c2f)
 
-### `Guid`  ###
+### `Guid` ###
 
 > [!WARNING]
 > This feature is still experimental
