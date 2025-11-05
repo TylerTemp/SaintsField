@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/GuidStyle.uss?fileID=7433441132597879392&amp;guid=54628bdd722880644aa20777ccf9aa89&amp;type=3#GuidStyle" />
+    <SaintsField.Editor.UIToolkitElements.HexInputLengthElement class="hex-input-8" />
+    <ui:Label text=":" />
+    <SaintsField.Editor.UIToolkitElements.HexInputLengthElement class="hex-input-4" />
+    <ui:Label text=":" />
+    <SaintsField.Editor.UIToolkitElements.HexInputLengthElement class="hex-input-4" />
+    <ui:Label text=":" />
+    <SaintsField.Editor.UIToolkitElements.HexInputLengthElement class="hex-input-4" />
+    <ui:Label text=":" />
+    <SaintsField.Editor.UIToolkitElements.HexInputLengthElement class="hex-input-12" />
+    <ui:Button class="dropdown-button" />
+</ui:UXML>

@@ -2198,8 +2198,8 @@ namespace SaintsField.Editor.Utils
             {
                 return scene.GetRootGameObjects();
             }
-#if UNITY_2021_2_OR_NEWER
 
+#if UNITY_2021_2_OR_NEWER
             PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(gameObject);
             if (prefabStage != null)  // isolated/context prefab should use its child
             {

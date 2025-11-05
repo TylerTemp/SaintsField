@@ -23572,6 +23572,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1794407094}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1564208812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1564208814}
+  - component: {fileID: 1564208813}
+  m_Layer: 0
+  m_Name: GuidStringExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1564208813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1564208812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df685efe45462c84b889066cb25ea951, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.GuidStringExample
+  guidString: df685efe-4546-2c84-b889-066cb25ea951
+--- !u!4 &1564208814
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1564208812}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1564447538
 GameObject:
   m_ObjectHideFlags: 0
@@ -33766,9 +33811,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SceneReferenceExample
   sceneRef:
-    guid: c009d94b732ccfc499360bdc46531550
+    guid: 65ad8bd450b80c5468397154b5f6c4cc
     index: 1
-    path: SaintsField/Samples/SaintsEditorExample
+    path: SaintsField/Samples/Example
 --- !u!4 &2002997102 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1316916096917999234, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
@@ -38626,3 +38671,4 @@ SceneRoots:
   - {fileID: 2138214539}
   - {fileID: 365509338}
   - {fileID: 1994419023}
+  - {fileID: 1564208814}
