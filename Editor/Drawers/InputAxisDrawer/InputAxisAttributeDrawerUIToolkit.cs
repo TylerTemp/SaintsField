@@ -99,6 +99,37 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
             }));
         }
 
+        public static VisualElement UIToolkitValueEditString(VisualElement oldElement, InputAxisAttribute inputAxisAttribute, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
+        {
+            if (oldElement is InputAxisField sls)
+            {
+                sls.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            InputAxisElement visualInput = new InputAxisElement
+            {
+                value = value,
+            };
+            InputAxisField element =
+                new InputAxisField(label, visualInput)
+                {
+                    value = value,
+                };
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                visualInput.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return element;
+        }
     }
 }
 #endif

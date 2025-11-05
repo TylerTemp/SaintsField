@@ -9,6 +9,7 @@ using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
+using SaintsField.Editor.Drawers.InputAxisDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SceneDrawer;
@@ -881,6 +882,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             return (TagAttributeDrawer.UIToolkitValueEditString(
                                 oldElement,
                                 tagAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case InputAxisAttribute inputAxisAttribute:
+                            return (InputAxisAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                inputAxisAttribute,
                                 label,
                                 (string) value,
                                 beforeSet,
