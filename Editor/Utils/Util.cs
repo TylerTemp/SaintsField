@@ -851,13 +851,22 @@ namespace SaintsField.Editor.Utils
             List<string> errors = new List<string>();
             foreach (MethodInfo methodInfo in methodInfos)
             {
-                (string error, object returnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target);
-                if (error == "")
+                if(methodInfo.Name == fieldOrMethod)
                 {
-                    return ConvertTo(returnValue, defaultValue);
-                }
+                    (string error, object returnValue) =
+                        InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target);
+                    if (error == "")
+                    {
+                        return ConvertTo(returnValue, defaultValue);
+                    }
 
-                errors.Add(error);
+                    errors.Add(error);
+                }
+            }
+
+            if (errors.Count == 0)
+            {
+                return ($"No method/field/property {fieldOrMethod} found", defaultValue);
             }
 
             string finalError = string.Join("\n", errors);
