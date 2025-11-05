@@ -13,6 +13,7 @@ using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SceneDrawer;
 using SaintsField.Editor.Drawers.SortingLayerDrawer;
+using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
@@ -869,6 +870,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             return (SortingLayerAttributeDrawer.UIToolkitValueEditString(
                                 oldElement,
                                 sortingLayerAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case TagAttribute tagAttribute:
+                            return (TagAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                tagAttribute,
                                 label,
                                 (string) value,
                                 beforeSet,

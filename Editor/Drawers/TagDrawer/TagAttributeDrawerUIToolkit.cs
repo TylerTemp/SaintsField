@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.SceneDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -28,9 +29,14 @@ namespace SaintsField.Editor.Drawers.TagDrawer
                 return new VisualElement();
             }
 
-            TagElement tagElement = new TagElement();
-            tagElement.BindProperty(property);
-            return new StringDropdownField(GetPreferredLabel(property), tagElement);
+            TagElement tagElement = new TagElement
+            {
+                bindingPath = property.propertyPath,
+            };
+            TagField r = new TagField(GetPreferredLabel(property), tagElement);
+            r.AddToClassList(TagField.alignedFieldUssClassName);
+            r.AddToClassList(ClassAllowDisable);
+            return r;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -61,11 +67,8 @@ namespace SaintsField.Editor.Drawers.TagDrawer
                 return;
             }
 
-            StringDropdownField layerStringField = container.Q<StringDropdownField>();
+            TagField layerStringField = container.Q<TagField>();
             AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
-
-            layerStringField.Button.clicked += () =>
-                MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
         }
 
         private static void AddContextualMenuManipulator(VisualElement root, SerializedProperty property,
@@ -100,64 +103,37 @@ namespace SaintsField.Editor.Drawers.TagDrawer
             }));
         }
 
-        private static void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        public static VisualElement UIToolkitValueEditString(VisualElement oldElement, TagAttribute tagAttribute, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
         {
-            AdvancedDropdownList<string> dropdown = new AdvancedDropdownList<string>();
-            dropdown.Add("[Empty String]", string.Empty);
-            dropdown.AddSeparator();
-
-
-            string selectedName = null;
-            foreach (string tag in InternalEditorUtility.tags)
+            if (oldElement is TagField sls)
             {
-                // dropdown.Add(path, (path, index));
-                dropdown.Add(tag, tag);
-                // ReSharper disable once InvertIf
-                if (tag == property.stringValue)
-                {
-                    selectedName = tag;
-                }
+                sls.SetValueWithoutNotify(value);
+                return null;
             }
 
-            dropdown.AddSeparator();
-            dropdown.Add("Edit Tags...", null, false, "d_editicon.sml");
-
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            TagElement visualInput = new TagElement
             {
-                CurValues = selectedName is null ? Array.Empty<object>(): new object[] { selectedName },
-                DropdownListValue = dropdown,
-                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                value = value,
             };
-
-            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
-
-            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
-                metaInfo,
-                root.worldBound.width,
-                maxHeight,
-                false,
-                (_, curItem) =>
+            TagField element =
+                new TagField(label, visualInput)
                 {
-                    string curValue = (string)curItem;
-                    if (curValue == null)
-                    {
-                        Selection.activeObject =
-                            AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset");
-                    }
-                    else
-                    {
-                        property.stringValue = curValue;
-                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
-                            parent, curValue);
-                        property.serializedObject.ApplyModifiedProperties();
-                        onValueChangedCallback.Invoke(curValue);
-                    }
-                }
-            );
+                    value = value,
+                };
 
-            UnityEditor.PopupWindow.Show(worldBound, sa);
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                visualInput.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return element;
         }
-
     }
 }
 #endif

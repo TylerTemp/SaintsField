@@ -1941,6 +1941,7 @@ private void DictExternalAdd()
 *   `Layer`
 *   `SortingLayer`
 *   `Guid`
+*   `Tag`
 
 ### Numerical ###
 

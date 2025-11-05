@@ -35283,8 +35283,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b125f4fbe8ad481381078d2c01910ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tag: 
-  _tag2: Finish
+  _tag: Finish
+  _tag2: MainCamera
   _tagDisabled: 
 --- !u!1 &2118423071
 GameObject:
