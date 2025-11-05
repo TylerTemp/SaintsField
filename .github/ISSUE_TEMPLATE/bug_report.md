@@ -8,7 +8,6 @@ assignees: TylerTemp
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
 
 **Unity Version**
 
@@ -16,18 +15,15 @@ A clear and concise description of what the bug is.
 
 **Drawer Env**
 
+(Use `- [x]` to mark one)
+
 - [ ] UI Toolkit
 - [ ] IMGUI
 - [ ] I'm not sure / It's not related.
 
-**Is it a display order issue?**
-
-- [ ] No
-- [ ] Yes, and I have [Code Analysis enabled](https://saintsfield.comes.today/layout-system/setup)
-- [ ] Yes, and I don't have [Code Analysis enabled](https://saintsfield.comes.today/layout-system/setup)
-
 **Additional context**
-Add any other context about the problem here.
+
+<!-- Any additional information that might help targetting this issue -->
 
 ```csharp
 // Paste code/log below this line if you have any
