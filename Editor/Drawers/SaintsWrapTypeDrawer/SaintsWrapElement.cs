@@ -2,19 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.SaintsSerialization;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
+namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 {
     public class SaintsWrapElement: VisualElement
     {
@@ -89,8 +90,24 @@ namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
                 _objectContainer.RegisterValueChangedCallback(v =>
                 {
                     // Debug.Log($"_objectContainer={v.newValue}");
-                    _unityProp.objectReferenceValue = v.newValue;
-                    _unityProp.serializedObject.ApplyModifiedProperties();
+                    Object newValue = v.newValue;
+                    if (!RuntimeUtil.IsNull(newValue))
+                    {
+                        (bool found, Object result) = RevertComponents(newValue, nonUnityType);
+                        if (!found)
+                        {
+                            Debug.LogWarning($"type {nonUnityType} not found on {newValue}");
+                            return;
+                        }
+
+                        newValue = result;
+                    }
+                    // ReSharper disable once InvertIf
+                    if(_unityProp.objectReferenceValue != newValue)
+                    {
+                        _unityProp.objectReferenceValue = newValue;
+                        _unityProp.serializedObject.ApplyModifiedProperties();
+                    }
                 });
             }
             columnContainer.Add(_objectContainer);
@@ -147,6 +164,25 @@ namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
             UpdateVRefChange(isVRef.boolValue);
 
             Debug.Assert(nonUnityType != null);
+        }
+
+        private static (bool found, Object result) RevertComponents(Object newValue, Type nonUnityType)
+        {
+            if (newValue is GameObject go)
+            {
+                foreach (Component component in go.GetComponents<Component>())
+                {
+                    if (nonUnityType.IsInstanceOfType(component))
+                    {
+                        return (true, component);
+                    }
+                }
+
+                return (false, null);
+            }
+
+            bool found = nonUnityType.IsInstanceOfType(newValue);
+            return found ? (true, newValue) : (false, null);
         }
 
         private void UpdateVRefChange(bool boolValue)
