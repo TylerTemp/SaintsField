@@ -1939,6 +1939,7 @@ private void DictExternalAdd()
 *   `DateTime`
 *   `TimeSpan`
 *   `Layer`
+*   `SortingLayer`
 *   `Guid`
 
 ### Numerical ###

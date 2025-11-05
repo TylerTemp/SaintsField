@@ -2708,8 +2708,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0134a10044b2475886a64552e7a8f4ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sortingLayerString: New Layer 3
-  _sortingLayerInt: 0
+  _sortingLayerString: Default
+  _sortingLayerInt: 1
   _sortingLayerDisabled: 0
 --- !u!4 &301131439
 Transform:

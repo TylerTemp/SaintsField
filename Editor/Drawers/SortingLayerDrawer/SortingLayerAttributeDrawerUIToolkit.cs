@@ -34,15 +34,27 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    SortingLayerIntElement sortingLayerIntElement = new SortingLayerIntElement();
-                    sortingLayerIntElement.BindProperty(property);
-                    return new IntDropdownField(GetPreferredLabel(property), sortingLayerIntElement);
+                    SortingLayerIntElement sortingLayerIntElement = new SortingLayerIntElement
+                    {
+                        bindingPath = property.propertyPath,
+                    };
+                    SortingLayerIntField r = new SortingLayerIntField(GetPreferredLabel(property), sortingLayerIntElement);
+
+                    r.AddToClassList(ClassAllowDisable);
+                    r.AddToClassList(SortingLayerIntField.alignedFieldUssClassName);
+                    return r;
                 }
                 case SerializedPropertyType.String:
                 {
-                    SortingLayerStringElement sortingLayerStringElement = new SortingLayerStringElement();
-                    sortingLayerStringElement.BindProperty(property);
-                    return new StringDropdownField(GetPreferredLabel(property), sortingLayerStringElement);
+                    SortingLayerStringElement sortingLayerStringElement = new SortingLayerStringElement
+                    {
+                        bindingPath = property.propertyPath,
+                    };
+
+                    SortingLayerStringField r = new SortingLayerStringField(GetPreferredLabel(property), sortingLayerStringElement);
+                    r.AddToClassList(ClassAllowDisable);
+                    r.AddToClassList(SortingLayerStringField.alignedFieldUssClassName);
+                    return r;
                 }
                 default:
                     return new VisualElement();
@@ -81,18 +93,14 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
             {
                 case SerializedPropertyType.Integer:
                 {
-                    IntDropdownField intDropdownField = container.Q<IntDropdownField>();
+                    SortingLayerIntField intDropdownField = container.Q<SortingLayerIntField>();
                     AddContextualMenuManipulator(intDropdownField, property, onValueChangedCallback, info, parent);
-
-                    intDropdownField.Button.clicked += () => MakeDropdown(property, intDropdownField, onValueChangedCallback, info, parent);
                 }
                     break;
                 case SerializedPropertyType.String:
                 {
-                    StringDropdownField layerStringField = container.Q<StringDropdownField>();
+                    SortingLayerStringField layerStringField = container.Q<SortingLayerStringField>();
                     AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
-
-                    layerStringField.Button.clicked += () => MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
                 }
                     break;
                 default:
@@ -242,6 +250,69 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
             UnityEditor.PopupWindow.Show(worldBound, sa);
         }
 
+        public static VisualElement UIToolkitValueEditString(VisualElement oldElement, SortingLayerAttribute sortingLayerAttribute, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
+        {
+            if (oldElement is SortingLayerStringField sls)
+            {
+                sls.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            SortingLayerStringElement visualInput = new SortingLayerStringElement
+            {
+                value = value,
+            };
+            SortingLayerStringField element =
+                new SortingLayerStringField(label, visualInput)
+                {
+                    value = value,
+                };
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                visualInput.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return element;
+        }
+
+        public static VisualElement UIToolkitValueEditInt(VisualElement oldElement, SortingLayerAttribute sortingLayerAttribute, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
+        {
+            if (oldElement is SortingLayerIntField sls)
+            {
+                sls.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            SortingLayerIntElement visualInput = new SortingLayerIntElement
+            {
+                value = value,
+            };
+            SortingLayerIntField element =
+                new SortingLayerIntField(label, visualInput)
+                {
+                    value = value,
+                };
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                visualInput.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return element;
+        }
     }
 }
 #endif

@@ -12,6 +12,7 @@ using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SceneDrawer;
+using SaintsField.Editor.Drawers.SortingLayerDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
@@ -485,6 +486,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 labelGrayColor,
                                 inHorizontalLayout,
                                 allAttributes), false);
+                        case SortingLayerAttribute sortingLayerAttribute:
+                            return (SortingLayerAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                sortingLayerAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
                     }
                 }
 
@@ -846,6 +858,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             return (GuidAttributeDrawer.UIToolkitValueEditString(
                                 oldElement,
                                 guidAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case SortingLayerAttribute sortingLayerAttribute:
+                            return (SortingLayerAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                sortingLayerAttribute,
                                 label,
                                 (string) value,
                                 beforeSet,
