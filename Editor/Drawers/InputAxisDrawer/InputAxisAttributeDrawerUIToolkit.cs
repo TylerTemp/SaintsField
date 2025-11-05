@@ -2,13 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEditor.UIElements;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,9 +24,15 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
                 return new VisualElement();
             }
 
-            InputAxisElement inputAxisElement = new InputAxisElement();
-            inputAxisElement.BindProperty(property);
-            return new StringDropdownField(GetPreferredLabel(property), inputAxisElement);
+            InputAxisElement inputAxisElement = new InputAxisElement
+            {
+                bindingPath = property.propertyPath,
+            };
+
+            InputAxisField r = new InputAxisField(GetPreferredLabel(property), inputAxisElement);
+            r.AddToClassList(ClassAllowDisable);
+            r.AddToClassList(InputAxisField.alignedFieldUssClassName);
+            return r;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -60,11 +63,8 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
                 return;
             }
 
-            StringDropdownField layerStringField = container.Q<StringDropdownField>();
+            InputAxisField layerStringField = container.Q<InputAxisField>();
             AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
-
-            layerStringField.Button.clicked += () =>
-                MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
         }
 
         private static void AddContextualMenuManipulator(VisualElement root, SerializedProperty property,
@@ -98,62 +98,6 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
                 }
             }));
         }
-
-        private static void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            AdvancedDropdownList<string> dropdown = new AdvancedDropdownList<string>();
-            dropdown.Add("[Empty String]", string.Empty);
-            dropdown.AddSeparator();
-
-            string selectedName = null;
-            foreach (string axisName in InputAxisUtils.GetAxisNames())
-            {
-                dropdown.Add(axisName, axisName);
-                // ReSharper disable once InvertIf
-                if (axisName == property.stringValue)
-                {
-                    selectedName = axisName;
-                }
-            }
-
-            dropdown.AddSeparator();
-            dropdown.Add("Open Input Manager...", null, false, "d_editicon.sml");
-
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
-            {
-                CurValues = selectedName is null ? Array.Empty<object>(): new object[] { selectedName },
-                DropdownListValue = dropdown,
-                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
-            };
-
-            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
-
-            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
-                metaInfo,
-                root.worldBound.width,
-                maxHeight,
-                false,
-                (_, curItem) =>
-                {
-                    string curValue = (string)curItem;
-                    if (curValue == null)
-                    {
-                        InputAxisUtils.OpenInputManager();
-                    }
-                    else
-                    {
-                        property.stringValue = curValue;
-                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
-                            parent, curValue);
-                        property.serializedObject.ApplyModifiedProperties();
-                        onValueChangedCallback.Invoke(curValue);
-                    }
-                }
-            );
-
-            UnityEditor.PopupWindow.Show(worldBound, sa);
-        }
-
 
     }
 }
