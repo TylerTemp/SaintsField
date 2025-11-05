@@ -259,9 +259,23 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
 
     public class GuidStringField : BaseField<string>
     {
+        private readonly GuidStringElement _guidStringElement;
+
         public GuidStringField(string label, GuidStringElement visualInput) : base(label, visualInput)
         {
+            _guidStringElement = visualInput;
             visualInput.BindDropdownElement(this);
+        }
+
+        public override void SetValueWithoutNotify(string newValue)
+        {
+            _guidStringElement.SetValueWithoutNotify(newValue);
+        }
+
+        public override string value
+        {
+            get => _guidStringElement.value;
+            set => _guidStringElement.value = value;
         }
     }
 }

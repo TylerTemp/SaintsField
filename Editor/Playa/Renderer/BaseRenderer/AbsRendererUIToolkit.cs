@@ -8,6 +8,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
+using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SceneDrawer;
@@ -841,6 +842,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 labelGrayColor,
                                 inHorizontalLayout,
                                 allAttributes), false);
+                        case GuidAttribute guidAttribute:
+                            return (GuidAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                guidAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
                     }
                 }
 
@@ -1658,6 +1670,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     });
                 }
                 return (element, false);
+            }
+
+            if (valueType == typeof(Guid) || value is Guid)
+            {
+                return (GuidAttributeDrawer.UIToolkitValueEditGuid(
+                    oldElement,
+                    label,
+                    (Guid) value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes), false);
             }
 
             bool valueIsNull = RuntimeUtil.IsNull(value);

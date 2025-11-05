@@ -46,48 +46,65 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.GuidStringExample
   guidString: df685efe-4546-2c84-b889-066cb25ea951
---- !u!1 &7808737016912714806
-GameObject:
+--- !u!1001 &4582429802290768897
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6715214730816916284}
-  - component: {fileID: 8840255517242535789}
-  m_Layer: 0
-  m_Name: SubInPrefab
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6715214730816916284
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7808737016912714806}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5255264711433821186}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8840255517242535789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5255264711433821186}
+    m_Modifications:
+    - target: {fileID: 6036577572168593463, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_Name
+      value: SubInPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+--- !u!4 &6715214730816916284 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7109270216074618685, guid: 0400a10c722e75d4595a2885ce12562e, type: 3}
+  m_PrefabInstance: {fileID: 4582429802290768897}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7808737016912714806}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df685efe45462c84b889066cb25ea951, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.GuidStringExample
-  guidString: 67a32c47-f523-4c6a-9d9e-bdf0ef39885e

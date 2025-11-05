@@ -7421,6 +7421,34 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7819265653788610906, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: _guidList__SaintsSerialized__.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7819265653788610906, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: _guidList__SaintsSerialized__.Array.data[0].VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7819265653788610906, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: _guidList__SaintsSerialized__.Array.data[1].VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7819265653788610906, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: _guidList__SaintsSerialized__.Array.data[0].stringValue
+      value: 70379530-9c77-5794-fb2b-afe6f6773b9b
+      objectReference: {fileID: 0}
+    - target: {fileID: 7819265653788610906, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: _guidList__SaintsSerialized__.Array.data[1].stringValue
+      value: 7aba8e6d-fb79-a874-09e1-e04f8817b3bb
+      objectReference: {fileID: 0}
+    - target: {fileID: 7819265653788610906, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: _guidList__SaintsSerialized__.Array.data[0].propertyType
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7819265653788610906, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: _guidList__SaintsSerialized__.Array.data[1].propertyType
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

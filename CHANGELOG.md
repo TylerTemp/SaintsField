@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.3.0 ##
+
+1.  You can now serialize a `Guid` type directly using "Extended Serialization"
+2.  You can now use `[Guid]` on `string` to pick a guid
+3.  `ShowInInspector` now shows the correct `Guid` type
+4.  `ShowInInspector` now can work with `[Guid]` of a string type
+5.  Fix `SaintsDictionary` drop element gives cast error [#338](https://github.com/TylerTemp/SaintsField/issues/338)
+
 ## 5.2.1 ##
 
 1.  Fix compile error for Unity 6.0 & Unity 6.1

@@ -96,10 +96,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.2.1**
+**5.3.0**
 
-1.  Fix compile error for Unity 6.0 & Unity 6.1
-2.  Reduce conditional field poping [#302](https://github.com/TylerTemp/SaintsField/issues/302)
+1.  You can now serialize a `Guid` type directly using "Extended Serialization"
+2.  You can now use `[Guid]` on `string` to pick a guid
+3.  `ShowInInspector` now shows the correct `Guid` type
+4.  `ShowInInspector` now can work with `[Guid]` of a string type
+5.  Fix `SaintsDictionary` drop element gives cast error [#338](https://github.com/TylerTemp/SaintsField/issues/338)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1936,6 +1939,7 @@ private void DictExternalAdd()
 *   `DateTime`
 *   `TimeSpan`
 *   `Layer`
+*   `Guid`
 
 ### Numerical ###
 
@@ -4781,6 +4785,28 @@ private long _showTsLong;
 
 ![](https://github.com/user-attachments/assets/995de9da-0493-45b7-9b60-7d382b9efcb1)
 
+#### `Guid` ####
+
+Allows you to set a Guid using `string` type.
+
+You can pick a guid from new, empty, current prefab(or prefabs if it's nested), current scriptableObject, or current mono script
+
+> [!TIP]
+> This will requires you to manually convert `string` to `Guid`.
+> You may want to see [Extended Serialization](https://saintsfield.comes.today/extended-serialization) to directly serialize a `Guid` type
+
+```csharp
+using SaintsField;
+
+[Guid] public string guidString;
+```
+
+![](https://github.com/user-attachments/assets/73a2fa92-511a-417c-b3d6-67c4c5d4c83b)
+
+Invalid input will get a notice
+
+![](https://github.com/user-attachments/assets/3ba4ac5b-1661-4190-a62a-44bec0332f94)
+
 ## Layout System ##
 
 ### Setup ###
@@ -7322,7 +7348,6 @@ If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/T
 
 > [!WARNING]
 > This feature is still experimental
-> This feature is UI Toolkit only
 
 `SaintsEditor` supports some types that usually can not be serialized. To use this function:
 
@@ -7333,6 +7358,9 @@ If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/T
 If a field is not supported, the default serialization provided by Unity will be used.
 
 ### `Dictionary<,>` ###
+
+> [!WARNING]
+> This feature is still experimental
 
 You can mark a `dictionary` directly for serialization. SaintsField will internally use `SaintsDictionary` to serialize it.
 
@@ -7506,7 +7534,7 @@ Serialize a `TimeSpan` type.
 using SaintsField;
 
 // note the partial
-public partial class SerTimeSpanExample : SaintsMonoBehaviour
+public partial class SerTimeSpanExample : MonoBehaviour
 {
     [SaintsSerialized]
     private TimeSpan _dt;
@@ -7516,7 +7544,7 @@ public partial class SerTimeSpanExample : SaintsMonoBehaviour
 }
 
 // use in a normal class/struct, set parents partial recursively
-public partial class SerTimeSpanExample : SaintsMonoBehaviour
+public partial class SerTimeSpanExample : MonoBehaviour
 {
     [Serializable]
     public partial class MyClass
@@ -7532,7 +7560,44 @@ public partial class SerTimeSpanExample : SaintsMonoBehaviour
 
 ![](https://github.com/user-attachments/assets/cd6b1135-6935-4366-940a-6f0c2a550c2f)
 
+### `Guid`  ###
 
+> [!WARNING]
+> This feature is still experimental
+
+Serialize a `Guid` type.
+
+**IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set all parent class/struct to `partial`
+
+```csharp
+using SaintsField;
+
+// note the partial
+public partial class SerGuidExample : MonoBehaviour
+{
+    [SaintsSerialized]
+    private Guid _guid;
+
+    [SaintsSerialized]
+    private List<Guid> _guidList;
+}
+
+// use in a normal class/struct, set parents partial recursively
+public partial class SerGuidExample : MonoBehaviour
+{
+    [Serializable]
+    public partial class MyClass
+    {
+        [SaintsSerialized]
+        private Guid[] _guidArray;
+    }
+
+    // No SaintsSerialized here
+    public MyClass myClass;
+}
+```
+
+![](https://github.com/user-attachments/assets/770ffe85-91cf-4d01-94a0-28a059610d49)
 
 ## `SaintsEditorWindow` ##
 
