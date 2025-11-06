@@ -13,6 +13,7 @@ using SaintsField.Editor.Drawers.InputAxisDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SceneDrawer;
+using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
 using SaintsField.Editor.Drawers.SortingLayerDrawer;
 using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
@@ -233,7 +234,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         public static readonly Color ReColor = EColor.EditorSeparator.GetColor();
 
         // before set: useful for struct editing that C# will mess-up and change the value of the reference you have
-        public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, bool neverNullable)
+        public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement,
+            string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull,
+            bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render start {label}/{valueType}/{value}");
@@ -499,6 +502,20 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 labelGrayColor,
                                 inHorizontalLayout,
                                 allAttributes), false);
+#if UNITY_2021_2_OR_NEWER
+                        case ShaderParamAttribute shaderParamAttribute:
+                            return (ShaderParamAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                shaderParamAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+#endif
                     }
                 }
 
@@ -900,6 +917,20 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 labelGrayColor,
                                 inHorizontalLayout,
                                 allAttributes), false);
+#if UNITY_2021_2_OR_NEWER
+                        case ShaderParamAttribute shaderParamAttribute:
+                            return (ShaderParamAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                shaderParamAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+#endif
                     }
                 }
 
@@ -1783,7 +1814,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
                 return (MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly,
                     dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
-                    inHorizontalLayout, neverNullable), false);
+                    inHorizontalLayout, targets), false);
 #else  // WTF Unity, backport it!
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1881,7 +1912,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (MakeListView(oldElement as Foldout, label, valueType, enumerableValue,
                     enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor,
-                    inHorizontalLayout, allAttributes, neverNullable), false);
+                    inHorizontalLayout, allAttributes, targets), false);
             }
 
             // Debug.Log(valueType);
@@ -2083,7 +2114,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         beforeSet?.Invoke(value);
                         setterOrNull?.Invoke(obj);
                     }
-                }, neverNullable));
+                }));
                 genFoldout.Add(fieldsBodyNew);
                 // genFoldout.Add(new VisualElement
                 // {
@@ -2100,7 +2131,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // Debug.Log($"Expand value {value} -> {evt.newValue}");
                     bool expanded = evt.newValue;
                     payload.IsFullFilled = true;
-                    FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
+                    FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout,targets);
                 });
 
                 // if (ExpandedValue.Contains(value))
@@ -2147,7 +2178,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (genFoldout.value && !payload.IsFullFilled)
             {
                 payload.IsFullFilled = true;
-                FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
+                FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, targets);
             }
 
             bool enabled = setterOrNull != null;
@@ -2161,8 +2192,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return (useOld ? null : genFoldout, true);
         }
 
-        private static void FillExpandIfNeeded(bool expanded, object value, Foldout genFoldout, VisualElement oldElement,
-            Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, bool neverNullable)
+        private static void FillExpandIfNeeded(bool expanded, object value, Foldout genFoldout,
+            VisualElement oldElement,
+            Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets)
         {
             const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
 
@@ -2298,7 +2330,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         labelGrayColor,
                         inHorizontalLayout,
                         ReflectCache.GetCustomAttributes(fieldInfo),
-                        neverNullable).result;
+                        targets).result;
                 }
                 // Debug.Log($"{name}: {result}: {fieldInfo.FieldType}");
                 // ReSharper disable once InvertIf
@@ -2395,7 +2427,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         labelGrayColor,
                         inHorizontalLayout,
                         ReflectCache.GetCustomAttributes(propertyInfo),
-                        neverNullable).result;
+                        targets).result;
                 }
 
                 // ReSharper disable once InvertIf
@@ -2482,7 +2514,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 : $"{type.Name}: <color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>{type.Namespace}</color>";
         }
 
-        private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType, object currentValue, Action<Type> setType, bool neverNullable)
+        private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType,
+            object currentValue, Action<Type> setType)
         {
             // Debug.Log($"fieldType={fieldType} label={label} currentValue={currentValue}");
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
@@ -2492,7 +2525,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 .GetTypesDerivedFrom(fieldType)
                 .ToArray();
             AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>();
-            bool canBeNull = !fieldType.IsValueType && !neverNullable;
+            bool canBeNull = !fieldType.IsValueType;
             if(canBeNull)
             {
                 dropdownList.Add("[Null]", null);
@@ -2570,7 +2603,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public object RawListValue;
         }
 
-        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, bool neverNullable)
+        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue,
+            object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor,
+            bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render list start {listValue.Length}/{label}/{valueType}");
@@ -2604,37 +2639,34 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if(setterOrNull != null)
                 {
                     // nullable
-                    if(!neverNullable)
+                    foldout.Q<Toggle>().Add(new Button(() =>
                     {
-                        foldout.Q<Toggle>().Add(new Button(() =>
+                        beforeSet?.Invoke(rawListValue);
+                        setterOrNull(null);
+                    })
+                    {
+                        // text = "x",
+                        tooltip = "Set to null",
+                        style =
                         {
-                            beforeSet?.Invoke(rawListValue);
-                            setterOrNull(null);
-                        })
-                        {
-                            // text = "x",
-                            tooltip = "Set to null",
-                            style =
-                            {
-                                position = Position.Absolute,
-                                // top = -EditorGUIUtility.singleLineHeight,
-                                top = 0,
-                                right = 0,
-                                width = EditorGUIUtility.singleLineHeight,
-                                height = EditorGUIUtility.singleLineHeight,
+                            position = Position.Absolute,
+                            // top = -EditorGUIUtility.singleLineHeight,
+                            top = 0,
+                            right = 0,
+                            width = EditorGUIUtility.singleLineHeight,
+                            height = EditorGUIUtility.singleLineHeight,
 
-                                backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
 #if UNITY_2022_2_OR_NEWER
-                                backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                                backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                                backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                                backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
+                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
 #else
                                 unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
-                            },
-                        });
-                    }
+                        },
+                    });
                 }
             }
 
@@ -2754,7 +2786,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         },
                         false,
                         inHorizontalLayout,
-                        allAttributes, neverNullable).result;
+                        allAttributes,
+                        targets).result;
                     if (item != null)
                     {
                         visualElement.Clear();
@@ -2901,7 +2934,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
-        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, bool neverNullable)
+        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue,
+            bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet,
+            Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets)
         {
             // Debug.Log(dictKeyType);
             // Debug.Log(dictValueType);
@@ -2935,37 +2970,35 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if(setterOrNull != null)
                 {
                     // nullable
-                    if(!neverNullable)
+                    foldout.Q<Toggle>().Add(new Button(() =>
                     {
-                        foldout.Q<Toggle>().Add(new Button(() =>
+                        beforeSet?.Invoke(rawDictValue);
+                        setterOrNull(null);
+                    })
+                    {
+                        // text = "x",
+                        tooltip = "Set to null",
+                        style =
                         {
-                            beforeSet?.Invoke(rawDictValue);
-                            setterOrNull(null);
-                        })
-                        {
-                            // text = "x",
-                            tooltip = "Set to null",
-                            style =
-                            {
-                                position = Position.Absolute,
-                                // top = -EditorGUIUtility.singleLineHeight,
-                                top = 0,
-                                right = 0,
-                                width = EditorGUIUtility.singleLineHeight,
-                                height = EditorGUIUtility.singleLineHeight,
+                            position = Position.Absolute,
+                            // top = -EditorGUIUtility.singleLineHeight,
+                            top = 0,
+                            right = 0,
+                            width = EditorGUIUtility.singleLineHeight,
+                            height = EditorGUIUtility.singleLineHeight,
 
-                                backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
 #if UNITY_2022_2_OR_NEWER
-                                backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                                backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                                backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                                backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
+                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
 #else
-                                unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
-                            },
-                        });
-                    }
+                        },
+                    });
+
                 }
             }
 
@@ -3096,7 +3129,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 // listView.itemsSource[sourceIndex] = newKey;
                                 key = newKey;
                                 keyChanged = true;
-                            }, false, true, Array.Empty<Attribute>(), neverNullable).result;
+                            }, false, true, Array.Empty<Attribute>(), targets).result;
 
                             if (editing != null)
                             {
@@ -3156,7 +3189,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             object refreshedKey = listView.itemsSource[elementIndex];
                             payload.SetKeyValue(refreshedKey, newValue);
-                        }, false, true, Array.Empty<Attribute>(), neverNullable).result;
+                        }, false, true, Array.Empty<Attribute>(), targets).result;
 
                         if (editing != null)
                         {
@@ -3287,7 +3320,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         false,
                         inHorizontalLayout,
                         Array.Empty<Attribute>(),
-                        neverNullable
+                        targets
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -3324,7 +3357,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         false,
                         inHorizontalLayout,
                         Array.Empty<Attribute>(),
-                        neverNullable
+                        targets
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)

@@ -1,5 +1,11 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: `TreeDropdown` search bar now pinned on the top 
+2.  Fix: `TreeDropdown` did not scroll to current selected value if the list is long
+3.  Add: `ShowInInspector` now works with `ShaderParam`
+
 ## 5.3.0 ##
 
 1.  You can now serialize a `Guid` type directly using "Extended Serialization"

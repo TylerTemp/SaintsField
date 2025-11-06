@@ -122,7 +122,8 @@ namespace SaintsField.Editor.Playa.Renderer
 
             Type fieldType = GetFieldType(FieldWithInfo);
             string labelName = NoLabel ? null : GetNiceName(FieldWithInfo);
-            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), isSaintsSerialized);
+            // FieldWithInfo.Targets;
+            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets);
 
             _onSearchFieldUIToolkit.AddListener(Search);
             container.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
@@ -276,7 +277,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 bool isSaintsSerialized = FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute);
 
-                (VisualElement result, bool isNestedField) = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), isSaintsSerialized);
+                (VisualElement result, bool _) = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets);
                 // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {

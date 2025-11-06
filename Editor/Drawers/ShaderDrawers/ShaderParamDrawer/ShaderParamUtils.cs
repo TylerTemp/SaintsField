@@ -1,9 +1,13 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
 using System.Collections.Generic;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
@@ -83,6 +87,84 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 #endif
                 yield return new ShaderCustomInfo(propertyName, propertyDescription, propertyType,
                     Shader.PropertyToID(propertyName));
+            }
+        }
+
+        public static void MakeDropdown<T>(T curValue, Shader shader, ShaderPropertyType? shaderPropertyType, VisualElement root, Action<T> onValueChangedCallback)
+        {
+            bool isString = typeof(T) == typeof(string);
+
+            AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo> dropdown = new AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo>();
+            if (isString)
+            {
+                dropdown.Add("[Empty String]", new ShaderParamUtils.ShaderCustomInfo("", "", default, -1));
+                dropdown.AddSeparator();
+            }
+
+            bool selected = false;
+            ShaderParamUtils.ShaderCustomInfo selectedInfo = default;
+            foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderPropertyType))
+            {
+                // dropdown.Add(path, (path, index));
+                dropdown.Add(shaderCustomInfo.GetString(false), shaderCustomInfo);
+                // ReSharper disable once InvertIf
+                if (isString && shaderCustomInfo.PropertyName == (string)(object)curValue
+                    || !isString && shaderCustomInfo.PropertyID == (int)(object)curValue)
+                {
+                    selected = true;
+                    selectedInfo = shaderCustomInfo;
+                }
+            }
+
+            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            {
+                CurValues = selected ? new object[] { selectedInfo } : Array.Empty<object>(),
+                DropdownListValue = dropdown,
+                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+            };
+
+            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+            SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
+                metaInfo,
+                root.worldBound.width,
+                maxHeight,
+                false,
+                (curItem, _) =>
+                {
+                    ShaderParamUtils.ShaderCustomInfo shaderCustomInfo = (ShaderParamUtils.ShaderCustomInfo)curItem;
+                    if (isString)
+                    {
+                        onValueChangedCallback.Invoke((T)(object)shaderCustomInfo.PropertyName);
+                    }
+                    else
+                    {
+                        onValueChangedCallback.Invoke((T)(object)shaderCustomInfo.PropertyID);
+                    }
+
+                    return new[] { curItem };
+                }
+            );
+
+            UnityEditor.PopupWindow.Show(worldBound, sa);
+        }
+
+        public static void UpdateHelpBox(HelpBox helpBox, string error)
+        {
+            if (helpBox.text == error)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(error))
+            {
+                helpBox.style.display = DisplayStyle.None;
+                helpBox.text = "";
+            }
+            else
+            {
+                helpBox.text = error;
+                helpBox.style.display = DisplayStyle.Flex;
             }
         }
     }

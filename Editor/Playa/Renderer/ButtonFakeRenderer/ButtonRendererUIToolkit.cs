@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             false,
                             InAnyHorizontalLayout,
                             Array.Empty<Attribute>(),
-                            false
+                            FieldWithInfo.Targets
                         ).result;
                         // ReSharper disable once InvertIf
                         if (r != null)
@@ -190,7 +190,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         false,
                         InAnyHorizontalLayout,
                         ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo),
-                        false
+                        FieldWithInfo.Targets
                     ).result;
                     if (r != null)
                     {

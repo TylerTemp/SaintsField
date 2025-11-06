@@ -628,22 +628,7 @@ namespace SaintsField.Utils
 
         public bool Equals(SaintsWrap<T> other)
         {
-            EnsureInit();
-            switch (wrapType)
-            {
-                case WrapType.T:
-                {
-                    return value == null? other == null: (object)value == (object)other.value;
-                }
-                case WrapType.Array:
-                case WrapType.List:
-                case WrapType.Field:
-                    return (object)_runtimeResult == (object)other._runtimeResult;
-                case WrapType.Undefined:  // Never inspected, ignore
-                    return other.wrapType == WrapType.Undefined;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(wrapType), wrapType, null);
-            }
+            return EqualityComparer<T>.Default.Equals(GetValue(), other.GetValue());
         }
 
         public override bool Equals(object obj)
@@ -659,6 +644,10 @@ namespace SaintsField.Utils
 #if UNITY_EDITOR
         public void OnBeforeSerialize()
         {
+            if (wrapType == WrapType.Undefined)
+            {
+                EnsureInit();
+            }
         }
 
         public void OnAfterDeserialize()

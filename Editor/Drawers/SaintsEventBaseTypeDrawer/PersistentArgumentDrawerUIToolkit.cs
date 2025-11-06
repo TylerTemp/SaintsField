@@ -503,7 +503,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         // Debug.Log($"re-render SerializedValueEditorRepaint");
                         SerializedValueEditorRepaint();
 
-                    }, false, true, ReflectCache.GetCustomAttributes(info), false);
+                    }, false, true, ReflectCache.GetCustomAttributes(info), property.serializedObject.targetObjects);
 
                 if (result != null)
                 {

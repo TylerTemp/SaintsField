@@ -13939,13 +13939,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5230f2d1430c07e4e95b1b00e4727da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaderParamString: 
-  shaderParamInt: 0
-  shaderParamFilter: 0
-  targetRenderer: {fileID: 0}
-  shaderParamRenderer: 0
-  shaderParamMat: 0
-  shaderParamShader: 0
+  shaderParamString: _EmissionColor
+  shaderParamInt: 562
+  shaderParamFilter: 432
+  targetRenderer: {fileID: 836531684}
+  shaderParamRenderer: 569
+  shaderParamMat: 583
+  shaderParamShader: 591
   readOnlyField: 
 --- !u!1 &841111314
 GameObject:

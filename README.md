@@ -1942,6 +1942,8 @@ private void DictExternalAdd()
 *   `SortingLayer`
 *   `Guid`
 *   `Tag`
+*   `InputAxis`
+*   `ShaderParam`
 
 ### Numerical ###
 

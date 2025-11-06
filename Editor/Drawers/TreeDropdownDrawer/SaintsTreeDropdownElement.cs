@@ -23,12 +23,14 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         // is row click or not (row click need to close the dropdown)
         public readonly UnityEvent<object, bool, bool> OnClickedEvent = new UnityEvent<object, bool, bool>();
 
-        public readonly UnityEvent<TreeRowAbsElement> ScrollToElementEvent = new UnityEvent<TreeRowAbsElement>();
+        // public readonly UnityEvent<TreeRowAbsElement> ScrollToElementEvent = new UnityEvent<TreeRowAbsElement>();
 
         public TreeRowAbsElement CurrentFocus { get; private set; }
         private readonly bool _allowToggle;
 
         private readonly IReadOnlyList<TreeRowAbsElement> _flatList;
+
+        private readonly ScrollView _treeContainer;
 
         public SaintsTreeDropdownElement(AdvancedDropdownMetaInfo metaInfo, bool toggle)
         {
@@ -67,14 +69,15 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 curValues)
                 .ToArray();
 
-            VisualElement treeContainer = new VisualElement
+            _treeContainer = new ScrollView
             {
                 focusable = true,
             };
-             List<TreeRowAbsElement> flatList = new List<TreeRowAbsElement>();
+
+            List<TreeRowAbsElement> flatList = new List<TreeRowAbsElement>();
             foreach (TreeRowAbsElement treeRow in treeRowElements)
             {
-                treeContainer.Add(treeRow);
+                _treeContainer.Add(treeRow);
                 foreach (TreeRowAbsElement rowAbsElement in FlatTreeRow(treeRow))
                 {
                     flatList.Add(rowAbsElement);
@@ -92,7 +95,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             _flatList = flatList;
 
-            Add(treeContainer);
+            Add(_treeContainer);
 
 #if UNITY_6000_0_OR_NEWER
             toolbarSearchField.placeholderText = "Search";
@@ -101,11 +104,21 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             {
                 if (evt.direction == NavigationMoveEvent.Direction.Down)
                 {
-                    treeContainer.Focus();
+                    _treeContainer.Focus();
                 }
             });
 
-            RegisterCallback<AttachToPanelEvent>(_ => toolbarSearchField.Q<TextField>().Q("unity-text-input").Focus());
+            RegisterCallback<AttachToPanelEvent>(_ =>
+            {
+                toolbarSearchField.Q<TextField>().Q("unity-text-input").Focus();
+                if(CurrentFocus != null)
+                {
+                    _treeContainer.schedule
+                        .Execute(() => _treeContainer.ScrollTo(CurrentFocus))
+                        // This delay is required for no good reason...
+                        .StartingIn(100);
+                }
+            });
 
             toolbarSearchField.RegisterValueChangedCallback(evt =>
             {
@@ -226,7 +239,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         treeRowAbsElement.SetNavigateHighlight(toFocus == treeRowAbsElement);
                     }
 
-                    ScrollToElementEvent.Invoke(CurrentFocus);
+                    // ScrollToElementEvent.Invoke(CurrentFocus);
+                    _treeContainer.ScrollTo(CurrentFocus);
                 }
             }, TrickleDown.TrickleDown);
             RegisterCallback<KeyUpEvent>(e =>

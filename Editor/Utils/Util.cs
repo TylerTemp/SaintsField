@@ -598,7 +598,7 @@ namespace SaintsField.Editor.Utils
             if (by.StartsWith(":"))
             {
                 // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                return GetOfStatic(by.Substring(1), defaultValue,property, memberInfo, target);
+                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target);
             }
 
             if (target == null)

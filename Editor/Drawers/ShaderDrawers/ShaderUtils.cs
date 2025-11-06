@@ -38,9 +38,14 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
                 return (error, null);
             }
 
+            return GetShaderFromObject(uObj, callback, index);
+        }
+
+        public static (string error, Shader shader) GetShaderFromObject(object uObj, string callback, int index)
+        {
             if (RuntimeUtil.IsNull(uObj))
             {
-                return ($"Target `{callback}` is null", null);
+                return ($"Target {callback} is null", null);
             }
 
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
@@ -61,7 +66,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
             }
         }
 
-        private static (string error, Shader shader) GetShaderFromRenderer(Renderer renderer, int index)
+        public static (string error, Shader shader) GetShaderFromRenderer(Renderer renderer, int index)
         {
             if (renderer == null)
             {
