@@ -11,6 +11,7 @@ using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.InputAxisDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
+using SaintsField.Editor.Drawers.RateDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SceneDrawer;
 #if UNITY_2021_2_OR_NEWER
@@ -519,6 +520,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 allAttributes,
                                 targets), false);
 #endif
+                        case RateAttribute rateAttribute:
+                            return (RateAttributeDrawer.UIToolkitValueEdit(
+                                oldElement,
+                                rateAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
 

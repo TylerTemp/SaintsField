@@ -27580,10 +27580,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f447d0d25d4a4bc19aaeac0ff720e887, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rate0To5: 2
+  rate0To5: 0
   rate1To5: 1
   rate3To5: 2
-  rate0To5Rich: 2
+  rate0To5Rich: 1
   rate:
     rate: 5
   rate1To5Disabled: 4

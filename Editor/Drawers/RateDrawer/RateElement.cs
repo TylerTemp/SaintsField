@@ -62,6 +62,15 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             }
 
             _starButtons = starButtons;
+            // foreach (Button button in _starButtons)
+            // {
+            //     button.clicked += () =>
+            //     {
+            //         int curValue = (int)button.userData;
+            //         // Debug.Log($"set value {value}");
+            //         value = curValue;
+            //     };
+            // }
 
             Add(root);
         }
@@ -161,6 +170,8 @@ namespace SaintsField.Editor.Drawers.RateDrawer
 
             button.RegisterCallback<MouseLeaveEvent>(_ => UpdateStarUIToolkit());
 
+            button.clicked += () => value = thisUserData;
+
             return button;
         }
 
@@ -178,22 +189,6 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             }
         }
 
-        public void BindClickProperty(SerializedProperty property, Action<int> onValueChangedCallback)
-        {
-            foreach (Button button in _starButtons)
-            {
-                button.clicked += () =>
-                {
-                    int curValue = (int)button.userData;
-                    // Debug.Log($"set value {value}");
-                    if (property.intValue != curValue)
-                    {
-                        onValueChangedCallback.Invoke(curValue);
-                    }
-                };
-            }
-
-        }
 
         public void SetValueWithoutNotify(int newValue)
         {
@@ -223,9 +218,22 @@ namespace SaintsField.Editor.Drawers.RateDrawer
 
     public class RateField : BaseField<int>
     {
+        private readonly RateElement _rateElement;
+
         public RateField(string label, RateElement visualInput) : base(label, visualInput)
         {
-            AddToClassList(alignedFieldUssClassName);
+            _rateElement = visualInput;
+        }
+
+        public override void SetValueWithoutNotify(int newValue)
+        {
+            _rateElement.SetValueWithoutNotify(newValue);
+        }
+
+        public override int value
+        {
+            get => _rateElement.value;
+            set => _rateElement.value = value;
         }
     }
 }

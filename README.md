@@ -1945,6 +1945,7 @@ private void DictExternalAdd()
 *   `InputAxis`
 *   `ShaderParam`
 *   `ShaderKeyword`
+*   `Rate`
 
 ### Numerical ###
 
