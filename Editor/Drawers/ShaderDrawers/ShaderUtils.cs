@@ -1,9 +1,12 @@
 #if UNITY_2021_2_OR_NEWER
+using System;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.ShaderDrawers
 {
@@ -86,6 +89,112 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
                 return ("Material is null", null);
             }
             return ("", result.shader);
+        }
+
+        public static void UpdateHelpBox(HelpBox helpBox, string error)
+        {
+            if (helpBox.text == error)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(error))
+            {
+                helpBox.style.display = DisplayStyle.None;
+                helpBox.text = "";
+            }
+            else
+            {
+                helpBox.text = error;
+                helpBox.style.display = DisplayStyle.Flex;
+            }
+        }
+
+        public static (string error, Shader shader) GetShaderForShowInInspector(object curValue, string callback, int index, object target)
+        {
+            if (string.IsNullOrEmpty(callback))  // find on target
+            {
+                Renderer directRenderer;
+                switch (target)
+                {
+                    case Component comp:
+                        directRenderer = comp.GetComponent<Renderer>();
+                        break;
+                    case GameObject go:
+                        directRenderer = go.GetComponent<Renderer>();
+                        break;
+                    default:
+                        return ($"{target} is not a valid target", null);
+                }
+                return ShaderUtils.GetShaderFromRenderer(directRenderer, index);
+            }
+
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
+            {
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, callback);
+
+                switch (getPropType)
+                {
+                    case ReflectUtils.GetPropType.NotFound:
+                        continue;
+
+                    case ReflectUtils.GetPropType.Property:
+                    {
+                        object genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                        if(genResult != null)
+                        {
+                            return ShaderUtils.GetShaderFromObject(genResult, callback, index);
+                        }
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Field:
+                    {
+                        FieldInfo fInfo = (FieldInfo)fieldOrMethodInfo;
+                        object genResult = fInfo.GetValue(target);
+                        if(genResult != null)
+                        {
+                            return ShaderUtils.GetShaderFromObject(genResult, callback, index);
+                        }
+                        // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+
+                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                        {
+                            curValue,
+                        });
+
+
+                        object genResult;
+                        try
+                        {
+                            genResult = methodInfo.Invoke(target, passParams);
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            return (e.InnerException?.Message ?? e.Message, null);
+                        }
+                        catch (Exception e)
+                        {
+                            return (e.Message, null);
+                        }
+
+                        if (genResult != null)
+                        {
+                            return ShaderUtils.GetShaderFromObject(genResult, callback, index);
+                        }
+
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                }
+            }
+
+            return ($"Target `{callback}` not found", null);
         }
     }
 }

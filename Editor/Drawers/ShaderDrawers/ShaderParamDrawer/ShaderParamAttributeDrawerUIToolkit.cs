@@ -133,7 +133,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             void OnSaintsEditorApplicationChanged()
             {
                 (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
-                ShaderParamUtils.UpdateHelpBox(helpBox, error);
+                ShaderUtils.UpdateHelpBox(helpBox, error);
                 if (error != "")
                 {
                     return;
@@ -159,7 +159,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 }
 
                 (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
-                ShaderParamUtils.UpdateHelpBox(helpBox, error);
+                ShaderUtils.UpdateHelpBox(helpBox, error);
                 if (error != "")
                 {
                     return;
@@ -242,7 +242,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
         public static VisualElement UIToolkitValueEditString(VisualElement oldElement, ShaderParamAttribute shaderParamAttribute, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
         {
-            (string error, Shader shader) = GetShaderForShowInInspector(
+            (string error, Shader shader) = ShaderUtils.GetShaderForShowInInspector(
                 value,
                 shaderParamAttribute.TargetName,
                 shaderParamAttribute.Index,
@@ -252,7 +252,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             {
                 oldContainer.Field.ShaderParamStringElement.value = value;
                 oldContainer.Field.ShaderParamStringElement.BindShader(shader);
-                ShaderParamUtils.UpdateHelpBox(oldContainer.HelpBox, error);
+                ShaderUtils.UpdateHelpBox(oldContainer.HelpBox, error);
                 return null;
             }
 
@@ -267,7 +267,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 };
             ShaderParamValueEditString element = new ShaderParamValueEditString(field);
             visualInput.BindShader(shader);
-            ShaderParamUtils.UpdateHelpBox(element.HelpBox, error);
+            ShaderUtils.UpdateHelpBox(element.HelpBox, error);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
                 labelGrayColor, inHorizontalLayout);
@@ -307,7 +307,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
         public static VisualElement UIToolkitValueEditInt(VisualElement oldElement, ShaderParamAttribute shaderParamAttribute, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
         {
-            (string error, Shader shader) = GetShaderForShowInInspector(
+            (string error, Shader shader) = ShaderUtils.GetShaderForShowInInspector(
                 value,
                 shaderParamAttribute.TargetName,
                 shaderParamAttribute.Index,
@@ -317,7 +317,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             {
                 oldContainer.Field.ShaderParamIntElement.value = value;
                 oldContainer.Field.ShaderParamIntElement.BindShader(shader);
-                ShaderParamUtils.UpdateHelpBox(oldContainer.HelpBox, error);
+                ShaderUtils.UpdateHelpBox(oldContainer.HelpBox, error);
                 return null;
             }
 
@@ -332,7 +332,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 };
             ShaderParamValueEditInt element = new ShaderParamValueEditInt(field);
             visualInput.BindShader(shader);
-            ShaderParamUtils.UpdateHelpBox(element.HelpBox, error);
+            ShaderUtils.UpdateHelpBox(element.HelpBox, error);
 
             UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
                 labelGrayColor, inHorizontalLayout);
@@ -346,93 +346,6 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 });
             }
             return element;
-        }
-
-        private static (string error, Shader shader) GetShaderForShowInInspector(object curValue, string callback, int index, object target)
-        {
-            if (string.IsNullOrEmpty(callback))  // find on target
-            {
-                Renderer directRenderer;
-                switch (target)
-                {
-                    case Component comp:
-                        directRenderer = comp.GetComponent<Renderer>();
-                        break;
-                    case GameObject go:
-                        directRenderer = go.GetComponent<Renderer>();
-                        break;
-                    default:
-                        return ($"{target} is not a valid target", null);
-                }
-                return ShaderUtils.GetShaderFromRenderer(directRenderer, index);
-            }
-
-            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
-            {
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, callback);
-
-                switch (getPropType)
-                {
-                    case ReflectUtils.GetPropType.NotFound:
-                        continue;
-
-                    case ReflectUtils.GetPropType.Property:
-                    {
-                        object genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-                        if(genResult != null)
-                        {
-                            return ShaderUtils.GetShaderFromObject(genResult, callback, index);
-                        }
-                    }
-                        break;
-                    case ReflectUtils.GetPropType.Field:
-                    {
-                        FieldInfo fInfo = (FieldInfo)fieldOrMethodInfo;
-                        object genResult = fInfo.GetValue(target);
-                        if(genResult != null)
-                        {
-                            return ShaderUtils.GetShaderFromObject(genResult, callback, index);
-                        }
-                        // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
-                    }
-                        break;
-                    case ReflectUtils.GetPropType.Method:
-                    {
-                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-
-                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
-                        {
-                            curValue,
-                        });
-
-
-                        object genResult;
-                        try
-                        {
-                            genResult = methodInfo.Invoke(target, passParams);
-                        }
-                        catch (TargetInvocationException e)
-                        {
-                            return (e.InnerException?.Message ?? e.Message, null);
-                        }
-                        catch (Exception e)
-                        {
-                            return (e.Message, null);
-                        }
-
-                        if (genResult != null)
-                        {
-                            return ShaderUtils.GetShaderFromObject(genResult, callback, index);
-                        }
-
-                        break;
-                    }
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-                }
-            }
-
-            return ($"Target `{callback}` not found", null);
         }
     }
 }

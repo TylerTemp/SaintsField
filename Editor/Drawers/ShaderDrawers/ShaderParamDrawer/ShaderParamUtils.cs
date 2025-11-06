@@ -94,16 +94,16 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         {
             bool isString = typeof(T) == typeof(string);
 
-            AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo> dropdown = new AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo>();
+            AdvancedDropdownList<ShaderCustomInfo> dropdown = new AdvancedDropdownList<ShaderCustomInfo>();
             if (isString)
             {
-                dropdown.Add("[Empty String]", new ShaderParamUtils.ShaderCustomInfo("", "", default, -1));
+                dropdown.Add("[Empty String]", new ShaderCustomInfo("", "", default, -1));
                 dropdown.AddSeparator();
             }
 
             bool selected = false;
-            ShaderParamUtils.ShaderCustomInfo selectedInfo = default;
-            foreach (ShaderParamUtils.ShaderCustomInfo shaderCustomInfo in ShaderParamUtils.GetShaderInfo(shader, shaderPropertyType))
+            ShaderCustomInfo selectedInfo = default;
+            foreach (ShaderCustomInfo shaderCustomInfo in GetShaderInfo(shader, shaderPropertyType))
             {
                 // dropdown.Add(path, (path, index));
                 dropdown.Add(shaderCustomInfo.GetString(false), shaderCustomInfo);
@@ -132,7 +132,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 false,
                 (curItem, _) =>
                 {
-                    ShaderParamUtils.ShaderCustomInfo shaderCustomInfo = (ShaderParamUtils.ShaderCustomInfo)curItem;
+                    ShaderCustomInfo shaderCustomInfo = (ShaderCustomInfo)curItem;
                     if (isString)
                     {
                         onValueChangedCallback.Invoke((T)(object)shaderCustomInfo.PropertyName);
@@ -147,25 +147,6 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             );
 
             UnityEditor.PopupWindow.Show(worldBound, sa);
-        }
-
-        public static void UpdateHelpBox(HelpBox helpBox, string error)
-        {
-            if (helpBox.text == error)
-            {
-                return;
-            }
-
-            if (string.IsNullOrEmpty(error))
-            {
-                helpBox.style.display = DisplayStyle.None;
-                helpBox.text = "";
-            }
-            else
-            {
-                helpBox.text = error;
-                helpBox.style.display = DisplayStyle.Flex;
-            }
         }
     }
 }

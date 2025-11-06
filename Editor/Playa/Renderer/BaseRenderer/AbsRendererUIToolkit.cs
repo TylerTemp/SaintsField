@@ -13,7 +13,10 @@ using SaintsField.Editor.Drawers.InputAxisDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SceneDrawer;
+#if UNITY_2021_2_OR_NEWER
+using SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer;
 using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
+#endif
 using SaintsField.Editor.Drawers.SortingLayerDrawer;
 using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
@@ -922,6 +925,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             return (ShaderParamAttributeDrawer.UIToolkitValueEditString(
                                 oldElement,
                                 shaderParamAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ShaderKeywordAttribute shaderKeywordAttribute:
+                            return (ShaderKeywordAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                shaderKeywordAttribute,
                                 label,
                                 (string) value,
                                 beforeSet,

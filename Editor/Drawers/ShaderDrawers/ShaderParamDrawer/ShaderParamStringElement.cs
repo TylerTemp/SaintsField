@@ -49,7 +49,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             {
                 if(_helpBox != null)
                 {
-                    ShaderParamUtils.UpdateHelpBox(_helpBox, "Shader not found");
+                    ShaderUtils.UpdateHelpBox(_helpBox, "Shader not found");
                 }
             }
             else
@@ -61,12 +61,29 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     if (r.PropertyName == CachedValue)
                     {
                         SetLabelString(r.GetString(false));
+                        if(_helpBox != null)
+                        {
+                            ShaderUtils.UpdateHelpBox(_helpBox, "");
+                        }
                         return;
                     }
                 }
             }
 
-            SetLabelString(string.IsNullOrEmpty(CachedValue) ? "": $"<color=red>?</color> {CachedValue}");
+            string toError = "";
+            if (string.IsNullOrEmpty(CachedValue))
+            {
+                SetLabelString("");
+            }
+            else
+            {
+                SetLabelString($"<color=red>?</color> {CachedValue}");
+                toError = $"Shader Param {CachedValue} not found in {_shader}";
+            }
+            if(_helpBox != null)
+            {
+                ShaderUtils.UpdateHelpBox(_helpBox, toError);
+            }
         }
     }
 

@@ -23451,11 +23451,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03e9d21f73989ab4f8df899ed2b1ded2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaderKeywordString: 
-  shaderKeywordIndex: 
-  targetRenderer: {fileID: 0}
+  shaderKeywordString: _ADDITIONAL_LIGHTS
+  shaderKeywordIndex: _RENDER_PASS_ENABLED
+  targetRenderer: {fileID: 1548456366}
   shaderKeywordRenderer: 
-  shaderKeywordMat: 
+  shaderKeywordMat: EVALUATE_SH_MIXED
   shaderKeywordShader: 
   readOnlyField: 
 --- !u!1 &1551141621

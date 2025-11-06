@@ -1,8 +1,9 @@
+using SaintsField.Playa;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class ShaderKeywordExample : MonoBehaviour
+    public class ShaderKeywordExample : SaintsMonoBehaviour
     {
 #if UNITY_2021_2_OR_NEWER
         [ShaderKeyword] public string shaderKeywordString;
@@ -21,6 +22,15 @@ namespace SaintsField.Samples.Scripts
 
         [ReadOnly, FieldLabelText("<icon=star.png/><label/>"), ShaderKeyword]
         public string readOnlyField;
+
+        [Separator]
+
+        [ShowInInspector, ShaderKeyword]
+        private string ShowShaderKeywordString
+        {
+            get => shaderKeywordString;
+            set => shaderKeywordString = value;
+        }
 #endif
     }
 }

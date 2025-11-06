@@ -49,7 +49,11 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             {
                 if(_helpBox != null)
                 {
-                    ShaderParamUtils.UpdateHelpBox(_helpBox, "Shader not found");
+                    ShaderUtils.UpdateHelpBox(_helpBox, "Shader not found");
+                    if(_helpBox != null)
+                    {
+                        ShaderUtils.UpdateHelpBox(_helpBox, "");
+                    }
                 }
             }
             else
@@ -66,6 +70,10 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             }
 
             Label.text = $"<color=red>?</color> {(CachedValue == null? "": $"({CachedValue})")}";
+            if(_helpBox != null)
+            {
+                ShaderUtils.UpdateHelpBox(_helpBox, CachedValue == null? "": $"Shader Param {CachedValue} not found in {_shader}");
+            }
         }
     }
 

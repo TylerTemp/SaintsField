@@ -1934,7 +1934,7 @@ private void DictExternalAdd()
 
 [![video](https://github.com/user-attachments/assets/dd3e7add-36f3-4f59-918c-58022d68cac6)](https://github.com/user-attachments/assets/57baefa0-144c-4c7f-8100-dd7b102d3935)
 
-**Supported Attributes**
+**Supported Attributes**: `ShowInInspector` can work together with the following attributes
 
 *   `DateTime`
 *   `TimeSpan`
@@ -1944,6 +1944,7 @@ private void DictExternalAdd()
 *   `Tag`
 *   `InputAxis`
 *   `ShaderParam`
+*   `ShaderKeyword`
 
 ### Numerical ###
 

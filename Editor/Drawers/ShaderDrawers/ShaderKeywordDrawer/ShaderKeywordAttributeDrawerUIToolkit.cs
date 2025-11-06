@@ -30,10 +30,14 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
                 return new VisualElement();
             }
 
-            ShaderKeywordElement layerStringStringDropdown = new ShaderKeywordElement();
-            layerStringStringDropdown.BindProperty(property);
-            return new StringDropdownField(GetPreferredLabel(property), layerStringStringDropdown);
-
+            ShaderKeywordElement shaderKeywordElement = new ShaderKeywordElement
+            {
+                bindingPath = property.propertyPath,
+            };
+            ShaderKeywordField r = new ShaderKeywordField(GetPreferredLabel(property), shaderKeywordElement);
+            r.AddToClassList(ClassAllowDisable);
+            r.AddToClassList(ShaderKeywordField.alignedFieldUssClassName);
+            return r;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -75,73 +79,31 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
 
             ShaderKeywordAttribute shaderKeywordAttribute = (ShaderKeywordAttribute)saintsAttribute;
 
-            StringDropdownField stringDropdownField = container.Q<StringDropdownField>();
-            AddContextualMenuManipulator(helpBox, shaderKeywordAttribute, stringDropdownField, property, onValueChangedCallback, info, parent);
+            ShaderKeywordField shaderKeywordField = container.Q<ShaderKeywordField>();
+            AddContextualMenuManipulator(helpBox, shaderKeywordAttribute, shaderKeywordField, property, onValueChangedCallback, info, parent);
 
-            stringDropdownField.Button.clicked += () => MakeDropdown(property, shaderKeywordAttribute, helpBox,stringDropdownField, onValueChangedCallback, info, parent);
-        }
+            RefreshShader();
 
-        private void MakeDropdown(SerializedProperty property, ShaderKeywordAttribute shaderKeywordAttribute, HelpBox helpBox, StringDropdownField root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            (string error, Shader shader) = ShaderUtils.GetShader(shaderKeywordAttribute.TargetName, shaderKeywordAttribute.Index, property, info, parent);
-            UpdateHelpBox(helpBox, error);
-            if (error != "")
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshShader);
+            container.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshShader));
+
+            return;
+
+            void RefreshShader()
             {
-                return;
-            }
-
-            if (shader != _currentShader)
-            {
-                _currentShader = shader;
-                root.Q<ShaderKeywordElement>().BindShader(shader);
-            }
-
-            AdvancedDropdownList<string> dropdown = new AdvancedDropdownList<string>();
-            dropdown.Add("[Empty String]", string.Empty);
-            dropdown.AddSeparator();
-
-            string selected = null;
-            foreach (string shaderKeyword in ShaderKeywordUtils.GetShaderKeywords(_currentShader))
-            {
-                // dropdown.Add(path, (path, index));
-                dropdown.Add(shaderKeyword, shaderKeyword);
-                // ReSharper disable once InvertIf
-                if (shaderKeyword == property.stringValue )
+                (string error, Shader shader) = ShaderUtils.GetShader(shaderKeywordAttribute.TargetName, shaderKeywordAttribute.Index, property, info, parent);
+                if (error != "")
                 {
-                    selected = shaderKeyword;
+                    ShaderUtils.UpdateHelpBox(helpBox, error);
+                }
+                else
+                {
+                    shaderKeywordField.ShaderKeywordElement.BindShader(shader);
                 }
             }
-
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
-            {
-                CurValues = selected is null ? Array.Empty<object>(): new object[] { selected },
-                DropdownListValue = dropdown,
-                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
-            };
-
-            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
-
-            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
-                metaInfo,
-                root.worldBound.width,
-                maxHeight,
-                false,
-                (_, curItem) =>
-                {
-                    string shaderKeyword = (string)curItem;
-                    property.stringValue = shaderKeyword;
-                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, shaderKeyword);
-                    property.serializedObject.ApplyModifiedProperties();
-                    onValueChangedCallback.Invoke(shaderKeyword);
-                }
-            );
-
-            UnityEditor.PopupWindow.Show(worldBound, sa);
         }
 
-        private Shader _currentShader;
-
-        private void AddContextualMenuManipulator(HelpBox helpBox, ShaderKeywordAttribute shaderKeywordAttribute, StringDropdownField root, SerializedProperty property, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        private static void AddContextualMenuManipulator(HelpBox helpBox, ShaderKeywordAttribute shaderKeywordAttribute, VisualElement root, SerializedProperty property, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             UIToolkitUtils.AddContextualMenuManipulator(root, property,
                 () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
@@ -155,20 +117,17 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
                 }
 
                 (string error, Shader shader) = ShaderUtils.GetShader(shaderKeywordAttribute.TargetName, shaderKeywordAttribute.Index, property, info, parent);
-                UpdateHelpBox(helpBox, error);
+                ShaderUtils.UpdateHelpBox(helpBox, error);
                 if (error != "")
                 {
                     return;
                 }
 
-                if (shader != _currentShader)
-                {
-                    _currentShader = shader;
-                    root.Q<ShaderKeywordElement>().BindShader(shader);
-                }
+                root.Q<ShaderKeywordElement>().BindShader(shader);
 
-                foreach (string shaderKeyword in ShaderKeywordUtils.GetShaderKeywords(_currentShader))
+                foreach (string shaderKeyword in ShaderKeywordUtils.GetShaderKeywords(shader))
                 {
+                    // ReSharper disable once InvertIf
                     if (shaderKeyword == clipboardText)
                     {
                         evt.menu.AppendAction($"Paste \"{shaderKeyword}\"", _ =>
@@ -184,55 +143,69 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
             }));
         }
 
-        private static void UpdateHelpBox(HelpBox helpBox, string error)
+        private class ShaderKeywordValueEdit : VisualElement
         {
-            if (helpBox.text == error)
-            {
-                return;
-            }
+            public readonly ShaderKeywordField Field;
+            public readonly HelpBox HelpBox;
 
-            if (string.IsNullOrEmpty(error))
+            public ShaderKeywordValueEdit(ShaderKeywordField field)
             {
-                helpBox.style.display = DisplayStyle.None;
-                helpBox.text = "";
-            }
-            else
-            {
-                helpBox.text = error;
-                helpBox.style.display = DisplayStyle.Flex;
+                Field = field;
+                Add(field);
+                HelpBox = new HelpBox("", HelpBoxMessageType.Error)
+                {
+                    style =
+                    {
+                        display = DisplayStyle.None,
+                        flexGrow = 1,
+                    },
+                };
+                Add(HelpBox);
+                field.ShaderKeywordElement.BindHelpBox(HelpBox);
             }
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChanged, FieldInfo info)
+        public static VisualElement UIToolkitValueEditString(VisualElement oldElement, ShaderKeywordAttribute shaderKeywordAttribute, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
         {
-            if (property.propertyType != SerializedPropertyType.String)
+            (string error, Shader shader) = ShaderUtils.GetShaderForShowInInspector(
+                value,
+                shaderKeywordAttribute.TargetName,
+                shaderKeywordAttribute.Index,
+                targets[0]);
+
+            if (oldElement is ShaderKeywordValueEdit oldContainer)
             {
-                return;
-            }
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            if (parent == null)
-            {
-                return;
+                oldContainer.Field.ShaderKeywordElement.value = value;
+                oldContainer.Field.ShaderKeywordElement.BindShader(shader);
+                ShaderUtils.UpdateHelpBox(oldContainer.HelpBox, error);
+                return null;
             }
 
-            ShaderKeywordAttribute shaderKeywordAttribute = (ShaderKeywordAttribute)saintsAttribute;
-            HelpBox helpBox = container.Q<HelpBox>(HelpBoxName(property));
-
-            (string error, Shader shader) = ShaderUtils.GetShader(shaderKeywordAttribute.TargetName,
-                shaderKeywordAttribute.Index, property, info, parent);
-            UpdateHelpBox(helpBox, error);
-            if (error != "")
+            ShaderKeywordElement visualInput = new ShaderKeywordElement()
             {
-                return;
-            }
+                value = value,
+            };
+            ShaderKeywordField field =
+                new ShaderKeywordField(label, visualInput)
+                {
+                    value = value,
+                };
+            ShaderKeywordValueEdit element = new ShaderKeywordValueEdit(field);
+            visualInput.BindShader(shader);
+            ShaderUtils.UpdateHelpBox(element.HelpBox, error);
 
-            // ReSharper disable once InvertIf
-            if (shader != _currentShader)
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
             {
-                _currentShader = shader;
-                container.Q<ShaderKeywordElement>().BindShader(shader);
+                visualInput.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
             }
+            return element;
         }
     }
 }
