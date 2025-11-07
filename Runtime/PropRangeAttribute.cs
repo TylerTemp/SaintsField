@@ -2,6 +2,7 @@
 using SaintsField.Interfaces;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
@@ -13,13 +14,13 @@ namespace SaintsField
         // ReSharper disable InconsistentNaming
         public readonly string MinCallback;
         public readonly string MaxCallback;
-        public readonly float Min;
-        public readonly float Max;
+        public readonly double Min;
+        public readonly double Max;
 
-        public readonly float Step;
+        public readonly double Step;
         // ReSharper enable InconsistentNaming
 
-        public PropRangeAttribute(float min, float max, float step=-1f)
+        public PropRangeAttribute(double min, double max, double step=-1f)
         {
             Min = min;
             Max = max;
@@ -28,7 +29,7 @@ namespace SaintsField
             Step = step;
         }
 
-        public PropRangeAttribute(string minCallback, string maxCallback, float step=-1f)
+        public PropRangeAttribute(string minCallback, string maxCallback, double step=-1f)
         {
             Min = -1;
             Max = -1;
@@ -37,7 +38,7 @@ namespace SaintsField
             Step = step;
         }
 
-        public PropRangeAttribute(string minCallback, float max, float step=-1f)
+        public PropRangeAttribute(string minCallback, double max, double step=-1f)
         {
             MinCallback = minCallback;
             MaxCallback = null;
@@ -45,7 +46,7 @@ namespace SaintsField
             Step = step;
         }
 
-        public PropRangeAttribute(float min, string maxCallback, float step=-1f)
+        public PropRangeAttribute(double min, string maxCallback, double step=-1f)
         {
             Min = min;
             MinCallback = null;

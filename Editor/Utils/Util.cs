@@ -64,6 +64,11 @@ namespace SaintsField.Editor.Utils
             int r = x % m;
             return r < 0 ? r + m : r;
         }
+        public static long PositiveMod(long x, long m)
+        {
+            long r = x % m;
+            return r < 0 ? r + m : r;
+        }
 
         // binary format
         // empty string for failure
@@ -162,6 +167,43 @@ namespace SaintsField.Editor.Utils
             return Mathf.Min(newValue, end);
         }
 
+        public static double BoundDoubleStep(double curValue, double start, double end, double step)
+        {
+            double distance = curValue - start;
+            float floatStep = (float)(distance / step);
+            int stepDown = Mathf.FloorToInt(floatStep);
+            int stepUp = Mathf.CeilToInt(floatStep);
+            int stepRound = Mathf.RoundToInt(floatStep);
+
+            double newValue = start + stepDown * step;
+            if (stepRound == stepUp && stepRound != stepDown)  // go up, but ensure it's not over end boundary
+            {
+                if (!(end - newValue < step)) // has space
+                {
+                    newValue = start + stepUp * step;
+                }
+            }
+
+            // var newValue = start + stepRound * step;
+            return newValue;
+        }
+
+        public static double DoubleClamp(double value, double min, double max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
+        }
+
         public static int BoundIntStep(float curValue, float start, float end, int step)
         {
             int useStart = Mathf.CeilToInt(start);
@@ -171,6 +213,136 @@ namespace SaintsField.Editor.Utils
             int stepRound = Mathf.RoundToInt(distance / step);
             int newValue = useStart + stepRound * step;
             return Mathf.Clamp(newValue, useStart, useEnd);
+        }
+
+
+
+        public static int BoundIntStep(int curValue, int start, int end, int step)
+        {
+            int distance = curValue - start;
+            int fineStep = distance / step;
+
+            int left = PositiveMod(distance, step);
+            int halfStep = step / 2;
+
+            int newValue = start + fineStep * step;
+            // Debug.Log($"cur={curValue}, newValue={newValue}; step={step}");
+
+            if (left > halfStep && end - step >= newValue)
+            {
+                newValue += step;
+                // Debug.Log($"pump {step} newValue={newValue}");
+            }
+
+            return newValue;
+        }
+
+        public static long BoundLongStep(long curValue, long start, long end, long step)
+        {
+            long distance = curValue - start;
+            long fineStep = distance / step;
+
+            long left = PositiveMod(distance, step);
+            long halfStep = step / 2;
+
+            long newValue = start + fineStep * step;
+            // Debug.Log($"cur={curValue}, newValue={newValue}; step={step}");
+
+            if (left > halfStep && end - step >= newValue)
+            {
+                newValue += step;
+                // Debug.Log($"pump {step} newValue={newValue}");
+            }
+
+            return newValue;
+        }
+
+        public static long ClampLong(long value, long min, long max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
+        }
+
+        public static ulong BoundULongStep(ulong curValue, ulong start, ulong end, ulong step)
+        {
+            ulong distance = curValue - start;
+            ulong fineStep = distance / step;
+
+            ulong left = distance % step;
+            ulong halfStep = step / 2;
+
+            ulong newValue = start + fineStep * step;
+            // Debug.Log($"cur={curValue}, newValue={newValue}; step={step}");
+
+            if (left > halfStep && end - step >= newValue)
+            {
+                newValue += step;
+                // Debug.Log($"pump {step} newValue={newValue}");
+            }
+
+            return newValue;
+        }
+
+        public static ulong ClampULong(ulong value, ulong min, ulong max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
+        }
+
+        public static uint BoundUIntStep(uint curValue, uint start, uint end, uint step)
+        {
+            uint distance = curValue - start;
+            uint fineStep = distance / step;
+
+            uint left = distance % step;
+            uint halfStep = step / 2;
+
+            uint newValue = start + fineStep * step;
+            // Debug.Log($"cur={curValue}, newValue={newValue}; step={step}");
+
+            if (left > halfStep && end - step >= newValue)
+            {
+                newValue += step;
+                // Debug.Log($"pump {step} newValue={newValue}");
+            }
+
+            return ClampUInt(newValue, start, end);
+        }
+
+        public static uint ClampUInt(uint value, uint min, uint max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
         }
 
         public static SerializedUtils.FieldOrProp GetWrapProp(IWrapProp wrapProp)

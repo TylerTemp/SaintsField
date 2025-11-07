@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             float minValue;
             if (propRangeAttribute.MinCallback == null)
             {
-                minValue = propRangeAttribute.Min;
+                minValue = (float)propRangeAttribute.Min;
             }
             else
             {
@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             float maxValue;
             if (propRangeAttribute.MaxCallback == null)
             {
-                maxValue = propRangeAttribute.Max;
+                maxValue = (float)propRangeAttribute.Max;
             }
             else
             {
@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 IsFloat = isFloat,
                 MinValue = minValue,
                 MaxValue = maxValue,
-                Step = propRangeAttribute.Step,
+                Step = (float)propRangeAttribute.Step,
                 Error = error,
             };
         }

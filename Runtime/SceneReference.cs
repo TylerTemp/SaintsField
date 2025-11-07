@@ -44,12 +44,19 @@ namespace SaintsField
                 return;
             }
 
+            SceneAsset sceneAsset;
+            try
+            {
 #if UNITY_6000_2_OR_NEWER
-            SceneAsset sceneAsset = AssetDatabase.LoadAssetByGUID<SceneAsset>(resultGuid);
+                sceneAsset = AssetDatabase.LoadAssetByGUID<SceneAsset>(resultGuid);
 #else
-            SceneAsset sceneAsset =
-                AssetDatabase.LoadAssetAtPath<SceneAsset>(AssetDatabase.GUIDToAssetPath(resultGuid));
+                sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(AssetDatabase.GUIDToAssetPath(resultGuid));
 #endif
+            }
+            catch (UnityException)
+            {
+                return;
+            }
 
             if (sceneAsset == null)
             {

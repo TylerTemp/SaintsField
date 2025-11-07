@@ -2848,6 +2848,34 @@ namespace SaintsField.Editor.Utils
                 .Execute(() => CheckOutOfScoopFoldout(root, processedToggles))
                 .Every(150);
         }
+
+        public static void SetHelpBox(HelpBox helpBox, string content)
+        {
+            if (helpBox == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(content))
+            {
+                if (helpBox.style.display != DisplayStyle.None)
+                {
+                    helpBox.style.display = DisplayStyle.None;
+                }
+
+                return;
+            }
+
+            if (helpBox.text != content)
+            {
+                helpBox.text = content;
+            }
+            if (helpBox.style.display != DisplayStyle.Flex)
+            {
+                helpBox.style.display = DisplayStyle.Flex;
+            }
+
+        }
     }
 #endif
 }

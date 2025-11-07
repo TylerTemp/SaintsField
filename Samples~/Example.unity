@@ -2915,21 +2915,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ab24fcecf85459b8c5c812cbe6c7870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  min: 10
-  max: 21
-  rangeFloat: 10
-  rangeInt: 18
-  rangeFloatStep: 14
-  rangeIntStep: 20
-  normalRange: 7
-  normalFloatRange: 0.73
-  normalDoubleRange: 6.75
-  normalLongRange: 0
-  myRange:
-    min: 0
-    max: 37
-    rangeFloat: 17.2
-  rangeFloatDisabled: 17.62
+  min: -2147483648
+  max: 2147483647
+  longMin: -100
+  longMax: 100
+  longRange: -883501967941427968
 --- !u!4 &308851078
 Transform:
   m_ObjectHideFlags: 0
