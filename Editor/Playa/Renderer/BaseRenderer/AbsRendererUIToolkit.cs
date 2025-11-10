@@ -11,6 +11,7 @@ using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.InputAxisDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
+using SaintsField.Editor.Drawers.PropRangeDrawer;
 using SaintsField.Editor.Drawers.RateDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SceneDrawer;
@@ -252,6 +253,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             // Color reColor = EColor.EditorSeparator.GetColor();
 
+            #region bool
             if (valueType == typeof(bool) || value is bool)
             {
                 if (oldElement is Toggle oldToggle)
@@ -297,8 +299,29 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region sbyte
             if (valueType == typeof(sbyte) || value is sbyte)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditSByte(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (sbyte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
                 if (oldElement is IntegerField integerField)
                 {
                     integerField.SetValueWithoutNotify((sbyte)value);
@@ -342,8 +365,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region byte
             if (valueType == typeof(byte) || value is byte)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditByte(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (byte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((byte)value);
@@ -387,8 +432,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region short
             if (valueType == typeof(short) || value is short)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditShort(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (short) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((short)value);
@@ -431,8 +498,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
+            #endregion
+
+            #region ushort
             if (valueType == typeof(ushort) || value is ushort)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditUShort(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (ushort) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((ushort)value);
@@ -476,6 +565,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region int
             if (valueType == typeof(int) || value is int)
             {
                 foreach (Attribute each in allAttributes)
@@ -532,6 +624,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
 
@@ -580,8 +684,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region unit
             if (valueType == typeof(uint) || value is uint)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditUInt(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (uint) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
 #if UNITY_2022_3_OR_NEWER
                 if (oldElement is UnsignedIntegerField oldUnsignedIntegerField)
                 {
@@ -660,8 +786,53 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
-            if ((valueType == typeof(long) || value is long) && allAttributes.All(each => each is not DateTimeAttribute && each is not TimeSpanAttribute))
+            #endregion
+
+            #region long
+            if ((valueType == typeof(long) || value is long))
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case DateTimeAttribute dateTimeAttribute:
+                            return (DateTimeAttributeDrawer.UIToolkitValueEdit(
+                                oldElement,
+                                label,
+                                valueType,
+                                value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case TimeSpanAttribute timeSpanAttribute:
+                            return (TimeSpanAttributeDrawer.UIToolkitValueEdit(
+                                oldElement,
+                                label,
+                                valueType,
+                                value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditLong(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (long) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
+
                 if (oldElement is LongField oldLongField)
                 {
                     oldLongField.SetValueWithoutNotify((long)value);
@@ -700,8 +871,29 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region ulong
             if (valueType == typeof(ulong) || value is ulong)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditULong(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (ulong) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
 #if UNITY_2022_3_OR_NEWER
                 ulong ulongRawValue = (ulong)value;
                 if (oldElement is UnsignedLongField oldLongField)
@@ -782,8 +974,29 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region float
             if (valueType == typeof(float) || value is float)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditFloat(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (float) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
                 if (oldElement is FloatField oldFloatField)
                 {
                     oldFloatField.SetValueWithoutNotify((float)value);
@@ -822,8 +1035,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region double
             if (valueType == typeof(double) || value is double)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditDouble(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (double) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is DoubleField oldDoubleField)
                 {
                     oldDoubleField.SetValueWithoutNotify((double)value);
@@ -862,6 +1097,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
             if (valueType == typeof(string) || value is string)
             {
                 foreach (Attribute attribute in allAttributes)
@@ -1695,7 +1931,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
-            
+
+            #region DateTime
             if (valueType == typeof(DateTime) || value is DateTime || allAttributes.Any(each => each is DateTimeAttribute))
             {
                 return (DateTimeAttributeDrawer.UIToolkitValueEdit(
@@ -1709,6 +1946,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     inHorizontalLayout,
                     allAttributes), false);
             }
+            #endregion
+
+            #region TimeSpan
             if (valueType == typeof(TimeSpan) || value is TimeSpan || allAttributes.Any(each => each is TimeSpanAttribute))
             {
                 return (TimeSpanAttributeDrawer.UIToolkitValueEdit(
@@ -1722,7 +1962,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     inHorizontalLayout,
                     allAttributes), false);
             }
+            #endregion
 
+            #region LayerMask
             if (valueType == typeof(LayerMask) || value is LayerMask)
             {
                 if (allAttributes.Any(each => each is LayerAttribute))
@@ -1777,7 +2019,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
+            #endregion
 
+            #region GUID
             if (valueType == typeof(Guid) || value is Guid)
             {
                 return (GuidAttributeDrawer.UIToolkitValueEditGuid(
@@ -1790,6 +2034,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     inHorizontalLayout,
                     allAttributes), false);
             }
+            #endregion
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
 

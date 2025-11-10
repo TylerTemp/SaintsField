@@ -96,13 +96,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.3.0**
+**5.3.1**
 
-1.  You can now serialize a `Guid` type directly using "Extended Serialization"
-2.  You can now use `[Guid]` on `string` to pick a guid
-3.  `ShowInInspector` now shows the correct `Guid` type
-4.  `ShowInInspector` now can work with `[Guid]` of a string type
-5.  Fix `SaintsDictionary` drop element gives cast error [#338](https://github.com/TylerTemp/SaintsField/issues/338)
+1.  Fix: `TreeDropdown` search bar now pinned on the top
+2.  Fix: `TreeDropdown` did not scroll to current selected value if the list is long
+3.  `PropRange` now supports `uint`, `short`, `ushort`, `byte`, `sbyte`, `long`, `ulong`
+4.  Add: `ShowInInspector` now works with `ShaderParam`, `ShaderKeyword`, `Rate`, `PropRange`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1946,6 +1945,7 @@ private void DictExternalAdd()
 *   `ShaderParam`
 *   `ShaderKeyword`
 *   `Rate`
+*   `PropRange`
 
 ### Numerical ###
 
@@ -1978,6 +1978,8 @@ using SaintsField;
 #### `PropRange` ####
 
 Very like Unity's `Range` but allow you to dynamically change the range, plus allow to set range step.
+
+Supports int, uint, short, ushort, byte, sbyte, long, ulong, float, double
 
 For each argument:
 

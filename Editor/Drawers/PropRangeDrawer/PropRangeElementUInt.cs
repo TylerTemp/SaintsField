@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     public class PropRangeElementUInt: BindableElement, INotifyValueChanged<uint>
     {
         private readonly Slider _slider;
-        private readonly IntegerField _integerField;
+        private readonly UnsignedIntegerField _unsignedIntegerField;
         private readonly AdaptAttribute _adaptAttribute;
 
         public PropRangeElementUInt(AdaptAttribute adaptAttribute)
@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             };
             Add(_slider);
 
-            _integerField = new IntegerField
+            _unsignedIntegerField = new UnsignedIntegerField
             {
                 style =
                 {
@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 },
             };
 
-            Add(_integerField);
+            Add(_unsignedIntegerField);
 
             _slider.RegisterValueChangedCallback(evt =>
             {
@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     if (newValue == value)
                     {
                         _slider.SetValueWithoutNotify(newValue);
-                        SetIntegerFieldValueWithoutNotify(newValue);
+                        SetUnsignedIntegerFieldValueWithoutNotify(newValue);
                     }
                     else
                     {
@@ -59,20 +59,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     }
                 }
             });
-            _integerField.RegisterValueChangedCallback(evt =>
+            _unsignedIntegerField.RegisterValueChangedCallback(evt =>
             {
                 if (!_init)
                 {
                     return;
                 }
 
-                (bool uIntOk, uint uIntNewValue)  = GetNumber(evt.newValue);
-                if (!uIntOk)
-                {
-                    return;
-                }
-
-                (string error, uint actualValue) = PropRangeAttributeDrawer.GetPostValue(uIntNewValue, _adaptAttribute);
+                (string error, uint actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
                 if (error != "")
                 {
                     Debug.LogError(error);
@@ -83,7 +77,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 if (newValue == value)
                 {
                     _slider.SetValueWithoutNotify(newValue);
-                    SetIntegerFieldValueWithoutNotify(newValue);
+                    SetUnsignedIntegerFieldValueWithoutNotify(newValue);
                 }
                 else
                 {
@@ -92,10 +86,10 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             });
         }
 
-        private void SetIntegerFieldValueWithoutNotify(uint newValue)
+        private void SetUnsignedIntegerFieldValueWithoutNotify(uint newValue)
         {
-            int preValue = PropRangeAttributeDrawer.GetPreValue((int)newValue, _adaptAttribute).value;
-            _integerField.SetValueWithoutNotify(preValue);
+            uint preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            _unsignedIntegerField.SetValueWithoutNotify(preValue);
         }
 
         private bool _init;
@@ -197,26 +191,32 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             uint originValue = value;
             uint newValue = RemapValue(value);
 
-            // Debug.Log($"refresh display to {newValue} with {_slider.lowValue}-{_slider.highValue}");
+            // Debug.Log($"refresh display from {originValue} to {newValue} with {_slider.lowValue}~{_slider.highValue}");
 
             if (originValue != newValue)
             {
+                // Debug.Log($"resign to {newValue}");
                 value = newValue;
             }
             else
             {
                 // _slider.value = newValue;
+                // Debug.Log($"update no notify to {newValue}");
                 _slider.SetValueWithoutNotify(newValue);
-                SetIntegerFieldValueWithoutNotify(newValue);
+                SetUnsignedIntegerFieldValueWithoutNotify(newValue);
                 SetHelpBox("");
             }
         }
 
         private uint RemapValue(uint newValue)
         {
-            return _step <= 1
+            uint r = _step <= 1
                 ? Util.ClampUInt(newValue, _minValue, _maxValue)
                 : Util.BoundUIntStep(newValue, _minValue, _maxValue, _step);
+
+            // Debug.Log($"Remap {newValue} to {r} range {_minValue}~{_maxValue} step {_step}");
+
+            return r;
         }
 
         private uint _cachedValue;
@@ -267,6 +267,17 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         public PropRangeUIntField(string label, PropRangeElementUInt visualInput) : base(label, visualInput)
         {
             PropRangeElementUInt = visualInput;
+        }
+
+        public override void SetValueWithoutNotify(uint newValue)
+        {
+            PropRangeElementUInt.SetValueWithoutNotify(newValue);
+        }
+
+        public override uint value
+        {
+            get => PropRangeElementUInt.value;
+            set => PropRangeElementUInt.value = value;
         }
     }
 }

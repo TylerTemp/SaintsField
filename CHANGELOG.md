@@ -1,10 +1,11 @@
 # Changelog
 
-## WIP ##
+## 5.3.1 ##
 
 1.  Fix: `TreeDropdown` search bar now pinned on the top 
 2.  Fix: `TreeDropdown` did not scroll to current selected value if the list is long
-3.  Add: `ShowInInspector` now works with `ShaderParam`, `ShaderKeyword`, `Rate`
+3.  `PropRange` now supports `uint`, `short`, `ushort`, `byte`, `sbyte`, `long`, `ulong`
+4.  Add: `ShowInInspector` now works with `ShaderParam`, `ShaderKeyword`, `Rate`, `PropRange`
 
 ## 5.3.0 ##
 

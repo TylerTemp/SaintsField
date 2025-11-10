@@ -74,6 +74,9 @@ namespace SaintsField.Editor.Drawers.AdaptDrawer
         }
 
         private static string FormatString(string display) => $" <color=#{ColorUtility.ToHtmlStringRGBA(EColor.Gray.GetColor())}>{display}</color>";
+
+
+
     }
 }
 #endif

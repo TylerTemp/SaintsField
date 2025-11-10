@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     // intValue, longValue, unitValue, ulongValue, floatValue, doubleValue
     // WTF so many... Even unity's range does not support long, ulong, uint
 
-    // This supports: byte, int, short, ushort
+    // This supports: sbyte, byte, int, short, ushort
     public class PropRangeElementInt: BindableElement, INotifyValueChanged<int>
     {
         private readonly Slider _slider;
@@ -120,17 +120,38 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return;
             }
 
-            _slider.lowValue = _minValue = Mathf.Max(minResult, minCap);
-            _slider.highValue = _maxValue = Mathf.Min(maxResult, maxCap);
+            bool changed = false;
 
-            _step = step;
+            int useMin = Mathf.Max(minResult, minCap);
+            if(useMin != _minValue)
+            {
+                _slider.lowValue = _minValue = useMin;
+                changed = true;
+            }
+            int useMax = Mathf.Min(maxResult, maxCap);
+            if(_maxValue != useMax)
+            {
+                _slider.highValue = _maxValue = useMax;
+                changed = true;
+            }
+
+            if(_step != step)
+            {
+                _step = step;
+                changed = true;
+            }
 
             _init = true;
 
-            RefreshDisplay();
+            // Debug.Log("Config OK");
+
+            if(changed)
+            {
+                RefreshDisplay();
+            }
         }
 
-        private (bool ok, int result) GetNumber(object num)
+        public (bool ok, int result) GetNumber(object num)
         {
             switch (num)
             {
@@ -203,7 +224,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             int originValue = value;
             int newValue = RemapValue(value);
 
-            // Debug.Log($"refresh display to {newValue} with {_slider.lowValue}-{_slider.highValue}");
+            // Debug.Log($"refresh display from {originValue} to {newValue} with {_slider.lowValue}~{_slider.highValue}");
 
             if (originValue != newValue)
             {
@@ -274,6 +295,17 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         public PropRangeIntField(string label, PropRangeElementInt visualInput) : base(label, visualInput)
         {
             PropRangeElementInt = visualInput;
+        }
+
+        public override void SetValueWithoutNotify(int newValue)
+        {
+            PropRangeElementInt.SetValueWithoutNotify(newValue);
+        }
+
+        public override int value
+        {
+            get => PropRangeElementInt.value;
+            set => PropRangeElementInt.value = value;
         }
     }
 }

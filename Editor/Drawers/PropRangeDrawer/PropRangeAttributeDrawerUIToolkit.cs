@@ -89,68 +89,6 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 default:
                     return PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
             }
-
-            // VisualElement root = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         flexDirection = FlexDirection.Row,
-            //     },
-            // };
-            //
-            // Slider slider = new Slider("", 0, 1, SliderDirection.Horizontal, 0.5f)
-            // {
-            //     name = NameSlider(property),
-            //     style =
-            //     {
-            //         flexGrow = 1,
-            //         flexShrink = 1,
-            //     },
-            // };
-            // root.Add(slider);
-            //
-            // const int width = 50;
-            //
-            // if (property.propertyType == SerializedPropertyType.Integer)
-            // {
-            //     root.Add(new IntegerField
-            //     {
-            //         name = NameInteger(property),
-            //         value = property.intValue,
-            //         style =
-            //         {
-            //             // flexShrink = 0,
-            //             flexGrow = 0,
-            //             width = width,
-            //         },
-            //     });
-            // }
-            // else
-            // {
-            //     root.Add(new FloatField
-            //     {
-            //         name = NameFloat(property),
-            //         value = property.floatValue,
-            //         style =
-            //         {
-            //             // flexShrink = 0,
-            //             flexGrow = 0,
-            //             width = width,
-            //         },
-            //     });
-            // }
-            //
-            // PropRangeField propRangeField = new PropRangeField(GetPreferredLabel(property), root)
-            // {
-            //     name = NamePropRange(property),
-            // };
-            // propRangeField.BindProperty(property);
-            //
-            // propRangeField.AddToClassList(ClassAllowDisable);
-            // propRangeField.labelElement.style.overflow = Overflow.Hidden;
-            // propRangeField.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
-            //
-            // return propRangeField;
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -224,6 +162,112 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 maxValue = getValue;
             }
             return (minValue, "", maxValue, "");
+        }
+
+        private static (object minValue, string minError, object maxValue, string maxError) GetMinMaxForShowInInspector(
+            PropRangeAttribute propRangeAttribute, object curValue, object target)
+        {
+            object minValue;
+            if (propRangeAttribute.MinCallback == null)
+            {
+                minValue = propRangeAttribute.Min;
+            }
+            else
+            {
+                (object getValue, string getError) = GetCallbackForShowInInspector(propRangeAttribute.MinCallback, curValue, target);
+                if (getError != "")
+                {
+                    return (null, getError, null, "");
+                }
+                minValue = getValue;
+            }
+
+            object maxValue;
+            if (propRangeAttribute.MaxCallback == null)
+            {
+                maxValue = propRangeAttribute.Max;
+            }
+            else
+            {
+                (object getValue, string getError) = GetCallbackForShowInInspector(propRangeAttribute.MaxCallback, curValue, target);
+                if (getError != "")
+                {
+                    return (null, getError, null, "");
+                }
+
+                maxValue = getValue;
+            }
+            return (minValue, "", maxValue, "");
+        }
+
+        private static (object getValue, string getError) GetCallbackForShowInInspector(string callback, object curValue, object target)
+        {
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
+            {
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, callback);
+
+                switch (getPropType)
+                {
+                    case ReflectUtils.GetPropType.NotFound:
+                        continue;
+
+                    case ReflectUtils.GetPropType.Property:
+                    {
+                        object genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                        if(genResult != null)
+                        {
+                            return (genResult, "");
+                        }
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Field:
+                    {
+                        FieldInfo fInfo = (FieldInfo)fieldOrMethodInfo;
+                        object genResult = fInfo.GetValue(target);
+                        if(genResult != null)
+                        {
+                            return (genResult, "");
+                        }
+                        // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+
+                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                        {
+                            curValue,
+                        });
+
+
+                        object genResult;
+                        try
+                        {
+                            genResult = methodInfo.Invoke(target, passParams);
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            return (e.InnerException?.Message ?? e.Message, null);
+                        }
+                        catch (Exception e)
+                        {
+                            return (e.Message, null);
+                        }
+
+                        if (genResult != null)
+                        {
+                            return (genResult, "");
+                        }
+
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                }
+            }
+
+            return ($"Target `{callback}` not found", null);
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -428,230 +472,454 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 }
                     break;
             }
-
-
-            // AdaptAttribute adaptAttribute = allAttributes.OfType<AdaptAttribute>().FirstOrDefault();
-
-            // PropRangeField propRangeField = container.Q<PropRangeField>(name: NamePropRange(property));
-
-
-            // Slider slider = propRangeField.Q<Slider>(NameSlider(property));
-
-            // PropRangeAttribute propRangeAttribute = (PropRangeAttribute)saintsAttribute;
-
-            // MetaInfo metaInfo = GetMetaInfo(property, propRangeAttribute, info, parent);
-
-            // bool isFloat = metaInfo.IsFloat;
-            // (string error, double value) curValueInfo = GetPreValue(isFloat ? property.floatValue : property.intValue, adaptAttribute);
-            // if (curValueInfo.error != "")
-            // {
-            //     return;
-            // }
-            // float curValue = (float) curValueInfo.value;
-            //
-            // (string error, double value) minValueInfo = GetPreValue(metaInfo.MinValue, adaptAttribute);
-            // if (minValueInfo.error != "")
-            // {
-            //     return;
-            // }
-            // float minValue = (float)minValueInfo.value;
-            //
-            // (string error, double value) maxValueInfo = GetPreValue(metaInfo.MaxValue, adaptAttribute);
-            // if (maxValueInfo.error != "")
-            // {
-            //     return;
-            // }
-            // float maxValue = (float)maxValueInfo.value;
-            //
-            // // Debug.Log($"{minValue}/{maxValue}");
-            //
-            // slider.lowValue = minValue;
-            // slider.highValue = maxValue;
-            // slider.value = curValue;
-            // slider.userData = metaInfo;
-            //
-            // IntegerField integerField = container.Q<IntegerField>(NameInteger(property));
-            // FloatField floatField = container.Q<FloatField>(NameFloat(property));
-            //
-            // if (isFloat)
-            // {
-            //     floatField.value = curValue;
-            //     floatField.RegisterValueChangedCallback(changed =>
-            //     {
-            //         float adaptedValue = changed.newValue;
-            //         (string error, double value) postValueInfo = GetPostValue(changed.newValue, adaptAttribute);
-            //         if (postValueInfo.error != "")
-            //         {
-            //             return;
-            //         }
-            //         float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, info, parent),
-            //             (float)postValueInfo.value);
-            //         property.doubleValue = _cachedChangeValue = parsedValue;
-            //         property.serializedObject.ApplyModifiedProperties();
-            //
-            //         floatField.SetValueWithoutNotify(adaptedValue);
-            //         slider.SetValueWithoutNotify(adaptedValue);
-            //         info.SetValue(parent, parsedValue);
-            //         onValueChangedCallback.Invoke(parsedValue);
-            //     });
-            // }
-            // else
-            // {
-            //     integerField.value = (int)curValue;
-            //     integerField.RegisterValueChangedCallback(changed =>
-            //     {
-            //         float adaptedValue = changed.newValue;
-            //         (string error, double value) postValueInfo = GetPostValue(changed.newValue, adaptAttribute);
-            //         if (postValueInfo.error != "")
-            //         {
-            //             return;
-            //         }
-            //         int parsedValue = (int)GetValue(GetMetaInfo(property, saintsAttribute, info, parent),
-            //             (float)postValueInfo.value);
-            //         property.intValue = parsedValue;
-            //         _cachedChangeValue = property.intValue;
-            //         property.serializedObject.ApplyModifiedProperties();
-            //
-            //         floatField.SetValueWithoutNotify(adaptedValue);
-            //         slider.SetValueWithoutNotify(adaptedValue);
-            //         info.SetValue(parent, parsedValue);
-            //         onValueChangedCallback.Invoke(parsedValue);
-            //     });
-            // }
-            //
-            // slider.RegisterValueChangedCallback(changed =>
-            // {
-            //     float adaptedValue = changed.newValue;
-            //     (string error, double value) postValueInfo = GetPostValue(adaptedValue, adaptAttribute);
-            //     if (postValueInfo.error != "")
-            //     {
-            //         return;
-            //     }
-            //
-            //     float parsedValue = GetValue(GetMetaInfo(property, saintsAttribute, info, parent), (float)postValueInfo.value);
-            //
-            //     (string error, double value) preValueInfo = GetPreValue(parsedValue, adaptAttribute);
-            //     if (preValueInfo.error != "")
-            //     {
-            //         return;
-            //     }
-            //
-            //     if (property.propertyType == SerializedPropertyType.Float)
-            //     {
-            //         property.doubleValue = parsedValue;
-            //         _cachedChangeValue = parsedValue;
-            //         property.serializedObject.ApplyModifiedProperties();
-            //
-            //         floatField.SetValueWithoutNotify((float)preValueInfo.value);
-            //         slider.SetValueWithoutNotify((float)preValueInfo.value);
-            //         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, parsedValue);
-            //         onValueChangedCallback.Invoke(parsedValue);
-            //     }
-            //     else
-            //     {
-            //         int intValue = (int)parsedValue;
-            //         property.intValue = intValue;
-            //         _cachedChangeValue = intValue;
-            //         property.serializedObject.ApplyModifiedProperties();
-            //
-            //         integerField.SetValueWithoutNotify((int) preValueInfo.value);
-            //         slider.SetValueWithoutNotify((int) preValueInfo.value);
-            //         // info.SetValue(parent, intValue);
-            //         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, intValue);
-            //         onValueChangedCallback.Invoke(intValue);
-            //     }
-            //
-            //     property.serializedObject.ApplyModifiedProperties();
-            // });
-            //
-            // HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-            // if (metaInfo.Error != "")
-            // {
-            //     helpBox.text = metaInfo.Error;
-            //     helpBox.style.display = DisplayStyle.Flex;
-            // }
-            //
-            // helpBox.TrackPropertyValue(property, _ => UpdateExternal());
-            // helpBox.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateExternal));
-            // SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateExternal);
-            //
-            // return;
-            //
-            // void UpdateExternal()
-            // {
-            //     if (metaInfo.IsFloat)
-            //     {
-            //         if (Mathf.Approximately(property.floatValue, _cachedChangeValue))
-            //         {
-            //             return;
-            //         }
-            //     }
-            //     else
-            //     {
-            //         if (Mathf.Approximately(property.intValue, _cachedChangeValue))
-            //         {
-            //             return;
-            //         }
-            //     }
-            //     UpdateDisplay(property, propRangeAttribute, adaptAttribute, container, info);
-            // }
         }
-        //
-        // private static void UpdateDisplay(SerializedProperty property, PropRangeAttribute propRangeAttribute,
-        //     AdaptAttribute adaptAttribute,
-        //     VisualElement container, FieldInfo info)
-        // {
-        //     object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-        //
-        //     MetaInfo metaInfo = GetMetaInfo(property, propRangeAttribute, info, parent);
-        //
-        //     Slider slider = container.Q<Slider>(NameSlider(property));
-        //     // MetaInfo curMetaInfo = (MetaInfo)slider.userData;
-        //
-        //     HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-        //
-        //     if (metaInfo.Error != helpBox.text)
-        //     {
-        //         helpBox.text = metaInfo.Error;
-        //         helpBox.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-        //         if (metaInfo.Error != "")
-        //         {
-        //             return;
-        //         }
-        //     }
-        //
-        //     if (!string.IsNullOrEmpty(propRangeAttribute.MinCallback))
-        //     {
-        //         slider.lowValue = metaInfo.MinValue;
-        //     }
-        //
-        //     if (!string.IsNullOrEmpty(propRangeAttribute.MaxCallback))
-        //     {
-        //         slider.highValue = metaInfo.MaxValue;
-        //     }
-        //
-        //     (string error, double value) curValueInfo = GetPreValue(metaInfo.IsFloat ? property.floatValue : property.intValue, adaptAttribute);
-        //     if (curValueInfo.error != "")
-        //     {
-        //         return;
-        //     }
-        //     float curValue = (float) curValueInfo.value;
-        //
-        //     IntegerField integerField = container.Q<IntegerField>(NameInteger(property));
-        //     FloatField floatField = container.Q<FloatField>(NameFloat(property));
-        //
-        //     if (metaInfo.IsFloat)
-        //     {
-        //         floatField.SetValueWithoutNotify(curValue);
-        //     }
-        //     else
-        //     {
-        //         integerField.SetValueWithoutNotify((int)curValue);
-        //     }
-        //
-        //     // let it trigger the change
-        //     slider.value = curValue;
-        // }
+
+        public static VisualElement UIToolkitValueEditSByte(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, sbyte value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            const sbyte min = sbyte.MinValue;
+            const sbyte max = sbyte.MaxValue;
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+
+            if (oldElement is PropRangeIntField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+                }
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementInt element = new PropRangeElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeIntField field =
+                new PropRangeIntField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+            }
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    (bool ok, int result) = element.GetNumber(evt.newValue);
+                    if (!ok)
+                    {
+                        return;
+                    }
+
+                    beforeSet?.Invoke(value);
+                    setterOrNull((sbyte)result);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditByte(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, byte value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            const byte min = byte.MinValue;
+            const byte max = byte.MaxValue;
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+
+            if (oldElement is PropRangeIntField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+                }
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementInt element = new PropRangeElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeIntField field =
+                new PropRangeIntField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+            }
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    (bool ok, int result) = element.GetNumber(evt.newValue);
+                    if (!ok)
+                    {
+                        return;
+                    }
+
+                    beforeSet?.Invoke(value);
+                    setterOrNull((byte)result);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditShort(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, short value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            const short min = short.MinValue;
+            const short max = short.MaxValue;
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+
+            if (oldElement is PropRangeIntField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+                }
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementInt element = new PropRangeElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeIntField field =
+                new PropRangeIntField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+            }
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    (bool ok, int result) = element.GetNumber(evt.newValue);
+                    if (!ok)
+                    {
+                        return;
+                    }
+
+                    beforeSet?.Invoke(value);
+                    setterOrNull((short)result);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditUShort(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, ushort value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            const ushort min = ushort.MinValue;
+            const ushort max = ushort.MaxValue;
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+
+            if (oldElement is PropRangeIntField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+                }
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementInt element = new PropRangeElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeIntField field =
+                new PropRangeIntField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+            }
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    (bool ok, int result) = element.GetNumber(evt.newValue);
+                    if (!ok)
+                    {
+                        return;
+                    }
+
+                    beforeSet?.Invoke(value);
+                    setterOrNull((ushort)result);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditInt(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            const int min = int.MinValue;
+            const int max = int.MaxValue;
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+
+            if (oldElement is PropRangeIntField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+                }
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementInt element = new PropRangeElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeIntField field =
+                new PropRangeIntField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementInt.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+            }
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditUInt(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, uint value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+            uint useStep = (propRangeAttribute.Step < 1 ? 0 : (uint)propRangeAttribute.Step);
+
+            if (oldElement is PropRangeUIntField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementUInt.SetConfig(minValue, maxValue, useStep);
+                }
+                // Debug.Log($"update {value}");
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementUInt element = new PropRangeElementUInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeUIntField field =
+                new PropRangeUIntField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementUInt.SetConfig(minValue, maxValue, useStep);
+            }
+
+            // Debug.Log($"init {value}");
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditLong(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, long value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+            long useStep = (long)propRangeAttribute.Step;
+
+            if (oldElement is PropRangeLongField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementLong.SetConfig(minValue, maxValue, useStep);
+                }
+                // Debug.Log($"update {value}");
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementLong element = new PropRangeElementLong(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeLongField field =
+                new PropRangeLongField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementLong.SetConfig(minValue, maxValue, useStep);
+            }
+
+            // Debug.Log($"init {value}");
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditULong(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, ulong value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+            ulong useStep = (propRangeAttribute.Step < 1 ? 0 : (ulong)propRangeAttribute.Step);
+
+            if (oldElement is PropRangeULongField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementULong.SetConfig(minValue, maxValue, useStep);
+                }
+                // Debug.Log($"update {value}");
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementULong element = new PropRangeElementULong(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeULongField field =
+                new PropRangeULongField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementULong.SetConfig(minValue, maxValue, useStep);
+            }
+
+            // Debug.Log($"init {value}");
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditFloat(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, float value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            const float min = float.MinValue;
+            const float max = float.MaxValue;
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+
+            if (oldElement is PropRangeDoubleField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementDouble.SetConfig(minValue, min, maxValue, max, propRangeAttribute.Step);
+                }
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementDouble element = new PropRangeElementDouble(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeDoubleField field =
+                new PropRangeDoubleField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementDouble.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+            }
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull((float)evt.newValue);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditDouble(VisualElement oldElement, PropRangeAttribute propRangeAttribute, string label, double value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            const double min = double.MinValue;
+            const double max = double.MaxValue;
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(propRangeAttribute, value, targets[0]);
+
+            if (oldElement is PropRangeDoubleField oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.PropRangeElementDouble.SetConfig(minValue, min, maxValue, max, propRangeAttribute.Step);
+                }
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            PropRangeElementDouble element = new PropRangeElementDouble(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            PropRangeDoubleField field =
+                new PropRangeDoubleField(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.PropRangeElementDouble.SetConfig(minValue, min, maxValue, max, (int)propRangeAttribute.Step);
+            }
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return field;
+        }
     }
 }
 #endif

@@ -2934,30 +2934,34 @@ MonoBehaviour:
   intMax: 2147483647
   intRange: 0
   intRangeAdapt: 0
+  byteMin: 0
+  byteMax: 255
+  byteRange: 0
+  sbyteMin: -128
+  sbyteMax: 127
+  sbyteRange: 0
   shortMin: -32768
   shortMax: 32767
   shortRange: 0
   uShortMin: 0
   uShortMax: 65535
   ushortRange: 0
-  uMin: 0
-  uMax: 4294967295
-  uIntRange: 0
-  uIntAdapt: 5
+  uIntMin: 0
+  uIntMax: 4294967295
+  uIntRange: 3247414272
+  uIntAdapt: 0
   floatMin: -3.4028235e+38
   floatMax: 3.4028235e+38
-  floatRange: 0
-  doubleMin: -8.988465674311579e+307
-  doubleMax: 8.988465674311579e+307
-  doubleRange: 0
-  doubleAdapt: 0.1
+  floatRange: -1.2824711e+38
+  floatAdapt: 0.4
   longMin: -4611686018427387904
   longMax: 4611686018427387903
-  longRange: 0
-  longAdapt: 0
+  longRange: 4611686018427387903
+  longAdapt: 3
   ulongMin: 0
   ulongMax: 18446744073709551615
-  ulongRange: 0
+  ulongRange: 17861059518360715264
+  ulongAdapt: 3
 --- !u!1 &325018645
 GameObject:
   m_ObjectHideFlags: 0

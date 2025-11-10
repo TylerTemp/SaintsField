@@ -36,6 +36,14 @@ namespace SaintsField.Editor.Drawers.AdaptDrawer
             }
             return ("", originValue * 100);
         }
+        public static (string error, uint value) GetUIntValuePre(uint originValue)
+        {
+            if (uint.MaxValue / 100 < originValue)
+            {
+                return ($"uint overflow {originValue}", uint.MaxValue);
+            }
+            return ("", originValue * 100);
+        }
 
         public static (string error, double value) GetDoubleValuePre(double originValue)
         {

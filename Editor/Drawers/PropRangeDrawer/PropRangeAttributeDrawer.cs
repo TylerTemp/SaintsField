@@ -101,6 +101,16 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
             return AdaptAttributeDrawer.GetIntValuePre(value);
         }
+        public static (string error, uint value) GetPreValue(uint value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetUIntValuePre(value);
+        }
 
         public static (string error, long value) GetPreValue(long value, AdaptAttribute adaptAttribute)
         {
