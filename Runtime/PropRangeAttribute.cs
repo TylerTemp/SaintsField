@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using SaintsField.Interfaces;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class PropRangeAttribute: PropertyAttribute, ISaintsAttribute, IAdaptable
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;

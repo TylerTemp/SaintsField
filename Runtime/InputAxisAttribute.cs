@@ -1,10 +1,12 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using SaintsField.Interfaces;
 using UnityEngine;
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class InputAxisAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;

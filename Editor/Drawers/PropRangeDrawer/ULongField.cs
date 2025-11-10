@@ -126,35 +126,35 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             this.longInput.ApplyInputDeviceDelta(delta, speed, startValue);
         }
 
-        [ExcludeFromDocs]
-        [Serializable]
-        public new class UxmlSerializedData : TextInputBaseField<long>.UxmlSerializedData
-        {
-            [Conditional("UNITY_EDITOR")]
-            public new static void Register() => TextInputBaseField<long>.UxmlSerializedData.Register();
-
-            public override object CreateInstance() => (object) new LongField();
-        }
+        // [ExcludeFromDocs]
+        // [Serializable]
+        // public new class UxmlSerializedData : TextInputBaseField<long>.UxmlSerializedData
+        // {
+        //     [Conditional("UNITY_EDITOR")]
+        //     public new static void Register() => TextInputBaseField<long>.UxmlSerializedData.Register();
+        //
+        //     public override object CreateInstance() => (object) new LongField();
+        // }
 
         /// <summary>
         ///        <para>
         /// Instantiates a LongField using the data read from a UXML file.
         /// </para>
         ///      </summary>
-        [Obsolete("UxmlFactory is deprecated and will be removed. Use UxmlElementAttribute instead.", false)]
-        public new class UxmlFactory : UnityEngine.UIElements.UxmlFactory<LongField, LongField.UxmlTraits>
-        {
-        }
+        // [Obsolete("UxmlFactory is deprecated and will be removed. Use UxmlElementAttribute instead.", false)]
+        // public new class UxmlFactory : UnityEngine.UIElements.UxmlFactory<LongField, LongField.UxmlTraits>
+        // {
+        // }
 
         /// <summary>
         ///        <para>
         /// Defines UxmlTraits for the LongField.
         /// </para>
         ///      </summary>
-        [Obsolete("UxmlTraits is deprecated and will be removed. Use UxmlElementAttribute instead.", false)]
-        public new class UxmlTraits : TextValueFieldTraits<long, UxmlLongAttributeDescription>
-        {
-        }
+        // [Obsolete("UxmlTraits is deprecated and will be removed. Use UxmlElementAttribute instead.", false)]
+        // public new class UxmlTraits : TextValueFieldTraits<long, UxmlLongAttributeDescription>
+        // {
+        // }
 
         private class ULongInput : TextValueField<ulong>.TextValueInput
         {

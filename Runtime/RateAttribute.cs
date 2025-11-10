@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using SaintsField.Interfaces;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -6,6 +7,7 @@ using Debug = UnityEngine.Debug;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class RateAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;

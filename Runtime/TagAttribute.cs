@@ -1,10 +1,13 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using SaintsField.Interfaces;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class TagAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
