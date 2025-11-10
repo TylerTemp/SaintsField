@@ -1,6 +1,6 @@
 using System;
 using SaintsField.Editor.Utils;
-using UnityEngine;
+// using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.PropRangeDrawer
@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     public class PropRangeElementULong: BindableElement, INotifyValueChanged<ulong>
     {
         private readonly Slider _slider;
-        private readonly LongField _longField;
+        private readonly ULongField _longField;
 
         public PropRangeElementULong()
         {
@@ -17,8 +17,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             _slider = new Slider("")
             {
                 showInputField = false,
-                lowValue = float.MinValue / 2,  // Magic!
-                highValue = float.MaxValue / 2,
+                lowValue = -10000,  // Magic!
+                highValue = 10000,
                 // lowValue = 0,
                 // highValue = 100,
                 style =
@@ -27,6 +27,20 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     flexShrink = 1,
                 },
             };
+            Add(_slider);
+
+            _longField = new ULongField
+            {
+                style =
+                {
+                    marginRight = 0,
+                    width = 50,
+                    flexGrow = 0,
+                    flexShrink = 0,
+                },
+            };
+            Add(_longField);
+
             _slider.RegisterValueChangedCallback(evt =>
             {
                 // Debug.Log(evt.newValue);
@@ -41,6 +55,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     if (newValue == value)
                     {
                         _slider.SetValueWithoutNotify(GetSliderValue(newValue));
+                        _longField.SetValueWithoutNotify(newValue);
                     }
                     else
                     {
@@ -48,19 +63,26 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     }
                 }
             });
-            Add(_slider);
 
-            _longField = new LongField
+            _longField.RegisterValueChangedCallback(evt =>
             {
-                style =
+                if (_init)
                 {
-                    marginRight = 0,
-                    width = 50,
-                    flexGrow = 0,
-                    flexShrink = 0,
-                },
-            };
-            Add(_longField);
+                    var actualValue = evt.newValue;
+                    ulong getNum = GetNumber(actualValue).result;
+                    ulong newValue = RemapValue(getNum);
+                    // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue} (getNum={getNum}); min={_minValue} max={_maxValue}");
+                    if (newValue == value)
+                    {
+                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
+                        _longField.SetValueWithoutNotify(newValue);
+                    }
+                    else
+                    {
+                        value = newValue;
+                    }
+                }
+            });
         }
 
         private float GetSliderValue(ulong newValue)
@@ -69,21 +91,15 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             {
                 return 0.5f;
             }
-            // Debug.Log(newValue);
-            // Debug.Log(newValue - _minValue);
-            // Debug.Log(_maxValue - _minValue);
-            // Debug.Log((newValue - _minValue) / (_maxValue - _minValue));
-            // return 0.3f;
-            ulong percent = (newValue - _minValue) / (_maxValue - _minValue);
-            // Debug.Log($"percent={percent}");
-            // return 0.3f;
-            return _slider.lowValue + _slider.range * percent;
+            decimal percent = (decimal)(newValue - _minValue) / (_maxValue - _minValue);
+            // Debug.Log($"percent={percent} for newValue={newValue}({_minValue} ~ {_maxValue})");
+            float sliderPos = (float)((decimal)_slider.lowValue + (decimal)(_slider.highValue - _slider.lowValue) * percent);
+            return sliderPos;
         }
 
         private ulong GetActualValue(float rangeValue)
         {
-            float percent = (rangeValue - _slider.lowValue) / _slider.range;
-            // Debug.Log($"percent={rangeValue}, min={rangeValue - _slider.lowValue}, max={_slider.range}");
+            float percent = (rangeValue - _slider.lowValue) / (_slider.highValue - _slider.lowValue);
             return (ulong)(_minValue + (_maxValue - _minValue) * percent);
         }
 
@@ -191,16 +207,25 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 float sliderValue = GetSliderValue(newValue);
                 // Debug.Log(sliderValue);
                 _slider.SetValueWithoutNotify(sliderValue);
-                _longField.SetValueWithoutNotify((long)newValue);
+                _longField.SetValueWithoutNotify(newValue);
                 SetHelpBox("");
             }
         }
 
         private ulong RemapValue(ulong newValue)
         {
-            return _step <= 1
-                ? Util.ClampULong(newValue, _minValue, _maxValue)
-                : Util.BoundULongStep(newValue, _minValue, _maxValue, _step);
+            if (_step <= 1)
+            {
+                ulong r= Util.ClampULong(newValue, _minValue, _maxValue);
+                // Debug.Log($"remap {r} from {newValue} ({_minValue} ~ {_maxValue})");
+                return r;
+            }
+            else
+            {
+                ulong r = Util.BoundULongStep(newValue, _minValue, _maxValue, _step);
+                // Debug.Log($"step {_step} for {r} from {newValue} ({_minValue} ~ {_maxValue})");
+                return r;
+            }
         }
 
         private ulong _cachedValue;

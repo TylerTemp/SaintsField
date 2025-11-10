@@ -1,6 +1,6 @@
 using System;
 using SaintsField.Editor.Utils;
-using UnityEngine;
+// using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.PropRangeDrawer
@@ -17,8 +17,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             _slider = new Slider("")
             {
                 showInputField = false,
-                lowValue = float.MinValue / 2,  // Magic!
-                highValue = float.MaxValue / 2,
+                lowValue = -10000,  // Magic!
+                highValue = 10000,
                 // lowValue = 0,
                 // highValue = 100,
                 style =
@@ -27,30 +27,9 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     flexShrink = 1,
                 },
             };
-            _slider.RegisterValueChangedCallback(evt =>
-            {
-                // Debug.Log(evt.newValue);
-                // ReSharper disable once InvertIf
-                if (_init)
-                {
-                    float rangeValue = evt.newValue;
-                    long actualValue = GetActualValue(rangeValue);
-                    // Debug.Log($"actual = {actualValue}");
-                    long newValue = RemapValue(actualValue);
-                    // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue}");
-                    if (newValue == value)
-                    {
-                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
-                    }
-                    else
-                    {
-                        value = newValue;
-                    }
-                }
-            });
-            Add(_slider);
 
-            _longField = new LongField()
+            Add(_slider);
+            _longField = new LongField
             {
                 style =
                 {
@@ -60,7 +39,49 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     flexShrink = 0,
                 },
             };
+
             Add(_longField);
+            _slider.RegisterValueChangedCallback(evt =>
+            {
+                // Debug.Log(evt.newValue);
+                // ReSharper disable once InvertIf
+                if (_init)
+                {
+                    float rangeValue = evt.newValue;
+                    long actualValue = GetActualValue(rangeValue);
+                    long newValue = RemapValue(actualValue);
+                    // Debug.Log($"rangeValue={rangeValue}, actual={actualValue}, remap={newValue}");
+                    if (newValue == value)
+                    {
+                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
+                        _longField.SetValueWithoutNotify(newValue);
+                    }
+                    else
+                    {
+                        value = newValue;
+                    }
+                }
+            });
+
+            _longField.RegisterValueChangedCallback(evt =>
+            {
+                if (_init)
+                {
+                    long actualValue = evt.newValue;
+                    // Debug.Log($"actual = {actualValue}");
+                    long newValue = RemapValue(actualValue);
+                    // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue}");
+                    if (newValue == value)
+                    {
+                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
+                        _longField.SetValueWithoutNotify(newValue);
+                    }
+                    else
+                    {
+                        value = newValue;
+                    }
+                }
+            });
         }
 
         private float GetSliderValue(long newValue)
@@ -69,21 +90,15 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             {
                 return 0.5f;
             }
-            // Debug.Log(newValue);
-            // Debug.Log(newValue - _minValue);
-            // Debug.Log(_maxValue - _minValue);
-            // Debug.Log((newValue - _minValue) / (_maxValue - _minValue));
-            // return 0.3f;
-            long percent = (newValue - _minValue) / (_maxValue - _minValue);
-            // Debug.Log($"percent={percent}");
-            // return 0.3f;
-            return _slider.lowValue + _slider.range * percent;
+            decimal percent = (decimal)(newValue - _minValue) / (_maxValue - _minValue);
+            // Debug.Log($"percent={percent} in new={newValue}({_minValue}~{_maxValue}); {(decimal)(newValue - _minValue)}/{(_maxValue - _minValue)}");
+            float sliderPos = (float)((decimal)_slider.lowValue + (decimal)(_slider.highValue - _slider.lowValue) * percent);
+            return sliderPos;
         }
 
         private long GetActualValue(float rangeValue)
         {
-            float percent = (rangeValue - _slider.lowValue) / _slider.range;
-            // Debug.Log($"percent={rangeValue}, min={rangeValue - _slider.lowValue}, max={_slider.range}");
+            float percent = (rangeValue - _slider.lowValue) / (_slider.highValue - _slider.lowValue);
             return (long)(_minValue + (_maxValue - _minValue) * percent);
         }
 
@@ -181,13 +196,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
             if (originValue != newValue)
             {
+                // Debug.Log($"reset Value={originValue}->{newValue}");
                 value = newValue;
             }
             else
             {
                 // _slider.value = newValue;
                 float sliderValue = GetSliderValue(newValue);
-                // Debug.Log(sliderValue);
+                // Debug.Log($"set sliderValue={sliderValue} from {originValue}->{newValue}");
                 _slider.SetValueWithoutNotify(sliderValue);
                 _longField.SetValueWithoutNotify(newValue);
                 SetHelpBox("");

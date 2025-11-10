@@ -1,6 +1,6 @@
 using System;
 using SaintsField.Editor.Utils;
-using UnityEngine;
+// using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.PropRangeDrawer
@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 // ReSharper disable once InvertIf
                 if (_init)
                 {
-                    Debug.Log(evt.newValue);
+                    // Debug.Log(evt.newValue);
                     uint newValue = RemapValue((uint)evt.newValue);
                     if (newValue == value)
                     {

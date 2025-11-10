@@ -1,5 +1,6 @@
 using System;
 using SaintsField.Editor.Utils;
+// using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.PropRangeDrawer
@@ -26,27 +27,6 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     flexShrink = 1,
                 },
             };
-            _slider.RegisterValueChangedCallback(evt =>
-            {
-                // Debug.Log(evt.newValue);
-                // ReSharper disable once InvertIf
-                if (_init)
-                {
-                    float rangeValue = evt.newValue;
-                    double actualValue = GetActualValue(rangeValue);
-                    // Debug.Log($"actual = {actualValue}");
-                    double newValue = RemapValue(actualValue);
-                    // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue}");
-                    if (Math.Abs(newValue - value) <= double.Epsilon)
-                    {
-                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
-                    }
-                    else
-                    {
-                        value = newValue;
-                    }
-                }
-            });
             Add(_slider);
 
             _doubleField = new DoubleField
@@ -60,19 +40,50 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 },
             };
             Add(_doubleField);
+
+            _slider.RegisterValueChangedCallback(evt =>
+            {
+                // Debug.Log(evt.newValue);
+                // ReSharper disable once InvertIf
+                if (_init)
+                {
+                    float rangeValue = evt.newValue;
+                    double actualValue = GetActualValue(rangeValue);
+                    // Debug.Log($"actual = {actualValue}");
+                    double newValue = RemapValue(actualValue);
+                    // Debug.Log($"newValue={newValue} from {actualValue}");
+                    if (Math.Abs(newValue - value) <= double.Epsilon)
+                    {
+                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
+                    }
+                    else
+                    {
+                        value = newValue;
+                    }
+                }
+            });
         }
 
         private float GetSliderValue(double newValue)
         {
+            if (Math.Abs(_maxValue - _minValue) <= double.Epsilon)
+            {
+                return 0.5f;
+            }
+
             double percent = (newValue - _minValue) / (_maxValue - _minValue);
-            return (float)(_slider.lowValue + _slider.range * percent);
+            double sliderPos = _slider.lowValue + (_slider.highValue - _slider.lowValue) * percent;
+            // return Math.Clamp(sliderPos, _slider.lowValue, _slider.highValue);
+            return Math.Clamp((float)sliderPos, _slider.lowValue, _slider.highValue);
         }
 
         private double GetActualValue(double rangeValue)
         {
-            double percent = (rangeValue - _slider.lowValue) / _slider.range;
-            // Debug.Log($"percent={rangeValue}, min={rangeValue - _slider.lowValue}, max={_slider.range}");
-            return _minValue + (_maxValue - _minValue) * percent;
+            double percent = (rangeValue - _slider.lowValue) / (_slider.highValue - _slider.lowValue);
+            // Debug.Log($"percent={percent}, {(rangeValue - _slider.lowValue)} / {(_slider.highValue - _slider.lowValue)}");
+            double actual = _minValue + (_maxValue - _minValue) * percent;
+            // Debug.Log($"actual={actual}; _maxValue={_maxValue}, min={_minValue}; {_minValue} + {(_maxValue - _minValue)} * {percent}");
+            return actual;
         }
 
         private bool _init;

@@ -26,14 +26,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         //     }
         // }
 
-        private static string NamePropRange(SerializedProperty property) => $"{property.propertyPath}__PropRange";
-        private static string NameSlider(SerializedProperty property) => $"{property.propertyPath}__PropRange_Slider";
-
-        private static string NameInteger(SerializedProperty property) =>
-            $"{property.propertyPath}__PropRange_IntegerField";
-
-        private static string NameFloat(SerializedProperty property) =>
-            $"{property.propertyPath}__PropRange_FloatField";
+        // private static string NamePropRange(SerializedProperty property) => $"{property.propertyPath}__PropRange";
+        // private static string NameSlider(SerializedProperty property) => $"{property.propertyPath}__PropRange_Slider";
+        //
+        // private static string NameInteger(SerializedProperty property) =>
+        //     $"{property.propertyPath}__PropRange_IntegerField";
+        //
+        // private static string NameFloat(SerializedProperty property) =>
+        //     $"{property.propertyPath}__PropRange_FloatField";
 
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__PropRange_HelpBox";
 
@@ -321,7 +321,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         field.PropRangeElementULong.BindHelpBox(helpBox);
                         field.PropRangeElementULong.bindingPath = property.propertyPath;
 
-                        ulong intStep = (ulong)step;
+                        ulong intStep = (ulong)(step <= 1? 1: step);
 
                         void UpdateMinMax()
                         {
@@ -417,6 +417,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                             return;
                         }
 
+                        // Debug.Log($"update min max {minValue}-{maxValue}");
                         field.PropRangeElementDouble.SetConfig(minValue, minCap, maxValue, maxCap, step);
                     }
 

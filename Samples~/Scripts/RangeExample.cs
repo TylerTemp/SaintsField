@@ -1,37 +1,48 @@
-﻿using System;
-using UnityEngine;
-using SaintsField.Playa;
-
-namespace SaintsField.Samples.Scripts
+﻿namespace SaintsField.Samples.Scripts
 {
     public class RangeExample: SaintsMonoBehaviour
     {
-        [MaxValue(nameof(max))] public int min;
-        [MinValue(nameof(min))] public int max;
+        [MaxValue(nameof(intMax))] public int intMin = int.MinValue;
+        [MinValue(nameof(intMin))] public int intMax = int.MaxValue;
 
-        // [PropRange(nameof(min), nameof(max), 3)] public int intRange;
-        // [PropRange(nameof(min), nameof(max))] public short shortRange;
-        // [PropRange(nameof(min), nameof(max))] public ushort ushortRange;
-        //
-        // public uint uMin = uint.MinValue;
-        // public uint uMax = uint.MaxValue;
-        // [PropRange(nameof(uMin), nameof(uMax))] public uint uIntRange;
-        //
-        // public float floatMin = float.MinValue;
-        // public float floatMax = float.MaxValue;
-        //
-        // [PropRange(nameof(floatMin), nameof(floatMax))] public float floatRange;
-        //
-        // public double doubleMin = double.MinValue;
-        // public double doubleMax = double.MaxValue;
-        //
-        // [PropRange(nameof(doubleMin), nameof(doubleMax))] public double doubleRange;
+        [PropRange(nameof(intMin), nameof(intMax), 3)] public int intRange;
+        [PropRange(0, 10), Adapt(EUnit.Percent)] public int intRangeAdapt;
 
-        public long longMin = long.MinValue;
-        public long longMax = long.MaxValue;
+        public short shortMin = short.MinValue;
+        public short shortMax = short.MaxValue;
+
+        [PropRange(nameof(shortMin), nameof(shortMax))] public short shortRange;
+
+        public ushort uShortMin = ushort.MinValue;
+        public ushort uShortMax = ushort.MaxValue;
+
+        [PropRange(nameof(uShortMin), nameof(uShortMax))] public ushort ushortRange;
+
+        public uint uMin = uint.MinValue;
+        public uint uMax = uint.MaxValue;
+        [PropRange(nameof(uMin), nameof(uMax))] public uint uIntRange;
+
+        public float floatMin = float.MinValue;
+        public float floatMax = float.MaxValue;
+
+        [PropRange(nameof(floatMin), nameof(floatMax))] public float floatRange;
+
+        public double doubleMin = double.MinValue / 2;
+        public double doubleMax = double.MaxValue / 2;
+
+        [PropRange(nameof(doubleMin), nameof(doubleMax))] public double doubleRange;
+
+        public long longMin = long.MinValue / 2;
+        public long longMax = long.MaxValue / 2;
 
         [PropRange(nameof(longMin), nameof(longMax))]
         public long longRange;
+
+        public ulong ulongMin = ulong.MinValue;
+        public ulong ulongMax = ulong.MaxValue;
+
+        [PropRange(nameof(ulongMin), nameof(ulongMax)), BelowText("<field/>")]
+        public ulong ulongRange;
 
         // [ShowInInspector] private bool v => float.MaxValue > double.MaxValue;
         // [ShowInInspector] private bool v2 => float.MinValue < double.MinValue;
