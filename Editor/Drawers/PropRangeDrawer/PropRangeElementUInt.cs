@@ -1,5 +1,6 @@
 using System;
 using SaintsField.Editor.Utils;
+using UnityEngine;
 // using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,18 +10,37 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     public class PropRangeElementUInt: BindableElement, INotifyValueChanged<uint>
     {
         private readonly Slider _slider;
+        private readonly IntegerField _integerField;
+        private readonly AdaptAttribute _adaptAttribute;
 
-        public PropRangeElementUInt()
+        public PropRangeElementUInt(AdaptAttribute adaptAttribute)
         {
+            _adaptAttribute = adaptAttribute;
+            style.flexDirection = FlexDirection.Row;
             _slider = new Slider("")
             {
-                showInputField = true,
+                showInputField = false,
                 style =
                 {
                     flexGrow = 1,
                     flexShrink = 1,
                 },
             };
+            Add(_slider);
+
+            _integerField = new IntegerField
+            {
+                style =
+                {
+                    marginRight = 0,
+                    width = 50,
+                    flexGrow = 0,
+                    flexShrink = 0,
+                },
+            };
+
+            Add(_integerField);
+
             _slider.RegisterValueChangedCallback(evt =>
             {
                 // ReSharper disable once InvertIf
@@ -31,6 +51,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     if (newValue == value)
                     {
                         _slider.SetValueWithoutNotify(newValue);
+                        SetIntegerFieldValueWithoutNotify(newValue);
                     }
                     else
                     {
@@ -38,7 +59,43 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     }
                 }
             });
-            Add(_slider);
+            _integerField.RegisterValueChangedCallback(evt =>
+            {
+                if (!_init)
+                {
+                    return;
+                }
+
+                (bool uIntOk, uint uIntNewValue)  = GetNumber(evt.newValue);
+                if (!uIntOk)
+                {
+                    return;
+                }
+
+                (string error, uint actualValue) = PropRangeAttributeDrawer.GetPostValue(uIntNewValue, _adaptAttribute);
+                if (error != "")
+                {
+                    Debug.LogError(error);
+                    return;
+                }
+                // Debug.Log(evt.newValue);
+                uint newValue = RemapValue(actualValue);
+                if (newValue == value)
+                {
+                    _slider.SetValueWithoutNotify(newValue);
+                    SetIntegerFieldValueWithoutNotify(newValue);
+                }
+                else
+                {
+                    value = newValue;
+                }
+            });
+        }
+
+        private void SetIntegerFieldValueWithoutNotify(uint newValue)
+        {
+            int preValue = PropRangeAttributeDrawer.GetPreValue((int)newValue, _adaptAttribute).value;
+            _integerField.SetValueWithoutNotify(preValue);
         }
 
         private bool _init;
@@ -150,6 +207,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             {
                 // _slider.value = newValue;
                 _slider.SetValueWithoutNotify(newValue);
+                SetIntegerFieldValueWithoutNotify(newValue);
                 SetHelpBox("");
             }
         }

@@ -13,18 +13,38 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     public class PropRangeElementInt: BindableElement, INotifyValueChanged<int>
     {
         private readonly Slider _slider;
+        private readonly IntegerField _intField;
 
-        public PropRangeElementInt()
+        private readonly AdaptAttribute _adaptAttribute;
+
+        public PropRangeElementInt(AdaptAttribute adaptAttribute)
         {
+            _adaptAttribute = adaptAttribute;
+
+            style.flexDirection = FlexDirection.Row;
+
             _slider = new Slider("")
             {
-                showInputField = true,
+                showInputField = false,
                 style =
                 {
                     flexGrow = 1,
                     flexShrink = 1,
                 },
             };
+            Add(_slider);
+            _intField = new IntegerField
+            {
+                style =
+                {
+                    marginRight = 0,
+                    width = 50,
+                    flexGrow = 0,
+                    flexShrink = 0,
+                },
+            };
+            Add(_intField);
+
             _slider.RegisterValueChangedCallback(evt =>
             {
                 // ReSharper disable once InvertIf
@@ -35,6 +55,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     if (newValue == value)
                     {
                         _slider.SetValueWithoutNotify(newValue);
+                        // _intField.SetValueWithoutNotify(newValue);
+                        SetIntFieldWithoutNotify(newValue);
                     }
                     else
                     {
@@ -42,7 +64,37 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     }
                 }
             });
-            Add(_slider);
+            _intField.RegisterValueChangedCallback(evt =>
+            {
+                if (!_init)
+                {
+                    return;
+                }
+
+                (string error, int actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                if (error != "")
+                {
+                    Debug.LogError(error);
+                    return;
+                }
+                int newValue = RemapValue(actualValue);
+                // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue}");
+                if (newValue == value)
+                {
+                    _slider.SetValueWithoutNotify(newValue);
+                    _intField.SetValueWithoutNotify(newValue);
+                }
+                else
+                {
+                    value = newValue;
+                }
+            });
+        }
+
+        private void SetIntFieldWithoutNotify(int newValue)
+        {
+            int preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            _intField.SetValueWithoutNotify(preValue);
         }
 
         private bool _init;
@@ -161,6 +213,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             {
                 // _slider.value = newValue;
                 _slider.SetValueWithoutNotify(newValue);
+                SetIntFieldWithoutNotify(newValue);
                 SetHelpBox("");
             }
         }

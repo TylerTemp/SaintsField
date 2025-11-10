@@ -2932,28 +2932,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.RangeExample
   intMin: -2147483648
   intMax: 2147483647
-  intRange: -105268865
+  intRange: 0
+  intRangeAdapt: 0
   shortMin: -32768
   shortMax: 32767
-  shortRange: 642
+  shortRange: 0
   uShortMin: 0
   uShortMax: 65535
-  ushortRange: 28591
+  ushortRange: 0
   uMin: 0
   uMax: 4294967295
-  uIntRange: 1452709504
+  uIntRange: 0
+  uIntAdapt: 5
   floatMin: -3.4028235e+38
   floatMax: 3.4028235e+38
-  floatRange: -5.4777165e+37
+  floatRange: 0
   doubleMin: -8.988465674311579e+307
   doubleMax: 8.988465674311579e+307
   doubleRange: 0
+  doubleAdapt: 0.1
   longMin: -4611686018427387904
   longMax: 4611686018427387903
   longRange: 0
+  longAdapt: 0
   ulongMin: 0
   ulongMax: 18446744073709551615
-  ulongRange: 4949261376922058752
+  ulongRange: 0
 --- !u!1 &325018645
 GameObject:
   m_ObjectHideFlags: 0

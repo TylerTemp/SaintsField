@@ -52,28 +52,28 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 {
                     if (rawType == typeof(uint))
                     {
-                        PropRangeElementUInt element = new PropRangeElementUInt();
+                        PropRangeElementUInt element = new PropRangeElementUInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                         PropRangeUIntField field = new PropRangeUIntField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeUIntField.alignedFieldUssClassName);
                         return field;
                     }
                     if (rawType == typeof(long))
                     {
-                        PropRangeElementLong element = new PropRangeElementLong();
+                        PropRangeElementLong element = new PropRangeElementLong(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                         PropRangeLongField field = new PropRangeLongField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeLongField.alignedFieldUssClassName);
                         return field;
                     }
                     if (rawType == typeof(ulong))
                     {
-                        PropRangeElementULong element = new PropRangeElementULong();
+                        PropRangeElementULong element = new PropRangeElementULong(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                         PropRangeULongField field = new PropRangeULongField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeULongField.alignedFieldUssClassName);
                         return field;
                     }
                     else
                     {
-                        PropRangeElementInt element = new PropRangeElementInt();
+                        PropRangeElementInt element = new PropRangeElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                         PropRangeIntField field = new PropRangeIntField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeIntField.alignedFieldUssClassName);
                         return field;
@@ -81,7 +81,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 }
                 case SerializedPropertyType.Float:
                 {
-                    PropRangeElementDouble element = new PropRangeElementDouble();
+                    PropRangeElementDouble element = new PropRangeElementDouble(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                     PropRangeDoubleField field = new PropRangeDoubleField(GetPreferredLabel(property), element);
                     field.AddToClassList(PropRangeDoubleField.alignedFieldUssClassName);
                     return field;

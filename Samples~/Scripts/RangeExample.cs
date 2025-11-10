@@ -6,7 +6,7 @@
         [MinValue(nameof(intMin))] public int intMax = int.MaxValue;
 
         [PropRange(nameof(intMin), nameof(intMax), 3)] public int intRange;
-        [PropRange(0, 10), Adapt(EUnit.Percent)] public int intRangeAdapt;
+        [PropRange(0, 10), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public int intRangeAdapt;
 
         public short shortMin = short.MinValue;
         public short shortMax = short.MaxValue;
@@ -21,6 +21,7 @@
         public uint uMin = uint.MinValue;
         public uint uMax = uint.MaxValue;
         [PropRange(nameof(uMin), nameof(uMax))] public uint uIntRange;
+        [PropRange(0, 10), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public uint uIntAdapt;
 
         public float floatMin = float.MinValue;
         public float floatMax = float.MaxValue;
@@ -31,12 +32,13 @@
         public double doubleMax = double.MaxValue / 2;
 
         [PropRange(nameof(doubleMin), nameof(doubleMax))] public double doubleRange;
+        [PropRange(0, 1, 0.1d), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public double doubleAdapt;
 
         public long longMin = long.MinValue / 2;
         public long longMax = long.MaxValue / 2;
 
-        [PropRange(nameof(longMin), nameof(longMax))]
-        public long longRange;
+        [PropRange(nameof(longMin), nameof(longMax))] public long longRange;
+        [PropRange(0, 10), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public long longAdapt;
 
         public ulong ulongMin = ulong.MinValue;
         public ulong ulongMax = ulong.MaxValue;

@@ -1,5 +1,6 @@
 using System;
 using SaintsField.Editor.Utils;
+using UnityEngine;
 // using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -10,9 +11,11 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     {
         private readonly Slider _slider;
         private readonly DoubleField _doubleField;
+        private readonly AdaptAttribute _adaptAttribute;
 
-        public PropRangeElementDouble()
+        public PropRangeElementDouble(AdaptAttribute adaptAttribute)
         {
+            _adaptAttribute = adaptAttribute;
             style.flexDirection = FlexDirection.Row;
             _slider = new Slider("")
             {
@@ -54,12 +57,40 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     // Debug.Log($"newValue={newValue} from {actualValue}");
                     if (Math.Abs(newValue - value) <= double.Epsilon)
                     {
+                        SetDoubleFieldWithoutNotify(newValue);
                         _slider.SetValueWithoutNotify(GetSliderValue(newValue));
                     }
                     else
                     {
                         value = newValue;
                     }
+                }
+            });
+            _doubleField.RegisterValueChangedCallback(evt =>
+            {
+                if (!_init)
+                {
+                    return;
+                }
+
+                (string error, double actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                if (error != "")
+                {
+                    Debug.LogError(error);
+                    return;
+                }
+                // double actualValue = ;
+                // Debug.Log($"actual = {actualValue}");
+                double newValue = RemapValue(actualValue);
+                // Debug.Log($"newValue={newValue} from {actualValue}");
+                if (Math.Abs(newValue - value) <= double.Epsilon)
+                {
+                    SetDoubleFieldWithoutNotify(newValue);
+                    _slider.SetValueWithoutNotify(GetSliderValue(newValue));
+                }
+                else
+                {
+                    value = newValue;
                 }
             });
         }
@@ -84,6 +115,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             double actual = _minValue + (_maxValue - _minValue) * percent;
             // Debug.Log($"actual={actual}; _maxValue={_maxValue}, min={_minValue}; {_minValue} + {(_maxValue - _minValue)} * {percent}");
             return actual;
+        }
+
+        private void SetDoubleFieldWithoutNotify(double newValue)
+        {
+            double preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            _doubleField.SetValueWithoutNotify(preValue);
         }
 
         private bool _init;
@@ -177,7 +214,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             {
                 // _slider.value = newValue;
                 _slider.SetValueWithoutNotify(GetSliderValue(newValue));
-                _doubleField.SetValueWithoutNotify(newValue);
+                SetDoubleFieldWithoutNotify(newValue);
                 SetHelpBox("");
             }
         }
@@ -186,7 +223,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             // return newValue;
             // Debug.Log($"will remap {newValue} with {_step}");
-            return _step > 1
+            return _step > double.Epsilon
                 ? Util.BoundDoubleStep(newValue, _minValue, _maxValue, _step)
                 : Util.DoubleClamp(newValue, _minValue, _maxValue);
         }

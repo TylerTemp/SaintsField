@@ -1,5 +1,6 @@
 using System;
 using SaintsField.Editor.Utils;
+using UnityEngine;
 // using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -10,9 +11,11 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     {
         private readonly Slider _slider;
         private readonly LongField _longField;
+        private readonly AdaptAttribute _adaptAttribute;
 
-        public PropRangeElementLong()
+        public PropRangeElementLong(AdaptAttribute adaptAttribute)
         {
+            _adaptAttribute = adaptAttribute;
             style.flexDirection = FlexDirection.Row;
             _slider = new Slider("")
             {
@@ -54,7 +57,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     if (newValue == value)
                     {
                         _slider.SetValueWithoutNotify(GetSliderValue(newValue));
-                        _longField.SetValueWithoutNotify(newValue);
+                        SetLongFieldValueWithoutNotify(newValue);
                     }
                     else
                     {
@@ -65,21 +68,30 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
             _longField.RegisterValueChangedCallback(evt =>
             {
-                if (_init)
+                if (!_init)
                 {
-                    long actualValue = evt.newValue;
-                    // Debug.Log($"actual = {actualValue}");
-                    long newValue = RemapValue(actualValue);
-                    // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue}");
-                    if (newValue == value)
-                    {
-                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
-                        _longField.SetValueWithoutNotify(newValue);
-                    }
-                    else
-                    {
-                        value = newValue;
-                    }
+                    return;
+                }
+
+                (string error, long actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                if (error != "")
+                {
+                    Debug.LogError(error);
+                    return;
+                }
+
+                // long actualValue = evt.newValue;
+                // Debug.Log($"actual = {actualValue}");
+                long newValue = RemapValue(actualValue);
+                // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue}");
+                if (newValue == value)
+                {
+                    _slider.SetValueWithoutNotify(GetSliderValue(newValue));
+                    SetLongFieldValueWithoutNotify(newValue);
+                }
+                else
+                {
+                    value = newValue;
                 }
             });
         }
@@ -100,6 +112,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             float percent = (rangeValue - _slider.lowValue) / (_slider.highValue - _slider.lowValue);
             return (long)(_minValue + (_maxValue - _minValue) * percent);
+        }
+
+        private void SetLongFieldValueWithoutNotify(long newValue)
+        {
+            long preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            _longField.SetValueWithoutNotify(preValue);
         }
 
         private bool _init;
@@ -205,7 +223,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 float sliderValue = GetSliderValue(newValue);
                 // Debug.Log($"set sliderValue={sliderValue} from {originValue}->{newValue}");
                 _slider.SetValueWithoutNotify(sliderValue);
-                _longField.SetValueWithoutNotify(newValue);
+                SetLongFieldValueWithoutNotify(newValue);
                 SetHelpBox("");
             }
         }

@@ -23,14 +23,81 @@ namespace SaintsField.Editor.Drawers.AdaptDrawer
             }
         }
 
+        public static (string error, int value) GetIntValuePre(int originValue)
+        {
+            if (int.MaxValue / 100 < originValue)
+            {
+                return ($"int overflow {originValue}", int.MaxValue);
+            }
+
+            if (int.MinValue / 100 > originValue)
+            {
+                return ($"int overflow {originValue}", int.MinValue);
+            }
+            return ("", originValue * 100);
+        }
+
         public static (string error, double value) GetDoubleValuePre(double originValue)
         {
+            if (double.MaxValue / 100 < originValue)
+            {
+                return ($"double overflow {originValue}", double.MaxValue);
+            }
+
+            if (double.MinValue / 100 > originValue)
+            {
+                return ($"double overflow {originValue}", double.MinValue);
+            }
+            return ("", originValue * 100);
+        }
+
+        public static (string error, long value) GetLongValuePre(long originValue)
+        {
+            if (long.MaxValue / 100 < originValue)
+            {
+                return ($"long overflow {originValue}", long.MaxValue);
+            }
+
+            if (long.MinValue / 100 > originValue)
+            {
+                return ($"long overflow {originValue}", long.MinValue);
+            }
+
+            return ("", originValue * 100);
+        }
+
+        public static (string error, ulong value) GetULongValuePre(ulong originValue)
+        {
+            if (ulong.MaxValue / 100 < originValue)
+            {
+                return ($"long overflow {originValue}", ulong.MaxValue);
+            }
             return ("", originValue * 100);
         }
 
         public static (string error, double value) GetDoubleValuePost(double adaptedValue)
         {
             return ("", adaptedValue / 100);
+        }
+
+        public static (string error, int value) GetIntValuePost(int value)
+        {
+            return ("", value / 100);
+        }
+
+        public static (string error, long value) GetLongValuePost(long value)
+        {
+            return ("", value / 100);
+        }
+
+        public static (string error, uint value) GetUIntValuePost(uint value)
+        {
+            return ("", value / 100);
+        }
+
+        public static (string error, ulong value) GetULongValuePost(ulong value)
+        {
+            return ("", value / 100);
         }
     }
 }

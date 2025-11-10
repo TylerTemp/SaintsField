@@ -1,5 +1,6 @@
 using System;
 using SaintsField.Editor.Utils;
+using UnityEngine;
 // using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,10 +10,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
     public class PropRangeElementULong: BindableElement, INotifyValueChanged<ulong>
     {
         private readonly Slider _slider;
-        private readonly ULongField _longField;
+        private readonly ULongField _uLongField;
+        private readonly AdaptAttribute _adaptAttribute;
 
-        public PropRangeElementULong()
+        public PropRangeElementULong(AdaptAttribute adaptAttribute)
         {
+            _adaptAttribute = adaptAttribute;
             style.flexDirection = FlexDirection.Row;
             _slider = new Slider("")
             {
@@ -29,7 +32,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             };
             Add(_slider);
 
-            _longField = new ULongField
+            _uLongField = new ULongField
             {
                 style =
                 {
@@ -39,7 +42,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     flexShrink = 0,
                 },
             };
-            Add(_longField);
+            Add(_uLongField);
 
             _slider.RegisterValueChangedCallback(evt =>
             {
@@ -55,7 +58,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     if (newValue == value)
                     {
                         _slider.SetValueWithoutNotify(GetSliderValue(newValue));
-                        _longField.SetValueWithoutNotify(newValue);
+                        SetULongFieldValueWithoutNotify(newValue);
                     }
                     else
                     {
@@ -64,23 +67,30 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 }
             });
 
-            _longField.RegisterValueChangedCallback(evt =>
+            _uLongField.RegisterValueChangedCallback(evt =>
             {
-                if (_init)
+                if (!_init)
                 {
-                    var actualValue = evt.newValue;
-                    ulong getNum = GetNumber(actualValue).result;
-                    ulong newValue = RemapValue(getNum);
-                    // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue} (getNum={getNum}); min={_minValue} max={_maxValue}");
-                    if (newValue == value)
-                    {
-                        _slider.SetValueWithoutNotify(GetSliderValue(newValue));
-                        _longField.SetValueWithoutNotify(newValue);
-                    }
-                    else
-                    {
-                        value = newValue;
-                    }
+                    return;
+                }
+
+                (string error, ulong actualValue) = PropRangeAttributeDrawer.GetPostValue(evt.newValue, _adaptAttribute);
+                if (error != "")
+                {
+                    Debug.LogError(error);
+                    return;
+                }
+
+                ulong newValue = RemapValue(actualValue);
+                // Debug.Log($"evt.newValue={evt.newValue}, newValue={newValue} (getNum={getNum}); min={_minValue} max={_maxValue}");
+                if (newValue == value)
+                {
+                    _slider.SetValueWithoutNotify(GetSliderValue(newValue));
+                    SetULongFieldValueWithoutNotify(newValue);
+                }
+                else
+                {
+                    value = newValue;
                 }
             });
         }
@@ -101,6 +111,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         {
             float percent = (rangeValue - _slider.lowValue) / (_slider.highValue - _slider.lowValue);
             return (ulong)(_minValue + (_maxValue - _minValue) * percent);
+        }
+
+        private void SetULongFieldValueWithoutNotify(ulong newValue)
+        {
+            ulong preValue = PropRangeAttributeDrawer.GetPreValue(newValue, _adaptAttribute).value;
+            _uLongField.SetValueWithoutNotify(preValue);
         }
 
         private bool _init;
@@ -207,7 +223,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 float sliderValue = GetSliderValue(newValue);
                 // Debug.Log(sliderValue);
                 _slider.SetValueWithoutNotify(sliderValue);
-                _longField.SetValueWithoutNotify(newValue);
+                SetULongFieldValueWithoutNotify(newValue);
                 SetHelpBox("");
             }
         }
