@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using SaintsField.SaintsSerialization;
 using UnityEngine;
 using UnityEngine.Events;
 // ReSharper disable once CheckNamespace
 using System;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField.Utils
 {
     [Serializable]
@@ -30,8 +30,10 @@ namespace SaintsField.Utils
 
         private bool _hasValue;
 
-        public void SetValue(T v)
+        // ReSharper disable once ParameterHidesMember
+        public void SetValue(WrapType wrapType, T v)
         {
+            this.wrapType = wrapType;
             _runtimeResult = v;
             _hasValue = true;
 
@@ -290,121 +292,11 @@ namespace SaintsField.Utils
 
         }
 
-        public SaintsWrap(T v)
+        public SaintsWrap(WrapType wrapType, T v)
         {
-            SetValue(v);
+            SetValue(wrapType, v);
             // _runtimeResult = v;
         }
-
-//         public void OnBeforeSerialize()
-//         {
-// #if UNITY_EDITOR
-//             EnsureInit();
-//             switch (wrapType)
-//             {
-//                 case WrapType.Undefined:
-//                 case WrapType.T:
-//                 {
-//                     // Debug.Log($"SaintsWrap OnBeforeSerialize value to {_runtimeResult}");
-//                     value = _runtimeResult;
-//                 }
-//                     break;
-//                 case WrapType.Array:
-//                 {
-//                     if (_runtimeResult == null)
-//                     {
-//                         _runtimeResult = (T) (object)Array.CreateInstance(_subType, 0);
-//                         valueArray = Array.Empty<SaintsSerializedProperty>();
-//                         // Debug.Log("init valueArray to empty");
-//                     }
-//                     else
-//                     {
-//                         List<object> lis = new List<object>();
-//                         // ReSharper disable once LoopCanBeConvertedToQuery
-//                         foreach (object o in (IEnumerable)_runtimeResult)
-//                         {
-//                             lis.Add(o);
-//                         }
-//
-//                         List<SaintsSerializedProperty> oldArray = new List<SaintsSerializedProperty>(valueArray);
-//                         if (valueArray.Length != lis.Count)
-//                         {
-//                             valueArray = new SaintsSerializedProperty[lis.Count];
-//                         }
-//                         // valueArray = new SaintsSerializedProperty[lis.Count];
-//                         int index = 0;
-//
-//                         // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-//                         foreach (object o in lis)
-//                         {
-//                             bool isVRef = index < oldArray.Count && oldArray[index].IsVRef;
-//                             // Debug.Log($"before ser {index}={thisSer.V}/{thisSer.VRef}");
-//
-//                             if (!SaintsSerializedPropertyEqual(o, valueArray[index], isVRef))
-//                             {
-//                                 SaintsSerializedProperty thisSer = GetSaintsSerializedProperty(o, isVRef);
-//                                 // Debug.Log($"on before ser not equal {index} {valueArray[index].VRef}->{thisSer.VRef}: {o}");
-//                                 valueArray[index] = thisSer;
-//                             }
-//
-//                             index++;
-//                         }
-//
-//                     }
-//                 }
-//                     break;
-//                 case WrapType.List:
-//                 {
-//                     if (_runtimeResult == null)
-//                     {
-//                         // Debug.Log(_listType);
-//                         _runtimeResult = (T)Activator.CreateInstance(_listType);
-//                         valueList.Clear();
-//                     }
-//                     else
-//                     {
-//                         List<SaintsSerializedProperty> oldArray = new List<SaintsSerializedProperty>(valueList);
-//
-//                         // valueList.Clear();
-//                         int index = 0;
-//                         foreach (object o in (IEnumerable)_runtimeResult)
-//                         {
-//                             bool isVRef = index < oldArray.Count && oldArray[index].IsVRef;
-//                             SaintsSerializedProperty thisSer = GetSaintsSerializedProperty(o, isVRef);
-//                             if(index < valueList.Count)
-//                             {
-//                                 if (!SaintsSerializedPropertyEqual(o, valueList[index], isVRef))
-//                                 {
-//                                     // Debug.Log($"on before ser not equal {index} {valueList[index].VRef}->{thisSer.VRef}: {o}");
-//                                     valueList[index] = thisSer;
-//                                 }
-//                             }
-//                             else
-//                             {
-//                                 // Debug.Log($"on before ser add {index} {thisSer.VRef}: {o}");
-//                                 valueList.Add(thisSer);
-//                             }
-//
-//                             index++;
-//                         }
-//
-//                         int shouldBeTotal = index;
-//                         if (valueList.Count > shouldBeTotal)
-//                         {
-//                             valueList.RemoveRange(shouldBeTotal, valueList.Count - shouldBeTotal);
-//                         }
-//
-//                     }
-//                 }
-//                     break;
-//                 case WrapType.Field:
-//                 {
-//                     valueField = GetSaintsSerializedProperty(_runtimeResult, valueField.IsVRef);
-//                 }
-//                     break;
-//             }
-// #endif
-//         }
 
         private bool SaintsSerializedPropertyEqual(object o, SaintsSerializedProperty thisSer, bool isVRef)
         {
@@ -604,26 +496,36 @@ namespace SaintsField.Utils
 
         }
 
+        public static WrapType GuessWrapType()
+        {
+            Type t = typeof(T);
+            // Debug.Log($"{t}/{t.IsGenericType}/{(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>))}");
+            WrapType wrapT;
+            if (t.IsArray)
+            {
+                return RuntimeUtil.IsSubFieldUnitySerializable(t.GetElementType())? WrapType.T: WrapType.Array;
+            }
+
+            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                return RuntimeUtil.IsSubFieldUnitySerializable(t.GetGenericArguments()[0])? WrapType.T: WrapType.List;
+                // Debug.Log($"_listType={_listType}");
+            }
+
+            return RuntimeUtil.IsSubFieldUnitySerializable(t)? WrapType.T: WrapType.Field;
+        }
+
         #region Base Functions
 
         public override int GetHashCode()
         {
             EnsureInit();
-            switch (wrapType)
+            if (!_hasValue)
             {
-                case WrapType.T:
-                {
-                    return EqualityComparer<T>.Default.GetHashCode(value);
-                }
-                case WrapType.Array:
-                case WrapType.List:
-                case WrapType.Field:
-                    return EqualityComparer<T>.Default.GetHashCode(_runtimeResult);
-                case WrapType.Undefined:  // Never inspected, ignore
-                    return 0;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(wrapType), wrapType, null);
+                return GetValue()?.GetHashCode() ?? 0;
             }
+
+            return _runtimeResult?.GetHashCode() ?? 0;
         }
 
         public bool Equals(SaintsWrap<T> other)
@@ -633,9 +535,18 @@ namespace SaintsField.Utils
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
             return Equals((SaintsWrap<T>)obj);
         }
 

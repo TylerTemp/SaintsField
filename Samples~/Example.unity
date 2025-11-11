@@ -1175,6 +1175,12 @@ MonoBehaviour:
     - {fileID: 0}
     - {fileID: 0}
     - {fileID: 0}
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &98296081
 GameObject:
   m_ObjectHideFlags: 0
@@ -2954,6 +2960,10 @@ MonoBehaviour:
   floatMax: 3.4028235e+38
   floatRange: -1.2824711e+38
   floatAdapt: 0.4
+  doubleMin: -8.988465674311579e+307
+  doubleMax: 8.988465674311579e+307
+  doubleRange: 0
+  doubleAdapt: 0
   longMin: -4611686018427387904
   longMax: 4611686018427387903
   longRange: 4611686018427387903
@@ -3188,12 +3198,14 @@ MonoBehaviour:
   saintsListGo:
     value: []
     _saintsList: []
-    _saintsSerializedVersion: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   gameObjects1: []
   gameObjects2:
     value: []
     _saintsList: []
-    _saintsSerializedVersion: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   references:
     version: 2
     RefIds: []
@@ -4158,6 +4170,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b95dd2a9a1143674188d99e54bd6979a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsArrayRefExample
+  inters:
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 2
+  refSub1:
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &428673597
 GameObject:
   m_ObjectHideFlags: 0
@@ -6194,7 +6217,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toggleDict:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -6224,6 +6246,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: 0
       valueField:
@@ -6253,6 +6276,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   toggleTable:
   - b1: 0
     b2: 0
@@ -12811,7 +12836,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iDict:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - valueField:
         propertyType: 4
@@ -12826,6 +12850,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
+    _wrapTypeKey: 1
     _saintsValues:
     - valueField:
         propertyType: 4
@@ -12840,6 +12865,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
+    _wrapTypeValue: 1
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -12900,7 +12927,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eToState:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -12930,6 +12956,21 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    - value: 2
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652844
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         <layerIndex>k__BackingField: 0
@@ -12973,8 +13014,30 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    - value:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652846
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   eToV3:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -13004,6 +13067,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: {x: 0, y: 0, z: 0}
       valueField:
@@ -13033,8 +13097,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   eToStateOld:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -13050,6 +13115,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         <layerIndex>k__BackingField: 0
@@ -13072,8 +13138,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   eToV3Old:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -13089,6 +13156,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: {x: 0, y: 0, z: 0}
       valueField:
@@ -13104,8 +13172,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   myStructToGameObject:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value:
         key: 
@@ -13123,6 +13192,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         ss: 
@@ -13140,6 +13210,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -15701,15 +15773,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   saintsArrayGo:
     value: []
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   gameObjects2:
   - value:
     - {fileID: 0}
     - {fileID: 0}
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   gameObjects2Nest:
     value: []
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   gameObjects4: []
   _arrSize:
     value: 0000000000000000
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  pagging:
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &965251183
 GameObject:
   m_ObjectHideFlags: 0
@@ -18152,7 +18243,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   oneField:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18168,6 +18258,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         f1: 
@@ -18184,8 +18275,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   oneFields:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18201,6 +18293,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
       - f1: 
@@ -18217,8 +18310,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   twoField:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18234,6 +18328,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         f1: 
@@ -18251,8 +18346,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   twoFields:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18268,6 +18364,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
       - f1: 
@@ -18285,8 +18382,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   oneFieldAttr:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18302,6 +18400,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         f1: 
@@ -18318,8 +18417,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   oneFieldLabel:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18335,6 +18435,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         f1: 
@@ -18351,6 +18452,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -19774,6 +19877,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   integerHashSet:
     _saintsList:
     - value: 1
@@ -19916,8 +20021,12 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   _arr:
   - _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   references:
     version: 2
     RefIds:
@@ -19978,6 +20087,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 1
   noPolymorphism:
     _saintsList:
     - value:
@@ -19996,6 +20107,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   polymorphism:
     _saintsList:
     - value:
@@ -20030,6 +20143,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   references:
     version: 2
     RefIds:
@@ -23132,7 +23247,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue338.Issue338SaintsDictionary
   sd:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -23148,6 +23262,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: []
       valueField:
@@ -23172,6 +23287,8 @@ MonoBehaviour:
         IsVRef: 0
       valueList: []
       wrapType: 2
+    _wrapTypeValue: 2
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -24971,7 +25088,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colors:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 3
       valueField:
@@ -24987,6 +25103,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: {r: 0, g: 0, b: 0, a: 0}
       valueField:
@@ -25002,6 +25119,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -25760,7 +25879,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    _saintsSerializedVersion: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   references:
     version: 2
     RefIds:
@@ -25982,7 +26102,6 @@ MonoBehaviour:
   treeEnums: 0
   flagsTreeEnums: 0
   namedEnumDict:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -25998,6 +26117,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: 0
       valueField:
@@ -26013,6 +26133,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -33884,79 +34006,60 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   genDict:
-    saintsSerializedVersion: 1
-    _saintsKeys:
-    - value: a
-      valueField:
-        propertyType: 4
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: b
-      valueField:
-        propertyType: 4
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _saintsValues:
-    - value: {fileID: 2137894679}
-      valueField:
-        propertyType: 4
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: {fileID: 2009324526}
-      valueField:
-        propertyType: 4
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
+    _saintsKeys: []
+    _wrapTypeKey: 4
+    _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   dict:
-    saintsSerializedVersion: 1
-    _saintsKeys: []
-    _saintsValues: []
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value:
+        myStringField: 
+        myIntField: 
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   genDictValueArray:
-    saintsSerializedVersion: 1
     _saintsKeys: []
+    _wrapTypeKey: 4
     _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   genDictValueList:
-    saintsSerializedVersion: 1
     _saintsKeys: []
+    _wrapTypeKey: 4
     _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   kvPagin10:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -34098,6 +34201,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: 0
       valueField:
@@ -34239,14 +34343,20 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   keyWidthControl:
-    saintsSerializedVersion: 1
     _saintsKeys: []
+    _wrapTypeKey: 4
     _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   valueWidthControl:
-    saintsSerializedVersion: 1
     _saintsKeys: []
+    _wrapTypeKey: 4
     _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -34529,7 +34639,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.Issue314ExpandableDictionary
   expand:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -34545,6 +34654,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: {fileID: 1131818498}
       valueField:
@@ -34560,6 +34670,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -36782,12 +36894,64 @@ PrefabInstance:
       value: 6921583410452630252
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: absDict._wrapTypeKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: dymDict._wrapTypeKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: 'managedReferences[-2]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: absDict._wrapTypeValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: dymDict._wrapTypeValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._wrapTypeKey
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._wrapTypeKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._wrapTypeValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._wrapTypeValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._wrapTypeKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDict._wrapTypeKey
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._wrapTypeValue
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDict._wrapTypeValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: valueInject._saintsKeys.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDictArrVal._wrapTypeKey
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDict._saintsKeys.Array.size
@@ -36796,6 +36960,10 @@ PrefabInstance:
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: valueInject._saintsValues.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDictArrVal._wrapTypeValue
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDict._saintsValues.Array.size
@@ -38092,6 +38260,10 @@ PrefabInstance:
       value: SaintsField.Samples.Scripts.ColorToggleTextExample, today.comes.saintsfield.Samples
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsArray.Array.data[0]._wrapType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsDict._saintsValues.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -38209,7 +38381,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsArray.Array.data[0]._saintsSerializedVersion
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsDict._saintsKeys.Array.data[0].valueField.VRef

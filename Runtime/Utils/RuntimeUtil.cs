@@ -704,5 +704,30 @@ namespace SaintsField.Utils
 
             return fullPath? preTrimScenePath : Path.GetFileNameWithoutExtension(preTrimScenePath);
         }
+
+#if UNITY_EDITOR
+        public static WrapType EditorWrapMigrateFrom1<T>(List<SaintsWrap<T>> wrapList)
+        {
+            if (wrapList.Count == 0)
+            {
+                return WrapType.T;
+            }
+
+            WrapType r = wrapList[0].wrapType;
+
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (SaintsWrap<T> wrap in wrapList)
+            {
+                // ReSharper disable once RedundantCheckBeforeAssignment
+                if (wrap.wrapType != r)
+                {
+                    Debug.Log($"Migrate 1 set wrap type to {r}");
+                    wrap.wrapType = r;
+                }
+            }
+
+            return r;
+        }
+#endif
     }
 }

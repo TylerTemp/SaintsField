@@ -19,8 +19,86 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 {
     public static class SaintsWrapUtils
     {
-        public static VisualElement CreateCellElement(FieldInfo info, Type rawType, SerializedProperty serializedProperty, IReadOnlyList<Attribute> injectedAttributes, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
+        public static WrapType GetWrapType(FieldInfo listFieldInfo, IReadOnlyList<Attribute> injectedAttributes)
         {
+            Type wrapInstanceType = listFieldInfo.FieldType.GetGenericArguments()[0];
+            Type underType = wrapInstanceType.GetGenericArguments()[0];
+
+            bool needUseRef;
+            if (underType.IsArray)
+            {
+                needUseRef = !RuntimeUtil.IsSubFieldUnitySerializable(underType.GetElementType());
+            }
+            else if(underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                needUseRef = !RuntimeUtil.IsSubFieldUnitySerializable(underType.GetGenericArguments()[0]);
+            }
+            else
+            {
+                needUseRef = injectedAttributes.Any(each => each is SerializeReference)
+                             || !RuntimeUtil.IsSubFieldUnitySerializable(underType);
+            }
+
+            if (!needUseRef)
+            {
+                if (underType.IsArray)
+                {
+                    Type arrayElement = underType.GetElementType();
+                    Debug.Assert(arrayElement != null);
+                    needUseRef = arrayElement.IsInterface || arrayElement.IsAbstract;
+                }
+                else if (underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    Type listElement = underType.GetGenericArguments()[0];
+                    needUseRef = listElement.IsInterface || listElement.IsAbstract;
+                }
+            }
+
+            if (needUseRef)
+            {
+                if (underType.IsArray)
+                {
+                    return WrapType.Array;
+                }
+
+                if (underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    return WrapType.List;
+                }
+
+                return WrapType.Field;
+            }
+
+            return WrapType.T;
+        }
+
+        public static WrapType EnsureWrapType(SerializedProperty wrapTypeProperty, FieldInfo listField, IReadOnlyList<Attribute> injectedKeyAttributes)
+        {
+            Debug.Assert(wrapTypeProperty != null);
+            WrapType wrapType = GetWrapType(listField, injectedKeyAttributes);
+            // ReSharper disable once InvertIf
+            if (wrapTypeProperty.intValue != (int)wrapType)
+            {
+                wrapTypeProperty.intValue = (int)wrapType;
+                wrapTypeProperty.serializedObject.ApplyModifiedProperties();
+            }
+
+            return wrapType;
+        }
+
+        public static VisualElement CreateCellElement(WrapType saintsWrapType, FieldInfo info, Type rawType, SerializedProperty serializedProperty, IReadOnlyList<Attribute> injectedAttributes, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
+        {
+            SerializedProperty wrapTypeProp = serializedProperty.FindPropertyRelative("wrapType");
+            Debug.Assert(wrapTypeProp != null);
+            if (wrapTypeProp.intValue != (int)saintsWrapType)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.Log($"set wrap from {(WrapType)wrapTypeProp.intValue} to {WrapType.Array}");
+#endif
+                wrapTypeProp.intValue = (int)saintsWrapType;
+                serializedProperty.serializedObject.ApplyModifiedProperties();
+            }
+
             Attribute[] allCustomAttributes = ReflectCache.GetCustomAttributes<Attribute>(info);
             // Debug.Log($"{info.Name}: {string.Join<PropertyAttribute>(", ", allAttributes)}");
 
@@ -82,61 +160,24 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                     needUseRef = listElement.IsInterface || listElement.IsAbstract;
                 }
             }
-            SerializedProperty wrapTypeProp = serializedProperty.FindPropertyRelative("wrapType");
-            Debug.Assert(wrapTypeProp != null);
+
             string wrapName;
-            if (needUseRef)
+            switch (saintsWrapType)
             {
-                if (underType.IsArray)
-                {
+                case WrapType.Array:
                     wrapName = "valueArray";
-                    if (wrapTypeProp.intValue != (int)WrapType.Array)
-                    {
-#if SAINTSFIELD_DEBUG
-                        Debug.Log($"set wrap from {(WrapType)wrapTypeProp.intValue} to {WrapType.Array}");
-#endif
-                        wrapTypeProp.intValue = (int)WrapType.Array;
-                        serializedProperty.serializedObject.ApplyModifiedProperties();
-                    }
-                }
-                else if (underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
-                {
+                    break;
+                case WrapType.List:
                     wrapName = "valueList";
-                    if (wrapTypeProp.intValue != (int)WrapType.List)
-                    {
-#if SAINTSFIELD_DEBUG
-                        Debug.Log($"set wrap from {(WrapType)wrapTypeProp.intValue} to {WrapType.List}");
-#endif
-                        wrapTypeProp.intValue = (int)WrapType.List;
-                        serializedProperty.serializedObject.ApplyModifiedProperties();
-                    }
-                }
-                else
-                {
+                    break;
+                case WrapType.Field:
                     wrapName = "valueField";
-                    if (wrapTypeProp.intValue != (int)WrapType.Field)
-                    {
-
-#if SAINTSFIELD_DEBUG
-                        Debug.Log($"set wrap from {(WrapType)wrapTypeProp.intValue} to {WrapType.Field}");
-#endif
-                        wrapTypeProp.intValue = (int)WrapType.Field;
-                        serializedProperty.serializedObject.ApplyModifiedProperties();
-                    }
-                }
-            }
-            else
-            {
-                wrapName = "value";
-                if (wrapTypeProp.intValue != (int)WrapType.T)
-                {
-
-#if SAINTSFIELD_DEBUG
-                    Debug.Log($"set wrap from {wrapTypeProp.intValue} to {WrapType.T}");
-#endif
-                    wrapTypeProp.intValue = (int)WrapType.T;
-                    serializedProperty.serializedObject.ApplyModifiedProperties();
-                }
+                    break;
+                case WrapType.T:
+                case WrapType.Undefined:
+                default:
+                    wrapName = "value";
+                    break;
             }
             Type wrapType = ReflectUtils.GetIWrapPropType(rawType, wrapName);
             FieldInfo wrapInfo = (FieldInfo)ReflectUtils.GetProp(rawType, wrapName).fieldOrMethodInfo;

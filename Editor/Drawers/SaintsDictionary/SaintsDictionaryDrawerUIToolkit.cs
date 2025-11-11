@@ -389,17 +389,16 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             (FieldInfo keysField, object keysParent) = GetTargetInfo(propKeysNameCompact, rawType, fieldValue);
-
             Debug.Assert(keysField != null, $"Failed to get keys field {propKeysNameCompact} from {property.propertyPath}");
             Type keyType = ReflectUtils.GetElementType(keysField.FieldType);
+            IReadOnlyList<Attribute> injectedKeyAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(KeyAttributeAttribute));
+            WrapType keyWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeKey"), keysField, injectedKeyAttributes);
 
             (FieldInfo valuesField, object valuesParent) = GetTargetInfo(propValuesNameCompact, rawType, fieldValue);
-
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
             Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);
-
-            IReadOnlyList<Attribute> injectedKeyAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(KeyAttributeAttribute));
             IReadOnlyList<Attribute> injectedValueAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
+            WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeValue"), valuesField, injectedValueAttributes);
 
             IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
             totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
@@ -687,7 +686,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     };
                     element.Add(keyContainer);
 
-                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(keysField, keyType, elementProp, injectedKeyAttributes, this, this, keysParent);
+                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(keyWrapType, keysField, keyType, elementProp, injectedKeyAttributes, this, this, keysParent);
                     keyContainer.Add(resultElement);
 
                     keyContainer.TrackPropertyValue(keysProp, _ =>
@@ -809,7 +808,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                     // Debug.Log($"elementProp={elementProp.propertyPath}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
 
-                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valuesField, valueType, elementProp, injectedValueAttributes, this, this, valuesParent);
+                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valueWrapType, valuesField, valueType, elementProp, injectedValueAttributes, this, this, valuesParent);
 
                     element.Add(resultElement);
 
@@ -1071,6 +1070,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }).Every(1);
             // Debug.Log($"{string.Join(",", itemIndexToPropertyIndex)}");
         }
+
+
 
         // private bool _asyncSearchBusy;
 

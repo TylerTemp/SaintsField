@@ -9,6 +9,7 @@ using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -657,6 +658,9 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 : new[]{serRef};
             // IReadOnlyList<Attribute> injectedKeyAttributes = new List<Attribute>();
 
+            WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(
+                property.FindPropertyRelative("_wrapType"), wrapField, injectedKeyAttributes);
+
             listView.bindItem = (element, elementIndex) =>
             {
                 int propIndex = itemIndexToPropertyIndex[elementIndex];
@@ -667,6 +671,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
                 VisualElement resultElement =
                     SaintsWrapUtils.CreateCellElement(
+                        valueWrapType,
                         wrapField,
                         wrapType,
                         elementProp, injectedKeyAttributes, this, this, wrapParent
