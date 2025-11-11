@@ -146,14 +146,34 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return;
             }
 
-            _minValue = Math.Max(minResult, minCap);
-            _maxValue = Math.Min(maxResult, maxCap);
+            bool changed = false;
 
-            _step = step;
+            var useMin = Math.Max(minResult, minCap);
+            if(!_init || Math.Abs(_minValue - useMin) > double.Epsilon)
+            {
+                _minValue = useMin;
+                changed = true;
+            }
+
+            var useMax = Math.Min(maxResult, maxCap);
+            if(!_init || Math.Abs(_maxValue - useMax) > double.Epsilon)
+            {
+                _maxValue = useMax;
+                changed = true;
+            }
+
+            if (!_init || Math.Abs(_step - step) > double.Epsilon)
+            {
+                changed = true;
+                _step = step;
+            }
 
             _init = true;
 
-            RefreshDisplay();
+            if(changed)
+            {
+                RefreshDisplay();
+            }
         }
 
         private (bool ok, double result) GetNumber(object num)

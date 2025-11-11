@@ -55,6 +55,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         PropRangeElementUInt element = new PropRangeElementUInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                         PropRangeUIntField field = new PropRangeUIntField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeUIntField.alignedFieldUssClassName);
+                        field.AddToClassList(ClassAllowDisable);
                         return field;
                     }
                     if (rawType == typeof(long))
@@ -62,6 +63,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         PropRangeElementLong element = new PropRangeElementLong(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                         PropRangeLongField field = new PropRangeLongField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeLongField.alignedFieldUssClassName);
+                        field.AddToClassList(ClassAllowDisable);
                         return field;
                     }
                     if (rawType == typeof(ulong))
@@ -69,6 +71,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         PropRangeElementULong element = new PropRangeElementULong(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                         PropRangeULongField field = new PropRangeULongField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeULongField.alignedFieldUssClassName);
+                        field.AddToClassList(ClassAllowDisable);
                         return field;
                     }
                     else
@@ -76,6 +79,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         PropRangeElementInt element = new PropRangeElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                         PropRangeIntField field = new PropRangeIntField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeIntField.alignedFieldUssClassName);
+                        field.AddToClassList(ClassAllowDisable);
                         return field;
                     }
                 }
@@ -84,6 +88,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     PropRangeElementDouble element = new PropRangeElementDouble(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                     PropRangeDoubleField field = new PropRangeDoubleField(GetPreferredLabel(property), element);
                     field.AddToClassList(PropRangeDoubleField.alignedFieldUssClassName);
+                    field.AddToClassList(ClassAllowDisable);
                     return field;
                 }
                 default:

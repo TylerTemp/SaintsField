@@ -18,6 +18,10 @@ namespace SaintsField.Editor.Drawers.AdaptDrawer
                     return ("", $"{property.longValue:P}");
                 case SerializedPropertyType.Float:
                     return ("", $"{property.doubleValue:P}");
+                case SerializedPropertyType.Vector2:
+                    return ("", $"Vector2({property.vector2Value.x}, {property.vector2Value.y})");
+                case SerializedPropertyType.Vector2Int:
+                    return ("", $"Vector2Int({property.vector2IntValue.x}, {property.vector2IntValue.y})");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(property.propertyType), property.propertyType, null);
             }
@@ -59,6 +63,20 @@ namespace SaintsField.Editor.Drawers.AdaptDrawer
             return ("", originValue * 100);
         }
 
+        public static (string error, float value) GetFloatValuePre(float originValue)
+        {
+            if (float.MaxValue / 100 < originValue)
+            {
+                return ($"float overflow {originValue}", float.MaxValue);
+            }
+
+            if (float.MinValue / 100 > originValue)
+            {
+                return ($"float overflow {originValue}", float.MinValue);
+            }
+            return ("", originValue * 100);
+        }
+
         public static (string error, long value) GetLongValuePre(long originValue)
         {
             if (long.MaxValue / 100 < originValue)
@@ -84,6 +102,10 @@ namespace SaintsField.Editor.Drawers.AdaptDrawer
         }
 
         public static (string error, double value) GetDoubleValuePost(double adaptedValue)
+        {
+            return ("", adaptedValue / 100);
+        }
+        public static (string error, float value) GetFloatValuePost(float adaptedValue)
         {
             return ("", adaptedValue / 100);
         }

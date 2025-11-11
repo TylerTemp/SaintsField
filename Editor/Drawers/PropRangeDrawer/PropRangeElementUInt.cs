@@ -115,14 +115,30 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return;
             }
 
-            _slider.lowValue = _minValue = minResult;
-            _slider.highValue = _maxValue = maxResult;
+            bool changed = false;
+            if(!_init || _minValue != minResult)
+            {
+                changed = true;
+                _slider.lowValue = _minValue = minResult;
+            }
+            if(!_init || _maxValue != maxResult)
+            {
+                changed = true;
+                _slider.highValue = _maxValue = maxResult;
+            }
 
-            _step = step;
+            if(!_init || _step != step)
+            {
+                changed = true;
+                _step = step;
+            }
 
             _init = true;
 
-            RefreshDisplay();
+            if(changed)
+            {
+                RefreshDisplay();
+            }
         }
 
         private (bool ok, uint result) GetNumber(object num)

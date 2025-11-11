@@ -245,6 +245,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
                 {
                     // Debug.Log(visualElement);
                     visualElement.AddToClassList(ClassRichLabelElement(property, index));
+                    visualElement.style.unityTextAlign = TextAnchor.MiddleLeft;
                     labelContainer.Add(visualElement);
                 }
             }

@@ -123,13 +123,13 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             bool changed = false;
 
             int useMin = Mathf.Max(minResult, minCap);
-            if(useMin != _minValue)
+            if(!_init || useMin != _minValue)
             {
                 _slider.lowValue = _minValue = useMin;
                 changed = true;
             }
             int useMax = Mathf.Min(maxResult, maxCap);
-            if(_maxValue != useMax)
+            if(!_init || _maxValue != useMax)
             {
                 _slider.highValue = _maxValue = useMax;
                 changed = true;

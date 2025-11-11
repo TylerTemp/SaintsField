@@ -52,17 +52,9 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
             float labelWidth = label.text == "" ? 0 : EditorGUIUtility.labelWidth;
 
-            float leftFieldWidth = property.propertyType == SerializedPropertyType.Vector2
-                ? GetNumberFieldWidth(property.vector2Value.x, minMaxSliderAttribute.MinWidth,
-                    minMaxSliderAttribute.MaxWidth)
-                : GetNumberFieldWidth(property.vector2IntValue.x, minMaxSliderAttribute.MinWidth,
-                    minMaxSliderAttribute.MaxWidth);
+            float leftFieldWidth = 50f;
             leftFieldWidth += 5f;
-            float rightFieldWidth = property.propertyType == SerializedPropertyType.Vector2
-                ? GetNumberFieldWidth(property.vector2Value.y, minMaxSliderAttribute.MinWidth,
-                    minMaxSliderAttribute.MaxWidth)
-                : GetNumberFieldWidth(property.vector2IntValue.y, minMaxSliderAttribute.MinWidth,
-                    minMaxSliderAttribute.MaxWidth);
+            float rightFieldWidth = 50;
 
             // float floatFieldWidth = EditorGUIUtility.fieldWidth;
             float sliderWidth = position.width - labelWidth - leftFieldWidth - rightFieldWidth;
@@ -81,7 +73,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 x = field3Rect.x + sliderPadding,
             }, rightFieldWidth);
 
-            bool freeInput = minMaxSliderAttribute.FreeInput;
+            bool freeInput = false;
             // Draw the slider
             ImGuiEnsureDispose(property.serializedObject.targetObject);
             if (property.propertyType == SerializedPropertyType.Vector2)
@@ -122,8 +114,8 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                         // sliderValue.x = minMaxSliderAttribute.FreeInput? sliderX: Mathf.Clamp(sliderX, minValue, Mathf.Min(maxValue, sliderValue.y));
                         Vector2 v = AdjustFloatInput(sliderX, sliderValue.y, minMaxSliderAttribute.Step, minValue,
                             maxValue,
-                            minMaxSliderAttribute.FreeInput);
-                        if (minMaxSliderAttribute.FreeInput && v.x < minValue)
+                            false);
+                        if (false && v.x < minValue)
                         {
                             freeRange.x = v.x;
                         }
@@ -141,8 +133,8 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                         // sliderValue.y = minMaxSliderAttribute.FreeInput? sliderY: Mathf.Clamp(sliderY, Mathf.Max(minValue, sliderValue.x), maxValue);
                         Vector2 v = AdjustFloatInput(sliderY, sliderValue.x, minMaxSliderAttribute.Step, minValue,
                             maxValue,
-                            minMaxSliderAttribute.FreeInput);
-                        if (minMaxSliderAttribute.FreeInput && v.y > maxValue)
+                            false);
+                        if (false && v.y > maxValue)
                         {
                             freeRange.y = v.y;
                         }
@@ -200,8 +192,8 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                         // sliderValue.x = minMaxSliderAttribute.FreeInput? sliderX: Mathf.Clamp(sliderX, minValue, Mathf.Min(maxValue, sliderValue.y));
                         Vector2Int v = AdjustIntInput(sliderX, (int)sliderValue.y, minMaxSliderAttribute.Step, minValue,
                             maxValue,
-                            minMaxSliderAttribute.FreeInput);
-                        if (minMaxSliderAttribute.FreeInput && v.x < minValue)
+                            false);
+                        if (false && v.x < minValue)
                         {
                             freeRange.x = v.x;
                         }
@@ -219,8 +211,8 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                         // sliderValue.y = minMaxSliderAttribute.FreeInput? sliderY: Mathf.Clamp(sliderY, Mathf.Max(minValue, sliderValue.x), maxValue);
                         Vector2Int v = AdjustIntInput(sliderY, (int)sliderValue.x, minMaxSliderAttribute.Step, minValue,
                             maxValue,
-                            minMaxSliderAttribute.FreeInput);
-                        if (minMaxSliderAttribute.FreeInput && v.y > maxValue)
+                            false);
+                        if (false && v.y > maxValue)
                         {
                             freeRange.y = v.y;
                         }

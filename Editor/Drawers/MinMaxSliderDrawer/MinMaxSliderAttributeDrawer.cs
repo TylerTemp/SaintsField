@@ -91,21 +91,21 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 };
             }
 
-            if (minMaxSliderAttribute.FreeInput)
-            {
-                if(property.propertyType == SerializedPropertyType.Vector2)
-                {
-                    Vector2 curValue = property.vector2Value;
-                    minValue = Mathf.Min(minValue, curValue.x);
-                    maxValue = Mathf.Max(maxValue, curValue.y);
-                }
-                else
-                {
-                    Vector2Int curValue = property.vector2IntValue;
-                    minValue = Mathf.Min(minValue, curValue.x);
-                    maxValue = Mathf.Max(maxValue, curValue.y);
-                }
-            }
+            // if (minMaxSliderAttribute.FreeInput)
+            // {
+            //     if(property.propertyType == SerializedPropertyType.Vector2)
+            //     {
+            //         Vector2 curValue = property.vector2Value;
+            //         minValue = Mathf.Min(minValue, curValue.x);
+            //         maxValue = Mathf.Max(maxValue, curValue.y);
+            //     }
+            //     else
+            //     {
+            //         Vector2Int curValue = property.vector2IntValue;
+            //         minValue = Mathf.Min(minValue, curValue.x);
+            //         maxValue = Mathf.Max(maxValue, curValue.y);
+            //     }
+            // }
 
             return new MetaInfo
             {

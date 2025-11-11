@@ -144,6 +144,16 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
             return AdaptAttributeDrawer.GetDoubleValuePre(value);
         }
+        public static (string error, float value) GetPreValue(float value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetFloatValuePre(value);
+        }
 
         public static (string error, double value) GetPostValue(double value, AdaptAttribute adaptAttribute)
         {
@@ -154,6 +164,16 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             return AdaptAttributeDrawer.GetDoubleValuePost(value);
+        }
+        public static (string error, float value) GetPostValue(float value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetFloatValuePost(value);
         }
 
         public static (string error, int value) GetPostValue(int value, AdaptAttribute adaptAttribute)
