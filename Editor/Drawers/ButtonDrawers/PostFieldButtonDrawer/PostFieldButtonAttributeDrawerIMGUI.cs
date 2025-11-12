@@ -30,11 +30,11 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
                 labelXml = ObjectNames.NicifyVariableName(decButtonAttribute.FuncName);
                 richChunks = new[]
                 {
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        IsIcon = false,
-                        Content = labelXml,
-                    },
+                    new RichTextDrawer.RichTextChunk(isIcon: false, content: labelXml),
+                    // {
+                    //     IsIcon = false,
+                    //     Content = labelXml,
+                    // },
                 };
             }
             else

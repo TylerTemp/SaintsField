@@ -217,7 +217,7 @@ namespace SaintsField.Utils
                     case ChunkType.Text:
                         return $"[TEXT = {RawContent}]";
                     case ChunkType.IconTag:
-                        return $"[ICON = {TagValue} {IconColor}]";
+                        return $"[ICON = content={TagValue} color={IconColor}]";
                     case ChunkType.NormalTag:
                         return $"[{(TagType == TagType.EndTag ? "/" : "")}TAG = {TagName} {TagValue}]";
                     default:
@@ -247,7 +247,7 @@ namespace SaintsField.Utils
             {
                 (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
 
-                // Debug.Log($"parse: {part} -> {parsedResult.partType}, {parsedResult.content}, {parsedResult.value}, {parsedResult.isSelfClose}");
+                // Debug.Log($"parse: {part} -> partType={parsedResult.partType}, content={parsedResult.content}, value={parsedResult.value}, isSelfClose={parsedResult.isSelfClose}");
 
                 // ReSharper disable once MergeIntoPattern
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
@@ -294,6 +294,7 @@ namespace SaintsField.Utils
 
                     if (parsedResult.content == "icon")
                     {
+                        // Debug.Log("processing icon");
                         Debug.Assert(parsedResult.value != null);
                         // process ending
                         string curContent = richText.ToString();
@@ -301,23 +302,35 @@ namespace SaintsField.Utils
                         {
                             yield return new RichTextParsedChunk(curContent, ChunkType.Text);
                         }
-                        richText = new StringBuilder();
 
-                        for (int revIndex = openTags.Count - 1; revIndex <= 0; revIndex++)
+                        // Debug.Log("processing richText");
+                        richText = new StringBuilder();
+                        (string tagName, string tagValueOrNull, string rawContent)[] openTagsCopy = openTags.ToArray();
+
+                        for (int index = 0; index < openTagsCopy.Length; index++)
                         {
-                            (string tagName, string tagValueOrNull, string rawContent) closeTag = openTags[revIndex];
-                            yield return new RichTextParsedChunk($"</{closeTag}>", ChunkType.IconTag,
+                            (string tagName, string tagValueOrNull, string rawContent) closeTag = openTagsCopy[openTagsCopy.Length - index - 1];
+                            yield return new RichTextParsedChunk($"</{closeTag}>", ChunkType.NormalTag,
                                 tagType: TagType.EndTag, tagName: closeTag.tagName, tagValue: closeTag.tagValueOrNull);
                         }
 
-                        yield return new RichTextParsedChunk(part,
+                        RichTextParsedChunk iconTag = new RichTextParsedChunk(part,
                             // ReSharper disable once UseIndexFromEndExpression
-                            ChunkType.IconTag, iconColor: colors.Count > 0 ? colors[colors.Count - 1] : null);
+                            ChunkType.IconTag,
+                            tagValue: parsedResult.value,
+                            iconColor: colors.Count > 0 ? colors[colors.Count - 1] : null);
+                        // Debug.Log($"yield raw iconTag {iconTag}");
+                        // Debug.Log($"yield iconTag={iconTag}");
 
-                        foreach ((string tagName, string tagValueOrNull, string rawContent) reOpenTag in openTags)
+                        yield return iconTag;
+
+                        foreach ((string tagName, string tagValueOrNull, string rawContent) reOpenTag in openTagsCopy)
                         {
-                            yield return new RichTextParsedChunk(reOpenTag.rawContent, ChunkType.NormalTag,
-                                tagType: TagType.StartTag, tagName: reOpenTag.tagName,
+                            yield return new RichTextParsedChunk(
+                                reOpenTag.rawContent,
+                                ChunkType.NormalTag,
+                                tagType: TagType.StartTag,
+                                tagName: reOpenTag.tagName,
                                 tagValue: reOpenTag.tagValueOrNull);
                         }
                     }

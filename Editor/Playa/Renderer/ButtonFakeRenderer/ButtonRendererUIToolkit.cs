@@ -288,8 +288,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 name = ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]),
             };
             buttonElement.Add(buttonLabelContainer);
-            foreach (VisualElement element in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(buttonText,
-                         FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0])))
+            foreach (VisualElement element in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXmlWithProvider(buttonText, this)))
             {
                 buttonLabelContainer.Add(element);
             }

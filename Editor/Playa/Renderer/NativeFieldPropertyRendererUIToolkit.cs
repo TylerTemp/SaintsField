@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
@@ -185,15 +186,27 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
+        private string _preRichLabelXml;
+        private IReadOnlyList<RichTextDrawer.RichTextChunk> _preRichLabelXmlChunks = Array.Empty<RichTextDrawer.RichTextChunk>();
+        private RichTextDrawer _richTextDrawer;
+
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
+            // Debug.Log(preCheckResult.RichLabelXml);
             if (!RenderField)
             {
                 return preCheckResult;
             }
 
             VisualElement container= root.Q<VisualElement>(NameContainer());
+
+            if (_preRichLabelXml != preCheckResult.RichLabelXml || preCheckResult.RichLabelXml.Contains("<field"))
+            {
+                _preRichLabelXml = preCheckResult.RichLabelXml;
+                IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(preCheckResult.RichLabelXml, this);
+                UIToolkitUtils.SetLabel(UIToolkitUtils.TryFindLabel(container), chunks, _richTextDrawer ??= new RichTextDrawer());
+            }
 
             (string error, object value) = GetValue(FieldWithInfo);
 

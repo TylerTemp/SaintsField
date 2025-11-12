@@ -88,13 +88,21 @@ namespace SaintsField.Editor.Core
             return ("", result);
         }
 
-        public struct RichTextChunk: IEquatable<RichTextChunk>
+        public readonly struct RichTextChunk: IEquatable<RichTextChunk>
         {
-            public string RawContent;
+            public readonly string RawContent;
 
-            public bool IsIcon;
-            public string Content;
-            public string IconColor;
+            public readonly bool IsIcon;
+            public readonly string Content;
+            public readonly string IconColor;
+
+            public RichTextChunk(string rawContent = "", bool isIcon = false, string content = "", string iconColor = null)
+            {
+                RawContent = rawContent ?? "";
+                IsIcon = isIcon;
+                Content = content ?? "";
+                IconColor = iconColor;
+            }
 
             public override string ToString() => IsIcon
                 ? $"<ICON={Content} COLOR={IconColor}/>"
@@ -233,20 +241,21 @@ namespace SaintsField.Editor.Core
                             if (curContent != "")
                             {
                                 string endTagsString = string.Join("", openTags.Select(each => $"</{each.tagName}>").Reverse());
-                                yield return new RichTextChunk
-                                {
-                                    IsIcon = false,
-                                    Content = $"{curContent}{endTagsString}",
-                                };
+                                yield return new RichTextChunk(isIcon: false, content: $"{curContent}{endTagsString}");
+                                // {
+                                //     IsIcon = false,
+                                //     Content = $"{curContent}{endTagsString}",
+                                // };
                             }
 
-                            yield return new RichTextChunk
-                            {
-                                IsIcon = true,
-                                Content = parsedResult.value,
-                                // ReSharper disable once UseIndexFromEndExpression
-                                IconColor = colors.Count > 0 ? colors[colors.Count - 1] : null,
-                            };
+                            yield return new RichTextChunk(isIcon: true, content: parsedResult.value,
+                                iconColor: colors.Count > 0 ? colors[colors.Count - 1] : null);
+                            // {
+                            //     IsIcon = true,
+                            //     Content = parsedResult.value,
+                            //     // ReSharper disable once UseIndexFromEndExpression
+                            //     IconColor = colors.Count > 0 ? colors[colors.Count - 1] : null,
+                            // };
 
                             // string textOpeningTags = string.Join("", openTags.Select(each => each.rawContent));
                             string textOpeningTags = string.Join("", openTags.Select(each => $"<{each.tagName}{(each.tagValueOrNull==null? "": $"={each.tagValueOrNull}")}>"));
@@ -285,7 +294,7 @@ namespace SaintsField.Editor.Core
                                         if(!RuntimeUtil.IsNull(accParent))
                                         {
                                             // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                                            string[] subFields = parsedResult.content.Substring("field.".Length).Split(SerializedUtils.PathSplitSeparator);
+                                            string[] subFields = parsedResult.content.Substring("field.".Length).Split(SerializedUtils.DotSplitSeparator);
                                             foreach (string attrName in subFields)
                                             {
                                                 MemberInfo accMemberInfo = null;
@@ -361,17 +370,140 @@ namespace SaintsField.Editor.Core
 #if EXT_INSPECTOR_LOG
                 Debug.Log($"chunk added left: {leftContent}{endTagsString}");
 #endif
-                yield return new RichTextChunk
-                {
-                    IsIcon = false,
-                    Content = $"{leftContent}{endTagsString}",
-                };
+                yield return new RichTextChunk(isIcon: false, content: $"{leftContent}{endTagsString}");
+                // {
+                //     IsIcon = false,
+                //     Content = $"{leftContent}{endTagsString}",
+                // };
             }
 
             // return richTextChunks;
         }
 
-        private static string TagStringFormatter(object finalValue, string parsedResultValue)
+        public static IEnumerable<RichTextChunk> ParseRichXmlWithProvider(string richXml, IRichTextTagProvider provider)
+        {
+            List<RuntimeUtil.RichTextParsedChunk> openTag = new List<RuntimeUtil.RichTextParsedChunk>();
+            // List<RuntimeUtil.RichTextParsedChunk> acc = new List<RuntimeUtil.RichTextParsedChunk>();
+            StringBuilder richText = new StringBuilder();
+            foreach (RuntimeUtil.RichTextParsedChunk richTextParsedChunk in RuntimeUtil.ParseRichXml(richXml))
+            {
+                // Debug.Log($"get parsed chunk {richTextParsedChunk}");
+                switch (richTextParsedChunk.ChunkType)
+                {
+                    case RuntimeUtil.ChunkType.NormalTag:
+                    {
+                        bool removed = false;
+                        bool isStartTag = richTextParsedChunk.TagType == RuntimeUtil.TagType.StartTag;
+                        if (isStartTag)
+                        {
+                            openTag.Add(richTextParsedChunk);
+                        }
+                        else
+                        {
+                            // ReSharper disable once UseIndexFromEndExpression
+                            if (openTag.Count > 0 && openTag[openTag.Count - 1].TagName == richTextParsedChunk.TagName)
+                            {
+                                removed = true;
+                                openTag.RemoveAt(openTag.Count - 1);
+                            }
+                        }
+
+                        switch (richTextParsedChunk.TagName)
+                        {
+                            case "color":
+                            {
+                                if(isStartTag)
+                                {
+                                    string colorHtml =
+                                        Colors.ToHtmlHexString(
+                                            Colors.GetColorByStringPresent(richTextParsedChunk.TagValue));
+                                    richText.Append($"<color={colorHtml}>");
+                                }
+                                else
+                                {
+                                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                                    if (removed)
+                                    {
+                                        richText.Append("</color>");
+                                    }
+                                    else // invalid
+                                    {
+                                        richText.Append(richTextParsedChunk.RawContent);
+                                    }
+                                }
+                            }
+                                break;
+                            case "label":
+                                richText.Append(provider.GetLabel());
+                                break;
+                            case "container.Type":
+                                richText.Append(provider.GetContainerType());
+                                break;
+                            case "container.Type.BaseType":
+                                richText.Append(provider.GetContainerTypeBaseType());
+                                break;
+                            case "index":
+                                richText.Append(provider.GetIndex(richTextParsedChunk.TagValue));
+                                break;
+                            case "icon":
+                                break;
+                            default:
+                            {
+                                // Debug.Log(parsedResult.content);
+                                if (richTextParsedChunk.RawContent != null && (richTextParsedChunk.TagName == "field" ||
+                                                                               richTextParsedChunk.TagName.StartsWith("field.")))
+                                {
+                                    richText.Append(provider.GetField(richTextParsedChunk.RawContent, richTextParsedChunk.TagName,
+                                        richTextParsedChunk.TagValue));
+                                }
+                                else
+                                {
+                                    richText.Append(richTextParsedChunk.RawContent);
+                                }
+                            }
+                                break;
+                        }
+
+                        // Debug.Log($"add tag {richTextParsedChunk}");
+
+                        // acc.Add(richTextParsedChunk);
+                        break;
+                    }
+                    case RuntimeUtil.ChunkType.IconTag:
+                    {
+                        string richTextFull = richText.ToString();
+                        if (richTextFull != "")
+                        {
+                            yield return new RichTextChunk(richTextFull, false, richTextFull);
+                        }
+                        richText.Clear();
+
+                        // Debug.Log($"parse icon {richTextParsedChunk}");
+
+                        RichTextChunk wrapIcon = new RichTextChunk(
+                            richTextParsedChunk.RawContent,
+                            true,
+                            richTextParsedChunk.TagValue,
+                            richTextParsedChunk.IconColor);
+                        // Debug.Log($"add icon {wrapIcon}");
+                        // acc.Add(richTextParsedChunk);
+                        yield return wrapIcon;
+                        break;
+                    }
+                    case RuntimeUtil.ChunkType.Text:
+                        richText.Append(richTextParsedChunk.RawContent);
+                        break;
+                }
+            }
+
+            string richTextFinal = richText.ToString();
+            if (richTextFinal != "")
+            {
+                yield return new RichTextChunk(richTextFinal, false, richTextFinal);
+            }
+        }
+
+        public static string TagStringFormatter(object finalValue, string parsedResultValue)
         {
             if (RuntimeUtil.IsNull(finalValue))
             {
@@ -642,7 +774,7 @@ namespace SaintsField.Editor.Core
                     if (!_textureCache.TryGetValue(cacheKey, out Texture texture) || texture == null)
                     {
                         texture = Util.LoadResource<Texture2D>(curChunk.Content);
-                        if (texture.width != 1 && texture.height != 1)
+                        if (texture != null && texture.width != 1 && texture.height != 1)
                         {
                             _textureCache[cacheKey] = texture;
                         }

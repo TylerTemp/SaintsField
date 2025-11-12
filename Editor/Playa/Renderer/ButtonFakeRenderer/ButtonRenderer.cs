@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 List<string> attrNames = new List<string>();
                 if (eventTarget.Contains("."))
                 {
-                    attrNames.AddRange(eventTarget.Split(SerializedUtils.PathSplitSeparator));
+                    attrNames.AddRange(eventTarget.Split(SerializedUtils.DotSplitSeparator));
                 }
                 else
                 {

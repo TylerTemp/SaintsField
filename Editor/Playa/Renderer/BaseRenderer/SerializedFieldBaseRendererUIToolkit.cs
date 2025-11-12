@@ -19,8 +19,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         private class UserDataPayload
         {
             public string XML;
-            public Label Label;
-            public string FriendlyName;
+            // public Label Label;
+            // public string FriendlyName;
             public RichTextDrawer RichTextDrawer;
 
             public bool TableHasSize;
@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         {
             UserDataPayload userDataPayload = new UserDataPayload
             {
-                FriendlyName = FieldWithInfo.SerializedProperty.displayName,
+                // FriendlyName = FieldWithInfo.SerializedProperty.displayName,
             };
 
             (VisualElement result, bool serializedUpdate) = CreateSerializedUIToolkit();
@@ -174,29 +174,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         userDataPayload.RichTextDrawer = new RichTextDrawer();
                     }
-                    if(userDataPayload.Label == null)
+                    userDataPayload.XML = xml;
+                    VisualElement saintsFieldContainer =
+                        _container.Q<VisualElement>(className: SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
+                        ?? _container;
+                    if(saintsFieldContainer != null)
                     {
-                        UIToolkitUtils.WaitUntilThenDo(
-                            _container,
-                            () =>
-                            {
-                                Label label = _container.Q<Label>(className: "unity-label");
-                                if (label == null)
-                                {
-                                    return (false, null);
-                                }
-                                return (true, label);
-                            },
-                            label =>
-                            {
-                                userDataPayload.Label = label;
-                            }
-                        );
-                    }
-                    else
-                    {
-                        userDataPayload.XML = xml;
-                        UIToolkitUtils.SetLabel(userDataPayload.Label, RichTextDrawer.ParseRichXml(xml, userDataPayload.FriendlyName, FieldWithInfo.SerializedProperty, GetMemberInfo(FieldWithInfo), FieldWithInfo.Targets[0]), userDataPayload.RichTextDrawer);
+                        UIToolkitUtils.ChangeLabelLoop(saintsFieldContainer, RichTextDrawer.ParseRichXmlWithProvider(xml, this), userDataPayload.RichTextDrawer);
                     }
                 }
             }

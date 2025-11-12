@@ -2,7 +2,7 @@
 
 ## WIP ##
 
-1.  Add: `ShowInInspector` now works with `MinMaxSlider`
+1.  Add: `ShowInInspector` now works with `MinMaxSlider`, `ProgressBar`
 2.  Breaking Changes: argument `free` from `MinMaxSlider` is now removed for the sake of complexity
 
 ## 5.3.1 ##

@@ -72,6 +72,13 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     },
                     // name = NameActualContainer(property),
                 };
+                root.Add(new Label
+                {
+                    style =
+                    {
+                        display = DisplayStyle.None,
+                    },
+                });
             }
             else
             {
@@ -95,6 +102,8 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
                 root = foldout;
             }
+
+            root.AddToClassList(ClassLabelFieldUIToolkit);
 
             root.AddToClassList(SaintsRowClass);
             root.AddToClassList(ClassAllowDisable);
@@ -131,6 +140,16 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
                             // VisualElement actualContainer = root.Q<VisualElement>(NameActualContainer(property));
                             root.Clear();
+                            if (inline)
+                            {
+                                root.Add(new Label
+                                {
+                                    style =
+                                    {
+                                        display = DisplayStyle.None,
+                                    },
+                                });
+                            }
 
                             SerializedProperty newProp = property.serializedObject.FindProperty(propPath);
 

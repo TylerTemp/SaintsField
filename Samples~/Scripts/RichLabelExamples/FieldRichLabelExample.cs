@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace SaintsField.Samples.Scripts.RichLabelExamples
 {
-    public class RichLabelExample: MonoBehaviour
+    public class FieldRichLabelExample: MonoBehaviour
     {
         [SepTitle("Rich Label", EColor.Green)]
         // [InfoBox("1")]
@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts.RichLabelExamples
         // [InfoBox("4")]
         // [InfoBox("5")]
         [FieldLabelText("<color=indigo><icon=star.png /></color><b><color=red>R</color><color=green>a</color><color=blue>i</color><color=yellow>i</color><color=cyan>n</color><color=magenta>b</color><color=pink>o</color><color=orange>w</color></b>: <color=violet><label /></color>")]
-        public RichLabelExample _rainbow;
+        public FieldRichLabelExample _rainbow;
 
         [FieldLabelText("$" + nameof(LabelCallback))]
         public bool _callbackToggle;

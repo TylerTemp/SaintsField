@@ -1156,7 +1156,6 @@ MonoBehaviour:
       rid: -2
     IsVRef: 0
   dictType__SaintsSerialized__:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -1186,6 +1185,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - valueField:
         propertyType: 4
@@ -1213,6 +1213,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
+    _wrapTypeValue: 1
+    saintsSerializedVersion: 2
   hashSetType__SaintsSerialized__:
     propertyType: 0
     propertyPath: 
@@ -5583,6 +5585,53 @@ MonoBehaviour:
   evt:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &1569099616
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1569099617}
+  - component: {fileID: 1569099618}
+  m_Layer: 0
+  m_Name: LabelText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1569099617
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569099616}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1569099618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569099616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 682c7e77fbd0daf47a75fb6ef7dbd00a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.LabelTextExample
+  _rainbow: 
+  _callbackToggle: 0
+  _propertyLabel: Hello <color=lime>Friends
 --- !u!1 &1580933664
 GameObject:
   m_ObjectHideFlags: 0
@@ -7552,3 +7601,4 @@ SceneRoots:
   - {fileID: 3442031997421319485}
   - {fileID: 203542844}
   - {fileID: 5363600775475268543}
+  - {fileID: 1569099617}

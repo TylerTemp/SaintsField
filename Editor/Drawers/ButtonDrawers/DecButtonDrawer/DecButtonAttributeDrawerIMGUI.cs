@@ -153,11 +153,11 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 buttonLabelXml = ObjectNames.NicifyVariableName(decButtonAttribute.FuncName);
                 richChunks = new[]
                 {
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        IsIcon = false,
-                        Content = buttonLabelXml,
-                    },
+                    new RichTextDrawer.RichTextChunk(isIcon: false, content: buttonLabelXml),
+                    // {
+                    //     IsIcon = false,
+                    //     Content = buttonLabelXml,
+                    // },
                 };
             }
             else

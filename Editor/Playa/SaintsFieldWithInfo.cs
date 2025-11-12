@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Playa;
 using UnityEditor;
@@ -22,6 +23,8 @@ namespace SaintsField.Editor.Playa
         public FieldInfo FieldInfo;
         public MethodInfo MethodInfo;
         public PropertyInfo PropertyInfo;
+
+        public Type ClassStructType;  // only for RenderType.ClassStruct
 
         // public List<IPlayaAttribute> PlayaAttributesQueue;
 

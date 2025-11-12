@@ -151,6 +151,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                     else
                     {
+                        Debug.LogError(error);
                         richLabelXml = ObjectNames.NicifyVariableName(GetMemberInfo(fieldWithInfo).Name);
                     }
                 }

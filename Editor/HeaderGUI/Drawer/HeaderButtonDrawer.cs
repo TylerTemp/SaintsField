@@ -50,13 +50,13 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
             {
                 titleChunks = new[]
                 {
-                    new RichTextDrawer.RichTextChunk
-                    {
-                        Content = friendlyName,
-                        IconColor =  null,
-                        IsIcon = false,
-                        RawContent = friendlyName,
-                    },
+                    new RichTextDrawer.RichTextChunk(content: friendlyName, iconColor: null, isIcon: false, rawContent: friendlyName),
+                    // {
+                    //     Content = friendlyName,
+                    //     IconColor =  null,
+                    //     IsIcon = false,
+                    //     RawContent = friendlyName,
+                    // },
                 };
             }
             else

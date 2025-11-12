@@ -23774,7 +23774,7 @@ GameObject:
   - component: {fileID: 1571298209}
   - component: {fileID: 1571298210}
   m_Layer: 0
-  m_Name: RichLabel
+  m_Name: FieldRichLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33250,7 +33250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44f420c4e1d44beb9a9861f26742c404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myHp: 6
+  myHp: 8
   myMp: 54.95
   minValue: 3
   maxValue: 77

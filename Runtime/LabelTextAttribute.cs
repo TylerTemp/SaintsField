@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using SaintsField.Playa;
+using SaintsField.Utils;
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField
@@ -16,8 +17,9 @@ namespace SaintsField
 
         public LabelTextAttribute(string richTextXml, bool isCallback=false)
         {
-            RichTextXml = richTextXml;
-            IsCallback = isCallback;
+            (string parsedContent, bool parsedIsCallback) = RuntimeUtil.ParseCallback(richTextXml, isCallback);
+            RichTextXml = parsedContent;
+            IsCallback = parsedIsCallback;
         }
     }
 }

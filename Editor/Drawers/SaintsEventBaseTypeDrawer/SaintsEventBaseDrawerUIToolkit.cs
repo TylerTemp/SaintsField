@@ -214,10 +214,11 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 IReadOnlyList<Type> types = GetTypes(property);
                 if (types.Count > 0)
                 {
-                    useChunks = useChunks.Append(new RichTextDrawer.RichTextChunk
-                    {
-                        Content = $" ({string.Join(", ", types.Select(SaintsEventUtils.StringifyType))})",
-                    }).ToList();
+                    useChunks = useChunks.Append(new RichTextDrawer.RichTextChunk(content: $" ({string.Join(", ", types.Select(SaintsEventUtils.StringifyType))})")
+                    // {
+                    //     Content = $" ({string.Join(", ", types.Select(SaintsEventUtils.StringifyType))})",
+                    // }
+                    ).ToList();
                 }
             }
             UIToolkitUtils.SetLabel(saintsEventView.Label, useChunks, richTextDrawer);

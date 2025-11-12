@@ -37,7 +37,7 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
-    public abstract partial class AbsRenderer
+    public abstract partial class AbsRenderer: IRichTextTagProvider
     {
         private const string ClassSaintsFieldPlaya = "saintsfield-playa";
         public const string ClassSaintsFieldEditingDisabled = "saintsfield-editing-disabled";
@@ -3881,6 +3881,176 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             list[toIndex] = item;
+        }
+
+        public string GetLabel()
+        {
+            switch (FieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                case SaintsRenderType.InjectedSerializedField:
+                {
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if (SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return FieldWithInfo.SerializedProperty.displayName;
+                    }
+
+                    return "";
+                }
+                case SaintsRenderType.NonSerializedField:
+                {
+                    if (FieldWithInfo.FieldInfo != null)
+                    {
+                        return ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name);
+                    }
+
+                    return "";
+                }
+                case SaintsRenderType.Method:
+                    return ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name);
+                case SaintsRenderType.NativeProperty:
+                    return ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name);
+                case SaintsRenderType.ClassStruct:
+                    return ObjectNames.NicifyVariableName(FieldWithInfo.ClassStructType.Name);
+                case SaintsRenderType.Other:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
+        }
+
+        public string GetContainerType()
+        {
+            return GetTargetType().Name;
+        }
+
+        private Type GetTargetType()
+        {
+            return FieldWithInfo.Targets[0].GetType();
+        }
+
+        public string GetContainerTypeBaseType()
+        {
+            return GetTargetType().BaseType?.Name ?? "";
+        }
+
+        public string GetIndex(string formatter)
+        {
+            switch (FieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                case SaintsRenderType.InjectedSerializedField:
+                {
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if (!SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return "";
+                    }
+
+                    int propPath = SerializedUtils.PropertyPathIndex(FieldWithInfo.SerializedProperty.propertyPath);
+                    return propPath < 0 ? "" : propPath.ToString();
+                }
+                case SaintsRenderType.NonSerializedField:
+                case SaintsRenderType.Method:
+                case SaintsRenderType.NativeProperty:
+                case SaintsRenderType.ClassStruct:
+                case SaintsRenderType.Other:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
+        }
+
+        public string GetField(string rawContent, string tagName, string tagValue)
+        {
+            switch (FieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                {
+                    if (!SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return "";
+                    }
+
+                    bool hasError = false;
+
+                    (string error, int index, object value) result = Util.GetValue(FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
+                    (string error, int index, object value) accResult = result;
+                    if (tagName == "field")
+                    {
+                        if (result.error != "")
+                        {
+                            hasError = true;
+                        }
+                    }
+                    else
+                    {
+                        string[] subFields = tagName["field.".Length..].Split(SerializedUtils.DotSplitSeparator);
+                        object accParent = FieldWithInfo.Targets[0];
+
+                        foreach (string attrName in subFields)
+                        {
+                            MemberInfo accMemberInfo = null;
+                            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
+                            {
+                                foreach (MemberInfo info in type.GetMember(attrName,
+                                             BindingFlags.Public | BindingFlags.NonPublic |
+                                             BindingFlags.Instance | BindingFlags.Static |
+                                             BindingFlags.FlattenHierarchy))
+                                {
+                                    accMemberInfo = info;
+                                    break;
+                                }
+                            }
+
+                            accResult = Util.GetValueAtIndex(-1, accMemberInfo, accParent);
+                            if (accResult.error != "")
+                            {
+#if SAINTSFIELD_DEBUG
+                                Debug.LogError($"{attrName} from {accParent}: {accResult.error}");
+#endif
+                                break;
+                            }
+
+                            accParent = accResult.value;
+                            if (accParent == null)
+                            {
+                                accResult = ($"No target found for {attrName}", -1, null);
+                                break;
+                            }
+                        }
+
+                        hasError = accResult.error != "";
+                    }
+
+                    if (hasError)
+                    {
+                        return rawContent;
+                    }
+
+                    return RichTextDrawer.TagStringFormatter(accResult.value, tagValue);
+                }
+                case SaintsRenderType.InjectedSerializedField:
+                {
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if (!SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return "";
+                    }
+
+                    int propPath = SerializedUtils.PropertyPathIndex(FieldWithInfo.SerializedProperty.propertyPath);
+                    return propPath < 0 ? "" : propPath.ToString();
+                }
+                case SaintsRenderType.NonSerializedField:
+                case SaintsRenderType.Method:
+                case SaintsRenderType.NativeProperty:
+                case SaintsRenderType.ClassStruct:
+                case SaintsRenderType.Other:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
         }
     }
 }
