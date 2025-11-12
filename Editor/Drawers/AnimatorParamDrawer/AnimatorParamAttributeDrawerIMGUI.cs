@@ -8,7 +8,7 @@ using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
+namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 {
     public partial class AnimatorParamAttributeDrawer
     {
@@ -94,7 +94,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
                     }
                     else
                     {
-                        OpenAnimator(metaInfo.Animator.runtimeAnimatorController);
+                        AnimatorParamUtils.OpenAnimator(metaInfo.Animator.runtimeAnimatorController);
                     }
                 }
             }
@@ -138,7 +138,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
                     }
                     else
                     {
-                        OpenAnimator(metaInfo.Animator.runtimeAnimatorController);
+                        AnimatorParamUtils.OpenAnimator(metaInfo.Animator.runtimeAnimatorController);
                     }
                 }
             }

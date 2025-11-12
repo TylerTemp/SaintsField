@@ -1,17 +1,17 @@
+using SaintsField.Playa;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class Anim : MonoBehaviour
+    public class Anim : SaintsMonoBehaviour
     {
         [field: SerializeField]
-        public Animator Animator { get; private set; }
+        public Animator MyAnimator { get; private set; }
 
         [AnimatorState][FieldLabelText("<icon=star.png /><label />")]
         public AnimatorState animator;
 
-        [AnimatorState(nameof(Animator))]
+        [AnimatorState(nameof(MyAnimator))]
         public string animStateName;
 
         [ReadOnly]
@@ -21,10 +21,25 @@ namespace SaintsField.Samples.Scripts
         [AnimatorParam][FieldLabelText("<icon=star.png /><label />")]
         public string animParamName;
 
-        [AnimatorParam(nameof(Animator))]
+        [ShowInInspector, AnimatorParam]
+        [LabelText("<icon=star.png /><label />")]
+        private string ShowAnimParamName
+        {
+            get => animParamName;
+            set => animParamName = value;
+        }
+
+        [AnimatorParam(nameof(MyAnimator))]
         public int animParamHash;
 
-        [AnimatorParam(nameof(Animator))]
+        [ShowInInspector, AnimatorParam(nameof(MyAnimator))]
+        public int ShowAnimParamHash
+        {
+            get => animParamHash;
+            set => animParamHash = value;
+        }
+
+        [AnimatorParam(nameof(MyAnimator))]
         public int[] animParamHashes;
 
         [ReadOnly]

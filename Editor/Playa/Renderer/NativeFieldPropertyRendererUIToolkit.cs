@@ -201,7 +201,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             VisualElement container= root.Q<VisualElement>(NameContainer());
 
-            if (_preRichLabelXml != preCheckResult.RichLabelXml || preCheckResult.RichLabelXml.Contains("<field"))
+            if (preCheckResult.HasRichLabel && _preRichLabelXml != preCheckResult.RichLabelXml || preCheckResult.RichLabelXml.Contains("<field"))
             {
                 _preRichLabelXml = preCheckResult.RichLabelXml;
                 IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(preCheckResult.RichLabelXml, this);

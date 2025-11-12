@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: `ShowInInspector` show empty label.
+2.  Add: `ShowInInspector` now works with `AnimParams`
+
 ## 5.3.2 ##
 
 1.  Add: `ShowInInspector` now works with `MinMaxSlider`, `ProgressBar`, `LabelText`

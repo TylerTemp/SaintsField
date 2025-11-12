@@ -178,10 +178,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     VisualElement saintsFieldContainer =
                         _container.Q<VisualElement>(className: SaintsPropertyDrawer.ClassLabelFieldUIToolkit)
                         ?? _container;
-                    if(saintsFieldContainer != null)
-                    {
-                        UIToolkitUtils.ChangeLabelLoop(saintsFieldContainer, RichTextDrawer.ParseRichXmlWithProvider(xml, this), userDataPayload.RichTextDrawer);
-                    }
+                    UIToolkitUtils.ChangeLabelLoop(saintsFieldContainer, RichTextDrawer.ParseRichXmlWithProvider(xml, this), userDataPayload.RichTextDrawer);
                 }
             }
 

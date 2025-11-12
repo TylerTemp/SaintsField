@@ -3536,7 +3536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beb4de7d3962b7e4794821da0e688603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Animator>k__BackingField: {fileID: 380193380}
+  <MyAnimator>k__BackingField: {fileID: 380193380}
   animator:
     <layerIndex>k__BackingField: 0
     <stateNameHash>k__BackingField: 0
@@ -3545,11 +3545,11 @@ MonoBehaviour:
     <stateTag>k__BackingField: 
     <animationClip>k__BackingField: {fileID: 0}
     <subStateMachineNameChain>k__BackingField: []
-  animStateName: Idle
-  animStateDisabled: Idle
-  animParamName: Trigger
-  animParamHash: 0
-  animParamHashes: c136d6d572017303c136d6d572017303
+  animStateName: 
+  animStateDisabled: 
+  animParamName: Some Bool
+  animParamHash: -1473725520
+  animParamHashes: 
   animParamNameDisable: 
 --- !u!95 &380193380
 Animator:

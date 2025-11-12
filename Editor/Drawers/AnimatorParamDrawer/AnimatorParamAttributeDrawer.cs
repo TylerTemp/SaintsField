@@ -13,7 +13,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
+namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 {
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
@@ -168,12 +168,6 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
                 Animator = animator,
                 AnimatorParameters = animatorParameters,
             };
-        }
-
-        private static void OpenAnimator(Object animatorController)
-        {
-            Selection.activeObject = animatorController;
-            EditorApplication.ExecuteMenuItem("Window/Animation/Animator");
         }
 
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,

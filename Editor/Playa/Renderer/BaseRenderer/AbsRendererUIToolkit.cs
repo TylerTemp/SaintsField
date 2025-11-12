@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.AnimatorParamDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
@@ -27,7 +28,6 @@ using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
-using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -698,6 +698,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+                        case AnimatorParamAttribute animatorParamAttribute:
+                            return (AnimatorParamAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                animatorParamAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
 
@@ -1283,6 +1295,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 allAttributes,
                                 targets), false);
 #endif
+
+                        case AnimatorParamAttribute animatorParamAttribute:
+                            return (AnimatorParamAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                animatorParamAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
 
