@@ -2442,5 +2442,39 @@ namespace SaintsField.Editor.Utils
                 yield return (enumValue, value, useLabel);
             }
         }
+
+        public static string GetStepFormatter(float step)
+        {
+            string valueStr = step.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            int decimalPointIndex = valueStr.IndexOf(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator, StringComparison.Ordinal);
+
+            int decimalPlaces = 0;
+
+            if (decimalPointIndex >= 0)
+            {
+                decimalPlaces = valueStr.Length - decimalPointIndex - 1;
+            }
+
+            // string formatValue = curValue.ToString("F" + decimalPlaces);
+            // return curValue.ToString($"0.{new string('#', decimalPlaces)}");
+            return $"0.{new string('#', decimalPlaces)}";
+        }
+
+        public static string GetStepFormatter(double step)
+        {
+            string valueStr = step.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            int decimalPointIndex = valueStr.IndexOf(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator, StringComparison.Ordinal);
+
+            int decimalPlaces = 0;
+
+            if (decimalPointIndex >= 0)
+            {
+                decimalPlaces = valueStr.Length - decimalPointIndex - 1;
+            }
+
+            // string formatValue = curValue.ToString("F" + decimalPlaces);
+            // return curValue.ToString($"0.{new string('#', decimalPlaces)}");
+            return $"0.{new string('#', decimalPlaces)}";
+        }
     }
 }

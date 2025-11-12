@@ -11,6 +11,8 @@ using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.InputAxisDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
+using SaintsField.Editor.Drawers.MinMaxSliderDrawer;
+using SaintsField.Editor.Drawers.ProgressBarDrawer;
 using SaintsField.Editor.Drawers.PropRangeDrawer;
 using SaintsField.Editor.Drawers.RateDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
@@ -320,6 +322,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditSByte(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (sbyte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
                 if (oldElement is IntegerField integerField)
@@ -378,6 +392,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             return (PropRangeAttributeDrawer.UIToolkitValueEditByte(
                                 oldElement,
                                 propRangeAttribute,
+                                label,
+                                (byte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditByte(
+                                oldElement,
+                                progressBarAttribute,
                                 label,
                                 (byte) value,
                                 beforeSet,
@@ -453,6 +479,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditShort(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (short) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
 
@@ -511,6 +549,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             return (PropRangeAttributeDrawer.UIToolkitValueEditUShort(
                                 oldElement,
                                 propRangeAttribute,
+                                label,
+                                (ushort) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditUShort(
+                                oldElement,
+                                progressBarAttribute,
                                 label,
                                 (ushort) value,
                                 beforeSet,
@@ -628,6 +678,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             return (PropRangeAttributeDrawer.UIToolkitValueEditInt(
                                 oldElement,
                                 propRangeAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                progressBarAttribute,
                                 label,
                                 (int) value,
                                 beforeSet,
@@ -789,7 +851,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             #endregion
 
             #region long
-            if ((valueType == typeof(long) || value is long))
+            if (valueType == typeof(long) || value is long)
             {
                 foreach (Attribute attribute in allAttributes)
                 {
@@ -995,6 +1057,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditFloat(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (float) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
                 if (oldElement is FloatField oldFloatField)
@@ -1056,6 +1130,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditDouble(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (double) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
 
@@ -1098,6 +1184,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return (element, false);
             }
             #endregion
+
+            #region string
             if (valueType == typeof(string) || value is string)
             {
                 foreach (Attribute attribute in allAttributes)
@@ -1237,6 +1325,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region char
             if (valueType == typeof(char) || value is char)
             {
                 if (oldElement is TextField oldTextField)
@@ -1303,8 +1394,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Vector2
             if (valueType == typeof(Vector2) || value is Vector2)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case MinMaxSliderAttribute minMaxSliderAttribute:
+                            return (MinMaxSliderAttributeDrawer.UIToolkitValueEditVector2(
+                                oldElement,
+                                minMaxSliderAttribute,
+                                label,
+                                (Vector2) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is Vector2Field oldVector2Field)
                 {
                     oldVector2Field.SetValueWithoutNotify((Vector2)value);
@@ -1351,6 +1464,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Vector3
             if (valueType == typeof(Vector3) || value is Vector3)
             {
                 if (oldElement is Vector3Field oldVector3Field)
@@ -1400,6 +1516,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Vector4
             if (valueType == typeof(Vector4) || value is Vector4)
             {
                 if (oldElement is Vector4Field oldVector4Field)
@@ -1448,8 +1567,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Vector2Int
             if (valueType == typeof(Vector2Int) || value is Vector2Int)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case MinMaxSliderAttribute minMaxSliderAttribute:
+                            return (MinMaxSliderAttributeDrawer.UIToolkitValueEditVector2Int(
+                                oldElement,
+                                minMaxSliderAttribute,
+                                label,
+                                (Vector2Int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is Vector2IntField oldVector2IntField)
                 {
                     oldVector2IntField.SetValueWithoutNotify((Vector2Int)value);
@@ -1496,6 +1637,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
             if (valueType == typeof(Vector3Int) || value is Vector3Int)
             {
                 if (oldElement is Vector3IntField oldVector3IntField)

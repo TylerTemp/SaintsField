@@ -1,10 +1,13 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using SaintsField.Interfaces;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class ProgressBarAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
@@ -25,16 +28,10 @@ namespace SaintsField
 
         public readonly string TitleCallback;
         // ReSharper enable InconsistentNaming
-
-        public ProgressBarAttribute(): this(0, 100, -1) { }
-        public ProgressBarAttribute(EColor color=EColor.OceanicSlate, EColor backgroundColor=EColor.CharcoalGray, string colorCallback=null, string backgroundColorCallback=null)
-            : this(0, 100, -1, color, backgroundColor, colorCallback, backgroundColorCallback) { }
-
+        public ProgressBarAttribute(float min, float max): this(min, max, -1) { }
         public ProgressBarAttribute(float max): this(0, max, -1) { }
         public ProgressBarAttribute(float max, EColor color=EColor.OceanicSlate, EColor backgroundColor=EColor.CharcoalGray, string colorCallback=null, string backgroundColorCallback=null)
             : this(0, max, -1, color, backgroundColor, colorCallback, backgroundColorCallback) { }
-
-        public ProgressBarAttribute(float max, float step): this(0, max, step) { }
 
         public ProgressBarAttribute(string maxCallback): this(0, maxCallback) { }
         public ProgressBarAttribute(string maxCallback, float step): this(0, maxCallback, step) { }
@@ -43,11 +40,6 @@ namespace SaintsField
             EColor backgroundColor = EColor.CharcoalGray, string colorCallback = null,
             string backgroundColorCallback = null)
             : this(0, maxCallback, step, color, backgroundColor, colorCallback, backgroundColorCallback)
-        {
-        }
-
-        public ProgressBarAttribute(float max=100, float step=-1, EColor color=EColor.OceanicSlate, EColor backgroundColor=EColor.CharcoalGray, string colorCallback=null, string backgroundColorCallback=null)
-            : this(0, max, step, color, backgroundColor, colorCallback, backgroundColorCallback)
         {
         }
 

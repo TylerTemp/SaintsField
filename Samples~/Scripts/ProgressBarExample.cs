@@ -1,11 +1,20 @@
-﻿using UnityEngine;
+﻿using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class ProgressBarExample: MonoBehaviour
+    public class ProgressBarExample: SaintsMonoBehaviour
     {
-        [ProgressBar(10)][FieldLabelText("<icon=star.png /><label/>")]
+        [ProgressBar(0, 10, -1, color: EColor.Brown)][FieldLabelText("<icon=star.png /><label/>")]
         public int myHp;
+
+        [ShowInInspector, ProgressBar(0, 10)]
+        public int ShowMyHp
+        {
+            get => myHp;
+            set => myHp = value;
+        }
+
         [ProgressBar(0, 100f, step: 0.05f, color: EColor.Blue)]
         public float myMp;
 
@@ -26,7 +35,11 @@ namespace SaintsField.Samples.Scripts
 
         private EColor BackgroundColor() => fValue <= 0? EColor.Brown: EColor.CharcoalGray;
 
-        private Color FillColor() => Color.Lerp(Color.yellow, EColor.Green.GetColor(), Mathf.Pow(Mathf.InverseLerp(minValue, maxValue, fValue), 2));
+        private Color FillColor()
+        {
+            return Color.Lerp(Color.yellow, EColor.Green.GetColor(),
+                Mathf.Pow(Mathf.InverseLerp(minValue, maxValue, fValue), 2));
+        }
 
         private string Title(float curValue, float min, float max, string label) => curValue < 0 ? $"[{label}] Game Over: {curValue}" : $"[{label}] {curValue / max:P}";
 

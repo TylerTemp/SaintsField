@@ -168,6 +168,112 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             return (minValue, "", maxValue, "");
         }
 
+        private static (object minValue, string minError, object maxValue, string maxError) GetMinMaxForShowInInspector(
+            MinMaxSliderAttribute minMaxSliderAttribute, object curValue, object target)
+        {
+            object minValue;
+            if (minMaxSliderAttribute.MinCallback == null)
+            {
+                minValue = minMaxSliderAttribute.Min;
+            }
+            else
+            {
+                (object getValue, string getError) = GetCallbackForShowInInspector(minMaxSliderAttribute.MinCallback, curValue, target);
+                if (getError != "")
+                {
+                    return (null, getError, null, "");
+                }
+                minValue = getValue;
+            }
+
+            object maxValue;
+            if (minMaxSliderAttribute.MaxCallback == null)
+            {
+                maxValue = minMaxSliderAttribute.Max;
+            }
+            else
+            {
+                (object getValue, string getError) = GetCallbackForShowInInspector(minMaxSliderAttribute.MaxCallback, curValue, target);
+                if (getError != "")
+                {
+                    return (null, getError, null, "");
+                }
+
+                maxValue = getValue;
+            }
+            return (minValue, "", maxValue, "");
+        }
+
+        private static (object getValue, string getError) GetCallbackForShowInInspector(string callback, object curValue, object target)
+        {
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
+            {
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, callback);
+
+                switch (getPropType)
+                {
+                    case ReflectUtils.GetPropType.NotFound:
+                        continue;
+
+                    case ReflectUtils.GetPropType.Property:
+                    {
+                        object genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                        if(genResult != null)
+                        {
+                            return (genResult, "");
+                        }
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Field:
+                    {
+                        FieldInfo fInfo = (FieldInfo)fieldOrMethodInfo;
+                        object genResult = fInfo.GetValue(target);
+                        if(genResult != null)
+                        {
+                            return (genResult, "");
+                        }
+                        // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+
+                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                        {
+                            curValue,
+                        });
+
+
+                        object genResult;
+                        try
+                        {
+                            genResult = methodInfo.Invoke(target, passParams);
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            return (e.InnerException?.Message ?? e.Message, null);
+                        }
+                        catch (Exception e)
+                        {
+                            return (e.Message, null);
+                        }
+
+                        if (genResult != null)
+                        {
+                            return (genResult, "");
+                        }
+
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                }
+            }
+
+            return ($"Target `{callback}` not found", null);
+        }
+
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -273,6 +379,86 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 default:
                     return;
             }
+        }
+
+        public static VisualElement UIToolkitValueEditVector2(VisualElement oldElement, MinMaxSliderAttribute minMaxSliderAttribute, string label, Vector2 value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(minMaxSliderAttribute, value, targets[0]);
+
+            if (oldElement is MinMaxSliderFieldFloat oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.MinMaxSliderElementFloat.SetConfig(minValue, maxValue, minMaxSliderAttribute.Step);
+                }
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            MinMaxSliderElementFloat element = new MinMaxSliderElementFloat(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            MinMaxSliderFieldFloat field =
+                new MinMaxSliderFieldFloat(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.MinMaxSliderElementFloat.SetConfig(minValue, maxValue, minMaxSliderAttribute.Step);
+            }
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return field;
+        }
+
+        public static VisualElement UIToolkitValueEditVector2Int(VisualElement oldElement, MinMaxSliderAttribute minMaxSliderAttribute, string label, Vector2Int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            (object minValue, string minError, object maxValue, string maxError) =
+                GetMinMaxForShowInInspector(minMaxSliderAttribute, value, targets[0]);
+
+            if (oldElement is MinMaxSliderFieldInt oldF)
+            {
+                if (minError == "" && maxError == "")
+                {
+                    oldF.MinMaxSliderElementInt.SetConfig(minValue, maxValue, (int)minMaxSliderAttribute.Step);
+                }
+
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            MinMaxSliderElementInt element = new MinMaxSliderElementInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+            MinMaxSliderFieldInt field =
+                new MinMaxSliderFieldInt(label, element);
+            if (minError == "" && maxError == "")
+            {
+                field.MinMaxSliderElementInt.SetConfig(minValue, maxValue, (int)minMaxSliderAttribute.Step);
+            }
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                element.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return field;
         }
     }
 }

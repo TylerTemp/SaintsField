@@ -52,7 +52,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 {
                     if (rawType == typeof(uint))
                     {
-                        PropRangeElementUInt element = new PropRangeElementUInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
+                        PropRangeElementUInt element =
+                            new PropRangeElementUInt(allAttributes.OfType<AdaptAttribute>().FirstOrDefault());
                         PropRangeUIntField field = new PropRangeUIntField(GetPreferredLabel(property), element);
                         field.AddToClassList(PropRangeUIntField.alignedFieldUssClassName);
                         field.AddToClassList(ClassAllowDisable);
@@ -302,7 +303,6 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         PropRangeUIntField field = container.Q<PropRangeUIntField>();
                         UIToolkitUtils.AddContextualMenuManipulator(field.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
                         field.PropRangeElementUInt.BindHelpBox(helpBox);
-                        field.PropRangeElementUInt.bindingPath = property.propertyPath;
 
                         uint intStep = step > 0? (uint)step: 0u;
 
@@ -329,13 +329,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateMinMax);
                         container.RegisterCallback<DetachFromPanelEvent>(_ =>
                             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
+                        field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
+                        field.PropRangeElementUInt.BindProperty(property);
                     }
                     else if (rawType == typeof(long))
                     {
                         PropRangeLongField field = container.Q<PropRangeLongField>();
                         UIToolkitUtils.AddContextualMenuManipulator(field.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
                         field.PropRangeElementLong.BindHelpBox(helpBox);
-                        field.PropRangeElementLong.bindingPath = property.propertyPath;
 
                         long intStep = (int)step;
 
@@ -362,13 +363,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateMinMax);
                         container.RegisterCallback<DetachFromPanelEvent>(_ =>
                             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
+                        field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
+                        field.PropRangeElementLong.BindProperty(property);
                     }
                     else if (rawType == typeof(ulong))
                     {
                         PropRangeULongField field = container.Q<PropRangeULongField>();
                         UIToolkitUtils.AddContextualMenuManipulator(field.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
                         field.PropRangeElementULong.BindHelpBox(helpBox);
-                        field.PropRangeElementULong.bindingPath = property.propertyPath;
 
                         ulong intStep = (ulong)(step <= 1? 1: step);
 
@@ -395,13 +397,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateMinMax);
                         container.RegisterCallback<DetachFromPanelEvent>(_ =>
                             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
+                        field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
+                        field.PropRangeElementULong.BindProperty(property);
                     }
                     else
                     {
                         PropRangeIntField field = container.Q<PropRangeIntField>();
                         UIToolkitUtils.AddContextualMenuManipulator(field.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
                         field.PropRangeElementInt.BindHelpBox(helpBox);
-                        field.PropRangeElementInt.bindingPath = property.propertyPath;
 
                         int intStep = (int)step;
 
@@ -433,6 +436,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateMinMax);
                         container.RegisterCallback<DetachFromPanelEvent>(_ =>
                             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
+                        field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
+                        field.PropRangeElementInt.BindProperty(property);
                     }
                 }
                     break;
@@ -441,7 +446,6 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     PropRangeDoubleField field = container.Q<PropRangeDoubleField>();
                     UIToolkitUtils.AddContextualMenuManipulator(field.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
                     field.PropRangeElementDouble.BindHelpBox(helpBox);
-                    field.PropRangeElementDouble.bindingPath = property.propertyPath;
 
                     // int intStep = (int)step;
 
@@ -474,6 +478,8 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateMinMax);
                     container.RegisterCallback<DetachFromPanelEvent>(_ =>
                         SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
+                    field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
+                    field.PropRangeElementDouble.BindProperty(property);
                 }
                     break;
             }

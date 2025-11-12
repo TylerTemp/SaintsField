@@ -2922,40 +2922,40 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.RangeExample
   intMin: -2147483648
   intMax: 2147483647
-  intRange: 0
+  intRange: 786701828
   intRangeAdapt: 0
   byteMin: 0
   byteMax: 255
-  byteRange: 0
+  byteRange: 101
   sbyteMin: -128
   sbyteMax: 127
-  sbyteRange: 0
+  sbyteRange: 42
   shortMin: -32768
   shortMax: 32767
-  shortRange: 0
+  shortRange: 11679
   uShortMin: 0
   uShortMax: 65535
   ushortRange: 0
   uIntMin: 0
   uIntMax: 4294967295
   uIntRange: 3247414272
-  uIntAdapt: 0
+  uIntAdapt: 7
   floatMin: -3.4028235e+38
   floatMax: 3.4028235e+38
-  floatRange: -1.2824711e+38
-  floatAdapt: 0.4
+  floatRange: 1.9664557e+38
+  floatAdapt: 0.6
   doubleMin: -8.988465674311579e+307
   doubleMax: 8.988465674311579e+307
-  doubleRange: 0
-  doubleAdapt: 0
+  doubleRange: 6.730057563419542e+307
+  doubleAdapt: 0.8
   longMin: -4611686018427387904
   longMax: 4611686018427387903
-  longRange: 4611686018427387903
-  longAdapt: 3
+  longRange: 3452769426670092288
+  longAdapt: 8
   ulongMin: 0
   ulongMax: 18446744073709551615
-  ulongRange: 17861059518360715264
-  ulongAdapt: 3
+  ulongRange: 17149015788212977664
+  ulongAdapt: 7
 --- !u!1 &325018645
 GameObject:
   m_ObjectHideFlags: 0
@@ -20511,7 +20511,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minValue: -5
   maxValue: 35
-  fValue: 14.5
+  fValue: 8.747229
 --- !u!1 &1338113061
 GameObject:
   m_ObjectHideFlags: 0
@@ -33251,14 +33251,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myHp: 6
-  myMp: 65.85
-  minValue: -5
-  maxValue: 30
-  fValue: 10.25
-  stamina: 123
+  myMp: 54.95
+  minValue: 3
+  maxValue: 77
+  fValue: 44.100002
+  stamina: 69
   highStamina: 150
   maxStamina: 200
-  myHpDisabled: 6
+  myHpDisabled: 0
 --- !u!1 &1965382813
 GameObject:
   m_ObjectHideFlags: 0
@@ -37936,19 +37936,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
       propertyPath: vector2Step03.x
-      value: -0.6626506
+      value: -0.2275852
       objectReference: {fileID: 0}
     - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
       propertyPath: vector2Step03.y
-      value: 2.6373496
+      value: 2.1724148
       objectReference: {fileID: 0}
     - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
       propertyPath: vector2IntStep3.x
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
       propertyPath: vector2IntStep3.y
-      value: 14
+      value: 17
       objectReference: {fileID: 0}
     - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
       propertyPath: vector2Step03Adapt.x
@@ -37965,6 +37965,10 @@ PrefabInstance:
     - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
       propertyPath: vector2IntStep3Adapt.y
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2Step03Disabled.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

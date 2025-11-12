@@ -114,7 +114,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             };
         }
 
-        private static (string error, Color value) GetCallbackColor(string by, Color defaultValue, SerializedProperty property, FieldInfo fieldInfo, object target)
+        private static (string error, Color value) GetCallbackColor(string by, Color defaultValue, SerializedProperty property, MemberInfo fieldInfo, object target)
         {
             (string error, object value) = Util.GetOf<object>(by, defaultValue, property, fieldInfo, target);
             return error != ""

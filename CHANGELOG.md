@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Add: `ShowInInspector` now works with `MinMaxSlider`
+2.  Breaking Changes: argument `free` from `MinMaxSlider` is now removed for the sake of complexity
+
 ## 5.3.1 ##
 
 1.  Fix: `TreeDropdown` search bar now pinned on the top 

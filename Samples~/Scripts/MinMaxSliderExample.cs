@@ -1,14 +1,27 @@
-﻿using UnityEngine;
+﻿using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class MinMaxSliderExample: MonoBehaviour
+    public class MinMaxSliderExample: SaintsMonoBehaviour
     {
         [MinMaxSlider(-1f, 3f, 0.3f)] public Vector2 vector2Step03;
         [MinMaxSlider(-1f, 3f, 0.3f), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public Vector2 vector2Step03Adapt;
+        [ShowInInspector, MinMaxSlider(-1f, 3f, 0.3f)]
+        private Vector2 ShowVector2Step03
+        {
+            get => vector2Step03;
+            set => vector2Step03 = value;
+        }
 
         [MinMaxSlider(0, 20, 3)] public Vector2Int vector2IntStep3;
         [MinMaxSlider(0, 20, 3), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public Vector2Int vector2IntStep3Adapt;
+        [ShowInInspector, MinMaxSlider(0, 20, 3)]
+        private Vector2Int ShowVector2IntStep3
+        {
+            get => vector2IntStep3;
+            set => vector2IntStep3 = value;
+        }
 
         // [MinMaxSlider(-1f, 3f)]
         // public Vector2 vector2Free;
