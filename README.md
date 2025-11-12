@@ -96,12 +96,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.3.1**
+**5.3.2**
 
-1.  Fix: `TreeDropdown` search bar now pinned on the top
-2.  Fix: `TreeDropdown` did not scroll to current selected value if the list is long
-3.  `PropRange` now supports `uint`, `short`, `ushort`, `byte`, `sbyte`, `long`, `ulong`
-4.  Add: `ShowInInspector` now works with `ShaderParam`, `ShaderKeyword`, `Rate`, `PropRange`
+1.  Add: `ShowInInspector` now works with `MinMaxSlider`, `ProgressBar`, `LabelText`
+2.  Breaking Changes: argument `free` from `MinMaxSlider` is now removed for the sake of complexity
+3.  Fix: `LabelText` now work like the old `RichLabel`, the `<label/>`, `<field/>` now works as expected
+4.  Add: more colors for `EColor`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -152,6 +152,8 @@ Parameters:
 
         `aqua`, `black`, `blue`, `brown`, `cyan`, `darkblue`, `fuchsia`, `green`, `gray`, `grey`, `lightblue`, `lime`, `magenta`, `maroon`, `navy`, `olive`, `orange`, `purple`, `red`, `silver`, `teal`, `white`, `yellow`
 
+    *   Standard [Unity Pre-Set Color Presets](https://docs.unity3d.com/6000.2/Documentation/ScriptReference/Color.html) (Unity 6.2 as a reference), e.g. `darkViolet`, `hotPink`
+
     *   Some extra colors from [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes/blob/master/Assets/NaughtyAttributes/Scripts/Core/Utility/EColor.cs):
 
         `clear`, `pink`, `indigo`, `violet`
@@ -174,7 +176,7 @@ Parameters:
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
-[LabelText("<color=lame>It's Labeled!")]
+[LabelText("<color=lime>It's Labeled!")]
 public List<string> myList;
 
 [LabelText("$" + nameof(MethodLabel))]
@@ -230,7 +232,6 @@ public string[] sindices;
 ```
 
 ![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
-
 
 #### `FieldLabelText`/`NoLabel` ####
 
@@ -651,7 +652,7 @@ public bool toggle;
 
 #### `FieldSeparator` / `FieldBelowSeparator` ####
 
-> [!TIPS]
+> [!TIP]
 > Only use this if you can not enable `SaintsEditor`
 
 Draw text, separator, spaces for field on above / below with rich text & dynamic text support.
@@ -1946,6 +1947,9 @@ private void DictExternalAdd()
 *   `ShaderKeyword`
 *   `Rate`
 *   `PropRange`
+*   `MinMaxSlider`
+*   `ProgressBar`
+*   `LabelText`
 
 ### Numerical ###
 

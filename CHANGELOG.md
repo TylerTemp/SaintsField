@@ -1,9 +1,11 @@
 # Changelog
 
-## WIP ##
+## 5.3.2 ##
 
-1.  Add: `ShowInInspector` now works with `MinMaxSlider`, `ProgressBar`
+1.  Add: `ShowInInspector` now works with `MinMaxSlider`, `ProgressBar`, `LabelText`
 2.  Breaking Changes: argument `free` from `MinMaxSlider` is now removed for the sake of complexity
+3.  Fix: `LabelText` now work like the old `RichLabel`, the `<label/>`, `<field/>` now works as expected
+4.  Add: more colors for `EColor`
 
 ## 5.3.1 ##
 
