@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.3.3 ##
+## 5.3.4 ##
 
 1.  Fix: `ShowInInspector` show empty label.
 2.  Add: `ShowInInspector` now works with `AnimatorParams`, `AnimatorState`

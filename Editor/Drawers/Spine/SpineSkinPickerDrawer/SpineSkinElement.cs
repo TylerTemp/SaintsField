@@ -43,16 +43,16 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
                 {
                     UIToolkitUtils.SetLabel(Label, new[]
                     {
-                        new RichTextDrawer.RichTextChunk
-                        {
-                            IsIcon = true,
-                            Content = SpineSkinUtils.IconPath,
-                        },
-                        new RichTextDrawer.RichTextChunk
-                        {
-                            IsIcon = false,
-                            Content = skin.Name,
-                        },
+                        new RichTextDrawer.RichTextChunk(isIcon: true, content: SpineSkinUtils.IconPath),
+                        // {
+                        //     IsIcon = true,
+                        //     Content = SpineSkinUtils.IconPath,
+                        // },
+                        new RichTextDrawer.RichTextChunk(isIcon: false, content: skin.Name),
+                        // {
+                        //     IsIcon = false,
+                        //     Content = skin.Name,
+                        // },
                     }, _richTextDrawer);
                     return;
                 }
@@ -60,17 +60,17 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
 
             UIToolkitUtils.SetLabel(Label, new[]
             {
-                new RichTextDrawer.RichTextChunk
-                {
-                    IsIcon = false,
-                    Content = "?",
-                    IconColor = "#FF0000",
-                },
-                new RichTextDrawer.RichTextChunk
-                {
-                    IsIcon = false,
-                    Content = $" {CachedValue}",
-                },
+                new RichTextDrawer.RichTextChunk(isIcon: false, content: "?", iconColor: "#FF0000"),
+                // {
+                //     IsIcon = false,
+                //     Content = "?",
+                //     IconColor = "#FF0000",
+                // },
+                new RichTextDrawer.RichTextChunk(isIcon: false, content: $" {CachedValue}"),
+                // {
+                //     IsIcon = false,
+                //     Content = $" {CachedValue}",
+                // },
             }, _richTextDrawer);
         }
     }

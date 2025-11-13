@@ -42,19 +42,20 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                 {
                     List<RichTextDrawer.RichTextChunk> chunks = new List<RichTextDrawer.RichTextChunk>
                     {
-                        new RichTextDrawer.RichTextChunk
-                        {
-                            IsIcon = false,
-                            Content = attachmentInfo.Name,
-                        },
+                        new RichTextDrawer.RichTextChunk(isIcon: false, content: attachmentInfo.Name),
+                        // {
+                        //     IsIcon = false,
+                        //     Content = attachmentInfo.Name,
+                        // },
                     };
                     if (!string.IsNullOrEmpty(attachmentInfo.Icon))
                     {
-                        chunks.Insert(0, new RichTextDrawer.RichTextChunk
-                        {
-                            IsIcon = true,
-                            Content = attachmentInfo.Icon,
-                        });
+                        chunks.Insert(0, new RichTextDrawer.RichTextChunk(isIcon: true, content: attachmentInfo.Icon)
+                        // {
+                        //     IsIcon = true,
+                        //     Content = attachmentInfo.Icon,
+                        // }
+                        );
                     }
                     UIToolkitUtils.SetLabel(Label, chunks, _richTextDrawer);
                     return;
@@ -63,17 +64,17 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
 
             UIToolkitUtils.SetLabel(Label, new[]
             {
-                new RichTextDrawer.RichTextChunk
-                {
-                    IsIcon = false,
-                    Content = "?",
-                    IconColor = "#FF0000",
-                },
-                new RichTextDrawer.RichTextChunk
-                {
-                    IsIcon = false,
-                    Content = $" {CachedValue}",
-                },
+                new RichTextDrawer.RichTextChunk(isIcon: false, content: "?", iconColor: "#FF0000"),
+                // {
+                //     IsIcon = false,
+                //     Content = "?",
+                //     IconColor = "#FF0000",
+                // },
+                new RichTextDrawer.RichTextChunk(isIcon: false, content: $" {CachedValue}"),
+                // {
+                //     IsIcon = false,
+                //     Content = $" {CachedValue}",
+                // },
             }, _richTextDrawer);
         }
     }
