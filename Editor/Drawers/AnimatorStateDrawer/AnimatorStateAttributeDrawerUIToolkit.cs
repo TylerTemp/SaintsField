@@ -230,7 +230,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             return root;
         }
 
-        private AnimatorState GetStateFromProp(SerializedProperty property)
+        private static AnimatorState GetStateFromProp(SerializedProperty property)
         {
             SerializedProperty curLayerIndexProp = FindPropertyRelative(property, "layerIndex");
             SerializedProperty curStateNameHashProp = FindPropertyRelative(property, "stateNameHash");
@@ -262,6 +262,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                 saintsAttribute as AnimatorStateAttribute ?? new AnimatorStateAttribute();
             HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property));
 
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
                 case SerializedPropertyType.String:
@@ -394,170 +395,184 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                     });
                 }
                     break;
+                default:
+                    UIToolkitUtils.SetHelpBox(helpBox, $"Expect string/AnimatorState, get {property.propertyType}");
+                    break;
             }
-
-
-
-            // UIToolkitUtils.DropdownButtonField dropdownButton =
-            //     container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
-            //
-            // UIToolkitUtils.AddContextualMenuManipulator(dropdownButton, property,
-            //     () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
-            //
-            // Foldout foldout = container.Q<Foldout>(NameFoldout(property));
-            // UIToolkitUtils.AddContextualMenuManipulator(foldout, property,
-            //     () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
-            //
-            // dropdownButton.ButtonElement.clicked += () =>
-            //     ShowDropdown(property, saintsAttribute, container, info, parent, onValueChangedCallback);
-            //
-            // string animFieldName = saintsAttribute is AnimatorStateAttribute animatorStateAttribute
-            //     ? animatorStateAttribute.AnimFieldName
-            //     : null;
-            //
-            // MetaInfo metaInfo = GetMetaInfo(property, animFieldName, info, parent);
-            // int curIndex = property.propertyType == SerializedPropertyType.String
-            //     ? Util.ListIndexOfAction(metaInfo.AnimatorStates,
-            //         eachInfo => eachInfo.state.name == property.stringValue)
-            //     : Util.ListIndexOfAction(metaInfo.AnimatorStates,
-            //         eachStateInfo => EqualAnimatorState(eachStateInfo, property));
-            //
-            // if (curIndex != -1)
-            // {
-            //     if (SetPropValue(property, metaInfo.AnimatorStates[curIndex]))
-            //     {
-            //         onValueChangedCallback.Invoke(property.propertyType == SerializedPropertyType.String
-            //             ? metaInfo.AnimatorStates[curIndex].state.name
-            //             : metaInfo.AnimatorStates[curIndex]);
-            //     }
-            // }
         }
 
-        // private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,
-        //     VisualElement container, FieldInfo info, object parent, Action<object> onChange)
-        // {
-        //     string animFieldName = saintsAttribute is AnimatorStateAttribute animatorStateAttribute
-        //         ? animatorStateAttribute.AnimFieldName
-        //         : null;
-        //
-        //     MetaInfo metaInfo = GetMetaInfo(property, animFieldName, info, parent);
-        //
-        //     GenericDropdownMenu genericDropdownMenu = new GenericDropdownMenu();
-        //
-        //     int selectedIndex = property.propertyType == SerializedPropertyType.String
-        //         ? Util.ListIndexOfAction(metaInfo.AnimatorStates,
-        //             eachInfo => eachInfo.state.name == property.stringValue)
-        //         : Util.ListIndexOfAction(metaInfo.AnimatorStates,
-        //             eachStateInfo => EqualAnimatorState(eachStateInfo, property));
-        //     // Debug.Log($"metaInfo.SelectedIndex={metaInfo.SelectedIndex}");
-        //     UIToolkitUtils.DropdownButtonField buttonLabel =
-        //         container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
-        //     // foreach (int index in Enumerable.Range(0, metaInfo.AnimatorStates.Count))
-        //     foreach ((AnimatorStateChanged value, int index) in metaInfo.AnimatorStates.WithIndex())
-        //     {
-        //         AnimatorStateChanged curItem = value;
-        //         string curName = FormatStateLabel(curItem, "/");
-        //
-        //         genericDropdownMenu.AddItem(curName, index == selectedIndex, () =>
-        //         {
-        //             SetPropValue(property, curItem);
-        //             // Util.SignFieldValue(property.serializedObject.targetObject, curItem, parent, info);
-        //             // Util.SignPropertyValue(property, curItem);
-        //             property.serializedObject.ApplyModifiedProperties();
-        //             // Debug.Log($"onChange {curItem}");
-        //             onChange(property.propertyType == SerializedPropertyType.String ? curItem.state.name : curItem);
-        //             buttonLabel.ButtonLabelElement.text = curName;
-        //             // property.serializedObject.ApplyModifiedProperties();
-        //         });
-        //     }
-        //
-        //     if (metaInfo.RuntimeAnimatorController != null)
-        //     {
-        //         if (metaInfo.AnimatorStates.Count > 0)
-        //         {
-        //             genericDropdownMenu.AddSeparator("");
-        //         }
-        //
-        //         genericDropdownMenu.AddItem($"Edit {metaInfo.RuntimeAnimatorController.name}...", false,
-        //             () => OpenAnimator(metaInfo.RuntimeAnimatorController));
-        //     }
-        //
-        //     UIToolkitUtils.DropdownButtonField root =
-        //         container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
-        //
-        //     genericDropdownMenu.DropDown(root.ButtonElement.worldBound, root, true);
-        // }
+        private class AnimatorStateStringHelpBox : VisualElement
+        {
+            public readonly AnimatorStateFieldString Field;
+            public readonly HelpBox HelpBox;
 
-        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-        //     int index,
-        //     IReadOnlyList<PropertyAttribute> allAttributes,
-        //     VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
-        // {
-        //     object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-        //
-        //     string animFieldName = saintsAttribute is AnimatorStateAttribute animatorStateAttribute
-        //         ? animatorStateAttribute.AnimFieldName
-        //         : null;
-        //
-        //     MetaInfo metaInfo = GetMetaInfo(property, animFieldName, info, parent);
-        //
-        //     HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
-        //
-        //     // ReSharper disable once InvertIf
-        //     if (metaInfo.Error != helpBox.text)
-        //     {
-        //         helpBox.text = metaInfo.Error;
-        //         helpBox.style.display = metaInfo.Error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-        //     }
-        //
-        //     TextField subStateMachineNameChainTextField =
-        //         container.Q<TextField>(name: NameSubStateMachineNameChain(property));
-        //     // ReSharper disable once InvertIf
-        //     if (subStateMachineNameChainTextField != null)
-        //     {
-        //         SerializedProperty chain = property.FindPropertyRelative("subStateMachineNameChain");
-        //         // ReSharper disable once InvertIf
-        //         if (chain != null)
-        //         {
-        //             string chainText = string.Join(" > ", Enumerable
-        //                     .Range(0, chain.arraySize)
-        //                     .Select(each => chain.GetArrayElementAtIndex(each).stringValue));
-        //             if (subStateMachineNameChainTextField.value != chainText)
-        //             {
-        //                 subStateMachineNameChainTextField.value = chainText;
-        //             }
-        //         }
-        //     }
-        //
-        //     int curIndex = property.propertyType == SerializedPropertyType.String
-        //         ? Util.ListIndexOfAction(metaInfo.AnimatorStates,
-        //             eachInfo => eachInfo.state.name == property.stringValue)
-        //         : Util.ListIndexOfAction(metaInfo.AnimatorStates,
-        //             eachStateInfo => EqualAnimatorState(eachStateInfo, property));
-        //     string buttonLabel = curIndex == -1 ? "-" : FormatStateLabel(metaInfo.AnimatorStates[curIndex], "/");
-        //     UIToolkitUtils.DropdownButtonField dropdownButton =
-        //         container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButton(property));
-        //     if (dropdownButton.ButtonLabelElement.text != buttonLabel)
-        //     {
-        //         dropdownButton.ButtonLabelElement.text = buttonLabel;
-        //     }
-        // }
-        //
-        // protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-        //     VisualElement container,
-        //     FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
-        // {
-        //     TextField subStateMachineNameChainTextField =
-        //         container.Q<TextField>(name: NameSubStateMachineNameChain(property));
-        //     // ReSharper disable once InvertIf
-        //     if (subStateMachineNameChainTextField != null)
-        //     {
-        //         AnimatorStateChanged subs = (AnimatorStateChanged)newValue;
-        //         subStateMachineNameChainTextField.value = subs.subStateMachineNameChain.Count == 0
-        //             ? ""
-        //             : string.Join(" > ", subs.subStateMachineNameChain);
-        //     }
-        // }
+            public AnimatorStateStringHelpBox(AnimatorStateFieldString field)
+            {
+                Add(Field = field);
+                Add(HelpBox = new HelpBox
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 1,
+                        display = DisplayStyle.None,
+                    },
+                });
+            }
+        }
+
+        public static VisualElement UIToolkitValueEditString(VisualElement oldElement, AnimatorStateAttribute animatorStateAttribute, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            MetaInfo metaInfo = GetMetaInfoShowInInspector(
+                animatorStateAttribute,
+                targets[0]);
+
+            if (oldElement is AnimatorStateStringHelpBox oldContainer)
+            {
+                oldContainer.Field.SetValueWithoutNotify(value);
+                if (metaInfo.Error == "")
+                {
+                    oldContainer.Field.AnimatorStateElementString.BindAnimatorInfo(metaInfo.AnimatorStates, metaInfo.RuntimeAnimatorController);
+                }
+                UIToolkitUtils.SetHelpBox(oldContainer.HelpBox, metaInfo.Error);
+                return null;
+            }
+
+            AnimatorStateElementString visualInput = new AnimatorStateElementString
+            {
+                value = value,
+            };
+
+            if (metaInfo.Error == "")
+            {
+                visualInput.BindAnimatorInfo(metaInfo.AnimatorStates, metaInfo.RuntimeAnimatorController);
+            }
+            AnimatorStateFieldString field =
+                new AnimatorStateFieldString(label, visualInput)
+                {
+                    value = value,
+                };
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                visualInput.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return new AnimatorStateStringHelpBox(field);
+        }
+
+        private class AnimatorStateStructCombo : VisualElement
+        {
+            public readonly AnimatorStateFieldStruct Field;
+            public readonly AnimatorStateDetailPanel DetailPanel;
+            public readonly HelpBox HelpBox;
+
+            public AnimatorStateStructCombo(AnimatorStateFieldStruct field)
+            {
+                Add(Field = field);
+                Add(DetailPanel = new AnimatorStateDetailPanel());
+                Add(HelpBox = new HelpBox
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 1,
+                        display = DisplayStyle.None,
+                    },
+                });
+            }
+        }
+
+        public static VisualElement UIToolkitValueEditAnimatorState(VisualElement oldElement, AnimatorStateAttribute animatorStateAttribute, string label, AnimatorState value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            MetaInfo metaInfo = GetMetaInfoShowInInspector(
+                animatorStateAttribute,
+                targets[0]);
+
+            if (oldElement is AnimatorStateStructCombo oldContainer)
+            {
+                oldContainer.Field.SetValueWithoutNotify(value);
+                if (metaInfo.Error == "")
+                {
+                    oldContainer.Field.AnimatorStateElementStruct.BindAnimatorInfo(metaInfo.AnimatorStates, metaInfo.RuntimeAnimatorController);
+                }
+                oldContainer.DetailPanel.SetValueWithoutNotify(value);
+                UIToolkitUtils.SetHelpBox(oldContainer.HelpBox, metaInfo.Error);
+                return null;
+            }
+
+            AnimatorStateElementStruct visualInput = new AnimatorStateElementStruct
+            {
+                value = value,
+            };
+
+            if (metaInfo.Error == "")
+            {
+                visualInput.BindAnimatorInfo(metaInfo.AnimatorStates, metaInfo.RuntimeAnimatorController);
+            }
+            AnimatorStateFieldStruct field =
+                new AnimatorStateFieldStruct(label, visualInput)
+                {
+                    value = value,
+                };
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                visualInput.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+
+            AnimatorStateStructCombo combo = new AnimatorStateStructCombo(field);
+            combo.Field.AnimatorStateElementStruct.BindDetailPanel(combo.DetailPanel);
+            combo.DetailPanel.UpdateStruct(value);
+            return combo;
+        }
+
+        public static VisualElement UIToolkitValueEditAnimatorStateBase(VisualElement oldElement, AnimatorStateAttribute animatorStateAttribute, string label, AnimatorStateBase value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            AnimatorState animatorState = new AnimatorState(
+                value.layerIndex,
+                value.stateNameHash,
+                value.stateName ?? "",
+                value.stateSpeed,
+                value.stateTag ?? "",
+                null,
+                value.subStateMachineNameChain ?? Array.Empty<string>()
+            );
+            Action<object> wrapSetter = null;
+            if (setterOrNull != null)
+            {
+                wrapSetter = (obj) =>
+                {
+                    setterOrNull.Invoke(GetBaseFromAnimatorState((AnimatorState)obj));
+                };
+            }
+
+            return UIToolkitValueEditAnimatorState(oldElement, animatorStateAttribute, label, animatorState, beforeSet,
+                wrapSetter, labelGrayColor, inHorizontalLayout, allAttributes, targets);
+        }
+
+        private static AnimatorStateBase GetBaseFromAnimatorState(AnimatorState animatorState) =>
+            new AnimatorStateBase(
+                    animatorState.layerIndex,
+                    animatorState.stateNameHash,
+                    animatorState.stateName ?? "",
+                    animatorState.stateSpeed,
+                    animatorState.stateTag ?? "",
+                    animatorState.subStateMachineNameChain ?? Array.Empty<string>()
+                );
     }
 }
 #endif

@@ -96,12 +96,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.3.2**
+**5.3.3**
 
-1.  Add: `ShowInInspector` now works with `MinMaxSlider`, `ProgressBar`, `LabelText`
-2.  Breaking Changes: argument `free` from `MinMaxSlider` is now removed for the sake of complexity
-3.  Fix: `LabelText` now work like the old `RichLabel`, the `<label/>`, `<field/>` now works as expected
-4.  Add: more colors for `EColor`
+1.  Fix: `ShowInInspector` show empty label.
+2.  Add: `ShowInInspector` now works with `AnimatorParams`, `AnimatorState`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1950,6 +1948,8 @@ private void DictExternalAdd()
 *   `MinMaxSlider`
 *   `ProgressBar`
 *   `LabelText`
+*   `AnimParams`
+*   `AnimState`
 
 ### Numerical ###
 
@@ -2180,28 +2180,18 @@ to get more useful info from the state, you can use `AnimatorStateBase`/`Animato
 
 *   `AnimationClip animationClip` is the actual animation clip of the state (can be null). It has a `length` value for the length of the clip. For more detail see [Unity Doc of AnimationClip](https://docs.unity3d.com/ScriptReference/AnimationClip.html)
 
-Special Note: using `AniamtorState`/`AnimatorStateBase` with `OnValueChanged`, you can get a `AnimatorStateChanged` on the callback (rather than the value of the field).
-This is because `AnimatorState` expected any class/struct with satisfied fields.
+Special Note: using `AniamtorState`/`AnimatorStateBase` with `OnValueChanged`, you will get a `AnimatorState` on the callback.
 
 ```csharp
 using SaintsField;
 
-[AnimatorState, OnValueChanged(nameof(OnChanged))]
+[AnimatorState]
 public string stateName;
 
-#if UNITY_EDITOR
-[AnimatorState, OnValueChanged(nameof(OnChangedState))]
-#endif
+[AnimatorState(nameof(MyAnimator))]  // you can specific an animator
 public AnimatorState state;
 
-// This does not have a `animationClip`, thus it won't include a resource when serialized: only pure data.
-[AnimatorState, OnValueChanged(nameof(OnChangedState))]
 public AnimatorStateBase stateBase;
-
-private void OnChanged(string changedValue) => Debug.Log(changedValue);
-#if UNITY_EDITOR
-private void OnChangedState(AnimatorStateChanged changedValue) => Debug.Log($"layerIndex={changedValue.layerIndex}, AnimatorControllerLayer={changedValue.layer}, AnimatorState={changedValue.state}, animationClip={changedValue.animationClip}, subStateMachineNameChain={string.Join("/", changedValue.subStateMachineNameChain)}");
-#endif
 ```
 
 ![animator_state](https://github.com/TylerTemp/SaintsField/assets/6391063/8ee35de5-c7d5-4f0d-b8b7-8feeac41c31d)

@@ -8,6 +8,7 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
@@ -263,6 +264,125 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                 Error = "",
             };
         }
+
+        private static MetaInfo GetMetaInfoShowInInspector(AnimatorStateAttribute animatorParamAttribute, object parent)
+        {
+            (string error, RuntimeAnimatorController runtimeAnimatorController) = GetRuntimeAnimatorControllerShowInInspector(animatorParamAttribute.AnimFieldName, parent);
+            if (error != "")
+            {
+                return new MetaInfo
+                {
+                    Error = error,
+                    AnimatorStates = Array.Empty<AnimatorStateChanged>(),
+                };
+            }
+
+            // Debug.Log(animator.runtimeAnimatorController);
+
+            AnimatorController controller = null;
+            Dictionary<AnimationClip, AnimationClip> clipOverrideDict = new Dictionary<AnimationClip, AnimationClip>();
+
+            switch (runtimeAnimatorController)
+            {
+                case AnimatorController ac:
+                    controller = ac;
+                    break;
+                case AnimatorOverrideController overrideController:
+                {
+                    controller = (AnimatorController)overrideController.runtimeAnimatorController;
+
+                    List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(overrideController.overridesCount);
+                    overrideController.GetOverrides(overrides);
+                    foreach (KeyValuePair<AnimationClip,AnimationClip> keyValuePair in overrides)
+                    {
+                        // Debug.Log($"{keyValuePair.Key} -> {keyValuePair.Value}");
+                        clipOverrideDict[keyValuePair.Key] = keyValuePair.Value;
+                    }
+                }
+                    break;
+            }
+
+            if (!controller)
+            {
+                return new MetaInfo
+                {
+                    Error = $"No AnimatorController on {runtimeAnimatorController}",
+                    AnimatorStates = Array.Empty<AnimatorStateChanged>(),
+                };
+            }
+
+            List<AnimatorStateChanged> animatorStates = new List<AnimatorStateChanged>();
+            foreach ((AnimatorControllerLayer animatorControllerLayer, int layerIndex) in controller.layers.Select((each, index) => (each, index)))
+            {
+                foreach ((UnityEditor.Animations.AnimatorState state, IReadOnlyList<string> subStateMachineNameChain) in GetAnimatorStateRecursively(animatorControllerLayer.stateMachine, animatorControllerLayer.stateMachine.stateMachines.Select(each => each.stateMachine), Array.Empty<string>()))
+                {
+                    AnimationClip clip = (AnimationClip)state.motion;
+                    if (clip && clipOverrideDict.TryGetValue(clip, out AnimationClip overrideClip))
+                    {
+                        clip = overrideClip;
+                    }
+                    animatorStates.Add(new AnimatorStateChanged
+                    {
+                        layer = animatorControllerLayer,
+                        layerIndex = layerIndex,
+                        state = state,
+
+                        animationClip = clip,
+                        subStateMachineNameChain = subStateMachineNameChain.ToArray(),
+                    });
+                }
+            }
+
+            return new MetaInfo
+            {
+                RuntimeAnimatorController = runtimeAnimatorController,
+                AnimatorStates = animatorStates,
+                Error = "",
+            };
+        }
+
+        private static (string error, RuntimeAnimatorController animator) GetRuntimeAnimatorControllerShowInInspector(string animatorName, object parent)
+        {
+            if (animatorName != null)
+            {
+                // search parent first
+                (string error, object result) = Util.GetOfNoParams<object>(parent, animatorName, null);
+                if (error != "")
+                {
+                    return (error, null);
+                }
+                // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+                switch (result)
+                {
+                    case Animator animatorResult:
+                        return ("", animatorResult.runtimeAnimatorController);
+                    case RuntimeAnimatorController controllerResult:
+                        return ("", controllerResult);
+                    default:
+                        return ($"No Animator or RuntimeAnimatorController found called {animatorName} in {parent}.", null);
+                }
+            }
+
+            if (parent is not Object uObj)
+            {
+                return ($"{parent} is not a Unity Object", null);
+            }
+
+
+            IReadOnlyList<Object> tryGetAnimator = Util.GetTargetsTypeFromObj(uObj, typeof(Animator));
+            if (tryGetAnimator.Count > 0)
+            {
+                return ("", ((Animator)tryGetAnimator[0]).runtimeAnimatorController);
+            }
+            IReadOnlyList<Object> tryGetAnimatorController = Util.GetTargetsTypeFromObj(uObj, typeof(RuntimeAnimatorController));
+            if (tryGetAnimatorController.Count > 0)
+            {
+                return ("", ((RuntimeAnimatorController)tryGetAnimatorController[0]));
+            }
+
+            return ($"No Animator or RuntimeAnimatorController found in {parent}.", null);
+        }
+
 
 
         public static IEnumerable<(UnityEditor.Animations.AnimatorState, IReadOnlyList<string>)> GetAnimatorStateRecursively(AnimatorStateMachine curStateMachine, IEnumerable<AnimatorStateMachine> subStateMachines, IReadOnlyList<string> accStateMachineNameChain)

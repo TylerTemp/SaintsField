@@ -86,6 +86,7 @@ namespace SaintsField.Editor.Playa.Renderer
             bool isSaintsSerialized = FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute);
 
             (string error, object value) = GetValue(FieldWithInfo);
+            // Debug.Log($"error={error}, value={value}");
 
             VisualElement container = new VisualElement
             {
@@ -187,7 +188,6 @@ namespace SaintsField.Editor.Playa.Renderer
         }
 
         private string _preRichLabelXml;
-        private IReadOnlyList<RichTextDrawer.RichTextChunk> _preRichLabelXmlChunks = Array.Empty<RichTextDrawer.RichTextChunk>();
         private RichTextDrawer _richTextDrawer;
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
@@ -209,6 +209,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
 
             (string error, object value) = GetValue(FieldWithInfo);
+            // Debug.Log($"error={error}, value={value}");
 
             string nameErrorBox = NameErrorBox();
             NativeFieldPropertyRendererErrorField errorHelpBox = container.Q<NativeFieldPropertyRendererErrorField>(nameErrorBox);

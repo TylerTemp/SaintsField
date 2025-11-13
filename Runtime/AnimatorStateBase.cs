@@ -23,6 +23,16 @@ namespace SaintsField
         [field: SerializeField]
         public string[] subStateMachineNameChain { get; private set; }
 
+        public AnimatorStateBase(int layerIndex, int stateNameHash, string stateName, float stateSpeed = 1f, string stateTag = "", string[] subStateMachineNameChain = null)
+        {
+            this.layerIndex = layerIndex;
+            this.stateNameHash = stateNameHash;
+            this.stateName = stateName ?? string.Empty;
+            this.stateSpeed = stateSpeed;
+            this.stateTag = stateTag ?? string.Empty;
+            this.subStateMachineNameChain = subStateMachineNameChain ?? Array.Empty<string>();
+        }
+
         public override string ToString() => $"[{layerIndex}] {stateName}";
 
         public override bool Equals(object obj)
@@ -33,10 +43,10 @@ namespace SaintsField
                 return false;
             }
 
-            return Equals((AnimatorState) obj);
+            return Equals((AnimatorStateBase) obj);
         }
 
-        public bool Equals(AnimatorState other)
+        public bool Equals(AnimatorStateBase other)
         {
             return layerIndex == other.layerIndex
                    && stateNameHash == other.stateNameHash;

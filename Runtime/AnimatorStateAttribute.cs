@@ -2,10 +2,11 @@
 using SaintsField.Interfaces;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
+    [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property)]
     public class AnimatorStateAttribute : PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;

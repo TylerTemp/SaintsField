@@ -4,6 +4,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
@@ -54,10 +55,23 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
         }
     }
 
-    public class ObjectBaseField : BaseField<UnityEngine.Object>
+    public class SubStateMachineNameChainField : BaseField<string[]>
     {
-        public ObjectBaseField(string label, VisualElement visualInput) : base(label, visualInput)
+        public readonly SubStateMachineNameChain SubStateMachineNameChain;
+        public SubStateMachineNameChainField(string label, SubStateMachineNameChain visualInput) : base(label, visualInput)
         {
+            SubStateMachineNameChain = visualInput;
+        }
+
+        public override void SetValueWithoutNotify(string[] newValue)
+        {
+            SubStateMachineNameChain.SetValueWithoutNotify(newValue);
+        }
+
+        public override string[] value
+        {
+            get => SubStateMachineNameChain.value;
+            set => SubStateMachineNameChain.value = value;
         }
     }
 
@@ -101,11 +115,59 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                     bindingPath = subStateMachineNameChainProp.propertyPath,
                 };
                 subStateMachineNameChain.TrackProp(subStateMachineNameChainProp);
-                ObjectBaseField baseF = new ObjectBaseField("State Machine", subStateMachineNameChain);
-                baseF.AddToClassList(ObjectBaseField.alignedFieldUssClassName);
+                SubStateMachineNameChainField baseF = new SubStateMachineNameChainField("State Machine", subStateMachineNameChain);
+                baseF.AddToClassList(SubStateMachineNameChainField.alignedFieldUssClassName);
                 baseF.SetEnabled(false);
                 Add(baseF);
             }
+        }
+
+        private bool _init;
+        private IntegerField _layerIndexField;
+        private TextField _stateNameField;
+        private IntegerField _stateNameHashField;
+        private FloatField _stateSpeedField;
+        private TextField _stateTagField;
+        private ObjectField _animationClipField;
+        private SubStateMachineNameChain _stateMachineField;
+
+        public void UpdateStruct(AnimatorState newState)
+        {
+            if (!_init)
+            {
+                _init = true;
+                Add(_layerIndexField = new IntegerField("Layer Index")
+                {
+                    value = newState.layerIndex,
+                });
+                Add(_stateNameField = new TextField("State Name")
+                {
+                    value = newState.stateName,
+                });
+                Add(_stateNameHashField = new IntegerField("State Name Hash")
+                {
+                    value = newState.stateNameHash,
+                });
+                Add(_stateSpeedField = new FloatField("State Speed")
+                {
+                    value = newState.stateSpeed,
+                });
+                Add(_stateTagField = new TextField("State Tag")
+                {
+                    value = newState.stateTag,
+                });
+                Add(_animationClipField = new ObjectField("Animation Clip")
+                {
+                    objectType = typeof(AnimationClip),
+                    value = newState.animationClip,
+                });
+                Add(_stateMachineField = new SubStateMachineNameChain()
+                {
+                    value = newState.subStateMachineNameChain ?? Array.Empty<string>(),
+                });
+            }
+
+            SetValueWithoutNotify(newState);
         }
 
         private static SerializedProperty FindPropertyRelative(SerializedProperty property, string name) =>
@@ -114,6 +176,17 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
         public void SetValueWithoutNotify(AnimatorState newValue)
         {
             _cachedValue = newValue;
+
+            if(_init)
+            {
+                _layerIndexField.SetValueWithoutNotify(newValue.layerIndex);
+                _stateNameField.SetValueWithoutNotify(newValue.stateName ?? string.Empty);
+                _stateNameHashField.SetValueWithoutNotify(newValue.stateNameHash);
+                _stateSpeedField.SetValueWithoutNotify(newValue.stateSpeed);
+                _stateTagField.SetValueWithoutNotify(newValue.stateTag ?? string.Empty);
+                _animationClipField.SetValueWithoutNotify(newValue.animationClip);
+                _stateMachineField.SetValueWithoutNotify(newValue.subStateMachineNameChain ?? Array.Empty<string>());
+            }
         }
 
         public AnimatorState value

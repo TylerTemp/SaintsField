@@ -6,6 +6,7 @@ using System.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.SaintsSerialization;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace SaintsField.Editor.Playa.Renderer
@@ -41,17 +42,22 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             if (fieldWithInfo.FieldInfo != null)
             {
+                // Debug.Log($"getting {fieldWithInfo.FieldInfo.Name}");
                 return ("", fieldWithInfo.FieldInfo.GetValue(fieldWithInfo.Targets[0]));
             }
 
             if (fieldWithInfo.PropertyInfo.CanRead)
             {
+                // Debug.Log($"getting {fieldWithInfo.PropertyInfo.Name}");
                 try
                 {
                     return ("", fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Targets[0]));
                 }
                 catch (Exception e)
                 {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(e);
+#endif
                     string message = e.InnerException?.Message ?? e.Message;
                     return (message, null);
                 }

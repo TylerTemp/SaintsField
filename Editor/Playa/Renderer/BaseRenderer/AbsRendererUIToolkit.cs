@@ -7,6 +7,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.AnimatorParamDrawer;
+using SaintsField.Editor.Drawers.AnimatorStateDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
@@ -71,12 +72,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             root.AddToClassList(ClassSaintsFieldPlaya);
             bool hasAnyChildren = false;
 
-            (VisualElement aboveTarget, bool aboveNeedUpdate) = CreateAboveUIToolkit();
-            if (aboveTarget != null)
-            {
-                root.Add(aboveTarget);
-                hasAnyChildren = true;
-            }
             (VisualElement target, bool targetNeedUpdate) = CreateTargetUIToolkit(root);
             if (target != null)
             {
@@ -95,15 +90,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 root.Add(targetContainer);
                 hasAnyChildren = true;
             }
-            (VisualElement belowTarget, bool belowNeedUpdate) = CreateBelowUIToolkit();
-            if (belowTarget != null)
-            {
-                root.Add(belowTarget);
-                hasAnyChildren = true;
-            }
 
-            bool anyNeedUpdate = aboveNeedUpdate || targetNeedUpdate || belowNeedUpdate;
-            if (anyNeedUpdate)
+            if (targetNeedUpdate)
             {
                 UIToolkitUtils.OnAttachToPanelOnce(root, _ =>
                 {
@@ -111,7 +99,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement)).Every(100);
                 });
             }
-            if(anyNeedUpdate || hasAnyChildren)
+            if(targetNeedUpdate || hasAnyChildren)
             {
                 return _rootElement = root;
             }
@@ -119,17 +107,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return null;
         }
 
-        protected virtual (VisualElement target, bool needUpdate) CreateAboveUIToolkit()
-        {
-            return (null, false);
-        }
-
         protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container);
-
-        protected virtual (VisualElement target, bool needUpdate) CreateBelowUIToolkit()
-        {
-            return (null, false);
-        }
 
         private static void MergeIntoGroup(Dictionary<string, VisualElement> groupElements, string groupBy, VisualElement root, VisualElement child)
         {
@@ -1308,6 +1286,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 inHorizontalLayout,
                                 allAttributes,
                                 targets), false);
+                        case AnimatorStateAttribute animatorStateAttribute:
+                            return (AnimatorStateAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                animatorStateAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
 
@@ -2201,6 +2191,39 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     inHorizontalLayout,
                     allAttributes), false);
             }
+            #endregion
+
+            #region AnimatorState
+
+            if (valueType == typeof(AnimatorState) || value is AnimatorState)
+            {
+                return (AnimatorStateAttributeDrawer.UIToolkitValueEditAnimatorState(
+                    oldElement,
+                    allAttributes.OfType<AnimatorStateAttribute>().FirstOrDefault() ?? new AnimatorStateAttribute(),
+                    label,
+                    (AnimatorState) value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes,
+                    targets), false);
+            }
+            if (valueType == typeof(AnimatorStateBase) || value is AnimatorState)
+            {
+                return (AnimatorStateAttributeDrawer.UIToolkitValueEditAnimatorStateBase(
+                    oldElement,
+                    allAttributes.OfType<AnimatorStateAttribute>().FirstOrDefault() ?? new AnimatorStateAttribute(),
+                    label,
+                    (AnimatorStateBase) value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes,
+                    targets), false);
+            }
+
             #endregion
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
