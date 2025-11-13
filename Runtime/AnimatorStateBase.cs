@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Serializable]
-    public class AnimatorStateBase: ILayerIndex, IStateNameHash, IStateName, IStateSpeed, IStateTag, ISubStateMachineNameChain
+    public struct AnimatorStateBase: ILayerIndex, IStateNameHash, IStateName, IStateSpeed, IStateTag, ISubStateMachineNameChain
     {
         [field: SerializeField]
         public int layerIndex { get; private set; }

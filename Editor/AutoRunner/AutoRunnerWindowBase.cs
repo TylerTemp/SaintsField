@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
 using SaintsField.Editor.Utils;
@@ -15,6 +14,7 @@ using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using AnimatorStateAttributeDrawer = SaintsField.Editor.Drawers.AnimatorStateDrawer.AnimatorStateAttributeDrawer;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.AutoRunner

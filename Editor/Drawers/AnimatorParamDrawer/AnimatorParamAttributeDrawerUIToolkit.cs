@@ -55,7 +55,12 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     return field;
                 }
                 default:
-                    return new VisualElement();
+                {
+                    PropertyField fallback = PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                    fallback.AddToClassList(ClassFieldUIToolkit(property));
+                    fallback.AddToClassList(ClassAllowDisable);
+                    return fallback;
+                }
             }
         }
 

@@ -229,6 +229,7 @@ namespace SaintsField.Utils
         // ReSharper disable once MemberCanBePrivate.Global
         public static IEnumerable<RichTextParsedChunk> ParseRichXml(string richXml)
         {
+            // Debug.Log($"get rich xml: {richXml}");
             List<string> colors = new List<string>();
 
             // Define a regular expression pattern to match the tags
@@ -247,7 +248,7 @@ namespace SaintsField.Utils
             {
                 (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
 
-                // Debug.Log($"parse: {part} -> partType={parsedResult.partType}, content={parsedResult.content}, value={parsedResult.value}, isSelfClose={parsedResult.isSelfClose}");
+                // Debug.Log($"parse: {part}({part == ""}) -> partType={parsedResult.partType}, content={parsedResult.content}, value={parsedResult.value}, isSelfClose={parsedResult.isSelfClose}");
 
                 // ReSharper disable once MergeIntoPattern
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
@@ -282,12 +283,13 @@ namespace SaintsField.Utils
                     if (!parsedResult.isSelfClose)
                     {
                         // ReSharper disable once UseIndexFromEndExpression
-#if SAINTSFIELD_DEBUG
-                        Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content,
-                            parsedResult.content);
-#endif
                         if (openTags.Count > 0)
                         {
+#if SAINTSFIELD_DEBUG
+                            Debug.Assert(openTags[openTags.Count - 1].tagName == parsedResult.content,
+                                parsedResult.content);
+#endif
+
                             openTags.RemoveAt(openTags.Count - 1);
                         }
                     }
@@ -514,6 +516,7 @@ namespace SaintsField.Utils
                 string endTagRawContent = part.Substring(2, part.Length - 3).Trim();
                 if (endTagRawContent.Length > 0)
                 {
+                    // Debug.Log($"part `{part}` is EndTag (StartsWith={part.StartsWith("</")})");
                     return (RichPartType.EndTag, endTagRawContent.Trim(), null, false);
                 }
                 return (RichPartType.Content, part, null, false);
@@ -522,9 +525,14 @@ namespace SaintsField.Utils
             {
                 string endTagRawContent = part.Substring(1, part.Length - 3).Trim();
                 (string endTagName, string endTagValue) = ParseTag(endTagRawContent);
-                return endTagName.Length > 0
-                    ? (RichPartType.EndTag, endTagName, endTagValue, true)
-                    : (RichPartType.Content, part, null, false);
+                // ReSharper disable once InvertIf
+                if (endTagName.Length > 0)
+                {
+                    // Debug.Log($"part `{part}` is EndTag");
+                    return (RichPartType.EndTag, endTagName, endTagValue, true);
+                }
+
+                return (RichPartType.Content, part, null, false);
             }
 
             // open tag

@@ -3539,18 +3539,13 @@ MonoBehaviour:
   <MyAnimator>k__BackingField: {fileID: 380193380}
   animator:
     <layerIndex>k__BackingField: 0
-    <stateNameHash>k__BackingField: 0
-    <stateName>k__BackingField: 
-    <stateSpeed>k__BackingField: 0
+    <stateNameHash>k__BackingField: -1075812047
+    <stateName>k__BackingField: SubNewState
+    <stateSpeed>k__BackingField: 2.42
     <stateTag>k__BackingField: 
-    <animationClip>k__BackingField: {fileID: 0}
-    <subStateMachineNameChain>k__BackingField: []
-  animStateName: 
-  animStateDisabled: 
-  animParamName: Some Bool
-  animParamHash: -1473725520
-  animParamHashes: 
-  animParamNameDisable: 
+    <animationClip>k__BackingField: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
+    <subStateMachineNameChain>k__BackingField:
+    - SubStateMachine2
 --- !u!95 &380193380
 Animator:
   serializedVersion: 7

@@ -8,7 +8,7 @@ using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
+namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
 {
     public partial class AnimatorStateAttributeDrawer
     {
@@ -115,7 +115,7 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
                     {
                         // Selection.activeObject = metaInfo.Animator.runtimeAnimatorController;
                         // EditorApplication.ExecuteMenuItem("Window/Animation/Animator");
-                        OpenAnimator(metaInfo.RuntimeAnimatorController);
+                        AnimatorStateUtil.OpenAnimator(metaInfo.RuntimeAnimatorController);
                     }
                     else
                     {

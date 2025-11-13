@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/RightFoldoutRotate.uss?fileID=7433441132597879392&amp;guid=0a3ebc4f4793a5d48ba5bfc122a7eda4&amp;type=3#RightFoldoutRotate" />
+    <ui:Button style="width: 18px; border-top-right-radius: 0; border-bottom-right-radius: 0; border-right-width: 0; margin-left: 0; margin-right: 0; padding-right: 0; padding-left: 0; height: 100%;">
+        <ui:VisualElement name="Icon" class="saints-right-foldout-rotate" style="flex-grow: 1; width: 100%; height: 100%; background-image: url(&quot;project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-right.png?fileID=2800000&amp;guid=55dad5685bb71954aa8919431bffb168&amp;type=3#classic-dropdown-right&quot;); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit;" />
+    </ui:Button>
+</ui:UXML>

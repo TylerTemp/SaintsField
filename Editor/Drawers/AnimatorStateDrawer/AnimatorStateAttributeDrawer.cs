@@ -10,7 +10,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
+namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
 {
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
@@ -264,11 +264,6 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
             };
         }
 
-        private static void OpenAnimator(Object animatorController)
-        {
-            Selection.activeObject = animatorController;
-            EditorApplication.ExecuteMenuItem("Window/Animation/Animator");
-        }
 
         public static IEnumerable<(UnityEditor.Animations.AnimatorState, IReadOnlyList<string>)> GetAnimatorStateRecursively(AnimatorStateMachine curStateMachine, IEnumerable<AnimatorStateMachine> subStateMachines, IReadOnlyList<string> accStateMachineNameChain)
         {

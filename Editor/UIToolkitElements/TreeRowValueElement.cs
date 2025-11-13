@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
     [UxmlElement]
 #endif
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -29,6 +29,7 @@ namespace SaintsField.Editor.UIToolkitElements
         private readonly bool _isToggle;
         public readonly object Value;
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public TreeRowValueElement(): this(null, null, 0, false)
         {
         }
@@ -38,7 +39,7 @@ namespace SaintsField.Editor.UIToolkitElements
         private static Texture2D _boxCheckedIcon;
         private static Texture2D _boxUncheckedIcon;
 
-        private RichTextDrawer _richTextDrawer = new RichTextDrawer();
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         public TreeRowValueElement(object value, string label, int indent, bool toggle)
         {
