@@ -331,6 +331,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
                         field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
                         field.PropRangeElementUInt.BindProperty(property);
+                        field.TrackPropertyValue(property, p => onValueChangedCallback(p.uintValue));
                     }
                     else if (rawType == typeof(long))
                     {
@@ -365,6 +366,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
                         field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
                         field.PropRangeElementLong.BindProperty(property);
+                        field.TrackPropertyValue(property, p => onValueChangedCallback(p.longValue));
                     }
                     else if (rawType == typeof(ulong))
                     {
@@ -399,6 +401,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
                         field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
                         field.PropRangeElementULong.BindProperty(property);
+                        field.TrackPropertyValue(property, p => onValueChangedCallback(p.ulongValue));
                     }
                     else
                     {
@@ -438,6 +441,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
                         field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
                         field.PropRangeElementInt.BindProperty(property);
+                        field.TrackPropertyValue(property, p => onValueChangedCallback(p.intValue));
                     }
                 }
                     break;
@@ -480,6 +484,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                         SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
                     field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
                     field.PropRangeElementDouble.BindProperty(property);
+                    if(rawType == typeof(float))
+                    {
+                        field.TrackPropertyValue(property, p => onValueChangedCallback(p.floatValue));
+                    }
+                    else
+                    {
+                        field.TrackPropertyValue(property, p => onValueChangedCallback(p.doubleValue));
+                    }
                 }
                     break;
             }

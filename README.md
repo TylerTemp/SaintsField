@@ -96,10 +96,29 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.3.4**
+**5.3.5**
 
-1.  Fix: `ShowInInspector` show empty label.
-2.  Add: `ShowInInspector` now works with `AnimatorParams`, `AnimatorState`
+1.  Fix: fix a bug that block the building
+2.  Fix: fix multiple attributes that does not work with (or get called on inspecting) `OnValueChanged`:
+    *   `DateTime`
+    *   `TimeSpan`
+    *   `Layer`
+    *   `SortingLayer`
+    *   `Guid`
+    *   `Tag`
+    *   `InputAxis`
+    *   `ShaderParam`
+    *   `ShaderKeyword`
+    *   `Rate`
+    *   `PropRange`
+    *   `MinMaxSlider`
+    *   `ProgressBar`
+    *   `LabelText`
+    *   `AnimParams`
+    *   `AnimState`
+    *   `CurveRange`
+3.  Add: `ShowInInspector` now works with `CurveRange
+4.  Add: `OnValueChanged` now support static method calling, syntax example: `[OnValueChanged(":Debug.Log")]`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1950,6 +1969,7 @@ private void DictExternalAdd()
 *   `LabelText`
 *   `AnimParams`
 *   `AnimState`
+*   `CurveRange`
 
 ### Numerical ###
 
@@ -2696,6 +2716,13 @@ private void ChangedAnyType(object anyObj, int index=-1)
 {
     Debug.Log($"changed={anyObj}@{index}");
 }
+```
+
+You can use static method too (see the syntax in the end of the document)
+
+```csharp
+// Call `Debug.Log(oj)` on changed
+[OnValueChanged(":Debug.Log")] public Object oj;
 ```
 
 #### `OnArraySizeChanged` ####

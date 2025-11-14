@@ -263,6 +263,8 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
 
         public GuidStringField(string label, GuidStringElement visualInput) : base(label, visualInput)
         {
+            style.flexShrink = 1;
+
             _guidStringElement = visualInput;
             visualInput.BindDropdownElement(this);
         }

@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts
     public class ShaderParamExample : SaintsMonoBehaviour
     {
 #if UNITY_2021_2_OR_NEWER
-        [ShaderParam] public string shaderParamString;
+        [ShaderParam, OnValueChanged(nameof(OnValueChanged))] public string shaderParamString;
         [ShaderParam(0)] public int shaderParamInt;
         [ShaderParam(ShaderPropertyType.Texture)] public int shaderParamFilter;
 
@@ -39,6 +39,8 @@ namespace SaintsField.Samples.Scripts
             get => shaderParamInt;
             set => shaderParamInt = value;
         }
+
+        private void OnValueChanged(string s) => Debug.Log(s);
 #endif
     }
 }

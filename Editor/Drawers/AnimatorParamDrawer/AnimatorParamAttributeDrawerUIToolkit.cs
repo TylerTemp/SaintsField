@@ -129,6 +129,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     SaintsEditorApplicationChanged.OnAnyEvent.AddListener(Check);
                     field.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(Check));
                     field.TrackSerializedObjectValue(property.serializedObject, _ => Check());
+                    field.TrackPropertyValue(property, p => onValueChangedCallback(p.stringValue));
 
                     AddContextualMenuManipulator(field, animatorParamAttribute, property, onValueChangedCallback, info, parent);
                 }
@@ -151,6 +152,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     SaintsEditorApplicationChanged.OnAnyEvent.AddListener(Check);
                     field.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(Check));
                     field.TrackSerializedObjectValue(property.serializedObject, _ => Check());
+                    field.TrackPropertyValue(property, p => onValueChangedCallback(p.intValue));
 
                     AddContextualMenuManipulator(field, animatorParamAttribute, property, onValueChangedCallback, info, parent);
                 }

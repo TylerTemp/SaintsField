@@ -1,4 +1,5 @@
 ﻿using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
@@ -6,7 +7,10 @@ namespace SaintsField.Samples.Scripts
     {
         [InputAxis]
         [FieldLabelText("<icon=star.png /><label/>")]
+        [OnValueChanged(nameof(OnValueChanged))]
         public string inputAxis;
+
+        private void OnValueChanged(string s) => Debug.Log(s);
 
         [ReadOnly]
         [InputAxis]

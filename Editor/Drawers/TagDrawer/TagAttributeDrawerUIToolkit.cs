@@ -2,10 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Drawers.SceneDrawer;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
-using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -69,6 +65,7 @@ namespace SaintsField.Editor.Drawers.TagDrawer
 
             TagField layerStringField = container.Q<TagField>();
             AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
+            layerStringField.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.stringValue));
         }
 
         private static void AddContextualMenuManipulator(VisualElement root, SerializedProperty property,

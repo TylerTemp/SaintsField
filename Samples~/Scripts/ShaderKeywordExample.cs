@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts
     public class ShaderKeywordExample : SaintsMonoBehaviour
     {
 #if UNITY_2021_2_OR_NEWER
-        [ShaderKeyword] public string shaderKeywordString;
+        [ShaderKeyword, OnValueChanged(":Debug.Log")] public string shaderKeywordString;
         [ShaderKeyword(0)] public string shaderKeywordIndex;
 
         [FieldSeparator("By Target")]

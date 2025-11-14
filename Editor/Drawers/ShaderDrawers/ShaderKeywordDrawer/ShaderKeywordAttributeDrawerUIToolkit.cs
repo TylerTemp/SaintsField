@@ -87,6 +87,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
             SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshShader);
             container.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshShader));
 
+            shaderKeywordField.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.stringValue));
+
             return;
 
             void RefreshShader()

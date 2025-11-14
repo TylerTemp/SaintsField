@@ -8,6 +8,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.AnimatorParamDrawer;
 using SaintsField.Editor.Drawers.AnimatorStateDrawer;
+using SaintsField.Editor.Drawers.CurveRangeDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
@@ -1966,6 +1967,16 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if (typeof(AnimationCurve).IsAssignableFrom(valueType) || value is AnimationCurve)
             {
+                return (CurveRangeAttributeDrawer.UIToolkitValueEdit(
+                    oldElement,
+                    label,
+                    (AnimationCurve) value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes,
+                    targets), false);
 
                 if (oldElement is CurveField curveField)
                 {

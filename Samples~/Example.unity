@@ -1770,9 +1770,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 011f8a5e302940a09cf45aaeba4c0a4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.DateTimeExample
-  dt: 638960797701510000
-  d1: 0
-  l: 0
+  dt: 638990632366560000
 --- !u!1 &206032195
 GameObject:
   m_ObjectHideFlags: 0
@@ -2698,7 +2696,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0134a10044b2475886a64552e7a8f4ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sortingLayerString: Default
+  _sortingLayerString: New Layer 2
   _sortingLayerInt: 1
   _sortingLayerDisabled: 0
 --- !u!4 &301131439
@@ -2922,7 +2920,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.RangeExample
   intMin: -2147483648
   intMax: 2147483647
-  intRange: 786701828
+  intRange: 22605056
   intRangeAdapt: 0
   byteMin: 0
   byteMax: 255
@@ -3545,8 +3543,8 @@ MonoBehaviour:
     <stateTag>k__BackingField: 
     <animationClip>k__BackingField: {fileID: 0}
     <subStateMachineNameChain>k__BackingField:
-    - SubStateMachine2
-    - Sub2-2
+    - SubStateMachine1
+    - Sub1-2
   animatorStateBase:
     <layerIndex>k__BackingField: 0
     <stateNameHash>k__BackingField: -1198717087
@@ -3556,10 +3554,10 @@ MonoBehaviour:
     <subStateMachineNameChain>k__BackingField:
     - SubStateMachine2
     - Sub2-2
-  animStateName: SubNewState
+  animStateName: Sub2State
   animStateDisabled: 
-  animParamName: Other Bool
-  animParamHash: 57868658
+  animParamName: Some Bool
+  animParamHash: -1473725520
   animParamHashes: b0bb28a8
   animParamNameDisable: 
 --- !u!95 &380193380
@@ -14010,7 +14008,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5230f2d1430c07e4e95b1b00e4727da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaderParamString: _EmissionColor
+  shaderParamString: _MetallicGlossMap
   shaderParamInt: 562
   shaderParamFilter: 432
   targetRenderer: {fileID: 836531684}
@@ -14361,8 +14359,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d407124ea7fa70439314f30bdd341b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.TimeSpanExample
-  dt: 1692123560000
-  expanded: 1692123560000
+  dt: 77523560000
+  expanded: 216123560000
   d1: 0
   l: 0
 --- !u!1 &847311490
@@ -20647,7 +20645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50a944f54e0f41ed8aebd21ecf823272, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputAxis: Mouse Y
+  inputAxis: Jump
   inputAxisDisabled: 
 --- !u!4 &1350909639
 Transform:
@@ -23503,7 +23501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03e9d21f73989ab4f8df899ed2b1ded2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaderKeywordString: _ADDITIONAL_LIGHTS
+  shaderKeywordString: _LIGHT_LAYERS
   shaderKeywordIndex: _RENDER_PASS_ENABLED
   targetRenderer: {fileID: 1548456366}
   shaderKeywordRenderer: 
@@ -27205,20 +27203,20 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      time: -1
+      value: -1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
@@ -27231,18 +27229,18 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
@@ -27637,7 +27635,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f447d0d25d4a4bc19aaeac0ff720e887, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rate0To5: 0
+  rate0To5: 5
   rate1To5: 1
   rate3To5: 2
   rate0To5Rich: 1
@@ -33261,7 +33259,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44f420c4e1d44beb9a9861f26742c404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myHp: 8
+  myHp: 5
   myMp: 54.95
   minValue: 3
   maxValue: 77
@@ -35330,7 +35328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b125f4fbe8ad481381078d2c01910ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tag: Finish
+  _tag: Respawn
   _tag2: MainCamera
   _tagDisabled: 
 --- !u!1 &2118423071
@@ -37947,11 +37945,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
       propertyPath: vector2Step03.x
-      value: -0.2275852
+      value: -0.1561566
       objectReference: {fileID: 0}
     - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
       propertyPath: vector2Step03.y
-      value: 2.1724148
+      value: 1.3438435
       objectReference: {fileID: 0}
     - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
       propertyPath: vector2IntStep3.x
@@ -38764,6 +38762,10 @@ PrefabInstance:
     - target: {fileID: 5255264711433821186, guid: 6b9a9a67031221c4eb3c7bd702c98cf5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7009332967656986138, guid: 6b9a9a67031221c4eb3c7bd702c98cf5, type: 3}
+      propertyPath: guidString
+      value: af843e0d-e3ba-41d3-9cf8-072a166abcca
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

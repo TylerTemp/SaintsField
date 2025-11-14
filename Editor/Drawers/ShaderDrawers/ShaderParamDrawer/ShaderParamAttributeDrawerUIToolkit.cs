@@ -109,6 +109,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     intDropdownField.ShaderParamIntElement.BindHelpBox(helpBox);
                     AddContextualMenuManipulator(helpBox, shaderParamAttribute, intDropdownField, property, onValueChangedCallback, info, parent);
                     bindShader = intDropdownField.ShaderParamIntElement;
+                    intDropdownField.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.intValue));
                 }
                     break;
                 case SerializedPropertyType.String:
@@ -117,6 +118,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     stringDropdownField.ShaderParamStringElement.BindHelpBox(helpBox);
                     AddContextualMenuManipulator(helpBox, shaderParamAttribute, stringDropdownField, property, onValueChangedCallback, info, parent);
                     bindShader = stringDropdownField.ShaderParamStringElement;
+                    stringDropdownField.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.stringValue));
                 }
                     break;
                 default:

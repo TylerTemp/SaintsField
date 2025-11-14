@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
 using UnityEditor;
@@ -24,14 +25,23 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement r = MakeElement(property, GetPreferredLabel(property));
+            DateTimeField r = MakeElement(property, GetPreferredLabel(property));
             r.AddToClassList(DateTimeField.alignedFieldUssClassName);
             return r;
         }
 
-        public static VisualElement RenderSerializedActual(ISaintsAttribute dateTimeAttribute, string label, SerializedProperty property, bool inHorizontal)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            VisualElement r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)), label);
+            DateTimeField field = container.Q<DateTimeField>();
+            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+            field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.longValue));
+        }
+
+
+        public static DateTimeField RenderSerializedActual(ISaintsAttribute dateTimeAttribute, string label, SerializedProperty property, bool inHorizontal)
+        {
+            DateTimeField r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)), label);
             if (inHorizontal)
             {
                 r.style.flexDirection = FlexDirection.Column;
@@ -44,7 +54,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             return r;
         }
 
-        private static VisualElement MakeElement(SerializedProperty property, string label)
+        private static DateTimeField MakeElement(SerializedProperty property, string label)
         {
             DateTimeElement dateTimeElement = new DateTimeElement();
             dateTimeElement.BindPath(property.propertyPath);

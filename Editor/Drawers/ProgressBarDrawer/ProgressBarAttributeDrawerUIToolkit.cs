@@ -1,7 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -433,6 +432,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
                     field.ProgressBarElementInt.BindProperty(property);
                     field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
+                    field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.intValue));
                 }
                     break;
                 case SerializedPropertyType.Float:
@@ -473,6 +473,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                         SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
                     field.ProgressBarElementDouble.BindProperty(property);  // refresh value
                     field.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
+                    field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.floatValue));
                 }
                     break;
             }

@@ -30,10 +30,12 @@ namespace SaintsField.Editor.Drawers.RateDrawer
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
+            RateField field = container.Q<RateField>();
             UIToolkitUtils.AddContextualMenuManipulator(
                 container.Q<RateField>(),
                 property,
                 () => onValueChangedCallback(property.intValue));
+            field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.intValue));
         }
 
         public static VisualElement UIToolkitValueEdit(VisualElement oldElement, RateAttribute rateAttribute, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)

@@ -1,10 +1,13 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using SaintsField.Interfaces;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class CurveRangeAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
@@ -14,19 +17,21 @@ namespace SaintsField
         public readonly Vector2 Max;
         public readonly EColor Color;
 
-        public CurveRangeAttribute(Vector2 min, Vector2 max, EColor color = EColor.Green)
+        private const EColor DefaultColor = EColor.Lime;
+
+        public CurveRangeAttribute(Vector2 min, Vector2 max, EColor color = DefaultColor)
         {
             Min = min;
             Max = max;
             Color = color;
         }
 
-        public CurveRangeAttribute(EColor color = EColor.Green)
+        public CurveRangeAttribute(EColor color)
             : this(Vector2.zero, Vector2.one, color)
         {
         }
 
-        public CurveRangeAttribute(float minX = 0f, float minY = 0f, float maxX = 1f, float maxY = 1f, EColor color = EColor.Green)
+        public CurveRangeAttribute(float minX = 0f, float minY = 0f, float maxX = 1f, float maxY = 1f, EColor color = DefaultColor)
             : this(new Vector2(minX, minY), new Vector2(maxX, maxY), color)
         {
         }

@@ -5,7 +5,8 @@ namespace SaintsField.Samples.Scripts
 {
     public class ProgressBarExample: SaintsMonoBehaviour
     {
-        [ProgressBar(0, 10, -1, color: EColor.Brown)][LabelText("<icon=star.png /><label/>")]
+        [OnValueChanged(":Debug.Log")]
+        [ProgressBar(0, 10, color: EColor.Brown)][LabelText("<icon=star.png /><label/>")]
         public int myHp;
 
         [ShowInInspector, ProgressBar(0, 10), LabelText("<color=green><label/>")]

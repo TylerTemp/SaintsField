@@ -102,6 +102,7 @@ namespace SaintsField.Editor.Drawers.TagDrawer
 
         public TagField(string label, TagElement visualInput) : base(label, visualInput)
         {
+            style.flexShrink = 1;
             _tagElement = visualInput;
             visualInput.BindBound(this);
         }

@@ -93,6 +93,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
         public ShaderParamStringField(string label, ShaderParamStringElement visualInput) : base(label, visualInput)
         {
+            style.flexShrink = 1;
             ShaderParamStringElement = visualInput;
             visualInput.BindBound(this);
         }

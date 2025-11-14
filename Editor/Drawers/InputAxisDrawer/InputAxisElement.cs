@@ -98,6 +98,7 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
 
         public InputAxisField(string label, InputAxisElement visualInput) : base(label, visualInput)
         {
+            style.flexShrink = 1;
             visualInput.BindBound(this);
             _inputAxisElement = visualInput;
         }

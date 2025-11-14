@@ -5,7 +5,10 @@ namespace SaintsField.Samples.Scripts
 {
     public class TagExample: SaintsMonoBehaviour
     {
-        [SerializeField, Tag][FieldLabelText("<icon=star.png /><label/>")] private string _tag;
+        [SerializeField, Tag][FieldLabelText("<icon=star.png /><label/>"), OnValueChanged(nameof(OnValueChanged))] private string _tag;
+
+        private void OnValueChanged(string s) => Debug.Log(s);
+
         [SerializeField, Tag] private string _tag2;
 
         [ReadOnly]

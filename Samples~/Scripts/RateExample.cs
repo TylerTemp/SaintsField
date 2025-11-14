@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class RateExample: SaintsMonoBehaviour
     {
+        [OnValueChanged(":Debug.Log")]
         [Rate(0, 5)] public int rate0To5;
         [Rate(1, 5)] public int rate1To5;
         [Rate(2, 5)] public int rate3To5;

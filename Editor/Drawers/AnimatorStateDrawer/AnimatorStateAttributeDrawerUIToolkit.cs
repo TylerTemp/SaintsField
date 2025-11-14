@@ -285,6 +285,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                     SaintsEditorApplicationChanged.OnAnyEvent.AddListener(Refresh);
                     field.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(Refresh));
                     field.TrackSerializedObjectValue(property.serializedObject, _ => Refresh());
+                    field.TrackPropertyValue(property, p => onValueChangedCallback(p.stringValue));
                 }
                     break;
                 case SerializedPropertyType.Generic:

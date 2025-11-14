@@ -8,6 +8,7 @@ namespace SaintsField.Samples.Scripts
         [field: SerializeField]
         public Animator MyAnimator { get; private set; }
 
+        [OnValueChanged(":Debug.Log")]
         [AnimatorState][FieldLabelText("<icon=star.png /><label />")]
         public AnimatorState animatorState;
 
@@ -27,6 +28,7 @@ namespace SaintsField.Samples.Scripts
             set => animatorStateBase = value;
         }
 
+        [OnValueChanged(":Debug.Log")]
         [AnimatorState(nameof(MyAnimator))]
         public string animStateName;
 
@@ -41,6 +43,7 @@ namespace SaintsField.Samples.Scripts
         [AnimatorState]
         public string animStateDisabled;
 
+        [OnValueChanged(":Debug.Log")]
         [AnimatorParam][FieldLabelText("<icon=star.png /><label />")]
         public string animParamName;
 
@@ -52,6 +55,7 @@ namespace SaintsField.Samples.Scripts
             set => animParamName = value;
         }
 
+        [OnValueChanged(":Debug.Log")]
         [AnimatorParam(nameof(MyAnimator))]
         public int animParamHash;
 

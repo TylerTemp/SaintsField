@@ -1,5 +1,29 @@
 # Changelog
 
+## 5.3.5 ##
+
+1.  Fix: fix a bug that block the building
+2.  Fix: fix multiple attributes that does not work with (or get called on inspecting) `OnValueChanged`:
+    *   `DateTime`
+    *   `TimeSpan`
+    *   `Layer`
+    *   `SortingLayer`
+    *   `Guid`
+    *   `Tag`
+    *   `InputAxis`
+    *   `ShaderParam`
+    *   `ShaderKeyword`
+    *   `Rate`
+    *   `PropRange`
+    *   `MinMaxSlider`
+    *   `ProgressBar`
+    *   `LabelText`
+    *   `AnimParams`
+    *   `AnimState`
+    *   `CurveRange`
+3.  Add: `ShowInInspector` now works with `CurveRange`
+4.  Add: `OnValueChanged` now support static method calling, syntax example: `[OnValueChanged(":Debug.Log")]`
+
 ## 5.3.4 ##
 
 1.  Fix: `ShowInInspector` show empty label.

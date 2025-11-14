@@ -39,13 +39,14 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
             object newValue)
         {
             // Debug.Log($"OK I got a new value {newValue}; {this}");
-            string propPath = property.propertyPath;
-            int propIndex = SerializedUtils.PropertyPathIndex(propPath);
-            string error = InvokeCallback(((OnValueChangedAttribute)saintsAttribute).Callback, newValue, propIndex,
-                parent);
+            // string propPath = property.propertyPath;
+            // int propIndex = SerializedUtils.PropertyPathIndex(propPath);
+            // string error = InvokeCallback(((OnValueChangedAttribute)saintsAttribute).Callback, newValue, propIndex,
+            //     parent);
+
+            (string error, object _) = Util.GetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
-            helpBox.text = error;
-            helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
+            UIToolkitUtils.SetHelpBox(helpBox, error);
         }
     }
 }

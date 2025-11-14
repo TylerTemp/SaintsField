@@ -7,6 +7,7 @@ using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -113,7 +114,8 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                     AddContextualMenuManipulator(intDropdownField, property, onValueChangedCallback, info, parent);
                     LayerIntDropdownElement layerIntDropdownElement = intDropdownField.Q<LayerIntDropdownElement>();
                     layerIntDropdownElement.BindDrop(intDropdownField);
-                    layerIntDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
+                    // layerIntDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
+                    intDropdownField.TrackPropertyValue(property, v => onValueChangedCallback(v.intValue));
 
                     // intDropdownField.Button.clicked += () => MakeDropdown(property, intDropdownField, onValueChangedCallback, info, parent);
                 }
@@ -124,8 +126,9 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                     AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
                     LayerStringDropdownElement layerStringDropdownElement = layerStringField.Q<LayerStringDropdownElement>();
                     layerStringDropdownElement.BindDrop(layerStringField);
-                    layerStringDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
+                    // layerStringDropdownElement.RegisterValueChangedCallback(v => onValueChangedCallback(v.newValue));
 
+                    layerStringField.TrackPropertyValue(property, v => onValueChangedCallback(v.stringValue));
                     // layerStringField.Button.clicked += () => MakeDropdown(property, layerStringField, onValueChangedCallback, info, parent);
                 }
                     break;
@@ -133,11 +136,13 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 {
                     LayerMaskDropdownField layerMaskField = container.Q<LayerMaskDropdownField>();
                     AddContextualMenuManipulator(layerMaskField, property, onValueChangedCallback, info, parent);
-                    layerMaskField.RegisterValueChangedCallback(v =>
-                        onValueChangedCallback(new LayerMask
-                        {
-                            value = v.newValue,
-                        }));
+
+                    layerMaskField.TrackPropertyValue(property, v => onValueChangedCallback(v.intValue));
+                    // layerMaskField.RegisterValueChangedCallback(v =>
+                    //     onValueChangedCallback(new LayerMask
+                    //     {
+                    //         value = v.newValue,
+                    //     }));
                 }
                     break;
                 default:

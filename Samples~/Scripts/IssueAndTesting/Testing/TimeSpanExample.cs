@@ -6,10 +6,12 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
     public class TimeSpanExample : SaintsMonoBehaviour
     {
-        [TimeSpan]  // Save value in this
+        [TimeSpan, OnValueChanged(nameof(OnValueChanged))]  // Save value in this
         public long dt;
         // Use this in script
         public TimeSpan MyTimeSpan => new TimeSpan(dt);
+
+        private void OnValueChanged(long dt) => Debug.Log(dt);
 
         [ShowInInspector] private long v => dt;
 

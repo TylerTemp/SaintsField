@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class MinMaxSliderExample: SaintsMonoBehaviour
     {
+        [OnValueChanged(":Debug.Log")]
         [MinMaxSlider(-1f, 3f, 0.3f)] public Vector2 vector2Step03;
         [MinMaxSlider(-1f, 3f, 0.3f), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public Vector2 vector2Step03Adapt;
         [ShowInInspector, MinMaxSlider(-1f, 3f, 0.3f)]

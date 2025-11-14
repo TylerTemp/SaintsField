@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class SortingLayerExample: SaintsMonoBehaviour
     {
-        [SerializeField, SortingLayer,
+        [SerializeField, SortingLayer, OnValueChanged(nameof(OnValueChanged)),
          // RichLabel("<icon=star.png /><label />")
         ] private string _sortingLayerString;
         [SerializeField, SortingLayer] private int _sortingLayerInt;
@@ -17,6 +17,8 @@ namespace SaintsField.Samples.Scripts
             get => _sortingLayerString;
             set => _sortingLayerString = value;
         }
+
+        private void OnValueChanged(string s) => Debug.Log(_sortingLayerString);
 
         [ShowInInspector, SortingLayer]
         private int SortingLayerInt

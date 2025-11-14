@@ -131,6 +131,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
         public readonly ShaderKeywordElement ShaderKeywordElement;
         public ShaderKeywordField(string label, ShaderKeywordElement visualInput) : base(label, visualInput)
         {
+            style.flexShrink = 1;
             visualInput.BindBound(this);
             ShaderKeywordElement = visualInput;
         }

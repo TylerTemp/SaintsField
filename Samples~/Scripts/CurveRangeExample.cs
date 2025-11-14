@@ -1,15 +1,33 @@
 ﻿using System;
+using SaintsField.Playa;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class CurveRangeExample: MonoBehaviour
+    public class CurveRangeExample: SaintsMonoBehaviour
     {
+        [OnValueChanged(":Debug.Log")]
         [CurveRange(-1, -1, 1, 1)][FieldLabelText("<icon=star.png /><label />")]
         public AnimationCurve curve;
 
         [CurveRange(EColor.Orange)]
         public AnimationCurve curve1;
+
+        // private void OnValueChanged(AnimationCurve ac) => Debug.Log(ac);
+
+        [ShowInInspector, CurveRange(EColor.Orange)]
+        public AnimationCurve ShowCurve1
+        {
+            get => curve1;
+            set => curve1 = value;
+        }
+
+        [ShowInInspector]
+        public AnimationCurve ShowCurve1Default
+        {
+            get => curve1;
+            set => curve1 = value;
+        }
 
         [CurveRange(0, 0, 5, 5, EColor.Red)]
         public AnimationCurve curve2;

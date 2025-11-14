@@ -95,12 +95,14 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                 {
                     SortingLayerIntField intDropdownField = container.Q<SortingLayerIntField>();
                     AddContextualMenuManipulator(intDropdownField, property, onValueChangedCallback, info, parent);
+                    intDropdownField.TrackPropertyValue(property, p => onValueChangedCallback(p.intValue));
                 }
                     break;
                 case SerializedPropertyType.String:
                 {
                     SortingLayerStringField layerStringField = container.Q<SortingLayerStringField>();
                     AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
+                    layerStringField.TrackPropertyValue(property, p => onValueChangedCallback(p.stringValue));
                 }
                     break;
                 default:

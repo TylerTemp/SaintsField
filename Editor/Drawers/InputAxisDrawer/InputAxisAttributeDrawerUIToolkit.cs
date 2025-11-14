@@ -6,6 +6,7 @@ using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -63,8 +64,9 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
                 return;
             }
 
-            InputAxisField layerStringField = container.Q<InputAxisField>();
-            AddContextualMenuManipulator(layerStringField, property, onValueChangedCallback, info, parent);
+            InputAxisField inputAxisField = container.Q<InputAxisField>();
+            AddContextualMenuManipulator(inputAxisField, property, onValueChangedCallback, info, parent);
+            inputAxisField.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.stringValue));
         }
 
         private static void AddContextualMenuManipulator(VisualElement root, SerializedProperty property,

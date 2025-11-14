@@ -77,7 +77,11 @@ namespace SaintsField
 
         public int GetHashCode(AnimatorStateChanged obj)
         {
-            return HashCode.Combine(obj.layer, obj.state, obj.layerIndex, obj.animationClip, obj.subStateMachineNameChain);
+            return HashCode.Combine(
+#if UNITY_EDITOR
+                obj.layer, obj.state,
+#endif
+                obj.layerIndex, obj.animationClip, obj.subStateMachineNameChain);
         }
     }
 }

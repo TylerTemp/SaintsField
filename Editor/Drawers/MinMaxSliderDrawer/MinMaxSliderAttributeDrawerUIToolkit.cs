@@ -327,8 +327,9 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                         Vector2Int newValue = evt.newValue;
                         property.vector2IntValue = newValue;
                         property.serializedObject.ApplyModifiedProperties();
-                        onValueChangedCallback(newValue);
+                        // onValueChangedCallback(newValue);
                     });
+                    field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.vector2IntValue));
                 }
                     break;
                 case SerializedPropertyType.Vector2:
@@ -372,8 +373,10 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                         Vector2 newValue = evt.newValue;
                         property.vector2Value = newValue;
                         property.serializedObject.ApplyModifiedProperties();
-                        onValueChangedCallback(newValue);
+                        // onValueChangedCallback(newValue);
                     });
+
+                    field.TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.vector2Value));
                 }
                     break;
                 default:

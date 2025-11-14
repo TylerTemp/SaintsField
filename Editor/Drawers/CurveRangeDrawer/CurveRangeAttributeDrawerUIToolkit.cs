@@ -1,7 +1,9 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -19,23 +21,16 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
             FieldInfo info, object parent)
         {
             CurveRangeAttribute curveRangeAttribute = (CurveRangeAttribute)saintsAttribute;
-            CurveField createFieldElement = new CurveField(GetPreferredLabel(property))
+            CustomCurveField createFieldElement = new CustomCurveField(GetPreferredLabel(property), curveRangeAttribute.Color.GetColor())
             {
-                value = property.animationCurveValue,
+                // value = property.animationCurveValue,
+                bindingPath = property.propertyPath,
                 ranges = GetRanges(curveRangeAttribute),
                 name = NameCurveField(property),
             };
 
-            Type type = typeof(CurveField);
-            FieldInfo colorFieldInfo = type.GetField("m_CurveColor", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (colorFieldInfo != null)
-            {
-                colorFieldInfo.SetValue(createFieldElement, curveRangeAttribute.Color.GetColor());
-            }
-
             createFieldElement.AddToClassList(ClassAllowDisable);
-            createFieldElement.AddToClassList("unity-base-field__aligned");
-            createFieldElement.BindProperty(property);
+            createFieldElement.AddToClassList(CustomCurveField.alignedFieldUssClassName);
 
             return createFieldElement;
         }
@@ -45,12 +40,42 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            container.Q<CurveField>(NameCurveField(property)).RegisterValueChangedCallback(v =>
+            container.Q<CustomCurveField>(NameCurveField(property)).TrackPropertyValue(property, p => onValueChangedCallback.Invoke(p.animationCurveValue));
+        }
+
+        public static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, AnimationCurve value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            CurveRangeAttribute curveRangeAttribute = allAttributes.OfType<CurveRangeAttribute>().FirstOrDefault();
+
+            if (oldElement is CustomCurveField oldF)
             {
-                // property.animationCurveValue = v.newValue;
-                // property.serializedObject.ApplyModifiedProperties();
-                onValueChangedCallback.Invoke(v.newValue);
-            });
+                oldF.SetValueWithoutNotify(value);
+                return null;
+            }
+
+            CustomCurveField field =
+                curveRangeAttribute == null
+                    ? new CustomCurveField(label)
+                    : new CustomCurveField(label, curveRangeAttribute.Color.GetColor())
+                    {
+                        ranges = GetRanges(curveRangeAttribute),
+                    };
+
+            field.value = value;
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                field.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return field;
+
         }
     }
 }

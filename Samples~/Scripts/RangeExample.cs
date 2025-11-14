@@ -6,6 +6,7 @@ namespace SaintsField.Samples.Scripts
     {
         [MaxValue(nameof(intMax))] public int intMin = int.MinValue;
         [MinValue(nameof(intMin))] public int intMax = int.MaxValue;
+        [OnValueChanged(":Debug.Log")]
         [PropRange(nameof(intMin), nameof(intMax), 3)] public int intRange;
         [ShowInInspector, PropRange(nameof(intMin), nameof(intMax), 3)]
         public int ShowIntRange

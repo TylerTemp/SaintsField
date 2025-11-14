@@ -32,7 +32,9 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            UIToolkitUtils.AddContextualMenuManipulator(container.Q<GuidStringField>(), property, () => onValueChangedCallback(property.stringValue));
+            GuidStringField field = container.Q<GuidStringField>();
+            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => onValueChangedCallback(property.stringValue));
+            field.TrackPropertyValue(property, p => onValueChangedCallback(p.stringValue));
         }
 
         private static VisualElement MakeElement(SerializedProperty property, string label)

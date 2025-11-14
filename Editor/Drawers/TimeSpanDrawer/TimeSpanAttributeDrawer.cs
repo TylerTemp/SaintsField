@@ -26,9 +26,15 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement r = MakeElement(property, GetPreferredLabel(property), allAttributes.Any(each => each is DefaultExpandAttribute));
+            TimeSpanField r = MakeElement(property, GetPreferredLabel(property), allAttributes.Any(each => each is DefaultExpandAttribute));
             r.AddToClassList(TimeSpanField.alignedFieldUssClassName);
             return r;
+        }
+
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            container.Q<TimeSpanField>().TrackPropertyValue(property, p => onValueChangedCallback(p.longValue));
         }
 
         public static VisualElement RenderSerializedActual(ISaintsAttribute timeSpanAttribute, string label, SerializedProperty property, IReadOnlyList<Attribute> allAttributes, bool inHorizontal)
@@ -46,7 +52,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
             return r;
         }
 
-        private static VisualElement MakeElement(SerializedProperty property, string label, bool defaultExpanded)
+        private static TimeSpanField MakeElement(SerializedProperty property, string label, bool defaultExpanded)
         {
             TimeSpanElement timeSpanElement = new TimeSpanElement(defaultExpanded);
             timeSpanElement.BindPath(property.propertyPath);
