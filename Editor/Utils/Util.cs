@@ -2133,6 +2133,7 @@ namespace SaintsField.Editor.Utils
 
             public Transform Transform;
             public Vector3 WorldPos;
+            // public Quaternion WorldRot;
 
             public override string ToString()
             {
@@ -2254,6 +2255,7 @@ namespace SaintsField.Editor.Utils
                     Error = "",
                     IsTransform = false,
                     WorldPos = v3Value,
+                    // WorldRot = Quaternion.identity,
                 };
             }
 
@@ -2273,6 +2275,7 @@ namespace SaintsField.Editor.Utils
                     Error = "",
                     IsTransform = false,
                     WorldPos = container.TransformPoint(v3Value),
+                    // WorldRot = container.rotation,
                 };
             }
 
@@ -2293,6 +2296,7 @@ namespace SaintsField.Editor.Utils
                         Error = "",
                         IsTransform = false,
                         WorldPos = go.transform.TransformPoint(v3Value),
+                        // WorldRot = go.transform.rotation,
                     };
                 case Component comp:
                     return new TargetWorldPosInfo
@@ -2300,6 +2304,7 @@ namespace SaintsField.Editor.Utils
                         Error = "",
                         IsTransform = false,
                         WorldPos = comp.transform.TransformPoint(v3Value),
+                        // WorldRot = comp.transform.rotation,
                     };
                 default:
                     return new TargetWorldPosInfo
