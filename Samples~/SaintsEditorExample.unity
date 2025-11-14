@@ -1333,26 +1333,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30ed5bea79a96b142b7b0096b7fb2991, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerHashSetExample
-  polymorphism:
-    _saintsList:
-    - value:
-        absC: 
-        sub1: 
-      valueField:
-        propertyType: 0
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: 169648373862236256
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    _saintsSerializedVersion: 2
-    _wrapType: 1
   stringHashSet__SaintsSerialized__:
     _saintsList:
     - value: 1
@@ -1436,15 +1416,129 @@ MonoBehaviour:
     _saintsSerializedVersion: 2
     _wrapType: 4
   polymorphism__SaintsSerialized__:
-    propertyType: 0
-    propertyPath: 
-    longValue: 0
-    uLongValue: 0
-    stringValue: 
-    V: {fileID: 0}
-    VRef:
-      rid: -2
-    IsVRef: 0
+    _saintsList:
+    - value:
+        absC: 
+        sub1: 
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: 169648373862236259
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 1
+  stringHashSetArr__SaintsSerialized__:
+  - _saintsList:
+    - value: 1
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 2
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  stringHashSetLis__SaintsSerialized__:
+  - _saintsList:
+    - value: 1
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 3
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  polymorphismArr__SaintsSerialized__:
+  - _saintsList:
+    - value:
+        absC: 
+        sub1: 
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: 169648373862236261
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 1
+  polymorphismLis__SaintsSerialized__:
+  - _saintsList:
+    - value:
+        absC: 
+        sub1: 
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: 169648373862236263
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   references:
     version: 2
     RefIds:
@@ -1455,11 +1549,22 @@ MonoBehaviour:
       data:
         common: 0
         structString: 
-    - rid: 169648373862236256
+    - rid: 169648373862236259
       type: {class: SaintsDictReference/Sub1, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
       data:
         absC: 
         sub1: 
+    - rid: 169648373862236261
+      type: {class: SaintsDictReference/Sub1, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        absC: 
+        sub1: 
+    - rid: 169648373862236263
+      type: {class: SaintsDictReference/Sub2, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+      data:
+        absC: 
+        sub1: 
+        sub2: 
 --- !u!4 &214392494
 Transform:
   m_ObjectHideFlags: 0

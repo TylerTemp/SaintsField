@@ -17,6 +17,16 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public HashSet<SaintsDictReference.Sub1> noPolymorphism;
 
         [SaintsSerialized, ValueAttribute(typeof(SerializeReference))]
-        public ReferenceHashSet<SaintsDictReference.Sub1> polymorphism;
+        public HashSet<SaintsDictReference.Sub1> polymorphism;
+
+        [SaintsSerialized]
+        public HashSet<string>[] stringHashSetArr;
+        [SaintsSerialized]
+        public List<HashSet<string>> stringHashSetLis;
+
+        [SaintsSerialized, ValueAttribute(typeof(SerializeReference))]
+        public HashSet<SaintsDictReference.Sub1>[] polymorphismArr;
+        [SaintsSerialized, ValueAttribute(typeof(SerializeReference))]
+        public List<HashSet<SaintsDictReference.Sub1>> polymorphismLis;
     }
 }
