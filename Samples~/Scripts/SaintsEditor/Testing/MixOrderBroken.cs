@@ -1,3 +1,4 @@
+using System.Collections;
 using SaintsField.Playa;
 using UnityEngine;
 
@@ -5,19 +6,28 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class MixOrderBroken : SaintsMonoBehaviour
     {
-        [LayoutStart("S", ELayout.FoldoutBox)]
-        [SerializeField] private GameObject _go;
-        [LayoutEnd]
-        private void FuncHere(){}
+        public string targetDirectory = "Assets/ART";  // 指定目录
+        public int newMaxSize = 128;
 
-        [ShowInInspector] private const int ConstInt = 5;
+        public static void ShowWindow()
+        {
+        }
 
-        [LayoutStart("events", ELayout.FoldoutBox)]
-        public GameObject _e1;
+        [Button("ApplyAndroid")]
+        private void ApplyMaxSizeToAndroidTextures()
+        {
+        }
 
-        [LayoutEnd]
-        private event System.Action _eventKeywordTarget;
+        [ProgressBar(0, maxCallback: nameof(_maxCount)), NoLabel, ReadOnly]
+        public int progressBar;
 
-        [ShowInInspector] private const int Const2 = 5;
+        private int _maxCount = 100;
+
+
+        [Button("ApplyIOS")]
+        private IEnumerator ApplyMaxSizeToAndroidTexturesIOS()
+        {
+            yield break;
+        }
     }
 }

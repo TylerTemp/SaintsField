@@ -149,6 +149,66 @@ namespace SaintsField.Utils
 
             return (true, serializedProp);
         }
+        public static (bool assign, SaintsHashSet<T> result) OnBeforeSerializeHashSet<T>(SaintsHashSet<T> serializedProp, object obj)
+        {
+            if (obj == null)
+            {
+                // Debug.Log("OnBeforeSerializeDictionary skip null");
+                // return (true, new SaintsDictionary<TKey, TValue>());
+                return (false, null);
+            }
+
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(obj is HashSet<T> originDic))
+            {
+                // Debug.Log("OnBeforeSerializeDictionary not dictionary");
+                return (false, null);
+            }
+
+            foreach (T originKv in originDic)
+            {
+                serializedProp.Add(originKv);
+            }
+
+            foreach (T removeKey in serializedProp.Except(originDic).ToArray())
+            {
+                serializedProp.Remove(removeKey);
+            }
+
+            // Debug.Log($"OnBeforeSerializeDictionary inplace modified {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))} to {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))}");
+
+            return (true, serializedProp);
+        }
+        public static (bool assign, ReferenceHashSet<T> result) OnBeforeSerializeReferenceHashSet<T>(ReferenceHashSet<T> serializedProp, object obj)
+        {
+            if (obj == null)
+            {
+                // Debug.Log("OnBeforeSerializeDictionary skip null");
+                // return (true, new SaintsDictionary<TKey, TValue>());
+                return (false, null);
+            }
+
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(obj is HashSet<T> originDic))
+            {
+                // Debug.Log("OnBeforeSerializeDictionary not dictionary");
+                return (false, null);
+            }
+
+            foreach (T originKv in originDic)
+            {
+                serializedProp.Add(originKv);
+            }
+
+            foreach (T removeKey in serializedProp.Except(originDic).ToArray())
+            {
+                serializedProp.Remove(removeKey);
+            }
+
+            // Debug.Log($"OnBeforeSerializeDictionary inplace modified {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))} to {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))}");
+
+            return (true, serializedProp);
+        }
 
         // public static void OnBeforeSerializeArray<T>(ref SaintsSerializedProperty[] toFill, ref T[] objList, Type elementType)
         // {
@@ -492,6 +552,64 @@ namespace SaintsField.Utils
 
                     // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}");
                     return (true, originDictionary);
+                }
+                default:
+                    // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
+                    return (false, null);
+            }
+        }
+        public static (bool assign, HashSet<T> result) OnAfterDeserializeHashSet<T>(object originValue, SaintsHashSet<T> saintsSerializedProperty)
+        {
+            switch (originValue)
+            {
+                case null:
+                {
+                    // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
+                    return (false, null);
+                }
+                case HashSet<T> originalHashSet:
+                {
+                    foreach (T kv in saintsSerializedProperty)
+                    {
+                        originalHashSet.Add(kv);
+                    }
+
+                    foreach (T removeKey in originalHashSet.Except(saintsSerializedProperty).ToArray())
+                    {
+                        originalHashSet.Remove(removeKey);
+                    }
+
+                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}");
+                    return (true, originalHashSet);
+                }
+                default:
+                    // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
+                    return (false, null);
+            }
+        }
+        public static (bool assign, HashSet<T> result) OnAfterDeserializeReferenceHashSet<T>(object originValue, ReferenceHashSet<T> saintsSerializedProperty)
+        {
+            switch (originValue)
+            {
+                case null:
+                {
+                    // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
+                    return (false, null);
+                }
+                case HashSet<T> originalHashSet:
+                {
+                    foreach (T kv in saintsSerializedProperty)
+                    {
+                        originalHashSet.Add(kv);
+                    }
+
+                    foreach (T removeKey in originalHashSet.Except(saintsSerializedProperty).ToArray())
+                    {
+                        originalHashSet.Remove(removeKey);
+                    }
+
+                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}");
+                    return (true, originalHashSet);
                 }
                 default:
                     // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");

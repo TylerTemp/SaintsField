@@ -87,15 +87,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         {
             UIToolkitUtils.DropdownButtonField dropdownButton = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
 
-            // try
-            // {
-            //     dropdownButton.BindProperty(property);
-            // }
-            // catch(IndexOutOfRangeException)
-            // {
-            //     // wtf Unity...
-            // }
-
             UIToolkitUtils.AddContextualMenuManipulator(dropdownButton.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
             VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
@@ -104,6 +95,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
 
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+                // Debug.Log(metaInfo.DropdownListValue.Count);
+                // Debug.Log(metaInfo.DropdownListValue.displayName);
+                // Debug.Log(metaInfo.DropdownListValue.value);
+                // Debug.Log(metaInfo.DropdownListValue.ChildCount());
 
                 SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
                     metaInfo,

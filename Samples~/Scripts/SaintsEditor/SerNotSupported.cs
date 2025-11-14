@@ -27,7 +27,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [SaintsSerialized] public IInterface1 interfaceType;
         [SaintsSerialized] public Dictionary<int, IInterface1> dictType;
-        [SaintsSerialized] public HashSet<string> hashSetType;
+        // [SaintsSerialized] public HashSet<string> hashSetType;
         [SaintsSerialized] public DateTime dateTimeType;
         [SaintsSerialized] public TimeSpan timeSpanType;
 

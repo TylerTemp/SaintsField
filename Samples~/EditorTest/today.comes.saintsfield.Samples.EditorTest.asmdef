@@ -28,7 +28,9 @@
         "DOTween.dll"
     ],
     "autoReferenced": false,
-    "defineConstraints": [],
+    "defineConstraints": [
+        "UNITY_EDITOR"
+    ],
     "versionDefines": [
         {
             "name": "com.unity.addressables",

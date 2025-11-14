@@ -16,5 +16,7 @@ namespace SaintsField.DropdownBase
 
         int ChildCount();
         int SepCount();
+
+        void SelfCompact();
     }
 }

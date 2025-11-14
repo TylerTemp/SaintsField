@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.DropdownBase;
 using SaintsField.Utils;
+using UnityEngine;
 
 namespace SaintsField
 {
     public class AdvancedDropdownList<T> : IAdvancedDropdownList
     {
         public IReadOnlyList<string> absolutePathFragments { get; private set; }
-        public string displayName { get; }
+        public string displayName { get; private set; }
 
-        private readonly T _typeValue;
+        private T _typeValue;
 
         public object value => _typeValue;
 
@@ -176,5 +177,58 @@ namespace SaintsField
 
         public AdvancedDropdownList<T> this[int index] => _typeChildren[index];
         IAdvancedDropdownList IReadOnlyList<IAdvancedDropdownList>.this[int index] => _typeChildren[index];
+
+        public void SelfCompact()
+        {
+            foreach (AdvancedDropdownList<T> child in _typeChildren)
+            {
+                child.IterCompact();
+            }
+        }
+
+        private void IterCompact()
+        {
+            if (isSeparator)
+            {
+                return;
+            }
+
+            if (_typeChildren.Count == 0)
+            {
+                return;
+            }
+
+            foreach (AdvancedDropdownList<T> child in _typeChildren)
+            {
+                child.SelfCompact();
+            }
+
+            // ReSharper disable once InvertIf
+            if (_typeChildren.Count == 1)  // merge this
+            {
+                AdvancedDropdownList<T> child = _typeChildren[0];
+                string myName = displayName;
+                string childName = child.displayName;
+                string childIcon = child.icon;
+                displayName = $"{myName}/{(string.IsNullOrEmpty(childIcon) ? "" : $"<icon={childIcon}/>")}{childName}";
+                // Debug.Log($"displayName={displayName}");
+
+                if (child._typeChildren.Count > 0)
+                {
+                    _typeChildren = child._typeChildren.ToList();
+                    // Debug.Log($"set children to {_typeValue}");
+                }
+                else
+                {
+                    _typeValue = child._typeValue;
+                    // Debug.Log($"set value to {_typeValue}");
+                    _typeChildren.Clear();
+                }
+            }
+            // else  // check child common prefix merge
+            // {
+            //
+            // }
+        }
     }
 }

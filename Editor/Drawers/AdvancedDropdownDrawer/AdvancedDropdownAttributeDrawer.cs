@@ -8,6 +8,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
@@ -156,6 +157,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 error = getOfError;
                 if (obj is IAdvancedDropdownList getOfDropdownListValue)
                 {
+                    getOfDropdownListValue.SelfCompact();
                     dropdownListValue = getOfDropdownListValue;
                 }
                 else if (obj is IEnumerable<object> ieObj)
