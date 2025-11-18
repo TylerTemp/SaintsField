@@ -73,6 +73,8 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public EmptyPrefabOverrideField(string label, VisualElement visualInput, SerializedProperty property): base(label, visualInput)
         {
+            style.overflow = Overflow.Visible;
+
             this.TrackPropertyValue(property, p =>
             {
                 _overrideStyled = EmptyPrefabOverrideElement.OverrideStyle(p, _overrideStyled, this, _blueBar);

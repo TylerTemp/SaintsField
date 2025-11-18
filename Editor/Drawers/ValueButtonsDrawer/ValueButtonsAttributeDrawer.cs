@@ -81,8 +81,9 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                     flexShrink = 1,
                 },
                 name = NameField(property),
-                bindingPath = property.propertyPath,
+                // bindingPath = property.propertyPath,
             };
+            // r.BindProperty(property);
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(EmptyPrefabOverrideField.alignedFieldUssClassName);
             return r;
