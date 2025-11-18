@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -26,7 +27,6 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             ISaintsAttribute saintsAttribute, int index,
             VisualElement container, object parent)
         {
-            // Debug.Log($"expandable for {property.propertyPath}");
             Foldout foldOut = new Foldout
             {
                 style =
@@ -37,8 +37,11 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                     width = LabelBaseWidth - IndentWidth,
                 },
                 name = NameFoldout(property),
-                viewDataKey = property.propertyPath,
-                userData = container,
+                // This is broken and not fixed even in Unity 6k
+                // viewDataKey = SerializedUtils.GetUniqueId(property),
+                // userData = container,
+                // value = false,
+                value = property.isExpanded,
             };
             Toggle toggle = foldOut.Q<Toggle>();
             if (toggle != null)
@@ -83,119 +86,124 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
             foldOut.RegisterValueChangedCallback(v =>
             {
-                // Debug.Log($"foldOut value changed to ={v.newValue}");
-                property.isExpanded = v.newValue;
-                nameProp.style.display =
-                    v.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                UpdatePropsDisplay(v.newValue);
             });
+            UpdatePropsDisplay(foldOut.value);
 
-            nameProp.style.display =
-                property.isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
-            // foldOut.value = property.isExpanded;
-            // Debug.Log($"Awake set foldOut.value={foldOut.value}");
-        }
+            UpdateDisplay();
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateDisplay);
+            foldOut.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateDisplay));
+            foldOut.TrackSerializedObjectValue(property.serializedObject, _ => UpdateDisplay());
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
-        {
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            if (parent == null)
+            return;
+
+            void UpdateDisplay()
             {
-                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
-                return;
-            }
-
-            Foldout foldOut = container.Q<Foldout>(NameFoldout(property));
-            if (!foldOut.value)
-            {
-                return;
-            }
-
-            VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
-            SerializedObject curObject = (SerializedObject)propsElement.userData;
-
-            SerializedObject serObject = GetSerObject(property, info, parent);
-            // Debug.Log(serObject);
-
-            if (EqualSerObject(serObject, curObject))
-            {
-                // Debug.Log($"equal: {serObject}/{curObject}");
-                return;
-            }
-
-            DisplayStyle foldoutDisplay = serObject == null ? DisplayStyle.None : DisplayStyle.Flex;
-            if (foldOut.style.display != foldoutDisplay)
-            {
-                foldOut.style.display = foldoutDisplay;
-            }
-
-            propsElement.userData = serObject;
-            propsElement.Clear();
-            if (serObject == null)
-            {
-                return;
-            }
-
-            if (serObject.targetObject is GameObject go)
-            {
-                if (serObject.targetObjects.Length > 1)
+                object refreshParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                if (refreshParent == null)
                 {
-                    propsElement.Add(new HelpBox("Multiple GameObjects inspecting is not supported. Only the first one is shown.", HelpBoxMessageType.Warning));
+                    Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly.");
+                    return;
                 }
 
-                // wtf Unity you can not inspect GameObject?
-                foreach ((Component comp, int compIndex) in go.GetComponents<Component>().WithIndex())
+                // if (!foldOut.value)
+                // {
+                //     return;
+                // }
+
+                VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
+                SerializedObject curObject = (SerializedObject)propsElement.userData;
+
+                SerializedObject serObject = GetSerObject(property, info, refreshParent);
+
+                if (EqualSerObject(serObject, curObject))
                 {
-                    VisualElement subContainer = new VisualElement
-                    {
-                        style =
-                        {
-                            backgroundColor = BackgroundColor,
-                            marginTop = 2,
-                            marginBottom = 2,
-                        },
-                    };
+                    return;
+                }
 
-                    string name = ObjectNames.NicifyVariableName(comp.GetType().Name);
-                    Foldout foldout = new Foldout
-                    {
-                        text = name,
-                        value = true,
-                        style =
-                        {
-                            marginLeft = 15,
-                        },
-                        viewDataKey = $"{property.propertyPath}_{comp}{compIndex}"
-                    };
-                    InspectorElement inspectorElement = new InspectorElement(comp);
+                DisplayStyle foldoutDisplay = serObject == null ? DisplayStyle.None : DisplayStyle.Flex;
+                if (foldOut.style.display != foldoutDisplay)
+                {
+                    foldOut.style.display = foldoutDisplay;
+                }
 
-                    foldout.Add(inspectorElement);
-                    subContainer.Add(foldout);
-                    propsElement.Add(subContainer);
+                propsElement.userData = serObject;
+                propsElement.Clear();
+                if (serObject == null)
+                {
+                    return;
+                }
 
-                    VisualElement foldoutContent = foldout.Q<VisualElement>(classes: "unity-foldout__content");
-                    if (foldoutContent != null)
+                if (serObject.targetObject is GameObject go)
+                {
+                    if (serObject.targetObjects.Length > 1)
                     {
-                        foldoutContent.style.marginLeft = 0;
+                        propsElement.Add(new HelpBox("Multiple GameObjects inspecting is not supported. Only the first one is shown.", HelpBoxMessageType.Warning));
                     }
+
+                    // wtf Unity you can not inspect GameObject?
+                    foreach ((Component comp, int compIndex) in go.GetComponents<Component>().WithIndex())
+                    {
+                        VisualElement subContainer = new VisualElement
+                        {
+                            style =
+                            {
+                                backgroundColor = BackgroundColor,
+                                marginTop = 2,
+                                marginBottom = 2,
+                            },
+                        };
+
+                        string name = ObjectNames.NicifyVariableName(comp.GetType().Name);
+                        Foldout foldout = new Foldout
+                        {
+                            text = name,
+                            // value = true,
+                            style =
+                            {
+                                marginLeft = 15,
+                            },
+                            viewDataKey = $"{SerializedUtils.GetUniqueId(property)}_{comp}{compIndex}",
+                        };
+                        InspectorElement inspectorElement = new InspectorElement(comp);
+
+                        foldout.Add(inspectorElement);
+                        subContainer.Add(foldout);
+                        propsElement.Add(subContainer);
+
+                        VisualElement foldoutContent = foldout.Q<VisualElement>(classes: "unity-foldout__content");
+                        if (foldoutContent != null)
+                        {
+                            foldoutContent.style.marginLeft = 0;
+                        }
+                    }
+
+                    propsElement.style.backgroundColor = Color.clear;
                 }
-
-                propsElement.style.backgroundColor = Color.clear;
-            }
-            else
-            {
-                InspectorElement inspectorElement = new InspectorElement(serObject)
+                else
                 {
-                    userData = serObject,
-                };
+                    InspectorElement inspectorElement = new InspectorElement(serObject)
+                    {
+                        userData = serObject,
+                    };
 
-                propsElement.Add(inspectorElement);
-                propsElement.style.backgroundColor = BackgroundColor;
+                    propsElement.Add(inspectorElement);
+                    propsElement.style.backgroundColor = BackgroundColor;
+                }
+            }
+
+            void UpdatePropsDisplay(bool newValue)
+            {
+                property.isExpanded = newValue;
+                // Debug.Log($"UpdatePropsDisplay={newValue}");
+                DisplayStyle display =
+                    newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                if (nameProp.style.display != display)
+                {
+                    nameProp.style.display = display;
+                }
             }
         }
-
     }
 }
 #endif
