@@ -87,9 +87,9 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             foldOut.RegisterValueChangedCallback(v =>
             {
                 UpdatePropsDisplay(v.newValue);
+                UpdateDisplay();
             });
             UpdatePropsDisplay(foldOut.value);
-
             UpdateDisplay();
             SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateDisplay);
             foldOut.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateDisplay));
@@ -106,11 +106,6 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                     return;
                 }
 
-                // if (!foldOut.value)
-                // {
-                //     return;
-                // }
-
                 VisualElement propsElement = container.Q<VisualElement>(NameProps(property));
                 SerializedObject curObject = (SerializedObject)propsElement.userData;
 
@@ -125,6 +120,11 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 if (foldOut.style.display != foldoutDisplay)
                 {
                     foldOut.style.display = foldoutDisplay;
+                }
+
+                if (!foldOut.value)
+                {
+                    return;
                 }
 
                 propsElement.userData = serObject;
