@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.4.0 ##
+
+1.  Add: `HashSet` now supported in "Extended Serialization"
+2.  Add: `AdvancedDropdown`/`TreeDropdown` now merge empty paging to a compact mode
+3.  Add: `ValueButtons`, `OptionsValueButtons`, `PairsValueButtons` to pick a value directly from the field buttons
+4.  Fix: When ordering fields, using the first name matched method order when all the method's matching failed
+5.  Fix: `InfoBox`, `Separator` not work on a bare method (no `ShowInInspector`, no `Button`)
+
 ## 5.3.5 ##
 
 1.  Fix: fix a bug that block the building

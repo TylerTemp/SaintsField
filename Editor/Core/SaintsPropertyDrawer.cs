@@ -6,6 +6,7 @@ using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace SaintsField.Editor.Core
     // above
     // pre, label, field, post
     // below-
-    public partial class SaintsPropertyDrawer: PropertyDrawer, IMakeRenderer, IDisposable
+    public partial class SaintsPropertyDrawer: PropertyDrawer, IMakeRenderer, IDisposable, IRichTextTagProvider
     {
         public bool InHorizontalLayout;
 
@@ -766,5 +767,88 @@ namespace SaintsField.Editor.Core
             OnDisposeUIToolkit();
 #endif
         }
+
+        #region IRichTextTagProvider
+
+        private SerializedProperty _thisProperty;
+
+        public string GetLabel()
+        {
+            if (_thisProperty == null || !SerializedUtils.IsOk(_thisProperty))
+            {
+                return "";
+            }
+
+            return _thisProperty.displayName;
+        }
+
+        private Type _thisPropertyType;
+
+        private Type GetThisPropertyType()
+        {
+            if (_thisPropertyType != null)
+            {
+                return _thisPropertyType;
+            }
+
+            if (_thisProperty == null || !SerializedUtils.IsOk(_thisProperty))
+            {
+                return null;
+            }
+            (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(_thisProperty);
+            return _thisPropertyType = parent?.GetType();
+        }
+
+        public string GetContainerType()
+        {
+            return GetThisPropertyType()?.Name ?? "";
+        }
+
+        public string GetContainerTypeBaseType()
+        {
+            Type t = GetThisPropertyType();
+            if (t != null)
+            {
+                return t.BaseType?.Name ?? "";
+            }
+
+            return "";
+        }
+
+        public string GetIndex(string formatter)
+        {
+            if (_thisProperty == null || !SerializedUtils.IsOk(_thisProperty))
+            {
+                return "";
+            }
+
+            int index = SerializedUtils.PropertyPathIndex(_thisProperty.propertyPath);
+            return index < 0 ? "" : index.ToString();
+        }
+
+        public string GetField(string rawContent, string tagName, string tagValue)
+        {
+            if (_thisProperty == null || !SerializedUtils.IsOk(_thisProperty))
+            {
+                return null;
+            }
+            (SerializedUtils.FieldOrProp _, object parent) = SerializedUtils.GetFieldInfoAndDirectParent(_thisProperty);
+            if (RuntimeUtil.IsNull(parent))
+            {
+                return "";
+            }
+
+            (string error, int _, object value) = Util.GetValue(_thisProperty, fieldInfo, parent);
+            if (error != "")
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning(error);
+#endif
+                return "";
+            }
+
+            return RichTextDrawer.TagStringFormatter(value, tagValue);
+        }
+        #endregion
     }
 }

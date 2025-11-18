@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 // ReSharper disable once ConvertIfStatementToReturnStatement
                 if (property.propertyType == SerializedPropertyType.Generic)
                 {
-                    (string _, object propValue) = Util.GetOf<object>(property.name, null, property, info, target);
+                    (string _, object propValue) = Util.FlatGetOf<object>(property.name, null, property, info, target);
                     if (propValue is IWrapProp wrapProp)
                     {
                         object actualValue = Util.GetWrapValue(wrapProp);
@@ -113,7 +113,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             }
 
             // search parent first
-            (string reflectError, object fieldValue) = Util.GetOf<object>(name, null, property, info, target);
+            (string reflectError, object fieldValue) = Util.FlatGetOf<object>(name, null, property, info, target);
             if(reflectError == "")
             {
                 if (fieldValue is IWrapProp wrapProp)

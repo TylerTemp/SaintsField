@@ -65,6 +65,27 @@ namespace SaintsField.Editor.UIToolkitElements
         }
     }
 
+    public class EmptyPrefabOverrideField: BaseField<UnityEngine.Object>
+    {
+        private bool _overrideStyled;
+
+        private readonly VisualElement _blueBar;
+
+        public EmptyPrefabOverrideField(string label, VisualElement visualInput, SerializedProperty property): base(label, visualInput)
+        {
+            this.TrackPropertyValue(property, p =>
+            {
+                _overrideStyled = EmptyPrefabOverrideElement.OverrideStyle(p, _overrideStyled, this, _blueBar);
+            });
+
+            _blueBar = new BlueBar();
+
+            Add(_blueBar);
+
+            _overrideStyled = EmptyPrefabOverrideElement.OverrideStyle(property, _overrideStyled, this, _blueBar);
+        }
+    }
+
     public class FoldoutPrefabOverrideElement: Foldout
     {
         private bool _overrideStyled;

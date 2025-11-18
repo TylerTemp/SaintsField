@@ -1538,7 +1538,7 @@ MonoBehaviour:
       valueList: []
       wrapType: 1
     _saintsSerializedVersion: 2
-    _wrapType: 4
+    _wrapType: 1
   references:
     version: 2
     RefIds:

@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers
             else  // has name, try find it
             {
 
-                (string error, Object button) = Util.GetOf<Object>(buttonComp, null, property, info, objTarget);
+                (string error, Object button) = Util.FlatGetOf<Object>(buttonComp, null, property, info, objTarget);
                 if(error != "")
                 {
                     return error;
@@ -122,7 +122,7 @@ namespace SaintsField.Editor.Drawers
             object value = buttonAddOnClickAttribute.Value;
             if (buttonAddOnClickAttribute.IsCallback)
             {
-                (string error, object foundValue) = Util.GetOf<object>((string) value, null, property, info, objTarget);
+                (string error, object foundValue) = Util.FlatGetOf<object>((string) value, null, property, info, objTarget);
 
                 if (error != "")
                 {

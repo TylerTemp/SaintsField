@@ -49,7 +49,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
                 };
             }
 
-            (string error, object result) = Util.GetOf<object>(
+            (string error, object result) = Util.FlatGetOf<object>(
                 infoboxAttribute.Content,
                 null,
                 property,
@@ -93,7 +93,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
                 return ("", true);
             }
 
-            (string error, object result) = Util.GetOf<object>(
+            (string error, object result) = Util.FlatGetOf<object>(
                 infoboxAttribute.ShowCallback,
                 null,
                 property,

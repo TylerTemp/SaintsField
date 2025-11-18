@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
             // string error = InvokeCallback(((OnValueChangedAttribute)saintsAttribute).Callback, newValue, propIndex,
             //     parent);
 
-            (string error, object _) = Util.GetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, parent);
+            (string error, object _) = Util.FlatGetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, parent);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             UIToolkitUtils.SetHelpBox(helpBox, error);
         }

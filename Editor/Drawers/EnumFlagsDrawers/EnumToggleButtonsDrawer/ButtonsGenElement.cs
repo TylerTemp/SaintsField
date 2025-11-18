@@ -25,11 +25,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
         private readonly Texture2D _checkboxEmptyTexture2D;
         private readonly Texture2D _checkboxIndeterminateTexture2D;
 
-        public readonly Button hToggleButton;
-        public readonly Button hCheckAllButton;
-        public readonly Button hEmptyButton;
+        public readonly Button HToggleButton;
+        public readonly Button HCheckAllButton;
+        public readonly Button HEmptyButton;
         public readonly IReadOnlyList<Button> ToggleButtons;
-        public readonly Button fillEmptyButton;
+        public readonly Button FillEmptyButton;
 
         // private readonly Action<object> SetValue;
 
@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             };
             Add(quickCheckButtons);
 
-            hToggleButton = new Button(() =>
+            HToggleButton = new Button(() =>
             {
                 object curEnum = Enum.ToObject(_metaInfo.EnumType, value);
                 object zeroEnum = Enum.ToObject(_metaInfo.EnumType, 0);
@@ -110,9 +110,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 #endif
                 },
             };
-            quickCheckButtons.Add(hToggleButton);
+            quickCheckButtons.Add(HToggleButton);
 
-            hCheckAllButton = new Button(() => setValue(_metaInfo.EverythingBit))
+            HCheckAllButton = new Button(() => setValue(_metaInfo.EverythingBit))
             {
                 style =
                 {
@@ -143,9 +143,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 #endif
                 },
             };
-            quickCheckButtons.Add(hCheckAllButton);
+            quickCheckButtons.Add(HCheckAllButton);
 
-            hEmptyButton = new Button(() => setValue(Enum.ToObject(_metaInfo.EnumType, 0)))
+            HEmptyButton = new Button(() => setValue(Enum.ToObject(_metaInfo.EnumType, 0)))
             {
                 style =
                 {
@@ -176,7 +176,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 #endif
                 },
             };
-            quickCheckButtons.Add(hEmptyButton);
+            quickCheckButtons.Add(HEmptyButton);
 
             if (!_metaInfo.IsFlags)
             {
@@ -222,7 +222,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
             ToggleButtons = toggleButtons;
 
-            fillEmptyButton = new Button
+            FillEmptyButton = new Button
             {
                 text = "",
                 style =
@@ -241,7 +241,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 },
             };
 
-            Add(fillEmptyButton);
+            Add(FillEmptyButton);
         }
 
         public void SetValueWithoutNotify(T newValue)
@@ -256,27 +256,27 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 object zeroBit = Enum.ToObject(_metaInfo.EnumType, 0);
                 if (newEnum.Equals(zeroBit))
                 {
-                    hToggleButton.style.backgroundImage = _checkboxEmptyTexture2D;
-                    hToggleButton.userData = zeroBit;
+                    HToggleButton.style.backgroundImage = _checkboxEmptyTexture2D;
+                    HToggleButton.userData = zeroBit;
 
-                    hEmptyButton.SetEnabled(false);
-                    hCheckAllButton.SetEnabled(true);
+                    HEmptyButton.SetEnabled(false);
+                    HCheckAllButton.SetEnabled(true);
                 }
                 else if (newEnum.Equals(_metaInfo.EverythingBit))
                 {
-                    hToggleButton.style.backgroundImage = _checkboxCheckedTexture2D;
-                    hToggleButton.userData = _metaInfo.EverythingBit;
+                    HToggleButton.style.backgroundImage = _checkboxCheckedTexture2D;
+                    HToggleButton.userData = _metaInfo.EverythingBit;
 
-                    hEmptyButton.SetEnabled(true);
-                    hCheckAllButton.SetEnabled(false);
+                    HEmptyButton.SetEnabled(true);
+                    HCheckAllButton.SetEnabled(false);
                 }
                 else
                 {
-                    hToggleButton.style.backgroundImage = _checkboxIndeterminateTexture2D;
-                    hToggleButton.userData = zeroBit;
+                    HToggleButton.style.backgroundImage = _checkboxIndeterminateTexture2D;
+                    HToggleButton.userData = zeroBit;
 
-                    hEmptyButton.SetEnabled(true);
-                    hCheckAllButton.SetEnabled(true);
+                    HEmptyButton.SetEnabled(true);
+                    HCheckAllButton.SetEnabled(true);
                 }
 
                 bool isULong = _metaInfo.UnderType == typeof(ulong);

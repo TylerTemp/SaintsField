@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers
                 else
                 {
                     (string error, Renderer result) =
-                        Util.GetOf<Renderer>(compName, null, property, info, parent);
+                        Util.FlatGetOf<Renderer>(compName, null, property, info, parent);
                     if (error != "")
                     {
                         return (error, result);

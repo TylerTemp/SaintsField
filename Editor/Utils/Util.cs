@@ -778,6 +778,24 @@ namespace SaintsField.Editor.Utils
                 return ("Target is null", defaultValue);
             }
 
+            return by.Contains(".")
+                ? AccGetOf(by, defaultValue, property, target)
+                : FlatGetOf(by, defaultValue, property, memberInfo, target);
+        }
+
+        public static (string error, T result) FlatGetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
+        {
+            if (by.StartsWith(":"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target);
+            }
+
+            if (target == null)
+            {
+                return ("Target is null", defaultValue);
+            }
+
             foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
             {
                 (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
@@ -821,6 +839,39 @@ namespace SaintsField.Editor.Utils
             }
 
             return ($"No field or method named `{by}` found on `{target}`", defaultValue);
+        }
+
+        private static (string error, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
+            object parent)
+        {
+            object accParent = parent;
+            // MemberInfo accMemberInfo = memberInfo;
+            (string error, T result) thisResult = ("No Attributes", defaultValue);
+
+            foreach (string attrName in by.Split(SerializedUtils.DotSplitSeparator))
+            {
+                MemberInfo accMemberInfo = null;
+                foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
+                {
+                    MemberInfo[] members = type.GetMember(attrName,
+                        BindingFlags.Public | BindingFlags.NonPublic |
+                        BindingFlags.Instance | BindingFlags.Static |
+                        BindingFlags.FlattenHierarchy);
+                    if (members.Length <= 0) continue;
+                    accMemberInfo = members[0];
+                    break;
+                }
+
+                thisResult = FlatGetOf(attrName, defaultValue, property, accMemberInfo, accParent);
+                // Debug.Log($"{attrName} = {thisResult.result}");
+                if (thisResult.error != "")
+                {
+                    return thisResult;
+                }
+                accParent = thisResult.result;
+            }
+            return thisResult;
+
         }
 
         private static (string error, T result) ConvertTo<T>(object genResult, T defaultValue)
@@ -1616,7 +1667,7 @@ namespace SaintsField.Editor.Utils
                 {
                     (string error, object getResult) = conditionStringTarget.Contains(".")
                         ? AccGetOf<object>(conditionStringTarget, null, property, target)
-                        : GetOf<object>(conditionStringTarget, null, property, info, target);
+                        : FlatGetOf<object>(conditionStringTarget, null, property, info, target);
 
                     if (error != "")
                     {
@@ -1640,7 +1691,7 @@ namespace SaintsField.Editor.Utils
                     else
                     {
                         (string errorValue, object callbackResult) =
-                            GetOf<object>((string)value, null, property, info, target);
+                            FlatGetOf<object>((string)value, null, property, info, target);
                         if (errorValue != "")
                         {
                             errors.Add(errorValue);
@@ -1705,38 +1756,7 @@ namespace SaintsField.Editor.Utils
             return (Array.Empty<string>(), callbackBoolResults);
         }
 
-        private static (string error, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
-            object parent)
-        {
-            object accParent = parent;
-            // MemberInfo accMemberInfo = memberInfo;
-            (string error, T result) thisResult = ("No Attributes", defaultValue);
 
-            foreach (string attrName in by.Split(SerializedUtils.DotSplitSeparator))
-            {
-                MemberInfo accMemberInfo = null;
-                foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
-                {
-                    MemberInfo[] members = type.GetMember(attrName,
-                        BindingFlags.Public | BindingFlags.NonPublic |
-                        BindingFlags.Instance | BindingFlags.Static |
-                        BindingFlags.FlattenHierarchy);
-                    if (members.Length <= 0) continue;
-                    accMemberInfo = members[0];
-                    break;
-                }
-
-                thisResult = GetOf(attrName, defaultValue, property, accMemberInfo, accParent);
-                // Debug.Log($"{attrName} = {thisResult.result}");
-                if (thisResult.error != "")
-                {
-                    return thisResult;
-                }
-                accParent = thisResult.result;
-            }
-            return thisResult;
-
-        }
 
         public static void BindEventWithValue(UnityEventBase unityEventBase, MethodInfo methodInfo, Type[] invokeRequiredTypeArr, object target, object value)
         {
@@ -2480,6 +2500,28 @@ namespace SaintsField.Editor.Utils
             // string formatValue = curValue.ToString("F" + decimalPlaces);
             // return curValue.ToString($"0.{new string('#', decimalPlaces)}");
             return $"0.{new string('#', decimalPlaces)}";
+        }
+
+        public static IReadOnlyList<T> ShrinkListTo<T>(IList<T> lis, int count)
+        {
+            List<T> removed = new List<T>();
+            if (count >= lis.Count)
+            {
+                // Debug.Log($"processedIndex skip {lis.Count} -> {count} ");
+                return removed;
+            }
+
+            // Debug.Log($"processedIndex try {lis.Count} -> {count} ");
+
+            for (int toRemoveIndex = lis.Count - 1; toRemoveIndex >= count; toRemoveIndex--)
+            {
+                // Debug.Log($"processedIndex remove index {toRemoveIndex}");
+                T ele = lis[toRemoveIndex];
+                // ele.RemoveFromHierarchy();
+                removed.Add(ele);
+                lis.RemoveAt(toRemoveIndex);
+            }
+            return removed;
         }
     }
 }

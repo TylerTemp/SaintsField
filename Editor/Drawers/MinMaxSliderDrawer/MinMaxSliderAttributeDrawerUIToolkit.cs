@@ -141,7 +141,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             else
             {
                 (string getError, object getValue) =
-                    Util.GetOf<object>(minMaxSliderAttribute.MinCallback, 0, property, info, parentTarget);
+                    Util.FlatGetOf<object>(minMaxSliderAttribute.MinCallback, 0, property, info, parentTarget);
                 if (getError != "")
                 {
                     return (null, getError, null, "");
@@ -157,7 +157,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             else
             {
                 (string getError, object getValue) =
-                    Util.GetOf<object>(minMaxSliderAttribute.MaxCallback, 0f, property, info, parentTarget);
+                    Util.FlatGetOf<object>(minMaxSliderAttribute.MaxCallback, 0f, property, info, parentTarget);
                 if (getError != "")
                 {
                     return (minValue, "", null, getError);

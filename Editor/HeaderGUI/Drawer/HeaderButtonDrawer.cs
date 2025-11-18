@@ -65,7 +65,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
 
                 if (headerButtonAttribute.IsCallback)
                 {
-                    (string error, string result) = Util.GetOf<string>(rawTitle, null,
+                    (string error, string result) = Util.FlatGetOf<string>(rawTitle, null,
                         null, method, target);
                     if (error != "")
                     {

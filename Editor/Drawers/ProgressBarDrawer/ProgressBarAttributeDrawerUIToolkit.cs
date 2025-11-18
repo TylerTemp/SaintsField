@@ -110,7 +110,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             else
             {
                 (string getError, object getValue) =
-                    Util.GetOf<object>(progressBarAttribute.MinCallback, 0, property, info, parent);
+                    Util.FlatGetOf<object>(progressBarAttribute.MinCallback, 0, property, info, parent);
                 if (getError != "")
                 {
                     return new CallbackInfo(
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             else
             {
                 (string getError, object getValue) =
-                    Util.GetOf<object>(progressBarAttribute.MaxCallback, 0f, property, info, parent);
+                    Util.FlatGetOf<object>(progressBarAttribute.MaxCallback, 0f, property, info, parent);
                 if (getError != "")
                 {
                     return new CallbackInfo(getError);

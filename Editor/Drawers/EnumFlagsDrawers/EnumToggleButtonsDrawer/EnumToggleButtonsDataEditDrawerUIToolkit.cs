@@ -63,13 +63,13 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             display = DisplayStyle.None,
                         },
                     };
-                    under.hToggleButton.style.display = DisplayStyle.None;
+                    under.HToggleButton.style.display = DisplayStyle.None;
                     under.AddToClassList(ClassAllowDisable);
                     under.BindProperty(subProp);
                     root.Add(under);
 
                     bool expanded = false;
-                    ele.fillEmptyButton.clicked += OnExpandedChanged;
+                    ele.FillEmptyButton.clicked += OnExpandedChanged;
                     wrap.ExpandButton.clicked += OnExpandedChanged;
 
                     return root;
@@ -78,9 +78,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     {
                         expandEvent.Invoke(expanded = !expanded);
                         under.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        ele.hToggleButton.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
-                        ele.hCheckAllButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        ele.hEmptyButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
+                        ele.HToggleButton.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
+                        ele.HCheckAllButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
+                        ele.HEmptyButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
                         foreach (Button button in ele.ToggleButtons)
                         {
                             button.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
@@ -122,13 +122,13 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             display = DisplayStyle.None,
                         },
                     };
-                    under.hToggleButton.style.display = DisplayStyle.None;
+                    under.HToggleButton.style.display = DisplayStyle.None;
                     under.AddToClassList(ClassAllowDisable);
                     under.BindProperty(subProp);
                     root.Add(under);
 
                     bool expanded = false;
-                    ele.fillEmptyButton.clicked += OnExpandedChanged;
+                    ele.FillEmptyButton.clicked += OnExpandedChanged;
                     wrap.ExpandButton.clicked += OnExpandedChanged;
 
                     return root;
@@ -137,9 +137,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     {
                         expandEvent.Invoke(expanded = !expanded);
                         under.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        ele.hToggleButton.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
-                        ele.hCheckAllButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        ele.hEmptyButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
+                        ele.HToggleButton.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
+                        ele.HCheckAllButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
+                        ele.HEmptyButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
                         foreach (Button button in ele.ToggleButtons)
                         {
                             button.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;

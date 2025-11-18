@@ -243,6 +243,8 @@ namespace SaintsField.Editor
             {
                 // Debug.Log($"looking for member {memberInfo.Name}");
 
+                int fallbackIndex = -1;
+
                 for (int index = 0; index < codeAnalysisMembers.Count; index++)
                 {
                     CodeAnalysisUtils.MemberContainer memberContainer = codeAnalysisMembers[index];
@@ -267,6 +269,11 @@ namespace SaintsField.Editor
 
                     MethodInfo methodInfo = (MethodInfo)memberInfo;
 
+                    if (fallbackIndex == -1)
+                    {
+                        fallbackIndex = index;  // If nothing matches, use the first matched method order
+                    }
+
                     // string methodInfoReturnTypeString = ReflectUtils.StringifyType(methodInfo.ReturnType);
                     // if (methodInfoReturnTypeString != memberContainer.ReturnType)
                     if (!TypeStringEqual(methodInfo.ReturnType, memberContainer.ReturnType))
@@ -283,12 +290,14 @@ namespace SaintsField.Editor
 
                     bool allMatch = true;
                     ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+                    // ReSharper disable once LoopCanBeConvertedToQuery
                     for (int paramIndex = 0; paramIndex < parameterInfos.Length; paramIndex++)
                     {
                         // string methodInfoParamTypeString = ReflectUtils.StringifyType(parameterInfos[paramIndex].ParameterType);
                         // string containerParamTypeString = memberContainer.Arguments[paramIndex];
                         // Debug.Log($"[{paramIndex}] methodInfoParamTypeString={methodInfoParamTypeString}, containerParamTypeString={containerParamTypeString}");
                         // if(methodInfoParamTypeString != containerParamTypeString)
+                        // ReSharper disable once InvertIf
                         if(!TypeStringEqual(parameterInfos[paramIndex].ParameterType, memberContainer.Arguments[paramIndex]))
                         {
                             // Debug.Log($"{memberInfo.Name} [{paramIndex}] not matched argument {parameterInfos[paramIndex].ParameterType} -> {memberContainer.Arguments[paramIndex]}, continue");
@@ -304,7 +313,7 @@ namespace SaintsField.Editor
                     }
                 }
 
-                return -1;
+                return fallbackIndex;
             }
 
             public int Compare(object x, object y)
@@ -1494,7 +1503,11 @@ namespace SaintsField.Editor
 
         public static IEnumerable<AbsRenderer> HelperMakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
-            // Debug.Log($"field {fieldWithInfo.fieldInfo?.Name}/{fieldWithInfo.fieldInfo?.GetCustomAttribute<ExtShowHideConditionBase>()}");
+            // if(fieldWithInfo.PlayaAttributes.Count > 0)
+            // {
+            //     Debug.Log(
+            //         $"field {fieldWithInfo.FieldInfo?.Name}/{fieldWithInfo.MethodInfo?.Name}: {string.Join(", ", fieldWithInfo.PlayaAttributes)}");
+            // }
             switch (fieldWithInfo.RenderType)
             {
                 case SaintsRenderType.SerializedField:
@@ -1528,6 +1541,7 @@ namespace SaintsField.Editor
                 case SaintsRenderType.Method:
                     bool hasRenderer = false;
                     bool hasLayout = false;
+                    bool needEmptyRenderer = false;
                     foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
                     {
                         if (playaAttribute is IPlayaMethodBindAttribute methodBindAttribute)
@@ -1545,6 +1559,10 @@ namespace SaintsField.Editor
                             hasRenderer = true;
                             yield return new RealTimeCalculatorRenderer(serializedObject, fieldWithInfo);
                         }
+                        else if (playaAttribute is SeparatorAttribute || playaAttribute is InfoBoxAttribute)
+                        {
+                            needEmptyRenderer = true;
+                        }
                         else if (playaAttribute is ISaintsLayout)
                         {
                             hasLayout = true;
@@ -1552,7 +1570,7 @@ namespace SaintsField.Editor
                         }
                     }
 
-                    if (hasLayout && !hasRenderer)
+                    if (needEmptyRenderer || (hasLayout && !hasRenderer))
                     {
                         yield return new EmptyRenderer();
                     }

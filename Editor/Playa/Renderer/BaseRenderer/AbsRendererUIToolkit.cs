@@ -4026,6 +4026,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             switch (FieldWithInfo.RenderType)
             {
                 case SaintsRenderType.SerializedField:
+                case SaintsRenderType.InjectedSerializedField:
                 {
                     if (!SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
                     {
@@ -4045,61 +4046,25 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                     else
                     {
-                        string[] subFields = tagName["field.".Length..].Split(SerializedUtils.DotSplitSeparator);
-                        object accParent = FieldWithInfo.Targets[0];
+                        string revName = tagName["field.".Length..];
 
-                        foreach (string attrName in subFields)
-                        {
-                            MemberInfo accMemberInfo = null;
-                            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
-                            {
-                                foreach (MemberInfo info in type.GetMember(attrName,
-                                             BindingFlags.Public | BindingFlags.NonPublic |
-                                             BindingFlags.Instance | BindingFlags.Static |
-                                             BindingFlags.FlattenHierarchy))
-                                {
-                                    accMemberInfo = info;
-                                    break;
-                                }
-                            }
+                        // string[] subFields = revName.Split(SerializedUtils.DotSplitSeparator);
+                        // object accParent = FieldWithInfo.Targets[0];
 
-                            accResult = Util.GetValueAtIndex(-1, accMemberInfo, accParent);
-                            if (accResult.error != "")
-                            {
-#if SAINTSFIELD_DEBUG
-                                Debug.LogError($"{attrName} from {accParent}: {accResult.error}");
-#endif
-                                break;
-                            }
+                        (string error, object result) getOfValue = Util.GetOf<object>(revName, null, FieldWithInfo.SerializedProperty,
+                            FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
 
-                            accParent = accResult.value;
-                            if (accParent == null)
-                            {
-                                accResult = ($"No target found for {attrName}", -1, null);
-                                break;
-                            }
-                        }
-
-                        hasError = accResult.error != "";
+                        hasError = getOfValue.error != "";
+                        accResult = (getOfValue.error, accResult.index, getOfValue.result);
                     }
 
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
                     if (hasError)
                     {
                         return rawContent;
                     }
 
                     return RichTextDrawer.TagStringFormatter(accResult.value, tagValue);
-                }
-                case SaintsRenderType.InjectedSerializedField:
-                {
-                    // ReSharper disable once ConvertIfStatementToReturnStatement
-                    if (!SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
-                    {
-                        return "";
-                    }
-
-                    int propPath = SerializedUtils.PropertyPathIndex(FieldWithInfo.SerializedProperty.propertyPath);
-                    return propPath < 0 ? "" : propPath.ToString();
                 }
                 case SaintsRenderType.NonSerializedField:
                 case SaintsRenderType.Method:

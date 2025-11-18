@@ -70,6 +70,8 @@ namespace SaintsField.Editor.Core
                 return new VisualElement();
             }
 
+            _thisProperty = property;
+
             // IMGUIContainer Fallback
             // if (SubDrawCounter.TryGetValue(InsideSaintsFieldScoop.MakeKey(property), out int insideDrawCount) &&
             //     insideDrawCount > 0)
@@ -89,6 +91,7 @@ namespace SaintsField.Editor.Core
             };
 
             (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+            _thisPropertyType = parent.GetType();
             // Debug.Log($"getting {property.propertyPath}: {string.Join<PropertyAttribute>(", ", allAttributesRaw)}");
             IReadOnlyList<PropertyAttribute> allAttributes;
             if (SaintsSubRenderer)

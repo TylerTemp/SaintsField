@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
         {
             return string.IsNullOrEmpty(minValueAttribute.ValueCallback)
                 ? ("", minValueAttribute.Value)
-                : Util.GetOf(minValueAttribute.ValueCallback, 0f, property, info, parentTarget);
+                : Util.FlatGetOf(minValueAttribute.ValueCallback, 0f, property, info, parentTarget);
         }
 
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
