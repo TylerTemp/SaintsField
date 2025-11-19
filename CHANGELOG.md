@@ -1,9 +1,10 @@
 # Changelog
 
-## WIP ##
+## 5.4.1 ##
 
 1.  Fix: `Expandable` foldout icon incorrect status
 2.  Fix: `SaintsEditorWindow` failed to use code analysisUtils to get a correct order
+3.  Add: You can use `../` to walk upward to get a callback/property for dropdowns [#336](https://github.com/TylerTemp/SaintsField/discussions/336)
 
 ## 5.4.0 ##
 

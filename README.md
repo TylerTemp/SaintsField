@@ -96,13 +96,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.4.0**
+**5.4.1**
 
-1.  Add: `HashSet` now supported in "Extended Serialization"
-2.  Add: `AdvancedDropdown`/`TreeDropdown` now merge empty paging to a compact mode
-3.  Add: `ValueButtons`, `OptionsValueButtons`, `PairsValueButtons` to pick a value directly from the field buttons
-4.  Fix: When ordering fields, using the first name matched method order when all the method's matching failed
-5.  Fix: `InfoBox`, `Separator` not work on a bare method (no `ShowInInspector`, no `Button`)
+1.  Fix: `Expandable` foldout icon incorrect status
+2.  Fix: `SaintsEditorWindow` failed to use code analysisUtils to get a correct order
+3.  Add: You can use `../` to walk upward to get a callback/property for dropdowns [#336](https://github.com/TylerTemp/SaintsField/discussions/336)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -3655,6 +3653,7 @@ This is the same as `AdvancedDropdown`, except it uses a tree view to pick.
 *   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
     When omitted, it will try to find all the static values from the field type.
+    You can use `../` to get upward callback/property for a callback
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
 
@@ -3696,6 +3695,31 @@ public AdvancedDropdownList<int> AdvDropdown()
 ```
 
 ![](https://github.com/user-attachments/assets/fcfd2932-0850-43af-8a93-5c3d1979240a)
+
+Example of up-walk
+
+```csharp
+[Serializable]
+public struct Down
+{
+    [TreeDropdown("../../" + nameof(options))]  // Up walk 2 levels
+    public string stringV;
+}
+
+[Serializable]
+public struct MyStruct
+{
+    [TreeDropdown("../" + nameof(options))]  // Up walk 1 level
+    public string stringV;
+    public Down down;
+}
+
+public List<string> options;
+
+public MyStruct myStruct;
+```
+
+![](https://github.com/user-attachments/assets/c9f42bf2-632a-496a-8ffc-74b2abbaceb9)
 
 #### `OptionsTreeDropdown` / `PairsTreeDropdown` ####
 
@@ -3762,6 +3786,7 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 *   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
     When omitted, it will try to find all the static values from the field type.
+    You can use `../` to get upward callback/property for a callback
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
 
@@ -3921,6 +3946,32 @@ Also, using on a type like `Color` to pick a pre-defined static value:
 ```
 
 ![image](https://github.com/user-attachments/assets/404d4cd6-b4bf-4521-b633-2dd745ec4de1)
+
+Example of up-walk
+
+```csharp
+[Serializable]
+public struct Down
+{
+    [AdvancedDropdown("../../" + nameof(options))]  // Up walk 2 levels
+    public string stringV;
+}
+
+[Serializable]
+public struct MyStruct
+{
+    [AdvancedDropdown("../" + nameof(options))]  // Up walk 1 level
+    public string stringV;
+    public Down down;
+}
+
+public List<string> options;
+
+public MyStruct myStruct;
+```
+
+![](https://github.com/user-attachments/assets/c9f42bf2-632a-496a-8ffc-74b2abbaceb9)
+
 
 #### `OptionsDropdown` / `PairsDropdown` ####
 
