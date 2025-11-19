@@ -303,7 +303,7 @@ namespace SaintsField.Editor.Utils
         }
 #else
 
-        [MenuItem(MENU_ROOT + "Enable Code Analysis...")]
+        [MenuItem(MenuRoot + "Enable Code Analysis...")]
         public static void EnableCodeAnalysis()
         {
             bool codyAnalysisFound = AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.StartsWith("Microsoft.CodeAnalysis.CSharp,"));
@@ -349,7 +349,7 @@ namespace SaintsField.Editor.Utils
         #region SAINTSFIELD_SERIALIZED_DEBUG
 #if SAINTSFIELD_SERIALIZED_DEBUG
 
-        [MenuItem(MENU_ROOT + "Extended Serialization/Disable Debug")]
+        [MenuItem(MenuRoot + "Extended Serialization/Disable Debug")]
         public static void DisableExtendedSerializationDebug()
         {
             RemoveCompileDefine("SAINTSFIELD_SERIALIZED_DEBUG");
@@ -366,7 +366,7 @@ namespace SaintsField.Editor.Utils
         #endregion
 
 #else
-        [MenuItem(MENU_ROOT + "Enable Extended Serialization")]
+        [MenuItem(MenuRoot + "Enable Extended Serialization")]
         public static void EnableExtendedSerialization()
         {
             AddCompileDefine("SAINTSFIELD_SERIALIZED");
