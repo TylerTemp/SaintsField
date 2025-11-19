@@ -18,6 +18,7 @@ namespace SaintsField.Editor.Utils
             }
 
             (bool found, MonoScript ms) = GetMonoScriptFromType(systemType);
+            // Debug.Log($"type {systemType} -> {ms}");
             if (!found)
             {
                 return Array.Empty<CodeAnalysisUtils.MemberContainer>();
@@ -40,6 +41,27 @@ namespace SaintsField.Editor.Utils
             {
                 // Debug.LogWarning($"Type {type} is not a Component or ScriptableObject, cannot find MonoScript.");
                 return (false, null);
+            }
+
+            if (typeof(SaintsEditorWindow).IsAssignableFrom(type))  // This does not fall into monoscript, even it's a scriptable object
+            {
+                string[] guids = AssetDatabase.FindAssets($"t:MonoScript {type.Name}");
+                foreach (string guid in guids)
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(guid);
+                    MonoScript ms = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
+                    // ReSharper disable once InvertIf
+                    if (ms != null)
+                    {
+                        // Debug.Log(ms.name);
+                        // Debug.Log(ms.GetClass());
+                        // Debug.Log(ms.GetClass() == type);
+                        if (ms.GetClass() == type)
+                        {
+                            return (true, ms);
+                        }
+                    }
+                }
             }
 
             foreach (MonoScript runtimeMonoScript in MonoImporter.GetAllRuntimeMonoScripts())

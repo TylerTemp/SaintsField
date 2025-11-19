@@ -7,9 +7,11 @@ namespace SaintsField.Samples.Scripts
 {
     // [CreateAssetMenu(fileName = "Scriptable", menuName = "ScriptableObjects/Scriptable", order = 0)]
     [Searchable]
-    public class Scriptable : ScriptableObject, IInterface2, IDummy
+    public class Scriptable : SaintsScriptableObject, IInterface2, IDummy
     {
         [TableHide] public int hideMeInTable;
+
+        [Button] private void AButton(){}
 
         [TableColumn("HideGroup"), TableHide]
         public int hideMeGroup1;
