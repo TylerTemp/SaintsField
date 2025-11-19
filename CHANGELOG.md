@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: `Expandable` foldout icon incorrect status
+2.  Fix: `SaintsEditorWindow` failed to use code analysisUtils to get a correct order
+
 ## 5.4.0 ##
 
 1.  Add: `HashSet` now supported in "Extended Serialization"
@@ -46,7 +51,7 @@
 
 ## 5.3.1 ##
 
-1.  Fix: `TreeDropdown` search bar now pinned on the top 
+1.  Fix: `TreeDropdown` search bar now pinned on the top
 2.  Fix: `TreeDropdown` did not scroll to current selected value if the list is long
 3.  `PropRange` now supports `uint`, `short`, `ushort`, `byte`, `sbyte`, `long`, `ulong`
 4.  Add: `ShowInInspector` now works with `ShaderParam`, `ShaderKeyword`, `Rate`, `PropRange`

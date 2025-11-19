@@ -7,12 +7,12 @@ namespace SaintsField.Editor.Utils
 {
     public static class ScriptInfoUtils
     {
-        private static Dictionary<Type, IReadOnlyList<CodeAnalysisUtils.MemberContainer>> _cache = new Dictionary<Type, IReadOnlyList<CodeAnalysisUtils.MemberContainer>>();
+        private static readonly Dictionary<Type, IReadOnlyList<CodeAnalysisUtils.MemberContainer>> Cache = new Dictionary<Type, IReadOnlyList<CodeAnalysisUtils.MemberContainer>>();
 
         public static IReadOnlyList<CodeAnalysisUtils.MemberContainer> GetMembersCorrectOrder(Type systemType)
         {
 #if SAINTSFIELD_CODE_ANALYSIS
-            if (_cache.TryGetValue(systemType, out IReadOnlyList<CodeAnalysisUtils.MemberContainer> cached))
+            if (Cache.TryGetValue(systemType, out IReadOnlyList<CodeAnalysisUtils.MemberContainer> cached))
             {
                 return cached;
             }
@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Utils
             {
                 if (container.Name == systemType.Name)
                 {
-                    return _cache[systemType] = container.Members;
+                    return Cache[systemType] = container.Members;
                 }
             }
 #endif
