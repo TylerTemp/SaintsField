@@ -102,6 +102,9 @@ namespace SaintsField
         }
         #endregion
 
+        // Microsoft is a shithole
+        public int Length => _array.Length;
+
         public void OnBeforeSerialize()
         {
 #if UNITY_EDITOR
