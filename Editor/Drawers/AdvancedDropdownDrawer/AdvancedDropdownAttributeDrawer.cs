@@ -171,7 +171,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             else
             {
                 (string getOfError, object obj) =
-                    Util.FlatGetOf<object>(funcName, null, property, field, parentObj);
+                    Util.GetOf<object>(funcName, null, property, field, parentObj);
                 error = getOfError;
                 if (obj is IAdvancedDropdownList getOfDropdownListValue)
                 {

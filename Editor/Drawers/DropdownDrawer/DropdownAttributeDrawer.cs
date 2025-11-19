@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -95,10 +96,25 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             }
             else
             {
-                (string getOfError, IDropdownList getOfDropdownListValue) =
-                    Util.FlatGetOf<IDropdownList>(dropdownAttribute.FuncName, null, property, field, parentObj);
+                (string getOfError, object getOfDropdownListValue) =
+                    Util.GetOf<object>(dropdownAttribute.FuncName, null, property, field, parentObj);
                 error = getOfError;
-                dropdownListValue = getOfDropdownListValue;
+                if (getOfError == "")
+                {
+                    switch (getOfDropdownListValue)
+                    {
+                        case IDropdownList dl:
+                            dropdownListValue = dl;
+                            break;
+                        case IEnumerable e:
+                            dropdownListValue = new DropdownList<object>(e.Cast<object>().Select(each => (each?.ToString() ?? "", each)));
+                            break;
+                        default:
+                            error = $"Value {getOfDropdownListValue} is not acceptable type";
+                            break;
+                    }
+                }
+                // dropdownListValue = getOfDropdownListValue;
             }
             if(dropdownListValue == null || error != "")
             {

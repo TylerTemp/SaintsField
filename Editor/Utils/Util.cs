@@ -844,11 +844,31 @@ namespace SaintsField.Editor.Utils
         private static (string error, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
             object parent)
         {
+            string accBy = by;
+            // SerializedProperty accProperty = property;
             object accParent = parent;
+            if (by.StartsWith("../"))
+            {
+                string error;
+                (error, accBy, accParent) = UpwardWalk(by, property, parent);
+                if (error != "")
+                {
+                    return (error, defaultValue);
+                }
+            }
+
+            // Don't use this: the memberInfo need to change
+            // if (!accBy.Contains("."))
+            // {
+            //     return FlatGetOf(accBy, defaultValue, property, memberInfo, accParent);
+            // }
+
+            // Debug.Log($"looking for {accBy} in {accParent}");
+
             // MemberInfo accMemberInfo = memberInfo;
             (string error, T result) thisResult = ("No Attributes", defaultValue);
 
-            foreach (string attrName in by.Split(SerializedUtils.DotSplitSeparator))
+            foreach (string attrName in accBy.Split(SerializedUtils.DotSplitSeparator))
             {
                 MemberInfo accMemberInfo = null;
                 foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
@@ -857,13 +877,16 @@ namespace SaintsField.Editor.Utils
                         BindingFlags.Public | BindingFlags.NonPublic |
                         BindingFlags.Instance | BindingFlags.Static |
                         BindingFlags.FlattenHierarchy);
-                    if (members.Length <= 0) continue;
+                    if (members.Length <= 0)
+                    {
+                        continue;
+                    }
                     accMemberInfo = members[0];
                     break;
                 }
 
                 thisResult = FlatGetOf(attrName, defaultValue, property, accMemberInfo, accParent);
-                // Debug.Log($"{attrName} = {thisResult.result}");
+                // Debug.Log($"{attrName} = {thisResult.result}({thisResult.error})");
                 if (thisResult.error != "")
                 {
                     return thisResult;
@@ -872,6 +895,46 @@ namespace SaintsField.Editor.Utils
             }
             return thisResult;
 
+        }
+
+        // this can not walk out of the
+        private static (string error, string by, object parent) UpwardWalk(string by, SerializedProperty property, object parent)
+        {
+            Debug.Assert(by.StartsWith("../"));
+            string[] split = by.Split("../");
+
+            int splitCount = split.Length;
+
+            int upWalkCount = splitCount - 1;
+            string leftBy = split[splitCount - 1];
+
+            string originPath = property.propertyPath;
+            string[] propPaths = originPath.Split(SerializedUtils.DotSplitSeparator);
+            (bool arrayTrim, string[] propPathSegments) = SerializedUtils.TrimEndArray(propPaths);
+            if (arrayTrim)
+            {
+                propPaths = propPathSegments;
+            }
+
+            IReadOnlyList<(SerializedUtils.FieldOrProp fieldOrProp, object parent)> walkable = SerializedUtils.GetFieldInfoAndParentListByPathSegments(property.serializedObject.targetObject, propPaths);
+            if (walkable.Count < upWalkCount - 1)  // skip self
+            {
+                return (
+                    $"Can not walk upward for {upWalkCount} steps when only {walkable.Count} parents found: {string.Join(", ", walkable.Select(each => each.parent))}",
+                    null, null);
+            }
+
+            (SerializedUtils.FieldOrProp _, object walkParent) = walkable[upWalkCount];
+
+            // Debug.Log($"upWalkCount-1={upWalkCount-1}");
+            // foreach ((SerializedUtils.FieldOrProp fieldOrProp, object fieldParent)  in walkable)
+            // {
+            //     Debug.Log($"{fieldOrProp}, {fieldParent}");
+            // }
+
+            // return (leftBy parent);
+
+            return ("", leftBy, walkParent);
         }
 
         private static (string error, T result) ConvertTo<T>(object genResult, T defaultValue)
@@ -900,6 +963,7 @@ namespace SaintsField.Editor.Utils
                     catch (InvalidCastException e)
                     {
                         Debug.LogException(e);
+                        Debug.LogError($"{genResult} -> {typeof(T)}");
                         return (e.Message, defaultValue);
                     }
                 }

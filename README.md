@@ -8322,9 +8322,6 @@ Go to `Window` - `Saints` to enable/disable functions you want
     #"Disable AI Navigation"
     -define:SAINTSFIELD_AI_NAVIGATION_DISABLED
 
-    #"Disable UI Toolkit"
-    -define:SAINTSFIELD_UI_TOOLKIT_DISABLE
-
     #"Enable SaintsEditor project wide"
     -define:SAINTSFIELD_SAINTS_EDITOR_APPLY
 
