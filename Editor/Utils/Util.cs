@@ -2217,7 +2217,7 @@ namespace SaintsField.Editor.Utils
 
             public Transform Transform;
             public Vector3 WorldPos;
-            // public Quaternion WorldRot;
+            public Transform Space;
 
             public override string ToString()
             {
@@ -2233,32 +2233,13 @@ namespace SaintsField.Editor.Utils
 
         public static TargetWorldPosInfo GetPropertyTargetWorldPosInfoSpace(string space, SerializedProperty property, MemberInfo info, object parent)
         {
-            try
-            {
-                SerializedPropertyType _ = property.propertyType;
-            }
-            catch (InvalidCastException)
+            if (!SerializedUtils.IsOk(property))
             {
                 return new TargetWorldPosInfo
                 {
                     Error = $"Property disposed",
                 };
             }
-            catch (NullReferenceException)
-            {
-                return new TargetWorldPosInfo
-                {
-                    Error = $"Property disposed",
-                };
-            }
-            catch (ObjectDisposedException)
-            {
-                return new TargetWorldPosInfo
-                {
-                    Error = $"Property disposed",
-                };
-            }
-
 
             switch (property.propertyType)
             {
@@ -2363,7 +2344,7 @@ namespace SaintsField.Editor.Utils
                 };
             }
 
-            (string callbackError, int _, object value) = GetValue(property, info, parent);
+            (string callbackError, object value) = GetOf<object>(space, null, property, info, parent);
             if (callbackError != "")
             {
                 return new TargetWorldPosInfo
@@ -2380,6 +2361,7 @@ namespace SaintsField.Editor.Utils
                         Error = "",
                         IsTransform = false,
                         WorldPos = go.transform.TransformPoint(v3Value),
+                        Space = go.transform,
                         // WorldRot = go.transform.rotation,
                     };
                 case Component comp:
@@ -2388,6 +2370,7 @@ namespace SaintsField.Editor.Utils
                         Error = "",
                         IsTransform = false,
                         WorldPos = comp.transform.TransformPoint(v3Value),
+                        Space = comp.transform,
                         // WorldRot = comp.transform.rotation,
                     };
                 default:

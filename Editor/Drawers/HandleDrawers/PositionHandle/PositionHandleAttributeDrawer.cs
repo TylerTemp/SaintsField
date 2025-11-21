@@ -199,14 +199,19 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             }
 
             positionHandleInfo.Center = positionHandleInfo.TargetWorldPosInfo.WorldPos;
-            positionHandleInfo.Rotation = GetRotate(positionHandleInfo.SerializedProperty);
+            positionHandleInfo.Rotation = GetRotate(positionHandleInfo.TargetWorldPosInfo.Space, positionHandleInfo.SerializedProperty);
 
             // Debug.Log(positionHandleInfo.Center);
             positionHandleInfo.Error = "";
         }
 
-        private static Quaternion GetRotate(SerializedProperty serializedProperty)
+        private static Quaternion GetRotate(Transform space, SerializedProperty serializedProperty)
         {
+            if (space != null)
+            {
+                return space.rotation;
+            }
+
             switch (serializedProperty.serializedObject.targetObject)
             {
                 case GameObject go:

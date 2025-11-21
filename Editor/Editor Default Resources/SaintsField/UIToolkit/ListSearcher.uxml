@@ -1,0 +1,17 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/ListSearcherStyle.uss?fileID=7433441132597879392&amp;guid=3a494a2a11e41834bacaa278382e4433&amp;type=3#ListSearcherStyle" />
+    <ui:VisualElement name="searchContainer" style="flex-grow: 1;">
+        <uie:ToolbarSearchField placeholder-text="Search" class="search-field" />
+        <ui:VisualElement name="LoadingIcon" picking-mode="Ignore" class="loading-icon" style="height: 100%;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="pagingContainer" class="paging-container">
+        <ui:IntegerField name="numberOfItemsPerPageField" is-delayed="true" class="input-field" />
+        <ui:Label text="/" class="vertical-center-text" />
+        <ui:IntegerField name="numberOfItemsTotalField" placeholder-text="Total" is-delayed="true" class="input-field" />
+        <ui:Label text="Items" class="vertical-center-text" />
+        <ui:Button name="pagePreButton" class="left-page-button page-button" />
+        <ui:IntegerField value="1" name="pageField" placeholder-text="Page" is-delayed="true" class="input-field" />
+        <ui:Label text="/ 1" name="pageLabel" class="vertical-center-text" />
+        <ui:Button name="pageNextButton" class="page-button right-page-button" />
+    </ui:VisualElement>
+</ui:UXML>

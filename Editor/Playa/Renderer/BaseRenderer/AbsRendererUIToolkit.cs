@@ -29,6 +29,7 @@ using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
@@ -1654,6 +1655,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return (element, false);
             }
             #endregion
+
+            #region Vector3Int
             if (valueType == typeof(Vector3Int) || value is Vector3Int)
             {
                 if (oldElement is Vector3IntField oldVector3IntField)
@@ -1702,6 +1705,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Color
             if (valueType == typeof(Color) || value is Color)
             {
                 if (oldElement is ColorField oldColorField)
@@ -1749,6 +1755,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Bounds
             if (valueType == typeof(Bounds) || value is Bounds)
             {
                 if (oldElement is BoundsField oldBoundsField)
@@ -1797,6 +1806,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Rect
             if (valueType == typeof(Rect) || value is Rect)
             {
                 if (oldElement is RectField oldRectField)
@@ -1845,6 +1857,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region RectInt
             if (valueType == typeof(RectInt) || value is RectInt)
             {
                 if (oldElement is RectIntField oldRectIntField)
@@ -1893,6 +1908,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Enum
             if (valueType.BaseType == typeof(Enum) || value is Enum)
             {
                 // Debug.Log(string.Join(",", allAttributes));
@@ -1959,12 +1977,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 //
                 // return (element, false);
             }
+            #endregion
+
+            #region UnityEngine.Object
             if (typeof(Object).IsAssignableFrom(valueType) || value is Object)
             {
                 return (UIToolkitObjectFieldEdit(oldElement, label, valueType, (Object)value, beforeSet,
                     setterOrNull, labelGrayColor, inHorizontalLayout), false);
             }
+            #endregion
 
+            #region AnimationCurve
             if (typeof(AnimationCurve).IsAssignableFrom(valueType) || value is AnimationCurve)
             {
                 return (CurveRangeAttributeDrawer.UIToolkitValueEdit(
@@ -1977,46 +2000,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     inHorizontalLayout,
                     allAttributes,
                     targets), false);
-
-                if (oldElement is CurveField curveField)
-                {
-                    curveField.SetValueWithoutNotify(value as AnimationCurve);
-                    return (null, false);
-                }
-                CurveField element = new CurveField(label)
-                {
-                    value = value as AnimationCurve,
-                };
-
-                if (labelGrayColor)
-                {
-                    element.labelElement.style.color = ReColor;
-                }
-                if (inHorizontalLayout)
-                {
-                    element.style.flexDirection = FlexDirection.Column;
-                }
-                else
-                {
-                    element.AddToClassList(CurveField.alignedFieldUssClassName);
-                }
-                if (setterOrNull == null)
-                {
-                    element.SetEnabled(false);
-                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
-                }
-                else
-                {
-                    element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
-                    element.RegisterValueChangedCallback(evt =>
-                    {
-                        beforeSet?.Invoke(value);
-                        setterOrNull(evt.newValue);
-                    });
-                }
-                return (element, false);
             }
+            #endregion
 
+            #region Hash128
             if (typeof(Hash128).IsAssignableFrom(valueType) || value is Hash128)
             {
                 if (oldElement is Hash128Field hash128Field)
@@ -2057,7 +2044,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
+            #endregion
 
+            #region Gradient
             if (typeof(Gradient).IsAssignableFrom(valueType) || value is Gradient)
             {
                 if (oldElement is GradientField gradientField)
@@ -2099,6 +2088,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
+            #endregion
 
             #region DateTime
             if (valueType == typeof(DateTime) || value is DateTime || allAttributes.Any(each => each is DateTimeAttribute))
@@ -2248,6 +2238,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 genTypes = genTypes.Prepend(valueType);
             }
 
+            #region Dictionary
             Type dictionaryInterface = typeof(IDictionary<,>);
             Type readonlyDictionaryInterface = typeof(IReadOnlyDictionary<,>);
             // ReSharper disable once NotAccessedVariable
@@ -2280,7 +2271,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                 }
             }
-
             if(isNormalDictionary || isReadonlyDictionary)
             {
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
@@ -2380,14 +2370,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return (foldout, false);
 #endif
             }
+            #endregion
+
+            #region List
             if (value is IEnumerable enumerableValue)
             {
                 // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
-
-                return (MakeListView(oldElement as Foldout, label, valueType, enumerableValue,
+                return (ListDrawerSettingsRenderer.UIToolkitValueEdit(oldElement, label, valueType, enumerableValue,
                     enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor,
                     inHorizontalLayout, allAttributes, targets), false);
             }
+            #endregion
 
             // Debug.Log(valueType);
 
@@ -2915,7 +2908,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static readonly Type[] SkipTypes = { typeof(IntPtr), typeof(UIntPtr), typeof(void) };
 
-        private static bool SkipTypeDrawing(Type checkType)
+        public static bool SkipTypeDrawing(Type checkType)
         {
             foreach (Type disallowType in SkipTypes)
             {
@@ -3067,327 +3060,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return dropdownButton;
         }
 
-        // private int _listCurPageIndex = 0;
-        // private List<int> _listItemIndexToOriginIndex;
-
-        private class ListViewPayload
-        {
-            public List<object> RawValues;
-            public List<int> ItemIndexToOriginIndex;
-            public object RawListValue;
-        }
-
-        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue,
-            object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor,
-            bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
-        {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-            Debug.Log($"render list start {listValue.Length}/{label}/{valueType}");
-#endif
-            Foldout foldout = oldElement;
-            if (foldout != null && !foldout.ClassListContains("saintsfield-list"))
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.Log($"foldout mismatch for {rawListValue}, recreate");
-#endif
-                foldout = null;
-            }
-            if (foldout == null)
-            {
-                // Debug.Log($"Create new Foldout");
-                foldout = new Foldout
-                {
-                    text = label,
-                };
-                if (labelGrayColor)
-                {
-                    foldout.style.color = EColor.EditorSeparator.GetColor();
-                }
-                foldout.AddToClassList("saintsfield-list");
-                VisualElement foldoutContent = foldout.Q<VisualElement>(className: "unity-foldout__content");
-                if (foldoutContent != null)
-                {
-                    foldoutContent.style.marginLeft = 0;
-                }
-
-                if(setterOrNull != null)
-                {
-                    // nullable
-                    foldout.Q<Toggle>().Add(new Button(() =>
-                    {
-                        beforeSet?.Invoke(rawListValue);
-                        setterOrNull(null);
-                    })
-                    {
-                        // text = "x",
-                        tooltip = "Set to null",
-                        style =
-                        {
-                            position = Position.Absolute,
-                            // top = -EditorGUIUtility.singleLineHeight,
-                            top = 0,
-                            right = 0,
-                            width = EditorGUIUtility.singleLineHeight,
-                            height = EditorGUIUtility.singleLineHeight,
-
-                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
-#if UNITY_2022_2_OR_NEWER
-                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                                unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                        },
-                    });
-                }
-            }
-
-            ListView listView = foldout.Q<ListView>();
-            if (listView == null)
-            {
-                ListViewPayload payload = new ListViewPayload
-                {
-                    RawValues = listValue.ToList(),
-                    ItemIndexToOriginIndex = listValue.Select((_, index) => index).ToList(),
-                    RawListValue = rawListValue,
-                };
-                // Debug.Log($"Create new listView for {rawListValue}");
-                bool showAddRemoveFooter = true;
-                if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
-                {
-                    // Debug.Log("array");
-                }
-                else if (rawListValue is IList)
-                {
-                    // Debug.Log("IList");
-                }
-                else
-                {
-                    showAddRemoveFooter = false;
-                }
-                listView = new ListView
-                {
-                    selectionType = SelectionType.Multiple,
-                    virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                    // showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
-                    showBoundCollectionSize = false,
-                    showFoldoutHeader = false,
-                    headerTitle = label,
-                    showAddRemoveFooter = showAddRemoveFooter,
-                    reorderMode = ListViewReorderMode.Animated,
-                    reorderable = showAddRemoveFooter,
-                    style =
-                    {
-                        flexGrow = 1,
-                        position = Position.Relative,
-                    },
-                    itemsSource = listValue.Select((_, index) => index).ToList(),
-                    makeItem = () => new VisualElement(),
-
-                    userData = payload,
-                };
-
-                Type elementType = null;
-                foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypesFromType(valueType))
-                {
-                    Type tryGetElementType = ReflectUtils.GetElementType(eachType);
-                    // Debug.Log($"{eachType}({eachType.IsGenericType}) -> {tryGetElementType}");
-                    if (tryGetElementType != eachType)
-                    {
-                        elementType = tryGetElementType;
-                        break;
-                    }
-                }
-
-                if (elementType == null)
-                {
-#if SAINTSFIELD_DEBUG
-                    Debug.LogError($"Failed to find element type in {valueType}");
-#endif
-                    elementType = typeof(object);
-                }
-
-                //
-                // Type elementType = ReflectUtils.GetElementType(valueType);
-                // Debug.Log(elementType.IsGenericType);
-                // if(elementType.IsGenericType)
-                // {
-                //     Debug.Log(elementType.GetGenericArguments()[0]);
-                // }
-                // Debug.Log($"elementType={elementType}");
-
-                void BindItem(VisualElement visualElement, int index)
-                {
-                    // int actualIndex = (int)listView.itemsSource[index];
-                    // Debug.Log($"{index} -> {actualIndex}");
-                    // Debug.Log($"index={index}, ItemIndexToOriginIndex={string.Join(",", payload.ItemIndexToOriginIndex)}");
-
-                    VisualElement firstChild = visualElement.Children().FirstOrDefault();
-
-                    int actualIndex = payload.ItemIndexToOriginIndex[index];
-                    object actualValue = payload.RawValues[actualIndex];
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-                    Debug.Log($"list index={index}, elementType={elementType}, actualValue={actualValue}, rawValues={string.Join(",", payload.RawValues)}");
-#endif
-                    VisualElement item = UIToolkitValueEdit(
-                        firstChild,
-                        $"Element {actualIndex}",
-                        elementType,
-                        actualValue,
-                        null,
-//                         showAddRemoveFooter
-//                          ? newItemValue =>
-//                             {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-//                                 Debug.Log($"List {actualIndex} set newValue {newItemValue}");
-// #endif
-//                                 IList rawListValueArray = (IList) payload.RawListValue;
-//                                 rawListValueArray[actualIndex] = newItemValue;
-//                                 payload.RawValues[actualIndex] = newItemValue;
-//                             }
-//                          : null,
-                        newItemValue =>
-                        {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-                            Debug.Log($"List {actualIndex} set newValue {newItemValue}");
-#endif
-                            IList rawListValueArray = (IList) payload.RawListValue;
-                            rawListValueArray[actualIndex] = newItemValue;
-                            payload.RawValues[actualIndex] = newItemValue;
-                            setterOrNull?.Invoke(rawListValueArray);
-                        },
-                        false,
-                        inHorizontalLayout,
-                        allAttributes,
-                        targets).result;
-                    if (item != null)
-                    {
-                        visualElement.Clear();
-                        visualElement.Add(item);
-                    }
-                }
-
-                listView.bindItem = BindItem;
-
-                Button listViewAddButton = listView.Q<Button>("unity-list-view__add-button");
-                if(listViewAddButton != null)
-                {
-                    listViewAddButton.clickable = new Clickable(() =>
-                    {
-                        int oldSize = payload.RawValues.Count;
-                        int newSize = oldSize + 1;
-                        object addItem = elementType.IsValueType
-                            ? Activator.CreateInstance(elementType)
-                            : null;
-
-                        if (valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
-                        {
-                            beforeSet?.Invoke(rawListValue);
-                            Array newArray = Array.CreateInstance(elementType, newSize);
-                            payload.RawValues.Add(addItem);
-                            Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
-                            payload.RawListValue = newArray;
-                            setterOrNull?.Invoke(newArray);
-                        }
-                        else
-                        {
-                            IList rawListValueArray = (IList)payload.RawListValue;
-                            rawListValueArray.Add(addItem);
-                            payload.RawValues.Add(addItem);
-                            payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
-                            listView.itemsSource = payload.ItemIndexToOriginIndex.ToList();
-                        }
-                    });
-                }
-
-                listView.itemsRemoved += objects =>
-                {
-                    List<int> removeIndexInRaw = objects
-                        .Select(removeIndex => payload.ItemIndexToOriginIndex[removeIndex])
-                        .OrderByDescending(each => each)
-                        .ToList();
-
-                    if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
-                    {
-                        beforeSet?.Invoke(rawListValue);
-                        Array newArray = Array.CreateInstance(elementType, payload.RawValues.Count - removeIndexInRaw.Count);
-                        Array rawArray = (Array) payload.RawListValue;
-                        int copyIndex = 0;
-                        foreach ((object rawValue, int rawIndex) in rawArray.Cast<object>().WithIndex())
-                        {
-                            if (removeIndexInRaw.Contains(rawIndex))
-                            {
-                                continue;
-                            }
-
-                            newArray.SetValue(rawValue, copyIndex);
-                            copyIndex++;
-                        }
-                        // payload.RawValues.Add(addItem);
-                        // Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
-                        payload.RawListValue = newArray;
-                        setterOrNull?.Invoke(newArray);
-                    }
-                    else
-                    {
-                        IList rawListValueArray = (IList) payload.RawListValue;
-                        foreach (int removeIndex in removeIndexInRaw)
-                        {
-                            rawListValueArray.RemoveAt(removeIndex);
-                        }
-                    }
-                };
-
-                listView.itemIndexChanged += (first, second) =>
-                {
-                    int fromPropIndex = payload.ItemIndexToOriginIndex[first];
-                    int toPropIndex = payload.ItemIndexToOriginIndex[second];
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
-                    Debug.Log($"drag {fromPropIndex}({first}) -> {toPropIndex}({second}); ItemIndexToOriginIndex={string.Join(",", payload.ItemIndexToOriginIndex)}");
-#endif
-
-                    IList lis = (IList)payload.RawListValue;
-                    MoveArrayElement(lis, fromPropIndex, toPropIndex);
-                    // (lis[fromPropIndex], lis[toPropIndex]) = (lis[toPropIndex], lis[fromPropIndex]);
-                    // payload.RawValues = lis.Cast<object>().ToList();
-                    // (payload.RawValues[fromPropIndex], payload.RawValues[toPropIndex]) = (payload.RawValues[toPropIndex], payload.RawValues[fromPropIndex]);
-                    // (payload.ItemIndexToOriginIndex[fromPropIndex], payload.ItemIndexToOriginIndex[toPropIndex]) = (payload.ItemIndexToOriginIndex[toPropIndex], payload.ItemIndexToOriginIndex[fromPropIndex]);
-                    // payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
-                    // listView.Rebuild();
-                };
-
-                foldout.Add(listView);
-            }
-
-            ListViewPayload oldPayload = (ListViewPayload)listView.userData;
-            oldPayload.RawValues = listValue.ToList();
-            oldPayload.RawListValue = rawListValue;
-
-            // Debug.Log($"Refresh count={listValue.Length}");
-            oldPayload.ItemIndexToOriginIndex = oldPayload.RawValues.Select((_, index) => index).ToList();
-            listView.itemsSource = oldPayload.ItemIndexToOriginIndex.ToList();
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
-            Debug.Log($"ItemIndexToOriginIndex={string.Join(",", oldPayload.ItemIndexToOriginIndex)}");
-#endif
-            // Debug.Log($"itemSource({listView.itemsSource.Count})={string.Join(",", listView.itemsSource)}");
-            // if (listValue.Length > 0)
-            // {
-            //     Debug.Log($"0 listValue={listValue[0]}; listView.itemsSource={listView.itemsSource[0]}");
-            // }
-            // listView.Rebuild();
-
-            return oldElement == null? foldout : null;
-        }
-
         private class DictionaryViewPayload
         {
             public object RawDictValue;
             private readonly PropertyInfo _keysProperty;
             private readonly PropertyInfo _indexerProperty;
             private readonly MethodInfo _removeMethod;
-            private readonly MethodInfo _containesKeyMethod;
+            private readonly MethodInfo _containersKeyMethod;
 
             public DictionaryViewPayload(object rawDictValue, PropertyInfo keysProperty, PropertyInfo indexerProperty,
                 MethodInfo removeMethod, MethodInfo containsKeyMethod)
@@ -3396,7 +3075,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 _keysProperty = keysProperty;
                 _indexerProperty = indexerProperty;
                 _removeMethod = removeMethod;
-                _containesKeyMethod = containsKeyMethod;
+                _containersKeyMethod = containsKeyMethod;
             }
 
             public IEnumerable<object> GetKeys() => ((IEnumerable)_keysProperty.GetValue(RawDictValue)).Cast<object>();
@@ -3404,7 +3083,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public object GetValue(object key) => _indexerProperty.GetValue(RawDictValue, new[] { key });
             public void DeleteKey(object key) => _removeMethod.Invoke(RawDictValue, new[] { key });
             public void SetKeyValue(object key, object value) => _indexerProperty.SetValue(RawDictValue, value, new[] { key });
-            public bool ContainsKey(object key) => (bool)_containesKeyMethod.Invoke(RawDictValue, new[] { key });
+            public bool ContainsKey(object key) => (bool)_containersKeyMethod.Invoke(RawDictValue, new[] { key });
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK

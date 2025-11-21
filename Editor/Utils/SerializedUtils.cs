@@ -540,7 +540,7 @@ namespace SaintsField.Editor.Utils
                         Debug.Log($"#Search# nested search {so.name} with searchedObjects={string.Join(",", searchedObjects)}");
 #endif
 
-                        return SearchSoProp(so, token, searchedObjects);
+                        return SearchUnityObjectProp(so, token, searchedObjects);
                     }
                     return property.objectReferenceValue.name.ToLower().Contains(token);
                 case SerializedPropertyType.LayerMask:
@@ -650,9 +650,9 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private static bool SearchSoProp(ScriptableObject so, string search, HashSet<object> searchedObjects)
+        public static bool SearchUnityObjectProp(UnityEngine.Object uObject, string search, HashSet<object> searchedObjects)
         {
-            if (!searchedObjects.Add(so))
+            if (!searchedObjects.Add(uObject))
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
                 Debug.Log($"#Search# skip {so.name} as already searched in searchedObjects={string.Join(",", searchedObjects)}");
@@ -661,7 +661,7 @@ namespace SaintsField.Editor.Utils
             }
 
             // ReSharper disable once ConvertToUsingDeclaration
-            using(SerializedObject serializedObject = new SerializedObject(so))
+            using(SerializedObject serializedObject = new SerializedObject(uObject))
             {
                 SerializedProperty iterator = serializedObject.GetIterator();
                 while (iterator.NextVisible(true))

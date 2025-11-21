@@ -96,11 +96,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.4.1**
+**5.4.2**
 
-1.  Fix: `Expandable` foldout icon incorrect status
-2.  Fix: `SaintsEditorWindow` failed to use code analysisUtils to get a correct order
-3.  Add: You can use `../` to walk upward to get a callback/property for dropdowns [#336](https://github.com/TylerTemp/SaintsField/discussions/336)
+1.  Fix: `PositionHandle` now use editor's "Tool Handle Rotation" value [#336](https://github.com/TylerTemp/SaintsField/discussions/336)
+2.  Fix: handles not using `space` when it's a callback
+3.  Fix: `ShowInInspector` with list/array now finally have the size input which has been missing for, decades...
+4.  Add: `ShowInInspector` now works with `ListDrawerSettings`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1494,7 +1495,7 @@ Parameters:
 *   `string extraSearch = null`: set a callback function to use your custom search. If not match, use the default search.
 *   `string overrideSearch = null`: set a callback function as a custom search. When present, ignore `extraSearch` and default search.
 
-`delayedSearch` only works for IMGUI. For UI Toolkit, it already has a debounced search, which means:
+Note about input:
 
 *   When input anything, it'll wait for 0.6 seconds for next input, then perform the actual searching
 *   You can always use `Enter` to search immediately
@@ -1530,9 +1531,9 @@ In UI Toolkit you can also see the async searching which does not block the edit
 
 `extraSearch` & `overrideSearch` uses the following signiture:
 
-*   `bool CustomSearch(T item, int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> seachToken)`
-*   `bool CustomSearch(T item, IReadOnlyList<SaintsField.Playa.ListSearchToken> seachToken)`
-*   `bool CustomSearch(int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> seachToken)`
+*   `bool CustomSearch(T item, int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> searchToken)`
+*   `bool CustomSearch(T item, IReadOnlyList<SaintsField.Playa.ListSearchToken> searchToken)`
+*   `bool CustomSearch(int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> searchToken)`
 
 `ListSearchToken` is a struct of:
 
@@ -1594,6 +1595,15 @@ public Weapon[] weapons;
 You can now search as you want, both your custom search & serialized property search:
 
 [![video](https://github.com/user-attachments/assets/a32b3592-68f6-4207-8142-3d895c926de1)](https://github.com/user-attachments/assets/d7fd4e08-355f-460b-88fb-2e874f58cb01)
+
+**ShowInInspector** is supported with this attribute.
+
+```csharp
+[ShowInInspector, ListDrawerSettings(numberOfItemsPerPage: 5)]
+private List<MyStruct> FullFeatures = new List<MyStruct>{ /*...*/ };
+```
+
+![](https://github.com/user-attachments/assets/c5a24f62-60f5-4fd4-8603-f7db9d985907)
 
 #### `Table` ####
 
@@ -1952,6 +1962,7 @@ private void DictExternalAdd()
 *   `AnimParams`
 *   `AnimState`
 *   `CurveRange`
+*   `ListDrawerSettings`
 
 ### Numerical ###
 

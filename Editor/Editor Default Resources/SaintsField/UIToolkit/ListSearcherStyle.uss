@@ -1,0 +1,58 @@
+:root {
+    flex-direction: row;
+}
+
+.paging-container {
+    flex-direction: row;
+    flex-shrink: 0;
+    margin-left: 4px;
+    justify-content: flex-end;
+}
+
+.page-button {
+    -unity-background-scale-mode: scale-to-fit;
+    background-size: contain;
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.left-page-button {
+    background-image: url("project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-left.png?fileID=2800000&guid=9bba20b448ef9bf4492563cdc5c95f4f&type=3#classic-dropdown-left");
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.right-page-button {
+    background-image: url("project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-right.png?fileID=2800000&guid=55dad5685bb71954aa8919431bffb168&type=3#classic-dropdown-right");
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.vertical-center-text {
+    align-self: center;
+}
+
+.search-field {
+    flex-grow: 1;
+    flex-shrink: 1;
+    max-width: 100%;
+}
+
+.input-field {
+    min-width: 30px;
+}
+
+#numberOfItemsPerPageField TextElement {
+    -unity-text-align: middle-right;
+}
+
+.loading-icon {
+    background-image: url("project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/refresh.png?fileID=2800000&guid=bfdf848cb00f1544db8f6a367acd4d8e&type=3#refresh");
+    flex-shrink: 0;
+    position: absolute;
+    right: 0;
+    height: 18px;
+    -unity-background-scale-mode: scale-to-fit;
+    width: 8px;
+    opacity: 0.6;
+}
