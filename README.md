@@ -98,7 +98,7 @@ namespace: `SaintsField`
 
 **5.4.2**
 
-1.  Fix: `PositionHandle` now use editor's "Tool Handle Rotation" value [#336](https://github.com/TylerTemp/SaintsField/discussions/336)
+1.  Fix: `PositionHandle` now use editor's "Tool Handle Rotation" value [#332](https://github.com/TylerTemp/SaintsField/discussions/332)
 2.  Fix: handles not using `space` when it's a callback
 3.  Fix: `ShowInInspector` with list/array now finally have the size input which has been missing for, decades...
 4.  Add: `ShowInInspector` now works with `ListDrawerSettings`
@@ -4148,7 +4148,7 @@ Parameters:
 *   `string funcName=null` callback function. Must return either a `OptionDropdownList<T>` or a `IEnumerable` (list/array etc.).
 
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
-    
+
     When using on a `bool`, you can omit thiss parameter, and a `True`, a `False` button will show.
 
     When omitted, it will try to find all the static values from the field type.

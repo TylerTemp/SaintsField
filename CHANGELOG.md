@@ -2,9 +2,9 @@
 
 ## 5.4.2 ##
 
-1.  Fix: `PositionHandle` now use editor's "Tool Handle Rotation" value [#336](https://github.com/TylerTemp/SaintsField/discussions/336)
+1.  Fix: `PositionHandle` now use editor's "Tool Handle Rotation" value [#332](https://github.com/TylerTemp/SaintsField/discussions/332)
 2.  Fix: handles not using `space` when it's a callback
-3.  Fix: `ShowInInspector` with list/array now finally have the size input which has been missing for, decades... 
+3.  Fix: `ShowInInspector` with list/array now finally have the size input which has been missing for, decades...
 4.  Add: `ShowInInspector` now works with `ListDrawerSettings`
 
 ## 5.4.1 ##
