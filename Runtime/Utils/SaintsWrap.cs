@@ -155,6 +155,7 @@ namespace SaintsField.Utils
             EnsureInit();
             switch (wrapType)
             {
+                case WrapType.Undefined:
                 case WrapType.T:
                 {
                     if((object)_runtimeResult != (object)value)
@@ -271,8 +272,6 @@ namespace SaintsField.Utils
 // #endif
                     }
                 }
-                    break;
-                case WrapType.Undefined:  // Never inspected, ignore
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(wrapType), wrapType, null);
