@@ -96,12 +96,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.4.2**
+**5.4.3**
 
-1.  Fix: `PositionHandle` now use editor's "Tool Handle Rotation" value [#332](https://github.com/TylerTemp/SaintsField/discussions/332)
-2.  Fix: handles not using `space` when it's a callback
-3.  Fix: `ShowInInspector` with list/array now finally have the size input which has been missing for, decades...
-4.  Add: `ShowInInspector` now works with `ListDrawerSettings`
+1.  Add: `[SaintsDictionary]` now works with `ShowInInspector`
+2.  Fix: `SaintsDictionary` the input element was a bit out of area
+3.  Fix: `ListDrawerSettings` in `ShowInInspector`, the searching function was not case-insensetive
+4.  Fix: `SaintsDictionary` failed to take an initial value if you create one at runtime
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1963,6 +1963,7 @@ private void DictExternalAdd()
 *   `AnimState`
 *   `CurveRange`
 *   `ListDrawerSettings`
+*   `SaintsDictionary`
 
 ### Numerical ###
 
@@ -6669,13 +6670,18 @@ using SaintsField;
 
 ![](https://github.com/user-attachments/assets/8ef121c0-9762-49ad-915b-cf83e1ef79f9)
 
-See [DictInterface](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/IssueAndTesting/Issue/Issue241DictInterface.cs) as an example of making an `SerializedReference` dictionary.
+`[SaintsDictionary]` can work with `[ShowInInspector]`
 
-![Image](https://github.com/user-attachments/assets/7b252440-c11d-4bd0-b206-4808cd4c3c01)
+```csharp
+[ShowInInspector, SaintsDictionary(numberOfItemsPerPage: 5)]
+private Dictionary<int, string> FullFeature
+{
+    get => _plainDict;
+    set => _plainDict = value;
+}
+```
 
-See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/SaintsDictExamples/SaintsDictFillerExample.cs) as an example of making dictionary with auto getters.
-
-[![video](https://github.com/user-attachments/assets/ce2efb49-2723-4e43-a3a7-9969f229f591)](https://github.com/user-attachments/assets/38dcb22c-d30f-40d4-bd6b-420aa1b41588)
+![](https://github.com/user-attachments/assets/f2a71a7c-57be-4745-b519-fb196ab7af22)
 
 ### `SaintsInterface<>` ###
 
