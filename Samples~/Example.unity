@@ -12918,7 +12918,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583427232728040
+          rid: 169648641493696654
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -12943,10 +12943,10 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6921583427232728040
-      type: {class: Issue241DictInterface/Key1, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+    - rid: 169648641493696654
+      type: {class: Issue241DictInterface/Key2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
-        k1: 
+        k2: 
     - rid: 6921583427232728041
       type: {class: Issue241DictInterface/Value2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
@@ -26321,7 +26321,7 @@ MonoBehaviour:
   flagsTreeEnums: 0
   namedEnumDict:
     _saintsKeys:
-    - value: 1
+    - value: 2
       valueField:
         propertyType: 4
         propertyPath: 

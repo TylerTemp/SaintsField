@@ -9,7 +9,6 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
@@ -447,11 +446,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             dictField.FooterStruct.NumberOfItemsTotalField.RegisterValueChangedCallback(ChangeSize);
 
             #region Key/Value
+            ResponsiveLength keyWidth = saintsDictionaryAttribute.KeyWidth;
             dictField.ListView.columns.Add(new Column
             {
                 name = "Keys",
                 // title = "Keys",
-                stretchable = true,
+                stretchable = keyWidth.Type == ResponsiveType.None,
+                width = MakeLength(keyWidth),
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
@@ -558,11 +559,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 },
             });
 
+            ResponsiveLength valueWidth = saintsDictionaryAttribute.ValueWidth;
             dictField.ListView.columns.Add(new Column
             {
                 name = "Values",
                 // title = "Keys",
-                stretchable = true,
+                stretchable = valueWidth.Type == ResponsiveType.None,
+                width = MakeLength(valueWidth),
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();

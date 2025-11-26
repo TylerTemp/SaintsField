@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.4.3 ##
+
+1.  Add: `[SaintsDictionary]` now works with `ShowInInspector`
+2.  Fix: `SaintsDictionary` the input element was a bit out of area
+3.  Fix: `ListDrawerSettings` in `ShowInInspector`, the searching function was not case-insensetive
+4.  Fix: `SaintsDictionary` failed to take an initial value if you create one at runtime
+ 
 ## 5.4.2 ##
 
 1.  Fix: `PositionHandle` now use editor's "Tool Handle Rotation" value [#332](https://github.com/TylerTemp/SaintsField/discussions/332)

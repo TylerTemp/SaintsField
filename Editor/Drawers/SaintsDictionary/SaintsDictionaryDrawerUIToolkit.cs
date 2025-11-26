@@ -618,7 +618,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 name = "Keys",
                 // title = "Keys",
                 stretchable = keyWidth.Type == ResponsiveType.None,
-                width = MakeLength(saintsDictionaryAttribute?.KeyWidth ?? default),
+                width = MakeLength(keyWidth),
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
@@ -747,7 +747,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 name = "Values",
                 // title = "Values",
                 stretchable = valueWidth.Type == ResponsiveType.None,
-                width = MakeLength(saintsDictionaryAttribute?.ValueWidth ?? default),
+                width = MakeLength(valueWidth),
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
