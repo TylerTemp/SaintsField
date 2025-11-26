@@ -210,30 +210,6 @@ namespace SaintsField.Utils
             return (true, serializedProp);
         }
 
-        // public static void OnBeforeSerializeArray<T>(ref SaintsSerializedProperty[] toFill, ref T[] objList, Type elementType)
-        // {
-        //     // Debug.Log($"OnBeforeSerializeArray toFill={toFill}, objList={objList}, elementType={elementType}");
-        //     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-        //     if (objList == null)
-        //     {
-        //         objList = Array.Empty<T>();
-        //     }
-        //
-        //     OnBeforeSerializeCollection(ref toFill, objList, elementType);
-        // }
-
-        // public static void OnBeforeSerializeList<T>(ref SaintsSerializedProperty[] toFill, ref List<T> objList, Type elementType)
-        // {
-        //     // Debug.Log($"OnBeforeSerializeArray toFill={toFill}, objList={objList}, elementType={elementType}");
-        //     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-        //     if (objList == null)
-        //     {
-        //         objList = new List<T>();
-        //     }
-        //
-        //     OnBeforeSerializeCollection(ref toFill, objList, elementType);
-        // }
-
         public static void OnBeforeSerializeCollection<T>(ref SaintsSerializedProperty[] toFill, IReadOnlyList<T> objList, Type elementType)
         {
             Debug.Assert(objList != null);
@@ -575,77 +551,6 @@ namespace SaintsField.Utils
             }
         }
 
-
-        // public static void OnBeforeSerializeCollectionDateTime(ref long[] toFill, IReadOnlyList<DateTime> objList)
-        // {
-        //     Debug.Assert(objList != null);
-        //     bool inPlace = toFill != null && toFill.Length == objList.Count;
-        //
-        //     long[] results;
-        //     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-        //     if (inPlace)
-        //     {
-        //         results = Array.Empty<long>();
-        //     }
-        //     else
-        //     {
-        //         results = new long[objList.Count];
-        //     }
-        //
-        //     for (int i = 0; i < objList.Count; i++)
-        //     {
-        //         if (inPlace)
-        //         {
-        //             toFill[i]  = OnBeforeSerializeDateTime(objList[i]);
-        //         }
-        //         else
-        //         {
-        //             results[i] = OnBeforeSerializeDateTime(objList[i]);
-        //         }
-        //     }
-        //
-        //     if (!inPlace)
-        //     {
-        //         toFill = results;
-        //     }
-        // }
-        //
-        // public static void OnBeforeSerializeCollectionTimeSpan(ref long[] toFill, IReadOnlyList<TimeSpan> objList)
-        // {
-        //     Debug.Assert(objList != null);
-        //     bool inPlace = toFill != null && toFill.Length == objList.Count;
-        //
-        //     long[] results;
-        //     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-        //     if (inPlace)
-        //     {
-        //         results = Array.Empty<long>();
-        //     }
-        //     else
-        //     {
-        //         results = new long[objList.Count];
-        //     }
-        //
-        //     for (int i = 0; i < objList.Count; i++)
-        //     {
-        //         if (inPlace)
-        //         {
-        //             toFill[i]  = OnBeforeSerializeTimeSpan(objList[i]);
-        //         }
-        //         else
-        //         {
-        //             results[i] = OnBeforeSerializeTimeSpan(objList[i]);
-        //         }
-        //     }
-        //
-        //     if (!inPlace)
-        //     {
-        //         toFill = results;
-        //     }
-        // }
-
-        // public static DateTime OnAfterDeserializeDateTime(long tick) => new DateTime(tick);
-        // public static TimeSpan OnAfterDeserializeTimeSpan(long tick) => new TimeSpan(tick);
 
         public static (bool ok, T result) OnAfterDeserialize<T>(SaintsSerializedProperty saintsSerializedProperty, Type targetType)
         {
