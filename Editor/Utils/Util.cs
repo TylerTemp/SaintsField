@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using SaintsField.Condition;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.Events;
@@ -2569,6 +2571,154 @@ namespace SaintsField.Editor.Utils
                 lis.RemoveAt(toRemoveIndex);
             }
             return removed;
+        }
+
+        public static bool SearchObject(object childObject, string rawToken, HashSet<object> searchedObjects)
+        {
+            if (RuntimeUtil.IsNull(childObject))
+            {
+                return false;
+            }
+
+            if(!searchedObjects.Add(childObject))
+            {
+                return false;
+            }
+
+            string token = rawToken.ToLower();
+
+            Type childType = childObject.GetType();
+            // treat primitive-like types as leaf nodes: match against their string representation
+            if (childType.IsPrimitive || childObject is string || childType.IsEnum || childType == typeof(decimal))
+            {
+                // Debug.Log($"Looking for string {childObject} with {token}");
+                return childObject.ToString().ToLower().Contains(token);
+            }
+
+            if (childObject is UnityEngine.Object uObject)
+            {
+                if (uObject is GameObject go)
+                {
+                    return go.name.ToLower().Contains(token);
+                }
+                return SerializedUtils.SearchUnityObjectProp(uObject, rawToken, searchedObjects);
+            }
+
+            if (childObject is IEnumerable ie)
+            {
+                return ie.Cast<object>().Any(each => SearchObject(each, rawToken, searchedObjects));
+            }
+
+            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+            FieldInfo[] fieldTargets = childType.GetFields(bindAttrNormal);
+            foreach (FieldInfo fieldInfo in fieldTargets)
+            {
+                if (AbsRenderer.SkipTypeDrawing(fieldInfo.FieldType))
+                {
+                    continue;
+                }
+
+                object fieldValue;
+                try
+                {
+                    fieldValue = fieldInfo.GetValue(childObject);
+                }
+                catch (Exception e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(e);
+#endif
+                    continue;
+                }
+
+                if (SearchObject(fieldValue, rawToken, searchedObjects))
+                {
+                    return true;
+                }
+            }
+            PropertyInfo[] propertyTargets = childType.GetProperties(bindAttrNormal);
+            foreach (PropertyInfo propertyInfo in propertyTargets)
+            {
+                if (AbsRenderer.SkipTypeDrawing(propertyInfo.PropertyType))
+                {
+                    continue;
+                }
+
+                object propertyValue;
+                try
+                {
+                    propertyValue = propertyInfo.GetValue(childObject);
+                }
+                catch (Exception e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(e);
+#endif
+                    continue;
+                }
+
+                if (SearchObject(propertyValue, rawToken, searchedObjects))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Note: This WILL contain -1 for the sake of async searching...
+        public static IEnumerable<int> SearchArrayObjects(IReadOnlyList<object> payloadRawValues, string searchFull)
+        {
+            IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(searchFull).ToArray();
+            for (int arrayElementIndex = 0; arrayElementIndex < payloadRawValues.Count; arrayElementIndex++)
+            {
+                object childObject = payloadRawValues[arrayElementIndex];
+                bool all = true;
+                HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                    .Select(_ => new HashSet<object>())
+                    .ToArray();
+                for (int tokenIndex = 0; tokenIndex < searchTokens.Count; tokenIndex++)
+                {
+                    ListSearchToken search = searchTokens[tokenIndex];
+                    HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+                    Debug.Log($"#Search# searching token@{tokenIndex}={search.Token} of property={property.name}@{arrayElementIndex} with seachedObjects={string.Join(",", searchedObjects)}");
+#endif
+                    if (!Util.SearchObject(childObject, search.Token, searchedObjects))
+                    {
+                        all = false;
+                        break;
+                    }
+                }
+
+                if (all)
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"found: {childProperty.propertyPath}");
+#endif
+                    yield return arrayElementIndex;
+                }
+                else
+                {
+                    yield return -1;
+                }
+            }
+        }
+
+        public static bool SearchObjectWithTokens(object value, IReadOnlyList<ListSearchToken> searchTokens)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (ListSearchToken search in searchTokens)
+            {
+                // ReSharper disable once InvertIf
+                if (!SearchObject(value, search.Token, new HashSet<object>()))
+                {
+                    // Debug.Log($"search failed {value} for {search.Token}");
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

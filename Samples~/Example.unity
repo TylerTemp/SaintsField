@@ -26315,13 +26315,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::DictionaryEnumLabel
   dropEnums: 1
-  buttonEnums: 0
+  buttonEnums: 2
   flagsEnums: 1
   treeEnums: 0
   flagsTreeEnums: 0
   namedEnumDict:
     _saintsKeys:
-    - value: 0
+    - value: 1
       valueField:
         propertyType: 4
         propertyPath: 
@@ -26337,7 +26337,7 @@ MonoBehaviour:
       wrapType: 4
     _wrapTypeKey: 4
     _saintsValues:
-    - value: 0
+    - value: 2
       valueField:
         propertyType: 4
         propertyPath: 

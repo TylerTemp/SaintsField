@@ -500,7 +500,6 @@ namespace SaintsField.Utils
         {
             Type t = typeof(T);
             // Debug.Log($"{t}/{t.IsGenericType}/{(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>))}");
-            WrapType wrapT;
             if (t.IsArray)
             {
                 return RuntimeUtil.IsSubFieldUnitySerializable(t.GetElementType())? WrapType.T: WrapType.Array;

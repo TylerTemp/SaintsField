@@ -29,7 +29,7 @@ namespace SaintsField.Editor.UIToolkitElements
             _treeRowTemplate ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/ListSearcher.uxml");
             TemplateContainer root = _treeRowTemplate.CloneTree();
 
-            SearchContainer = root.Q<VisualElement>(name: "searchContainer");
+            SearchContainer = root.Q<VisualElement>(name: "SearchContainer");
 
             ToolbarSearchField = SearchContainer.Q<ToolbarSearchField>();
             ToolbarSearchField.style.width = StyleKeyword.Auto;

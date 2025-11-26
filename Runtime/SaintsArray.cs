@@ -36,7 +36,7 @@ namespace SaintsField
         public static implicit operator T[](SaintsArray<T> saintsArray) => saintsArray._array;
 
         // Explicit conversion operator: Converts T[] to SaintsArray<T>
-        public static explicit operator SaintsArray<T>(T[] array) => new SaintsArray<T>(array);
+        public static implicit operator SaintsArray<T>(T[] array) => new SaintsArray<T>(array);
 
         public override string ToString() => _array.ToString();
 

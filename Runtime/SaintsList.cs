@@ -148,7 +148,7 @@ namespace SaintsField
         }
 
         // Explicit conversion operator: Converts T[] to SaintsArray<T>
-        public static explicit operator SaintsList<T>(List<T> lis)
+        public static implicit operator SaintsList<T>(List<T> lis)
         {
             return new SaintsList<T>(lis);
         }

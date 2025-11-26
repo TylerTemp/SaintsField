@@ -19,6 +19,7 @@ using SaintsField.Editor.Drawers.ProgressBarDrawer;
 using SaintsField.Editor.Drawers.PropRangeDrawer;
 using SaintsField.Editor.Drawers.RateDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
+using SaintsField.Editor.Drawers.SaintsDictionary;
 using SaintsField.Editor.Drawers.SceneDrawer;
 #if UNITY_2021_2_OR_NEWER
 using SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer;
@@ -2273,8 +2274,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if(isNormalDictionary || isReadonlyDictionary)
             {
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
                 bool isReadOnly = !isNormalDictionary;
+                return (SaintsDictionaryDrawer.UIToolkitValueEdit(
+                    oldElement as Foldout, label, valueType, value, isReadOnly,
+                    dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
+                    inHorizontalLayout, allAttributes, targets), false);
+
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
                 return (MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly,
                     dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,

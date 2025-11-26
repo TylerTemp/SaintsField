@@ -332,27 +332,27 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             return (keysField, keysParent);
         }
 
-        private class AsyncSearchItems
+        private class AsyncSearchItems<TKey>
         {
             public bool Started;
             public bool Finished;
-            public IEnumerator<int> SourceGenerator;
+            public IEnumerator<TKey> SourceGenerator;
             public string KeySearchText;
             public string ValueSearchText;
             public double DebounceSearchTime;
 
-            public List<int> HitTargetIndexes;
-            public List<int> CachedHitTargetIndexes;
+            public List<TKey> HitTargetIndexes;
+            public List<TKey> CachedHitTargetIndexes;
 
             public int PageIndex;
             public int Size;
             public int TotalPage = 1;
             public int NumberOfItemsPerPage;
 
-            public readonly HashSet<Image> LoadingImages = new HashSet<Image>();
+            public readonly HashSet<VisualElement> LoadingImages = new HashSet<VisualElement>();
         }
 
-        private AsyncSearchItems _asyncSearchItems;
+        private AsyncSearchItems<int> _asyncSearchItems;
 
         private const float DebounceTime = 0.6f;
 
@@ -453,11 +453,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
 
             int initNumberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
-            List<int> initTargets = initNumberOfItemsPerPage <= 0
-                ? new List<int>(Enumerable.Range(0, keysProp.arraySize))
-                : new List<int>(Enumerable.Range(0, keysProp.arraySize).Take(initNumberOfItemsPerPage));
+            List<int> initTargets = new List<int>(Enumerable.Range(0, keysProp.arraySize));
 
-            _asyncSearchItems = new AsyncSearchItems
+            _asyncSearchItems = new AsyncSearchItems<int>
             {
                 Started = true,
                 Finished = true,
@@ -489,6 +487,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 // List<int> useIndexes = new List<int>(itemIndexToPropertyIndex);
                 // ReSharper disable once AccessToModifiedClosure
                 List<int> refreshedHitTargetIndexes = new List<int>(_asyncSearchItems.Started? _asyncSearchItems.HitTargetIndexes: _asyncSearchItems.CachedHitTargetIndexes);
+                // Debug.Log($"_asyncSearchItems.Started={_asyncSearchItems.Started}? {string.Join(",", _asyncSearchItems.HitTargetIndexes)}: {string.Join(",", _asyncSearchItems.CachedHitTargetIndexes)}");
                 if (nowArraySize != _asyncSearchItems.Size)
                 {
                     _asyncSearchItems.Size = nowArraySize;
@@ -532,6 +531,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     int endIndex = Mathf.Min((curPageIndex + 1) * numberOfItemsPerPage, refreshedHitTargetIndexes.Count);
                     itemIndexToPropertyIndex = refreshedHitTargetIndexes.GetRange(startIndex, endIndex - startIndex);
                     int totalPage = Mathf.Max(1, Mathf.CeilToInt(refreshedHitTargetIndexes.Count / (float)numberOfItemsPerPage));
+                    // Debug.Log($"get total page {totalPage} from {refreshedHitTargetIndexes.Count} / {numberOfItemsPerPage}");
 
                     // pageField.SetValueWithoutNotify(curPageIndex + 1);
 
@@ -625,7 +625,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     string keyLabel = GetKeyLabel(saintsDictionaryAttribute);
                     if(!string.IsNullOrEmpty(keyLabel))
                     {
-                        header.Add(new Label(keyLabel));
+                        header.Add(new Label(keyLabel)
+                        {
+                            style =
+                            {
+                                marginLeft = 4,
+                            },
+                        });
                     }
                     ToolbarSearchField keySearch = new ToolbarSearchField
                     {
@@ -750,7 +756,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                     if(!string.IsNullOrEmpty(valueLabel))
                     {
-                        header.Add(new Label(valueLabel));
+                        header.Add(new Label(valueLabel)
+                        {
+                            style =
+                            {
+                                marginLeft = 4,
+                            },
+                        });
                     }
 
                     // header.Add(new Label("Values"));
@@ -796,7 +808,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }, TrickleDown.TrickleDown);
                     return header;
                 },
-                makeCell = () => new VisualElement(),
+                makeCell = () => new VisualElement
+                {
+                    style =
+                    {
+                        marginRight = 4,
+                    }
+                },
                 bindCell = (element, elementIndex) =>
                 {
                     int propIndex = itemIndexToPropertyIndex[elementIndex];

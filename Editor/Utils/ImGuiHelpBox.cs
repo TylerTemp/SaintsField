@@ -59,5 +59,12 @@ namespace SaintsField.Editor.Utils
         // {
         //     EditorGUI.HelpBox(position, content, messageType);
         // }
+
+        private const string DeprecatedImGuiMessage =
+            "IMGUI is deprecated and this attribute/data type can not work. Please switch to UI Toolkit or downgrad to SaintsField 4.32.7";
+
+        public static float DeprecatedGetHeight(float width) =>
+            GetHeight(DeprecatedImGuiMessage, width, EMessageType.Error);
+        public static Rect DeprecatedDraw(Rect position) => Draw(position, DeprecatedImGuiMessage, EMessageType.Error);
     }
 }

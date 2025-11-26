@@ -206,7 +206,7 @@ namespace SaintsField
         private void OnAfterDeserializeProcess()
         {
             _onAfterDeserializeOnce = true;
-            Dictionary.Clear();
+            _dictionary.Clear();
 
             int keyCount = SerializedKeysCount();
             for (int index = 0; index < keyCount; index++)
@@ -214,19 +214,25 @@ namespace SaintsField
                 TKey key = SerializedKeyGetAt(index);
                 TValue value = SerializedValuesCount() > index ? SerializedValueGetAt(index) : default;
 #if UNITY_EDITOR
-                // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
-                if (!RuntimeUtil.IsNull(key) && !Dictionary.ContainsKey(key))
+                if (RuntimeUtil.IsNull(key))
                 {
-                    Dictionary.Add(key, value);
+                    Debug.LogWarning($"Found null key in dictionary at index {index}, skip");
+                    continue;
+                }
+                
+                // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
+                if (!Dictionary.ContainsKey(key))
+                {
+                    _dictionary.Add(key, value);
                 }
                 // if(!RuntimeUtil.IsNull(key))
                 // {
                 //     Dictionary[key] = value;
                 // }
 #else
-                Dictionary.Add(key, value);
+                Debug.Assert(key != null, $"Found null key in dictionary at index {index}");
+                _dictionary.Add(key, value);
 #endif
-                // Dictionary[_keys[index]] = _values[index];
             }
 
 #if UNITY_EDITOR
@@ -488,86 +494,60 @@ namespace SaintsField
 
         public SaintsDictionary()
         {
-            saintsSerializedVersion = SaintsSerializedVersionRuntime;
+            SetupDictionary(new Dictionary<TKey, TValue>());
         }
 
         public SaintsDictionary(IDictionary<TKey, TValue> dictionary)
         {
-            saintsSerializedVersion = SaintsSerializedVersionRuntime;
-
-            _wrapTypeKey = SaintsWrap<TKey>.GuessWrapType();
-            _wrapTypeValue = SaintsWrap<TValue>.GuessWrapType();
-
-            Dictionary = new Dictionary<TKey, TValue>(dictionary);
-            foreach (KeyValuePair<TKey, TValue> kv in Dictionary)
-            {
-                _saintsKeys.Add(new SaintsWrap<TKey>(_wrapTypeKey, kv.Key));
-                _saintsValues.Add(new SaintsWrap<TValue>(_wrapTypeValue, kv.Value));
-            }
+            SetupDictionary(new Dictionary<TKey, TValue>(dictionary));
         }
 
         public SaintsDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
         {
-            _wrapTypeKey = SaintsWrap<TKey>.GuessWrapType();
-            _wrapTypeValue = SaintsWrap<TValue>.GuessWrapType();
-
-            Dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
-            foreach (KeyValuePair<TKey, TValue> kv in Dictionary)
-            {
-                _saintsKeys.Add(new SaintsWrap<TKey>(_wrapTypeKey, kv.Key));
-                _saintsValues.Add(new SaintsWrap<TValue>(_wrapTypeValue, kv.Value));
-            }
+            SetupDictionary(new Dictionary<TKey, TValue>(dictionary, comparer));
         }
 
 #if UNITY_2021_2_OR_NEWER
         public SaintsDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection)
         {
-            _wrapTypeKey = SaintsWrap<TKey>.GuessWrapType();
-            _wrapTypeValue = SaintsWrap<TValue>.GuessWrapType();
-
-            Dictionary = new Dictionary<TKey, TValue>(collection);
-            foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
-            {
-                _saintsKeys.Add(new SaintsWrap<TKey>(_wrapTypeKey, kv.Key));
-                _saintsValues.Add(new SaintsWrap<TValue>(_wrapTypeValue, kv.Value));
-            }
+            SetupDictionary(new Dictionary<TKey, TValue>(collection));
         }
 
         public SaintsDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection,
             IEqualityComparer<TKey> comparer)
         {
-            _wrapTypeKey = SaintsWrap<TKey>.GuessWrapType();
-            _wrapTypeValue = SaintsWrap<TValue>.GuessWrapType();
-
-            Dictionary = new Dictionary<TKey, TValue>(collection, comparer);
-            foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
-            {
-                _saintsKeys.Add(new SaintsWrap<TKey>(_wrapTypeKey, kv.Key));
-                _saintsValues.Add(new SaintsWrap<TValue>(_wrapTypeValue, kv.Value));
-            }
+            SetupDictionary(new Dictionary<TKey, TValue>(collection, comparer));
         }
 #endif
 
         public SaintsDictionary(IEqualityComparer<TKey> comparer)
         {
+            SetupDictionary(new Dictionary<TKey, TValue>(comparer));
+        }
+
+        private void SetupDictionary(Dictionary<TKey, TValue> dictionary)
+        {
+            saintsSerializedVersion = SaintsSerializedVersionRuntime;
+            
             _wrapTypeKey = SaintsWrap<TKey>.GuessWrapType();
             _wrapTypeValue = SaintsWrap<TValue>.GuessWrapType();
-
-            Dictionary = new Dictionary<TKey, TValue>(comparer);
-            foreach (KeyValuePair<TKey,TValue> kv in Dictionary)
+            
+#if UNITY_EDITOR
+            foreach (KeyValuePair<TKey,TValue> kv in dictionary)
             {
                 _saintsKeys.Add(new SaintsWrap<TKey>(_wrapTypeKey, kv.Key));
                 _saintsValues.Add(new SaintsWrap<TValue>(_wrapTypeValue, kv.Value));
             }
+#endif
+
+            _dictionary = dictionary;
+            _onAfterDeserializeOnce = true;
         }
 
         #region Convert
 
-        // Implicit conversion operator: Converts SaintsDictionary<,> to Dictionary<,>
         public static implicit operator Dictionary<TKey, TValue>(SaintsDictionary<TKey, TValue> saintsDict) => saintsDict.Dictionary;
-
-        // Explicit conversion operator: Converts T[] to SaintsArray<T>
-        public static explicit operator SaintsDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict) => new SaintsDictionary<TKey, TValue>(dict);
+        public static implicit operator SaintsDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict) => new SaintsDictionary<TKey, TValue>(dict);
 
         #endregion
     }
