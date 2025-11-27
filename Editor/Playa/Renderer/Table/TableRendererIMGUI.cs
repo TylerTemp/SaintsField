@@ -4,7 +4,7 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.Table
+namespace SaintsField.Editor.Playa.Renderer.Table
 {
     public partial class TableRenderer
     {

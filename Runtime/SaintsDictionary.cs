@@ -177,8 +177,8 @@ namespace SaintsField
         }
 
 #if UNITY_EDITOR
-        private HashSet<SaintsWrap<TKey>> _editorWatchedKeys = new HashSet<SaintsWrap<TKey>>();
-        private HashSet<SaintsWrap<TValue>> _editorWatchedValues = new HashSet<SaintsWrap<TValue>>();
+        private List<SaintsWrap<TKey>> _editorWatchedKeys = new List<SaintsWrap<TKey>>();
+        private List<SaintsWrap<TValue>> _editorWatchedValues = new List<SaintsWrap<TValue>>();
 #endif
         public void OnAfterDeserialize()
         {
@@ -219,7 +219,7 @@ namespace SaintsField
                     Debug.LogWarning($"Found null key in dictionary at index {index}, skip");
                     continue;
                 }
-                
+
                 // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
                 if (!Dictionary.ContainsKey(key))
                 {
@@ -528,10 +528,10 @@ namespace SaintsField
         private void SetupDictionary(Dictionary<TKey, TValue> dictionary)
         {
             saintsSerializedVersion = SaintsSerializedVersionRuntime;
-            
+
             _wrapTypeKey = SaintsWrap<TKey>.GuessWrapType();
             _wrapTypeValue = SaintsWrap<TValue>.GuessWrapType();
-            
+
 #if UNITY_EDITOR
             foreach (KeyValuePair<TKey,TValue> kv in dictionary)
             {

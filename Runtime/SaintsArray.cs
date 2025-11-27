@@ -140,7 +140,7 @@ namespace SaintsField
         }
 
 #if UNITY_EDITOR
-        private HashSet<SaintsWrap<T>> _editorWatchedKeys = new HashSet<SaintsWrap<T>>();
+        private List<SaintsWrap<T>> _editorWatchedKeys = new List<SaintsWrap<T>>();
 #endif
         public void OnAfterDeserialize()
         {
@@ -169,7 +169,7 @@ namespace SaintsField
         private void OnAfterDeserializeProcess()
         {
             int serCount = _saintsList.Count;
-            _array = Enumerable.Range(0, serCount).Select(_ => default(T)).ToArray();
+            _array = new T[serCount];
             for (int index = 0; index < serCount; index++)
             {
                 T v = _saintsList[index].GetValue();

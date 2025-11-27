@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -29,25 +30,27 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
                 },
             };
             helpBox.AddToClassList(ClassAllowDisable);
+
             return helpBox;
         }
 
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             MinValueAttribute minValueAttribute = (MinValueAttribute)saintsAttribute;
 
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            TrackValue(property, minValueAttribute, helpBox, onValueChangedCallback, info, parent);
+            helpBox.TrackPropertyValue(property, _ => TrackValue(property, minValueAttribute, helpBox, onValueChangedCallback, info, parent));
+            helpBox.RegisterCallback<DetachFromPanelEvent>(_ => UIToolkitUtils.Unbind(helpBox));
+        }
+
+        private static void TrackValue(SerializedProperty property, MinValueAttribute minValueAttribute,
+            HelpBox helpBox, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
             (string error, float valueLimit) = GetLimitFloat(property, minValueAttribute, info, parent);
 
-            if (helpBox.text != error)
-            {
-                helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
-                helpBox.text = error;
-            }
+            UIToolkitUtils.SetHelpBox(helpBox, error);
 
             if (error != "")
             {

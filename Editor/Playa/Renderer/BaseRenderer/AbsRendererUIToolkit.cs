@@ -30,7 +30,7 @@ using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
-using SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings;
+using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;

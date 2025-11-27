@@ -13,7 +13,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
+namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 {
     public partial class ListDrawerSettingsRenderer
     {

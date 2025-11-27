@@ -978,6 +978,7 @@ namespace SaintsField.Editor.Utils
                 }
                 catch (InvalidCastException e)
                 {
+                    Debug.LogError($"Failed to convert {genResult} to type {typeof(T)}");
                     Debug.LogException(e);
                     return (e.Message, defaultValue);
                 }
@@ -2063,6 +2064,7 @@ namespace SaintsField.Editor.Utils
                 return ("", -1, rawValue);
             }
 
+            // Debug.Log($"get value at {arrayIndex} from rawValue {((IEnumerable)rawValue).Cast<object>().Count()}");
             (string indexError, object indexResult) = GetValueAtIndex(rawValue, arrayIndex);
             if (indexError != "")
             {

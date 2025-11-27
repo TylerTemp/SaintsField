@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Improve: `MinValue` & `MaxValue` now behaves more naturally if you use both attributes together
+2.  Fix: `MinMaxSlider` did not check the callback boundary automaticlly when edited (used to require a ctrl/cmd+s)
+
 ## 5.4.3 ##
 
 1.  Add: `[SaintsDictionary]` now works with `ShowInInspector`
@@ -45,7 +50,6 @@
     *   `PropRange`
     *   `MinMaxSlider`
     *   `ProgressBar`
-    *   `LabelText`
     *   `AnimParams`
     *   `AnimState`
     *   `CurveRange`

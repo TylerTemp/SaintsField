@@ -315,6 +315,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateMinMax);
                     container.RegisterCallback<DetachFromPanelEvent>(_ =>
                         SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
+                    container.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
 
                     // Well, this does not work, tf Unity
                     // field.MinMaxSliderElementInt.bindingPath = property.propertyPath;
@@ -361,6 +362,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                     SaintsEditorApplicationChanged.OnAnyEvent.AddListener(UpdateMinMax);
                     container.RegisterCallback<DetachFromPanelEvent>(_ =>
                         SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(UpdateMinMax));
+                    container.TrackSerializedObjectValue(property.serializedObject, _ => UpdateMinMax());
 
                     // Well, this does not work, tf Unity
                     // field.MinMaxSliderElementInt.bindingPath = property.propertyPath;

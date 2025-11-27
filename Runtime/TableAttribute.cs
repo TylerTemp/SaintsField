@@ -5,10 +5,11 @@ using SaintsField.Interfaces;
 using SaintsField.Playa;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Field)]
     public class TableAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;

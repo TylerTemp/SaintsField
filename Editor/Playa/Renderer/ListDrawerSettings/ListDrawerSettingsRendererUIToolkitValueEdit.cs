@@ -7,12 +7,11 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
+namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 {
     public partial class ListDrawerSettingsRenderer
     {
