@@ -149,7 +149,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
         private void OnArrayPropertyChanged()
         {
-            var arrayProp = _fieldWithInfo.SerializedProperty;
+            SerializedProperty arrayProp = _fieldWithInfo.SerializedProperty;
             int newArraySize = arrayProp.arraySize;
             if (newArraySize == 0)
             {
@@ -184,9 +184,8 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 //                 sortingEnabled = true,
 // #endif
                 };
-                _tableContentContainer.Add(multiColumnListView);
 
-                var firstProp = arrayProp.GetArrayElementAtIndex(0);
+                SerializedProperty firstProp = arrayProp.GetArrayElementAtIndex(0);
                 bool itemIsObject = firstProp.propertyType == SerializedPropertyType.ObjectReference;
 
                 if (itemIsObject)
@@ -194,6 +193,30 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                     Object obj0 = multiColumnListView.itemsSource.Cast<SerializedProperty>()
                         .Select(each => each.objectReferenceValue)
                         .FirstOrDefault(each => each);
+
+                    if (!obj0)
+                    {
+                        // PropertyField nullProp = new PropertyField(child0);
+                        // nullProp.Bind(child0.serializedObject);
+                        // return nullProp;
+                        ObjectField arrayItemProp = new ObjectField("")
+                        {
+                            objectType = ReflectUtils.GetElementType(_fieldWithInfo.FieldInfo?.FieldType??_fieldWithInfo.PropertyInfo.PropertyType),
+                        };
+
+                        _tableContentContainer.Add(arrayItemProp);
+
+                        arrayItemProp.RegisterValueChangedCallback(evt =>
+                        {
+                            var newValue = evt.newValue;
+                            _tableContentContainer.Clear();
+                            _preArraySize = 0;
+                            _fieldWithInfo.SerializedProperty.GetArrayElementAtIndex(0).objectReferenceValue = newValue;
+                            _fieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                            OnArrayPropertyChanged();
+                        });
+                        return;
+                    }
 
                     Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
                     Dictionary<string, bool> columnToDefaultHide = new Dictionary<string, bool>();
@@ -529,7 +552,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                         .ToList();
                 };
                 multiColumnListView.RegisterCallback<KeyDownEvent>(evt =>
-            {
+                {
                 // ReSharper disable once MergeIntoLogicalPattern
                 bool ctrl = evt.modifiers == EventModifiers.Control ||
                             evt.modifiers == EventModifiers.Command;
@@ -576,6 +599,8 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 }
             });
 
+                _tableContentContainer.Add(multiColumnListView);
+
                 return;
             }
 
@@ -583,7 +608,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             {
                 _preArraySize = newArraySize;
                 // MultiColumnListView multiColumnListView = container.Q<MultiColumnListView>();
-                var source = MakeSource(arrayProp);
+                List<SerializedProperty> source = MakeSource(arrayProp);
                 // Debug.Log($"Refresh set source to {string.Join(", ", source.Select(each => $"{each.propertyPath}/{each.propertyType}"))}");
                 _multiColumnListView.itemsSource = source;
                 // _multiColumnListView.Rebuild();
