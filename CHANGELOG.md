@@ -1,9 +1,11 @@
 # Changelog
 
-## WIP ##
+## 5.4.4 ##
 
 1.  Improve: `MinValue` & `MaxValue` now behaves more naturally if you use both attributes together
 2.  Fix: `MinMaxSlider` did not check the callback boundary automaticlly when edited (used to require a ctrl/cmd+s)
+3.  Fix: `Table` incorrect indent
+4.  Fix: Serialized Data might incorrectly read `null` value when `Instantiate` a prefab
 
 ## 5.4.3 ##
 
@@ -11,7 +13,7 @@
 2.  Fix: `SaintsDictionary` the input element was a bit out of area
 3.  Fix: `ListDrawerSettings` in `ShowInInspector`, the searching function was not case-insensetive
 4.  Fix: `SaintsDictionary` failed to take an initial value if you create one at runtime
- 
+
 ## 5.4.2 ##
 
 1.  Fix: `PositionHandle` now use editor's "Tool Handle Rotation" value [#332](https://github.com/TylerTemp/SaintsField/discussions/332)

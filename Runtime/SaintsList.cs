@@ -51,16 +51,15 @@ namespace SaintsField
             }
 #endif
 
-#if UNITY_EDITOR
-            // do nothing
-#else
-            _saintsList.Clear();
-            foreach (T v in _list)
-            {
-                _saintsList.Add(new SaintsWrap<T>(_wrapType, v));
-            }
-
-#endif
+// #if UNITY_EDITOR
+//             // do nothing
+// #else
+//             _saintsList.Clear();
+//             foreach (T v in _list)
+//             {
+//                 _saintsList.Add(new SaintsWrap<T>(_wrapType, v));
+//             }
+// #endif
             _saintsSerializedVersion = SaintsSerializedVersionRuntime;
         }
 

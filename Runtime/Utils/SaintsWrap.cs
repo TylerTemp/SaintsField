@@ -28,14 +28,14 @@ namespace SaintsField.Utils
         public static readonly string EditorPropertyName = nameof(value);
 #endif
 
-        private bool _hasValue;
+        // private bool _hasValue;
 
         // ReSharper disable once ParameterHidesMember
         public void SetValue(WrapType wrapType, T v)
         {
             this.wrapType = wrapType;
             _runtimeResult = v;
-            _hasValue = true;
+            // _hasValue = true;
 
 #if UNITY_EDITOR
             EnsureInit();
@@ -147,10 +147,11 @@ namespace SaintsField.Utils
 
         public T GetValue()
         {
-            if (_hasValue)
-            {
-                return _runtimeResult;
-            }
+            // if (_hasValue)
+            // {
+            //     Debug.Log($"OnAfterDeserializeProcess already has value, return it {_runtimeResult}");
+            //     return _runtimeResult;
+            // }
 
             EnsureInit();
             switch (wrapType)
@@ -158,6 +159,7 @@ namespace SaintsField.Utils
                 case WrapType.Undefined:
                 case WrapType.T:
                 {
+                    // Debug.Log($"OnAfterDeserializeProcess Undefined/T use value");
                     if((object)_runtimeResult != (object)value)
                     {
                         _runtimeResult = value;
@@ -171,6 +173,7 @@ namespace SaintsField.Utils
                     break;
                 case WrapType.Array:
                 {
+                    // Debug.Log($"OnAfterDeserializeProcess Array use valueArray");
                     bool changed = false;
                     if (_runtimeResult == null)
                     {
@@ -213,6 +216,7 @@ namespace SaintsField.Utils
                     break;
                 case WrapType.List:
                 {
+                    // Debug.Log($"OnAfterDeserializeProcess Array use valueList");
                     bool changed = false;
                     if (_runtimeResult == null)
                     {
@@ -264,6 +268,7 @@ namespace SaintsField.Utils
 
                 case WrapType.Field:
                 {
+                    // Debug.Log($"OnAfterDeserializeProcess Field use valueField");
                     if(!SaintsSerializedPropertyEqual(_runtimeResult, valueField, valueField.IsVRef))
                     {
                         _runtimeResult = GetFromSaintsSerializedProperty(valueField);
@@ -286,7 +291,7 @@ namespace SaintsField.Utils
 //             valueArray = Array.Empty<SaintsSerializedProperty>();
 //             valueList.Clear();
 // #endif
-            _hasValue = true;
+            // _hasValue = true;
             return _runtimeResult;
 
         }
@@ -518,12 +523,13 @@ namespace SaintsField.Utils
         public override int GetHashCode()
         {
             EnsureInit();
-            if (!_hasValue)
-            {
-                return GetValue()?.GetHashCode() ?? 0;
-            }
-
-            return _runtimeResult?.GetHashCode() ?? 0;
+            return GetValue()?.GetHashCode() ?? 0;
+            // if (!_hasValue)
+            // {
+            //     return GetValue()?.GetHashCode() ?? 0;
+            // }
+            //
+            // return _runtimeResult?.GetHashCode() ?? 0;
         }
 
         public bool Equals(SaintsWrap<T> other)
@@ -561,7 +567,7 @@ namespace SaintsField.Utils
 
         public void OnAfterDeserialize()
         {
-            _hasValue = false;
+            // _hasValue = false;
             GetValue();
             EditorOnAfterDeserializeChanged.Invoke();
         }

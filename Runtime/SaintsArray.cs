@@ -18,10 +18,10 @@ namespace SaintsField
         , IStructuralComparable
         , ISerializationCallbackReceiver
     {
-        [SerializeField, Obsolete]
-        public T[] value = {};
+        // [SerializeField, Obsolete]
+        // public T[] value = {};
 
-        [SerializeField] private List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
+        [SerializeField] public List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
         [SerializeField] private int _saintsSerializedVersion;
         private const int SaintsSerializedVersionRuntime = 2;
         [SerializeField] private WrapType _wrapType;
@@ -107,36 +107,36 @@ namespace SaintsField
 
         public void OnBeforeSerialize()
         {
-#if UNITY_EDITOR
-            // ReSharper disable once InvertIf
-            if (_saintsSerializedVersion < 2)
-            {
-                _wrapType = SaintsWrap<T>.GuessWrapType();
+// #if UNITY_EDITOR
+//             // ReSharper disable once InvertIf
+//             if (_saintsSerializedVersion < 2)
+//             {
+//                 _wrapType = SaintsWrap<T>.GuessWrapType();
+//
+//                 _saintsSerializedVersion = 2;
+//                 _saintsList.Clear();
+// #pragma warning disable CS0612 // Type or member is obsolete
+//                 foreach (T oldValue in value)
+// #pragma warning restore CS0612 // Type or member is obsolete
+//                 {
+//                     _saintsList.Add(new SaintsWrap<T>(_wrapType, oldValue));
+//                 }
+//
+//                 // ReSharper disable once RedundantJumpStatement
+//                 return;
+//             }
+// #endif
 
-                _saintsSerializedVersion = 2;
-                _saintsList.Clear();
-#pragma warning disable CS0612 // Type or member is obsolete
-                foreach (T oldValue in value)
-#pragma warning restore CS0612 // Type or member is obsolete
-                {
-                    _saintsList.Add(new SaintsWrap<T>(_wrapType, oldValue));
-                }
-
-                // ReSharper disable once RedundantJumpStatement
-                return;
-            }
-#endif
-
-#if UNITY_EDITOR
-            // do nothing
-#else
-            _saintsList.Clear();
-            foreach (T v in _array)
-            {
-                _saintsList.Add(new SaintsWrap<T>(_wrapType, v));
-            }
-
-#endif
+// #if UNITY_EDITOR
+//             // do nothing
+// #else
+//             _saintsList.Clear();
+//             foreach (T v in _array)
+//             {
+//                 _saintsList.Add(new SaintsWrap<T>(_wrapType, v));
+//             }
+//
+// #endif
         }
 
 #if UNITY_EDITOR
@@ -144,15 +144,15 @@ namespace SaintsField
 #endif
         public void OnAfterDeserialize()
         {
-#if UNITY_EDITOR
-            if (_saintsSerializedVersion < 2)
-            {
-#pragma warning disable CS0612 // Type or member is obsolete
-                _array = value;
-#pragma warning restore CS0612 // Type or member is obsolete
-                return;
-            }
-#endif
+// #if UNITY_EDITOR
+//             if (_saintsSerializedVersion < 2)
+//             {
+// #pragma warning disable CS0612 // Type or member is obsolete
+//                 _array = value;
+// #pragma warning restore CS0612 // Type or member is obsolete
+//                 return;
+//             }
+// #endif
 
 #if UNITY_EDITOR
             IEnumerable<SaintsWrap<T>> extraKeys = _saintsList.Except(_editorWatchedKeys);
@@ -173,13 +173,14 @@ namespace SaintsField
             for (int index = 0; index < serCount; index++)
             {
                 T v = _saintsList[index].GetValue();
+                // Debug.Log($"OnAfterDeserializeProcess [{index}] null: {v==null}({_saintsList[index].wrapType}/{_saintsList[index].value})");
                 _array[index] = v;
             }
 
 #if UNITY_EDITOR
             // do nothing
 #else
-            _saintsList.Clear();
+            // _saintsList.Clear();
 #endif
         }
 

@@ -216,7 +216,6 @@ namespace SaintsField
 #if UNITY_EDITOR
                 if (RuntimeUtil.IsNull(key))
                 {
-                    Debug.LogWarning($"Found null key in dictionary at index {index}, skip");
                     continue;
                 }
 
@@ -238,8 +237,8 @@ namespace SaintsField
 #if UNITY_EDITOR
             // do nothing
 #else
-            SerializedKeysClear();
-            SerializedValuesClear();
+            // SerializedKeysClear();
+            // SerializedValuesClear();
 #endif
         }
 
