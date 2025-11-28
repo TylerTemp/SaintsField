@@ -96,7 +96,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.4.4**
+**5.4.5**
 
 1.  Improve: `MinValue` & `MaxValue` now behaves more naturally if you use both attributes together
 2.  Fix: `MinMaxSlider` did not check the callback boundary automaticlly when edited (used to require a ctrl/cmd+s)
