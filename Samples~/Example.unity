@@ -1089,7 +1089,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 04c54e912690bfb4ba15453a1e41d49d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue200.Issue200Se
   debugHolder: 
   mainC:
     mainS: 
@@ -1155,10 +1155,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   withAttr:
-    value:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
     _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
@@ -15845,25 +15841,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saintsArrayGo:
-    value: []
     _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
   gameObjects2:
-  - value:
-    - {fileID: 0}
-    - {fileID: 0}
-    _saintsList: []
+  - _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
   gameObjects2Nest:
-    value: []
     _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
   gameObjects4: []
   _arrSize:
-    value: 0000000000000000
     _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
@@ -20784,6 +20774,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56615ab2f7d08384cb69cb27b0faa746, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue344BoxIndent
+  gatheringFromWorld:
+    gathering:
+      cell1:
+        type: 0
+        worldObject: 
+        displayBiome: 
+        f2: 0
+        f3: 0
+        range: {x: 0, y: 0}
+      cell2:
+        type: 0
+        worldObject: 
+        displayBiome: 
+        f2: 0
+        f3: 0
+        range: {x: 0, y: 0}
+      cell3:
+        type: 0
+        worldObject: 
+        displayBiome: 
+        f2: 0
+        f3: 0
+        range: {x: 0, y: 0}
+    n: 
+    damage: 
+    health: 
+    size: 
 --- !u!1 &1350909637
 GameObject:
   m_ObjectHideFlags: 0
@@ -22713,6 +22730,7 @@ Transform:
   - {fileID: 1819524261}
   - {fileID: 153662392}
   - {fileID: 1696357885}
+  - {fileID: 1648914610}
   - {fileID: 993807258}
   - {fileID: 1604104088}
   - {fileID: 1875572972}
@@ -23489,6 +23507,15 @@ MonoBehaviour:
           rid: -2
         IsVRef: 0
       valueArray:
+      - propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 1528962972}
+        VRef:
+          rid: -2
+        IsVRef: 0
       - propertyType: 0
         propertyPath: 
         longValue: 0
@@ -24723,6 +24750,430 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hvrTeleporter: {fileID: 831760790}
   hvrTeleporterInactive: {fileID: 1597261715}
+--- !u!1 &1648914609
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1648914610}
+  - component: {fileID: 1648914611}
+  m_Layer: 0
+  m_Name: DictionaryOtherTypes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1648914610
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1648914609}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1648914611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1648914609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 440a9d69fa9101048935fda346a96e7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.DictionaryOtherTypes
+  rac:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  ac:
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+  acArr:
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value:
+      - serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+  rg:
+    serializedVersion: 2
+    key0: {r: 0, g: 0.16926694, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  g:
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value:
+        serializedVersion: 2
+        key0: {r: 0, g: 0.16926694, b: 1, a: 1}
+        key1: {r: 1, g: 1, b: 1, a: 1}
+        key2: {r: 0, g: 0, b: 0, a: 0}
+        key3: {r: 0, g: 0, b: 0, a: 0}
+        key4: {r: 0, g: 0, b: 0, a: 0}
+        key5: {r: 0, g: 0, b: 0, a: 0}
+        key6: {r: 0, g: 0, b: 0, a: 0}
+        key7: {r: 0, g: 0, b: 0, a: 0}
+        ctime0: 0
+        ctime1: 65535
+        ctime2: 0
+        ctime3: 0
+        ctime4: 0
+        ctime5: 0
+        ctime6: 0
+        ctime7: 0
+        atime0: 0
+        atime1: 65535
+        atime2: 0
+        atime3: 0
+        atime4: 0
+        atime5: 0
+        atime6: 0
+        atime7: 0
+        m_Mode: 0
+        m_ColorSpace: -1
+        m_NumColorKeys: 2
+        m_NumAlphaKeys: 2
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+  gArr:
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value:
+      - serializedVersion: 2
+        key0: {r: 0, g: 0.16926694, b: 1, a: 1}
+        key1: {r: 1, g: 1, b: 1, a: 1}
+        key2: {r: 0, g: 0, b: 0, a: 0}
+        key3: {r: 0, g: 0, b: 0, a: 0}
+        key4: {r: 0, g: 0, b: 0, a: 0}
+        key5: {r: 0, g: 0, b: 0, a: 0}
+        key6: {r: 0, g: 0, b: 0, a: 0}
+        key7: {r: 0, g: 0, b: 0, a: 0}
+        ctime0: 0
+        ctime1: 65535
+        ctime2: 0
+        ctime3: 0
+        ctime4: 0
+        ctime5: 0
+        ctime6: 0
+        ctime7: 0
+        atime0: 0
+        atime1: 65535
+        atime2: 0
+        atime3: 0
+        atime4: 0
+        atime5: 0
+        atime6: 0
+        atime7: 0
+        m_Mode: 0
+        m_ColorSpace: -1
+        m_NumColorKeys: 2
+        m_NumAlphaKeys: 2
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+  rro:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  ro:
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value:
+        m_Left: 0
+        m_Right: 0
+        m_Top: 0
+        m_Bottom: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+  roArr:
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value:
+      - m_Left: 0
+        m_Right: 0
+        m_Top: 0
+        m_Bottom: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &1649546546
 GameObject:
   m_ObjectHideFlags: 0

@@ -226,6 +226,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 else
                 {
                     (string getValueError, int _, object getValue) = Util.GetValue(property, info, parentValue);
+                    // Debug.Log($"Get {getValue}(error={getValueError}) from parentValue={parentValue}/{property.propertyPath}");
                     if (getValueError != "")
                     {
                         error = getValueError;
@@ -242,7 +243,52 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     return;
                 }
 
-                Debug.Assert(value != null);
+                if (value == null)
+                {
+                    // https://github.com/TylerTemp/SaintsField/issues/200
+                    // Unity will re-render this whole, for no reason...
+                    var errorHelpBox = new HelpBox($"Failed to get value from {property.propertyPath}",
+                        HelpBoxMessageType.Error);
+                    root.Add(errorHelpBox);
+                    try
+                    {
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
+                            parentValue,
+                            Activator.CreateInstance(info is PropertyInfo pi
+                                ? pi.PropertyType
+                                : ((FieldInfo)info).FieldType));
+                    }
+                    catch (Exception)
+                    {
+                        return;
+                    }
+                    errorHelpBox.schedule.Execute(() =>
+                    {
+                        try
+                        {
+                            property.serializedObject.Update();
+                            object parentValueAgain = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+                            (string __, int _, object getValue) = Util.GetValue(property, info, parentValueAgain);
+                            if (getValue != null)
+                            {
+                                root.Clear();
+                                FillElement(root, label, property, info, inHorizontalLayout, makeRenderer,
+                                    doTweenPlayRecorder,
+                                    parent);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            return;
+                        }
+#if SAINTSFIELD_DEBUG
+                        Debug.Log("Patched up #200");
+#endif
+                    }).StartingIn(150);
+                    return;
+                }
+
+                // Debug.Assert(value != null);
             }
 
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
