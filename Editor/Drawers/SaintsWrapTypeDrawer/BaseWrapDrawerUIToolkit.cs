@@ -45,10 +45,10 @@ namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
                 : info.FieldType;
 
             // Debug.Log(info.FieldType);
-            // Debug.Log(elementType);
             Type wrapType = elementType.GetGenericArguments()[0];
 
             SerializedProperty wrapTypeProp = property.FindPropertyRelative("wrapType");
+            // Debug.Log($"BaseWrap wrapType {wrapType}={wrapTypeProp.intValue}");
 
             switch (wrapTypeProp.intValue)
             {

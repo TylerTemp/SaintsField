@@ -52,8 +52,14 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             });
 
             bool canNotAssignUnityObject =
-                nonUnityType.IsClass && !typeof(UnityEngine.Object).IsAssignableFrom(nonUnityType)
+                nonUnityType.IsClass && !typeof(Object).IsAssignableFrom(nonUnityType)
                 || nonUnityType.IsValueType;
+            bool canOnlyAssignUnityObject =
+                nonUnityType.IsClass && typeof(Object).IsAssignableFrom(nonUnityType);
+            if (canOnlyAssignUnityObject)
+            {
+                isVRefButton.style.display = DisplayStyle.None;
+            }
 
             if (canNotAssignUnityObject)
             {
@@ -76,7 +82,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             Add(columnContainer);
 
             _objectContainer =
-                new GeneralUObjectPicker(_unityProp.propertyPath, _unityProp.objectReferenceValue, typeof(UnityEngine.Object), nonUnityType, property.serializedObject.targetObject)
+                new GeneralUObjectPicker(_unityProp.propertyPath, _unityProp.objectReferenceValue, typeof(Object), nonUnityType, property.serializedObject.targetObject)
                     {
                         // bindingPath = _unityProp.propertyPath,
                         // value = _unityProp.objectReferenceValue,
@@ -216,7 +222,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             return _cachedTypesImplementingInterface ??= AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
                 .Where(type => !type.IsAbstract
-                               &&!typeof(UnityEngine.Object).IsAssignableFrom(type)
+                               &&!typeof(Object).IsAssignableFrom(type)
                                && interfaceType.IsAssignableFrom(type))
                 .ToArray();
         }

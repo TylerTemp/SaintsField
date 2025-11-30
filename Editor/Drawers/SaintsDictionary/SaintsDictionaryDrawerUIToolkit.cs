@@ -399,6 +399,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);
             IReadOnlyList<Attribute> injectedValueAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
             WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeValue"), valuesField, injectedValueAttributes);
+            // Debug.Log($"decide valueWrapType={valueWrapType} for {valuesField.Name}/{valueType}");
 
             IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
             totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
