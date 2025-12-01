@@ -5,7 +5,7 @@ using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
+namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 {
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.ValuePriority)]

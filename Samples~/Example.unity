@@ -23440,8 +23440,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1528962970}
-  - component: {fileID: 1528962971}
   - component: {fileID: 1528962972}
+  - component: {fileID: 1528962973}
   m_Layer: 0
   m_Name: Issue338SaintsDictionary
   m_TagString: Untagged
@@ -23465,7 +23465,19 @@ Transform:
   - {fileID: 2027839467}
   m_Father: {fileID: 1486592967}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1528962971
+--- !u!114 &1528962972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1528962969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3420d0b328b5b4489b40c0fdc5b489e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue338.ContextHintElement1
+--- !u!114 &1528962973
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -23495,7 +23507,8 @@ MonoBehaviour:
       wrapType: 4
     _wrapTypeKey: 4
     _saintsValues:
-    - value: []
+    - value:
+      - {fileID: 1528962972}
       valueField:
         propertyType: 0
         propertyPath: 
@@ -23506,46 +23519,16 @@ MonoBehaviour:
         VRef:
           rid: -2
         IsVRef: 0
-      valueArray:
-      - propertyType: 0
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 1528962972}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      - propertyType: 0
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 1528962972}
-        VRef:
-          rid: -2
-        IsVRef: 0
+      valueArray: []
       valueList: []
-      wrapType: 2
-    _wrapTypeValue: 2
+      wrapType: 4
+    _wrapTypeValue: 4
     saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
---- !u!114 &1528962972
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1528962969}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3420d0b328b5b4489b40c0fdc5b489e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue338.ContextHintElement1
 --- !u!1 &1538400497
 GameObject:
   m_ObjectHideFlags: 0

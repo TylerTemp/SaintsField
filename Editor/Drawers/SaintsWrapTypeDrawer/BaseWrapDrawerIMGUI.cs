@@ -4,7 +4,7 @@ using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
+namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 {
     public partial class BaseWrapDrawer
     {

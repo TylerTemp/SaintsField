@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.BaseWrapTypeDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.RendererGroup;
@@ -28,6 +27,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             if (underType.IsArray)
             {
                 needUseRef = !RuntimeUtil.IsSubFieldUnitySerializable(underType.GetElementType());
+                // Debug.Log($"is array {underType} and needUseRef={needUseRef}");
             }
             else if(underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
             {
@@ -45,12 +45,12 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 {
                     Type arrayElement = underType.GetElementType();
                     Debug.Assert(arrayElement != null);
-                    needUseRef = arrayElement.IsInterface || arrayElement.IsAbstract;
+                    needUseRef = arrayElement.IsInterface || (arrayElement.IsAbstract && !typeof(UnityEngine.Object).IsAssignableFrom(arrayElement));
                 }
                 else if (underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
                 {
                     Type listElement = underType.GetGenericArguments()[0];
-                    needUseRef = listElement.IsInterface || listElement.IsAbstract;
+                    needUseRef = listElement.IsInterface || (listElement.IsAbstract && !typeof(UnityEngine.Object).IsAssignableFrom(listElement));
                 }
             }
 
@@ -58,6 +58,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             {
                 if (underType.IsArray)
                 {
+                    Debug.Log($"is array because array underhood needUseRef=true");
                     return WrapType.Array;
                 }
 
@@ -72,10 +73,10 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             return WrapType.T;
         }
 
-        public static WrapType EnsureWrapType(SerializedProperty wrapTypeProperty, FieldInfo listField, IReadOnlyList<Attribute> injectedKeyAttributes)
+        public static WrapType EnsureWrapType(SerializedProperty wrapTypeProperty, FieldInfo info, IReadOnlyList<Attribute> injectedKeyAttributes)
         {
             Debug.Assert(wrapTypeProperty != null);
-            WrapType wrapType = GetWrapType(listField, injectedKeyAttributes);
+            WrapType wrapType = GetWrapType(info, injectedKeyAttributes);
             // ReSharper disable once InvertIf
             if (wrapTypeProperty.intValue != (int)wrapType)
             {
@@ -93,7 +94,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             if (wrapTypeProp.intValue != (int)saintsWrapType)
             {
 #if SAINTSFIELD_DEBUG
-                Debug.Log($"set wrap from {(WrapType)wrapTypeProp.intValue} to {WrapType.Array}");
+                Debug.Log($"set wrap from {(WrapType)wrapTypeProp.intValue} to {WrapType.Array} for {info.FieldType}/{rawType}");
 #endif
                 wrapTypeProp.intValue = (int)saintsWrapType;
                 serializedProperty.serializedObject.ApplyModifiedProperties();
@@ -264,7 +265,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
             // return (result, false);
 
-            // Debug.Log($"{useAttribute}/{useDrawerType}: {serializedProperty.propertyPath}");
+            Debug.Log($"{useAttribute}/{useDrawerType}({useDrawerType == typeof(BaseWrapDrawer)}): {serializedProperty.propertyPath}");
 
             PropertyDrawer propertyDrawer = useDrawerType == typeof(BaseWrapDrawer)
                 ? SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, info, null, null)  // baseWrap itself will looking into the wrap
@@ -289,7 +290,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 
             if (!useImGui)
             {
-                // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}");
+                Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}(BaseWrapDrawer={propertyDrawer is BaseWrapDrawer})");
                 VisualElement r = propertyDrawer.CreatePropertyGUI(propertyDrawer is BaseWrapDrawer? serializedProperty: serializedBaseProperty);
                 VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
                 UIToolkitUtils.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());

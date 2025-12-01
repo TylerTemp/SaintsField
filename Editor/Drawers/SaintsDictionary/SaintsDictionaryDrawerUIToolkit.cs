@@ -825,7 +825,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     elementProp.isExpanded = true;
                     element.Clear();
 
-                    // Debug.Log($"elementProp={elementProp.propertyPath}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
+                    // Debug.Log($"elementProp={elementProp.propertyPath}, valueWrapType={valueWrapType}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
 
                     VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valueWrapType, valuesField, valueType, elementProp, injectedValueAttributes, this, this, valuesParent);
 

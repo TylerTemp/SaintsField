@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers;
-using SaintsField.Editor.Drawers.BaseWrapTypeDrawer;
 using SaintsField.Editor.Drawers.FullWidthRichLabelDrawer;
 using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;

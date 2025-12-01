@@ -1,11 +1,9 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
-using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
@@ -14,7 +12,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
+namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 {
     public partial class BaseWrapDrawer
     {
@@ -48,7 +46,7 @@ namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
             Type wrapType = elementType.GetGenericArguments()[0];
 
             SerializedProperty wrapTypeProp = property.FindPropertyRelative("wrapType");
-            // Debug.Log($"BaseWrap wrapType {wrapType}={wrapTypeProp.intValue}");
+            Debug.Log($"BaseWrap wrapType {wrapType}={wrapTypeProp.intValue}");
 
             switch (wrapTypeProp.intValue)
             {
@@ -137,9 +135,14 @@ namespace SaintsField.Editor.Drawers.BaseWrapTypeDrawer
                     // PropertyAttribute[] fieldAttributes = ReflectCache.GetCustomAttributes<PropertyAttribute>(info);
 
                     SerializedProperty valueProp = property.FindPropertyRelative("value");
-                    Type valueType = info.FieldType.GetGenericArguments()[0];
-                    // Debug.Log(valueType);
-                    FieldInfo fInfo = valueType.GetField("value", BindingFlags.Instance | BindingFlags.Public);
+                    // info.FieldType=list<SaintsWrap<T>>
+                    // here we want to obtain T for valueType, not SaintsWrap<T>
+                    Debug.Log($"info.FieldType={info.FieldType}");
+                    Type saintsWrapType = info.FieldType.GetGenericArguments()[0];  // SaintsWrap<T>
+                    Type valueType = saintsWrapType.GetGenericArguments()[0];
+                    Debug.Log(valueProp.propertyPath);
+                    Debug.Log(valueType);
+                    FieldInfo fInfo = saintsWrapType.GetField("value", BindingFlags.Instance | BindingFlags.Public);
                     (PropertyAttribute[] _, object valueParent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(valueProp);
 
                     using(new SaintsRowAttributeDrawer.ForceInlineScoop(1))
