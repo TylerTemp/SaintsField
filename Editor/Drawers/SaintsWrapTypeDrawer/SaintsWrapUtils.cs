@@ -265,7 +265,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
             // return (result, false);
 
-            Debug.Log($"{useAttribute}/{useDrawerType}({useDrawerType == typeof(BaseWrapDrawer)}): {serializedProperty.propertyPath}");
+            // Debug.Log($"{useAttribute}/{useDrawerType}({useDrawerType == typeof(BaseWrapDrawer)}): {serializedProperty.propertyPath}");
 
             PropertyDrawer propertyDrawer = useDrawerType == typeof(BaseWrapDrawer)
                 ? SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, info, null, null)  // baseWrap itself will looking into the wrap
@@ -290,7 +290,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 
             if (!useImGui)
             {
-                Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}(BaseWrapDrawer={propertyDrawer is BaseWrapDrawer})");
+                // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}(BaseWrapDrawer={propertyDrawer is BaseWrapDrawer})");
                 VisualElement r = propertyDrawer.CreatePropertyGUI(propertyDrawer is BaseWrapDrawer? serializedProperty: serializedBaseProperty);
                 VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
                 UIToolkitUtils.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
