@@ -96,12 +96,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.4.5**
+**5.4.6**
 
-1.  Improve: `MinValue` & `MaxValue` now behaves more naturally if you use both attributes together
-2.  Fix: `MinMaxSlider` did not check the callback boundary automaticlly when edited (used to require a ctrl/cmd+s)
-3.  Fix: `Table` incorrect indent
-4.  Fix: Serialized Data might incorrectly read `null` value when `Instantiate` a prefab
+1.  Fix: For `SaintsDictionary`, `SaintsHashSet` etc., if the element is obviously `UnityEngine.Object`, now the switch button for `reference type` is removed.
+2.  Fix: `RectOffset` field gave an error when adding a new component
+3.  Fix: For `SaintsDictionary`, `SaintsHashSet` etc., they incorrectly decided the wrap type as special serialization type.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

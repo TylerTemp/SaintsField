@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.4.6 ##
+
+1.  Fix: For `SaintsDictionary`, `SaintsHashSet` etc., if the element is obviously `UnityEngine.Object`, now the switch button for `reference type` is removed.
+2.  Fix: `RectOffset` field gave an error when adding a new component
+3.  Fix: For `SaintsDictionary`, `SaintsHashSet` etc., they incorrectly decided the wrap type as special serialization type.
+
 ## 5.4.5 ##
 
 1.  Improve: `MinValue` & `MaxValue` now behaves more naturally if you use both attributes together
