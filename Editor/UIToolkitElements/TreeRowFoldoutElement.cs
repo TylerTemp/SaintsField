@@ -30,6 +30,7 @@ namespace SaintsField.Editor.UIToolkitElements
         }
 
         private readonly string _labelLow;
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
         public TreeRowFoldoutElement(string label, int indent, bool defaultExpanded)
         {
@@ -61,7 +62,9 @@ namespace SaintsField.Editor.UIToolkitElements
             if (!string.IsNullOrEmpty(label))
             {
                 _labelLow = label.ToLower();
-                labelElement.text = label;
+                UIToolkitUtils.SetLabel(labelElement, RichTextDrawer.ParseRichXml(label, "", null, null, null), _richTextDrawer);
+                // labelElement.text = label;
+                // Debug.Log($"set label text to {label}");
             }
 
             _foldoutElement = treeRow.Q<VisualElement>("saintsfield-tree-row-foldout");
