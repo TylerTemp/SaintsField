@@ -7,6 +7,7 @@
 3.  Add: `TypeReference` now show the "visible"/"internal" category if you have `AllowInternal` set
 4.  Change: `EType.GroupAssembly` & `EType.GroupNameSpace` is now deprecated and is always on in flavor of `TreeDropdown` drawer
 5.  Fix: rich label might give an incorrect `</color (trash text)>` tag
+6.  Fix: `TreeDropdown` foldout label didn't use rich text drawer
 
 ## 5.4.6 ##
 
