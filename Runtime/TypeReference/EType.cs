@@ -49,10 +49,12 @@ namespace SaintsField
         /// <summary>
         /// Group the list by the assmbly short name.
         /// </summary>
+        [Obsolete("TreeView no longer need this options. It's now on by default")]
         GroupAssembly = 1 << 7,
         /// <summary>
         /// Group the list by the type namespace.
         /// </summary>
+        [Obsolete("TreeView no longer need this options. It's now on by default")]
         GroupNameSpace = 1 << 8,
     }
 

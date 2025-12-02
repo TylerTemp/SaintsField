@@ -53,14 +53,23 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
         }
 
-        public void RefreshCurValue(object curValue)
+        public void RefreshCurValue(object curValue, bool isFirst, bool isLast)
         {
             if (Util.GetIsEqual(curValue, Value))
             {
                 const float gray = 0.15f;
                 const float grayBorder = 0.45f;
                 style.backgroundColor = new Color(gray, gray, gray, 1f);
-                style.borderTopColor = style.borderBottomColor = new Color(grayBorder, 0.6f, grayBorder, 1f);
+                var borderColor = new Color(grayBorder, 0.6f, grayBorder, 1f);
+                style.borderTopColor = style.borderBottomColor = borderColor;
+                if (isFirst)
+                {
+                    style.borderLeftColor = borderColor;
+                }
+                else if (isLast)
+                {
+                    style.borderRightColor = borderColor;
+                }
             }
             else
             {

@@ -1,10 +1,45 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
     public class TreeDropdownExample: MonoBehaviour
     {
+        [TreeDropdown(nameof(BookDrop))] public string bookName;
+
+        private IEnumerable<string> BookDrop()
+        {
+            return new[]
+            {
+                "Hackers & Painters, Vol 1",
+                "Hackers & Painters, Vol 2",
+                "The Art of Unix Programming, Vol 1",
+                "The Art of Unix Programming, Vol 2",
+                "The Mythical Man-Month, Vol 1",
+                "The Mythical Man-Month, Vol 2",
+            };
+        }
+
+        [TreeDropdown(nameof(QuickDrop))] public float percent;
+
+        private AdvancedDropdownList<float> QuickDrop()
+        {
+            AdvancedDropdownList<float> result = new AdvancedDropdownList<float>
+            {
+                // { "20%", 0.2f },
+                // { "40%", 0.4f },
+                // { "60%", 0.6f },
+            };
+            // `Add` is supported
+            // result.Add("80%", 0.8f);
+            // rich tag is supported
+            result.Add($"<color={EColor.GoldenRod}>100%<icon=lightMeter/redLight/>", 1f);
+            // disable is supported
+            // result.Add("120%", 1.2f, true);
+            return result;
+        }
+
         [
             TreeDropdown(nameof(AdvDropdown)),
             // PostFieldButton(nameof(Reset), "R"),

@@ -431,17 +431,23 @@ namespace SaintsField.Editor
 
 #if SAINTSFIELD_CODE_ANALYSIS
                     IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers = ScriptInfoUtils.GetMembersCorrectOrder(systemType);
-                    MemberOrderComparer memberOrderComparer = new MemberOrderComparer(codeAnalysisMembers);
+                    MemberOrderComparer memberOrderComparer = codeAnalysisMembers.Count > 0
+                        ? new MemberOrderComparer(codeAnalysisMembers)
+                        : null;
 #endif
 
-                    List<MemberInfo> memberLis = systemType
+                    MemberInfo[] members = systemType
                         .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                    BindingFlags.Public | BindingFlags.DeclaredOnly)
+                                    BindingFlags.Public | BindingFlags.DeclaredOnly);
+
+                    List<MemberInfo> memberLis =
 #if SAINTSFIELD_CODE_ANALYSIS
-                        .OrderBy(memberInfo => memberInfo, memberOrderComparer)
+                        (memberOrderComparer == null
+                            ? members.OrderBy(memberInfo => memberInfo.MetadataToken)
+                            : members.OrderBy(memberInfo => memberInfo, memberOrderComparer))
 #else
                         // this is still not the correct order, but... a bit better
-                        .OrderBy(memberInfo => memberInfo.MetadataToken)
+                        members.OrderBy(memberInfo => memberInfo.MetadataToken).ToList();
 #endif
                         .ToList();
 

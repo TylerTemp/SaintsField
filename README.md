@@ -96,11 +96,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.4.6**
+**5.4.7**
 
-1.  Fix: For `SaintsDictionary`, `SaintsHashSet` etc., if the element is obviously `UnityEngine.Object`, now the switch button for `reference type` is removed.
-2.  Fix: `RectOffset` field gave an error when adding a new component
-3.  Fix: For `SaintsDictionary`, `SaintsHashSet` etc., they incorrectly decided the wrap type as special serialization type.
+1.  Add: `TreeDropdown` now has an indent guild for readability
+2.  Add: `TypeReference` now uses `TreeDropdown`, for a much faster rendering.
+3.  Add: `TypeReference` now show the "visible"/"internal" category if you have `AllowInternal` set
+4.  Change: `EType.GroupAssembly` & `EType.GroupNameSpace` is now deprecated and is always on in flavor of `TreeDropdown` drawer
+5.  Fix: rich label might give an incorrect `</color (trash text)>` tag
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -232,11 +234,9 @@ public string[] sindices;
 
 ![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
 
-#### `FieldLabelText`/`NoLabel` ####
+#### `FieldLabelText` ####
 
 Like `LabelText`, but it can be applied to an array/list to change the element label (instead of the label of array/list itself)
-
-`[NoLabel]` is a shortcut for `[FieldLabelText(null)]`
 
 Use it on an array/list will apply it to all the direct child element instead of the field label itself.
 You can use this to modify elements of an array/list field, in this way:
@@ -258,6 +258,36 @@ private string ArrayLabels(object _, int index) => $"<color=pink>[{(char)('A' + 
 ```
 
 ![label_array](https://github.com/TylerTemp/SaintsField/assets/6391063/232da62c-9e31-4415-a09a-8e1e95ae9441)
+
+#### `NoLabel` ####
+
+Hide the label for the field. When using on an array/list, hide label for every element.
+
+`[NoLabel]` is a shortcut for `[FieldLabelText(null)]`
+
+```csharp
+[NoLabel] [ProgressBar(0, 100)] public int mp;
+[NoLabel] [PairsValueButtons("<icon=lightMeter/greenLight/>", true, "<icon=lightMeter/redLight/>", false)] public bool allowed;
+
+[Serializable, Flags]
+public enum Direction
+{
+    [InspectorName("↑")]
+    Up = 1,
+    [InspectorName("→")]
+    Right = 1 << 1,
+    [InspectorName("↓")]
+    Down = 1 << 2,
+    [InspectorName("←")]
+    Left = 1 << 3,
+}
+
+[NoLabel] [EnumToggleButtons] public Direction direction;
+
+[NoLabel] [GetComponentInChildren] public Transform[] transArray;
+```
+
+![](https://github.com/user-attachments/assets/7299393b-a7a0-4873-bc03-54e559dcfd6a)
 
 #### `AboveText` / `BelowText` ####
 
@@ -3656,8 +3686,7 @@ A tree dropdown selector. Supports reference type, sub-menu, separator, search, 
 
 This is the same as `AdvancedDropdown`, except it uses a tree view to pick.
 
-> [!WARNING]
-> UI Toolkit only.
+This is the recommended way to make a searchable dropdown.
 
 **Arguments**
 
@@ -3666,9 +3695,54 @@ This is the same as `AdvancedDropdown`, except it uses a tree view to pick.
     When omitted, it will try to find all the static values from the field type.
     You can use `../` to get upward callback/property for a callback
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
-*   AllowMultiple: No
+*   Allow Multiple: No
 
-See `AdvancedDropdown` for more usage
+First, it can make a quick searchable dropdown:
+
+
+```csharp
+[TreeDropdown(nameof(BookDrop))] public string bookName;
+
+private IEnumerable<string> BookDrop()
+{
+    return new[]
+    {
+        "Hackers & Painters, Vol 1",
+        "Hackers & Painters, Vol 2",
+        "The Art of Unix Programming, Vol 1",
+        "The Art of Unix Programming, Vol 2",
+        "The Mythical Man-Month, Vol 1",
+        "The Mythical Man-Month, Vol 2",
+    };
+}
+```
+
+Second, it can set labels for these items with rich text support
+
+```csharp
+[TreeDropdown(nameof(QuickDrop))] public float percent;
+
+private AdvancedDropdownList<float> QuickDrop()
+{
+    AdvancedDropdownList<float> result = new AdvancedDropdownList<float>
+    {
+        { "20%", 0.2f },
+        { "40%", 0.4f },
+        { "60%", 0.6f },
+    };
+    // `Add` is supported
+    result.Add("80%", 0.8f);
+    // rich tag is supported
+    result.Add($"<color={EColor.GoldenRod}>100%<icon=lightMeter/redLight/>", 1f);
+    // disable is supported
+    result.Add("120%", 1.2f, true);
+    return result;
+}
+```
+
+![](https://github.com/user-attachments/assets/27bc0d84-a268-41d4-ad06-72bd8ba84976)
+
+Finally, it support nested items
 
 ```csharp
 using SaintsField;
@@ -3705,7 +3779,7 @@ public AdvancedDropdownList<int> AdvDropdown()
 }
 ```
 
-![](https://github.com/user-attachments/assets/fcfd2932-0850-43af-8a93-5c3d1979240a)
+![](https://github.com/user-attachments/assets/3fe0f68c-f91a-48eb-b2dd-df23ebb08c37)
 
 Example of up-walk
 
@@ -6862,19 +6936,10 @@ public enum EType
     /// Allow non-public types.
     /// </summary>
     AllowInternal = 1 << 6,
-
-    /// <summary>
-    /// Group the list by the assmbly short name.
-    /// </summary>
-    GroupAssmbly = 1 << 7,
-    /// <summary>
-    /// Group the list by the type namespace.
-    /// </summary>
-    GroupNameSpace = 1 << 8,
 }
 ```
 
-Please note: if you have many type options, the big dropdown list might be SLOW.
+Please note: if you have many type options, the big dropdown list will be SLOW.
 
 Example:
 
@@ -6885,7 +6950,7 @@ using SaintsField;
 public TypeReference typeReference;
 
 // current assembly, and group it
-[TypeReference(EType.CurrentOnly | EType.GroupAssmbly | EType.GroupNameSpace)]
+[TypeReference(EType.CurrentOnly | EType.GroupAssmbly)]
 [BelowButton(nameof(TestCreate))]
 public TypeReference typeReference2;
 
@@ -6897,7 +6962,7 @@ private void TestCreate(TypeReference tr)
 }
 
 // all assembly with non-public types, and group it
-[TypeReference(EType.AllAssembly | EType.AllowInternal | EType.GroupAssmbly)]
+[TypeReference(EType.AllAssembly | EType.AllowInternal)]
 public TypeReference typeReference3;
 
 public interface IMyTypeRef {}
@@ -6908,7 +6973,8 @@ private class MyTypeClass : IMyTypeRef{}
 [TypeReference(EType.AllAssembly | EType.AllowInternal, superTypes: new[]{typeof(IMyTypeRef)})]
 public TypeReference typeReferenceOf;
 ```
-[![video](https://github.com/user-attachments/assets/a11c8c68-019b-4b13-abde-f8c21ed2fd15)](https://github.com/user-attachments/assets/edac2a97-b9e1-4e8e-aa7f-567f25a50528)
+
+![](https://github.com/user-attachments/assets/74d4cdf5-bc4b-49a9-b6ed-b6f0bec021a9)
 
 This feature is heavily inspired by [ClassTypeReference-for-Unity](https://github.com/SolidAlloy/ClassTypeReference-for-Unity), please go give them a star!
 

@@ -9,8 +9,8 @@ namespace SaintsField.Samples.Scripts.TypeReferenceExamples
         public TypeReference typeReference;
 
         // current assembly, and group it
-        [TypeReference(EType.CurrentOnly | EType.GroupAssembly | EType.GroupNameSpace)]
-        [BelowButton(nameof(TestCreate))]
+        [TypeReference(EType.CurrentOnly)]
+        // [BelowButton(nameof(TestCreate))]
         public TypeReference typeReference2;
 
         private void TestCreate(TypeReference tr)
@@ -21,7 +21,7 @@ namespace SaintsField.Samples.Scripts.TypeReferenceExamples
         }
 
         // all assembly with non-public types, and group it
-        [TypeReference(EType.AllAssembly | EType.AllowInternal | EType.GroupAssembly)]
+        [TypeReference(EType.AllAssembly | EType.AllowInternal)]
         public TypeReference typeReference3;
 
         public interface IMyTypeRef {}

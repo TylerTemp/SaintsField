@@ -312,7 +312,7 @@ namespace SaintsField.Utils
                         for (int index = 0; index < openTagsCopy.Length; index++)
                         {
                             (string tagName, string tagValueOrNull, string rawContent) closeTag = openTagsCopy[openTagsCopy.Length - index - 1];
-                            yield return new RichTextParsedChunk($"</{closeTag}>", ChunkType.NormalTag,
+                            yield return new RichTextParsedChunk($"</{closeTag.tagName}>", ChunkType.NormalTag,
                                 tagType: TagType.EndTag, tagName: closeTag.tagName, tagValue: closeTag.tagValueOrNull);
                         }
 

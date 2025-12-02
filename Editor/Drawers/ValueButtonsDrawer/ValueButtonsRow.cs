@@ -79,9 +79,11 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
         public void RefreshCurValue(object curValue)
         {
-            foreach (ValueButton valueButton in _buttons)
+            foreach ((ValueButton valueButton, int index) in _buttons.WithIndex())
             {
-                valueButton.RefreshCurValue(curValue);
+                bool isFirst = index == 0;
+                bool isLast = index == _buttons.Count - 1;
+                valueButton.RefreshCurValue(curValue, isFirst, isLast);
             }
         }
     }

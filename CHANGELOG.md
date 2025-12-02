@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.4.7 ##
+
+1.  Add: `TreeDropdown` now has an indent guild for readability
+2.  Add: `TypeReference` now uses `TreeDropdown`, for a much faster rendering.
+3.  Add: `TypeReference` now show the "visible"/"internal" category if you have `AllowInternal` set
+4.  Change: `EType.GroupAssembly` & `EType.GroupNameSpace` is now deprecated and is always on in flavor of `TreeDropdown` drawer
+5.  Fix: rich label might give an incorrect `</color (trash text)>` tag
+
 ## 5.4.6 ##
 
 1.  Fix: For `SaintsDictionary`, `SaintsHashSet` etc., if the element is obviously `UnityEngine.Object`, now the switch button for `reference type` is removed.

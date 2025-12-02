@@ -271,7 +271,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 string internalTag = "";
                 if (allowInternal)
                 {
-                    internalTag = $"{(loadedType.IsVisible ? "Visible" : "<color=gray>Internal</color>")}/";
+                    internalTag = $"{(loadedType.IsVisible ? "Visible" : "<color=grey>Internal</color>")}/";
                 }
 
                 return $"{ass}/{nameSpace}/{internalTag}{name}";
