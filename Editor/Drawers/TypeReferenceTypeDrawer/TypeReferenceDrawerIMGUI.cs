@@ -67,7 +67,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             {
                 cache.CachedAsssemblies = GetAssembly(typeReferenceAttribute, parent).ToArray();
             }
-            FillAsssembliesTypes(cache.CachedAsssemblies, cache.CachedAsssembliesTypes);
+            FillAssembliesTypes(cache.CachedAsssemblies, cache.CachedAsssembliesTypes);
 
             (string error, Type type) = GetSelectedType(property);
             cache.Error = error;

@@ -49,7 +49,7 @@ namespace SaintsField
         /// <summary>
         /// Group the list by the assmbly short name.
         /// </summary>
-        GroupAssmbly = 1 << 7,
+        GroupAssembly = 1 << 7,
         /// <summary>
         /// Group the list by the type namespace.
         /// </summary>

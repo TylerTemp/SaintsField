@@ -149,7 +149,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     {
                         Dictionary<string, List<TypeDropdownInfo>> assToGroup = new Dictionary<string, List<TypeDropdownInfo>>();
                         IEnumerable<Assembly> allAss = TypeReferenceDrawer.GetAssembly(typeReferenceAttribute, property.serializedObject);
-                        TypeReferenceDrawer.FillAsssembliesTypes(allAss, ToFill);
+                        TypeReferenceDrawer.FillAssembliesTypes(allAss, ToFill);
                         foreach ((Assembly ass, Type[] assTypes) in ToFill)
                         {
                             string assName = TypeReference.GetShortAssemblyName(ass);
@@ -165,7 +165,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
                             foreach (Type assType in assTypes)
                             {
-                                lis.Add(new TypeDropdownInfo(TypeReferenceDrawer.FormatPath(assType, 0, false), assType, null));
+                                lis.Add(new TypeDropdownInfo(TypeReferenceDrawer.FormatPath(assType, 0, true, false), assType, null));
                             }
                         }
 
@@ -440,7 +440,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             {
                 Type assType = expandedObj.GetType();
                 return new TypeDropdownInfo(
-                    TypeReferenceDrawer.FormatPath(assType, 0, false), assType, expandedObj);
+                    TypeReferenceDrawer.FormatPath(assType, 0, true, false), assType, expandedObj);
             })
             .ToList();
 

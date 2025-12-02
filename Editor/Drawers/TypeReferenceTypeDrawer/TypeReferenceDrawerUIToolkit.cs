@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -70,18 +71,20 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 worldBound.height = SingleLineHeight;
 
                 _cachedAssemblies ??= GetAssembly(typeReferenceAttribute, parent).ToArray();
-                FillAsssembliesTypes(_cachedAssemblies, _cachedAssembliesTypes);
+                FillAssembliesTypes(_cachedAssemblies, _cachedAssembliesTypes);
                 AdvancedDropdownMetaInfo metaInfo = GetDropdownMetaInfo(type, typeReferenceAttribute, _cachedAssemblies, _cachedAssembliesTypes, false, parent);
 
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
+                // Debug.Log(metaInfo.DropdownListValue.Count);
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsTreeDropdownUIToolkit(
                     metaInfo,
                     dropdown.worldBound.width,
                     maxHeight,
                     false,
-                    (_, curItem) =>
+                    (curItem, _) =>
                     {
                         TypeReference r = SetValue(property, curItem as Type);
                         onValueChangedCallback.Invoke(r);
+                        return null;
                     }
                 ));
             };

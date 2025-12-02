@@ -125,10 +125,8 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             }
         }
 
-        // private IReadOnlyList<Assembly> _cachedAsssemblies;
-        // private readonly Dictionary<Assembly, Type[]> _cachedAsssembliesTypes = new Dictionary<Assembly, Type[]>();
 
-        public static void FillAsssembliesTypes(IEnumerable<Assembly> assemblies, Dictionary<Assembly, Type[]> toFill)
+        public static void FillAssembliesTypes(IEnumerable<Assembly> assemblies, Dictionary<Assembly, Type[]> toFill)
         {
             foreach (Assembly assembly in assemblies)
             {
@@ -139,7 +137,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             }
         }
 
-        private static AdvancedDropdownMetaInfo GetDropdownMetaInfo(Type selected, TypeReferenceAttribute typeRefAttr, IReadOnlyList<Assembly> cachedAsssemblies, IReadOnlyDictionary<Assembly, Type[]> cachedAsssembliesTypes, bool isImGui, object parent)
+        private static AdvancedDropdownMetaInfo GetDropdownMetaInfo(Type selected, TypeReferenceAttribute typeRefAttr, IReadOnlyList<Assembly> cachedAssemblies, IReadOnlyDictionary<Assembly, Type[]> cachedAsssembliesTypes, bool isImGui, object parent)
         {
             // ReSharper disable once MergeConditionalExpression
             EType eTypeFilter = typeRefAttr == null
@@ -154,16 +152,16 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             // int count = 0;
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if (cachedAsssemblies == null)
+            if (cachedAssemblies == null)
             {
-                cachedAsssemblies = GetAssembly(typeRefAttr, parent).ToArray();
+                cachedAssemblies = GetAssembly(typeRefAttr, parent).ToArray();
             }
 
             bool allowInternal = eTypeFilter.HasFlagFast(EType.AllowInternal);
 
-            bool flatListRendering = !eTypeFilter.HasFlagFast(EType.GroupAssmbly | EType.GroupNameSpace);
+            // bool flatListRendering = !eTypeFilter.HasFlagFast(EType.GroupAssembly | EType.GroupNameSpace);
 
-            foreach (Assembly assembly in cachedAsssemblies)
+            foreach (Assembly assembly in cachedAssemblies)
             {
                 Type[] types = cachedAsssembliesTypes[assembly];
 
@@ -192,29 +190,45 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 // Debug.Log(invisibleItems.Count > 0);
                 // Debug.Log((eTypeFilter & (EType.GroupAssmbly | EType.GroupNameSpace)));
                 // Debug.Log((eTypeFilter & (EType.GroupAssmbly | EType.GroupNameSpace)) == 0);
-                if (flatListRendering && cachedAsssemblies.Count > 1 && (visibleItems.Count > 0 || invisibleItems.Count > 0))
-                {
-                    // Debug.Log("Sep main");
-                    dropdownList.AddSeparator();
-                    dropdownList.Add(new AdvancedDropdownList<Type>(TypeReference.GetShortAssemblyName(assembly), true));
-                    dropdownList.AddSeparator();
-                }
-
-                foreach (Type visibleItem in visibleItems)
-                {
-                    dropdownList.Add(FormatPath(visibleItem, eTypeFilter, isImGui), visibleItem);
-                }
-
-                // if(visibleItems.Count > 0 && invisibleItems.Count > 0)
+                // if (flatListRendering && cachedAssemblies.Count > 1 && (visibleItems.Count > 0 || invisibleItems.Count > 0))
                 // {
-                //     Debug.Log("Sep visible");
+                //     // Debug.Log("Sep main");
+                //     dropdownList.AddSeparator();
+                //     dropdownList.Add(new AdvancedDropdownList<Type>(TypeReference.GetShortAssemblyName(assembly), true));
                 //     dropdownList.AddSeparator();
                 // }
-
-                foreach (Type invisibleItem in invisibleItems)
+                if (visibleItems.Count > 0 || invisibleItems.Count > 0)
                 {
-                    dropdownList.Add(FormatPath(invisibleItem, eTypeFilter, isImGui), invisibleItem);
+                    // var header = new AdvancedDropdownList<Type>(TypeReference.GetShortAssemblyName(assembly));
+
+
+                    foreach (Type visibleItem in visibleItems)
+                    {
+                        dropdownList.Add(FormatPath(visibleItem, eTypeFilter, allowInternal, isImGui), visibleItem);
+                    }
+                    foreach (Type invisibleItem in invisibleItems)
+                    {
+                        dropdownList.Add(FormatPath(invisibleItem, eTypeFilter, allowInternal, isImGui), invisibleItem);
+                    }
+
+                    // dropdownList.Add(header);
                 }
+
+                // foreach (Type visibleItem in visibleItems)
+                // {
+                //     dropdownList.Add(FormatPath(visibleItem, eTypeFilter, isImGui), visibleItem);
+                // }
+                //
+                // // if(visibleItems.Count > 0 && invisibleItems.Count > 0)
+                // // {
+                // //     Debug.Log("Sep visible");
+                // //     dropdownList.AddSeparator();
+                // // }
+                //
+                // foreach (Type invisibleItem in invisibleItems)
+                // {
+                //     dropdownList.Add(FormatPath(invisibleItem, eTypeFilter, isImGui), invisibleItem);
+                // }
             }
 
             return new AdvancedDropdownMetaInfo
@@ -246,34 +260,41 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 ? $"{loadedType.Name}:{loadedType.Namespace}({TypeReference.GetShortAssemblyName(loadedType)})"
                 : $"{loadedType.Name} <color={GrayHtmlColor}>{loadedType.Namespace}({TypeReference.GetShortAssemblyName(loadedType)})</color>";
 
-        public static string FormatPath(Type loadedType, EType eType, bool imGui)
+        public static string FormatPath(Type loadedType, EType eType, bool allowInternal, bool imGui)
         {
             string ass = TypeReference.GetShortAssemblyName(loadedType);
             string nameSpace = loadedType.Namespace;
             string name = loadedType.Name;
 
-            if (eType.HasFlagFast(EType.GroupAssmbly))
+            if (!imGui)
             {
+                string internalTag = "";
+                if (allowInternal)
+                {
+                    internalTag = $"{(loadedType.IsVisible ? "Visible" : "<color=gray>Internal</color>")}/";
+                }
+
+                return $"{ass}/{nameSpace}/{internalTag}{name}";
+            }
+
+            if (eType.HasFlagFast(EType.GroupAssembly))
+            {
+                // ReSharper disable once ConvertIfStatementToReturnStatement
                 if (eType.HasFlagFast(EType.GroupNameSpace))
                 {
                     return $"{ass}/{nameSpace}/{name}";
                 }
 
-                return imGui
-                    ? $"{ass}/{name}:{nameSpace}"
-                    : $"{ass}/{name} <color={GrayHtmlColor}>{nameSpace}</color>";
+                return $"{ass}/{name}:{nameSpace}";
             }
 
+            // ReSharper disable once ConvertIfStatementToReturnStatement
             if (eType.HasFlagFast(EType.GroupNameSpace))
             {
-                return imGui
-                    ? $"{ass}:{nameSpace}/{name}"
-                    : $"<color={GrayHtmlColor}>{ass}</color>:{nameSpace}/{name}";
+                return $"{ass}:{nameSpace}/{name}";
             }
 
-            return imGui
-                ? $"{name}:{nameSpace}({ass})"
-                : $"{name} <color={GrayHtmlColor}>{nameSpace}({ass})</color>";
+            return $"{name}:{nameSpace}({ass})";
         }
 
         private static (string error, Type type) GetSelectedType(SerializedProperty property)

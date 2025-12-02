@@ -277,7 +277,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeReference:
-    _typeNameAndAssembly: 
+    _typeNameAndAssembly: SaintsField.Samples.Scripts.AdvancedDropdownExample+MyStruct,
+      today.comes.saintsfield.Samples
     _monoScriptGuid: 
   typeReference2:
     _typeNameAndAssembly: 
