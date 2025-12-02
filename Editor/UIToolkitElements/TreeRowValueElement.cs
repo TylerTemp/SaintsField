@@ -21,6 +21,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public bool IsOn { get; private set; }
         private static VisualTreeAsset _treeRowTemplate;
+        // private static VisualTreeAsset _treeRowIndentIconTemplate;
 
         // public VisualElement MainButton;
         private readonly VisualElement _toggleButton;
@@ -86,10 +87,16 @@ namespace SaintsField.Editor.UIToolkitElements
                 toggleButton.style.backgroundImage = _checkedIcon;
             }
 
-            VisualElement root = treeRow.Q<VisualElement>("saintsfield-tree-row");
+            // VisualElement root = treeRow.Q<VisualElement>("saintsfield-tree-row");
             if (indent > 0)
             {
-                root.style.paddingLeft = indent * SaintsPropertyDrawer.IndentWidth;
+                // _treeRowIndentIconTemplate ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/TreeDropdown/TreeRowIndentIcon.uxml");
+                VisualElement indentContainer = treeRow.Q<VisualElement>("saintsfield-tree-row-indent");
+                for (int indentIndex = 0; indentIndex < indent; indentIndex++)
+                {
+                    TemplateContainer clone = TreeIndentUtil.MakeIndentElement(indentIndex);
+                    indentContainer.Add(clone);
+                }
             }
 
             Label labelElement = treeRow.Q<Label>("saintsfield-tree-row-label");

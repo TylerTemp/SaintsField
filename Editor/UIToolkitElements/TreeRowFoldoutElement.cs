@@ -21,7 +21,8 @@ namespace SaintsField.Editor.UIToolkitElements
         private static VisualTreeAsset _treeRowTemplate;
         private readonly VisualElement _foldoutElement;
 
-        private readonly VisualElement _conentElement;
+        private readonly VisualElement _contentElement;
+        // private static VisualTreeAsset _treeRowIndentIconTemplate;
 
         // ReSharper disable once MemberCanBePrivate.Global
         public TreeRowFoldoutElement(): this(null, 0, false)
@@ -46,7 +47,14 @@ namespace SaintsField.Editor.UIToolkitElements
             }));
             if (indent > 0)
             {
-                root.style.paddingLeft = indent * SaintsPropertyDrawer.IndentWidth;
+                // root.style.paddingLeft = indent * SaintsPropertyDrawer.IndentWidth;
+                // _treeRowIndentIconTemplate ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/TreeDropdown/TreeRowIndentIcon.uxml");
+                VisualElement indentContainer = treeRow.Q<VisualElement>("saintsfield-tree-row-indent");
+                for (int indentIndex = 0; indentIndex < indent; indentIndex++)
+                {
+                    TemplateContainer clone = TreeIndentUtil.MakeIndentElement(indentIndex);
+                    indentContainer.Add(clone);
+                }
             }
 
             Label labelElement = treeRow.Q<Label>("saintsfield-tree-row-label");
@@ -58,8 +66,8 @@ namespace SaintsField.Editor.UIToolkitElements
 
             _foldoutElement = treeRow.Q<VisualElement>("saintsfield-tree-row-foldout");
 
-            _conentElement = treeRow.Q<VisualElement>("saintsfield-tree-row-content");
-            Debug.Assert(_conentElement != null);
+            _contentElement = treeRow.Q<VisualElement>("saintsfield-tree-row-content");
+            Debug.Assert(_contentElement != null);
 
             Add(treeRow);
 
@@ -81,7 +89,7 @@ namespace SaintsField.Editor.UIToolkitElements
         public void AddContent(TreeRowAbsElement child)
         {
             _children.Add(child);
-            _conentElement.Add(child);
+            _contentElement.Add(child);
 
             int addChildCount = child.HasValueCount;
 
@@ -106,9 +114,9 @@ namespace SaintsField.Editor.UIToolkitElements
         {
             _foldoutElement.style.rotate = new StyleRotate(new Rotate(_expand ? 90 : 0));
             DisplayStyle contentDisplay = _expand ? DisplayStyle.Flex : DisplayStyle.None;
-            if (_conentElement.style.display != contentDisplay)
+            if (_contentElement.style.display != contentDisplay)
             {
-                _conentElement.style.display = contentDisplay;
+                _contentElement.style.display = contentDisplay;
             }
 
             foreach (TreeRowAbsElement contentChild in ContentChildren)
