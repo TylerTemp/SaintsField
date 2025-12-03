@@ -29,6 +29,7 @@ using SaintsField.Editor.Drawers.SortingLayerDrawer;
 using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.Utils;
@@ -235,6 +236,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             // Color reColor = EColor.EditorSeparator.GetColor();
+
+            if (value != null)
+            {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case ValueButtonsAttribute valueButtonsAttribute:
+                        {
+                            return (ValueButtonsAttributeDrawer.UIToolkitValueEdit(
+                                oldElement,
+                                valueButtonsAttribute,
+                                label,
+                                value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        }
+                    }
+                }
+            }
 
             #region bool
             if (valueType == typeof(bool) || value is bool)
@@ -1914,18 +1939,48 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             #region Enum
             if (valueType.BaseType == typeof(Enum) || value is Enum)
             {
-                // Debug.Log(string.Join(",", allAttributes));
+                Type enumType = valueType.BaseType == typeof(Enum)
+                    ? valueType
+                    : value.GetType();
+                bool isFlag = Attribute.IsDefined(enumType, typeof(FlagsAttribute));
 
+                // Debug.Log(string.Join(",", allAttributes));
                 foreach (Attribute attribute in allAttributes)
                 {
                     switch (attribute)
                     {
-                        case EnumToggleButtonsAttribute _:
+                        case EnumToggleButtonsAttribute enumToggleButtonsAttribute:
                         {
-                            return (EnumToggleButtonsAttributeDrawer.DrawEnumUIToolkit(allAttributes, oldElement, label, valueType,
-                                value, beforeSet,
-                                setterOrNull,
-                                labelGrayColor, inHorizontalLayout), false);
+                            if(isFlag)
+                            {
+                                return (EnumToggleButtonsAttributeDrawer.UIToolkitValueEdit(
+                                    oldElement,
+                                    enumToggleButtonsAttribute,
+                                    label,
+                                    value,
+                                    enumType,
+                                    beforeSet,
+                                    setterOrNull,
+                                    labelGrayColor,
+                                    inHorizontalLayout,
+                                    allAttributes,
+                                    targets), false);
+                            }
+                            else
+                            {
+                                return (ValueButtonsAttributeDrawer.UIToolkitValueEditEnum(
+                                    oldElement,
+                                    new ValueButtonsAttribute(),
+                                    label,
+                                    value,
+                                    enumType,
+                                    beforeSet,
+                                    setterOrNull,
+                                    labelGrayColor,
+                                    inHorizontalLayout,
+                                    allAttributes,
+                                    targets), false);
+                            }
                         }
                     }
                 }
@@ -1933,50 +1988,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return (TreeDropdownAttributeDrawer.DrawEnumUIToolkit(oldElement, label, valueType, value, beforeSet,
                     setterOrNull,
                     labelGrayColor, inHorizontalLayout), false);
-                // if (oldElement is EnumField oldEnumField)
-                // {
-                //     oldEnumField.SetValueWithoutNotify((Enum)value);
-                //     return (null, false);
-                // }
-                //
-                // EnumField element = new EnumField(label, (Enum)value);
-                // if (labelGrayColor)
-                // {
-                //     element.labelElement.style.color = ReColor;
-                // }
-                // // ReSharper disable once PossibleNullReferenceException
-                // typeof(EnumField).GetField("m_EnumType", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(element, valueType);
-                // if (inHorizontalLayout)
-                // {
-                //     element.style.flexDirection = FlexDirection.Column;
-                //     // element.style.flexWrap = Wrap.Wrap;
-                //     // Label elementLabel = element.Q<Label>();
-                //     // if (elementLabel != null)
-                //     // {
-                //     //     elementLabel.style.minWidth = 0;
-                //     //     elementLabel.style.borderRightWidth = 1;
-                //     //     elementLabel.style.borderRightColor = EColor.Gray.GetColor();
-                //     // }
-                // }
-                // else
-                // {
-                //     element.AddToClassList(EnumField.alignedFieldUssClassName);
-                // }
-                // if (setterOrNull == null)
-                // {
-                //     element.SetEnabled(false);
-                //     element.AddToClassList(ClassSaintsFieldEditingDisabled);
-                // }
-                // else
-                // {
-                //     element.RegisterValueChangedCallback(evt =>
-                //     {
-                //         beforeSet?.Invoke(value);
-                //         setterOrNull(evt.newValue);
-                //     });
-                // }
-                //
-                // return (element, false);
             }
             #endregion
 

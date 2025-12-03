@@ -309,6 +309,280 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return ("", ReWrapUniqueList(dropdownListValue, eUnique, existsValues, curValue));
         }
 
+        public static AdvancedDropdownMetaInfo GetMetaInfoShowInInspector(Type elementType, PathedDropdownAttribute advancedDropdownAttribute, object v, object parentObj, bool isImGui, bool flat=false)
+        {
+            string funcName = advancedDropdownAttribute.FuncName;
+
+            string error;
+            IAdvancedDropdownList dropdownListValue = null;
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Options)
+            {
+                AdvancedDropdownList<object> optionsDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                foreach (object value in advancedDropdownAttribute.Options)
+                {
+                    optionsDropdown.Add(RuntimeUtil.IsNull(value)? "[Null]": value.ToString(), value);
+                }
+
+                error = "";
+                dropdownListValue = optionsDropdown;
+            }
+            else if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Tuples)
+            {
+                AdvancedDropdownList<object> tuplesDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                foreach ((string path, object value) in advancedDropdownAttribute.Tuples)
+                {
+                    tuplesDropdown.Add(path, value);
+                }
+
+                error = "";
+                dropdownListValue = tuplesDropdown;
+            }
+            else if (funcName is null)
+            {
+                if (elementType == typeof(bool))
+                {
+                    AdvancedDropdownList<object> boolDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "")
+                    {
+                        {"True", true },
+                        {"False", false },
+                    };
+
+                    error = "";
+                    dropdownListValue = boolDropdown;
+                }
+                else if(elementType.IsEnum)
+                {
+                    AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "");
+                    foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(elementType))
+                    {
+                        if (flat)
+                        {
+                            enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue));
+                        }
+                        else {
+                            enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue);
+                        }
+                    }
+
+                    error = "";
+                    dropdownListValue = enumDropdown;
+                }
+                else
+                {
+                    AdvancedDropdownList<object> staticDropdown = new AdvancedDropdownList<object>(isImGui? $"Pick a {elementType.Name}": "");
+
+                    Dictionary<object, List<string>> valueToNames = new Dictionary<object, List<string>>();
+
+                    // Get static fields
+                    FieldInfo[] staticFields = elementType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    foreach (FieldInfo eachField in staticFields)
+                    {
+                        object value = eachField.GetValue(null);
+                        // ReSharper disable once InvertIf
+                        if (value != null && elementType.IsAssignableFrom(value.GetType()))
+                        {
+                            if (!valueToNames.TryGetValue(value, out List<string> names))
+                            {
+                                valueToNames[value] = names = new List<string>();
+                            }
+                            names.Add(eachField.Name);
+                        }
+                    }
+
+                    // Get static properties
+                    PropertyInfo[] staticProperties = elementType.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    foreach (PropertyInfo eachProp in staticProperties)
+                    {
+                        object value = eachProp.GetValue(null);
+                        if (elementType.IsAssignableFrom(value.GetType()))
+                        {
+                            if (!valueToNames.TryGetValue(value, out List<string> names))
+                            {
+                                valueToNames[value] = names = new List<string>();
+                            }
+                            names.Add(eachProp.Name);
+                        }
+                    }
+
+                    // ReSharper disable once UseDeconstruction
+                    foreach (KeyValuePair<object, List<string>> kv in valueToNames)
+                    {
+                        object value = kv.Key;
+                        List<string> names = kv.Value;
+                        names.Sort();
+                        string displayName;
+                        if (isImGui)
+                        {
+                            displayName = names[0] + (names.Count <= 1? "": $" ({string.Join(",", names.Skip(1))})");
+                        }
+                        else
+                        {
+                            displayName = names[0] + (names.Count <= 1? "": $" <color=#808080ff>({string.Join(",", names.Skip(1))})</color>");
+                        }
+
+                        staticDropdown.Add(new AdvancedDropdownList<object>(displayName, value));
+                    }
+
+                    error = "";
+                    dropdownListValue = staticDropdown;
+                    // error = $"{property.displayName}({elementType}) is not a enum";
+                }
+            }
+            else
+            {
+                (object obj, string getOfError) = GetCallbackForShowInInspector(funcName, v, parentObj);
+                    // Util.GetOf<object>(funcName, null, property, field, parentObj);
+                error = getOfError;
+                if (obj is IAdvancedDropdownList getOfDropdownListValue)
+                {
+                    getOfDropdownListValue.SelfCompact();
+                    dropdownListValue = getOfDropdownListValue;
+                }
+                else if (obj is IEnumerable ieObj)
+                {
+                    AdvancedDropdownList<object> list = new AdvancedDropdownList<object>(isImGui? "Pick an item": "");
+                    foreach (object each in ieObj)
+                    {
+                        if (flat)
+                        {
+                            list.Add(new AdvancedDropdownList<object>($"{each}", each));
+                        }
+                        else
+                        {
+                            list.Add($"{each}", each);
+                        }
+                    }
+
+                    dropdownListValue = list;
+                }
+                else
+                {
+                    error = $"{funcName} return value is not a AdvancedDropdownList";
+                }
+            }
+            if(dropdownListValue == null || error != "")
+            {
+                return new AdvancedDropdownMetaInfo
+                {
+                    Error = error == ""? $"dropdownList is null from `{funcName}` on target `{parentObj}`": error,
+                    CurDisplay = "[Error]",
+                    CurValues = Array.Empty<object>(),
+                    DropdownListValue = null,
+                    SelectStacks = Array.Empty<SelectStack>(),
+                };
+            }
+
+            #region Get Cur Value
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
+            Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
+#endif
+
+            // process the unique options
+            // This won't work for ShowInInspector because we can not find siblings
+            // (string uniqueError, IAdvancedDropdownList dropdownListValueUnique) =
+            //     GetUniqueListShowInInspector(dropdownListValue, advancedDropdownAttribute.EUnique, curValue, field, parentObj);
+            //
+            // if (uniqueError != "")
+            // {
+            //     return new AdvancedDropdownMetaInfo
+            //     {
+            //         Error = uniqueError,
+            //         CurDisplay = "[Error]",
+            //         CurValues = Array.Empty<object>(),
+            //         DropdownListValue = null,
+            //         SelectStacks = Array.Empty<SelectStack>(),
+            //     };
+            // }
+
+            // string curDisplay = "";
+            (IReadOnlyList<SelectStack> curSelected, string display) = AdvancedDropdownUtil.GetSelected(v, Array.Empty<SelectStack>(), dropdownListValue);
+            #endregion
+
+            return new AdvancedDropdownMetaInfo
+            {
+                Error = "",
+                // FieldInfo = field,
+                CurDisplay = display,
+                CurValues = new[] { v },
+                DropdownListValue = dropdownListValue,
+                SelectStacks = curSelected,
+            };
+        }
+
+
+
+        private static (object getValue, string getError) GetCallbackForShowInInspector(string callback, object curValue, object target)
+        {
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
+            {
+                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, callback);
+
+                switch (getPropType)
+                {
+                    case ReflectUtils.GetPropType.NotFound:
+                        continue;
+
+                    case ReflectUtils.GetPropType.Property:
+                    {
+                        object genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                        if(genResult != null)
+                        {
+                            return (genResult, "");
+                        }
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Field:
+                    {
+                        FieldInfo fInfo = (FieldInfo)fieldOrMethodInfo;
+                        object genResult = fInfo.GetValue(target);
+                        if(genResult != null)
+                        {
+                            return (genResult, "");
+                        }
+                        // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+
+                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                        {
+                            curValue,
+                        });
+
+
+                        object genResult;
+                        try
+                        {
+                            genResult = methodInfo.Invoke(target, passParams);
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            return (e.InnerException?.Message ?? e.Message, null);
+                        }
+                        catch (Exception e)
+                        {
+                            return (e.Message, null);
+                        }
+
+                        if (genResult != null)
+                        {
+                            return (genResult, "");
+                        }
+
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                }
+            }
+
+            return ($"Target `{callback}` not found", null);
+        }
+
         private static AdvancedDropdownList<object> ReWrapUniqueList(IAdvancedDropdownList dropdownListValue, EUnique eUnique, List<object> existsValues, object curValue)
         {
             AdvancedDropdownList<object> dropdownList = new AdvancedDropdownList<object>(dropdownListValue.displayName, dropdownListValue.disabled, dropdownListValue.icon);

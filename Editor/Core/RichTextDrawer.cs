@@ -380,6 +380,19 @@ namespace SaintsField.Editor.Core
             // return richTextChunks;
         }
 
+        public struct EmptyRichTextTagProvider: IRichTextTagProvider
+        {
+            public string GetLabel() => "";
+
+            public string GetContainerType() => "";
+
+            public string GetContainerTypeBaseType() => "";
+
+            public string GetIndex(string formatter) => "";
+
+            public string GetField(string rawContent, string tagName, string tagValue) => "";
+        }
+
         public static IEnumerable<RichTextChunk> ParseRichXmlWithProvider(string richXml, IRichTextTagProvider provider)
         {
             List<RuntimeUtil.RichTextParsedChunk> openTag = new List<RuntimeUtil.RichTextParsedChunk>();

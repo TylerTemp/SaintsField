@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
     [CustomPropertyDrawer(typeof(ValueButtonsAttribute), true)]
     [CustomPropertyDrawer(typeof(OptionsValueButtonsAttribute), true)]
     [CustomPropertyDrawer(typeof(PairsValueButtonsAttribute), true)]
-    public class ValueButtonsAttributeDrawer: SaintsPropertyDrawer
+    public partial class ValueButtonsAttributeDrawer: SaintsPropertyDrawer
     {
         private static string NameField(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Field";
         private static string NameArrange(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Arrange";
@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
         public static  VisualElement UtilCreateFieldUIToolKit(string label, SerializedProperty property)
         {
-            VisualElement root = new VisualElement
+            VisualElement visualInput = new VisualElement
             {
                 style =
                 {
@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             {
                 name = expandName,
             };
-            root.Add(leftExpandButton);
+            visualInput.Add(leftExpandButton);
 
             VisualElement valueButtonsArrangeElementWrapper = new VisualElement
             {
@@ -63,7 +63,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                     flexShrink = 1,
                 },
             };
-            root.Add(valueButtonsArrangeElementWrapper);
+            visualInput.Add(valueButtonsArrangeElementWrapper);
 
             // root.Add(leftExpandButton);
             ValueButtonsArrangeElement valueButtonsArrangeElement = new ValueButtonsArrangeElement(new ValueButtonsCalcElement())
@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             };
             valueButtonsArrangeElementWrapper.Add(valueButtonsArrangeElement);
 
-            EmptyPrefabOverrideField r = new EmptyPrefabOverrideField(label, root, property)
+            EmptyPrefabOverrideField r = new EmptyPrefabOverrideField(label, visualInput, property)
             {
                 style =
                 {
@@ -157,6 +157,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 valueButtonsArrangeElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshButtons));
                 valueButtonsArrangeElement.TrackSerializedObjectValue(property.serializedObject, _ => RefreshButtons());
             }
+            valueButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshCurValue());
 
             valueButtonsArrangeElement.schedule.Execute(() =>
             {
@@ -166,7 +167,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
                 {
                     // leftExpandButton.SetEnabled(hasSubRow);
-                    var display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
+                    DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
                     if (leftExpandButton.style.display != display)
                     {
                         leftExpandButton.style.display = display;

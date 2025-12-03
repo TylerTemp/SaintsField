@@ -25,17 +25,17 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             }
         }
 
-        private static string NameEnumFlags(SerializedProperty property) => $"{property.propertyPath}__EnumFlags";
-        private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Foldout";
-        private static string NameFillEmpty(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_FillEmpty";
-        private static string NameToggleButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButton";
-        // private static string NameQuickCheckButtons(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_QuickCheckButtons";
-        private static string NameCheckAllButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_CheckAllButton";
-        private static string NameEmptyButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_EmptyButton";
-        private static string NameBelowAll(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Below";
-        // private static string NameSetNoneButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetNoneButtonImage";
-
-        private static string ClassToggleBitButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleBitButton";
+        // private static string NameEnumFlags(SerializedProperty property) => $"{property.propertyPath}__EnumFlags";
+        // private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Foldout";
+        // private static string NameFillEmpty(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_FillEmpty";
+        // private static string NameToggleButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButton";
+        // // private static string NameQuickCheckButtons(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_QuickCheckButtons";
+        // private static string NameCheckAllButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_CheckAllButton";
+        // private static string NameEmptyButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_EmptyButton";
+        // private static string NameBelowAll(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Below";
+        // // private static string NameSetNoneButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetNoneButtonImage";
+        //
+        // private static string ClassToggleBitButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleBitButton";
 
         private static string NameExpand(SerializedProperty sp) => $"{sp.propertyPath}__EnumToggleButtons_Expand";
         private static string NameArrange(SerializedProperty sp) => $"{sp.propertyPath}__EnumToggleButtons_Arrange";
@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 return ValueButtonsAttributeDrawer.UtilCreateFieldUIToolKit(GetPreferredLabel(property), property);
             }
 
-            VisualElement root = new VisualElement
+            VisualElement visualInput = new VisualElement
             {
                 style =
                 {
@@ -71,9 +71,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             {
                 name = expandName,
             };
-            root.Add(leftExpandButton);
+            visualInput.Add(leftExpandButton);
 
-            root.Add(new FlagButtonFullToggleGroupElement
+            visualInput.Add(new FlagButtonFullToggleGroupElement
             {
                 name = NameFullToggleGroup(property),
             });
@@ -87,7 +87,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     flexShrink = 1,
                 },
             };
-            root.Add(valueButtonsArrangeElementWrapper);
+            visualInput.Add(valueButtonsArrangeElementWrapper);
 
             // root.Add(leftExpandButton);
             FlagButtonsArrangeElement valueButtonsArrangeElement = new FlagButtonsArrangeElement(new FlagButtonsCalcElement(false))
@@ -101,7 +101,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             };
             valueButtonsArrangeElementWrapper.Add(valueButtonsArrangeElement);
 
-            EmptyPrefabOverrideField r = new EmptyPrefabOverrideField(GetPreferredLabel(property), root, property)
+            EmptyPrefabOverrideField r = new EmptyPrefabOverrideField(GetPreferredLabel(property), visualInput, property)
             {
                 style =
                 {
@@ -116,278 +116,12 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             r.AddToClassList(EmptyPrefabOverrideField.alignedFieldUssClassName);
             return r;
 
-//             LoadIcons();
-//
-//             // float lineHeight = EditorGUIUtility.singleLineHeight;
-//
-//             VisualElement fieldContainer = new VisualElement
-//             {
-//                 style =
-//                 {
-//                     // flexGrow = 1,
-//                     // flexShrink = 1,
-//                     flexWrap = Wrap.NoWrap,
-//                     flexDirection = FlexDirection.Row,
-//                     marginRight = 22,
-//                     // width = Length.Percent(100),
-//                     // position = Position.Relative,
-//                 },
-//             };
-//
-//             VisualElement quickCheckButtons = new VisualElement
-//             {
-//                 style =
-//                 {
-//                     flexDirection = FlexDirection.Row,
-//                 },
-//             };
-//             fieldContainer.Add(quickCheckButtons);
-//
-//             Button hToggleButton = new Button
-//             {
-//                 name = NameToggleButton(property),
-//                 style =
-//                 {
-//                     width = EditorGUIUtility.singleLineHeight - 2,
-//                     height = EditorGUIUtility.singleLineHeight - 2,
-//                     paddingTop = 0,
-//                     paddingBottom = 0,
-//                     paddingLeft = 0,
-//                     paddingRight = 0,
-//                     marginLeft = 0,
-//                     marginRight = 0,
-//
-//                     backgroundImage = _checkboxIndeterminateTexture2D,
-//                     backgroundColor = Color.clear,
-//                     borderLeftWidth = 0,
-//                     borderRightWidth = 0,
-//                     borderTopWidth = 0,
-//                     borderBottomWidth = 0,
-// #if UNITY_2022_2_OR_NEWER
-//                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-//                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-//                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-//                     backgroundSize  = new BackgroundSize(EditorGUIUtility.singleLineHeight - 3, EditorGUIUtility.singleLineHeight - 3),
-// #else
-//                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-// #endif
-//                 },
-//             };
-//             quickCheckButtons.Add(hToggleButton);
-//
-//             Button hCheckAllButton = new Button
-//             {
-//                 name = NameCheckAllButton(property),
-//                 style =
-//                 {
-//                     display = DisplayStyle.None,
-//
-//                     width = EditorGUIUtility.singleLineHeight - 2,
-//                     height = EditorGUIUtility.singleLineHeight - 2,
-//                     paddingTop = 0,
-//                     paddingBottom = 0,
-//                     paddingLeft = 0,
-//                     paddingRight = 0,
-//                     marginLeft = 0,
-//                     marginRight = 0,
-//
-//                     backgroundImage = _checkboxCheckedTexture2D,
-//                     backgroundColor = Color.clear,
-//                     borderLeftWidth = 0,
-//                     borderRightWidth = 0,
-//                     borderTopWidth = 0,
-//                     borderBottomWidth = 0,
-// #if UNITY_2022_2_OR_NEWER
-//                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-//                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-//                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-//                     backgroundSize  = new BackgroundSize(EditorGUIUtility.singleLineHeight - 3, EditorGUIUtility.singleLineHeight - 3),
-// #else
-//                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-// #endif
-//                 },
-//             };
-//             quickCheckButtons.Add(hCheckAllButton);
-//
-//             Button hEmptyButton = new Button
-//             {
-//                 name = NameEmptyButton(property),
-//                 style =
-//                 {
-//                     display = DisplayStyle.None,
-//
-//                     width = EditorGUIUtility.singleLineHeight - 2,
-//                     height = EditorGUIUtility.singleLineHeight - 2,
-//                     paddingTop = 0,
-//                     paddingBottom = 0,
-//                     paddingLeft = 0,
-//                     paddingRight = 0,
-//                     marginLeft = 0,
-//                     marginRight = 0,
-//
-//                     backgroundImage = _checkboxEmptyTexture2D,
-//                     backgroundColor = Color.clear,
-//                     borderLeftWidth = 0,
-//                     borderRightWidth = 0,
-//                     borderTopWidth = 0,
-//                     borderBottomWidth = 0,
-// #if UNITY_2022_2_OR_NEWER
-//                     backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-//                     backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-//                     backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-//                     backgroundSize  = new BackgroundSize(EditorGUIUtility.singleLineHeight - 3, EditorGUIUtility.singleLineHeight - 3),
-// #else
-//                     unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-// #endif
-//                 },
-//             };
-//             quickCheckButtons.Add(hEmptyButton);
-//
-//             if (!metaInfo.HasFlags)
-//             {
-//                 quickCheckButtons.style.display = DisplayStyle.None;
-//             }
-//
-//             foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in GetDisplayBit(metaInfo))
-//             {
-//                 Button inlineToggleButton = new Button
-//                 {
-//                     text = "",
-//                     // text = bitValueToName.Value.HasRichName? bitValueToName.Value.RichName: bitValueToName.Value.Name,
-//                     userData = bitValueToName.Key,
-//                     style =
-//                     {
-//                         marginLeft = 0,
-//                         marginRight = 0,
-//                         paddingLeft = 1,
-//                         paddingRight = 1,
-//                     },
-//                 };
-//
-//                 FillButtonText(inlineToggleButton, bitValueToName.Value, property, info, parent);
-//
-//                 inlineToggleButton.AddToClassList(ClassToggleBitButton(property));
-//                 fieldContainer.Add(inlineToggleButton);
-//             }
-//
-//             fieldContainer.Add(new Button
-//             {
-//                 text = "",
-//                 style =
-//                 {
-//                     flexGrow = 1,
-//
-//                     backgroundColor = Color.clear,
-//                     borderLeftWidth = 0,
-//                     borderRightWidth = 0,
-//                     borderTopWidth = 0,
-//                     borderBottomWidth = 0,
-//                     marginLeft = 0,
-//                     marginRight = 0,
-//                     paddingLeft = 0,
-//                     paddingRight = 0,
-//                 },
-//                 name = NameFillEmpty(property),
-//             });
-//
-//             // Debug.Log(preferredLabel);
-//
-//             EnumFlagsField enumFlagsField = new EnumFlagsField(GetPreferredLabel(property), fieldContainer);
-//             enumFlagsField.BindProperty(property);
-//             enumFlagsField.labelElement.style.overflow = Overflow.Hidden;
-//             // enumFlagsField.style.flexGrow = 1;
-//             enumFlagsField.AddToClassList(BaseField<object>.alignedFieldUssClassName);
-//             enumFlagsField.style.flexShrink = 1;
-//             enumFlagsField.name = NameEnumFlags(property);
-//
-//             enumFlagsField.labelElement.style.maxHeight = SingleLineHeight;
-//
-//             enumFlagsField.AddToClassList(ClassAllowDisable);
-//
-//             return enumFlagsField;
         }
-
-        // private RichTextDrawer _richTextDrawer;
-
-        // private void FillButtonText(Button button, EnumFlagsUtil.EnumDisplayInfo displayInfo, SerializedProperty property, MemberInfo info, object parent)
-        // {
-        //     if (displayInfo.HasRichName)
-        //     {
-        //         _richTextDrawer ??= new RichTextDrawer();
-        //         VisualElement visualElement = new VisualElement
-        //         {
-        //             style =
-        //             {
-        //                 flexDirection = FlexDirection.Row,
-        //             },
-        //         };
-        //         foreach (VisualElement chunk in _richTextDrawer.DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(displayInfo.RichName, displayInfo.Name, property, info, parent)))
-        //         {
-        //             visualElement.Add(chunk);
-        //         }
-        //         button.Add(visualElement);
-        //     }
-        //     else
-        //     {
-        //         button.text = displayInfo.Name;
-        //     }
-        // }
-
-        // protected override VisualElement CreatePostOverlayUIKit(SerializedProperty property,
-        //     ISaintsAttribute saintsAttribute, int index,
-        //     VisualElement container, object parent)
-        // {
-        //     Button expandButton = new ExpandButton();
-        //     expandButton.name = NameFoldout(property);
-        //     return expandButton;
-        // }
-
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            // EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
-            //
-            // if (!metaInfo.HasFlags)
-            // {
-            //     return ValueButtonsAttributeDrawer.UtilCreateBelowUIToolkit(property);
-            // }
-            //
-            // VisualElement fieldContainer = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         flexGrow = 1,
-            //         flexWrap = Wrap.Wrap,
-            //         flexDirection = FlexDirection.Row,
-            //         // position = Position.Relative,
-            //     },
-            //     name = NameBelowAll(property),
-            // };
-            //
-            // foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName in GetDisplayBit(metaInfo))
-            // {
-            //     Button inlineToggleButton = new Button
-            //     {
-            //         // text = bitValueToName.Value.HasRichName? bitValueToName.Value.RichName: bitValueToName.Value.Name,
-            //         userData = bitValueToName.Key,
-            //         style =
-            //         {
-            //             marginLeft = 0,
-            //             marginRight = 0,
-            //             paddingLeft = 1,
-            //             paddingRight = 1,
-            //         },
-            //     };
-            //
-            //     FillButtonText(inlineToggleButton, bitValueToName.Value, property, info, parent);
-            //     inlineToggleButton.AddToClassList(ClassToggleBitButton(property));
-            //     inlineToggleButton.AddToClassList(ClassAllowDisable);
-            //     fieldContainer.Add(inlineToggleButton);
-            // }
-            //
-            // return fieldContainer;
             return ValueButtonsAttributeDrawer.UtilCreateBelowUIToolkit(property);
         }
 
@@ -457,7 +191,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
             // HelpBox helpBox = container.Q<HelpBox>(name: ValueButtonsAttributeDrawer.NameHelpBox(property));
-            FlagButtonsArrangeElement valueButtonsArrangeElement =
+            FlagButtonsArrangeElement flagButtonsArrangeElement =
                 container.Q<FlagButtonsArrangeElement>(name: NameArrange(property));
             VisualElement subPanel = container.Q<VisualElement>(name: ValueButtonsAttributeDrawer.NameSubPanel(property));
             LeftExpandButton leftExpandButton = container.Q<LeftExpandButton>(name: NameExpand(property));
@@ -465,17 +199,19 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 flagButtonFullToggleGroupElement.ToFullToggles(evt.newValue));
             flagButtonFullToggleGroupElement.ToFullToggles(leftExpandButton.value);
 
-            valueButtonsArrangeElement.BindSubContainer(subPanel);
+            flagButtonsArrangeElement.BindSubContainer(subPanel);
 
-            RefreshButtons();
-            valueButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshButtons());
+            flagButtonsArrangeElement.UpdateButtons(
+                rawInfos
+            );
+            RefreshCurValue();
 
-            valueButtonsArrangeElement.schedule.Execute(() =>
+            flagButtonsArrangeElement.schedule.Execute(() =>
             {
                 subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
                 leftExpandButton.RegisterValueChangedCallback(evt =>
                     subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                flagButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
                 {
                     // leftExpandButton.SetEnabled(hasSubRow);
                     DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
@@ -485,7 +221,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     }
                     RefreshCurValue();
                 });
-                valueButtonsArrangeElement.OnButtonClicked.AddListener(value =>
+                flagButtonsArrangeElement.OnButtonClicked.AddListener(value =>
                 {
                     int toggle = (int)value;
 
@@ -497,6 +233,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     property.serializedObject.ApplyModifiedProperties();
                 });
                 RefreshCurValue();
+                flagButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshCurValue());
             });
 
             return;
@@ -505,7 +242,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             {
                 int curValue = property.intValue;
 
-                valueButtonsArrangeElement.RefreshCurValue(curValue);
+                flagButtonsArrangeElement.RefreshCurValue(curValue);
                 flagButtonFullToggleGroupElement.RefreshValue(curValue, metaInfo);
 
                 bool leftExpandButtonEnabled = leftExpandButton.enabledSelf;
@@ -519,15 +256,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     leftExpandButton.tooltip = $"{curValue}";
                 }
             }
-
-            void RefreshButtons()
-            {
-                valueButtonsArrangeElement.UpdateButtons(
-                    rawInfos
-                );
-                RefreshCurValue();
-            }
-
             // Button toggleButton = container.Q<Button>(name: NameToggleButton(property));
             // if (EnumFlagsUtil.IsOn(property.intValue, metaInfo.AllCheckedInt))
             // {
