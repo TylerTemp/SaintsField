@@ -447,7 +447,7 @@ namespace SaintsField.Editor
                             : members.OrderBy(memberInfo => memberInfo, memberOrderComparer))
 #else
                         // this is still not the correct order, but... a bit better
-                        members.OrderBy(memberInfo => memberInfo.MetadataToken).ToList();
+                        members.OrderBy(memberInfo => memberInfo.MetadataToken)
 #endif
                         .ToList();
 
