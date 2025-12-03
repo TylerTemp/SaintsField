@@ -21844,7 +21844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 774fb341ae404c778c68e533864a2a5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.ValueButtonsExample
-  clickAButton: 
+  clickAButton: The <color=red>Wild Roses
   stringItems:
   - <icon=lightMeter/greenLight/>Where
   - Are

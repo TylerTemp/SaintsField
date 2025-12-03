@@ -1994,6 +1994,7 @@ private void DictExternalAdd()
 *   `CurveRange`
 *   `ListDrawerSettings`
 *   `SaintsDictionary`
+*   `ValueButtons`
 
 ### Numerical ###
 
@@ -4318,6 +4319,17 @@ using SaintsField;
 
 ![](https://github.com/user-attachments/assets/4b76bb2b-f2fd-4efb-a879-71eef57c7444)
 
+This can works with `ShowInInspector`
+
+```csharp
+[ShowInInspector, ValueButtons(nameof(stringItems))]
+public string ShowClickAButton
+{
+    get => clickAButton;
+    set => clickAButton = value;
+}
+```
+
 #### `OptionsValueButtons` / `PairsValueButtons` ####
 
 Select an option directly in the attribute.
@@ -4376,7 +4388,7 @@ public enum BitMask
 [EnumToggleButtons] public BitMask myMask;
 ```
 
-[![video](https://github.com/user-attachments/assets/13f86449-6632-4489-ba3f-31e55f718966)](https://github.com/user-attachments/assets/0a589a01-f00f-4bfd-a845-57b1ddce45fa)
+[![video](https://github.com/user-attachments/assets/13f86449-6632-4489-ba3f-31e55f718966)](https://github.com/user-attachments/assets/11610852-fd14-41f0-b74e-a2c83dc8860e)
 
 For a normal enum it allows you to do a quick select
 
@@ -4410,7 +4422,7 @@ public enum EnumExpand
 [EnumToggleButtons, DefaultExpand] public EnumExpand enumExpand;
 ```
 
-![image](https://github.com/user-attachments/assets/0acb17ee-9866-41a3-abb7-5718cdc398f8)
+![image](https://github.com/user-attachments/assets/4e839b76-7228-48bd-ae4f-388a79d2534a)
 
 You can use `RichLabel` to change the name of the buttons. Note: only standard Unity RichText tag is supported at this point.
 
@@ -4418,14 +4430,14 @@ You can use `RichLabel` to change the name of the buttons. Note: only standard U
 [Serializable, Flags]
 public enum BitMask
 {
-    None = 0,
-    [RichLabel("M<color=red>1</color>")]
+    None = 0,  // this will be replaced for all/none button
+    [InspectorName("M<color=red>1</color>")]
     Mask1 = 1,
-    [RichLabel("M<color=green>2</color>")]
+    [InspectorName("M<color=green>2</color>")]
     Mask2 = 1 << 1,
-    [RichLabel("M<color=blue>3</color>")]
+    [InspectorName("M<color=blue>3</color>")]
     Mask3 = 1 << 2,
-    [RichLabel("M4")]
+    [InspectorName("M4")]
     Mask4 = 1 << 3,
     Mask5 = 1 << 4,
 }
@@ -4434,7 +4446,7 @@ public enum BitMask
 public BitMask myMask;
 ```
 
-![image](https://github.com/user-attachments/assets/556ff203-aa55-44c9-9cc1-6ca2675b995f)
+![image](https://github.com/user-attachments/assets/a61d9613-8c18-456f-9f27-e25193722dfb)
 
 #### `FlagsDropdown` ####
 

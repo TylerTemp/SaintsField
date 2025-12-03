@@ -72,6 +72,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 name = expandName,
             };
             visualInput.Add(leftExpandButton);
+            leftExpandButton.SetCustomViewDataKey(SerializedUtils.GetUniqueId(property));
+            if (property.isExpanded || allAttributes.Any(each => each is FieldDefaultExpandAttribute))
+            {
+                leftExpandButton.value = true;
+            }
 
             visualInput.Add(new FlagButtonFullToggleGroupElement
             {

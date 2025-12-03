@@ -75,38 +75,10 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 Add(SubPanel);
 
                 ValueButtonsArrangeElement.BindSubContainer(SubPanel);
-
-                // List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
-
-                // RichTextDrawer.EmptyRichTextTagProvider emptyRichTextTagProvider = new RichTextDrawer.EmptyRichTextTagProvider();
-                // foreach (EnumMetaInfo.EnumValueInfo enumValueInfo in metaInfo.EnumValues)
-                // {
-                //     IReadOnlyList<RichTextDrawer.RichTextChunk> chunks;
-                //     if (enumValueInfo.OriginalLabel != enumValueInfo.Label)
-                //     {
-                //         chunks = RichTextDrawer.ParseRichXmlWithProvider(enumValueInfo.Label, emptyRichTextTagProvider).ToArray();
-                //     }
-                //     else
-                //     {
-                //         chunks = new[]
-                //         {
-                //             new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
-                //         };
-                //     }
-                //     rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Value));
-                // }
-                // FlagButtonsArrangeElement.UpdateButtons(
-                //     rawInfos
-                // );
             }
         }
 
-        public static VisualElement UIToolkitValueEdit(VisualElement oldElement, ValueButtonsAttribute valueButtonsAttribute, string label, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
-        {
-            return null;
-        }
-
-        public static VisualElement UIToolkitValueEditEnum(VisualElement oldElement, ValueButtonsAttribute valueButtonsAttribute, string label, object value, Type enumType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        public static VisualElement UIToolkitValueEdit(VisualElement oldElement, ValueButtonsAttribute valueButtonsAttribute, string label, object value, Type valueTypeOrNull, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
         {
             if (oldElement is UIToolkitWrapper oldF)
             {
@@ -116,7 +88,9 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             UIToolkitWrapper wrapper = new UIToolkitWrapper(label, labelGrayColor, inHorizontalLayout, setterOrNull);
 
-            AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfoShowInInspector(enumType, valueButtonsAttribute, value, targets[0], false, true);
+            Type underType = valueTypeOrNull ?? value.GetType();
+
+            AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfoShowInInspector(underType, valueButtonsAttribute, value, targets[0], false, true);
 
             List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
 
@@ -156,6 +130,60 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             ValueEditRefreshCurValue(wrapper, value);
             return wrapper;
+        }
+
+        public static VisualElement UIToolkitValueEditEnum(VisualElement oldElement, ValueButtonsAttribute valueButtonsAttribute, string label, object value, Type enumType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            return UIToolkitValueEdit(oldElement, valueButtonsAttribute, label, value, enumType, beforeSet,
+                setterOrNull, labelGrayColor, inHorizontalLayout, allAttributes, targets);
+            // if (oldElement is UIToolkitWrapper oldF)
+            // {
+            //     ValueEditRefreshCurValue(oldF, value);
+            //     return null;
+            // }
+            //
+            // UIToolkitWrapper wrapper = new UIToolkitWrapper(label, labelGrayColor, inHorizontalLayout, setterOrNull);
+            //
+            // AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfoShowInInspector(enumType, valueButtonsAttribute, value, targets[0], false, true);
+            //
+            // List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
+            //
+            // RichTextDrawer.EmptyRichTextTagProvider emptyRichTextTagProvider = new RichTextDrawer.EmptyRichTextTagProvider();
+            // foreach (IAdvancedDropdownList info in metaInfo.DropdownListValue)
+            // {
+            //     IReadOnlyList<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(
+            //         info.displayName, emptyRichTextTagProvider).ToArray();
+            //     rawInfos.Add(new ValueButtonRawInfo(chunks, false, info.value));
+            // }
+            // wrapper.ValueButtonsArrangeElement.UpdateButtons(
+            //     rawInfos
+            // );
+            //
+            // wrapper.ValueButtonsArrangeElement.schedule.Execute(() =>
+            // {
+            //     wrapper.SubPanel.style.display = wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+            //     wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
+            //         wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+            //     wrapper.ValueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+            //     {
+            //         // leftExpandButton.SetEnabled(hasSubRow);
+            //         DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
+            //         if (wrapper.LeftExpandButton.style.display != display)
+            //         {
+            //             wrapper.LeftExpandButton.style.display = display;
+            //         }
+            //         ValueEditRefreshCurValue(wrapper, value);
+            //     });
+            //     wrapper.ValueButtonsArrangeElement.OnButtonClicked.AddListener(clickedValue =>
+            //     {
+            //         beforeSet?.Invoke(wrapper.Value);
+            //         setterOrNull?.Invoke(clickedValue);
+            //     });
+            //     ValueEditRefreshCurValue(wrapper, value);
+            // });
+            //
+            // ValueEditRefreshCurValue(wrapper, value);
+            // return wrapper;
         }
 
         private static void ValueEditRefreshCurValue(UIToolkitWrapper wrapper, object curValue)

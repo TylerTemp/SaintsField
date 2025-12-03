@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SaintsField.Playa;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -8,6 +9,13 @@ namespace SaintsField.Samples.Scripts
     {
         [ValueButtons(nameof(stringItems))] public string clickAButton;
         public List<string> stringItems;
+
+        [ShowInInspector, ValueButtons(nameof(stringItems))]
+        public string ShowClickAButton
+        {
+            get => clickAButton;
+            set => clickAButton = value;
+        }
 
         // Use property/field as options
         [GetComponentInChildren] public Transform[] transOpts;

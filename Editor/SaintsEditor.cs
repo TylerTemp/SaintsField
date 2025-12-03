@@ -1546,8 +1546,8 @@ namespace SaintsField.Editor
 
                 case SaintsRenderType.Method:
                     bool hasRenderer = false;
-                    bool hasLayout = false;
-                    bool needEmptyRenderer = false;
+                    // bool hasLayout = false;
+                    // bool needEmptyRenderer = false;
                     foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
                     {
                         if (playaAttribute is IPlayaMethodBindAttribute methodBindAttribute)
@@ -1565,18 +1565,19 @@ namespace SaintsField.Editor
                             hasRenderer = true;
                             yield return new RealTimeCalculatorRenderer(serializedObject, fieldWithInfo);
                         }
-                        else if (playaAttribute is SeparatorAttribute || playaAttribute is InfoBoxAttribute)
-                        {
-                            needEmptyRenderer = true;
-                        }
-                        else if (playaAttribute is ISaintsLayout)
-                        {
-                            hasLayout = true;
-                            // yield return new EmptyRenderer();
-                        }
+                        // else if (playaAttribute is SeparatorAttribute || playaAttribute is InfoBoxAttribute)
+                        // {
+                        //     needEmptyRenderer = true;
+                        // }
+                        // else if (playaAttribute is ISaintsLayout)
+                        // {
+                        //     hasLayout = true;
+                        //     // yield return new EmptyRenderer();
+                        // }
                     }
 
-                    if (needEmptyRenderer || (hasLayout && !hasRenderer))
+                    // if (needEmptyRenderer || (hasLayout && !hasRenderer))
+                    if (!hasRenderer && fieldWithInfo.PlayaAttributes.Count > 0)
                     {
                         yield return new EmptyRenderer();
                     }

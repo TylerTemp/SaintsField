@@ -250,6 +250,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 valueButtonsAttribute,
                                 label,
                                 value,
+                                valueType,
                                 beforeSet,
                                 setterOrNull,
                                 labelGrayColor,

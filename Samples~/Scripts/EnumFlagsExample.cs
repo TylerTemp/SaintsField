@@ -9,13 +9,13 @@ namespace SaintsField.Samples.Scripts
         public enum BitMask
         {
             None = 0,  // this will be replaced for all/none button
-            [FieldLabelText("M<color=red>1</color>")]
+            [InspectorName("M<color=red>1</color>")]
             Mask1 = 1,
-            [FieldLabelText("M<color=green>2</color>")]
+            [InspectorName("M<color=green>2</color>")]
             Mask2 = 1 << 1,
-            [FieldLabelText("M<color=blue>3</color>")]
+            [InspectorName("M<color=blue>3</color>")]
             Mask3 = 1 << 2,
-            [FieldLabelText("M4")]
+            [InspectorName("M4")]
             Mask4 = 1 << 3,
             Mask5 = 1 << 4,
             MaskLongLongLongLong = 1 << 5,
@@ -27,8 +27,6 @@ namespace SaintsField.Samples.Scripts
         // [RichLabel("<icon=star.png /><label />")]
         [EnumToggleButtons]
         public BitMask myMask;
-
-        // [Space(60)]
 
         [EnumToggleButtons, FieldLabelText(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
         private void ValueChanged() => Debug.Log(myMask2);
