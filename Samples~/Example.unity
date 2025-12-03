@@ -16729,15 +16729,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45cb9069ce004c2ab4ee78763c064fcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myMask: 0
-  myMask2: 0
+  myMask: 14
+  myMask2: 10
   myStruct:
     myMask: 0
   myMaskDisabled: 0
   myMaskDisabledLabel: 0
-  enumNormal: 2
-  enumExpand: 5
-  labelField: 0
+  enumNormal: 1
+  enumExpand: 4
+  labelField: 2
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0

@@ -25,13 +25,17 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
         private static string NameField(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Field";
         private static string NameArrange(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Arrange";
         private static string NameExpand(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Expand";
-        private static string NameSubPanel(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_SubPanel";
-        private static string NameHelpBox(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_HelpBox";
+        public static string NameSubPanel(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_SubPanel";
+        public static string NameHelpBox(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_HelpBox";
 
         // private RichTextDrawer _richTextDrawer;
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent) =>
+            UtilCreateFieldUIToolKit(GetPreferredLabel(property), property);
+
+        public static  VisualElement UtilCreateFieldUIToolKit(string label, SerializedProperty property)
         {
             VisualElement root = new VisualElement
             {
@@ -62,7 +66,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             root.Add(valueButtonsArrangeElementWrapper);
 
             // root.Add(leftExpandButton);
-            ValueButtonsArrangeElement valueButtonsArrangeElement = new ValueButtonsArrangeElement
+            ValueButtonsArrangeElement valueButtonsArrangeElement = new ValueButtonsArrangeElement(new ValueButtonsCalcElement())
             {
                 name = NameArrange(property),
                 style =
@@ -73,7 +77,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             };
             valueButtonsArrangeElementWrapper.Add(valueButtonsArrangeElement);
 
-            EmptyPrefabOverrideField r = new EmptyPrefabOverrideField(GetPreferredLabel(property), root, property)
+            EmptyPrefabOverrideField r = new EmptyPrefabOverrideField(label, root, property)
             {
                 style =
                 {
@@ -89,8 +93,12 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             return r;
         }
 
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
+        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
+            ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent) =>
+            UtilCreateBelowUIToolkit(property);
+
+        public static VisualElement UtilCreateBelowUIToolkit(SerializedProperty property)
         {
             VisualElement root = new VisualElement
             {
@@ -120,8 +128,14 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             return root;
         }
 
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent) =>
+            UtilOnAwakeUIToolkit(this, property, saintsAttribute, container, onValueChangedCallback,
+                info, parent);
+
+        public static void UtilOnAwakeUIToolkit(IRichTextTagProvider richTextTagProvider, SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
@@ -134,7 +148,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             valueButtonsArrangeElement.BindSubContainer(subPanel);
 
-            ValueButtonsAttribute valueButtonsAttribute = (ValueButtonsAttribute)saintsAttribute;
+            PathedDropdownAttribute valueButtonsAttribute = (PathedDropdownAttribute)saintsAttribute;
 
             RefreshButtons();
             if (!string.IsNullOrEmpty(valueButtonsAttribute.FuncName))
@@ -206,7 +220,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                         initMetaInfo.DropdownListValue
                             .Select(each =>
                                 new ValueButtonRawInfo(
-                                    RichTextDrawer.ParseRichXmlWithProvider(each.displayName, this).ToArray(),
+                                    RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
                                     each.disabled,
                                     each.value))
                             .ToArray()

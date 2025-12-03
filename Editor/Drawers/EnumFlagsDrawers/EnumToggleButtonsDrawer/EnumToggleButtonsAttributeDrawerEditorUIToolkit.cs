@@ -556,6 +556,22 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 button.text = xml;
             }
         }
+
+        private static void SetBitButtonStyle(Button bitButton, bool on)
+        {
+            if (on)
+            {
+                const float gray = 0.15f;
+                const float grayBorder = 0.45f;
+                bitButton.style.backgroundColor = new Color(gray, gray, gray, 1f);
+                bitButton.style.borderTopColor = bitButton.style.borderBottomColor = new Color(grayBorder, 0.6f, grayBorder, 1f);
+            }
+            else
+            {
+                bitButton.style.backgroundColor = StyleKeyword.Null;
+                bitButton.style.borderTopColor = bitButton.style.borderBottomColor = StyleKeyword.Null;
+            }
+        }
     }
 }
 #endif
