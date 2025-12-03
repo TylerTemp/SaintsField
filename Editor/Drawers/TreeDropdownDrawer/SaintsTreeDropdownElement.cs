@@ -29,6 +29,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         private readonly bool _allowToggle;
 
         private readonly IReadOnlyList<TreeRowAbsElement> _flatList;
+        public readonly ToolbarSearchField _toolbarSearchField;
 
         public SaintsTreeDropdownElement(AdvancedDropdownMetaInfo metaInfo, bool toggle)
         {
@@ -38,7 +39,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             // CleanableTextInputFullWidth cleanableTextInput = new CleanableTextInputFullWidth(null);
             // Add(cleanableTextInput);
-            ToolbarSearchField toolbarSearchField = new ToolbarSearchField
+            _toolbarSearchField = new ToolbarSearchField
             {
                 style =
                 {
@@ -46,7 +47,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     width = StyleKeyword.None,
                 },
             };
-            Add(toolbarSearchField);
+            Add(_toolbarSearchField);
 
             HashSet<object> curValues = metaInfo.CurValues.ToHashSet();
 
@@ -96,9 +97,9 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             Add(treeContainer);
 
 #if UNITY_6000_0_OR_NEWER
-            toolbarSearchField.placeholderText = "Search";
+            _toolbarSearchField.placeholderText = "Search";
 #endif
-            toolbarSearchField.RegisterCallback<NavigationMoveEvent>(evt =>
+            _toolbarSearchField.RegisterCallback<NavigationMoveEvent>(evt =>
             {
                 if (evt.direction == NavigationMoveEvent.Direction.Down)
                 {
@@ -108,7 +109,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             RegisterCallback<AttachToPanelEvent>(_ =>
             {
-                toolbarSearchField.Q<TextField>().Q("unity-text-input").Focus();
+                _toolbarSearchField.Q<TextField>().Q("unity-text-input").Focus();
                 if(CurrentFocus != null)
                 {
                     treeContainer.schedule
@@ -118,7 +119,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
             });
 
-            toolbarSearchField.RegisterValueChangedCallback(evt =>
+            _toolbarSearchField.RegisterValueChangedCallback(evt =>
             {
                 string searchText = evt.newValue;
 
@@ -382,6 +383,11 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             }
 
             return hasMeaningfulChild ? result : Array.Empty<TreeRowAbsElement>();
+        }
+
+        public void SetSearch(string search)
+        {
+            _toolbarSearchField.value = search;
         }
     }
 }

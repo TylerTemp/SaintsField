@@ -96,14 +96,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.4.7**
+**5.4.8**
 
-1.  Add: `TreeDropdown` now has an indent guild for readability
-2.  Add: `TypeReference` now uses `TreeDropdown`, for a much faster rendering.
-3.  Add: `TypeReference` now show the "visible"/"internal" category if you have `AllowInternal` set
-4.  Change: `EType.GroupAssembly` & `EType.GroupNameSpace` is now deprecated and is always on in flavor of `TreeDropdown` drawer
-5.  Fix: rich label might give an incorrect `</color (trash text)>` tag
-6.  Fix: `TreeDropdown` foldout label didn't use rich text drawer
+1.  Improve: `EnumToggleButtons` now uses the same style of `ValueButtons` for a better visual present
+2.  Add: `TypeReference` now add a `string defultSearch = ""` parameter to input a default search string when opening up the popup [#340](https://github.com/TylerTemp/SaintsField/issues/340)
+3.  Fix: code compile error when `SAINTS_CODE_ANALYSIS` is disabled [#345](https://github.com/TylerTemp/SaintsField/issues/345)
+4.  Add: `ValueButtons` now works with `ShowInInspector`
+5.  Fix: `ValueButtons` now update it's display if the value is externally edited
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -6902,7 +6901,8 @@ You can add an extra `[TypeReference]` to control the behavior.
 *   `EType eType = EType.Current`: Options. See below
 *   `Type[] superTypes = null`: A list of type/interface, the option list types are inhirent from these types. The type in the list is also included in list.
 *   `string[] onlyAssemblies = null`: only use these assembly names
-*   `string[] extraAssemblies = null`: extrally add these assemblies to the result list.
+*   `string[] extraAssemblies = null`: extrally add these assemblies to the result lists
+*   `string defultSearch = ""`: input a default search string when opening up the popup
 
 EType:
 

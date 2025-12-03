@@ -18,13 +18,15 @@ namespace SaintsField
         public readonly IReadOnlyList<Type> SuperTypes;
         public readonly IReadOnlyList<string> OnlyAssemblies;
         public readonly IReadOnlyList<string> ExtraAssemblies;
+        public readonly string DefaultSearch;
 
-        public TypeReferenceAttribute(EType eType = EType.Current, Type[] superTypes = null, string[] onlyAssemblies = null, string[] extraAssemblies = null)
+        public TypeReferenceAttribute(EType eType = EType.Current, Type[] superTypes = null, string[] onlyAssemblies = null, string[] extraAssemblies = null, string defaultSearch = "")
         {
             EType = eType;
             SuperTypes = superTypes;
             OnlyAssemblies = onlyAssemblies;
             ExtraAssemblies = extraAssemblies;
+            DefaultSearch = defaultSearch;
         }
     }
 }

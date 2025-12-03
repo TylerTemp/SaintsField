@@ -1,6 +1,6 @@
 {
   "name": "today.comes.saintsfield",
-  "version": "5.4.7",
+  "version": "5.4.8",
   "displayName": "SaintsField",
   "description": "A Unity plugin for field in inspector",
   "unity": "2022.2",

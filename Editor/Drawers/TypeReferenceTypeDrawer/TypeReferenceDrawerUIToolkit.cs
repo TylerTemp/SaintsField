@@ -58,6 +58,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             UIToolkitUtils.AddContextualMenuManipulator(dropdown.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
             TypeReferenceAttribute typeReferenceAttribute = GetTypeReferenceAttribute(allAttributes);
+            string preSearch = typeReferenceAttribute?.DefaultSearch;
 
             dropdown.ButtonElement.clicked += () =>
             {
@@ -75,7 +76,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 AdvancedDropdownMetaInfo metaInfo = GetDropdownMetaInfo(type, typeReferenceAttribute, _cachedAssemblies, _cachedAssembliesTypes, false, parent);
 
                 // Debug.Log(metaInfo.DropdownListValue.Count);
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsTreeDropdownUIToolkit(
+                SaintsTreeDropdownUIToolkit element = new SaintsTreeDropdownUIToolkit(
                     metaInfo,
                     dropdown.worldBound.width,
                     maxHeight,
@@ -86,7 +87,13 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                         onValueChangedCallback.Invoke(r);
                         return null;
                     }
-                ));
+                );
+                UnityEditor.PopupWindow.Show(worldBound, element);
+
+                if (!string.IsNullOrEmpty(preSearch))
+                {
+                    element.SetSearch(preSearch);
+                }
             };
 
             UpdateLabel(container, property);

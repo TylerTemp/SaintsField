@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.TypeReferenceExamples
         public TypeReference typeReference;
 
         // current assembly, and group it
-        [TypeReference(EType.CurrentOnly)]
+        [TypeReference(EType.CurrentOnly, defaultSearch: "Example")]
         // [BelowButton(nameof(TestCreate))]
         public TypeReference typeReference2;
 

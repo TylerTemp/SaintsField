@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.4.8 ##
+
+1.  Improve: `EnumToggleButtons` now uses the same style of `ValueButtons` for a better visual present
+2.  Add: `TypeReference` now add a `string defultSearch = ""` parameter to input a default search string when opening up the popup [#340](https://github.com/TylerTemp/SaintsField/issues/340)
+3.  Fix: code compile error when `SAINTS_CODE_ANALYSIS` is disabled [#345](https://github.com/TylerTemp/SaintsField/issues/345)
+4.  Add: `ValueButtons` now works with `ShowInInspector`
+5.  Fix: `ValueButtons` now update it's display if the value is externally edited
+
 ## 5.4.7 ##
 
 1.  Add: `TreeDropdown` now has an indent guild for readability

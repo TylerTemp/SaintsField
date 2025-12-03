@@ -81,6 +81,11 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             }
         }
 
+        public void SetSearch(string search)
+        {
+            _treeDropdownElement.SetSearch(search);
+        }
+
 
 // #if SAINTSFIELD_DEBUG
 //         public SaintsTreeDropdownElement DebugGetElement()
