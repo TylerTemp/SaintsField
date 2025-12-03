@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.UIToolkitElements.ValueButtons;
 using SaintsField.Editor.Utils;
 
 namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
@@ -10,7 +11,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
         {
         }
 
-        public override bool IsOn(object curValue)
+        protected override bool IsOn(object curValue)
         {
             return Util.GetIsEqual(curValue, Value);
         }
