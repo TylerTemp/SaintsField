@@ -13,14 +13,6 @@ assignees: TylerTemp
 
 **SaintsField Version**
 
-**Drawer Env**
-
-(Use `- [x]` to mark one)
-
-- [ ] UI Toolkit
-- [ ] IMGUI
-- [ ] I'm not sure / It's not related.
-
 **Additional context**
 
 <!-- Any additional information that might help targetting this issue -->
