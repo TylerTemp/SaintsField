@@ -74,7 +74,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             else
             {
                 style.backgroundColor = StyleKeyword.Null;
-                style.borderTopColor = style.borderBottomColor = StyleKeyword.Null;
+                style.borderTopColor = style.borderBottomColor = style.borderLeftColor = style.borderRightColor = StyleKeyword.Null;
             }
         }
         public abstract bool IsOn(object curValue);
