@@ -10,8 +10,8 @@ using Debug = UnityEngine.Debug;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class SeparatorAttribute: Attribute, IPlayaAttribute, ISeparatorAttribute
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
+    public class SeparatorAttribute: Attribute, IPlayaAttribute, ISeparatorAttribute, IPlayaClassAttribute
     {
         public string Title { get; }
         public Color Color { get; }
@@ -45,5 +45,7 @@ namespace SaintsField
             Space = space;
             Below = below;
         }
+
+        public virtual bool EndDecorator => false;
     }
 }

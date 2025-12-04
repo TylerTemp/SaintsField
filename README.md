@@ -96,13 +96,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.4.8**
+**5.4.9**
 
-1.  Improve: `EnumToggleButtons` now uses the same style of `ValueButtons` for a better visual present
-2.  Add: `TypeReference` now add a `string defultSearch = ""` parameter to input a default search string when opening up the popup [#340](https://github.com/TylerTemp/SaintsField/issues/340)
-3.  Fix: code compile error when `SAINTS_CODE_ANALYSIS` is disabled [#345](https://github.com/TylerTemp/SaintsField/issues/345)
-4.  Add: `ValueButtons` now works with `ShowInInspector`
-5.  Fix: `ValueButtons` now update it's display if the value is externally edited
+1.  Fix: `SaintsEditor` failed to inject the component header functions
+2.  Add: `Separator`, `BelowSeparator`, `BelowText` now can be used on a class/struct directly.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -294,9 +291,9 @@ public enum Direction
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-Like `RichLabel`, but it's rendered above/below the field in full width of view instead.
+Like `LabelLabel`, but it's rendered above/below the field in full width of view instead.
 
-For `AboveText`, it can also be applied on a class/struct.
+It can also be applied on a class/struct, which can act like a class/struct comment
 
 Parameters:
 
@@ -319,7 +316,7 @@ public string dynamicContent;
 
 ![Image](https://github.com/user-attachments/assets/5c29a43b-7276-488a-98fa-da133e77edc4)
 
-Example of using on a class/struct like a data comment:
+Example of using on a class/struct like a comment:
 
 ```csharp
 using SaintsField;
@@ -333,7 +330,7 @@ public class ClassPlayaAboveRichLabelExample : MonoBehaviour
     public string dynamicContent;
 
     [Serializable]
-    [PlayaAboveRichLabel("<color=gray>--This is a struct message--")]
+    [AboveText("<color=gray>--This is a struct message--")]
     public struct MyStruct
     {
         public string structString;
@@ -450,7 +447,7 @@ public string TakeAGuess()
 
 Draw an info box above/below the field.
 
-It can also be directly applied on a class/struct definition.
+It can also be directly applied on a class/struct definition, to act like a comment.
 
 *   `string content`
 
@@ -607,7 +604,7 @@ private string DynamicMessage() => _content ? "False" : "True";
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-Draw text, separator, spaces for field/property/button/layout on above / below with rich text & dynamic text support.
+Draw text, separator, spaces for field/property/button/layout/class/struct on above / below with rich text & dynamic text support.
 
 Parameters:
 
@@ -678,6 +675,28 @@ public bool toggle;
 ```
 
 ![image](https://github.com/user-attachments/assets/792960eb-50eb-4a26-b563-37282c20a174)
+
+Use it on a class to get a class default seperator. This is useful for inherent.
+
+```csharp
+// AbsSepMono.cs
+[BelowSeparator("Inherent Fields of <color=brown><container.Type/>", EColor.Brown, EAlign.Center)]
+[BelowSeparator(10)]
+public abstract class AbsSepMono : SaintsMonoBehaviour
+{
+    public string absField1;
+    public string absField2;
+}
+
+// ChildSepMono.cs
+[Separator("Begin of <container.Type>", EAlign.Center)]
+public class ChildSepMono : AbsSepMono
+{
+    public string childField;
+}
+```
+
+![](https://github.com/user-attachments/assets/8701a114-5923-4ca4-867f-30ab01f43f9a)
 
 #### `FieldSeparator` / `FieldBelowSeparator` ####
 
@@ -6182,9 +6201,9 @@ Component Header allows you to draw extra stuffs on a component like this:
 
 ![image](https://github.com/user-attachments/assets/18385c3d-bc65-4761-a1be-a406a731d963)
 
-This component can work if `SaintsEditor` is enabled, or work stand-alone.
+If you have `SaintsEditor` enabled, this works by default.
 
-To work as stand-alone, go `window` - `Saints` - `Enable Stand-Alone Header GUI Support`
+(If you can not enable `SaintsEditor`, it can work as stand-alone, go `window` - `Saints` - `Enable Stand-Alone Header GUI Support`)
 
 ### `HeaderButton` / `HeaderLeftButton` ###
 

@@ -3683,7 +3683,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private Type GetTargetType()
         {
-            return FieldWithInfo.Targets[0].GetType();
+            return  FieldWithInfo.ClassStructType ?? FieldWithInfo.Targets[0].GetType();
         }
 
         public string GetContainerTypeBaseType()

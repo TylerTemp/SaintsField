@@ -5,9 +5,11 @@ using System.Diagnostics;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class  | AttributeTargets.Struct, AllowMultiple = true)]
     public class BelowInfoBox: InfoBoxAttribute
     {
+        public override bool EndDecorator => true;
+
         public BelowInfoBox(string content, EMessageType messageType=EMessageType.Info, string show=null, bool isCallback=false, string groupBy=""): base(content, messageType, show, isCallback, true, groupBy)
         {
         }

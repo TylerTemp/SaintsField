@@ -10,10 +10,8 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field)]
-    public class TableAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute
+    public class TableAttribute: Attribute, IPlayaAttribute
     {
-        public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
-        public string GroupBy => "__LABEL_FIELD__";
         // public readonly bool DefaultExpanded;
         public readonly bool HideAddButton;
         public readonly bool HideRemoveButton;

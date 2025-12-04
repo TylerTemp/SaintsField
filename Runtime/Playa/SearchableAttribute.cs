@@ -7,6 +7,6 @@ namespace SaintsField.Playa
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct)]
     public class SearchableAttribute: Attribute, IPlayaAttribute, IPlayaClassAttribute
     {
-
+        public bool EndDecorator => false;
     }
 }
