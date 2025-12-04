@@ -880,7 +880,7 @@ namespace SaintsField.Editor
             bool anyChange = false;
             // target.GetType()
 
-            AbsComponentHeaderAttribute[] classAttributes = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(targets.GetType());
+            AbsComponentHeaderAttribute[] classAttributes = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(targets[0].GetType());
             foreach ((AbsComponentHeaderAttribute componentHeaderAttribute, int order) in classAttributes.WithIndex(-classAttributes.Length))
             {
                 bool added = DrawHeaderGUI.AddAttributeIfNot(
