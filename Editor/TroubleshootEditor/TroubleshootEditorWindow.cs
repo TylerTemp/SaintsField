@@ -292,42 +292,41 @@ namespace SaintsField.Editor.TroubleshootEditor
                 // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
                 serializedPropertyDict = serializableFields
                     .ToDictionary(each => each, serializedObject.FindProperty);
-            }
-
-            foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor.HelperGetSaintsFieldWithInfo(serializedPropertyDict, new[]{inspectTarget}))
-            {
-                // Debug.Log(saintsFieldWithInfo.RenderType);
-                if (saintsFieldWithInfo.RenderType == SaintsRenderType.SerializedField)
+                foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor.HelperGetSaintsFieldWithInfo(serializedObject, serializedPropertyDict, new[]{inspectTarget}))
                 {
-                    // ReSharper disable once InvertIf
-                    if(saintsFieldWithInfo.FieldInfo != null)
+                    // Debug.Log(saintsFieldWithInfo.RenderType);
+                    if (saintsFieldWithInfo.RenderType == SaintsRenderType.SerializedField)
                     {
-                        result.Add(saintsFieldWithInfo.FieldInfo.Name, _pickFieldMemberInfos.Count);
-                        _pickFieldMemberInfos.Add(saintsFieldWithInfo.FieldInfo);
-                    }
-                }
-                else
-                {
-                    if (saintsFieldWithInfo.PlayaAttributes.Count > 0)
-                    {
-                        switch (saintsFieldWithInfo.RenderType)
+                        // ReSharper disable once InvertIf
+                        if(saintsFieldWithInfo.FieldInfo != null)
                         {
-                            case SaintsRenderType.Method:
-                                result.Add($"[Method] {saintsFieldWithInfo.MethodInfo.Name}", _pickFieldMemberInfos.Count);
-                                _pickFieldMemberInfos.Add(saintsFieldWithInfo.MethodInfo);
-                                break;
-                            case SaintsRenderType.NativeProperty:
-                                result.Add($"[Property] {saintsFieldWithInfo.PropertyInfo.Name}", _pickFieldMemberInfos.Count);
-                                _pickFieldMemberInfos.Add(saintsFieldWithInfo.PropertyInfo);
-                                break;
-                            case SaintsRenderType.NonSerializedField:
-                                result.Add($"[NonSerialized] {saintsFieldWithInfo.FieldInfo.Name}", _pickFieldMemberInfos.Count);
-                                _pickFieldMemberInfos.Add(saintsFieldWithInfo.FieldInfo);
-                                break;
-                            case SaintsRenderType.SerializedField:
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException(nameof(saintsFieldWithInfo.RenderType), saintsFieldWithInfo.RenderType, null);
+                            result.Add(saintsFieldWithInfo.FieldInfo.Name, _pickFieldMemberInfos.Count);
+                            _pickFieldMemberInfos.Add(saintsFieldWithInfo.FieldInfo);
+                        }
+                    }
+                    else
+                    {
+                        if (saintsFieldWithInfo.PlayaAttributes.Count > 0)
+                        {
+                            switch (saintsFieldWithInfo.RenderType)
+                            {
+                                case SaintsRenderType.Method:
+                                    result.Add($"[Method] {saintsFieldWithInfo.MethodInfo.Name}", _pickFieldMemberInfos.Count);
+                                    _pickFieldMemberInfos.Add(saintsFieldWithInfo.MethodInfo);
+                                    break;
+                                case SaintsRenderType.NativeProperty:
+                                    result.Add($"[Property] {saintsFieldWithInfo.PropertyInfo.Name}", _pickFieldMemberInfos.Count);
+                                    _pickFieldMemberInfos.Add(saintsFieldWithInfo.PropertyInfo);
+                                    break;
+                                case SaintsRenderType.NonSerializedField:
+                                    result.Add($"[NonSerialized] {saintsFieldWithInfo.FieldInfo.Name}", _pickFieldMemberInfos.Count);
+                                    _pickFieldMemberInfos.Add(saintsFieldWithInfo.FieldInfo);
+                                    break;
+                                case SaintsRenderType.SerializedField:
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException(nameof(saintsFieldWithInfo.RenderType), saintsFieldWithInfo.RenderType, null);
+                            }
                         }
                     }
                 }

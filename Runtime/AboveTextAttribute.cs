@@ -13,5 +13,7 @@ namespace SaintsField
         {
             Below = false;
         }
+
+        public override bool EndDecorator => false;
     }
 }

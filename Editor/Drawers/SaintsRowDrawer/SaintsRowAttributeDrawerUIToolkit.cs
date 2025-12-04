@@ -299,17 +299,17 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
              VisualElement bodyElement = new VisualElement();
 
-             Type objectType = value.GetType();
-             IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
+             // Type objectType = value.GetType();
+             // IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
 
-             foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(objectType, playaClassAttributes, property.serializedObject, new[]{value}))
-             {
-                 VisualElement rendererElement = saintsRenderer.CreateVisualElement();
-                 if (rendererElement != null)
-                 {
-                     bodyElement.Add(rendererElement);
-                 }
-             }
+             // foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(objectType, playaClassAttributes, property.serializedObject, new[]{value}))
+             // {
+             //     VisualElement rendererElement = saintsRenderer.CreateVisualElement();
+             //     if (rendererElement != null)
+             //     {
+             //         bodyElement.Add(rendererElement);
+             //     }
+             // }
 
             // this... fixed by adding Bind()... wtf...
             foreach (ISaintsRenderer saintsRenderer in renderer)

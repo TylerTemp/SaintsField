@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
+namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 {
     public abstract class AbsValueButton: Button
     {
@@ -24,7 +23,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             }
         }
 
-        public AbsValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
+        protected AbsValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
         {
             Chunks = chunks;
             style.marginLeft = 0;
@@ -74,10 +73,11 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             else
             {
                 style.backgroundColor = StyleKeyword.Null;
-                style.borderTopColor = style.borderBottomColor = StyleKeyword.Null;
+                style.borderTopColor = style.borderBottomColor = style.borderLeftColor = style.borderRightColor = StyleKeyword.Null;
             }
         }
-        public abstract bool IsOn(object curValue);
+
+        protected abstract bool IsOn(object curValue);
 
         private void DrawChunks()
         {

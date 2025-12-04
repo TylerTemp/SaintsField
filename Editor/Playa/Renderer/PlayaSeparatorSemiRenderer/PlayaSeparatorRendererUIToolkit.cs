@@ -70,12 +70,9 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
                 if (!string.IsNullOrEmpty(newRichXml))
                 {
                     _titleElement.Clear();
-                    IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXml(
+                    IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(
                         newRichXml,
-                        GetFriendlyName(FieldWithInfo),
-                        FieldWithInfo.SerializedProperty,
-                        FieldWithInfo.FieldInfo ?? (MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.MethodInfo,
-                        FieldWithInfo.Targets[0]);
+                        this);
                     foreach (VisualElement rich in _richTextDrawer.DrawChunksUIToolKit(chunks))
                     {
                         // Debug.Log($"title add {rich}");

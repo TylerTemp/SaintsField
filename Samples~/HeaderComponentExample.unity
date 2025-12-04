@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -38,13 +38,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -67,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -168,7 +164,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8749fbe0f1a151848aaab4280b4e5480, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.HeaderComponentExample.Issues.Issue300.Issue300InheDupChild
-  _saintsSerializedProperties: []
   normalizedHealth: 0.652
 --- !u!114 &319780640
 MonoBehaviour:
@@ -182,8 +177,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94783056a926e42478e7ee3ccdf7e007, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.HeaderComponentExample.Issues.Issue300.Issue300InheDupParent
-  _saintsSerializedProperties: []
   normalizedHealth: 0.133
+--- !u!1 &776954073
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 776954075}
+  - component: {fileID: 776954074}
+  m_Layer: 0
+  m_Name: WorkTogether
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &776954074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776954073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47dcd5323a82e594db7336f3f72dbf3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::WorkTogether
+--- !u!4 &776954075
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776954073}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &806467987
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,7 +268,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86cfb8eb5e58e4b49806544f9ed96bd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   rate: 1
 --- !u!114 &806467992
 MonoBehaviour:
@@ -244,7 +281,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc9f6e885bc43624b87b21bfcfb5cc90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   nickName: MyName
   password: 12345
   age: 0
@@ -260,7 +296,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3817c33280f0fed40a2c8fa9a8543232, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1 &912651398
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,7 +328,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fd61f1c252f89b47b23a7ab45a24c0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   label: <color=lime>dynamic
 --- !u!4 &912651400
 Transform:
@@ -335,7 +369,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6e7a8255d1d22040b8dc6aaa59f6e98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   value: <color=brown>Title
 --- !u!114 &912651403
 MonoBehaviour:
@@ -380,7 +413,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c52006f1e74fdd54ba6d9d61b9beee3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   range1: 0.14997311
   range2: 0.44994134
   range3: 0.2999706
@@ -411,7 +443,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8540c98014784f246b83c04c2194eea6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   range1: 0.669
 --- !u!1 &1294209384
 GameObject:
@@ -491,65 +522,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9284326e4b6a61940a216f5da48bd3fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
   isPlay: 0
---- !u!1 &1373399644
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1373399646}
-  - component: {fileID: 1373399645}
-  m_Layer: 0
-  m_Name: WwiseGlobal
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1373399645
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1373399644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f535381981f961458dc90594ffd0000, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  InitializationSettings: {fileID: 11400000, guid: 9f5202af46b37f943b2374477f000754, type: 2}
-  basePath: 
-  language: 
-  defaultPoolSize: 0
-  lowerPoolSize: 0
-  streamingPoolSize: 0
-  memoryCutoffThreshold: 0
-  monitorPoolSize: 0
-  monitorQueuePoolSize: 0
-  callbackManagerBufferSize: 0
-  spatialAudioPoolSize: 0
-  maxSoundPropagationDepth: 0
-  engineLogging: 0
---- !u!4 &1373399646
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1373399644}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1480302248
 GameObject:
   m_ObjectHideFlags: 0
@@ -594,7 +567,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f1a267b353aebf44b44af88c8ff30dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _saintsSerializedProperties: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -603,4 +575,4 @@ SceneRoots:
   - {fileID: 1259809732}
   - {fileID: 912651400}
   - {fileID: 1294209385}
-  - {fileID: 1373399646}
+  - {fileID: 776954075}

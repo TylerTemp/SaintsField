@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
-// using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
+// using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
+namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 {
     public abstract class AbsValueButtonsCalcElement<T>: VisualElement where T: AbsValueButton
     {

@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.4.9 ##
+
+1.  Fix: `SaintsEditor` failed to inject the component header functions
+2.  Add: `Separator`, `BelowSeparator`, `BelowText` now can be used on a class/struct directly.
+
 ## 5.4.8 ##
 
 1.  Improve: `EnumToggleButtons` now uses the same style of `ValueButtons` for a better visual present

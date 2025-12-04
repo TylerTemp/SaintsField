@@ -7,7 +7,7 @@ using SaintsField.Utils;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
     public class BelowTextAttribute: Attribute, IPlayaAttribute, IPlayaClassAttribute
     {
         public readonly string Content;
@@ -22,5 +22,7 @@ namespace SaintsField
             Content = contentParsed;
             IsCallback = isCallbackParsed;
         }
+
+        public virtual bool EndDecorator => true;
     }
 }

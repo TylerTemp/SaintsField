@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
+namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 {
     public abstract class AbsValueButtonsArrangeElement<T>: VisualElement where T: AbsValueButton
     {

@@ -9,7 +9,7 @@ namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-    public class InfoBoxAttribute: Attribute, IPlayaAttribute, IPlayaClassAttribute, IPlayaIMGUIGroupBy
+    public class InfoBoxAttribute: Attribute, IPlayaClassAttribute, IPlayaIMGUIGroupBy
     {
         // public readonly string GroupBy;
         public string GroupBy { get; }
@@ -38,5 +38,7 @@ namespace SaintsField
         public InfoBoxAttribute(string content, bool isCallback): this(content, EMessageType.Info, null, isCallback)
         {
         }
+
+        public virtual bool EndDecorator => false;
     }
 }

@@ -4,9 +4,11 @@ using System.Diagnostics;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
     public class BelowSeparatorAttribute: SeparatorAttribute
     {
+        public override bool EndDecorator => true;
+
         public BelowSeparatorAttribute() : base(null, below: true) {}
 
         public BelowSeparatorAttribute(EColor color): base(color, below: true) {}

@@ -3,9 +3,7 @@ using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
-using SaintsField.Playa;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
@@ -24,7 +22,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
-            (HelpBox helpBox, bool needUpdate) = CreateInfoBox(FieldWithInfo, _playaInfoBoxAttribute);
+            (HelpBox helpBox, bool needUpdate) = CreateInfoBox(FieldWithInfo, _playaInfoBoxAttribute, this);
             helpBox.name = FieldWithInfo.MemberId;
             return (helpBox, needUpdate);
         }
@@ -33,11 +31,11 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         {
             PreCheckResult result = UpdatePreCheckUIToolkit();
             HelpBox helpBox = root.Q<HelpBox>(FieldWithInfo.MemberId);
-            UpdateInfoBox(helpBox);
+            UpdateInfoBox(helpBox, this);
             return result;
         }
 
-        private static (HelpBox helpBox, bool needUpdate) CreateInfoBox(SaintsFieldWithInfo fieldWithInfo, InfoBoxAttribute infoBoxAttribute)
+        private static (HelpBox helpBox, bool needUpdate) CreateInfoBox(SaintsFieldWithInfo fieldWithInfo, InfoBoxAttribute infoBoxAttribute, IRichTextTagProvider provider)
         {
             RichTextDrawer richTextDrawer = new RichTextDrawer();
             InfoBoxUserData infoBoxUserData = new InfoBoxUserData
@@ -62,12 +60,12 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
                 },
             };
 
-            UpdateInfoBox(helpBox);
+            UpdateInfoBox(helpBox, provider);
 
             return (helpBox, !string.IsNullOrEmpty(infoBoxAttribute.ShowCallback) || infoBoxAttribute.IsCallback);
         }
 
-        private static void UpdateInfoBox(HelpBox helpBox)
+        private static void UpdateInfoBox(HelpBox helpBox, IRichTextTagProvider provider)
         {
             InfoBoxUserData infoBoxUserData = (InfoBoxUserData)helpBox.userData;
 
@@ -81,7 +79,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             }
             if (!showHasError)
             {
-                UpdateInfoBoxContent(willShow, helpBox, infoBoxUserData);
+                UpdateInfoBoxContent(willShow, helpBox, infoBoxUserData, provider);
             }
         }
 
@@ -110,7 +108,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             return ("", willShow);
         }
 
-        private static void UpdateInfoBoxContent(bool willShow, HelpBox helpBox, InfoBoxUserData infoBoxUserData)
+        private static void UpdateInfoBoxContent(bool willShow, HelpBox helpBox, InfoBoxUserData infoBoxUserData, IRichTextTagProvider provider)
         {
             if (!willShow)
             {
@@ -196,7 +194,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 
             label.Clear();
             foreach (VisualElement richTextElement in infoBoxUserData.RichTextDrawer.DrawChunksUIToolKit(
-                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, infoBoxUserData.FieldWithInfo.SerializedProperty, member, infoBoxUserData.FieldWithInfo.Targets[0]))
+                         RichTextDrawer.ParseRichXmlWithProvider(xmlContent, provider))
                      )
             {
 

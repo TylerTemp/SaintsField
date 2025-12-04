@@ -2,6 +2,7 @@
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
@@ -31,7 +32,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         {
             PreCheckResult result = UpdatePreCheckUIToolkit();
             VisualElement labelContainer = root.Q<VisualElement>(FieldWithInfo.MemberId);
-            UpdateContainer(labelContainer);
+            UpdateContainer(labelContainer, this);
             return result;
         }
 
@@ -58,12 +59,12 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
                 },
             };
 
-            UpdateContainer(container);
+            UpdateContainer(container, this);
 
             return (container, playaAboveRichLabelAttribute.IsCallback);
         }
 
-        private static void UpdateContainer(VisualElement container)
+        private static void UpdateContainer(VisualElement container, IRichTextTagProvider richTextTagProvider)
         {
             AboveRichLabelUserData userData = (AboveRichLabelUserData)container.userData;
             string xmlContent = userData.PlayaBelowRichLabelAttribute.Content;
@@ -118,7 +119,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 
             container.Clear();
             foreach (VisualElement richTextElement in userData.RichTextDrawer.DrawChunksUIToolKit(
-                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, userData.FieldWithInfo.SerializedProperty, member, userData.FieldWithInfo.Targets[0]))
+                         RichTextDrawer.ParseRichXmlWithProvider(xmlContent, richTextTagProvider))
                      )
             {
                 container.Add(richTextElement);

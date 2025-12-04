@@ -86,53 +86,6 @@ namespace SaintsField.Editor
             IReadOnlyList<object> targets)
         {
             string[] serFields = GetSerializedProperties(serializedObject).ToArray();
-// #if SAINTSFIELD_SERIALIZED && SAINTSFIELD_NEWTONSOFT_JSON
-//             (string filePath, IReadOnlyList<SerializedInfo> serializedInfos) = SaintsEditorUtils.GetSaintsSerialized(targets[0].GetType());
-//             if (serializedInfos != null)
-//             {
-//                 // Debug.Log(filePath.Replace("\\", "/"));
-//                 string fileContent = System.IO.File.ReadAllText($"Assets/{filePath}");
-//                 string fileMd5 = SaintsEditorUtils.CreateMD5(fileContent);
-//                 // DateTime lastWriteTime = System.IO.File.GetLastWriteTime($"Assets/{filePath}");
-//                 // Debug.Log($"{lastWriteTime:yyyyMMdd-HHmmss-ffff}/{filePath}");
-//                 // // string lastWriteTimeString = lastWriteTime.ToString("yyyyMMdd-HHmmss-ffff");
-//                 // string lastWriteTimeString = "";
-//
-//                 // const string serFolder = "Temp/SaintsField";
-//                 string tempFile = $"Temp/SaintsField/{filePath}.{fileMd5}.json";
-//                 string tempFolder = System.IO.Path.GetDirectoryName(tempFile);
-//                 if (!System.IO.Directory.Exists(tempFolder))
-//                 {
-//                     // ReSharper disable once AssignNullToNotNullAttribute
-//                     System.IO.Directory.CreateDirectory(tempFolder);
-//                 }
-//
-//                 if (serializedInfos.Count == 0)
-//                 {
-//                     System.IO.File.WriteAllText(tempFile, "[]");
-//                 }
-//                 else
-//                 {
-//                     // string tempFile = $"{serFolder}/{filePath}.json";
-//                     // Debug.Log(tempFile);
-//                     string oldContent = System.IO.File.Exists(tempFile)
-//                         ? System.IO.File.ReadAllText(tempFile)
-//                         : null;
-//                     string newContent = Newtonsoft.Json.JsonConvert.SerializeObject(serializedInfos,
-//                         Newtonsoft.Json.Formatting.Indented);
-//                     if (oldContent != newContent)
-//                     {
-//                         System.IO.File.WriteAllText(tempFile, newContent);
-// #if SAINTSFIELD_DEBUG
-//                         Debug.Log($"Force Re-Import {filePath}");
-// #endif
-//                         AssetDatabase.ImportAsset("Assets/" + filePath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-//                     }
-//                 }
-//             }
-// #endif
-
-            // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
             Dictionary<string, SerializedProperty> serializedPropertyDict = serFields
                 .Where(each => !skipSerializedFields.Contains(each))
                 .ToDictionary(each => each, serializedObject.FindProperty);
@@ -141,55 +94,55 @@ namespace SaintsField.Editor
             return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, targets);
         }
 
-        public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(Type objectType, IEnumerable<IPlayaClassAttribute> playaClassAttributes, SerializedObject serializedObject, IReadOnlyList<object> targets)
-        {
-            // List<SaintsFieldWithInfo> saintsFieldWithInfos = new List<SaintsFieldWithInfo>(playaClassAttributes.Length);
-            foreach ((IPlayaClassAttribute playaClassAttribute, int index) in playaClassAttributes.WithIndex())
-            {
-                switch (playaClassAttribute)
-                {
-
-                    case InfoBoxAttribute infoBox:
-                    {
-                        yield return new PlayaInfoBoxRenderer(serializedObject, new SaintsFieldWithInfo
-                        {
-                            PlayaAttributes = new[] { infoBox },
-                            Targets = targets,
-                            RenderType = SaintsRenderType.ClassStruct,
-                            ClassStructType = objectType,
-                            SerializedProperty = null,
-                            FieldInfo = null,
-                            PropertyInfo = null,
-                            MethodInfo = null,
-                            InherentDepth = -1,
-                            Order = int.MinValue,
-                            MemberId = $"{objectType.Name}-{infoBox}-{index}",
-                        }, infoBox);
-                    }
-                        break;
-                    case AboveTextAttribute playaAboveRichLabelAttribute:
-                    {
-                        yield return new PlayaFullWidthRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
-                        {
-                            PlayaAttributes = new[] { playaAboveRichLabelAttribute },
-                            Targets = targets,
-                            RenderType = SaintsRenderType.ClassStruct,
-                            ClassStructType = objectType,
-                            SerializedProperty = null,
-                            FieldInfo = null,
-                            PropertyInfo = null,
-                            MethodInfo = null,
-                            InherentDepth = -1,
-                            Order = int.MinValue,
-                            MemberId = $"{objectType.Name}-{playaAboveRichLabelAttribute}-{index}",
-                        }, playaAboveRichLabelAttribute);
-                    }
-                        break;
-                }
-            }
-
-            // return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
-        }
+        // public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(Type objectType, IEnumerable<IPlayaClassAttribute> playaClassAttributes, SerializedObject serializedObject, IReadOnlyList<object> targets)
+        // {
+        //     // List<SaintsFieldWithInfo> saintsFieldWithInfos = new List<SaintsFieldWithInfo>(playaClassAttributes.Length);
+        //     foreach ((IPlayaClassAttribute playaClassAttribute, int index) in playaClassAttributes.WithIndex())
+        //     {
+        //         switch (playaClassAttribute)
+        //         {
+        //
+        //             case InfoBoxAttribute infoBox:
+        //             {
+        //                 yield return new PlayaInfoBoxRenderer(serializedObject, new SaintsFieldWithInfo
+        //                 {
+        //                     PlayaAttributes = new[] { infoBox },
+        //                     Targets = targets,
+        //                     RenderType = SaintsRenderType.ClassStruct,
+        //                     ClassStructType = objectType,
+        //                     SerializedProperty = null,
+        //                     FieldInfo = null,
+        //                     PropertyInfo = null,
+        //                     MethodInfo = null,
+        //                     InherentDepth = -1,
+        //                     Order = int.MinValue,
+        //                     MemberId = $"{objectType.Name}-{infoBox}-{index}",
+        //                 }, infoBox);
+        //             }
+        //                 break;
+        //             case AboveTextAttribute playaAboveRichLabelAttribute:
+        //             {
+        //                 yield return new PlayaFullWidthRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
+        //                 {
+        //                     PlayaAttributes = new[] { playaAboveRichLabelAttribute },
+        //                     Targets = targets,
+        //                     RenderType = SaintsRenderType.ClassStruct,
+        //                     ClassStructType = objectType,
+        //                     SerializedProperty = null,
+        //                     FieldInfo = null,
+        //                     PropertyInfo = null,
+        //                     MethodInfo = null,
+        //                     InherentDepth = -1,
+        //                     Order = int.MinValue,
+        //                     MemberId = $"{objectType.Name}-{playaAboveRichLabelAttribute}-{index}",
+        //                 }, playaAboveRichLabelAttribute);
+        //             }
+        //                 break;
+        //         }
+        //     }
+        //
+        //     // return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
+        // }
 
         // wtf with C#'s list order unstable... it's a fucking but not a feature
         public class MemberOrderComparer : IComparer<MemberInfo>, IComparer
@@ -384,6 +337,7 @@ namespace SaintsField.Editor
         }
 
         public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(
+            SerializedObject serializedObject,
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
             IReadOnlyList<object> targets)
         {
@@ -424,6 +378,26 @@ namespace SaintsField.Editor
                     // {
                     //     continue;
                     // }
+                    IPlayaClassAttribute[] playaClassAttributes = (IPlayaClassAttribute[])systemType.GetCustomAttributes(typeof(IPlayaClassAttribute), inherit: false);
+
+                    IPlayaClassAttribute[] startClassAttributes = playaClassAttributes.Where(each => !each.EndDecorator).ToArray();
+                    if (startClassAttributes.Length > 0)
+                    {
+                        // Debug.Log($"Add start for systemType {systemType}={string.Join<IPlayaClassAttribute>(", ", playaClassAttributes)}");
+                        fieldWithInfos.Add(new SaintsFieldWithInfo
+                        {
+                            InherentDepth = inherentDepth,
+                            Order = int.MinValue,
+                            PlayaAttributes = startClassAttributes,
+                            Targets = targets,
+                            RenderType = SaintsRenderType.ClassStruct,
+                            MemberId = "StartClassStruct",
+                            FieldInfo = null,
+                            MethodInfo = null,
+                            PropertyInfo = null,
+                            ClassStructType = systemType,
+                        });
+                    }
 
                     // as we can not get the correct order, we'll make it order as: field(serialized+nonSerialized), property, method
                     List<SaintsFieldWithInfo> thisDepthInfos = new List<SaintsFieldWithInfo>();
@@ -518,6 +492,7 @@ namespace SaintsField.Editor
                                     // Debug.Log($"{fieldInfo.Name}/{string.Join(",", pendingSerializedProperties.Keys)}");
                                     thisDepthInfos.Add(new SaintsFieldWithInfo
                                     {
+                                        ClassStructType = systemType,
                                         PlayaAttributes = playaAttributes,
                                         // PlayaAttributesQueue = playaAttributes,
                                         // LayoutBases = layoutBases,
@@ -566,6 +541,7 @@ namespace SaintsField.Editor
                                     {
                                         thisDepthInfos.Add(new SaintsFieldWithInfo
                                         {
+                                            ClassStructType = systemType,
                                             PlayaAttributes = playaAttributes,
                                             // PlayaAttributesQueue = playaAttributes,
                                             // LayoutBases = layoutBases,
@@ -609,6 +585,7 @@ namespace SaintsField.Editor
 
                                         thisDepthInfos.Add(new SaintsFieldWithInfo
                                         {
+                                            ClassStructType = systemType,
                                             PlayaAttributes = playaAttributes,
                                             // PlayaAttributesQueue = playaAttributes,
                                             // LayoutBases = layoutBases,
@@ -643,6 +620,7 @@ namespace SaintsField.Editor
                                     int order = orderProp?.Order ?? int.MinValue;
                                     thisDepthInfos.Add(new SaintsFieldWithInfo
                                     {
+                                        ClassStructType = systemType,
                                         PlayaAttributes = playaAttributes,
                                         // PlayaAttributesQueue = playaAttributes,
                                         // LayoutBases = layoutBases,
@@ -693,6 +671,7 @@ namespace SaintsField.Editor
 
                                 thisDepthInfos.Add(new SaintsFieldWithInfo
                                 {
+                                    ClassStructType = systemType,
                                     PlayaAttributes = playaAttributes,
                                     // PlayaAttributesQueue = playaAttributes,
                                     // LayoutBases = layoutBases,
@@ -734,6 +713,7 @@ namespace SaintsField.Editor
 #endif
                                 thisDepthInfos.Add(new SaintsFieldWithInfo
                                 {
+                                    ClassStructType = systemType,
                                     PlayaAttributes = playaAttributes,
                                     // PlayaAttributesQueue = playaAttributes,
                                     // LayoutBases = layoutBases,
@@ -758,6 +738,27 @@ namespace SaintsField.Editor
                     // fieldWithInfos.AddRange(fieldInfos);
                     // fieldWithInfos.AddRange(propertyInfos);
                     // fieldWithInfos.AddRange(methodInfos);
+
+                    // Debug.Log($"systemType{systemType}={string.Join<IPlayaClassAttribute>(", ", playaClassAttributes)}");
+                    List<IPlayaAttribute> endClassAttributes = playaClassAttributes.Where(each => each.EndDecorator).Cast<IPlayaAttribute>().ToList();
+                    if (endClassAttributes.Count > 0)
+                    {
+                        endClassAttributes.Insert(0, new LayoutEndAttribute());
+                        // Debug.Log($"Add end for systemType {systemType}={string.Join<IPlayaClassAttribute>(", ", playaClassAttributes)}");
+                        fieldWithInfos.Add(new SaintsFieldWithInfo
+                        {
+                            InherentDepth = inherentDepth,
+                            Order = int.MinValue,
+                            PlayaAttributes = endClassAttributes,
+                            Targets = targets,
+                            RenderType = SaintsRenderType.ClassStruct,
+                            MemberId = "EndClassStruct",
+                            FieldInfo = null,
+                            MethodInfo = null,
+                            PropertyInfo = null,
+                            ClassStructType = systemType,
+                        });
+                    }
                 }
             }
 
@@ -789,7 +790,8 @@ namespace SaintsField.Editor
                 .OrderBy(each => each.value.InherentDepth)
                 .ThenBy(each => each.value.Order)
                 .ThenBy(each => each.index)
-                .Select(each => each.value);
+                .Select(each => each.value)
+                ;
         }
 
         // private static int MemberLisCompare(MemberInfo a, MemberInfo b,IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
@@ -874,13 +876,13 @@ namespace SaintsField.Editor
             IMakeRenderer makeRenderer,
             IReadOnlyList<object> targets)
         {
-            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedPropertyDict, targets).ToArray();
+            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedObject, serializedPropertyDict, targets).ToArray();
 
             // let's handle some HeaderGUI here... not a good idea but...
             bool anyChange = false;
             // target.GetType()
 
-            AbsComponentHeaderAttribute[] classAttributes = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(targets.GetType());
+            AbsComponentHeaderAttribute[] classAttributes = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(targets[0].GetType());
             foreach ((AbsComponentHeaderAttribute componentHeaderAttribute, int order) in classAttributes.WithIndex(-classAttributes.Length))
             {
                 bool added = DrawHeaderGUI.AddAttributeIfNot(
@@ -1581,6 +1583,24 @@ namespace SaintsField.Editor
                     {
                         yield return new EmptyRenderer();
                     }
+                    yield break;
+                case SaintsRenderType.ClassStruct:
+                {
+                    if (fieldWithInfo.PlayaAttributes.OfType<IPlayaClassAttribute>().Any())
+                    {
+                        yield return new EmptyRenderer();
+                    }
+                    // foreach (IPlayaClassAttribute classAttribute in fieldWithInfo.PlayaAttributes.OfType<IPlayaClassAttribute>())
+                    // {
+                    //     switch (classAttribute)
+                    //     {
+                    //         case BelowSeparatorAttribute belowSeparatorAttribute:
+                    //             yield return new PlayaSeparatorRenderer(serializedObject, fieldWithInfo,
+                    //                 belowSeparatorAttribute);
+                    //             break;
+                    //     }
+                    // }
+                }
                     yield break;
                 default:
                     if (fieldWithInfo.PlayaAttributes.OfType<ISaintsLayout>().Any())
