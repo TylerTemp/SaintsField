@@ -223,3 +223,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SpineEventExample
   spineEvent: 
+  spineEventPicker: 

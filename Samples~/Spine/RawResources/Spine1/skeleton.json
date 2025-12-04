@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "5imLZOPNln0",
-	"spine": "4.2.39",
+	"hash": "1jAWbLhqkWc",
+	"spine": "4.2.43",
 	"x": -6,
 	"y": -129,
 	"width": 1,
@@ -30,6 +30,11 @@
 	{ "name": "Basic" },
 	{ "name": "Holiday" }
 ],
+"events": {
+	"Event1": {},
+	"Event2": {},
+	"Event3": {}
+},
 "animations": {
 	"Idle": {
 		"bones": {
@@ -40,7 +45,12 @@
 					{ "time": 0.6667 }
 				]
 			}
-		}
+		},
+		"events": [
+			{ "time": 0.2, "name": "Event1" },
+			{ "time": 0.3, "name": "Event2" },
+			{ "time": 0.6667, "name": "Event3" }
+		]
 	},
 	"Run": {
 		"bones": {

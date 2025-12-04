@@ -714,6 +714,14 @@ PrefabInstance:
       propertyPath: animationReference
       value: 
       objectReference: {fileID: 11400000, guid: a924776cd53f906479b59420d1a8e895, type: 2}
+    - target: {fileID: 6741434235030954049, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spineEvent
+      value: Event1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6741434235030954049, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spineEventPicker
+      value: Event3
+      objectReference: {fileID: 0}
     - target: {fileID: 6835433886103782019, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
       propertyPath: skinPicked
       value: Holiday
