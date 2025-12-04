@@ -1,6 +1,5 @@
 skeleton.png
 size:16,16
 filter:Linear,Linear
-pma:true
 White1
 bounds:2,2,1,1

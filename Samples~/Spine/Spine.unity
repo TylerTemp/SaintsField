@@ -698,6 +698,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6126409447255845456, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spineBone
+      value: bone2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6126409447255845456, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spineBonePicker
+      value: bone3
+      objectReference: {fileID: 0}
     - target: {fileID: 6314497149558520088, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
       propertyPath: animationName
       value: Idle
@@ -713,28 +721,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1303085664095575046, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7254157651530707233}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
---- !u!1 &7254157651530707232 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1303085664095575046, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
-  m_PrefabInstance: {fileID: 7254157651530707231}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &7254157651530707233
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7254157651530707232}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70abc706ca2d3864c80c562d6360f2b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SpineBoneExample
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 1329099849136555986}
   - component: {fileID: 105871120352110135}
   - component: {fileID: 6126409447255845456}
+  - component: {fileID: 6741434235030954049}
   m_Layer: 0
   m_Name: Spine GameObject (skeleton)
   m_TagString: Untagged
@@ -208,3 +209,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SaintsField.Samples.Spine.Scripts.SpineBoneExample
   spineBone: 
+  spineBonePicker: 
+--- !u!114 &6741434235030954049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303085664095575046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0837bdc3faa589645a47930a75166fdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SpineEventExample
+  spineEvent: 

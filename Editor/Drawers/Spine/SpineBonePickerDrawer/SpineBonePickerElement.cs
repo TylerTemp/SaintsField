@@ -27,7 +27,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
                 return;
             }
 
-            AdvancedDropdownList<string> options = new AdvancedDropdownList<string>();
+            AdvancedDropdownList<string> options = new AdvancedDropdownList<string>
+            {
+                {"[Empty String]", ""},
+            };
+            options.AddSeparator();
+
             for (int i = 0; i < _skeletonData.Bones.Count; i++)
             {
                 BoneData bone = _skeletonData.Bones.Items[i];
@@ -45,7 +50,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
             AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
             {
                 DropdownListValue = options,
-                CurValues = new string[] { value },
+                CurValues = new[] { value },
             };
 
             (Rect wb, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos((_boundTarget ?? this).worldBound);
@@ -104,18 +109,17 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
 
             UIToolkitUtils.SetHelpBox(_helpBox, "");
 
+            if (string.IsNullOrEmpty(value))
+            {
+                Label.Clear();
+                tooltip = "[Empty String]";
+                return;
+            }
+
             for (int i = 0; i < _skeletonData.Bones.Count; i++)
             {
                 BoneData bone = _skeletonData.Bones.Items[i];
                 string boneName = bone.Name;
-                // // jointName = "root/hip/bone" to show a hierarchial tree.
-                // string jointName = boneName;
-                // BoneData iterator = bone;
-                // while ((iterator = iterator.Parent) != null)
-                // {
-                //     jointName = $"{iterator.Name}/{jointName}";
-                // }
-
                 if (boneName == value)
                 {
                     UIToolkitUtils.SetLabel(Label, new []
@@ -132,6 +136,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
             {
                 new RichTextDrawer.RichTextChunk($"<color=red>?</color> {value}",false, $"<color=red>?</color> {value}"),
             }, _richTextDrawer);
+            tooltip = $"Invalid: {value}";
         }
 
         public override void SetValueWithoutNotify(string newValue)
