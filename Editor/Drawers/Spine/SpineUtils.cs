@@ -43,11 +43,12 @@ namespace SaintsField.Editor.Drawers.Spine
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (uObj)
             {
-                case SkeletonDataAsset skeletonDataAsset:
-                    return ("", skeletonDataAsset);
-
                 case SkeletonRenderer skeletonRenderer:
                     return SkeletonDataOrNull(skeletonRenderer, $"{skeletonRenderer}");
+                case IHasSkeletonDataAsset hasSkeletonDataAsset:
+                    return ("", hasSkeletonDataAsset.SkeletonDataAsset);
+                case SkeletonDataAsset skeletonDataAsset:
+                    return ("", skeletonDataAsset);
                 case Component comp:
                     return SkeletonDataOrNull(comp.GetComponent<SkeletonRenderer>(), $"{comp}");
                 case GameObject go:

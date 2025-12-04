@@ -9,13 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6002538088245066857}
+  - component: {fileID: 263681631512436403}
   - component: {fileID: 2151001047522572703}
   - component: {fileID: 6666348171974079898}
-  - component: {fileID: 7042942015232597083}
   - component: {fileID: 6835433886103782019}
   - component: {fileID: 6314497149558520088}
   - component: {fileID: 1329099849136555986}
   - component: {fileID: 105871120352110135}
+  - component: {fileID: 6126409447255845456}
   m_Layer: 0
   m_Name: Spine GameObject (skeleton)
   m_TagString: Untagged
@@ -38,6 +39,49 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &263681631512436403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303085664095575046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: spine-unity::Spine.Unity.SkeletonAnimation
+  skeletonDataAsset: {fileID: 11400000, guid: 8d5f2950274fbbc489a8f192a7f02730, type: 2}
+  initialSkinName: 
+  fixPrefabOverrideViaMeshFilter: 2
+  initialFlipX: 0
+  initialFlipY: 0
+  updateWhenInvisible: 3
+  separatorSlotNames: []
+  zSpacing: 0
+  useClipping: 1
+  immutableTriangles: 0
+  pmaVertexColors: 1
+  clearStateOnDisable: 0
+  tintBlack: 0
+  singleSubmesh: 0
+  fixDrawOrder: 0
+  addNormals: 0
+  calculateTangents: 0
+  maskInteraction: 0
+  maskMaterials:
+    materialsMaskDisabled: []
+    materialsInsideMask: []
+    materialsOutsideMask: []
+  disableRenderingOnOverride: 1
+  physicsPositionInheritanceFactor: {x: 1, y: 1}
+  physicsRotationInheritanceFactor: 1
+  physicsMovementRelativeTo: {fileID: 0}
+  updateTiming: 1
+  unscaledTime: 0
+  _animationName: 
+  loop: 0
+  timeScale: 1
 --- !u!33 &2151001047522572703
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -63,6 +107,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -84,50 +133,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &7042942015232597083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1303085664095575046}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: 8d5f2950274fbbc489a8f192a7f02730, type: 2}
-  initialSkinName: 
-  fixPrefabOverrideViaMeshFilter: 2
-  initialFlipX: 0
-  initialFlipY: 0
-  updateWhenInvisible: 3
-  separatorSlotNames: []
-  zSpacing: 0
-  useClipping: 1
-  immutableTriangles: 0
-  pmaVertexColors: 1
-  clearStateOnDisable: 0
-  tintBlack: 0
-  singleSubmesh: 0
-  fixDrawOrder: 0
-  addNormals: 0
-  calculateTangents: 0
-  maskInteraction: 0
-  maskMaterials:
-    materialsMaskDisabled: []
-    materialsInsideMask: []
-    materialsOutsideMask: []
-  disableRenderingOnOverride: 1
-  updateTiming: 1
-  unscaledTime: 0
-  _animationName: 
-  loop: 1
-  timeScale: 1
 --- !u!114 &6835433886103782019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -155,7 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationName: 
-  spine: {fileID: 7042942015232597083}
+  spine: {fileID: 263681631512436403}
   animationReference: {fileID: 11400000, guid: 687c5206e57b41046a2fcf250d8bfabc, type: 2}
 --- !u!114 &1329099849136555986
 MonoBehaviour:
@@ -169,8 +179,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c621dd00b18e9f468fcd1faa16ff8b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spineSlotDefault: Red
-  spineSlotPicker: 
+  spineSlotDefault: White1
+  spineSlotPicker: White1
 --- !u!114 &105871120352110135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -184,4 +194,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attachmentOriginal: White1
-  spineAttachment: 
+  spineAttachment: White1
+--- !u!114 &6126409447255845456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303085664095575046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70abc706ca2d3864c80c562d6360f2b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SaintsField.Samples.Spine.Scripts.SpineBoneExample
+  spineBone: 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Addressable;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -87,18 +88,19 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                 AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, assetGroups.Where(each => each.MainAsset is SceneAsset), addressableSceneAttribute.SepAsSub, false);
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(container.worldBound);
 
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsTreeDropdownUIToolkit(
                     metaInfo,
                     worldBound.width,
                     maxHeight,
                     false,
-                    (_, curItem) =>
+                    (curItem, _) =>
                     {
                         AddressableAssetEntry entry = (AddressableAssetEntry)curItem;
                         string newValue = entry?.address ?? "";
                         property.stringValue = newValue;
                         property.serializedObject.ApplyModifiedProperties();
                         onValueChangedCallback.Invoke(newValue);
+                        return null;
                     }
                 ));
             };
@@ -116,63 +118,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             helpBox.style.display = string.IsNullOrEmpty(error) ? DisplayStyle.None : DisplayStyle.Flex;
             helpBox.text = error;
         }
-
-        // protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-        //     int index,
-        //     IReadOnlyList<PropertyAttribute> allAttributes,
-        //     VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
-        // {
-        //     if (AddressableAssetSettingsDefaultObject.GetSettings(false) == null)
-        //     {
-        //         UpdateHelpBox(container.Q<HelpBox>(name: NameHelpBox(property)), AddressableUtil.ErrorNoSettings);
-        //         return;
-        //     }
-        //
-        //     ObjectField objectField = container.Q<ObjectField>(name: NameObjectField(property));
-        //     string oldValue = (string)objectField.userData;
-        //     if (oldValue == property.stringValue)
-        //     {
-        //         return;
-        //     }
-        //
-        //     UpdateFieldAndErrorMessage(objectField, container.Q<HelpBox>(name: NameHelpBox(property)), property.stringValue, (AddressableSceneAttribute)saintsAttribute);
-        // }
-        //
-        // protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-        //     FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
-        // {
-        //     string value = (string)newValue;
-        //     ObjectField objectField = container.Q<ObjectField>(name: NameObjectField(property));
-        //     if(value == objectField.userData as string)
-        //     {
-        //         return;
-        //     }
-        //
-        //     UpdateFieldAndErrorMessage(objectField, container.Q<HelpBox>(name: NameHelpBox(property)), value, (AddressableSceneAttribute)saintsAttribute);
-        // }
-        //
-        // private static void UpdateFieldAndErrorMessage(ObjectField objectField, HelpBox helpBox, string value, AddressableSceneAttribute addressableSceneAttribute)
-        // {
-        //     (string error, AddressableAssetEntry sceneEntry) = GetSceneEntry(value, addressableSceneAttribute);
-        //     if (error != "")
-        //     {
-        //         UpdateHelpBox(helpBox, error);
-        //         return;
-        //     }
-        //
-        //     UpdateHelpBox(helpBox, "");
-        //     objectField.userData = value;
-        //     objectField.SetValueWithoutNotify(sceneEntry?.MainAsset);
-        // }
-
-        // protected override void ChangeFieldLabelToUIToolkit(SerializedProperty property,
-        //     ISaintsAttribute saintsAttribute, int index, VisualElement container, string labelOrNull,
-        //     IReadOnlyList<RichTextDrawer.RichTextChunk> richTextChunks, bool tried, RichTextDrawer richTextDrawer)
-        // {
-        //     UIToolkitUtils.DropdownButtonField dropdownField =
-        //         container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownField(property));
-        //     UIToolkitUtils.SetLabel(dropdownField.labelElement, richTextChunks, richTextDrawer);
-        // }
     }
 }
 #endif

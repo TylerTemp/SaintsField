@@ -7227,7 +7227,6 @@ A picker to select an addressable scene into a string field.
 
 **Parameters**:
 
-*   [Optional] `bool sepAsSub = true`: if true, use `/` as a seperator as sub-list
 *   `string group = null`: the Addressable group name. `null` for all groups
 *   `params string[] orLabels`: the addressable label names to filter. Only `entries` with this label will be shown. `null` for no filter.
 
@@ -7237,13 +7236,12 @@ A picker to select an addressable scene into a string field.
 
 ```csharp
 [AddressableScene] public string sceneKey;
-// don't use nested list when picking
 // only use scenes from `Scenes` group
 // with label `Battle`, or `Profile`
-[AddressableScene(false, "Scenes", "Battle", "Profile")] public string sceneKeySep;
+[AddressableScene("Scenes", "Battle", "Profile")] public string sceneKeySep;
 ```
 
-[![video](https://github.com/user-attachments/assets/743def95-8b60-4453-9b1d-1a2f263165a1)](https://github.com/user-attachments/assets/e2718c8d-6372-4e16-bbdc-3b5fb331ce5e)
+![](https://github.com/user-attachments/assets/98702d20-4328-429b-b334-ef3f2199744c)
 
 ### `AddressableSubAssetRequired` ##
 

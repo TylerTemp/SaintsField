@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -128,12 +129,12 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, getAttachmentRefresh(), spineAttachmentPickerAttribute.SepAsSub);
             (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 
-            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
+            SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
                 metaInfo,
                 root.worldBound.width,
                 maxHeight,
-                true,
-                (_, curItem) =>
+                false,
+                (curItem, _) =>
                 {
                     string newValue = (string)curItem;
                     // ReSharper disable once InvertIf
@@ -144,6 +145,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newValue);
                         onValueChangedCallback.Invoke(newValue);
                     }
+
+                    return null;
                 }
             );
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField.Addressable
 {
     [Conditional("UNITY_EDITOR")]
