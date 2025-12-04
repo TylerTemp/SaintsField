@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -26,7 +27,8 @@ namespace SaintsField.Editor.UIToolkitElements
         // public VisualElement MainButton;
         private readonly VisualElement _toggleButton;
 
-        private readonly string _labelLow;
+        // private readonly string _labelLow;
+        private readonly HashSet<string> _searches = new HashSet<string>();
         private readonly bool _isToggle;
         public readonly object Value;
 
@@ -102,7 +104,8 @@ namespace SaintsField.Editor.UIToolkitElements
             Label labelElement = treeRow.Q<Label>("saintsfield-tree-row-label");
             if (!string.IsNullOrEmpty(label))
             {
-                _labelLow = label.ToLower();
+                // _labelLow = label.ToLower();
+                _searches.Add(label.ToLower());
                 UIToolkitUtils.SetLabel(labelElement, RichTextDrawer.ParseRichXml(label, "", null, null, null), _richTextDrawer);
                 // labelElement.text = label;
             }
@@ -155,6 +158,11 @@ namespace SaintsField.Editor.UIToolkitElements
         private bool _shown = true;
         private bool _shownAsChild = true;
 
+        public void AddSearches(ICollection<string> searches)
+        {
+            _searches.UnionWith(searches);
+        }
+
         public override bool OnSearch(IReadOnlyList<ListSearchToken> searchTokens)
         {
             if (searchTokens.Count == 0)
@@ -164,14 +172,15 @@ namespace SaintsField.Editor.UIToolkitElements
                 return true;
             }
 
-            if (_labelLow is null)
+            if (_searches.Count == 0)
             {
                 SetDisplay(DisplayStyle.None);
                 _shown = false;
                 return false;
             }
 
-            bool anyMatched = RuntimeUtil.SimpleSearch(_labelLow, searchTokens);
+            // bool anyMatched = RuntimeUtil.SimpleSearch(_labelLow, searchTokens);
+            bool anyMatched = _searches.Any(each => RuntimeUtil.SimpleSearch(each, searchTokens));
 
             SetDisplay(anyMatched ? DisplayStyle.Flex : DisplayStyle.None);
             _shown = anyMatched;
@@ -186,7 +195,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         public override string ToString()
         {
-            return $"<TreeRowValue label={_labelLow} nav={Navigateable}/>";
+            return $"<TreeRowValue search={string.Join("/", _searches)} nav={Navigateable}/>";
         }
     }
 }

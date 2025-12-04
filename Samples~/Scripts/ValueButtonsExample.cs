@@ -28,9 +28,9 @@ namespace SaintsField.Samples.Scripts
         [ValueButtons(nameof(GetTransOpts))] public Transform transformCallback;
 
         // Use OptionList for a bit more control
-        private OptionList<Transform> GetTransAdvanced()
+        private AdvancedDropdownList<Transform> GetTransAdvanced()
         {
-            OptionList<Transform> result = new OptionList<Transform>
+            AdvancedDropdownList<Transform> result = new AdvancedDropdownList<Transform>
             {
                 {transOpts[0].name, transOpts[0]},  // inline add
             };
@@ -38,7 +38,7 @@ namespace SaintsField.Samples.Scripts
             // direct add
             result.Add(transOpts[1].name, transOpts[1], true);  // true means disabled
             // rich tags are supported
-            result.Add($"<color={EColor.Aquamarine}><icon=star.png/> {transOpts[1].name}", transOpts[2]);
+            result.Add($"<color={EColor.Aquamarine}><icon=star.png/> {transOpts[2].name}", transOpts[2]);
             result.Add(transOpts[3].name, transOpts[3]);
             return result;
         }

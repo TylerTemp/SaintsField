@@ -79,9 +79,9 @@ namespace SaintsField
         }
 
         // this will parse "/"
-        public virtual void Add(string displayNames, T value, bool disabled = false, string icon = null)
+        public virtual void Add(string displayNames, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
         {
-            AddByNames(this, new Queue<string>(RuntimeUtil.SeparatePath(displayNames)), value, disabled, icon);
+            AddByNames(this, new Queue<string>(RuntimeUtil.SeparatePath(displayNames)), value, disabled, icon, extraSearches);
         }
 
         // this add a separator
@@ -102,12 +102,15 @@ namespace SaintsField
 
         }
 
-        private static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null)
+        private static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
         {
             string curName = nameQuery.Dequeue();
             if (nameQuery.Count == 0)
             {
-                container.Add(curName == ""? Separator(): new AdvancedDropdownList<T>(curName, value, disabled, icon));
+                container.Add(curName == ""? Separator(): new AdvancedDropdownList<T>(curName, value, disabled, icon)
+                {
+                    ExtraSearches = extraSearches ?? new HashSet<string>(),
+                });
                 return;
             }
             IAdvancedDropdownList matchedChild = container.children.FirstOrDefault(each => each.displayName == curName);
@@ -185,6 +188,8 @@ namespace SaintsField
                 child.IterCompact();
             }
         }
+
+        public ICollection<string> ExtraSearches { get; set; } = new HashSet<string>();
 
         private void IterCompact()
         {

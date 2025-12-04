@@ -95,12 +95,22 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "");
                     foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(elementType))
                     {
+                        // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
+                        HashSet<string> extraSearches = enumRichLabel == enumLabel
+                            ? new HashSet<string>
+                            {
+                                enumValue.ToString(),
+                            }
+                            : new HashSet<string>();
                         if (flat)
                         {
-                            enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue));
+                            enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue)
+                            {
+                                ExtraSearches = extraSearches,
+                            });
                         }
                         else {
-                            enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue);
+                            enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue, extraSearches: extraSearches);
                         }
                     }
 
@@ -665,40 +675,74 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         }
 
 
-        private static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> FlattenChild(IReadOnlyList<string> stackDisplays, IEnumerable<IAdvancedDropdownList> children)
+        // private static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> FlattenChild(IReadOnlyList<string> stackDisplays, IEnumerable<IAdvancedDropdownList> children)
+        private static IEnumerable<FlattenInfo> FlattenChild(IReadOnlyList<string> stackDisplays, IEnumerable<IAdvancedDropdownList> children)
         {
             foreach (IAdvancedDropdownList child in children)
             {
                 if (child.ChildCount() > 0)
                 {
                     // List<(string, object, List<object>, bool, string, bool)> grandChildren = child.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
-                    foreach ((IReadOnlyList<string> stackDisplays, string, string, bool, object) grandChild in FlattenChild(Prefix(stackDisplays, child.displayName), child.children.Where(each => !each.isSeparator)))
+                    foreach (FlattenInfo grandChild in FlattenChild(Prefix(stackDisplays, child.displayName), child.children.Where(each => !each.isSeparator)))
                     {
                         yield return grandChild;
                     }
                 }
                 else
                 {
-                    yield return (Prefix(stackDisplays, child.displayName), child.displayName, child.icon, child.disabled, child.value);
+                    yield return new FlattenInfo(
+                        Prefix(stackDisplays, child.displayName),
+                        child.displayName,
+                        child.icon,
+                        child.disabled,
+                        child.value,
+                        child.ExtraSearches);
                 }
             }
         }
 
-        public static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> Flatten(IAdvancedDropdownList roots)
+        public readonly struct FlattenInfo
+        {
+            public readonly IReadOnlyList<string> stackDisplays;
+            public readonly string display;
+            public readonly string icon;
+            public readonly bool disabled;
+            public readonly object value;
+            public readonly ICollection<string> extraSearches;
+
+            public FlattenInfo(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value, ICollection<string> extraSearches)
+            {
+                this.stackDisplays = stackDisplays;
+                this.display = display;
+                this.icon = icon;
+                this.disabled = disabled;
+                this.value = value;
+                this.extraSearches = extraSearches;
+            }
+        }
+
+        // public static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> Flatten(IAdvancedDropdownList roots)
+        public static IEnumerable<FlattenInfo> Flatten(IAdvancedDropdownList roots)
         {
             foreach (IAdvancedDropdownList root in roots)
             {
                 if (root.ChildCount() > 0)
                 {
                     // IAdvancedDropdownList children = root.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
-                    foreach ((IReadOnlyList<string> stackDisplays, string, string, bool, object) child in FlattenChild(new[]{root.displayName}, root.children.Where(each => !each.isSeparator)))
+                    foreach (FlattenInfo child in FlattenChild(new[]{root.displayName}, root.children.Where(each => !each.isSeparator)))
                     {
                         yield return child;
                     }
                 }
                 else
                 {
-                    yield return (new []{root.displayName}, root.displayName, root.icon, root.disabled, root.value);
+                    yield return new FlattenInfo(
+                        new []{root.displayName},
+                        root.displayName,
+                        root.icon,
+                        root.disabled,
+                        root.value,
+                        root.ExtraSearches);
                 }
             }
         }

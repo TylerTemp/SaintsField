@@ -272,7 +272,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 : _metaInfo.SelectStacks);
 
             // search
-            IReadOnlyList<(IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)> flattenOptions = AdvancedDropdownAttributeDrawer.Flatten(_metaInfo.DropdownListValue).ToArray();
+            IReadOnlyList<AdvancedDropdownAttributeDrawer.FlattenInfo> flattenOptions = AdvancedDropdownAttributeDrawer.Flatten(_metaInfo.DropdownListValue).ToArray();
             // Dictionary<string, VisualElement> stackDisplayToElement = new Dictionary<string, VisualElement>();
             // _toolbarSearchField.focusable = true;
 #if UNITY_6000_0_OR_NEWER
@@ -337,11 +337,24 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
                 toolbarBreadcrumbs.style.display = DisplayStyle.None;
 
-                (IReadOnlyList<string> stackDisplay, string display, string icon, bool disabled, object value)[] matchedValueOptions = flattenOptions.Where(each =>
+                AdvancedDropdownAttributeDrawer.FlattenInfo[] matchedValueOptions = flattenOptions.Where(each =>
                 {
                     // Debug.Log($"{string.Join("/", each.stackDisplay)}: {each.display}");
-                    string lowerDisplay = each.display.ToLower();
-                    return searchFragments.All(fragment => lowerDisplay.Contains(fragment));
+                    ICollection<string> extraSearches = each.extraSearches ?? new HashSet<string>();
+                    // string lowerDisplay = each.display.ToLower();
+
+                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    foreach (string display in new[]{each.display}.Concat(extraSearches))
+                    {
+                        string lowerDisplay = display.ToLower();
+                        if (searchFragments.All(fragment => lowerDisplay.Contains(fragment)))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                    // return searchFragments.All(fragment => lowerDisplay.Contains(fragment));
                 }).ToArray();
 
                 // List<(string stackDisplay, string display, string icon, bool disabled, object value)> matchedOptions = new List<(string stackDisplay, string display, string icon, bool disabled, object value)>(matchedValueOptions);
@@ -354,9 +367,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 List<Image> iconImages = new List<Image>(matchedValueOptions.Length);
 
                 scrollView.Clear();
-                foreach ((IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value) in matchedValueOptions)
+                // foreach ((IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value) in matchedValueOptions)
+                foreach (AdvancedDropdownAttributeDrawer.FlattenInfo matchedValueOption in matchedValueOptions)
                 {
-                    string stackDisplay = string.Join("/", stackDisplays.SkipLast(1));
+                    string stackDisplay = string.Join("/", matchedValueOption.stackDisplays.SkipLast(1));
 
                     TemplateContainer elementItem = _itemAsset.CloneTree();
 
@@ -367,23 +381,23 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     selectImage.image = _checkIcon;
 
                     string labelText = stackDisplay.Length == 0
-                        ? display
-                        : $"{display} <color=#{ColorUtility.ToHtmlStringRGBA(EColor.Gray.GetColor())}>({stackDisplay})</color>";
+                        ? matchedValueOption.display
+                        : $"{matchedValueOption.display} <color=#{ColorUtility.ToHtmlStringRGBA(EColor.Gray.GetColor())}>({stackDisplay})</color>";
 
                     UIToolkitUtils.SetLabel(itemContainer.Q<Label>("item-content"), RichTextDrawer.ParseRichXml(labelText, "", null, null, null), _richTextDrawer);
 
                     // bool curSelect = _metaInfo.SelectStacks.Count > 0 && _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
-                    bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
+                    bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, matchedValueOption.value)) ;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
                     Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}, value={value}");
 #endif
 
                     Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
                     iconImages.Add(itemIconImage);
-                    if(!string.IsNullOrEmpty(icon))
+                    if(!string.IsNullOrEmpty(matchedValueOption.icon))
                     {
                         anyHasIcon = true;
-                        itemIconImage.image = Util.LoadResource<Texture2D>(icon);
+                        itemIconImage.image = Util.LoadResource<Texture2D>(matchedValueOption.icon);
                     }
 
                     if (curSelect)
@@ -391,7 +405,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         selectImage.visible = true;
                     }
 
-                    if (disabled)
+                    if (matchedValueOption.disabled)
                     {
                         itemContainer.SetEnabled(false);
                         itemContainer.AddToClassList("saintsfield-advanced-dropdown-item-disabled");
@@ -412,7 +426,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         {
                             Action onSelect = () =>
                             {
-                                _setValue(stackDisplay, value);
+                                _setValue(stackDisplay, matchedValueOption.value);
                                 editorWindow.Close();
                             };
                             itemContainer.clicked += onSelect;

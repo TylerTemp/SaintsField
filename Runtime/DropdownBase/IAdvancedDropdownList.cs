@@ -18,5 +18,7 @@ namespace SaintsField.DropdownBase
         int SepCount();
 
         void SelfCompact();
+
+        ICollection<string> ExtraSearches { get; }
     }
 }
