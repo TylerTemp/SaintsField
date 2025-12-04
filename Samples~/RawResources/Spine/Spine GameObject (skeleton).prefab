@@ -18,6 +18,8 @@ GameObject:
   - component: {fileID: 105871120352110135}
   - component: {fileID: 6126409447255845456}
   - component: {fileID: 6741434235030954049}
+  - component: {fileID: 5474268652342508572}
+  - component: {fileID: 383723818526546587}
   m_Layer: 0
   m_Name: Spine GameObject (skeleton)
   m_TagString: Untagged
@@ -224,3 +226,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SpineEventExample
   spineEvent: 
   spineEventPicker: 
+--- !u!114 &5474268652342508572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303085664095575046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a480cda5e0890a4f9b337c969753d50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SpineIkConstraintExample
+  spineIKConstraint: 
+  spineIKConstraintPicker: 
+--- !u!114 &383723818526546587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303085664095575046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a05ba5329474841994dab48a89479f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SpineTransformConstraintExample
+  spineTransformConstraint: 
+  spineTransformConstraintPicker: 

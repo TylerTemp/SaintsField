@@ -646,6 +646,10 @@ PrefabInstance:
       propertyPath: attachmentOriginal
       value: White1
       objectReference: {fileID: 0}
+    - target: {fileID: 383723818526546587, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spineTransformConstraintPicker
+      value: transConst2
+      objectReference: {fileID: 0}
     - target: {fileID: 1303085664095575046, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
       propertyPath: m_Name
       value: Spine GameObject (skeleton)
@@ -657,6 +661,14 @@ PrefabInstance:
     - target: {fileID: 2151001047522572703, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5474268652342508572, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spineIKConstraint
+      value: bone
+      objectReference: {fileID: 0}
+    - target: {fileID: 5474268652342508572, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spineIKConstraintPicker
+      value: target
       objectReference: {fileID: 0}
     - target: {fileID: 6002538088245066857, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
       propertyPath: m_LocalPosition.x
