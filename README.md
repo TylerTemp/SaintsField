@@ -7719,26 +7719,170 @@ using SaintsField.I2Loc;
 
 Namespace: `SaintsField.Playa`
 
-Compared with `NaughtyAttributes` and `MarkupAttributes`:
+Please note, any `Editor` level component can not work together with each other (it will not cause trouble, but only one will actually work). Which means, `OdinInspector`, `NaughtyAttributes`, `EditorAttributes`, `SaintsEditor` can not work together.
 
-1.  `NaughtyAttributes` has `Button`, and has a way to show a non-field property(`ShowNonSerializedField`, `ShowNativeProperty`), but it does not retain the order of these fields, but only draw them at the end. It has layout functions (`Foldout`, `BoxGroup`) but it has not `Tab` layout, and much less powerful compared to `MarkupAttributes`. It's IMGUI only.
-2.  `MarkupAttributes` is super powerful in layout, but it does not have a way to show a non-field property. It's IMGUI only. It also supports shader editor.
-3.  `SaintsEditor`
+### Setup ###
 
-    *   `Layout` like markup attributes. Compared to `MarkupAttributes`, it allows a non-field property (e.g. a button or a `ShowInInspector` inside a group) (like `OdinInspector`). it has `LayoutGrooup`/`LayoutEnd` for convenience coding.
-    *   It provides `Button` (with less function) and a way to show a non-field property (`ShowInInspector`).
-    *   It tries to retain the order, and allows you to use `[Ordered]` when it can not get the order (c# does not allow to obtain all the orders).
-    *   Supports both `UI Toolkit` and `IMGUI`.
-
-Please note, any `Editor` level component can not work together with each other (it will not cause trouble, but only one will actually work). Which means, `OdinInspector`, `NaughtyAttributes`, `MarkupAttributes`, `SaintsEditor` can not work together.
-
-If you are interested, here is how to use it.
-
-**Setup SaintsEditor**
-
-`Window` - `Saints` - `Enable SaintsEditor`. After the project finish re-compile, go `Window` - `Saints` - `SaintsEditor` to tweak configs.
+`Window` - `Saints` - `Enable SaintsEditor`.
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
+
+### Inherent ###
+
+You need to inherent `SaintsField.Editor.SaintsEditor`:
+
+
+```csharp
+[CustomEditor(typeof(MyMonoBehavior))]
+public class LabelTestEditor : SaintsField.Editor.SaintsEditor  // <-- Use this
+{
+    public override VisualElement CreateInspectorGUI()
+    {
+        VisualElement root = new VisualElement();
+
+        root.Add(base.CreateInspectorGUI());  // fill the default fields
+
+        // If you want to use IMGUI, put it inside IMGUIContainer
+        root.Add(new IMGUIContainer(() =>
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.TextField("IMGUI Text Field");
+                GUILayout.Button("IMGUI Button");
+            }
+        }));
+
+        return root;
+    }
+}
+```
+
+### Extend ###
+
+> [!WARNING]
+> Some APIs might get changed in the future
+
+You can use `AbsRenderer` to control how each field is rendered.
+
+Example type:
+
+```csharp
+public class MyMonoWithCustom : MonoBehaviour
+{
+    public string myString;
+
+    public bool toggle;
+    public string input;
+
+    public int myInt;
+}
+```
+
+Now let's make a toggleable input
+
+```csharp
+using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using UnityEditor;
+using UnityEngine.UIElements;
+
+[CustomEditor(typeof(MyMonoWithCustom), true)]
+public class MyMonoWithCustomEditor : SaintsField.Editor.SaintsEditor
+{
+    public override IEnumerable<AbsRenderer> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+    {
+        if (fieldWithInfo.FieldInfo != null && fieldWithInfo.FieldInfo.Name == "toggle")
+        {
+            yield break;  // returns nothing to show nothing
+        }
+
+        if (fieldWithInfo.FieldInfo != null && fieldWithInfo.FieldInfo.Name == "input")
+        {
+            yield return new ToggleInputRenderer(so, fieldWithInfo);  // custom rendering
+            yield break;
+        }
+
+        // default rendering
+        foreach (AbsRenderer defaultRenderer in base.MakeRenderer(so, fieldWithInfo))
+        {
+            yield return defaultRenderer;
+        }
+    }
+}
+
+public class ToggleInputRenderer: AbsRenderer
+{
+    private readonly SerializedObject _serializedObject;
+    public ToggleInputRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
+    {
+        _serializedObject = serializedObject;
+    }
+
+    public override void OnDestroy()
+    {
+    }
+
+    public override void OnSearchField(string searchString)
+    {
+    }
+
+    protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
+    {
+    }
+
+    protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
+    {
+        return 0;
+    }
+
+    protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+    {
+    }
+
+    protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+    {
+        VisualElement root = new VisualElement
+        {
+            style =
+            {
+                flexDirection = FlexDirection.Row,
+            },
+        };
+
+        Toggle toggle = new Toggle("Input")
+        {
+            bindingPath = _serializedObject.FindProperty("toggle").propertyPath,
+        };
+        toggle.AddToClassList(Toggle.alignedFieldUssClassName);
+        root.Add(toggle);
+
+        TextField input = new TextField
+        {
+            bindingPath = _serializedObject.FindProperty("input").propertyPath,
+            style =
+            {
+                flexGrow = 1,
+                flexShrink = 1,
+            },
+        };
+        root.Add(input);
+
+        return (root, true);
+    }
+
+    protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
+    {
+        // If needUpdate=true, this function is called every 0.1s. You can do some ticking update here.
+        TextField textField = root.Q<TextField>();
+        textField.SetEnabled(_serializedObject.FindProperty("toggle").boolValue);
+
+        // return the required value
+        return base.OnUpdateUIToolKit(root);
+    }
+}
+```
+
+[![](https://github.com/user-attachments/assets/922d2cf8-267f-4c9c-b30e-c77fb4ed6675)](https://github.com/user-attachments/assets/6feb2f62-6396-4347-87ec-686874524a3a)
 
 ## Extended Serialization ##
 
