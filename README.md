@@ -7879,7 +7879,7 @@ public class ToggleInputRenderer: AbsRenderer
 }
 ```
 
-[![](https://github.com/user-attachments/assets/922d2cf8-267f-4c9c-b30e-c77fb4ed6675)](https://github.com/user-attachments/assets/6feb2f62-6396-4347-87ec-686874524a3a)
+[![video](https://github.com/user-attachments/assets/922d2cf8-267f-4c9c-b30e-c77fb4ed6675)](https://github.com/user-attachments/assets/6feb2f62-6396-4347-87ec-686874524a3a)
 
 ## Extended Serialization ##
 
