@@ -7352,7 +7352,10 @@ Please note: `NetworkVariable` and `NetworkList` will always be rendered at the 
 [`Spine`](http://en.esotericsoftware.com/spine-in-depth) has [Unity Attributes](http://en.esotericsoftware.com/spine-unity) like `SpineAnimation`,
 but it has some limit, e.g. it can not be used on string, it can not report an error if the target is changed, mismatch with skeleton or missing etc.
 
-`SainsField`'s spine attributes allow more robust references, and are supported by `Auto Validator` tool, with searching supported.
+`SainsField`'s spine attributes allow more robust references:
+1.  Check reference when possible
+2.  Supported by `Auto Validator` tool, with searching supported
+3.  Unity's default right click context menu works as expected
 
 These tools are there only if you have `Spine` installed.
 
@@ -7452,6 +7455,90 @@ public SkeletonAnimation _spine;
 ```
 
 ![image](https://github.com/user-attachments/assets/2d05f473-5789-482d-8d63-69ec2c732bce)
+
+### `SpineBonePicker` ###
+
+Alternative to `[SpineBone]`, allows searching and supports auto validator.
+
+**Parameters**
+*   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
+    Use `GetComponent<SkeletonRenderer>()` to the current object if null.
+
+```csharp
+using SaintsField.Spine;
+[SpineBonePicker] public string spineBonePicker;
+[SpineBonePicker(nameof(_spine))] public string spineBonePicker;
+```
+
+![](https://github.com/user-attachments/assets/b7a2f6c6-c770-4808-97e0-52ad532aff5f)
+
+### `SpineEventPicker` ###
+
+Alternative to `[SpineEvent]`, allows searching and supports auto validator.
+
+**Parameters**
+*   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
+    Use `GetComponent<SkeletonRenderer>()` to the current object if null.
+
+```csharp
+using SaintsField.Spine;
+
+[SpineEventPicker] public string spineEventPicker;
+[SpineEventPicker(nameof(_spine))] public string spineEventPicker;
+```
+
+![](https://github.com/user-attachments/assets/2963992c-1f00-4ee2-9112-2fcea86a9285)
+
+### `SpineIkConstraintPicker` ###
+
+Alternative to `[SpineIkConstraint]`, allows searching and supports auto validator.
+
+**Parameters**
+*   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
+    Use `GetComponent<SkeletonRenderer>()` to the current object if null.
+
+```csharp
+using SaintsField.Spine;
+
+[SpineIkConstraintPicker] public string spineIKConstraintPicker;
+[SpineIkConstraintPicker(nameof(_spine))] public string spineIKConstraintPicker;
+```
+
+![](https://github.com/user-attachments/assets/49545eff-6503-4fb3-86d7-3cbb1c21c858)
+
+### `SpinePathConstraintPicker` ###
+
+Alternative to `[SpinePathConstraint]`, allows searching and supports auto validator.
+
+**Parameters**
+*   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
+    Use `GetComponent<SkeletonRenderer>()` to the current object if null.
+
+```csharp
+using SaintsField.Spine;
+
+[SpinePathConstraintPicker] public string spinePackConstraintPicker;
+[SpinePathConstraintPicker(nameof(_spine))] public string spinePackConstraintPicker;
+```
+
+![](https://github.com/user-attachments/assets/4127d66c-0cd2-4a81-b8e4-e4b1fb70c46d)
+
+### `SpineTransformConstraintPicker` ###
+
+Alternative to `[SpineTransformConstraint]`, allows searching and supports auto validator.
+
+**Parameters**
+*   `string skeletonTarget = null`: the target, either be a `SkeletonData`, `SkeletonRenderer`, or component/gameObject with `SkeletonRenderer` attached.
+    Use `GetComponent<SkeletonRenderer>()` to the current object if null.
+
+```csharp
+using SaintsField.Spine;
+
+[SpineTransformConstraintPicker] public string spineTransformConstraintPicker;
+[SpineTransformConstraintPicker(nameof(_spine))] public string spineTransformConstraintPicker;
+```
+
+![](https://github.com/user-attachments/assets/2f77d481-4cb3-416d-9058-faea0ef5d334)
 
 ## DOTween ##
 

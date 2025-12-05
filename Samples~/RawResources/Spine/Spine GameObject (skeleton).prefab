@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 6741434235030954049}
   - component: {fileID: 5474268652342508572}
   - component: {fileID: 383723818526546587}
+  - component: {fileID: 2123830887107041827}
   m_Layer: 0
   m_Name: Spine GameObject (skeleton)
   m_TagString: Untagged
@@ -196,8 +197,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e75001919fd1a34c8e785702c8e4308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attachmentOriginal: White1
-  spineAttachment: White1
+  attachmentOriginal: 
+  spineAttachment: 
 --- !u!114 &6126409447255845456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -254,3 +255,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SpineTransformConstraintExample
   spineTransformConstraint: 
   spineTransformConstraintPicker: 
+--- !u!114 &2123830887107041827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303085664095575046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2007d74e31f33c4449b609afb7c12fe4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Sample.Spine::SpinePathConstraintExample
+  spinePackConstraint: 
+  spinePackConstraintPicker: 

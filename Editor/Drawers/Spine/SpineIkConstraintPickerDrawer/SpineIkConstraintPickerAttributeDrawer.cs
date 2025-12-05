@@ -76,6 +76,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineIkConstraintPickerDrawer
 
             SpineIkConstraintPickerAttribute spineIkConstraintPickerAttribute = (SpineIkConstraintPickerAttribute)saintsAttribute;
             SpineIkConstraintPickerField field = container.Q<SpineIkConstraintPickerField>();
+            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property));
             field.SpineIkConstraintPickerElement.BindHelpBox(helpBox);
 

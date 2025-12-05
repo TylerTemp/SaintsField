@@ -11,13 +11,13 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.Spine.SpineEventPickerDrawer
+namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
 {
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
-    [CustomPropertyDrawer(typeof(SpineEventPickerAttribute), true)]
-    public partial class SpineEventPickerAttributeDrawer: SaintsPropertyDrawer
+    [CustomPropertyDrawer(typeof(SpinePathConstraintPickerAttribute), true)]
+    public partial class SpinePathConstraintPickerAttributeDrawer: SaintsPropertyDrawer
     {
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__SpineEvent_HelpBox";
 
@@ -29,13 +29,13 @@ namespace SaintsField.Editor.Drawers.Spine.SpineEventPickerDrawer
                 return PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
             }
 
-            SpineEventPickerElement element = new SpineEventPickerElement
+            SpinePathConstraintPickerElement element = new SpinePathConstraintPickerElement
             {
                 bindingPath = property.propertyPath,
             };
-            SpineEventPickerField field = new SpineEventPickerField(GetPreferredLabel(property), element);
+            SpinePathConstraintPickerField field = new SpinePathConstraintPickerField(GetPreferredLabel(property), element);
             field.AddToClassList(ClassAllowDisable);
-            field.AddToClassList(SpineEventPickerField.alignedFieldUssClassName);
+            field.AddToClassList(SpinePathConstraintPickerField.alignedFieldUssClassName);
             return field;
         }
 
@@ -74,11 +74,11 @@ namespace SaintsField.Editor.Drawers.Spine.SpineEventPickerDrawer
                 return;
             }
 
-            SpineEventPickerAttribute spineEventPickerAttribute = (SpineEventPickerAttribute)saintsAttribute;
-            SpineEventPickerField field = container.Q<SpineEventPickerField>();
+            SpinePathConstraintPickerAttribute spineIkConstraintPickerAttribute = (SpinePathConstraintPickerAttribute)saintsAttribute;
+            SpinePathConstraintPickerField field = container.Q<SpinePathConstraintPickerField>();
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property));
-            field.SpineEventPickerElement.BindHelpBox(helpBox);
+            field.SpinePathConstraintPickerElement.BindHelpBox(helpBox);
 
             CheckSkeletonData();
 
@@ -89,7 +89,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineEventPickerDrawer
 
             void CheckSkeletonData()
             {
-                (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(spineEventPickerAttribute.SkeletonTarget, property, info,
+                (string error, SkeletonDataAsset skeletonDataAsset) = SpineUtils.GetSkeletonDataAsset(spineIkConstraintPickerAttribute.SkeletonTarget, property, info,
                     parent);
                 UIToolkitUtils.SetHelpBox(helpBox, error);
                 if (error != "")
@@ -97,7 +97,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineEventPickerDrawer
                     return;
                 }
 
-                field.SpineEventPickerElement.BindSkeletonData(skeletonDataAsset.GetSkeletonData(false));
+                field.SpinePathConstraintPickerElement.BindSkeletonData(skeletonDataAsset.GetSkeletonData(false));
             }
         }
     }

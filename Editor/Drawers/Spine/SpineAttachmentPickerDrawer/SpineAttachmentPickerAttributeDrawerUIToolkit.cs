@@ -81,8 +81,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
 
             StringDropdownField stringDropdownField = container.Q<StringDropdownField>(NameDropdownField(property));
             SpineAttachmentElement element = stringDropdownField.Q<SpineAttachmentElement>();
-            UIToolkitUtils.AddContextualMenuManipulator(stringDropdownField, property,
-                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+            UIToolkitUtils.AddContextualMenuManipulator(stringDropdownField, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
             stringDropdownField.Button.clicked += () => MakeDropdown(GetAttachmentRefresh, spineAttachmentPickerAttribute, property,
                 stringDropdownField, onValueChangedCallback, info, parent);

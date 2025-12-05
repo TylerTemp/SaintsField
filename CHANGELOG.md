@@ -4,6 +4,12 @@
 
 1.  Fix: When using `InspectorName` with `enum` type, the search box now support search the original enum name (previously only `InspectorName` value)
 2.  Improve: `AddressableScene`, `SpineAttachmentPicker` now uses `TreeDropdown` as the picker
+3.  Add: Spine pickers. Now all Spine default picker has an adapted version. New added:
+   *   `SpineBonePicker`
+   *   `SpineEventPicker`
+   *   `SpineIkConstraintPicker`
+   *   `SpinePathConstraintPicker`
+   *   `SpineTransformConstraintPicker`
 
 ## 5.4.9 ##
 

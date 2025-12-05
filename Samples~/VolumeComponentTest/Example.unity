@@ -6466,7 +6466,7 @@ GameObject:
   - component: {fileID: 622173743}
   - component: {fileID: 622173742}
   m_Layer: 0
-  m_Name: PostFieldRichLabel
+  m_Name: EndText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14538,6 +14538,55 @@ MonoBehaviour:
   expanded: 216123560000
   d1: 0
   l: 0
+--- !u!1 &846204988
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 846204989}
+  - component: {fileID: 846204990}
+  m_Layer: 0
+  m_Name: Issue346LabelTestEditor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &846204989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846204988}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &846204990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846204988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cf04288d69eb4a439fff37d33039c3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue346LabelTestEditor
+  testStruct:
+    secondsC: 0
+    secondsCArr: 00000000
+    secondsD: 0
+    secondsDArr: 00000000
 --- !u!1 &847311490
 GameObject:
   m_ObjectHideFlags: 0
@@ -22907,6 +22956,7 @@ Transform:
   - {fileID: 2020411938}
   - {fileID: 1350119077}
   - {fileID: 2130716704}
+  - {fileID: 846204989}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1487457131
@@ -34755,7 +34805,7 @@ MonoBehaviour:
   sceneRef:
     guid: 65ad8bd450b80c5468397154b5f6c4cc
     index: 1
-    path: SaintsField/Samples/Example
+    path: SaintsField/Samples/VolumeComponentTest/Example
 --- !u!4 &2002997102 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1316916096917999234, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}

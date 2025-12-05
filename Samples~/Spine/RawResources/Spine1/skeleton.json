@@ -1,11 +1,11 @@
 {
 "skeleton": {
-	"hash": "KT94KHvMM1I",
+	"hash": "aPDYuTMe9So",
 	"spine": "4.2.43",
-	"x": -11.86,
-	"y": 8.46,
-	"width": 1.11,
-	"height": 1.11,
+	"x": -6.25,
+	"y": 65.76,
+	"width": 1.29,
+	"height": 1.29,
 	"images": "./images/",
 	"audio": "./audio"
 },
@@ -18,26 +18,27 @@
 		"rotation": -39.38,
 		"x": 1.5,
 		"y": -1.5,
-		"color": "ff4000ff",
+		"color": "ff3f00ff",
 		"icon": "ik"
 	},
 	{ "name": "bone2", "parent": "bone", "length": 103.25, "rotation": -96.4, "x": 86.68 },
 	{ "name": "bone3", "parent": "bone2", "length": 80.62, "rotation": 89.78, "x": 103.25 },
-	{ "name": "target", "parent": "root", "x": -62.7, "y": -53.11, "color": "ff4000ff", "icon": "ik" }
+	{ "name": "target", "parent": "root", "x": -62.7, "y": -53.11, "color": "ff3f00ff", "icon": "ik" }
 ],
 "slots": [
-	{ "name": "White1", "bone": "bone3", "attachment": "White1" }
+	{ "name": "White1", "bone": "bone3", "attachment": "White1" },
+	{ "name": "path", "bone": "bone", "attachment": "path-const2" }
 ],
 "ik": [
 	{
 		"name": "bone",
-		"order": 1,
+		"order": 2,
 		"bones": [ "bone2" ],
 		"target": "bone"
 	},
 	{
 		"name": "target",
-		"order": 3,
+		"order": 5,
 		"bones": [ "bone3" ],
 		"target": "target"
 	}
@@ -45,6 +46,7 @@
 "transform": [
 	{
 		"name": "transCons1",
+		"order": 1,
 		"bones": [ "bone2" ],
 		"target": "bone",
 		"mixRotate": 0,
@@ -54,7 +56,7 @@
 	},
 	{
 		"name": "transConst2",
-		"order": 2,
+		"order": 4,
 		"bones": [ "bone3" ],
 		"target": "bone",
 		"mixRotate": 0,
@@ -63,10 +65,37 @@
 		"mixShearY": 0
 	}
 ],
+"path": [
+	{
+		"name": "path-con1",
+		"bones": [ "bone2", "bone3" ],
+		"target": "path"
+	},
+	{
+		"name": "path-con2",
+		"order": 3,
+		"bones": [ "bone3" ],
+		"target": "path"
+	}
+],
 "skins": [
 	{
 		"name": "default",
 		"attachments": {
+			"path": {
+				"path-const1": {
+					"type": "path",
+					"lengths": [ 98.67, 158.57, 197.46, 299.83 ],
+					"vertexCount": 12,
+					"vertices": [ -3.01, 18.66, 25.04, 27.32, 53.09, 35.99, 96.27, 61.5, 118.54, 56.22, 140.81, 50.93, 131.68, 16.08, 129.36, 2.58, 127.05, -10.93, 115.68, -23.99, 104.7, -24.5, 93.73, -25.02 ]
+				},
+				"path-const2": {
+					"type": "path",
+					"lengths": [ 121.63, 229.24, 274.72, 469.04 ],
+					"vertexCount": 12,
+					"vertices": [ -70.68, 19.57, -48.57, 47.98, -26.47, 76.38, -6.96, 132.3, 25.12, 142.66, 57.19, 153.02, 103.85, 115.45, 122.08, 103.08, 140.31, 90.71, 144.13, 76.72, 139.78, 64.86, 135.43, 52.99 ]
+				}
+			},
 			"White1": {
 				"White1": { "rotation": 46.01, "width": 1, "height": 1 }
 			}

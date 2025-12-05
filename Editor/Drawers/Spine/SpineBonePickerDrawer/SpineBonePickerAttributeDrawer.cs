@@ -77,6 +77,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
 
             SpineBonePickerAttribute spineBonePickerAttribute = (SpineBonePickerAttribute)saintsAttribute;
             SpineBonePickerField field = container.Q<SpineBonePickerField>();
+            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property));
             field.SpineBonePickerElement.BindHelpBox(helpBox);
 

@@ -658,6 +658,14 @@ PrefabInstance:
       propertyPath: spineSlotPicker
       value: White1
       objectReference: {fileID: 0}
+    - target: {fileID: 2123830887107041827, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spinePackConstraint
+      value: path-con1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2123830887107041827, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
+      propertyPath: spinePackConstraintPicker
+      value: path-con2
+      objectReference: {fileID: 0}
     - target: {fileID: 2151001047522572703, guid: 5b8b54044b6069f4b8a1ed7856a6cf86, type: 3}
       propertyPath: m_Mesh
       value: 

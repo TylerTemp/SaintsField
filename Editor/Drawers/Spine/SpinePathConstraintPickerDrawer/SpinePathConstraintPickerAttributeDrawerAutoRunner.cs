@@ -8,9 +8,9 @@ using Spine.Unity;
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Drawers.Spine.SpineIkConstraintPickerDrawer
+namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
 {
-    public partial class SpineIkConstraintPickerAttributeDrawer: IAutoRunnerFixDrawer
+    public partial class SpinePathConstraintPickerAttributeDrawer: IAutoRunnerFixDrawer
     {
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             SerializedProperty property, MemberInfo memberInfo, object parent)
@@ -46,16 +46,16 @@ namespace SaintsField.Editor.Drawers.Spine.SpineIkConstraintPickerDrawer
             }
 
             HashSet<string> foundNames = new HashSet<string>();
-            for (int i = 0; i < skeletonData.IkConstraints.Count; i++)
+            for (int i = 0; i < skeletonData.PathConstraints.Count; i++)
             {
-                IkConstraintData ikConstraint = skeletonData.IkConstraints.Items[i];
-                string ikConstraintName = ikConstraint.Name;
-                if (ikConstraintName == property.stringValue)
+                PathConstraintData pathConstraints = skeletonData.PathConstraints.Items[i];
+                string pathConstraintsName = pathConstraints.Name;
+                if (pathConstraintsName == property.stringValue)
                 {
                     return null;
                 }
 
-                foundNames.Add(ikConstraintName);
+                foundNames.Add(pathConstraintsName);
             }
 
             return new AutoRunnerFixerResult

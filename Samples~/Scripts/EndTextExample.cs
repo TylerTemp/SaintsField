@@ -1,8 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+
+using UnityEngine;
+
 
 namespace SaintsField.Samples.Scripts
 {
-    public class PostFieldRichLabelExample: MonoBehaviour
+    public class EndTextExample: MonoBehaviour
     {
         [EndText("<color=grey>km/s")] public float speed;
         [EndText("<icon=eye.png/>", padding: 0)] public Sprite eye;
@@ -26,10 +29,5 @@ namespace SaintsField.Samples.Scripts
 
             return "<color=green>acceptable!";
         }
-
-        // public string Error()
-        // {
-        //     throw new Exception("Expected Exception");
-        // }
     }
 }
