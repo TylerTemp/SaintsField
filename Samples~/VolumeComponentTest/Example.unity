@@ -3681,14 +3681,12 @@ MonoBehaviour:
   <MyAnimator>k__BackingField: {fileID: 380193380}
   animatorState:
     <layerIndex>k__BackingField: 0
-    <stateNameHash>k__BackingField: -1198717087
-    <stateName>k__BackingField: Sub2State
-    <stateSpeed>k__BackingField: 1
+    <stateNameHash>k__BackingField: -1588485629
+    <stateName>k__BackingField: Example
+    <stateSpeed>k__BackingField: 8
     <stateTag>k__BackingField: 
-    <animationClip>k__BackingField: {fileID: 0}
-    <subStateMachineNameChain>k__BackingField:
-    - SubStateMachine1
-    - Sub1-2
+    <animationClip>k__BackingField: {fileID: 7400000, guid: 0ec4adcc82cdaa8408d6d75139028914, type: 2}
+    <subStateMachineNameChain>k__BackingField: []
   animatorStateBase:
     <layerIndex>k__BackingField: 0
     <stateNameHash>k__BackingField: -1198717087

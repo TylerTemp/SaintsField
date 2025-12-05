@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
+using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -61,6 +63,8 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
         private VisualElement _boundElement;
         public void BindBound(VisualElement target) => _boundElement = target;
 
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
+
         private void RefreshDisplay()
         {
             if (_animatorStates == null)
@@ -73,12 +77,20 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                 // ReSharper disable once InvertIf
                 if (animatorState.state.name == value)
                 {
-                    SetLabelString(AnimatorStateUtil.StateButtonLabel(animatorState));
+                    AnimatorStateUtil.StateButtonLabel(Label, animatorState, _richTextDrawer);
                     return;
                 }
             }
 
-            SetLabelString(value == ""? "": $"<color=red>?</color> {value}");
+            if (value == "")
+            {
+                Label.Clear();
+            }
+            else
+            {
+                string wrongLabel = $"<color=red>?</color> {value}";
+                UIToolkitUtils.SetLabel(Label, new []{new RichTextDrawer.RichTextChunk(wrongLabel, false, wrongLabel)}, _richTextDrawer);
+            }
         }
 
 

@@ -18,6 +18,23 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 
         private static string _brownColor;
 
+        public static string GetIcon(AnimatorControllerParameterType parameterType)
+        {
+            switch (parameterType)
+            {
+                case AnimatorControllerParameterType.Float:
+                    return "FloatField@4x";
+                case AnimatorControllerParameterType.Int:
+                    return "IntegerField@4x";
+                case AnimatorControllerParameterType.Bool:
+                    return "ToolbarToggle@4x";
+                case AnimatorControllerParameterType.Trigger:
+                    return "EventTrigger Icon";
+                default:
+                    return null;
+            }
+        }
+
         public static void ShowDropdown(bool isString, object curValue, IReadOnlyList<AnimatorControllerParameter> animatorControllerParams, Animator _cachedAnimator, Rect rootWorldBound, Action<AnimatorControllerParameter> setValue)
         {
             _brownColor ??= $"#{ColorUtility.ToHtmlStringRGB(EColor.Brown.GetColor())}";
@@ -30,7 +47,9 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
             {
                 lis.Add(
                     $"{cachedAnimatorControllerParam.name} <color={_brownColor}>{cachedAnimatorControllerParam.type}</color> <color=#808080>({cachedAnimatorControllerParam.nameHash})</color>",
-                    cachedAnimatorControllerParam);
+                    cachedAnimatorControllerParam,
+                    false,
+                    GetIcon(cachedAnimatorControllerParam.type));
 
                 if (isString && cachedAnimatorControllerParam.name == (string)curValue
                     || !isString && cachedAnimatorControllerParam.nameHash == (int)curValue)

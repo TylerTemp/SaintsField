@@ -77,11 +77,15 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             string toError = "";
             if (string.IsNullOrEmpty(CachedValue))
             {
-                SetLabelString("");
+                Label.Clear();
+                // SetLabelString("");
             }
             else
             {
-                SetLabelString($"<color=red>?</color> {CachedValue}");
+                // SetLabelString($"<color=red>?</color> {CachedValue}");
+                string wrongLabel = $"<color=red>?</color> {CachedValue}";
+                UIToolkitUtils.SetLabel(Label, new[]{new RichTextDrawer.RichTextChunk(wrongLabel, false, wrongLabel)}, _richTextDrawer);
+
                 toError = $"Shader Param {CachedValue} not found in {_shader}";
             }
             if(_helpBox != null)

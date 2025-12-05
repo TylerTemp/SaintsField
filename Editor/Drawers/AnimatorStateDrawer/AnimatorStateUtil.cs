@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using PopupWindow = UnityEditor.PopupWindow;
 
 namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
@@ -101,16 +104,38 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             string preText = animatorStateInfo.subStateMachineNameChain.Count == 0
                 ? ""
                 : $"{string.Join('/', animatorStateInfo.subStateMachineNameChain)}/";
-            string clipText = animatorStateInfo.animationClip == null
-                ? ""
-                : $" <color=gray>({animatorStateInfo.animationClip.name})</color>";
+            string clipText;
+            string iconText = "";
+            if (animatorStateInfo.animationClip == null)
+            {
+                clipText = "";
+            }
+            else
+            {
+                clipText = $" <color=gray>({animatorStateInfo.animationClip.name})</color>";
+                iconText = "<icon=d_AnimationClip Icon/>";
+            }
             return
                 preText
+                + iconText
                 + animatorStateInfo.state.name
                 + clipText
                 + ": " + animatorStateInfo.layer.name;
         }
 
-        public static string StateButtonLabel(AnimatorStateChanged animatorStateInfo) => $"{animatorStateInfo.state.name}<color=grey>{(animatorStateInfo.animationClip == null ? "" : $" ({animatorStateInfo.animationClip.name})")}: {animatorStateInfo.layer.name}{(animatorStateInfo.subStateMachineNameChain.Count == 0 ? "" : $"/{string.Join('/', animatorStateInfo.subStateMachineNameChain)}")}</color>";
+        public static void StateButtonLabel(Label label, AnimatorStateChanged animatorStateInfo, RichTextDrawer richTextDrawer)
+        {
+            List<RichTextDrawer.RichTextChunk> chunks = new List<RichTextDrawer.RichTextChunk>();
+            if (animatorStateInfo.animationClip != null)
+            {
+                chunks.Add(new RichTextDrawer.RichTextChunk("<icon=d_AnimationClip Icon/>", true, "d_AnimationClip Icon"));
+            }
+
+            string content =
+                $"{animatorStateInfo.state.name}<color=grey>{(animatorStateInfo.animationClip == null ? "" : $" ({animatorStateInfo.animationClip.name})")}: {animatorStateInfo.layer.name}{(animatorStateInfo.subStateMachineNameChain.Count == 0 ? "" : $"/{string.Join('/', animatorStateInfo.subStateMachineNameChain)}")}</color>";
+            chunks.Add(new RichTextDrawer.RichTextChunk(content, false, content));
+
+            UIToolkitUtils.SetLabel(label, chunks, richTextDrawer);
+        }
     }
 }
