@@ -13,14 +13,20 @@ namespace SaintsField
         public readonly string Content;
         public readonly bool IsCallback;
 
+        public readonly float PaddingLeft;
+        public readonly float PaddingRight;
+
         public bool Below = true;
 
-        public BelowTextAttribute(string content)
+        public BelowTextAttribute(string content, float paddingLeft=0, float paddingRight=0)
         {
             (string contentParsed, bool isCallbackParsed) = RuntimeUtil.ParseCallback(content);
 
             Content = contentParsed;
             IsCallback = isCallbackParsed;
+
+            PaddingLeft = paddingLeft;
+            PaddingRight = paddingRight;
         }
 
         public virtual bool EndDecorator => true;

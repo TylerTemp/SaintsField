@@ -305,6 +305,7 @@ Parameters:
 
 *   `string content` the content to show. If it starts with `$`, then a callback/propery/field value is used. When a callback gives null or empty string, the label will be hidden.
     For `AboveText` the default value for this parameter is `"<color=gray><label/>"`. For `BelowText` this parameter is required.
+*   `float paddingLeft=0`, `float paddingRight=0`: add pading space for content
 
 ```csharp
 using SaintsField;
@@ -5175,6 +5176,14 @@ public int mp;
 ![](https://github.com/user-attachments/assets/1368d7df-7505-44d3-8c03-703dce2f6fea)
 
 You can install it using any method below:
+
+**Auto Installer**
+
+1.  Go `Window` - `Saints` - `Enable Code Analysis...`
+2.  If it's not installed, click `Install` for "Code Analysis"
+3.  Click `Enable` for "Code Analysis"
+
+![](https://github.com/user-attachments/assets/d09344b0-9fbe-48b0-bad5-fbeb93e1164a)
 
 **Unity Package Manager + Unity NuGet**
 

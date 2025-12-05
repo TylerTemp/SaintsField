@@ -56,6 +56,8 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
                     // flexWrap = F
                     flexGrow = 1,
                     flexShrink = 0,
+                    paddingLeft = _playaBelowRichLabelAttribute.PaddingLeft,
+                    paddingRight = _playaBelowRichLabelAttribute.PaddingRight,
                 },
             };
 
@@ -102,18 +104,18 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 
             userData.XmlContent = xmlContent;
 
-            string useLabel;
-            MemberInfo member;
-            if (userData.FieldWithInfo.RenderType == SaintsRenderType.ClassStruct)
-            {
-                member = null;
-                useLabel = ObjectNames.NicifyVariableName(userData.FieldWithInfo.Targets[0].GetType().Name);
-            }
-            else
-            {
-                member = GetMemberInfo(userData.FieldWithInfo);
-                useLabel = ObjectNames.NicifyVariableName(member.Name);
-            }
+            // string useLabel;
+            // MemberInfo member;
+            // if (userData.FieldWithInfo.RenderType == SaintsRenderType.ClassStruct)
+            // {
+            //     member = null;
+            //     useLabel = ObjectNames.NicifyVariableName(userData.FieldWithInfo.Targets[0].GetType().Name);
+            // }
+            // else
+            // {
+            //     member = GetMemberInfo(userData.FieldWithInfo);
+            //     useLabel = ObjectNames.NicifyVariableName(member.Name);
+            // }
 
             // Debug.Log($"parse {xmlContent}");
 

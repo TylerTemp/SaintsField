@@ -104,22 +104,29 @@ namespace SaintsField.Editor.Utils
 
         #region SaintsEditor
 
+        // ReSharper disable once InconsistentNaming
+        public const string SAINTSFIELD_SAINTS_EDITOR_APPLY = "SAINTSFIELD_SAINTS_EDITOR_APPLY";
+
 #if SAINTSFIELD_SAINTS_EDITOR_APPLY
-        [MenuItem("Window/Saints/SaintsEditor/Disable SaintsEditor")]
-        public static void SaintsEditorUnapply() => RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_APPLY");
+        [MenuItem(MenuRoot + "SaintsEditor/Disable SaintsEditor")]
+        public static void SaintsEditorUnapply() => RemoveCompileDefine(SAINTSFIELD_SAINTS_EDITOR_APPLY);
 
         #region IMGUI Constant Repaint
 #if SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
-        [MenuItem("Window/Saints/SaintsEditor/Enable IMGUI Constant Repaint")]
+        [MenuItemMenuRoot + "SaintsEditor/Enable IMGUI Constant Repaint")]
         public static void SaintsEditorIMGUIConstantRepaint() => RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE");
 #else
-        [MenuItem("Window/Saints/SaintsEditor/Disable IMGUI Constant Repaint")]
+        [MenuItem(MenuRoot + "SaintsEditor/Disable IMGUI Constant Repaint")]
         public static void SaintsEditorIMGUIConstantRepaint() => AddCompileDefine("SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE");
 #endif
         #endregion
 #else
-        [MenuItem("Window/Saints/Enable SaintsEditor")]
-        public static void ApplySaintsEditor() => AddCompileDefine("SAINTSFIELD_SAINTS_EDITOR_APPLY");
+        [MenuItem(MenuRoot + "Enable SaintsEditor")]
+        public static void ApplySaintsEditor()
+        {
+            SaintsFieldSetupWindow.Open();
+            // AddCompileDefine(SAINTSFIELD_SAINTS_EDITOR_APPLY);
+        }
 #endif
 
         #endregion
@@ -294,41 +301,22 @@ namespace SaintsField.Editor.Utils
 
         #region Code Analysis
 
+        // ReSharper disable once InconsistentNaming
+        public const string SAINTSFIELD_CODE_ANALYSIS = "SAINTSFIELD_CODE_ANALYSIS";
+
 #if SAINTSFIELD_CODE_ANALYSIS
 
         [MenuItem(MenuRoot + "Disable Code Analysis")]
         public static void DisableCodeAnalysis()
         {
-            RemoveCompileDefine("SAINTSFIELD_CODE_ANALYSIS");
+            RemoveCompileDefine(SAINTSFIELD_CODE_ANALYSIS);
         }
 #else
 
         [MenuItem(MenuRoot + "Enable Code Analysis...")]
         public static void EnableCodeAnalysis()
         {
-            bool codyAnalysisFound = AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.StartsWith("Microsoft.CodeAnalysis.CSharp,"));
-            if (codyAnalysisFound)
-            {
-                AddCompileDefine("SAINTSFIELD_CODE_ANALYSIS");
-                EditorUtility.DisplayDialog("Code Analysis Enabled",
-                    "Done. Please wait for script re-compile",
-                    "OK",
-                    "");
-                return;
-            }
-
-            if (EditorUtility.DisplayDialog("Code Analysis Not Found",
-                    "Microsoft.CodeAnalysis.CSharp not found in your project. This will break your script compilation if it's not installed at all.\n" +
-                    "If you believe this is a detection mistake, you can enable it anyway",
-                    "Enable Anyway",
-                    "How To Install?"))
-            {
-                AddCompileDefine("SAINTSFIELD_CODE_ANALYSIS");
-            }
-            else
-            {
-                Application.OpenURL("https://github.com/TylerTemp/SaintsField/?tab=readme-ov-file#setup");
-            }
+            SaintsFieldSetupWindow.Open();
         }
 #endif
 
@@ -426,7 +414,7 @@ namespace SaintsField.Editor.Utils
         }
 
         // ReSharper disable once UnusedMember.Local
-        private static void RemoveCompileDefine(string defineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)
+        public static void RemoveCompileDefine(string defineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)
         {
             IEnumerable<BuildTargetGroup> targets = targetGroups ?? Enum.GetValues(typeof(BuildTargetGroup)).Cast<BuildTargetGroup>();
 
