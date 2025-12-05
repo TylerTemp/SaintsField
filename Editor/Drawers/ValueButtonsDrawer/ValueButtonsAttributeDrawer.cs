@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
         private static string NameArrange(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Arrange";
         private static string NameExpand(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Expand";
         public static string NameSubPanel(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_SubPanel";
-        public static string NameHelpBox(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_HelpBox";
+        private static string NameHelpBox(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_HelpBox";
 
         // private RichTextDrawer _richTextDrawer;
 
@@ -180,6 +180,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                         parent, value);
                     Util.SignPropertyValue(property, info, parent, value);
                     property.serializedObject.ApplyModifiedProperties();
+                    onValueChangedCallback.Invoke(value);
                     RefreshCurValue();
                 });
                 RefreshCurValue();

@@ -200,7 +200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Inherent.MyMonoWithCustom
   myString: 
   toggle: 0
-  input: 
+  input: Some Content
   myInt: 0
 --- !u!4 &2862699
 Transform:

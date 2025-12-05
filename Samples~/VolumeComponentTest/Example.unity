@@ -16760,7 +16760,7 @@ GameObject:
   - component: {fileID: 1036765201}
   - component: {fileID: 1036765200}
   m_Layer: 0
-  m_Name: EnumFlags
+  m_Name: EnumToggleButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16784,7 +16784,7 @@ MonoBehaviour:
     myMask: 0
   myMaskDisabled: 0
   myMaskDisabledLabel: 0
-  enumNormal: 1
+  enumNormal: 0
   enumExpand: 4
   labelField: 2
 --- !u!4 &1036765201
@@ -21893,7 +21893,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 774fb341ae404c778c68e533864a2a5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.ValueButtonsExample
-  clickAButton: The <color=red>Wild Roses
+  clickAButton: <icon=lightMeter/greenLight/>Where
   stringItems:
   - <icon=lightMeter/greenLight/>Where
   - Are

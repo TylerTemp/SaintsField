@@ -237,27 +237,24 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             // Color reColor = EColor.EditorSeparator.GetColor();
 
-            if (value != null)
+            foreach (Attribute attribute in allAttributes)
             {
-                foreach (Attribute attribute in allAttributes)
+                switch (attribute)
                 {
-                    switch (attribute)
+                    case ValueButtonsAttribute valueButtonsAttribute:
                     {
-                        case ValueButtonsAttribute valueButtonsAttribute:
-                        {
-                            return (ValueButtonsAttributeDrawer.UIToolkitValueEdit(
-                                oldElement,
-                                valueButtonsAttribute,
-                                label,
-                                value,
-                                valueType,
-                                beforeSet,
-                                setterOrNull,
-                                labelGrayColor,
-                                inHorizontalLayout,
-                                allAttributes,
-                                targets), false);
-                        }
+                        return (ValueButtonsAttributeDrawer.UIToolkitValueEdit(
+                            oldElement,
+                            valueButtonsAttribute,
+                            label,
+                            value,
+                            valueType,
+                            beforeSet,
+                            setterOrNull,
+                            labelGrayColor,
+                            inHorizontalLayout,
+                            allAttributes,
+                            targets), false);
                     }
                 }
             }
@@ -876,7 +873,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     switch (attribute)
                     {
-                        case DateTimeAttribute dateTimeAttribute:
+                        case DateTimeAttribute _:
                             return (DateTimeAttributeDrawer.UIToolkitValueEdit(
                                 oldElement,
                                 label,
@@ -887,7 +884,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 labelGrayColor,
                                 inHorizontalLayout,
                                 allAttributes), false);
-                        case TimeSpanAttribute timeSpanAttribute:
+                        case TimeSpanAttribute _:
                             return (TimeSpanAttributeDrawer.UIToolkitValueEdit(
                                 oldElement,
                                 label,

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class EnumFlagsExample: MonoBehaviour
+    public class EnumToggleButtonsExample: MonoBehaviour
     {
         [Serializable, Flags]
         public enum BitMask
@@ -25,7 +25,7 @@ namespace SaintsField.Samples.Scripts
         }
 
         // [RichLabel("<icon=star.png /><label />")]
-        [EnumToggleButtons]
+        [EnumToggleButtons, OnValueChanged(":Debug.Log")]
         public BitMask myMask;
 
         [EnumToggleButtons, FieldLabelText(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
@@ -57,7 +57,7 @@ namespace SaintsField.Samples.Scripts
             Third,
         }
 
-        [EnumToggleButtons] public EnumNormal enumNormal;
+        [EnumToggleButtons, OnValueChanged(":Debug.Log")] public EnumNormal enumNormal;
 
         [Serializable]
         public enum EnumExpand

@@ -86,6 +86,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
             SaintsEditorApplicationChanged.OnAnyEvent.AddListener(CheckSkeletonData);
             container.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CheckSkeletonData));
             field.TrackSerializedObjectValue(property.serializedObject, _ => CheckSkeletonData());
+            field.TrackPropertyValue(property, _ => onValueChangedCallback.Invoke(property.stringValue));
             return;
 
             void CheckSkeletonData()

@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.5.1 ##
+
+1.  Fix: `EnumToggleButtons`, `ValueButtons` & `Spine*` related attributes did not trigger `OnValueChanged`
+2.  Fix: `ResizableTextArea` right padding off-screen
+3.  Add: `AboveText`/`BelowText` add `leftPadding`, `rightPadding`, and default left 4px padding to align with other fields
+4.  Add: Add a panel to auto install code analysis
+5.  Document: Add instruction of custom `SaintsEditor`
+
 ## 5.5.0 ##
 
 1.  Fix: When using `InspectorName` with `enum` type, the search box now support search the original enum name (previously only `InspectorName` value)
@@ -63,7 +71,7 @@
 ## 5.4.1 ##
 
 1.  Fix: `Expandable` foldout icon incorrect status
-2.  Fix: `SaintsEditorWindow` failed to use code analysisUtils to get a correct order
+2.  Fix: `SaintsEditorWindow` failed to use code analysis Utils to get a correct order
 3.  Add: You can use `../` to walk upward to get a callback/property for dropdowns [#336](https://github.com/TylerTemp/SaintsField/discussions/336)
 
 ## 5.4.0 ##

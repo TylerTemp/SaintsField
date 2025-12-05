@@ -96,16 +96,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.5.0**
+**5.5.1**
 
-1.  Fix: When using `InspectorName` with `enum` type, the search box now support search the original enum name (previously only `InspectorName` value)
-2.  Improve: `AddressableScene`, `SpineAttachmentPicker` now uses `TreeDropdown` as the picker
-3.  Add: Spine pickers. Now all Spine default picker has an adapted version. New added:
-   *   `SpineBonePicker`
-   *   `SpineEventPicker`
-   *   `SpineIkConstraintPicker`
-   *   `SpinePathConstraintPicker`
-   *   `SpineTransformConstraintPicker`
+1.  Fix: `EnumToggleButtons`, `ValueButtons` & `Spine*` related attributes did not trigger `OnValueChanged`
+2.  Fix: `ResizableTextArea` right padding off-screen
+3.  Add: `AboveText`/`BelowText` add `leftPadding`, `rightPadding`, and default left 4px padding to align with other fields
+4.  Add: Add a panel to auto install code analysis
+5.  Document: Add instruction of custom `SaintsEditor`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

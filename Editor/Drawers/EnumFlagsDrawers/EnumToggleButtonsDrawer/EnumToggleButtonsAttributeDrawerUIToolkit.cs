@@ -241,6 +241,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 flagButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshCurValue());
             });
 
+            flagButtonsArrangeElement.TrackPropertyValue(property, _ => onValueChangedCallback.Invoke(property.intValue));
+
             return;
 
             void RefreshCurValue()

@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class ValueButtonsExample: SaintsMonoBehaviour
     {
-        [ValueButtons(nameof(stringItems))] public string clickAButton;
+        [ValueButtons(nameof(stringItems)), OnValueChanged(":Debug.Log")] public string clickAButton;
         public List<string> stringItems;
 
         [ShowInInspector, ValueButtons(nameof(stringItems))]

@@ -7,6 +7,6 @@ namespace SaintsField.Samples.Spine.Scripts
     public class SpineTransformConstraintExample : MonoBehaviour
     {
         [SpineTransformConstraint] public string spineTransformConstraint;
-        [SpineTransformConstraintPicker] public string spineTransformConstraintPicker;
+        [SpineTransformConstraintPicker, OnValueChanged(":Debug.Log")] public string spineTransformConstraintPicker;
     }
 }
