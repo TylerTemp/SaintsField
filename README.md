@@ -305,7 +305,7 @@ Parameters:
 
 *   `string content` the content to show. If it starts with `$`, then a callback/propery/field value is used. When a callback gives null or empty string, the label will be hidden.
     For `AboveText` the default value for this parameter is `"<color=gray><label/>"`. For `BelowText` this parameter is required.
-*   `float paddingLeft=0`, `float paddingRight=0`: add pading space for content
+*   `float paddingLeft=4`, `float paddingRight=0`: add pading space for content
 
 ```csharp
 using SaintsField;

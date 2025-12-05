@@ -18,7 +18,7 @@ namespace SaintsField
 
         public bool Below = true;
 
-        public BelowTextAttribute(string content, float paddingLeft=0, float paddingRight=0)
+        public BelowTextAttribute(string content, float paddingLeft=4, float paddingRight=0)
         {
             (string contentParsed, bool isCallbackParsed) = RuntimeUtil.ParseCallback(content);
 
