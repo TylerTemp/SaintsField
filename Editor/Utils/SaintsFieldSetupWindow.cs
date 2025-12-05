@@ -249,6 +249,7 @@ namespace SaintsField.Editor.Utils
 
         [Ordered]
         [Button("Uninstall")]
+        [PlayaEnableIf(nameof(CodeAnalysisInstalled))]
         private void UninstallCodeAnalysis()
         {
             string content = File.ReadAllText(ManifestFile);
