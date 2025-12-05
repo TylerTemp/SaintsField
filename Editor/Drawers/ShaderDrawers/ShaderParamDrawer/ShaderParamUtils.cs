@@ -1,6 +1,7 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
 using System.Collections.Generic;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
@@ -51,6 +52,39 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                         );
                 }
                 return properyName + (imGui? $"[{PropertyType}]": $" <color=#808080>{PropertyType}</color>");
+            }
+
+            public string GetIcon()
+            {
+                switch (PropertyType)
+                {
+                    case ShaderPropertyType.Color:
+                        return "d_color_picker";
+                    case ShaderPropertyType.Float:
+                        return "FloatField";
+                    case ShaderPropertyType.Vector:
+                        return "Vector3Field@4x";
+                    case ShaderPropertyType.Range:
+                        return "Slider@4x";
+                    case ShaderPropertyType.Texture:
+                        return "d_Texture Icon";
+                    case ShaderPropertyType.Int:
+                        return "IntegerField@4x";
+                    default:
+                        return null;
+                }
+            }
+
+            public IEnumerable<RichTextDrawer.RichTextChunk> GetDisplayChunks(bool isImGui)
+            {
+                string icon = GetIcon();
+                if (icon != null)
+                {
+                    yield return new RichTextDrawer.RichTextChunk($"<icon={icon}/>", true, icon);
+                }
+
+                string label = GetString(isImGui);
+                yield return new RichTextDrawer.RichTextChunk(label, false, label);
             }
 
             public bool Equals(ShaderCustomInfo other)
@@ -106,7 +140,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             foreach (ShaderCustomInfo shaderCustomInfo in GetShaderInfo(shader, shaderPropertyType))
             {
                 // dropdown.Add(path, (path, index));
-                dropdown.Add(shaderCustomInfo.GetString(false), shaderCustomInfo);
+                dropdown.Add(shaderCustomInfo.GetString(false), shaderCustomInfo, false, shaderCustomInfo.GetIcon());
                 // ReSharper disable once InvertIf
                 if (isString && shaderCustomInfo.PropertyName == (string)(object)curValue
                     || !isString && shaderCustomInfo.PropertyID == (int)(object)curValue)

@@ -6,6 +6,7 @@ using SaintsField.Utils;
 using UnityEngine.Rendering;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]

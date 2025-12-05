@@ -1,5 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
+using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
+using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
@@ -43,6 +45,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             RefreshDisplay();
         }
 
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
+
         private void RefreshDisplay()
         {
             if (_shader == null)
@@ -60,7 +64,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     // ReSharper disable once InvertIf
                     if (r.PropertyName == CachedValue)
                     {
-                        SetLabelString(r.GetString(false));
+                        UIToolkitUtils.SetLabel(Label, r.GetDisplayChunks(false), _richTextDrawer);
                         if(_helpBox != null)
                         {
                             ShaderUtils.UpdateHelpBox(_helpBox, "");
