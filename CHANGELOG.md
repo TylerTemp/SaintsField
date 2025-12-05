@@ -1,6 +1,6 @@
 # Changelog
 
-## WIP ##
+## 5.5.0 ##
 
 1.  Fix: When using `InspectorName` with `enum` type, the search box now support search the original enum name (previously only `InspectorName` value)
 2.  Improve: `AddressableScene`, `SpineAttachmentPicker` now uses `TreeDropdown` as the picker

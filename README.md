@@ -96,10 +96,16 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.4.9**
+**5.5.0**
 
-1.  Fix: `SaintsEditor` failed to inject the component header functions
-2.  Add: `Separator`, `BelowSeparator`, `BelowText` now can be used on a class/struct directly.
+1.  Fix: When using `InspectorName` with `enum` type, the search box now support search the original enum name (previously only `InspectorName` value)
+2.  Improve: `AddressableScene`, `SpineAttachmentPicker` now uses `TreeDropdown` as the picker
+3.  Add: Spine pickers. Now all Spine default picker has an adapted version. New added:
+   *   `SpineBonePicker`
+   *   `SpineEventPicker`
+   *   `SpineIkConstraintPicker`
+   *   `SpinePathConstraintPicker`
+   *   `SpineTransformConstraintPicker`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
