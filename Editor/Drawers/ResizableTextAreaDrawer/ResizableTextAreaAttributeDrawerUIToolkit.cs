@@ -49,6 +49,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
                 {
                     whiteSpace = WhiteSpace.Normal,
                     minHeight = minHeight,
+                    marginRight = 0,
                 },
             };
 
