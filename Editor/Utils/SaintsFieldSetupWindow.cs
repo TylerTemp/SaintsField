@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+#if SAINTSFIELD_NEWTONSOFT_JSON
 using Newtonsoft.Json;
+#endif
 using SaintsField.Editor.Linq;
 using SaintsField.Playa;
 using UnityEditor;
