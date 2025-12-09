@@ -74,6 +74,16 @@
             "name": "com.unity.serialization",
             "expression": "",
             "define": "SAINTSFIELD_SERIALIZATION"
+        },
+        {
+            "name": "org.nuget.microsoft.codeanalysis.csharp",
+            "expression": "",
+            "define": "SAINTSFIELD_CODE_ANALYSIS"
+        },
+        {
+            "name": "microsoft.codeanalysis.csharp",
+            "expression": "",
+            "define": "SAINTSFIELD_CODE_ANALYSIS"
         }
     ],
     "noEngineReferences": false

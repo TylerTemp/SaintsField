@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.5.2 ##
+
+1.  Fix: Compile error in installer panel when no `Newtonsoft.Json` installed
+2.  Add: icon from `ShaderParam`, `AnimatorState`
+3.  Improve: `AnimatorState` now uses `TreeView` to render
+4.  Improve: Code Analysis is now default enabled if you have `org.nuget.microsoft.codeanalysis.csharp` installed
+
 ## 5.5.1 ##
 
 1.  Fix: `EnumToggleButtons`, `ValueButtons` & `Spine*` related attributes did not trigger `OnValueChanged`

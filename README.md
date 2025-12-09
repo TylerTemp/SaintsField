@@ -96,13 +96,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.5.1**
+**5.5.2**
 
-1.  Fix: `EnumToggleButtons`, `ValueButtons` & `Spine*` related attributes did not trigger `OnValueChanged`
-2.  Fix: `ResizableTextArea` right padding off-screen
-3.  Add: `AboveText`/`BelowText` add `leftPadding`, `rightPadding`, and default left 4px padding to align with other fields
-4.  Add: Add a panel to auto install code analysis
-5.  Document: Add instruction of custom `SaintsEditor`
+1.  Fix: Compile error in installer panel when no `Newtonsoft.Json` installed
+2.  Add: icon from `ShaderParam`, `AnimatorState`
+3.  Improve: `AnimatorState` now uses `TreeView` to render
+4.  Improve: Code Analysis is now default enabled if you have `org.nuget.microsoft.codeanalysis.csharp` installed
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1142,7 +1141,7 @@ private Shader GetShader() => targetRenderer.sharedMaterial.shader;
 [ShaderParam(nameof(GetShader))] public int shaderParamShader;
 ```
 
-![image](https://github.com/user-attachments/assets/c16ebc4b-434d-4e6c-afd8-4a714c842a06)
+![image](https://github.com/user-attachments/assets/80ba6891-2a7e-41e5-8887-74e29479f1d9)
 
 #### `ShaderKeyword` ####
 
@@ -2261,7 +2260,7 @@ public AnimatorState state;
 public AnimatorStateBase stateBase;
 ```
 
-![animator_state](https://github.com/TylerTemp/SaintsField/assets/6391063/8ee35de5-c7d5-4f0d-b8b7-8feeac41c31d)
+![animator_state](https://github.com/user-attachments/assets/6c4b972a-a69e-4890-9b67-a0d141eefed7)
 
 #### `CurveRange` ####
 

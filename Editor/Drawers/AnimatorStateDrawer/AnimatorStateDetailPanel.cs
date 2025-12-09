@@ -13,9 +13,9 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
     {
         private readonly TextField _textField;
 
-        public SubStateMachineNameChain()
+        public SubStateMachineNameChain(string label)
         {
-            Add(_textField = new TextField());
+            Add(_textField = new TextField(label));
         }
 
         private string[] _cachedValue = Array.Empty<string>();
@@ -110,7 +110,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             SerializedProperty subStateMachineNameChainProp = FindPropertyRelative(property, "subStateMachineNameChain");
             if(subStateMachineNameChainProp != null)
             {
-                SubStateMachineNameChain subStateMachineNameChain = new SubStateMachineNameChain
+                SubStateMachineNameChain subStateMachineNameChain = new SubStateMachineNameChain("Sub State Machine")
                 {
                     bindingPath = subStateMachineNameChainProp.propertyPath,
                 };
@@ -161,7 +161,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                     objectType = typeof(AnimationClip),
                     value = newState.animationClip,
                 });
-                Add(_stateMachineField = new SubStateMachineNameChain()
+                Add(_stateMachineField = new SubStateMachineNameChain("Sub State Machine")
                 {
                     value = newState.subStateMachineNameChain ?? Array.Empty<string>(),
                 });

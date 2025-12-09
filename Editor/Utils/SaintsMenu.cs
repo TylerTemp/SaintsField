@@ -107,27 +107,27 @@ namespace SaintsField.Editor.Utils
         // ReSharper disable once InconsistentNaming
         public const string SAINTSFIELD_SAINTS_EDITOR_APPLY = "SAINTSFIELD_SAINTS_EDITOR_APPLY";
 
-#if SAINTSFIELD_SAINTS_EDITOR_APPLY
-        [MenuItem(MenuRoot + "SaintsEditor/Disable SaintsEditor")]
-        public static void SaintsEditorUnapply() => RemoveCompileDefine(SAINTSFIELD_SAINTS_EDITOR_APPLY);
-
-        #region IMGUI Constant Repaint
-#if SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
-        [MenuItemMenuRoot + "SaintsEditor/Enable IMGUI Constant Repaint")]
-        public static void SaintsEditorIMGUIConstantRepaint() => RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE");
-#else
-        [MenuItem(MenuRoot + "SaintsEditor/Disable IMGUI Constant Repaint")]
-        public static void SaintsEditorIMGUIConstantRepaint() => AddCompileDefine("SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE");
-#endif
-        #endregion
-#else
-        [MenuItem(MenuRoot + "Enable SaintsEditor")]
+// #if SAINTSFIELD_SAINTS_EDITOR_APPLY
+//         [MenuItem(MenuRoot + "SaintsEditor/Disable SaintsEditor")]
+//         public static void SaintsEditorUnapply() => RemoveCompileDefine(SAINTSFIELD_SAINTS_EDITOR_APPLY);
+//
+//         #region IMGUI Constant Repaint
+// #if SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE
+//         [MenuItemMenuRoot + "SaintsEditor/Enable IMGUI Constant Repaint")]
+//         public static void SaintsEditorIMGUIConstantRepaint() => RemoveCompileDefine("SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE");
+// #else
+//         [MenuItem(MenuRoot + "SaintsEditor/Disable IMGUI Constant Repaint")]
+//         public static void SaintsEditorIMGUIConstantRepaint() => AddCompileDefine("SAINTSFIELD_SAINTS_EDITOR_IMGUI_CONSTANT_REPAINT_DISABLE");
+// #endif
+//         #endregion
+// #else
+        [MenuItem(MenuRoot + "SaintsEditor...")]
         public static void ApplySaintsEditor()
         {
             SaintsFieldSetupWindow.Open();
             // AddCompileDefine(SAINTSFIELD_SAINTS_EDITOR_APPLY);
         }
-#endif
+// #endif
 
         #endregion
 
@@ -304,21 +304,11 @@ namespace SaintsField.Editor.Utils
         // ReSharper disable once InconsistentNaming
         public const string SAINTSFIELD_CODE_ANALYSIS = "SAINTSFIELD_CODE_ANALYSIS";
 
-#if SAINTSFIELD_CODE_ANALYSIS
-
-        [MenuItem(MenuRoot + "Disable Code Analysis")]
-        public static void DisableCodeAnalysis()
-        {
-            RemoveCompileDefine(SAINTSFIELD_CODE_ANALYSIS);
-        }
-#else
-
-        [MenuItem(MenuRoot + "Enable Code Analysis...")]
+        [MenuItem(MenuRoot + "Code Analysis...")]
         public static void EnableCodeAnalysis()
         {
             SaintsFieldSetupWindow.Open();
         }
-#endif
 
 
         #endregion
