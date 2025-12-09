@@ -96,12 +96,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.5.2**
+**5.5.3**
 
-1.  Fix: Compile error in installer panel when no `Newtonsoft.Json` installed
-2.  Add: icon from `ShaderParam`, `AnimatorState`
-3.  Improve: `AnimatorState` now uses `TreeView` to render
-4.  Improve: Code Analysis is now default enabled if you have `org.nuget.microsoft.codeanalysis.csharp` installed
+Fix Extended Serialization for OSX
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -7883,7 +7880,8 @@ public class ToggleInputRenderer: AbsRenderer
 ## Extended Serialization ##
 
 > [!WARNING]
-> This feature is still experimental
+> This feature is still experimental.
+> Not work with `OnValueChanged`.
 
 `SaintsEditor` supports some types that usually can not be serialized. To use this function:
 
@@ -7990,7 +7988,7 @@ public partial class SerInterfaceExample : SaintsMonoBehaviour
 You can serialize a `long`/`ulong` base typed `enum` with `SaintsSerialized`, which is not supported by Unity.
 
 1.  **IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial`
-2.  Add `[SaintsSerialized]` to your enum field. To avoid Unity's default broken serialization, it's suggested to add `[NonSerialized]` too.
+2.  Add `[SaintsSerialized]` to your enum field
 
 
 ```csharp
@@ -8000,7 +7998,7 @@ using SaintsField.Playa;
 
 public partial class MyBehavior: MonoBehaviour
 {
-    [Serializable, Flags]
+    [Flags]  // no need to use Serializable, because Unity just can not serialize it.
     public enum TestULongEnum: ulong
     {
         None = 0,
@@ -8010,7 +8008,6 @@ public partial class MyBehavior: MonoBehaviour
         All = First | Second | Third,
     }
 
-    [Serializable]
     public enum TestULongEnumNormal: ulong
     {
         None,
@@ -8020,15 +8017,15 @@ public partial class MyBehavior: MonoBehaviour
     }
 
     [FormerlySerializedAs("MyOldName")]  // FormerlySerializedAs works too
-    [NonSerialized, SaintsSerialized] public TestULongEnum ULongEnumPub;
-    [NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalPub;
+    [SaintsSerialized] public TestULongEnum ULongEnumPub;
+    [SaintsSerialized] public TestULongEnumNormal ULongEnumNormalPub;
     // EnumToggleButtons is supported too
-    [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPubBtns;
+    [SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPubBtns;
 
     [Serializable]  // use inside class/struct requires `partial` keyword too
     public partial class MyClass
     {
-        [NonSerialized, SaintsSerialized]  // This work inside a normal class/struct. Note the `partial`!
+        [SaintsSerialized]  // This work inside a normal class/struct. Note the `partial`!
         public MyULongEmun myEnum;
     }
 
@@ -8037,7 +8034,7 @@ public partial class MyBehavior: MonoBehaviour
 }
 ```
 
-![](https://github.com/user-attachments/assets/1e16d6d6-dfdd-483c-b95d-ba19f5706e66)
+![](https://github.com/user-attachments/assets/0073e76b-51e0-4efe-a9c3-7614d0d34834)
 
 This can work with `EnumToggleButtons`.
 

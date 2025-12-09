@@ -8,7 +8,7 @@ namespace SaintsField.SaintsSerialization
     public struct SaintsSerializedProperty: IWrapProp
     {
         public SaintsPropertyType propertyType;
-        public string propertyPath;
+        // public string propertyPath;
 
         public long longValue;
         public ulong uLongValue;

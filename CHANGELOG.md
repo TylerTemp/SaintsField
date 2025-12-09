@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.5.3 ##
+
+Fix Extended Serialization for OSX
+
 ## 5.5.2 ##
 
 1.  Fix: Compile error in installer panel when no `Newtonsoft.Json` installed

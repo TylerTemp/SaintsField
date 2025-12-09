@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 value = allAttributes.Any(each => each is DefaultExpandAttribute) || property.isExpanded,
             };
             foldout.Add(SaintsRowAttributeDrawer.CreateElement(property, GetPreferredLabel(property), info,
-                InHorizontalLayout, new SaintsRowAttribute(inline: true), this, this, parent));
+                InHorizontalLayout, new SaintsRowAttribute(inline: true), this, this, parent, this));
 
             return foldout;
         }

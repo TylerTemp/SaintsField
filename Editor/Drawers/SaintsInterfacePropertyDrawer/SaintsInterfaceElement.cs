@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.UIToolkitElements;
@@ -106,7 +107,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             Debug.Assert(vPropInfo != null, fieldType);
 
             _saintsRowElement = SaintsRowAttributeDrawer.CreateElement(_vRef, "", vPropInfo,
-                true, new SaintsRowAttribute(inline: true), makeRenderer, doTweenPlayRecorder, parentObj);
+                true, new SaintsRowAttribute(inline: true), makeRenderer, doTweenPlayRecorder, parentObj, new RichTextDrawer.EmptyRichTextTagProvider());
             _referenceContainer.Add(_saintsRowElement);
 
             UpdateExpand(_referenceExpandButton.value);

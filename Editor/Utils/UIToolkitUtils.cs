@@ -818,7 +818,7 @@ namespace SaintsField.Editor.Utils
                     }
 
                     return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout,
-                        null, makeRenderer, doTweenPlayRecorder, parent);
+                        null, makeRenderer, doTweenPlayRecorder, parent, new RichTextDrawer.EmptyRichTextTagProvider());
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:

@@ -1153,7 +1153,6 @@ MonoBehaviour:
   customDt:
     value__SaintsSerialized__:
       propertyType: 5
-      propertyPath: 
       longValue: 0
       uLongValue: 0
       stringValue: 
@@ -1165,7 +1164,6 @@ MonoBehaviour:
     value: 67
     value__SaintsSerialized__:
       propertyType: 0
-      propertyPath: 
       longValue: 0
       uLongValue: 0
       stringValue: 
@@ -1175,7 +1173,6 @@ MonoBehaviour:
       IsVRef: 0
   letUnitySerInt__SaintsSerialized__:
     propertyType: 0
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -1185,7 +1182,6 @@ MonoBehaviour:
     IsVRef: 0
   letUnitySerString__SaintsSerialized__:
     propertyType: 0
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -1195,7 +1191,6 @@ MonoBehaviour:
     IsVRef: 0
   interfaceType__SaintsSerialized__:
     propertyType: 4
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -1208,7 +1203,6 @@ MonoBehaviour:
     - value: 0
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1222,7 +1216,6 @@ MonoBehaviour:
     - value: 1
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1237,7 +1230,6 @@ MonoBehaviour:
     _saintsValues:
     - valueField:
         propertyType: 4
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1250,7 +1242,6 @@ MonoBehaviour:
       wrapType: 1
     - valueField:
         propertyType: 4
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1265,7 +1256,6 @@ MonoBehaviour:
     saintsSerializedVersion: 2
   dateTimeType__SaintsSerialized__:
     propertyType: 5
-    propertyPath: 
     longValue: 638973792000000000
     uLongValue: 0
     stringValue: 
@@ -1275,7 +1265,6 @@ MonoBehaviour:
     IsVRef: 0
   timeSpanType__SaintsSerialized__:
     propertyType: 6
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -1386,7 +1375,6 @@ MonoBehaviour:
     - value: 1
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1400,7 +1388,6 @@ MonoBehaviour:
     - value: 2
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1417,7 +1404,6 @@ MonoBehaviour:
     _saintsList:
     - valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1430,7 +1416,6 @@ MonoBehaviour:
       wrapType: 1
     - valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1450,7 +1435,6 @@ MonoBehaviour:
         sub1: 
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1470,7 +1454,6 @@ MonoBehaviour:
         sub1: 
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1488,7 +1471,6 @@ MonoBehaviour:
     - value: 1
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1502,7 +1484,6 @@ MonoBehaviour:
     - value: 2
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1520,7 +1501,6 @@ MonoBehaviour:
     - value: 1
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1534,7 +1514,6 @@ MonoBehaviour:
     - value: 3
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1554,7 +1533,6 @@ MonoBehaviour:
         sub1: 
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1574,7 +1552,6 @@ MonoBehaviour:
         sub1: 
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -1841,8 +1818,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: _longFlags__SaintsSerialized__.longValue
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: _uLongFlags__SaintsSerialized__.uLongValue
+      value: 49
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPub__SaintsSerialized__.uLongValue
       value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: _uLongNormal__SaintsSerialized__.uLongValue
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPubs__SaintsSerialized__.Array.size
@@ -1855,6 +1844,10 @@ PrefabInstance:
     - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: LongEnumPubArr__SaintsSerialized__.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
+      propertyPath: ULongEnumNormalPub__SaintsSerialized__.uLongValue
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5054142045232435872, guid: f17158a0b14e15c4ab1ed881488a84a1, type: 3}
       propertyPath: ULongEnumPubs__SaintsSerialized__.Array.data[0].VRef
@@ -3550,7 +3543,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.FixUsing
   _interface1__SaintsSerialized__:
     propertyType: 4
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -5193,7 +5185,6 @@ MonoBehaviour:
   s: 
   _dt__SaintsSerialized__:
     propertyType: 5
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -5204,7 +5195,6 @@ MonoBehaviour:
   _dtList__SaintsSerialized__: []
   dt__SaintsSerialized__:
     propertyType: 5
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -5265,7 +5255,6 @@ MonoBehaviour:
     _dtArray__SaintsSerialized__: []
   _dt__SaintsSerialized__:
     propertyType: 6
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -5276,7 +5265,6 @@ MonoBehaviour:
   _dtList__SaintsSerialized__: []
   dt__SaintsSerialized__:
     propertyType: 6
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -5286,7 +5274,6 @@ MonoBehaviour:
     IsVRef: 0
   s__SaintsSerialized__:
     propertyType: 6
-    propertyPath: 
     longValue: 0
     uLongValue: 0
     stringValue: 
@@ -5914,7 +5901,6 @@ MonoBehaviour:
     - value: 1
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -5928,7 +5914,6 @@ MonoBehaviour:
     - value: 2
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -5942,7 +5927,6 @@ MonoBehaviour:
     - value: 3
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -5956,7 +5940,6 @@ MonoBehaviour:
     - value: 5
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -5970,7 +5953,6 @@ MonoBehaviour:
     - value: 4
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -5984,7 +5966,6 @@ MonoBehaviour:
     - value: 6
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -5998,7 +5979,6 @@ MonoBehaviour:
     - value: 7
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6012,7 +5992,6 @@ MonoBehaviour:
     - value: 8
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6026,7 +6005,6 @@ MonoBehaviour:
     - value: 9
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6040,7 +6018,6 @@ MonoBehaviour:
     - value: 10
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6054,7 +6031,6 @@ MonoBehaviour:
     - value: 11
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6068,7 +6044,6 @@ MonoBehaviour:
     - value: 12
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6082,7 +6057,6 @@ MonoBehaviour:
     - value: 13
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6098,7 +6072,6 @@ MonoBehaviour:
     - value: A1
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6112,7 +6085,6 @@ MonoBehaviour:
     - value: B1
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6126,7 +6098,6 @@ MonoBehaviour:
     - value: C3
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6140,7 +6111,6 @@ MonoBehaviour:
     - value: D4
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6154,7 +6124,6 @@ MonoBehaviour:
     - value: D4
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6168,7 +6137,6 @@ MonoBehaviour:
     - value: F6
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6182,7 +6150,6 @@ MonoBehaviour:
     - value: G7
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6196,7 +6163,6 @@ MonoBehaviour:
     - value: H8
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6210,7 +6176,6 @@ MonoBehaviour:
     - value: I9
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6224,7 +6189,6 @@ MonoBehaviour:
     - value: J10
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6238,7 +6202,6 @@ MonoBehaviour:
     - value: K11
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6252,7 +6215,6 @@ MonoBehaviour:
     - value: L12
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -6266,7 +6228,6 @@ MonoBehaviour:
     - value: M13
       valueField:
         propertyType: 0
-        propertyPath: 
         longValue: 0
         uLongValue: 0
         stringValue: 

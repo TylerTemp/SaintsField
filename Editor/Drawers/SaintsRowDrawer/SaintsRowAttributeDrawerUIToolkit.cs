@@ -13,11 +13,9 @@ using SaintsField.Editor.Playa;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
-using SaintsField.Playa;
 using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -46,7 +44,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         public const string SaintsRowClass = "saints-field--saintsrow";
         // private static string NameActualContainer(SerializedProperty property) => $"{property.propertyPath}__saints_row";
 
-        public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
+        public static VisualElement CreateElement(SerializedProperty property, string label, MemberInfo info, bool inHorizontalLayout, SaintsRowAttribute saintsRowAttribute, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent, IRichTextTagProvider richTextTagProvider)
         {
             bool inline = saintsRowAttribute?.Inline ?? false;
 
@@ -108,7 +106,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             root.AddToClassList(SaintsRowClass);
             root.AddToClassList(ClassAllowDisable);
 
-            FillElement(root, label, property, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, parent);
+            FillElement(root, label, property, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, parent, richTextTagProvider);
 
             // ReSharper disable once InvertIf
             if (property.propertyType == SerializedPropertyType.ManagedReference)
@@ -153,7 +151,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
                             SerializedProperty newProp = property.serializedObject.FindProperty(propPath);
 
-                            FillElement(root, label, newProp, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, parent);
+                            FillElement(root, label, newProp, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, parent, richTextTagProvider);
                         }
                         // Debug.Log(property.managedReferenceId);
                     })
@@ -167,7 +165,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         {
             SaintsRowAttribute saintsRowAttribute = saintsAttribute as SaintsRowAttribute;
 
-            VisualElement ele = CreateElement(property, property.displayName, info, InHorizontalLayout, saintsRowAttribute, this, this, parent);
+            VisualElement ele = CreateElement(property, property.displayName, info, InHorizontalLayout, saintsRowAttribute, this, this, parent, this);
             //
             // if (InHorizentalLayout)
             // {
@@ -184,7 +182,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         //         : ((FieldInfo) member).FieldType;
         // }
 
-        private static void FillElement(VisualElement root, string label, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
+        private static void FillElement(VisualElement root, string label, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent, IRichTextTagProvider richTextTagProvider)
         {
             // Debug.Log(info.Name);
             // Debug.Log(info.DeclaringType);
@@ -199,7 +197,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     label = label[..^"__Saints Serialized__".Length];
                 }
                 // Debug.Log($"{info.Name}/{property.propertyPath}/{saintsSerializedActual.Name}/{saintsSerializedActual.ElementType}");
-                VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, (FieldInfo)info, inHorizontalLayout, parent);
+                VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, (FieldInfo)info, inHorizontalLayout, parent, richTextTagProvider);
                 root.Add(renderSerializedActual);
                 return;
             }
@@ -274,7 +272,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                                 root.Clear();
                                 FillElement(root, label, property, info, inHorizontalLayout, makeRenderer,
                                     doTweenPlayRecorder,
-                                    parent);
+                                    parent, richTextTagProvider);
                             }
                         }
                         catch (Exception)
@@ -334,7 +332,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         }
 
         private static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual,
-            string label, SerializedProperty property, FieldInfo serInfo, bool inHorizontalLayout, object parent)
+            string label, SerializedProperty property, FieldInfo serInfo, bool inHorizontalLayout, object parent, IRichTextTagProvider richTextTagProvider)
         {
             // Debug.Log(property.propertyPath);
             Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);
@@ -381,7 +379,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
                     if (enumToggle != null)
                     {
-                        return EnumToggleButtonsAttributeDrawer.RenderSerializedActual(saintsSerializedActual, enumToggle, label, property, serInfo, parent);
+                        return EnumToggleButtonsAttributeDrawer.RenderSerializedActual(saintsSerializedActual, enumToggle, label, property, serInfo, parent, richTextTagProvider);
                     }
                     return TreeDropdownAttributeDrawer.RenderSerializedActual(saintsSerializedActual, (ISaintsAttribute)flagsTreeDropdownAttribute ?? flagsDropdownAttribute, label, property, parent);
                     // return null;

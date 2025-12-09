@@ -1,8 +1,13 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Drawers.ValueButtonsDrawer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
@@ -17,7 +22,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 {
     public partial class EnumToggleButtonsAttributeDrawer: ISaintsSerializedPropertyDrawer
     {
-        public static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual, ISaintsAttribute enumToggle, string label, SerializedProperty property, MemberInfo info, object parent)
+        public static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual, ISaintsAttribute enumToggle, string label, SerializedProperty property, MemberInfo info, object parent, IRichTextTagProvider richTextTagProvider)
         {
             Type targetType = ReflectUtils.SaintsSerializedActualGetType(saintsSerializedActual, parent);
             if (targetType == null)
@@ -31,118 +36,628 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             {
                 case SaintsPropertyType.EnumLong:
                 {
-                    EnumMetaInfo enumMetaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
-                    SerializedProperty subProp = property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
-                    ButtonsULongElement ele = new ButtonsULongElement(enumMetaInfo, property, info, parent, newValue =>
+                    EnumMetaInfo metaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
+                    foreach (EnumMetaInfo.EnumValueInfo metaInfoEnumValue in metaInfo.EnumValues)
                     {
-                        subProp.longValue = Convert.ToInt64(newValue);
-                        subProp.serializedObject.ApplyModifiedProperties();
-                    });
-                    ele.AddToClassList(ClassAllowDisable);
-                    ele.BindProperty(subProp);
-
-                    UnityEvent<bool> expandEvent = new UnityEvent<bool>();
-                    ExpandableButtonsElement wrap = new ExpandableButtonsElement(ele, expandEvent);
-
-                    ButtonsULongField r = new ButtonsULongField(label, wrap);
-                    r.AddToClassList(DropdownFieldULong.alignedFieldUssClassName);
-
-                    UIToolkitUtils.AddContextualMenuManipulator(r, subProp, () => { });
-
-                    VisualElement root = new VisualElement();
-                    root.Add(r);
-
-                    ButtonsULongElement under = new ButtonsULongElement(enumMetaInfo, property, info, parent, newValue =>
+                        Debug.Log(metaInfoEnumValue);
+                    }
+                    if (!metaInfo.IsFlags)
                     {
-                        subProp.longValue = Convert.ToInt64(newValue);
-                        subProp.serializedObject.ApplyModifiedProperties();
-                    })
-                    {
-                        style =
+                        VisualElement container = new VisualElement();
+                        VisualElement nonFlagField = ValueButtonsAttributeDrawer.UtilCreateFieldUIToolKit(label, property);
+                        container.Add(nonFlagField);
+                        VisualElement nonFlagBelow = ValueButtonsAttributeDrawer.UtilCreateBelowUIToolkit(property);
+                        container.Add(nonFlagBelow);
+
+                        EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(ValueButtonsAttributeDrawer.NameField(property));
+                        UIToolkitUtils.AddContextualMenuManipulator(field, property, () => {});
+
+                        HelpBox helpBox = container.Q<HelpBox>(name: ValueButtonsAttributeDrawer.NameHelpBox(property));
+                        ValueButtonsArrangeElement valueButtonsArrangeElement =
+                            container.Q<ValueButtonsArrangeElement>(name: ValueButtonsAttributeDrawer.NameArrange(property));
+                        VisualElement subPanel = container.Q<VisualElement>(name: ValueButtonsAttributeDrawer.NameSubPanel(property));
+                        LeftExpandButton leftExpandButton = container.Q<LeftExpandButton>(name: ValueButtonsAttributeDrawer.NameExpand(property));
+
+                        valueButtonsArrangeElement.BindSubContainer(subPanel);
+
+                        PathedDropdownAttribute valueButtonsAttribute = (PathedDropdownAttribute)enumToggle;
+
+                        RefreshButtons();
+                        if (!string.IsNullOrEmpty(valueButtonsAttribute.FuncName))
                         {
-                            display = DisplayStyle.None,
-                        },
-                    };
-                    under.HToggleButton.style.display = DisplayStyle.None;
-                    under.AddToClassList(ClassAllowDisable);
-                    under.BindProperty(subProp);
-                    root.Add(under);
+                            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshButtons);
+                            valueButtonsArrangeElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshButtons));
+                            valueButtonsArrangeElement.TrackSerializedObjectValue(property.serializedObject, _ => RefreshButtons());
+                        }
+                        valueButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshCurValue());
 
-                    bool expanded = false;
-                    ele.FillEmptyButton.clicked += OnExpandedChanged;
-                    wrap.ExpandButton.clicked += OnExpandedChanged;
-
-                    return root;
-
-                    void OnExpandedChanged()
-                    {
-                        expandEvent.Invoke(expanded = !expanded);
-                        under.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        ele.HToggleButton.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
-                        ele.HCheckAllButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        ele.HEmptyButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        foreach (Button button in ele.ToggleButtons)
+                        valueButtonsArrangeElement.schedule.Execute(() =>
                         {
-                            button.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
+                            subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                            leftExpandButton.RegisterValueChangedCallback(evt =>
+                                subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                            valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                            {
+                                DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
+                                if (leftExpandButton.style.display != display)
+                                {
+                                    leftExpandButton.style.display = display;
+                                }
+                                RefreshCurValue();
+                            });
+                            valueButtonsArrangeElement.OnButtonClicked.AddListener(value =>
+                            {
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue))
+                                    .longValue = (long)value;
+                                // ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
+                                //     parent, value);
+                                // Util.SignPropertyValue(property, info, parent, value);
+                                property.serializedObject.ApplyModifiedProperties();
+                                // onValueChangedCallback.Invoke(value);
+                                RefreshCurValue();
+                            });
+                            RefreshCurValue();
+                        });
+
+                        return container;
+
+                        void RefreshCurValue()
+                        {
+                            long longValue = property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue))
+                                .longValue;
+                            object curValue = Enum.ToObject(metaInfo.EnumType, longValue);
+                            valueButtonsArrangeElement.RefreshCurValue(curValue);
+                            bool leftExpandButtonEnabled = leftExpandButton.enabledSelf;
+                            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                            if (leftExpandButtonEnabled)
+                            {
+                                leftExpandButton.tooltip = $"{curValue} (Click to see all buttons)";
+                            }
+                            else
+                            {
+                                leftExpandButton.tooltip = $"{curValue}";
+                            }
+                        }
+
+                        void RefreshButtons()
+                        {
+                            long longValue = property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue))
+                                .longValue;
+                            object curValue = Enum.ToObject(metaInfo.EnumType, longValue);
+
+                            AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>("");
+                            foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(targetType))
+                            {
+                                // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
+                                HashSet<string> extraSearches = enumRichLabel == enumLabel
+                                    ? new HashSet<string>
+                                    {
+                                        enumValue.ToString(),
+                                    }
+                                    : new HashSet<string>();
+                                enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue)
+                                {
+                                    ExtraSearches = extraSearches,
+                                });
+                            }
+
+                            AdvancedDropdownMetaInfo initMetaInfo = new AdvancedDropdownMetaInfo
+                            {
+                                CurValues = new[]{curValue},
+                                DropdownListValue = enumDropdown,
+                            };
+
+                            UIToolkitUtils.SetHelpBox(helpBox, initMetaInfo.Error);
+                            valueButtonsArrangeElement.UpdateButtons(
+                                initMetaInfo.DropdownListValue
+                                    .Select(each =>
+                                        new ValueButtonRawInfo(
+                                            RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
+                                            each.disabled,
+                                            each.value))
+                                    .ToArray()
+                            );
+                            RefreshCurValue();
+                        }
+
+                    }
+                    else
+                    {
+                        VisualElement container = new VisualElement();
+
+                        VisualElement visualInput = new VisualElement
+                        {
+                            style =
+                            {
+                                flexDirection = FlexDirection.Row,
+                                flexGrow = 1,
+                                flexShrink = 1,
+                            },
+                        };
+
+                        string expandName = NameExpand(property);
+                        LeftExpandButton leftExpandButton = new LeftExpandButton
+                        {
+                            name = expandName,
+                        };
+                        visualInput.Add(leftExpandButton);
+                        leftExpandButton.SetCustomViewDataKey(SerializedUtils.GetUniqueId(property));
+
+                        visualInput.Add(new FlagButtonFullToggleGroupElement
+                        {
+                            name = NameFullToggleGroup(property),
+                        });
+
+                        VisualElement valueButtonsArrangeElementWrapper = new VisualElement
+                        {
+                            style =
+                            {
+                                // flexDirection = FlexDirection.Row,
+                                flexGrow = 1,
+                                flexShrink = 1,
+                            },
+                        };
+                        visualInput.Add(valueButtonsArrangeElementWrapper);
+
+                        FlagButtonsArrangeElement valueButtonsArrangeElement = new FlagButtonsArrangeElement(new FlagButtonsCalcElement(false))
+                        {
+                            name = NameArrange(property),
+                            style =
+                            {
+                                marginRight = 2,
+                            },
+                        };
+                        valueButtonsArrangeElementWrapper.Add(valueButtonsArrangeElement);
+
+                        EmptyPrefabOverrideField r = new EmptyPrefabOverrideField(label, visualInput, property)
+                        {
+                            style =
+                            {
+                                flexGrow = 1,
+                                flexShrink = 1,
+                            },
+                            name = NameField(property),
+                        };
+                        r.AddToClassList(ClassAllowDisable);
+                        r.AddToClassList(EmptyPrefabOverrideField.alignedFieldUssClassName);
+                        container.Add(r);
+
+                        container.Add(ValueButtonsAttributeDrawer.UtilCreateBelowUIToolkit(property));
+
+                        FlagButtonFullToggleGroupElement flagButtonFullToggleGroupElement =
+                            container.Q<FlagButtonFullToggleGroupElement>(name: NameFullToggleGroup(property));
+                        flagButtonFullToggleGroupElement.HToggleButton.clicked += () =>
+                        {
+                            object userData = flagButtonFullToggleGroupElement.HToggleButton.userData;
+                            if (userData == null)
+                            {
+                                Debug.LogWarning("userData for hToggleButton is null, skip");
+                                return;
+                            }
+
+                            SerializedProperty targetProp =
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
+
+                            targetProp.longValue = (long) userData;
+                            property.serializedObject.ApplyModifiedProperties();
+                        };
+                        flagButtonFullToggleGroupElement.HCheckAllButton.clicked += () =>
+                        {
+                            SerializedProperty targetProp =
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
+                            targetProp.longValue = (long)metaInfo.EverythingBit;
+                            property.serializedObject.ApplyModifiedProperties();
+                        };
+                        flagButtonFullToggleGroupElement.HEmptyButton.clicked += () =>
+                        {
+                            SerializedProperty targetProp =
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
+                            targetProp.longValue = 0;
+                            property.serializedObject.ApplyModifiedProperties();
+                        };
+
+                        List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
+
+                        foreach (EnumMetaInfo.EnumValueInfo enumValueInfo in metaInfo.EnumValues)
+                        {
+                            IReadOnlyList<RichTextDrawer.RichTextChunk> chunks;
+                            if (enumValueInfo.OriginalLabel != enumValueInfo.Label)
+                            {
+                                chunks = RichTextDrawer.ParseRichXmlWithProvider(enumValueInfo.Label, richTextTagProvider).ToArray();
+                            }
+                            else
+                            {
+                                chunks = new[]
+                                {
+                                    new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
+                                };
+                            }
+                            rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Value));
+                        }
+
+                        EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));
+                        UIToolkitUtils.AddContextualMenuManipulator(field, property, () => {});
+
+                        FlagButtonsArrangeElement flagButtonsArrangeElement =
+                            container.Q<FlagButtonsArrangeElement>(name: NameArrange(property));
+                        VisualElement subPanel = container.Q<VisualElement>(name: ValueButtonsAttributeDrawer.NameSubPanel(property));
+                        // LeftExpandButton leftExpandButton = container.Q<LeftExpandButton>(name: NameExpand(property));
+                        leftExpandButton.RegisterValueChangedCallback(evt =>
+                            flagButtonFullToggleGroupElement.ToFullToggles(evt.newValue));
+                        flagButtonFullToggleGroupElement.ToFullToggles(leftExpandButton.value);
+
+                        flagButtonsArrangeElement.BindSubContainer(subPanel);
+
+                        flagButtonsArrangeElement.UpdateButtons(
+                            rawInfos
+                        );
+                        RefreshCurValue();
+
+                        flagButtonsArrangeElement.schedule.Execute(() =>
+                        {
+                            subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                            leftExpandButton.RegisterValueChangedCallback(evt =>
+                                subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                            flagButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                            {
+                                // leftExpandButton.SetEnabled(hasSubRow);
+                                DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
+                                if (leftExpandButton.style.display != display)
+                                {
+                                    leftExpandButton.style.display = display;
+                                }
+                                RefreshCurValue();
+                            });
+                            flagButtonsArrangeElement.OnButtonClicked.AddListener(value =>
+                            {
+                                long toggle = (long)value;
+
+                                SerializedProperty targetProp =
+                                    property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
+                                long newValue = EnumFlagsUtil.ToggleBit(targetProp.longValue, toggle);
+
+                                targetProp.longValue = newValue;
+                                property.serializedObject.ApplyModifiedProperties();
+                            });
+                            RefreshCurValue();
+                            flagButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshCurValue());
+                        });
+
+                        flagButtonsArrangeElement.TrackPropertyValue(property, _ => {});
+
+                        return container;
+
+                        void RefreshCurValue()
+                        {
+                            SerializedProperty targetProp =
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
+                            long curValue = targetProp.longValue;
+
+                            flagButtonsArrangeElement.RefreshCurValue(curValue);
+                            flagButtonFullToggleGroupElement.RefreshValue(curValue, metaInfo);
+
+                            bool leftExpandButtonEnabled = leftExpandButton.enabledSelf;
+                            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                            if (leftExpandButtonEnabled)
+                            {
+                                leftExpandButton.tooltip = $"{curValue} (Click to see all buttons)";
+                            }
+                            else
+                            {
+                                leftExpandButton.tooltip = $"{curValue}";
+                            }
                         }
                     }
                 }
 #if UNITY_2022_1_OR_NEWER
                 case SaintsPropertyType.EnumULong:
                 {
-                    EnumMetaInfo enumMetaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
-                    SerializedProperty subProp = property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
-                    ButtonsULongElement ele = new ButtonsULongElement(enumMetaInfo, property, info, parent, newValue =>
+                    EnumMetaInfo metaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
+                    if (!metaInfo.IsFlags)
                     {
-                        subProp.ulongValue = Convert.ToUInt64(newValue);
-                        subProp.serializedObject.ApplyModifiedProperties();
-                    });
-                    ele.AddToClassList(ClassAllowDisable);
-                    ele.BindProperty(subProp);
+                        VisualElement container = new VisualElement();
+                        VisualElement nonFlagField = ValueButtonsAttributeDrawer.UtilCreateFieldUIToolKit(label, property);
+                        container.Add(nonFlagField);
+                        VisualElement nonFlagBelow = ValueButtonsAttributeDrawer.UtilCreateBelowUIToolkit(property);
+                        container.Add(nonFlagBelow);
 
-                    UnityEvent<bool> expandEvent = new UnityEvent<bool>();
+                        EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(ValueButtonsAttributeDrawer.NameField(property));
+                        UIToolkitUtils.AddContextualMenuManipulator(field, property, () => {});
 
-                    ExpandableButtonsElement wrap = new ExpandableButtonsElement(ele, expandEvent);
-                    ButtonsULongField r = new ButtonsULongField(label, wrap);
-                    r.AddToClassList(DropdownFieldULong.alignedFieldUssClassName);
+                        HelpBox helpBox = container.Q<HelpBox>(name: ValueButtonsAttributeDrawer.NameHelpBox(property));
+                        ValueButtonsArrangeElement valueButtonsArrangeElement =
+                            container.Q<ValueButtonsArrangeElement>(name: ValueButtonsAttributeDrawer.NameArrange(property));
+                        VisualElement subPanel = container.Q<VisualElement>(name: ValueButtonsAttributeDrawer.NameSubPanel(property));
+                        LeftExpandButton leftExpandButton = container.Q<LeftExpandButton>(name: ValueButtonsAttributeDrawer.NameExpand(property));
 
-                    UIToolkitUtils.AddContextualMenuManipulator(r, subProp, () => { });
+                        valueButtonsArrangeElement.BindSubContainer(subPanel);
 
-                    VisualElement root = new VisualElement();
-                    root.Add(r);
+                        PathedDropdownAttribute valueButtonsAttribute = (PathedDropdownAttribute)enumToggle;
 
-                    ButtonsULongElement under = new ButtonsULongElement(enumMetaInfo, property, info, parent, newValue =>
-                    {
-                        subProp.ulongValue = Convert.ToUInt64(newValue);
-                        subProp.serializedObject.ApplyModifiedProperties();
-                    })
-                    {
-                        style =
+                        RefreshButtons();
+                        if (!string.IsNullOrEmpty(valueButtonsAttribute.FuncName))
                         {
-                            display = DisplayStyle.None,
-                        },
-                    };
-                    under.HToggleButton.style.display = DisplayStyle.None;
-                    under.AddToClassList(ClassAllowDisable);
-                    under.BindProperty(subProp);
-                    root.Add(under);
+                            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshButtons);
+                            valueButtonsArrangeElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshButtons));
+                            valueButtonsArrangeElement.TrackSerializedObjectValue(property.serializedObject, _ => RefreshButtons());
+                        }
+                        valueButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshCurValue());
 
-                    bool expanded = false;
-                    ele.FillEmptyButton.clicked += OnExpandedChanged;
-                    wrap.ExpandButton.clicked += OnExpandedChanged;
-
-                    return root;
-
-                    void OnExpandedChanged()
-                    {
-                        expandEvent.Invoke(expanded = !expanded);
-                        under.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        ele.HToggleButton.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
-                        ele.HCheckAllButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        ele.HEmptyButton.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
-                        foreach (Button button in ele.ToggleButtons)
+                        valueButtonsArrangeElement.schedule.Execute(() =>
                         {
-                            button.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
+                            subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                            leftExpandButton.RegisterValueChangedCallback(evt =>
+                                subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                            valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                            {
+                                DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
+                                if (leftExpandButton.style.display != display)
+                                {
+                                    leftExpandButton.style.display = display;
+                                }
+                                RefreshCurValue();
+                            });
+                            valueButtonsArrangeElement.OnButtonClicked.AddListener(value =>
+                            {
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue))
+                                    .ulongValue = (ulong)value;
+                                // ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
+                                //     parent, value);
+                                // Util.SignPropertyValue(property, info, parent, value);
+                                property.serializedObject.ApplyModifiedProperties();
+                                // onValueChangedCallback.Invoke(value);
+                                RefreshCurValue();
+                            });
+                            RefreshCurValue();
+                        });
+
+                        return container;
+
+                        void RefreshCurValue()
+                        {
+                            ulong longValue = property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue))
+                                .ulongValue;
+                            object curValue = Enum.ToObject(metaInfo.EnumType, longValue);
+                            valueButtonsArrangeElement.RefreshCurValue(curValue);
+                            bool leftExpandButtonEnabled = leftExpandButton.enabledSelf;
+                            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                            if (leftExpandButtonEnabled)
+                            {
+                                leftExpandButton.tooltip = $"{curValue} (Click to see all buttons)";
+                            }
+                            else
+                            {
+                                leftExpandButton.tooltip = $"{curValue}";
+                            }
+                        }
+
+                        void RefreshButtons()
+                        {
+                            ulong longValue = property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue))
+                                .ulongValue;
+                            object curValue = Enum.ToObject(metaInfo.EnumType, longValue);
+
+                            AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>("");
+                            foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(targetType))
+                            {
+                                // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
+                                HashSet<string> extraSearches = enumRichLabel == enumLabel
+                                    ? new HashSet<string>
+                                    {
+                                        enumValue.ToString(),
+                                    }
+                                    : new HashSet<string>();
+                                enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue)
+                                {
+                                    ExtraSearches = extraSearches,
+                                });
+                            }
+
+                            AdvancedDropdownMetaInfo initMetaInfo = new AdvancedDropdownMetaInfo
+                            {
+                                CurValues = new[]{curValue},
+                                DropdownListValue = enumDropdown,
+                            };
+
+                            UIToolkitUtils.SetHelpBox(helpBox, initMetaInfo.Error);
+                            valueButtonsArrangeElement.UpdateButtons(
+                                initMetaInfo.DropdownListValue
+                                    .Select(each =>
+                                        new ValueButtonRawInfo(
+                                            RichTextDrawer.ParseRichXmlWithProvider(each.displayName, richTextTagProvider).ToArray(),
+                                            each.disabled,
+                                            each.value))
+                                    .ToArray()
+                            );
+                            RefreshCurValue();
+                        }
+
+                    }
+                    else
+                    {
+                        VisualElement container = new VisualElement();
+
+                        VisualElement visualInput = new VisualElement
+                        {
+                            style =
+                            {
+                                flexDirection = FlexDirection.Row,
+                                flexGrow = 1,
+                                flexShrink = 1,
+                            },
+                        };
+
+                        string expandName = NameExpand(property);
+                        LeftExpandButton leftExpandButton = new LeftExpandButton
+                        {
+                            name = expandName,
+                        };
+                        visualInput.Add(leftExpandButton);
+                        leftExpandButton.SetCustomViewDataKey(SerializedUtils.GetUniqueId(property));
+
+                        visualInput.Add(new FlagButtonFullToggleGroupElement
+                        {
+                            name = NameFullToggleGroup(property),
+                        });
+
+                        VisualElement valueButtonsArrangeElementWrapper = new VisualElement
+                        {
+                            style =
+                            {
+                                // flexDirection = FlexDirection.Row,
+                                flexGrow = 1,
+                                flexShrink = 1,
+                            },
+                        };
+                        visualInput.Add(valueButtonsArrangeElementWrapper);
+
+                        FlagButtonsArrangeElement valueButtonsArrangeElement = new FlagButtonsArrangeElement(new FlagButtonsCalcElement(false))
+                        {
+                            name = NameArrange(property),
+                            style =
+                            {
+                                marginRight = 2,
+                            },
+                        };
+                        valueButtonsArrangeElementWrapper.Add(valueButtonsArrangeElement);
+
+                        EmptyPrefabOverrideField r = new EmptyPrefabOverrideField(label, visualInput, property)
+                        {
+                            style =
+                            {
+                                flexGrow = 1,
+                                flexShrink = 1,
+                            },
+                            name = NameField(property),
+                        };
+                        r.AddToClassList(ClassAllowDisable);
+                        r.AddToClassList(EmptyPrefabOverrideField.alignedFieldUssClassName);
+                        container.Add(r);
+
+                        container.Add(ValueButtonsAttributeDrawer.UtilCreateBelowUIToolkit(property));
+
+                        FlagButtonFullToggleGroupElement flagButtonFullToggleGroupElement =
+                            container.Q<FlagButtonFullToggleGroupElement>(name: NameFullToggleGroup(property));
+                        flagButtonFullToggleGroupElement.HToggleButton.clicked += () =>
+                        {
+                            object userData = flagButtonFullToggleGroupElement.HToggleButton.userData;
+                            if (userData == null)
+                            {
+                                Debug.LogWarning("userData for hToggleButton is null, skip");
+                                return;
+                            }
+
+                            SerializedProperty targetProp =
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
+
+                            targetProp.ulongValue = (ulong) userData;
+                            property.serializedObject.ApplyModifiedProperties();
+                        };
+                        flagButtonFullToggleGroupElement.HCheckAllButton.clicked += () =>
+                        {
+                            SerializedProperty targetProp =
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
+                            targetProp.ulongValue = (ulong)metaInfo.EverythingBit;
+                            property.serializedObject.ApplyModifiedProperties();
+                        };
+                        flagButtonFullToggleGroupElement.HEmptyButton.clicked += () =>
+                        {
+                            SerializedProperty targetProp =
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
+                            targetProp.ulongValue = 0;
+                            property.serializedObject.ApplyModifiedProperties();
+                        };
+
+                        List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
+
+                        foreach (EnumMetaInfo.EnumValueInfo enumValueInfo in metaInfo.EnumValues)
+                        {
+                            IReadOnlyList<RichTextDrawer.RichTextChunk> chunks;
+                            if (enumValueInfo.OriginalLabel != enumValueInfo.Label)
+                            {
+                                chunks = RichTextDrawer.ParseRichXmlWithProvider(enumValueInfo.Label, richTextTagProvider).ToArray();
+                            }
+                            else
+                            {
+                                chunks = new[]
+                                {
+                                    new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
+                                };
+                            }
+                            rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Value));
+                        }
+
+                        EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));
+                        UIToolkitUtils.AddContextualMenuManipulator(field, property, () => {});
+
+                        FlagButtonsArrangeElement flagButtonsArrangeElement =
+                            container.Q<FlagButtonsArrangeElement>(name: NameArrange(property));
+                        VisualElement subPanel = container.Q<VisualElement>(name: ValueButtonsAttributeDrawer.NameSubPanel(property));
+                        // LeftExpandButton leftExpandButton = container.Q<LeftExpandButton>(name: NameExpand(property));
+                        leftExpandButton.RegisterValueChangedCallback(evt =>
+                            flagButtonFullToggleGroupElement.ToFullToggles(evt.newValue));
+                        flagButtonFullToggleGroupElement.ToFullToggles(leftExpandButton.value);
+
+                        flagButtonsArrangeElement.BindSubContainer(subPanel);
+
+                        flagButtonsArrangeElement.UpdateButtons(
+                            rawInfos
+                        );
+                        RefreshCurValue();
+
+                        flagButtonsArrangeElement.schedule.Execute(() =>
+                        {
+                            subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                            leftExpandButton.RegisterValueChangedCallback(evt =>
+                                subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                            flagButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                            {
+                                // leftExpandButton.SetEnabled(hasSubRow);
+                                DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
+                                if (leftExpandButton.style.display != display)
+                                {
+                                    leftExpandButton.style.display = display;
+                                }
+                                RefreshCurValue();
+                            });
+                            flagButtonsArrangeElement.OnButtonClicked.AddListener(value =>
+                            {
+                                ulong toggle = (ulong)value;
+
+                                SerializedProperty targetProp =
+                                    property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
+                                ulong newValue = EnumFlagsUtil.ToggleBit(targetProp.ulongValue, toggle);
+
+                                targetProp.ulongValue = newValue;
+                                property.serializedObject.ApplyModifiedProperties();
+                            });
+                            RefreshCurValue();
+                            flagButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshCurValue());
+                        });
+
+                        flagButtonsArrangeElement.TrackPropertyValue(property, _ => {});
+
+                        return container;
+
+                        void RefreshCurValue()
+                        {
+                            SerializedProperty targetProp =
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
+                            ulong curValue = targetProp.ulongValue;
+
+                            flagButtonsArrangeElement.RefreshCurValue(curValue);
+                            flagButtonFullToggleGroupElement.RefreshValue(curValue, metaInfo);
+
+                            bool leftExpandButtonEnabled = leftExpandButton.enabledSelf;
+                            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                            if (leftExpandButtonEnabled)
+                            {
+                                leftExpandButton.tooltip = $"{curValue} (Click to see all buttons)";
+                            }
+                            else
+                            {
+                                leftExpandButton.tooltip = $"{curValue}";
+                            }
                         }
                     }
                 }

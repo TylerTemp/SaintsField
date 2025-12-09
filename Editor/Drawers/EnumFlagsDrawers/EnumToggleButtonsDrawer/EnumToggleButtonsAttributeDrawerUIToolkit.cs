@@ -25,18 +25,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             }
         }
 
-        // private static string NameEnumFlags(SerializedProperty property) => $"{property.propertyPath}__EnumFlags";
-        // private static string NameFoldout(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Foldout";
-        // private static string NameFillEmpty(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_FillEmpty";
-        // private static string NameToggleButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleButton";
-        // // private static string NameQuickCheckButtons(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_QuickCheckButtons";
-        // private static string NameCheckAllButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_CheckAllButton";
-        // private static string NameEmptyButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_EmptyButton";
-        // private static string NameBelowAll(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_Below";
-        // // private static string NameSetNoneButtonImage(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_SetNoneButtonImage";
-        //
-        // private static string ClassToggleBitButton(SerializedProperty property) => $"{property.propertyPath}__EnumFlags_ToggleBitButton";
-
         private static string NameExpand(SerializedProperty sp) => $"{sp.propertyPath}__EnumToggleButtons_Expand";
         private static string NameArrange(SerializedProperty sp) => $"{sp.propertyPath}__EnumToggleButtons_Arrange";
         private static string NameField(SerializedProperty sp) => $"{sp.propertyPath}__EnumToggleButtons_Field";
@@ -94,13 +82,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             };
             visualInput.Add(valueButtonsArrangeElementWrapper);
 
-            // root.Add(leftExpandButton);
             FlagButtonsArrangeElement valueButtonsArrangeElement = new FlagButtonsArrangeElement(new FlagButtonsCalcElement(false))
             {
                 name = NameArrange(property),
                 style =
                 {
-                    // height = 22,
                     marginRight = 2,
                 },
             };
@@ -114,9 +100,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     flexShrink = 1,
                 },
                 name = NameField(property),
-                // bindingPath = property.propertyPath,
             };
-            // r.BindProperty(property);
             r.AddToClassList(ClassAllowDisable);
             r.AddToClassList(EmptyPrefabOverrideField.alignedFieldUssClassName);
             return r;
@@ -172,9 +156,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
             List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
 
-            // var underType = rawType.GetEnumUnderlyingType();
-
-            // int everythingBit = (int)metaInfo.AllCheckedInt;
             foreach (EnumMetaInfo.EnumValueInfo enumValueInfo in metaInfo.EnumValues)
             {
                 IReadOnlyList<RichTextDrawer.RichTextChunk> chunks;
@@ -195,7 +176,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
-            // HelpBox helpBox = container.Q<HelpBox>(name: ValueButtonsAttributeDrawer.NameHelpBox(property));
             FlagButtonsArrangeElement flagButtonsArrangeElement =
                 container.Q<FlagButtonsArrangeElement>(name: NameArrange(property));
             VisualElement subPanel = container.Q<VisualElement>(name: ValueButtonsAttributeDrawer.NameSubPanel(property));
@@ -263,179 +243,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     leftExpandButton.tooltip = $"{curValue}";
                 }
             }
-            // Button toggleButton = container.Q<Button>(name: NameToggleButton(property));
-            // if (EnumFlagsUtil.IsOn(property.intValue, metaInfo.AllCheckedInt))
-            // {
-            //     toggleButton.userData = 1;  // 1=all
-            // }
-            // else if (property.intValue == 0)
-            // {
-            //     toggleButton.userData = 0;  // 0=none
-            // }
-            // else
-            // {
-            //     toggleButton.userData = -1;  // -1=indeterminate
-            // }
-            // toggleButton.clicked += () =>
-            // {
-            //     int curToggleState = (int) toggleButton.userData;
-            //
-            //     // if (!metaInfo.HasFlags)
-            //     // {
-            //     //     property.intValue = curToggleState;
-            //     //     property.serializedObject.ApplyModifiedProperties();
-            //     //     onValueChangedCallback.Invoke(curToggleState);
-            //     //     return;
-            //     // }
-            //
-            //     switch (curToggleState)
-            //     {
-            //         case 0:  // none to all
-            //             property.intValue = metaInfo.AllCheckedInt;
-            //             toggleButton.userData = 1;
-            //             property.serializedObject.ApplyModifiedProperties();
-            //             onValueChangedCallback.Invoke(metaInfo.AllCheckedInt);
-            //             break;
-            //         case 1:  // all to none
-            //         case -1:  // indeterminate to none
-            //             property.intValue = 0;
-            //             toggleButton.userData = 0;
-            //             property.serializedObject.ApplyModifiedProperties();
-            //             onValueChangedCallback.Invoke(0);
-            //             break;
-            //         default:
-            //             throw new ArgumentOutOfRangeException(nameof(curToggleState), curToggleState, null);
-            //     }
-            // };
-            //
-            // Button checkAllButton = container.Q<Button>(name: NameCheckAllButton(property));
-            // checkAllButton.clicked += () =>
-            // {
-            //     property.intValue = metaInfo.AllCheckedInt;
-            //     property.serializedObject.ApplyModifiedProperties();
-            //     onValueChangedCallback.Invoke(metaInfo.AllCheckedInt);
-            // };
-            //
-            // Button emptyButton = container.Q<Button>(name: NameEmptyButton(property));
-            // emptyButton.clicked += () =>
-            // {
-            //     property.intValue = 0;
-            //     property.serializedObject.ApplyModifiedProperties();
-            //     onValueChangedCallback.Invoke(0);
-            // };
-            //
-            // IReadOnlyList<Button> toggleBitButtons = container.Query<Button>(className: ClassToggleBitButton(property)).ToList();
-            //
-            // foreach (Button button in toggleBitButtons)
-            // {
-            //     button.clicked += () =>
-            //     {
-            //         int toggle = (int)button.userData;
-            //
-            //         int newValue =
-            //             metaInfo.HasFlags
-            //                 ? EnumFlagsUtil.ToggleBit(property.intValue, toggle)
-            //                 : toggle;
-            //
-            //         property.intValue = newValue;
-            //         // Debug.Log($"new={newValue}");
-            //         property.serializedObject.ApplyModifiedProperties();
-            //         // RefreshDisplay(toggleButton, toggleBitButtons, metaInfo.AllCheckedInt, newValue);
-            //         onValueChangedCallback.Invoke(newValue);
-            //     };
-            // }
-            //
-            // EnumFlagsField enumFlagsField = container.Q<EnumFlagsField>();
-            //
-            // IReadOnlyList<Button> toggleBitFieldButtons = enumFlagsField
-            //     .Query<Button>(className: ClassToggleBitButton(property))
-            //     .ToList();
-            // VisualElement belowAllElement = container.Q<VisualElement>(name: NameBelowAll(property));
-            // Button foldoutButton = container.Q<Button>(name: NameFoldout(property));
-            // bool curExpanded = property.isExpanded;
-            // if (property.isExpanded != curExpanded)
-            // {
-            //     property.isExpanded = curExpanded;
-            // }
-            //
-            // RefreshDisplayToggle(curExpanded, toggleButton, checkAllButton, emptyButton, toggleBitFieldButtons,
-            //     belowAllElement, foldoutButton);
-            // foldoutButton.clicked += () =>
-            // {
-            //     bool nowExpanded = property.isExpanded = !property.isExpanded;
-            //     RefreshDisplayToggle(nowExpanded, toggleButton, checkAllButton, emptyButton, toggleBitFieldButtons,
-            //         belowAllElement, foldoutButton);
-            // };
-            //
-            // Button fillEmptyButton = container.Q<Button>(name: NameFillEmpty(property));
-            // fillEmptyButton.clicked += () =>
-            // {
-            //     bool nowExpanded = property.isExpanded = !property.isExpanded;
-            //     RefreshDisplayToggle(nowExpanded, toggleButton, checkAllButton, emptyButton, toggleBitFieldButtons,
-            //         belowAllElement, foldoutButton);
-            // };
-            //
-            // enumFlagsField.labelElement.RegisterCallback<ClickEvent>(_ =>
-            // {
-            //     bool nowExpanded = property.isExpanded = !property.isExpanded;
-            //     RefreshDisplayToggle(nowExpanded, toggleButton, checkAllButton, emptyButton, toggleBitFieldButtons,
-            //         belowAllElement, foldoutButton);
-            // });
-            //
-            // foldoutButton.TrackPropertyValue(property, _ => RefreshDisplay(toggleButton, checkAllButton, emptyButton, toggleBitButtons, metaInfo.HasFlags, metaInfo.AllCheckedInt, property.intValue));
-            //
-            // RefreshDisplay(toggleButton, checkAllButton, emptyButton, toggleBitButtons, metaInfo.HasFlags, metaInfo.AllCheckedInt, property.intValue);
         }
-
-        // private void RefreshDisplay(Button toggleButton, Button checkAllButton, Button emptyButton, IEnumerable<Button> toggleBitButtons, bool hasFlags, int allCheckedInt, int currentInt)
-        // {
-        //     if (currentInt == 0)
-        //     {
-        //         toggleButton.style.backgroundImage = _checkboxEmptyTexture2D;
-        //         toggleButton.userData = 0;
-        //
-        //         emptyButton.SetEnabled(false);
-        //         checkAllButton.SetEnabled(true);
-        //     }
-        //     else if (EnumFlagsUtil.IsOn(currentInt, allCheckedInt))
-        //     {
-        //         toggleButton.style.backgroundImage = _checkboxCheckedTexture2D;
-        //         toggleButton.userData = 1;
-        //
-        //         emptyButton.SetEnabled(true);
-        //         checkAllButton.SetEnabled(false);
-        //
-        //     }
-        //     else
-        //     {
-        //         toggleButton.style.backgroundImage = _checkboxIndeterminateTexture2D;
-        //         toggleButton.userData = -1;
-        //
-        //         emptyButton.SetEnabled(true);
-        //         checkAllButton.SetEnabled(true);
-        //     }
-        //
-        //     foreach (Button bitButton in toggleBitButtons)
-        //     {
-        //         int buttonMask = (int) bitButton.userData;
-        //         bool on = hasFlags? EnumFlagsUtil.IsOn(currentInt, buttonMask): currentInt == buttonMask;
-        //         SetBitButtonStyle(bitButton, on);
-        //     }
-        // }
-        //
-        // private static void RefreshDisplayToggle(bool isExpanded, Button toggleButton, Button checkAllButton, Button emptyButton, IEnumerable<Button> toggleBitFieldButtons, VisualElement belowAllElement, Button foldoutButton)
-        // {
-        //     belowAllElement.style.display = isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
-        //     foldoutButton.style.rotate = new StyleRotate(new Rotate(isExpanded ? -90 : 0));
-        //
-        //     foreach (Button toggleBitFieldButton in toggleBitFieldButtons)
-        //     {
-        //         toggleBitFieldButton.style.display = isExpanded ? DisplayStyle.None : DisplayStyle.Flex;
-        //     }
-        //     toggleButton.style.display = isExpanded ? DisplayStyle.None : DisplayStyle.Flex;
-        //     checkAllButton.style.display = isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
-        //     emptyButton.style.display = isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
-        // }
     }
 }
 #endif

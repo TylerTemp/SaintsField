@@ -22,11 +22,11 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
     [CustomPropertyDrawer(typeof(PairsValueButtonsAttribute), true)]
     public partial class ValueButtonsAttributeDrawer: SaintsPropertyDrawer
     {
-        private static string NameField(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Field";
-        private static string NameArrange(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Arrange";
-        private static string NameExpand(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Expand";
+        public static string NameField(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Field";
+        public static string NameArrange(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Arrange";
+        public static string NameExpand(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_Expand";
         public static string NameSubPanel(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_SubPanel";
-        private static string NameHelpBox(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_HelpBox";
+        public static string NameHelpBox(SerializedProperty sp) => $"{sp.propertyPath}__ValueButtons_HelpBox";
 
         // private RichTextDrawer _richTextDrawer;
 
@@ -135,7 +135,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             UtilOnAwakeUIToolkit(this, property, saintsAttribute, container, onValueChangedCallback,
                 info, parent);
 
-        public static void UtilOnAwakeUIToolkit(IRichTextTagProvider richTextTagProvider, SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        public static void UtilOnAwakeUIToolkit(IRichTextTagProvider richTextTagProvider, SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement container, Action<object> onValueChangedCallback, MemberInfo info, object parent)
         {
             EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));

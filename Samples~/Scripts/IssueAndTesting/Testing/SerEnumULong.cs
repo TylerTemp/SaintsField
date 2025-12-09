@@ -8,7 +8,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
     public partial class SerEnumULong : SaintsMonoBehaviour
     {
-        [Serializable, Flags]
+        // [Serializable]
+        [Flags]
         public enum LongEnum: long
         {
             First = 1,
@@ -16,7 +17,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             M12 = First | Second,
         }
 
-        [Serializable, Flags]
+        // [Serializable]
+        [Flags]
         public enum TestULongEnum: ulong
         {
             No = 0,
@@ -31,13 +33,26 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             First3 = First | Second | Third,
         }
 
-        [Serializable]
+        // [Serializable]
         public enum TestULongEnumNormal: ulong
         {
             First = 1,
             Second,
             Third,
         }
+
+        // [Serializable]
+        public enum TestLongEnumNormal: long
+        {
+            First = 1,
+            Second,
+            Third,
+        }
+
+        [SaintsSerialized, EnumToggleButtons] private TestLongEnumNormal _longNormal;
+        [SaintsSerialized, EnumToggleButtons] private LongEnum _longFlags;
+        [SaintsSerialized, EnumToggleButtons] private TestULongEnumNormal _uLongNormal;
+        [SaintsSerialized, EnumToggleButtons] private TestULongEnum _uLongFlags;
 
         [NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalNoButton;
 
@@ -97,12 +112,5 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         }
 
         public Nested2 nested2;
-
-        // [Button]
-        // private void InspectIt()
-        // {
-        //     Debug.Log(ULongEnumPubArr);
-        //     Debug.Log(ULongEnumPubArr == null);
-        // }
     }
 }

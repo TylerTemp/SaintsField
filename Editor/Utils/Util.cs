@@ -8,6 +8,7 @@ using SaintsField.Condition;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
+using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.Events;
@@ -389,6 +390,22 @@ namespace SaintsField.Editor.Utils
                     (string error, int _, object value) = GetValue(property, fieldInfo, parent);
                     if (error == "" && value is IWrapProp)
                     {
+                        if (value is SaintsSerializedProperty saintsSerializedProperty)
+                        {
+                            if (saintsSerializedProperty.propertyType == SaintsPropertyType.EnumLong)
+                            {
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)).longValue =
+                                    (long)newValue;
+                                break;
+                            }
+
+                            if (saintsSerializedProperty.propertyType == SaintsPropertyType.EnumULong)
+                            {
+                                property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue)).ulongValue =
+                                    (ulong)newValue;
+                                break;
+                            }
+                        }
                         string propName = ReflectUtils.GetIWrapPropName(value.GetType());
                         SerializedProperty wrapProperty = property.FindPropertyRelative(propName) ??
                                                           SerializedUtils.FindPropertyByAutoPropertyName(property,

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Playa;
@@ -160,7 +161,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             Debug.Assert(vPropInfo != null, nonUnityType);
 
             _saintsRowElement = SaintsRowAttributeDrawer.CreateElement(vRef, "", vPropInfo,
-                true, new SaintsRowAttribute(inline: true), makeRenderer, doTweenPlayRecorder, parentObj);
+                true, new SaintsRowAttribute(inline: true), makeRenderer, doTweenPlayRecorder, parentObj, new RichTextDrawer.EmptyRichTextTagProvider());
             _referenceContainer.Add(_saintsRowElement);
 
             UpdateExpand(referenceExpandButton.value);

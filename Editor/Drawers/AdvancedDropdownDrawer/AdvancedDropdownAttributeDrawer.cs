@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -47,7 +48,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        public static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, PathedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj, bool isImGui, bool flat=false)
+        public static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, PathedDropdownAttribute advancedDropdownAttribute, MemberInfo field, object parentObj, bool isImGui, bool flat=false)
         {
             string funcName = advancedDropdownAttribute.FuncName;
 
@@ -78,7 +79,15 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
             else if (funcName is null)
             {
-                Type elementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
+                Type memberInfoType = field is FieldInfo fInfo
+                    ? fInfo.FieldType
+                    : ((PropertyInfo)field).PropertyType;
+
+                Type elementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                    ? ReflectUtils.GetElementType(memberInfoType)
+                    : memberInfoType;
+
+                // Debug.Log(elementType);
                 if (elementType == typeof(bool))
                 {
                     AdvancedDropdownList<object> boolDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "")
@@ -274,7 +283,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             };
         }
 
-        private static (string error, IAdvancedDropdownList dropdownList) GetUniqueList(IAdvancedDropdownList dropdownListValue, EUnique eUnique, object curValue, SerializedProperty property, FieldInfo info, object parent)
+        private static (string error, IAdvancedDropdownList dropdownList) GetUniqueList(IAdvancedDropdownList dropdownListValue, EUnique eUnique, object curValue, SerializedProperty property, MemberInfo info, object parent)
         {
             if(eUnique == EUnique.None)
             {
