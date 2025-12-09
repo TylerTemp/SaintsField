@@ -132,7 +132,13 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             }
 
             string content =
-                $"{animatorStateInfo.state.name}<color=grey>{(animatorStateInfo.animationClip == null ? "" : $" ({animatorStateInfo.animationClip.name})")}: {animatorStateInfo.layer.name}{(animatorStateInfo.subStateMachineNameChain.Count == 0 ? "" : $"/{string.Join('/', animatorStateInfo.subStateMachineNameChain)}")}</color>";
+                $"{animatorStateInfo.state.name}" +
+                $"<color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>" +
+                (animatorStateInfo.animationClip == null ? "" : $" ({animatorStateInfo.animationClip.name})") +
+                ": " +
+                animatorStateInfo.layer.name +
+                (animatorStateInfo.subStateMachineNameChain.Count == 0 ? "" : $"/{string.Join('/', animatorStateInfo.subStateMachineNameChain)}") +
+                "</color>";
             chunks.Add(new RichTextDrawer.RichTextChunk(content, false, content));
 
             UIToolkitUtils.SetLabel(label, chunks, richTextDrawer);
