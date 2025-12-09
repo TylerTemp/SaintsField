@@ -2,6 +2,13 @@ fileFormatVersion: 2
 guid: 66cc772529837ac428e4de456675e426
 labels:
 - RoslynAnalyzer
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 
+  assetPath: Assets/SaintsField/Dll/SaintsFieldSourceGenerator.dll
+  uploadId: 0
 PluginImporter:
   externalObjects: {}
   serializedVersion: 3
@@ -10,8 +17,8 @@ PluginImporter:
   defineConstraints: []
   isPreloaded: 0
   isOverridable: 0
-  isExplicitlyReferenced: 1
-  validateReferences: 0
+  isExplicitlyReferenced: 0
+  validateReferences: 1
   platformData:
     Any:
       enabled: 0
@@ -50,10 +57,3 @@ PluginImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 269741
-  packageName: Saints Field
-  packageVersion: 
-  assetPath: Assets/SaintsField/Dll/SaintsFieldSourceGenerator.dll
-  uploadId: 0

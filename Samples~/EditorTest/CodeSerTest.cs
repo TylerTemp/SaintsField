@@ -11,11 +11,11 @@ namespace SaintsField.Samples.EditorTest
     {
 
 #if SAINTSFIELD_NEWTONSOFT_JSON
-        [Button]
-        private SerializedInfo[] T()
-        {
-            return SaintsEditorUtils.GetSaintsSerialized(typeof(SerEnumULong)).ToArray();
-        }
+        // [Button]
+        // private SerializedInfo[] T()
+        // {
+        //     return SaintsEditorUtils.GetSaintsSerialized(typeof(SerEnumULong)).ToArray();
+        // }
 #endif
     }
 }
