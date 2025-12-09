@@ -136,7 +136,7 @@ namespace SaintsField.Editor.Utils
         [PlayaDisableIf(nameof(CodeAnalysisInstalled))]
         private void InstallCodeAnalysis()
         {
-
+#if SAINTSFIELD_NEWTONSOFT_JSON
             string content = File.ReadAllText(ManifestFile);
             Manifest manifest = JsonConvert.DeserializeObject<Manifest>(content);
             bool foundDependences = false;
@@ -217,6 +217,7 @@ namespace SaintsField.Editor.Utils
             Debug.Log(jsonResult);
             _loadingCodeAnalysis = true;
             File.WriteAllText(ManifestFile, jsonResult + "\n");
+#endif
         }
 
         private static List<string> MergeList(List<string> scopes, ICollection<string> toAdd)
@@ -254,6 +255,7 @@ namespace SaintsField.Editor.Utils
         [PlayaEnableIf(nameof(CodeAnalysisInstalled))]
         private void UninstallCodeAnalysis()
         {
+#if SAINTSFIELD_NEWTONSOFT_JSON
             string content = File.ReadAllText(ManifestFile);
             Manifest manifest = JsonConvert.DeserializeObject<Manifest>(content);
 
@@ -315,6 +317,7 @@ namespace SaintsField.Editor.Utils
             _loadingCodeAnalysis = true;
             File.WriteAllText(ManifestFile, jsonResult + "\n");
             DisableCodeAnalysis();
+#endif
         }
 
         [LayoutEnd(".")]
