@@ -14,8 +14,16 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.GuidDrawer
 {
-    public class GuidStringElement: BindableElement, INotifyValueChanged<string>
+#if UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
+    [UxmlElement]
+#endif
+    public partial class GuidStringElement: BindableElement, INotifyValueChanged<string>
     {
+
+#if !UNITY_6000_0_OR_NEWER
+        public new class UxmlFactory : UxmlFactory<GuidStringElement, UxmlTraits> { }
+#endif
+
         private static VisualTreeAsset _containerTree;
 
         private readonly IReadOnlyList<HexInputLengthElement> _hexInputs;

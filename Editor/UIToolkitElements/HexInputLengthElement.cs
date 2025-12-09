@@ -9,6 +9,10 @@ namespace SaintsField.Editor.UIToolkitElements
 #endif
     public partial class HexInputLengthElement: BindableElement, INotifyValueChanged<string>
     {
+#if !UNITY_6000_0_OR_NEWER
+        public new class UxmlFactory : UxmlFactory<HexInputLengthElement, UxmlTraits> { }
+#endif
+
         public readonly TextField TextField;
         private string _cachedValue = "";
         private int _length;
