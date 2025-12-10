@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
             if (animatorName != null)
             {
                 // search parent first
-                (string error, Animator result) = Util.FlatGetOf<Animator>(animatorName, null, property, info, parent);
+                (string error, Animator result) = Util.GetOf<Animator>(animatorName, null, property, info, parent, null);
                 if (result == null)
                 {
                     return ($"Animator {animatorName} can not be null.", null);

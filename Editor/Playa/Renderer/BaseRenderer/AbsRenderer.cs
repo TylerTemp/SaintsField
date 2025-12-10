@@ -263,7 +263,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
                         }
 
-                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]{curValue});
+                        (string paramError, object[] passParams) = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]{curValue});
+                        if (paramError != "")
+                        {
+                            continue;
+                        }
 
                         // Debug.Log($"passParams={passParams[0]==null}, length={passParams.Length}, curValue==null={curValue==null}");
 

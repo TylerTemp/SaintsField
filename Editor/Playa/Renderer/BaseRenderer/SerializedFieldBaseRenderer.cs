@@ -35,10 +35,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     continue;
                 }
 
-                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                (string paramError, object[] passParams) = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
                 {
                     newValue,
                 });
+                if (paramError != "")
+                {
+                    continue;
+                }
 
                 try
                 {

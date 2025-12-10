@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.ArraySizeDrawer
                 return ("", false, arraySizeAttribute.Min, arraySizeAttribute.Max);
             }
 
-            (string error, object result) = Util.FlatGetOf<object>(arraySizeAttribute.Callback, null, property, info, parent);
+            (string error, object result) = Util.GetOf<object>(arraySizeAttribute.Callback, null, property, info, parent, null);
             if (error != "")
             {
                 return ("", true, -1, -1);

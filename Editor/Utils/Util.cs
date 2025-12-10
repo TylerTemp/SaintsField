@@ -784,12 +784,12 @@ namespace SaintsField.Editor.Utils
         //         : ("", ReflectUtils.Truly(value));
         // }
 
-        public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
+        public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
         {
             if (by.StartsWith(":"))
             {
                 // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target);
+                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target, overrideParams);
             }
 
             if (target == null)
@@ -798,70 +798,12 @@ namespace SaintsField.Editor.Utils
             }
 
             return by.Contains(".")
-                ? AccGetOf(by, defaultValue, property, target)
-                : FlatGetOf(by, defaultValue, property, memberInfo, target);
-        }
-
-        public static (string error, T result) FlatGetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
-        {
-            if (by.StartsWith(":"))
-            {
-                // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target);
-            }
-
-            if (target == null)
-            {
-                return ("Target is null", defaultValue);
-            }
-
-            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
-            {
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
-
-                object genResult;
-                switch (getPropType)
-                {
-                    case ReflectUtils.GetPropType.NotFound:
-                        continue;
-
-                    case ReflectUtils.GetPropType.Property:
-                        genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-                        break;
-                    case ReflectUtils.GetPropType.Field:
-                    {
-                        FieldInfo fInfo = (FieldInfo)fieldOrMethodInfo;
-                        genResult = fInfo.GetValue(target);
-                        // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
-                    }
-                        break;
-                    case ReflectUtils.GetPropType.Method:
-                    {
-                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-
-                        (string methodError, object methodReturnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target);
-                        if (methodError != "")
-                        {
-                            return (methodError, defaultValue);
-                        }
-
-                        genResult = methodReturnValue;
-
-                        break;
-                    }
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-                }
-
-                // Debug.Log($"GetOf {genResult}/{genResult?.GetType()}/{genResult==null}");
-                return ConvertTo(genResult, defaultValue);
-            }
-
-            return ($"No field or method named `{by}` found on `{target}`", defaultValue);
+                ? AccGetOf(by, defaultValue, property, target, overrideParams)
+                : FlatGetOf(by, defaultValue, property, memberInfo, target, overrideParams);
         }
 
         private static (string error, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
-            object parent)
+            object parent, IReadOnlyList<object> overrideParams)
         {
             string accBy = by;
             // SerializedProperty accProperty = property;
@@ -904,7 +846,7 @@ namespace SaintsField.Editor.Utils
                     break;
                 }
 
-                thisResult = FlatGetOf(attrName, defaultValue, property, accMemberInfo, accParent);
+                thisResult = FlatGetOf(attrName, defaultValue, property, accMemberInfo, accParent, overrideParams);
                 // Debug.Log($"{attrName} = {thisResult.result}({thisResult.error})");
                 if (thisResult.error != "")
                 {
@@ -914,6 +856,86 @@ namespace SaintsField.Editor.Utils
             }
             return thisResult;
 
+        }
+
+        public static (string error, T result) FlatGetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
+        {
+            if (by.StartsWith(":"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target, overrideParams);
+            }
+
+            if (target == null)
+            {
+                return ("Target is null", defaultValue);
+            }
+
+            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
+            {
+                ReflectUtils.GetPropType getPropType;
+                object fieldOrMethodInfo;
+                try
+                {
+                    (getPropType, fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
+                }
+                catch (AmbiguousMatchException)
+                {
+                    List<MethodInfo> methodInfos = new List<MethodInfo>();
+                    foreach (MethodInfo methodInfo in type.GetMethods(ReflectUtils.FindTargetBindAttr))
+                    {
+                        if (methodInfo.Name == by)
+                        {
+                            methodInfos.Add(methodInfo);
+                            (string methodError, object methodReturnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
+                            if (methodError == "")
+                            {
+                                return ConvertTo(methodReturnValue, defaultValue);
+                            }
+                        }
+                    }
+                    return ($"All method failed to match the signature: {string.Join("; ", methodInfos.Select(eachMethod => $"({string.Join(", ", eachMethod.GetParameters().Select(each => $"{each.ParameterType} {each.Name}{(each.HasDefaultValue? $"={each.DefaultValue}": "")}"))}) => {eachMethod.ReturnParameter}"))}", defaultValue);
+                }
+
+                object genResult;
+                switch (getPropType)
+                {
+                    case ReflectUtils.GetPropType.NotFound:
+                        continue;
+
+                    case ReflectUtils.GetPropType.Property:
+                        genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
+                        break;
+                    case ReflectUtils.GetPropType.Field:
+                    {
+                        FieldInfo fInfo = (FieldInfo)fieldOrMethodInfo;
+                        genResult = fInfo.GetValue(target);
+                        // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
+                    }
+                        break;
+                    case ReflectUtils.GetPropType.Method:
+                    {
+                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
+
+                        (string methodError, object methodReturnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
+                        if (methodError != "")
+                        {
+                            return (methodError, defaultValue);
+                        }
+
+                        genResult = methodReturnValue;
+
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                }
+
+                // Debug.Log($"GetOf {genResult}/{genResult?.GetType()}/{genResult==null}");
+                return ConvertTo(genResult, defaultValue);
+            }
+
+            return ($"No field or method named `{by}` found on `{target}`", defaultValue);
         }
 
         // this can not walk out of the
@@ -1004,7 +1026,7 @@ namespace SaintsField.Editor.Utils
             return ("", finalResult);
         }
 
-        private static (string error, object returnValue) InvokeMethodInfo(MethodInfo methodInfo, object defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
+        private static (string error, object returnValue) InvokeMethodInfo(MethodInfo methodInfo, object defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
         {
             object[] passParams;
             if (property == null || memberInfo == null || target == null)
@@ -1019,16 +1041,31 @@ namespace SaintsField.Editor.Utils
                     return (error, defaultValue);
                 }
 
-                passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-                    ? new[]
-                    {
-                        curValue,
-                    }
-                    : new []
-                    {
-                        curValue,
-                        arrayIndex,
-                    });
+                IReadOnlyList<object> baseParams;
+                if (overrideParams != null)
+                {
+                    baseParams = overrideParams;
+                }
+                else
+                {
+                    baseParams = arrayIndex == -1
+                        ? new[]
+                        {
+                            curValue,
+                        }
+                        : new[]
+                        {
+                            curValue,
+                            arrayIndex,
+                        };
+                }
+
+                string paramError;
+                (paramError, passParams) = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), baseParams);
+                if (paramError != "")
+                {
+                    return (paramError, null);
+                }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_GET_OF
                    Debug.Log($"#Util# arrayIndex={arrayIndex}, rawValue={rawValue}, curValue={curValue}, fill={string.Join(",", passParams)}");
@@ -1063,7 +1100,7 @@ namespace SaintsField.Editor.Utils
                 : assembly.GetTypes().FirstOrDefault(t => t.Name == split[0]);
         }
 
-        private static (string error, T result) GetOfStatic<T>(string nameSpaceAndName, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
+        private static (string error, T result) GetOfStatic<T>(string nameSpaceAndName, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
         {
             List<string> split = new List<string>(nameSpaceAndName.Split('.'));
             int totalLength = split.Count;
@@ -1161,7 +1198,7 @@ namespace SaintsField.Editor.Utils
                 if(methodInfo.Name == fieldOrMethod)
                 {
                     (string error, object returnValue) =
-                        InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target);
+                        InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
                     if (error == "")
                     {
                         return ConvertTo(returnValue, defaultValue);
@@ -1185,70 +1222,70 @@ namespace SaintsField.Editor.Utils
             return (finalError, defaultValue);
         }
 
-        public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
-        {
-            const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                          BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
-
-            (string error, int arrayIndex, object curValue) = GetValue(property, memberInfo, target);
-            if (error != "")
-            {
-                return (error, defaultValue);
-            }
-
-            if (by.StartsWith(":"))
-            {
-                // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target);
-            }
-
-            foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
-            {
-                MethodInfo methodInfo = type.GetMethod(by, bindAttr);
-                if (methodInfo == null)
-                {
-                    continue;
-                }
-
-                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-                    ? new[]
-                    {
-                        curValue,
-                    }
-                    : new []
-                    {
-                        curValue,
-                        arrayIndex,
-                    });
-
-                T result;
-                try
-                {
-                    result = (T)methodInfo.Invoke(target, passParams);
-                }
-                catch (TargetInvocationException e)
-                {
-                    Debug.LogException(e);
-                    Debug.Assert(e.InnerException != null);
-                    return (e.InnerException.Message, defaultValue);
-                }
-                catch (InvalidCastException e)
-                {
-                    Debug.LogException(e);
-                    return (e.Message, defaultValue);
-                }
-                catch (Exception e)
-                {
-                    // _error = e.Message;
-                    Debug.LogException(e);
-                    return (e.Message, defaultValue);
-                }
-
-                return ("", result);
-            }
-
-            return ($"No field or method named `{by}` found on `{target}`", defaultValue);
-        }
+        // public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
+        // {
+        //     const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+        //                                   BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+        //
+        //     (string error, int arrayIndex, object curValue) = GetValue(property, memberInfo, target);
+        //     if (error != "")
+        //     {
+        //         return (error, defaultValue);
+        //     }
+        //
+        //     if (by.StartsWith(":"))
+        //     {
+        //         // ReSharper disable once ReplaceSubstringWithRangeIndexer
+        //         return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target, overrideParams);
+        //     }
+        //
+        //     foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
+        //     {
+        //         MethodInfo methodInfo = type.GetMethod(by, bindAttr);
+        //         if (methodInfo == null)
+        //         {
+        //             continue;
+        //         }
+        //
+        //         object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+        //             ? new[]
+        //             {
+        //                 curValue,
+        //             }
+        //             : new []
+        //             {
+        //                 curValue,
+        //                 arrayIndex,
+        //             });
+        //
+        //         T result;
+        //         try
+        //         {
+        //             result = (T)methodInfo.Invoke(target, passParams);
+        //         }
+        //         catch (TargetInvocationException e)
+        //         {
+        //             Debug.LogException(e);
+        //             Debug.Assert(e.InnerException != null);
+        //             return (e.InnerException.Message, defaultValue);
+        //         }
+        //         catch (InvalidCastException e)
+        //         {
+        //             Debug.LogException(e);
+        //             return (e.Message, defaultValue);
+        //         }
+        //         catch (Exception e)
+        //         {
+        //             // _error = e.Message;
+        //             Debug.LogException(e);
+        //             return (e.Message, defaultValue);
+        //         }
+        //
+        //         return ("", result);
+        //     }
+        //
+        //     return ($"No field or method named `{by}` found on `{target}`", defaultValue);
+        // }
 
         public static UnityEngine.Object GetTypeFromObj(UnityEngine.Object fieldResult, Type fieldType)
         {
@@ -1750,8 +1787,8 @@ namespace SaintsField.Editor.Utils
                 if(!foundResult)
                 {
                     (string error, object getResult) = conditionStringTarget.Contains(".")
-                        ? AccGetOf<object>(conditionStringTarget, null, property, target)
-                        : FlatGetOf<object>(conditionStringTarget, null, property, info, target);
+                        ? AccGetOf<object>(conditionStringTarget, null, property, target, null)
+                        : FlatGetOf<object>(conditionStringTarget, null, property, info, target, null);
 
                     if (error != "")
                     {
@@ -1775,7 +1812,7 @@ namespace SaintsField.Editor.Utils
                     else
                     {
                         (string errorValue, object callbackResult) =
-                            FlatGetOf<object>((string)value, null, property, info, target);
+                            GetOf<object>((string)value, null, property, info, target, null);
                         if (errorValue != "")
                         {
                             errors.Add(errorValue);
@@ -2365,7 +2402,7 @@ namespace SaintsField.Editor.Utils
                 };
             }
 
-            (string callbackError, object value) = GetOf<object>(space, null, property, info, parent);
+            (string callbackError, object value) = GetOf<object>(space, null, property, info, parent, null);
             if (callbackError != "")
             {
                 return new TargetWorldPosInfo

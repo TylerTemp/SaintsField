@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
                 return GetShaderFromRenderer(directRenderer, index);
             }
 
-            (string error, Object uObj) = Util.FlatGetOf<Object>(callback, null, property, info, parent);
+            (string error, Object uObj) = Util.GetOf<Object>(callback, null, property, info, parent, null);
             if (error != "")
             {
 #if SAINTSFIELD_DEBUG
@@ -126,7 +126,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
                     default:
                         return ($"{target} is not a valid target", null);
                 }
-                return ShaderUtils.GetShaderFromRenderer(directRenderer, index);
+                return GetShaderFromRenderer(directRenderer, index);
             }
 
             foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
@@ -143,7 +143,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
                         object genResult = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
                         if(genResult != null)
                         {
-                            return ShaderUtils.GetShaderFromObject(genResult, callback, index);
+                            return GetShaderFromObject(genResult, callback, index);
                         }
                     }
                         break;
@@ -153,7 +153,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
                         object genResult = fInfo.GetValue(target);
                         if(genResult != null)
                         {
-                            return ShaderUtils.GetShaderFromObject(genResult, callback, index);
+                            return GetShaderFromObject(genResult, callback, index);
                         }
                         // Debug.Log($"{fInfo}/{fInfo.Name}, target={target} genResult={genResult}");
                     }
@@ -162,10 +162,14 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
                     {
                         MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
 
-                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                        (string paramError, object[] passParams) = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
                         {
                             curValue,
                         });
+                        if (paramError != "")
+                        {
+                            continue;
+                        }
 
 
                         object genResult;
@@ -184,7 +188,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
 
                         if (genResult != null)
                         {
-                            return ShaderUtils.GetShaderFromObject(genResult, callback, index);
+                            return GetShaderFromObject(genResult, callback, index);
                         }
 
                         break;

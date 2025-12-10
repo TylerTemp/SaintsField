@@ -88,7 +88,7 @@ namespace SaintsField.Editor.Drawers
                     }
                     if(targetProperty.propertyType == SerializedPropertyType.Generic)
                     {
-                        (string _, IWrapProp getResult) = Util.FlatGetOf<IWrapProp>(compName, null, property, info, parent);
+                        (string _, IWrapProp getResult) = Util.GetOf<IWrapProp>(compName, null, property, info, parent, null);
                         // Debug.Log(getResult);
                         if (getResult != null)
                         {
@@ -101,7 +101,7 @@ namespace SaintsField.Editor.Drawers
                 }
 
                 (string error, object foundObj) =
-                    Util.FlatGetOf<object>(compName, null, property, info, parent);
+                    Util.GetOf<object>(compName, null, property, info, parent, null);
 
                 if (error != "")
                 {

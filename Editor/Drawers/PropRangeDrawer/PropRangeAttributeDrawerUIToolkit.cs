@@ -143,7 +143,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             else
             {
                 (string getError, object getValue) =
-                    Util.FlatGetOf<object>(propRangeAttribute.MinCallback, 0, property, info, parentTarget);
+                    Util.GetOf<object>(propRangeAttribute.MinCallback, 0, property, info, parentTarget, null);
                 if (getError != "")
                 {
                     return (null, getError, null, "");
@@ -159,7 +159,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             else
             {
                 (string getError, object getValue) =
-                    Util.FlatGetOf<object>(propRangeAttribute.MaxCallback, 0f, property, info, parentTarget);
+                    Util.GetOf<object>(propRangeAttribute.MaxCallback, 0f, property, info, parentTarget, null);
                 if (getError != "")
                 {
                     return (minValue, "", null, getError);
@@ -241,10 +241,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                     {
                         MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
 
-                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                        (string paramError, object[] passParams) = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
                         {
                             curValue,
                         });
+                        if (paramError != "")
+                        {
+                            continue;
+                        }
 
 
                         object genResult;

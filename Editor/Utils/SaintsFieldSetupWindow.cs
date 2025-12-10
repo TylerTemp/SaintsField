@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Utils
 #endif
         public static void Open()
         {
-            EditorWindow.GetWindow<SaintsFieldSetupWindow>("SaintsField Setup").Show();
+            GetWindow<SaintsFieldSetupWindow>("SaintsField Setup").Show();
         }
 
         // ReSharper disable InconsistentNaming
@@ -132,14 +132,14 @@ namespace SaintsField.Editor.Utils
         [Ordered]
         [AboveText("$" + nameof(CodeAnalysisIntallInfo), 5, 5)]
         [LayoutStart("./Code Analysis Install Buttons", ELayout.Horizontal)]
-        [Button("Install")]
         [PlayaDisableIf(nameof(CodeAnalysisInstalled))]
+        [Button("Install")]
         private void InstallCodeAnalysis()
         {
 #if SAINTSFIELD_NEWTONSOFT_JSON
             string content = File.ReadAllText(ManifestFile);
             Manifest manifest = JsonConvert.DeserializeObject<Manifest>(content);
-            bool foundDependences = false;
+            bool foundDependencies = false;
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
             foreach (KeyValuePair<string, string> manifestDependency in manifest.dependencies)
             {
@@ -147,15 +147,15 @@ namespace SaintsField.Editor.Utils
                 // ReSharper disable once InvertIf
                 if (manifestDependency.Key == "org.nuget.microsoft.codeanalysis.csharp")
                 {
-                    foundDependences = true;
-                    Debug.Log($"Already found dependences {manifestDependency.Key}");
+                    foundDependencies = true;
+                    Debug.Log($"Already found dependencies {manifestDependency.Key}");
                 }
             }
 
-            if (!foundDependences)
+            if (!foundDependencies)
             {
                 manifest.dependencies["org.nuget.microsoft.codeanalysis.csharp"] = "4.14.0";
-                Debug.Log($"Add dependences org.nuget.microsoft.codeanalysis.csharp={manifest.dependencies["org.nuget.microsoft.codeanalysis.csharp"]}");
+                Debug.Log($"Add dependencies org.nuget.microsoft.codeanalysis.csharp={manifest.dependencies["org.nuget.microsoft.codeanalysis.csharp"]}");
             }
 
             const string scopeName = "package.openupm.com";
@@ -316,7 +316,7 @@ namespace SaintsField.Editor.Utils
             Debug.Log(jsonResult);
             _loadingCodeAnalysis = true;
             File.WriteAllText(ManifestFile, jsonResult + "\n");
-            DisableCodeAnalysis();
+            SaintsMenu.RemoveCompileDefine(SaintsMenu.SAINTSFIELD_CODE_ANALYSIS);
 #endif
         }
 
@@ -335,7 +335,7 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_CODE_ANALYSIS
         [PlayaDisableIf(true)]
 #endif
-        [Button("Enable")]
+        [Button("Force Enable")]
         private void EnableCodeAnalysis()
         {
             bool codeAnalysisFound = CodeAnalysisInstalled();
@@ -359,17 +359,6 @@ namespace SaintsField.Editor.Utils
             {
                 Application.OpenURL("https://github.com/TylerTemp/SaintsField/?tab=readme-ov-file#setup");
             }
-        }
-
-        [Ordered]
-#if !SAINTSFIELD_CODE_ANALYSIS
-        [PlayaDisableIf(true)]
-#endif
-        [Button("Disable")]
-        private void DisableCodeAnalysis()
-        {
-            SaintsMenu.RemoveCompileDefine(SaintsMenu.SAINTSFIELD_CODE_ANALYSIS);
-            _loadingCodeAnalysis = true;
         }
     }
 }

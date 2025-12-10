@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
                     continue;
                 }
 
-                object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), index == -1
+                (string error, object[] passParams) = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), index == -1
                     ? new[]
                     {
                         newValue,
@@ -56,6 +56,11 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
                         newValue,
                         index,
                     });
+
+                if (error != "")
+                {
+                    continue;
+                }
 
                 try
                 {

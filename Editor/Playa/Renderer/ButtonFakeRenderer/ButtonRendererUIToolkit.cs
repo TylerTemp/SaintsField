@@ -414,8 +414,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             // ReSharper disable once InvertIf
             if(!string.IsNullOrEmpty(labelCallback))
             {
-                (string error, string result) = Util.FlatGetOf<string>(labelCallback, null,
-                    FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
+                (string error, string result) = Util.GetOf<string>(labelCallback, null,
+                    FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0], null);
                 // Debug.Log($"{error}/{result}");
                 if (error != "")
                 {

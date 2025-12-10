@@ -97,7 +97,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             else
             {
                 (string getOfError, object getOfDropdownListValue) =
-                    Util.GetOf<object>(dropdownAttribute.FuncName, null, property, field, parentObj);
+                    Util.GetOf<object>(dropdownAttribute.FuncName, null, property, field, parentObj, null);
                 error = getOfError;
                 if (getOfError == "")
                 {

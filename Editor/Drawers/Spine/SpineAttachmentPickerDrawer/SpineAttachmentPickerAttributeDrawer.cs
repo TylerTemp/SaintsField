@@ -119,7 +119,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                 string currentSkinName;
                 if (spineAttachmentPickerAttribute.SkinTargetIsCallback)
                 {
-                    (string error, string result) skinFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SkinTarget, null, property, info, parent);
+                    (string error, string result) skinFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SkinTarget, null, property, info, parent, null);
                     if (skinFilter.error != "")
                     {
                         return new SpineAttachmentUtils.AttachmentsResult(skinFilter.error, null, null);
@@ -153,7 +153,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
             string currentSlotName;
             if (spineAttachmentPickerAttribute.SlotTargetIsCallback)
             {
-                (string error, string result) slotFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SlotTarget, null, property, info, parent);
+                (string error, string result) slotFilter = Util.GetOf<string>(spineAttachmentPickerAttribute.SlotTarget, null, property, info, parent, null);
                 if (slotFilter.error != "")
                 {
                     return new SpineAttachmentUtils.AttachmentsResult(slotFilter.error, null, null);

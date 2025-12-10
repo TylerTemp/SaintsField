@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             float min = progressBarAttribute.Min;
             if(progressBarAttribute.MinCallback != null)
             {
-                (string error, float value) = Util.FlatGetOf(progressBarAttribute.MinCallback, 0f, property, info, parent);
+                (string error, float value) = Util.GetOf(progressBarAttribute.MinCallback, 0f, property, info, parent, null);
                 if (error != "")
                 {
                     return new MetaInfo
@@ -54,7 +54,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             float max = progressBarAttribute.Max;
             if(progressBarAttribute.MaxCallback != null)
             {
-                (string error, float value) = Util.FlatGetOf(progressBarAttribute.MaxCallback, 0f, property, info, parent);
+                (string error, float value) = Util.GetOf(progressBarAttribute.MaxCallback, 0f, property, info, parent, null);
                 if (error != "")
                 {
                     return new MetaInfo
@@ -116,7 +116,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 
         private static (string error, Color value) GetCallbackColor(string by, Color defaultValue, SerializedProperty property, MemberInfo fieldInfo, object target)
         {
-            (string error, object value) = Util.FlatGetOf<object>(by, defaultValue, property, fieldInfo, target);
+            (string error, object value) = Util.GetOf<object>(by, defaultValue, property, fieldInfo, target, null);
             return error != ""
                 ? (error, defaultValue)
                 : ObjToColor(value);

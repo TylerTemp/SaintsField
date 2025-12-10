@@ -37,10 +37,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 case SaintsPropertyType.EnumLong:
                 {
                     EnumMetaInfo metaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
-                    foreach (EnumMetaInfo.EnumValueInfo metaInfoEnumValue in metaInfo.EnumValues)
-                    {
-                        Debug.Log(metaInfoEnumValue);
-                    }
+                    // foreach (EnumMetaInfo.EnumValueInfo metaInfoEnumValue in metaInfo.EnumValues)
+                    // {
+                    //     Debug.Log(metaInfoEnumValue);
+                    // }
                     if (!metaInfo.IsFlags)
                     {
                         VisualElement container = new VisualElement();
@@ -663,6 +663,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 }
 #endif
                 case SaintsPropertyType.Undefined:
+                case SaintsPropertyType.ClassOrStruct:
+                case SaintsPropertyType.Interface:
+                case SaintsPropertyType.DateTime:
+                case SaintsPropertyType.TimeSpan:
+                case SaintsPropertyType.Guid:
                 default:
                     return null;
             }

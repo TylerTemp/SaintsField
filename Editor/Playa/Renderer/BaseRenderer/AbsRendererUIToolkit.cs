@@ -3746,7 +3746,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         // object accParent = FieldWithInfo.Targets[0];
 
                         (string error, object result) getOfValue = Util.GetOf<object>(revName, null, FieldWithInfo.SerializedProperty,
-                            FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
+                            FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0], null);
 
                         hasError = getOfValue.error != "";
                         accResult = (getOfValue.error, accResult.index, getOfValue.result);

@@ -190,7 +190,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             else
             {
                 (string getOfError, object obj) =
-                    Util.GetOf<object>(funcName, null, property, field, parentObj);
+                    Util.GetOf<object>(funcName, null, property, field, parentObj, null);
                 error = getOfError;
                 if (obj is IAdvancedDropdownList getOfDropdownListValue)
                 {
@@ -567,10 +567,15 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     {
                         MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
 
-                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                        (string error, object[] passParams) = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
                         {
                             curValue,
                         });
+
+                        if (error != "")
+                        {
+                            continue;
+                        }
 
 
                         object genResult;

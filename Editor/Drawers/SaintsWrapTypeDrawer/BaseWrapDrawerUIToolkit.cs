@@ -46,7 +46,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             Type wrapType = elementType.GetGenericArguments()[0];
 
             SerializedProperty wrapTypeProp = property.FindPropertyRelative("wrapType");
-            Debug.Log($"BaseWrap wrapType {wrapType}={wrapTypeProp.intValue}");
+            // Debug.Log($"BaseWrap wrapType {wrapType}={wrapTypeProp.intValue}");
 
             switch (wrapTypeProp.intValue)
             {

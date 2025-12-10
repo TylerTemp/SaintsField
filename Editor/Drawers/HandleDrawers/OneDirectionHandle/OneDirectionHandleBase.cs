@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 
             if (!string.IsNullOrEmpty(oneDirectionConstInfo.OneDirectionAttribute.ColorCallback))
             {
-                (string error, Color result) = Util.FlatGetOf(oneDirectionConstInfo.OneDirectionAttribute.ColorCallback, oneDirectionConstInfo.OneDirectionAttribute.Color, oneDirectionConstInfo.SerializedProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent);
+                (string error, Color result) = Util.GetOf(oneDirectionConstInfo.OneDirectionAttribute.ColorCallback, oneDirectionConstInfo.OneDirectionAttribute.Color, oneDirectionConstInfo.SerializedProperty, oneDirectionConstInfo.MemberInfo, oneDirectionConstInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -153,7 +153,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             // another field will be tricky to get (if it's inside a normal struct/class), so we just treat it as a callback
             // this decorator will only draw one arrow, so if the target is an array/list, use the index to fetch only one element
 
-            (string error, object result) = Util.FlatGetOf<object>(target, null, property, info, parent);
+            (string error, object result) = Util.GetOf<object>(target, null, property, info, parent, null);
             if (error != "")
             {
                 return new Util.TargetWorldPosInfo

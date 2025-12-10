@@ -361,6 +361,12 @@ namespace SaintsField.Editor.Utils
         }
 #endif
 
+        [MenuItem(MenuRoot + "EColor Preview")]
+        public static void OpenEColorPreview()
+        {
+            EColorPreviewWindow.Open();
+        }
+
         // ReSharper disable once UnusedMember.Local
         public static void AddCompileDefine(string newDefineCompileConstant, IEnumerable<BuildTargetGroup> targetGroups = null)
         {

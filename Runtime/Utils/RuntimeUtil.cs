@@ -8,6 +8,7 @@ using SaintsField.Playa;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField.Utils
 {
     public static class RuntimeUtil
@@ -317,9 +318,9 @@ namespace SaintsField.Utils
                         }
 
                         RichTextParsedChunk iconTag = new RichTextParsedChunk(part,
-                            // ReSharper disable once UseIndexFromEndExpression
                             ChunkType.IconTag,
                             tagValue: parsedResult.value,
+                            // ReSharper disable once UseIndexFromEndExpression
                             iconColor: colors.Count > 0 ? colors[colors.Count - 1] : null);
                         // Debug.Log($"yield raw iconTag {iconTag}");
                         // Debug.Log($"yield iconTag={iconTag}");

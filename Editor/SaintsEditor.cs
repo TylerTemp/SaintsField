@@ -13,6 +13,7 @@ using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer;
@@ -1531,6 +1532,18 @@ namespace SaintsField.Editor
                             case ListDrawerSettingsAttribute _:
                                 yield return new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo);
                                 yield break;
+
+                            case OnValueChangedAttribute onValueChangedAttribute:
+                            {
+                                SerializedProperty prop = fieldWithInfo.SerializedProperty;
+                                if(prop.propertyType == SerializedPropertyType.Generic && prop.isArray)
+                                {
+                                    yield return new OnValueChangedCollectionRenderer(onValueChangedAttribute,
+                                        serializedObject, fieldWithInfo);
+                                }
+                            }
+                                // Break the switch, but continue the logic
+                                break;
                         }
                     }
 

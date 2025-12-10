@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.Spine
                 }
             }
 
-            (string error, Object uObj) = Util.GetOf<Object>(callback, null, property, info, parent);
+            (string error, Object uObj) = Util.GetOf<Object>(callback, null, property, info, parent, null);
             if (error != "")
             {
 #if SAINTSFIELD_DEBUG

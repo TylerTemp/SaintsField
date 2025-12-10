@@ -87,7 +87,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
             if (labelInfo.DrawLabelAttribute.IsCallback)
             {
                 (string error, object value) =
-                    Util.FlatGetOf<object>(labelInfo.DrawLabelAttribute.Content, null, labelInfo.SerializedProperty, labelInfo.MemberInfo, labelInfo.Parent);
+                    Util.FlatGetOf<object>(labelInfo.DrawLabelAttribute.Content, null, labelInfo.SerializedProperty, labelInfo.MemberInfo, labelInfo.Parent, null);
 
                 if (error != "")
                 {
@@ -116,7 +116,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 
             if (!string.IsNullOrEmpty(labelInfo.DrawLabelAttribute.ColorCallback))
             {
-                (string error, Color result) = Util.FlatGetOf(labelInfo.DrawLabelAttribute.ColorCallback, labelInfo.DrawLabelAttribute.Color, labelInfo.SerializedProperty, labelInfo.MemberInfo, labelInfo.Parent);
+                (string error, Color result) = Util.GetOf(labelInfo.DrawLabelAttribute.ColorCallback, labelInfo.DrawLabelAttribute.Color, labelInfo.SerializedProperty, labelInfo.MemberInfo, labelInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG

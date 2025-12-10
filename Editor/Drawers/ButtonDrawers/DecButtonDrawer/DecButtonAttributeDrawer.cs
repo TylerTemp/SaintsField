@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
             if (property.serializedObject.targetObjects.Length < 2)
             {
-                yield return Util.GetMethodOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, target);
+                yield return Util.GetOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, target, null);
                 yield break;
             }
 
@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
                     // Debug.Log($"Found property {prop.name} in {t.GetType().Name}");
                     (PropertyAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(prop);
-                    yield return Util.GetMethodOf<object>(decButtonAttribute.FuncName, null, prop, fieldInfo, parent);
+                    yield return Util.GetOf<object>(decButtonAttribute.FuncName, null, prop, fieldInfo, parent, null);
                     // property = prop;
                 }
                 // (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);

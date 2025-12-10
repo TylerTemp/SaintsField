@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
         {
             return maxValueAttribute.ValueCallback == null
                 ? ("", maxValueAttribute.Value)
-                : Util.FlatGetOf(maxValueAttribute.ValueCallback, 0f, property, info, parentTarget);
+                : Util.GetOf(maxValueAttribute.ValueCallback, 0f, property, info, parentTarget, null);
         }
 
         public AutoRunnerFixerResult AutoRunFix(UnityEngine.PropertyAttribute propertyAttribute, IReadOnlyList<UnityEngine.PropertyAttribute> allAttributes,

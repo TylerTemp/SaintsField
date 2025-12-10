@@ -54,7 +54,8 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
                 null,
                 property,
                 info,
-                target);
+                target,
+                null);
 
             if (error != "")
             {
@@ -93,12 +94,13 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
                 return ("", true);
             }
 
-            (string error, object result) = Util.FlatGetOf<object>(
+            (string error, object result) = Util.GetOf<object>(
                 infoboxAttribute.ShowCallback,
                 null,
                 property,
                 info,
-                target);
+                target,
+                null);
 
             return error != ""
                 ? (error, false)

@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 BackgroundColor = backgroundColor;
             }
         }
-        
+
         private static CallbackInfo GetMinMax(SerializedProperty property, ProgressBarAttribute progressBarAttribute,
             MemberInfo info, object parent)
         {
@@ -110,7 +110,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             else
             {
                 (string getError, object getValue) =
-                    Util.FlatGetOf<object>(progressBarAttribute.MinCallback, 0, property, info, parent);
+                    Util.GetOf<object>(progressBarAttribute.MinCallback, 0, property, info, parent, null);
                 if (getError != "")
                 {
                     return new CallbackInfo(
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             else
             {
                 (string getError, object getValue) =
-                    Util.FlatGetOf<object>(progressBarAttribute.MaxCallback, 0f, property, info, parent);
+                    Util.GetOf<object>(progressBarAttribute.MaxCallback, 0f, property, info, parent, null);
                 if (getError != "")
                 {
                     return new CallbackInfo(getError);
@@ -292,10 +292,15 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                     {
                         MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
 
-                        object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
+                        (string paramError, object[] passParams) = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]
                         {
                             curValue,
                         });
+
+                        if (paramError != "")
+                        {
+                            continue;
+                        }
 
 
                         object genResult;

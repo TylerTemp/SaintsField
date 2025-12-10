@@ -28,6 +28,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [Space]
 
+        [InfoBox("use `Window` - `Saints` - `EColor Preview` to view all the pre-set colors")]
+
         [LabelText("<color=aqua>██ EColor ██</color>")] public string colorAqua = "Aqua";
         [LabelText("<color=black>██ EColor ██</color>")] public string colorBlack = "Black";
         [LabelText("<color=blue>██ EColor ██</color>")] public string colorBlue = "Blue";

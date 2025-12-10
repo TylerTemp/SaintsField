@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using SaintsField.Samples.Scripts.SaintsEditor;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [Serializable, Flags]
         public enum NamedEnums
         {
-            [FieldLabelText("--> <color=gray><label />")]
+            [InspectorName("--> <color=gray><label />")]
             Tag1  = 1,
             Tag2 = 1 << 1,
             Tag3 = 1 << 2,

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Linq;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -48,26 +49,24 @@ namespace SaintsField.Editor.Utils
 
         public static (GetPropType getPropType, object fieldOrMethodInfo) GetProp(Type targetType, string fieldName)
         {
-            const BindingFlags bindAttr = FindTargetBindAttr;
-
-            FieldInfo fieldInfo = targetType.GetField(fieldName, bindAttr);
+            FieldInfo fieldInfo = targetType.GetField(fieldName, FindTargetBindAttr);
             // Debug.Log($"init get fieldInfo {fieldInfo}");
             if (fieldInfo == null)
             {
-                fieldInfo = targetType.GetField($"<{fieldName}>k__BackingField", bindAttr);
+                fieldInfo = targetType.GetField($"<{fieldName}>k__BackingField", FindTargetBindAttr);
             }
             if (fieldInfo != null)
             {
                 return (GetPropType.Field, fieldInfo);
             }
 
-            PropertyInfo propertyInfo = targetType.GetProperty(fieldName, bindAttr);
+            PropertyInfo propertyInfo = targetType.GetProperty(fieldName, FindTargetBindAttr);
             if (propertyInfo != null)
             {
                 return (GetPropType.Property, propertyInfo);
             }
 
-            MethodInfo methodInfo = targetType.GetMethod(fieldName, bindAttr);
+            MethodInfo methodInfo = targetType.GetMethod(fieldName, FindTargetBindAttr);
             // Debug.Log($"methodInfo={methodInfo}, fieldName={fieldName}, targetType={targetType}/FlattenHierarchy={bindAttr.HasFlagFast(BindingFlags.FlattenHierarchy)}");
             return methodInfo == null ? (GetPropType.NotFound, null) : (GetPropType.Method, methodInfo);
 
@@ -121,7 +120,7 @@ namespace SaintsField.Editor.Utils
             public object Value;
         }
 
-        public static object[] MethodParamsFill(IReadOnlyList<ParameterInfo> methodParams, IEnumerable<object> toFillValues)
+        public static (string error, object[] filled) MethodParamsFill(IReadOnlyList<ParameterInfo> methodParams, IEnumerable<object> toFillValues)
         {
             // first we just sign default value and null value
             MethodParamFiller[] filledValues = methodParams
@@ -149,12 +148,21 @@ namespace SaintsField.Editor.Utils
             Debug.Log($"toFillQueue.Count={toFillQueue.Count}");
 #endif
             // required:
-            for (var index = 0; index < methodParams.Count; index++)
+            for (int index = 0; index < methodParams.Count; index++)
             {
-                if (!methodParams[index].IsOptional)
+                // ReSharper disable once InvertIf
+                if(!methodParams[index].IsOptional)
                 {
                     // Debug.Log($"checking {index}={methodParams[index].Name}");
-                    Debug.Assert(toFillQueue.Count > 0, $"Nothing to fill required parameter {methodParams[index].Name}");
+                    // Debug.Assert(toFillQueue.Count > 0, $"Nothing to fill required parameter {methodParams[index].Name}");
+                    if (toFillQueue.Count == 0)
+                    {
+                        string message = $"Nothing to fill required parameter {methodParams[index].Name}";
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(message);
+#endif
+                        return (message, null);
+                    }
                     while(toFillQueue.Count > 0)
                     {
                         object value = toFillQueue.Dequeue();
@@ -194,7 +202,7 @@ namespace SaintsField.Editor.Utils
             // optional:
             if(leftOverQueue.Count > 0)
             {
-                for (var index = 0; index < methodParams.Count; index++)
+                for (int index = 0; index < methodParams.Count; index++)
                 {
                     if (leftOverQueue.Count == 0)
                     {
@@ -224,15 +232,38 @@ namespace SaintsField.Editor.Utils
                 }
             }
 
-            return filledValues.Select(each =>
+            object[] results = new object[filledValues.Length];
+            foreach ((MethodParamFiller each, int index) in filledValues.WithIndex())
             {
                 if (each.Signed)
                 {
-                    return each.Value;
+                    results[index] = each.Value;
+                    // return each.Value;
                 }
-                Debug.Assert(each.IsOptional, $"No value for required parameter `{each.Name}` in method.");
-                return each.DefaultValue;
-            }).ToArray();
+                else if (each.IsOptional)
+                {
+                    results[index] = each.DefaultValue;
+                }
+                else
+                {
+                    string message = $"No value for required parameter `{each.Name}` in method.";
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(message);
+#endif
+                    return (message, null);
+                }
+            }
+
+            return ("", results.ToArray());
+            // return filledValues.Select(each =>
+            // {
+            //     if (each.Signed)
+            //     {
+            //         return each.Value;
+            //     }
+            //     Debug.Assert(each.IsOptional, $"No value for required parameter `{each.Name}` in method.");
+            //     return each.DefaultValue;
+            // }).ToArray();
         }
 
         private static bool CheckSignEnum(object value, Type paramType)

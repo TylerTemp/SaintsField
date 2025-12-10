@@ -96,9 +96,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.5.3**
+**5.5.4**
 
-Fix Extended Serialization for OSX
+1.  Add: `[OnValueChanged]` now response to array/list size changes if you have `SaintsEditor` enabled. `[OnArraySizeChanged]` is now deprecated.
+2.  Add: `OnValueChanged`, `Button`-s etc now works with method overloading, and will find the first matched method possible.
+3.  Add: All the callback now support up-walk with syntax `../MyCallback`
+4.  Fix: `ListDrawerSettings` now can remember it's foldout status
+5.  Fix: if a list is expanded, fix `RichLabel` changes the first element label instead of list itself
+6.  Add: `Window` - `Saints` - `EColor Preview` to view all the pre-set colors
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -143,7 +148,7 @@ Parameters:
 
     You can also use Unity Editor's built-in icons. See [UnityEditorIcons](https://github.com/nukadelic/UnityEditorIcons). e.g. `<icon=d_AudioListener Icon/>`
 
-    for `color` it supports:
+    for `color`, you can use `Window` - `Saints` - `EColor Preview` to view all the pre-set colors. It supports:
 
     *   Standard [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) colors:
 
@@ -151,17 +156,13 @@ Parameters:
 
     *   Standard [Unity Pre-Set Color Presets](https://docs.unity3d.com/6000.2/Documentation/ScriptReference/Color.html) (Unity 6.2 as a reference), e.g. `darkViolet`, `hotPink`
 
-    *   Some extra colors from [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes/blob/master/Assets/NaughtyAttributes/Scripts/Core/Utility/EColor.cs):
+    *   Some extra colors from [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes/blob/master/Assets/NaughtyAttributes/Scripts/Core/Utility/EColor.cs) & UI Toolkit:
 
-        `clear`, `pink`, `indigo`, `violet`
-
-    *   Some extra colors from UI Toolkit:
-
-        `charcoalGray`, `oceanicSlate`
+        `clear`, `pink`, `indigo`, `violet`, `charcoalGray`, `oceanicSlate`
 
     *   html color which is supported by [`ColorUtility.TryParseHtmlString`](https://docs.unity3d.com/ScriptReference/ColorUtility.TryParseHtmlString.html), like `#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`
 
-    ![color_list_ui_toolkit_add](https://github.com/TylerTemp/SaintsField/assets/6391063/50ec511b-b914-4395-8b42-793a4389c8da)
+    ![color_list](https://github.com/user-attachments/assets/d913d142-3ef8-4744-a2c3-7d9eaef6157d)
 
     If it starts with `$`, the leading `$` will be removed and `isCallback` will be set to `true`. Use `\$` to escape the starting `$`.
 
@@ -1619,21 +1620,7 @@ private bool ExtraSearch(Weapon weapon, int _, IReadOnlyList<ListSearchToken> to
         { WeaponType.Sword , "刀剑 单手" },
         { WeaponType.Hammer, "大锤 双手" },
     }[weapon.weaponType];
-
-    foreach (ListSearchToken token in tokens)
-    {
-        if (token.Type == ListSearchType.Exclude && searchName.Contains(token.Token))
-        {
-            return false;
-        }
-
-        if (token.Type == ListSearchType.Include && !searchName.Contains(token.Token))
-        {
-            return false;
-        }
-    }
-
-    return true;
+    return RuntimeUtil.SimpleSearch(searchName, tokens);
 }
 
 [ListDrawerSettings(extraSearch: nameof(ExtraSearch))]
@@ -1655,16 +1642,14 @@ private List<MyStruct> FullFeatures = new List<MyStruct>{ /*...*/ };
 
 #### `Table` ####
 
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
 Show a list/array of class/struct/`ScriptableObject`(or `MonoBehavior` if you like) as a table.
 
 It allows to resize the rows, hide rows.
 
 UI Toolkit: `Button`, `ShowInInspector` & `Playa*` will work as expected, and `Layout` will be ignored.
-
-Note:
-1.  It's highly recommended to enable `SaintsEditor`, otherwise the outside `list` will always be visible with some empty rows.
-2.  for UI Toolkit user: it requires Unity 2022.2+, otherwise it'll fall back to IMGUI.
-3.  IMGUI: complex field might not resize properly even I've set up the height function as Unity's document said. Drag component like `Range` sometimes will get triggered even out of the drawing area. This can not be fixed unless Unity gives a guild of how to resolve it.
 
 **Parameters**:
 
@@ -2720,7 +2705,7 @@ Call a function every time the field value is changed
 
     It'll try to pass the new value and the index (only if it's in an array/list). You can set the corresponding parameter in your callback if you want to receive them.
 
-*   AllowMultiple: Yes
+*   Allow Multiple: Yes
 
 Special Note: `AnimatorState` will have a different `OnValueChanged` parameter passed in. See `AnimatorState` for more detail.
 
@@ -2768,14 +2753,70 @@ You can use static method too (see the syntax in the end of the document)
 [OnValueChanged(":Debug.Log")] public Object oj;
 ```
 
+**List/Array Change**
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using this feature
+
+If you have `SaintsEditor` enabled, `OnValueChanged` can response to element add/remove.
+
+For add element, it uses the same signature.
+
+For remove element, it uses
+
+```csharp
+MyCallback(MyType arrayOrListType, int negativeCount);
+```
+
+*   `MyType arrayOrListType`: the array/list field. Need to be the same as you announced.
+*   `negativeCount`: a negative number to present how many elements has been removed.
+
+```csharp
+// Enable `SaintsEditor` before trying this example
+using SaintsField;
+
+[OnValueChanged(nameof(OnArrayChanged))] public string[] arrayChanged;
+
+private void OnArrayChanged(string content, int index)
+{
+    Debug.Log($"array[{index}]={content}");
+}
+
+private void OnArrayChanged(string[] arrayItself, int removedCount)
+{
+    Debug.Log($"array.length removed {-removedCount}, current length={arrayItself.Length}");
+}
+```
+
+Output:
+
+```
+// Click the `+` button
+array[1]=Something
+// Click the `+` button
+array[2]=Something
+// Input `1` in the size input in array/list drawer
+array.length removed 2, current length=1
+// Input `5` in the size input in array/list drawer
+array[1]=Something
+array[2]=Something
+array[3]=Something
+array[4]=Something
+// Click the `-` button
+array.length removed 1, current length=4
+```
+
 #### `OnArraySizeChanged` ####
+
+> [!ERROR]
+> Deprecated. Use `OnValueChanged` instead.
 
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
-`OnValueChanged` can not detect if an array/list is changed in size. `OnArraySizeChanged` attribute will call a callback for that.
+~~`OnValueChanged` can not detect if an array/list is changed in size.~~ `OnArraySizeChanged` attribute will call a callback for that.
 
-Using it together with `OnValueChanged` to get all changing notification for an array/list.
+~~Using it together with `OnValueChanged` to get all changing notification for an array/list.~~
 
 Parameters:
 

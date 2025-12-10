@@ -47,7 +47,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             else
             {
                 (string getError, float getValue) =
-                    Util.FlatGetOf(minMaxSliderAttribute.MinCallback, 0f, property, info, parentTarget);
+                    Util.GetOf(minMaxSliderAttribute.MinCallback, 0f, property, info, parentTarget, null);
                 // Debug.Log($"get min {getValue} with error {getError}, name={minMaxSliderAttribute.MinCallback} target={parentTarget}/directGet={parentTarget.GetType().GetField(minMaxSliderAttribute.MinCallback).GetValue(parentTarget)}");
                 if (!string.IsNullOrEmpty(getError))
                 {
@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
             }
             else
             {
-                (string getError, float getValue) = Util.FlatGetOf(minMaxSliderAttribute.MaxCallback, 0f, property, info, parentTarget);
+                (string getError, float getValue) = Util.GetOf(minMaxSliderAttribute.MaxCallback, 0f, property, info, parentTarget, null);
                 if (!string.IsNullOrEmpty(getError))
                 {
                     return new MetaInfo

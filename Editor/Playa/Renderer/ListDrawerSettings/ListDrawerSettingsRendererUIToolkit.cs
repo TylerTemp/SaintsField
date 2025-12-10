@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
@@ -33,6 +34,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             (VisualElement root, Button addButton, Button removeButton) = MakeListDrawerSettingsField(listDrawerSettingsAttribute, FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault());
             _addButton = addButton;
             _removeButton = removeButton;
+            root.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
 
             return (root, false);
         }
@@ -522,6 +524,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             };
 
             Foldout foldoutElement = listView.Q<Foldout>();
+            foldoutElement.viewDataKey = property.propertyPath;
 
             UIToolkitUtils.AddContextualMenuManipulator(foldoutElement, property, () => {});
             Toggle toggle = foldoutElement.Q<Toggle>();

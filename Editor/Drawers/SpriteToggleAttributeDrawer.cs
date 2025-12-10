@@ -74,7 +74,7 @@ namespace SaintsField.Editor.Drawers
                 // }
 
                 (string error, object foundObj) =
-                    Util.FlatGetOf<object>(imageCompName, null, property, info, parent);
+                    Util.GetOf<object>(imageCompName, null, property, info, parent, null);
 
                 if (error != "")
                 {

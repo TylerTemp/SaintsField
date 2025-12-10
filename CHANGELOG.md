@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.5.4 ##
+
+1.  Add: `[OnValueChanged]` now response to array/list size changes if you have `SaintsEditor` enabled. `[OnArraySizeChanged]` is now deprecated.
+2.  Add: `OnValueChanged`, `Button`-s etc now works with method overloading, and will find the first matched method possible.
+3.  Add: All the callback now support up-walk with syntax `../MyCallback`
+4.  Fix: `ListDrawerSettings` now can remember it's foldout status
+5.  Fix: if a list is expanded, fix `RichLabel` changes the first element label instead of list itself
+6.  Add: `Window` - `Saints` - `EColor Preview` to view all the pre-set colors
+
 ## 5.5.3 ##
 
 Fix Extended Serialization for OSX
