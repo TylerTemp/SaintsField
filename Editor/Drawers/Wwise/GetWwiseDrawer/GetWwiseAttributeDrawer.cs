@@ -345,7 +345,7 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
                     // Debug.Log($"xPathInfo.IsCallback={xPathInfo.IsCallback}/{xPathInfo.Callback}");
                     if (xPathInfo.IsCallback)
                     {
-                        (string error, string xPathString) = Util.GetOf(xPathInfo.Callback, "", property, info, parent);
+                        (string error, string xPathString) = Util.GetOf(xPathInfo.Callback, "", property, info, parent, null);
 
                         if (error != "")
                         {
