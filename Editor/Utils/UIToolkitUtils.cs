@@ -1914,23 +1914,116 @@ namespace SaintsField.Editor.Utils
 
         #region ContextMenu
 
-        private static bool _fillPropertyContextMenuDelegateLoaded;
-        private delegate GenericMenu FillPropertyContextMenuDelegate(SerializedProperty property, SerializedProperty linkedProperty = null, GenericMenu menu = null, VisualElement element = null);
+        // private static bool _fillPropertyContextMenuDelegateLoaded;
+        private delegate GenericMenu FillPropertyContextMenuDelegate(
+            SerializedProperty property,
+            SerializedProperty linkedProperty = null,
+            GenericMenu menu = null,
+            VisualElement element = null
+        );
+        private delegate GenericMenu FillPropertyContextMenuDelegate2(
+            SerializedProperty property,
+            bool isShiftPressed,
+            bool isEnabled,
+            SerializedProperty linkedProperty = null,
+            GenericMenu menu = null,
+            VisualElement element = null
+        );
         private static FillPropertyContextMenuDelegate _fillPropertyContextMenu;
 
-//         private static FillPropertyContextMenuDelegate PopulateInternalUnityFunctions()
-//         {
-//             if (_fillPropertyContextMenuDelegateLoaded)
+        private readonly struct FillPropertyContextMenuInfo
+        {
+            public readonly bool FillPropertyContextMenuDelegateLoaded;
+            private readonly FillPropertyContextMenuDelegate _fillPropertyContextMenuDelegate;
+            private readonly FillPropertyContextMenuDelegate2 _fillPropertyContextMenuDelegate2;
+
+            public readonly bool Ready;
+
+            public FillPropertyContextMenuInfo(
+                FillPropertyContextMenuDelegate fillPropertyContextMenuDelegate,
+                FillPropertyContextMenuDelegate2 fillPropertyContextMenuDelegate2)
+            {
+                FillPropertyContextMenuDelegateLoaded = true;
+                _fillPropertyContextMenuDelegate = fillPropertyContextMenuDelegate;
+                _fillPropertyContextMenuDelegate2 = fillPropertyContextMenuDelegate2;
+
+                Ready = _fillPropertyContextMenuDelegate != null || _fillPropertyContextMenuDelegate2 != null;
+            }
+
+            public GenericMenu Invoke(SerializedProperty property, VisualElement root)
+            {
+                if (!Ready)
+                {
+                    return null;
+                }
+
+                if (_fillPropertyContextMenuDelegate != null)
+                {
+                    return _fillPropertyContextMenuDelegate.Invoke(property, null, null, root);
+                }
+
+                // ReSharper disable once ConvertIfStatementToReturnStatement
+                // ReSharper disable once UseNullPropagation
+                if (_fillPropertyContextMenuDelegate2 != null)
+                {
+                    return _fillPropertyContextMenuDelegate2.Invoke(property, false, true, null, null, root);
+                }
+
+                return null;
+            }
+        }
+
+        private static FillPropertyContextMenuInfo _fillPropertyContextMenuInfo;
+
+        private static FillPropertyContextMenuInfo PopulateInternalUnityFunctions()
+        {
+            if (_fillPropertyContextMenuInfo.FillPropertyContextMenuDelegateLoaded)
+            {
+                return _fillPropertyContextMenuInfo;
+            }
+
+            // _fillPropertyContextMenuDelegateLoaded = true;
+            FillPropertyContextMenuDelegate delegate1 = null;
+            FillPropertyContextMenuDelegate2 delegate2 = null;
+            foreach (MethodInfo methodInfo in typeof(EditorGUI).GetMethods(BindingFlags.NonPublic | BindingFlags.Static))
+            {
+                // ReSharper disable once InvertIf
+                if (methodInfo.Name == "FillPropertyContextMenu")
+                {
+                    try
+                    {
+                        delegate1 =
+                            methodInfo.CreateDelegate(typeof(FillPropertyContextMenuDelegate)) as
+                                FillPropertyContextMenuDelegate;
+                    }
+                    catch (Exception)
+                    {
+                        try
+                        {
+                            delegate2 = methodInfo.CreateDelegate(typeof(FillPropertyContextMenuDelegate2)) as
+                                FillPropertyContextMenuDelegate2;
+                        }
+                        catch (Exception)
+                        {
+                            continue;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            _fillPropertyContextMenuInfo = new FillPropertyContextMenuInfo(delegate1, delegate2);
+
+//             MethodInfo method = typeof(EditorGUI)
+//                 .GetMethod("FillPropertyContextMenu", BindingFlags.NonPublic | BindingFlags.Static);
+//             if (method == null)
 //             {
-//                 return _fillPropertyContextMenu;
+//                 return null;
 //             }
 //
-//             _fillPropertyContextMenuDelegateLoaded = true;
 //             try
 //             {
-//                 _fillPropertyContextMenu = typeof(EditorGUI)
-//                     .GetMethod("FillPropertyContextMenu", BindingFlags.NonPublic | BindingFlags.Static)
-//                     ?.CreateDelegate(typeof(FillPropertyContextMenuDelegate)) as FillPropertyContextMenuDelegate;
+//                 _fillPropertyContextMenu = method.CreateDelegate(typeof(FillPropertyContextMenuDelegate)) as FillPropertyContextMenuDelegate;
 //             }
 //             catch (Exception ex)
 //             {
@@ -1938,36 +2031,7 @@ namespace SaintsField.Editor.Utils
 //                 Debug.LogException(ex);
 // #endif
 //             }
-//
-//             return _fillPropertyContextMenu;
-//         }
-        // [UnityEditor.InitializeOnLoadMethod]
-        private static FillPropertyContextMenuDelegate PopulateInternalUnityFunctions()
-        {
-            if (_fillPropertyContextMenuDelegateLoaded)
-            {
-                return _fillPropertyContextMenu;
-            }
-
-            _fillPropertyContextMenuDelegateLoaded = true;
-            MethodInfo method = typeof(EditorGUI)
-                .GetMethod("FillPropertyContextMenu", BindingFlags.NonPublic | BindingFlags.Static);
-            if (method == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                _fillPropertyContextMenu = method.CreateDelegate(typeof(FillPropertyContextMenuDelegate)) as FillPropertyContextMenuDelegate;
-            }
-            catch (Exception ex)
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogException(ex);
-#endif
-            }
-            return _fillPropertyContextMenu;
+            return _fillPropertyContextMenuInfo;
         }
 
         // Recursively gathers all visible VisualElements under a mouse event
@@ -2130,8 +2194,8 @@ namespace SaintsField.Editor.Utils
         {
             ele.AddManipulator(new ContextualMenuManipulator(evt =>
             {
-                FillPropertyContextMenuDelegate fillPropertyContextMenu = PopulateInternalUnityFunctions();
-                if(fillPropertyContextMenu != null)
+                FillPropertyContextMenuInfo fillPropertyContextMenu = PopulateInternalUnityFunctions();
+                if(fillPropertyContextMenu.Ready)
                 {
                     try
                     {
@@ -2248,8 +2312,8 @@ namespace SaintsField.Editor.Utils
             // Event currentEvent = Event.current;
             GenericMenu menu = null;
 
-            FillPropertyContextMenuDelegate fillPropertyContextMenu = PopulateInternalUnityFunctions();
-            if(fillPropertyContextMenu != null)
+            FillPropertyContextMenuInfo fillPropertyContextMenu = PopulateInternalUnityFunctions();
+            if(fillPropertyContextMenu.Ready)
             {
                 using (new EventCurrentScoop(evt.imguiEvent))
                 using (new GUIEnabledScoop(underElement.enabledInHierarchy))
@@ -2260,7 +2324,7 @@ namespace SaintsField.Editor.Utils
                         // Event.current = evt.imguiEvent;
                         // GUI.enabled = element.enabledInHierarchy;
 
-                        menu = PopulateInternalUnityFunctions()?.Invoke(property, null, null, root);
+                        menu = fillPropertyContextMenu.Invoke(property, root);
                     }
                     catch (Exception e)
                     {
