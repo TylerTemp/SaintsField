@@ -2808,7 +2808,7 @@ array.length removed 1, current length=4
 
 #### `OnArraySizeChanged` ####
 
-> [!ERROR]
+> [!CAUTION]
 > Deprecated. Use `OnValueChanged` instead.
 
 > [!IMPORTANT]
