@@ -7,6 +7,7 @@
 3.  Add: You can now config in `Edit` - `Project Settings` - `SaintsField` to tweak configs
 4.  Add: Config now have a override toggle to allow you not to override the default settings
 5.  Fix: `ShowInInspector` for enum flags now display multiple bits name instead of all the toggled names to match the behavor of Unity
+6.  Fix: right click menu fallback error on Unity 6k.3
 
 ## 5.5.4 ##
 

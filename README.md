@@ -101,8 +101,9 @@ namespace: `SaintsField`
 1.  Fix: `ResizeableTextArea` did not work with `OnValueChanged`
 2.  Add: `ResizeableTextArea` now works with `ShowInInspector`
 3.  Add: You can now config in `Edit` - `Project Settings` - `SaintsField` to tweak configs
-4.  Add: Configs now have a override toggle to allow you not to override the default settings
+4.  Add: Config now have a override toggle to allow you not to override the default settings
 5.  Fix: `ShowInInspector` for enum flags now display multiple bits name instead of all the toggled names to match the behavor of Unity
+6.  Fix: right click menu fallback error on Unity 6k.3
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -7765,7 +7766,7 @@ using SaintsField.I2Loc;
 
 1.  All attributes that requires `SaintsEditor` to be enabled
 2.  Auto kick-in sub-editor. A serializable class/struct now automatically use `SaintsRow` (`SaintsEditor`) to allow many attributes works
-3.  Auto kick-in drawer. Unity by default loading attribute from top to buttom, left to right. If you write `[Range(0, 100), OnValueChanged]` by default won't work because `Range` (Unity attribute) won't fallback. 
+3.  Auto kick-in drawer. Unity by default loading attribute from top to buttom, left to right. If you write `[Range(0, 100), OnValueChanged]` by default won't work because `Range` (Unity attribute) won't fallback.
     `SaintsEdtior` will handle the order to make `OnValueChanged` (SaintsField attributes) to work with `Range` (other attributes)
 
 Namespace: `SaintsField.Playa`
