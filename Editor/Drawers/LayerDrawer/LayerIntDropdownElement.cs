@@ -1,5 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.UIToolkitElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 
@@ -26,6 +27,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
 
             foreach (LayerUtils.LayerInfo layerInfo in LayerUtils.GetAllLayers())
             {
+                // ReSharper disable once InvertIf
                 if (layerInfo.Value == newValue)
                 {
                     Label.text = LayerUtils.LayerInfoLabelUIToolkit(layerInfo);

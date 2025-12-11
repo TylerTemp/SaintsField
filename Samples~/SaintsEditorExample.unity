@@ -3433,7 +3433,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Saintsfield.Samples::Saintsfield.Samples.Scripts.SaintsEditor.ShowInInspectorPropRange
   min: 0
   max: 23
-  propRange: 8
+  propRange: 9
 --- !u!4 &851986020
 Transform:
   m_ObjectHideFlags: 0

@@ -94,9 +94,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         }
 
         [Button]
-        private void ButtonParamPropLayer([Layer] int layerI)
+        private (int i, string s, LayerMask mask) ButtonParamPropLayer([Layer] int layerI, [Layer] string layerS, [Layer] LayerMask layerMask)
         {
-            // return (layerI, layerS);
+            return (layerI, layerS, layerMask);
         }
     }
 }

@@ -12,10 +12,10 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
         {
             Button.clicked += () =>
             {
-                if (CachedValue == null)
-                {
-                    return;
-                }
+                // if (CachedValue == null)
+                // {
+                //     return;
+                // }
 
                 LayerUtils.MakeDropdown(false, _maskValue, root, newValue =>
                 {
