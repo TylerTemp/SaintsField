@@ -1048,6 +1048,30 @@ public LayerMask singleLayerMask;
 
 ![layer](https://github.com/TylerTemp/SaintsField/assets/6391063/a7ff79a3-f7b8-48ca-8233-5facc975f5eb)
 
+It can work with `ShowInInspector`
+
+```csharp
+[ShowInInspector, Layer] private int layerIntRaw
+{
+    get => layerInt;
+    set => layerInt = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/8f22ea70-29d9-4e3c-a823-1bf4a1880167)
+
+It can work with `Button` parameters
+
+```csharp
+[Button]
+private (int i, string s, LayerMask mask) ButtonParamPropLayer([Layer] int layerI, [Layer] string layerS, [Layer] LayerMask layerMask)
+{
+    return (layerI, layerS, layerMask);
+}
+```
+
+![](https://github.com/user-attachments/assets/fe8482d8-ae02-4bb2-9af9-aa1ff071972a)
+
 #### `Scene` ####
 
 A dropdown selector for a scene in the build list, plus "Edit Scenes In Build..." option to directly open the "Build Settings" window where you can change building scenes.
@@ -1067,6 +1091,32 @@ using SaintsField;
 ```
 
 ![image](https://github.com/user-attachments/assets/4628d7a1-30cd-4025-b315-da5f8589f7cc)
+
+It can work with `ShowInInspector`
+
+```csharp
+[ShowInInspector, Scene]
+private string sceneSRaw
+{
+    get => sceneS;
+    set => sceneS = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/4dd7b6d3-1518-4dac-a7c8-a6715b779013)
+
+
+It can work with `Button` parameters
+
+```csharp
+[Button]
+private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sceneS)
+{
+    return (sceneI, sceneS);
+}
+```
+
+![](https://github.com/user-attachments/assets/b7a67b5a-3cf4-4840-b87b-8003f583c2b9)
 
 #### `SortingLayer` ####
 

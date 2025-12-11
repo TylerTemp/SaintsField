@@ -98,5 +98,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         {
             return (layerI, layerS, layerMask);
         }
+
+        // [ShowInInspector]
+        [Button]
+        private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sceneS)
+        {
+            return (sceneI, sceneS);
+        }
     }
 }
