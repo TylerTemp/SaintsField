@@ -1,6 +1,6 @@
 {
-    "name": "today.comes.saintsfield.Editor.I2Loc",
-    "rootNamespace": "",
+    "name": "Saintsfield.Editor.I2Loc",
+    "rootNamespace": "Saintsfield",
     "references": [
         "today.comes.saintsfield.Runtime",
         "today.comes.saintsfield.Editor",

@@ -1,7 +1,12 @@
 {
-    "name": "today.comes.saintsfield.Runtime.Wwise",
-    "rootNamespace": "",
-    "references": ["GUID:9b261077c7a2ac34886513ec1345f8e0","GUID:55b98396b7628454da7ce17a99ac5e67"],
+    "name": "Saintsfield.Samples.Wwise",
+    "rootNamespace": "Saintsfield",
+    "references": [
+        "Saintsfield.Runtime",
+        "Saintsfield.Runtime.Wwise",
+        "AK.Wwise.Unity.API.WwiseTypes",
+        "AK.Wwise.Unity.API.Editor"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

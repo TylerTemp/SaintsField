@@ -1,5 +1,11 @@
 # Changelog
 
+## WIP ##
+
+1.  Add: `FindObjectsByType` to replace `GetComponentInScene`. (You can still use the old name) Add `GetInScene` which by default include inactive objects.
+2.  Add: `GetInSiblings` to get sibling objects
+3.  Rename asmdef. (Unity by default uses GUID for asmdef reference. This change should not impact your current work unless you manually turned it off)
+
 ## 5.5.5 ##
 
 1.  Fix: `ResizeableTextArea` did not work with `OnValueChanged`

@@ -1,12 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using SaintsField.Interfaces;
-using SaintsField.Playa;
-using SaintsField.SaintsXPathParser.Optimization;
-using SaintsField.Utils;
-using UnityEngine;
 
 namespace SaintsField
 {

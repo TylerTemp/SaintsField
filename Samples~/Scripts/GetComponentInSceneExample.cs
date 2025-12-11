@@ -4,11 +4,11 @@ namespace SaintsField.Samples.Scripts
 {
     public class GetComponentInSceneExample: MonoBehaviour
     {
-        [GetComponentInScene] public Dummy myDummy;
+        [FindObjectsByType] public Dummy myDummy;
         // by setting compType, you can sign it as a different type
-        [GetComponentInScene(compType: typeof(Dummy))] public Transform myDummyTrans;
+        [FindObjectsByType(type: typeof(Dummy))] public Transform myDummyTrans;
         // and GameObject type works too
-        [GetComponentInScene(compType: typeof(Dummy))] public GameObject myDummyGo;
+        [FindObjectsByType(type: typeof(Dummy))] public GameObject myDummyGo;
 
         [FieldSeparator("XPath")]
         [GetByXPath("scene:://*")] public Dummy myDummyXPath;

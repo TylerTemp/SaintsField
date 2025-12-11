@@ -1,14 +1,14 @@
 {
-    "name": "today.comes.saintsfield.Samples",
-    "rootNamespace": "",
+    "name": "Saintsfield.Samples.EditorTest",
+    "rootNamespace": "Saintsfield",
     "references": [
-        "today.comes.saintsfield.Runtime",
-        "today.comes.saintsfield.Editor",
+        "Saintsfield.Runtime",
+        "Saintsfield.Editor",
         "Unity.Addressables",
         "DOTween.Modules",
         "AYellowpaper.SerializedCollections",
         "NaughtyAttributes.Core",
-        "today.comes.saintsfield.Runtime.Addressable",
+        "Saintsfield.Runtime.Addressable",
         "Unity.Netcode.Runtime",
         "Unity.Mathematics",
         "Obvious.Soap",
@@ -16,8 +16,8 @@
         "Kybernetik.UltEvents",
         "AYellowpaper.SerializeInterfaces",
         "com.inter-illusion.i2",
-        "today.comes.saintsfield.Runtime.TypeReference",
-        "today.comes.saintsfield.Runtime.Events"
+        "Saintsfield.Runtime.TypeReference",
+        "Saintsfield.Samples"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -27,8 +27,10 @@
         "DOTweenEditor.dll",
         "DOTween.dll"
     ],
-    "autoReferenced": true,
-    "defineConstraints": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_EDITOR"
+    ],
     "versionDefines": [
         {
             "name": "com.unity.addressables",

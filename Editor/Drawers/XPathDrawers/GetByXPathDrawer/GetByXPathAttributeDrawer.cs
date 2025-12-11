@@ -21,7 +21,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     [CustomPropertyDrawer(typeof(GetComponentInChildrenAttribute), true)]
     [CustomPropertyDrawer(typeof(GetComponentInParentAttribute), true)]
     [CustomPropertyDrawer(typeof(GetComponentInParentsAttribute), true)]
-    [CustomPropertyDrawer(typeof(GetComponentInSceneAttribute), true)]
+    [CustomPropertyDrawer(typeof(FindObjectsByTypeAttribute), true)]
     [CustomPropertyDrawer(typeof(GetComponentByPathAttribute), true)]
     [CustomPropertyDrawer(typeof(GetPrefabWithComponentAttribute), true)]
     [CustomPropertyDrawer(typeof(GetScriptableObjectAttribute), true)]

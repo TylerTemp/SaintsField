@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
     public class PrefabDontRefToScene : SaintsMonoBehaviour
     {
-        [GetComponentInScene] public Transform dontRefToSceneWhenInPrefab;
+        [FindObjectsByType] public Transform dontRefToSceneWhenInPrefab;
 
         [GetComponentInParents] public Transform[] dontRefToSceneParentsWhenInPrefab;
     }

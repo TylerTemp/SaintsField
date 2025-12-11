@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting
 {
     public class AutoGetterPrefabScene : MonoBehaviour
     {
-        [GetComponentInScene]
+        [FindObjectsByType]
         public Dummy sceneDummy;
     }
 }

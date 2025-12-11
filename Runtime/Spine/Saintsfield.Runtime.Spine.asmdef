@@ -1,0 +1,24 @@
+{
+    "name": "Saintsfield.Runtime.Spine",
+    "rootNamespace": "Saintsfield",
+    "references": [
+        "Saintsfield.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_SPINE_CSHARP"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.esotericsoftware.spine.spine-csharp",
+            "expression": "",
+            "define": "SAINTSFIELD_SPINE_CSHARP"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue158
 {
     public class Issue158Main : MonoBehaviour
     {
-        [GetComponentInScene] public HVRTeleporter hvrTeleporter;
-        [GetComponentInScene(includeInactive: true)] public HVRTeleporter hvrTeleporterInactive;
+        [FindObjectsByType] public HVRTeleporter hvrTeleporter;
+        [FindObjectsByType(findObjectsInactive: true)] public HVRTeleporter hvrTeleporterInactive;
     }
 }

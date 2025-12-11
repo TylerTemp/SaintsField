@@ -2313,7 +2313,7 @@ using SaintsField;
 
 ![get_component](https://github.com/TylerTemp/SaintsField/assets/6391063/a5e9ca85-ab23-4b4a-b228-5d19c66c4052)
 
-#### `GetComponentInChildren` ####
+#### `GetComponentInChildren`/`GetInChildren` ####
 
 Automatically assign a component to a field, if the field value is null and the component is already attached to itself or its child GameObjects. (First one found will be used)
 
@@ -2339,7 +2339,9 @@ NOTE: Like `GetComponentInChildren` by Unity, this **will** check the target obj
 
     For error message grouping.
 
-*   AllowMultiple: No
+*   Allow Multiple: No
+
+`GetInChildren` by default does **NOT** check the target object itself, and does **INCLUDE** inactive objects.
 
 ```csharp
 using SaintsField;
@@ -2398,27 +2400,31 @@ using SaintsField;
 
 ![get_component_in_parents](https://github.com/TylerTemp/SaintsField/assets/6391063/02836529-1aff-4bc9-b849-203d7bdaad21)
 
-#### `GetComponentInScene` ####
+#### `FindObjectsByType`/`GetInScene` ####
 
 Automatically assign a component to a field, if the field value is null and the component is in the currently opened scene. (First one found will be used)
+
+(Old Name: `GetComponentInScene`)
 
 *   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
 
     Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
 
-*   `bool includeInactive = false`
+*   `Type type = null`
+
+    The component type to assign. If null, it'll use the field type.
+
+*   `bool findObjectsInactive = false`
 
     Should inactive GameObject be included? `true` to include inactive GameObject.
-
-*   `Type compType = null`
-
-    The component type to sign. If null, it'll use the field type.
 
 *   `string groupBy = ""`
 
     For error message grouping.
 
-*   AllowMultiple: No
+*   Allow Multiple: Yes
+
+`[GetInScene(bool includeInactive = true, Type compType = null, string groupBy = "")]` is an alias of `FindObjectsByType(null, true)`
 
 ```csharp
 using SaintsField;
@@ -2450,7 +2456,7 @@ Recommended to use it with `FieldType`!
 
     For error message grouping.
 
-*   AllowMultiple: No
+*   Allow Multiple: Yes
 
 ```csharp
 using SaintsField;
@@ -2475,7 +2481,7 @@ Recommended to use it with `Expandable`!
     Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
 
 *   `string pathSuffix=null` the path suffix for this `ScriptableObject`. `null` for no limit. for example: if it's `/Resources/mySo`, it will only assign the file whose path is ends with `/Resources/mySo.asset`, like `Assets/proj/Resources/mySo.asset`
-*   AllowMultiple: No
+*   Allow Multiple: Yes
 
 ```csharp
 using SaintsField;
@@ -2486,9 +2492,34 @@ using SaintsField;
 
 ![GetScriptableObject](https://github.com/TylerTemp/SaintsField/assets/6391063/191c3b4b-a58a-4475-80cd-3dbc809a9511)
 
+#### `GetInSiblings` ####
+
+Automatically assign a sibling target.
+
+*   (Optional) `EXP config`: config. See `Saints XPath-like Syntax` section for more information.
+
+*   `bool includeInactive = true`
+
+    Should inactive GameObject be included? `true` to include inactive GameObject.
+ 
+*   `Type compType = null`
+
+    The component type to assign. If null, it'll use the field type.
+
+*   Allow Multiple: Yes
+
+```csharp
+using SaintsField;
+
+[GetInSiblings] public SpriteRenderer sr;
+[GetInSiblings] public SpriteRenderer[] srArray;
+```
+
+![](https://github.com/user-attachments/assets/8a84d719-9da9-426f-89e5-f09ac96a2952)
+
 #### `GetByXPath` ####
 
-Note: You can change the default behavior of these attributes using `Window/Saints/Create or Edit SaintsField Config`
+Note: You can change the default behavior of these attributes using `Edit/Project Settings/SaintsField/Config`
 
 Please read `Saints XPath-like Syntax` section for more information.
 

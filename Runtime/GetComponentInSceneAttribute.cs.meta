@@ -1,10 +1,3 @@
 fileFormatVersion: 2
-guid: 77ed437a26fe4a43990d9d646145bbf9
-timeCreated: 1702290817
-AssetOrigin:
-  serializedVersion: 1
-  productId: 269741
-  packageName: Saints Field
-  packageVersion: 4.32.7
-  assetPath: Assets/SaintsField/Runtime/GetComponentInSceneAttribute.cs
-  uploadId: 802314
+guid: fde02b124fdc4b15939d19a50ac41760
+timeCreated: 1765444356

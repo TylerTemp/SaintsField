@@ -7,8 +7,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue45
 {
     public class GetComponentInSceneArray : SaintsMonoBehaviour
     {
-        [GetComponentInScene, EndText(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInSceneArray;
-        [GetComponentInScene, EndText(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInSceneList;
+        [FindObjectsByType, EndText(nameof(DummyNumber), isCallback: true)] public Dummy[] getComponentInSceneArray;
+        [FindObjectsByType, EndText(nameof(DummyNumber), isCallback: true)] public List<Dummy> getComponentInSceneList;
 
         private string DummyNumber(Dummy dummy)
         {

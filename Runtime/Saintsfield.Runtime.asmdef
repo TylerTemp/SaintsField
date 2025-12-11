@@ -1,6 +1,6 @@
 {
-    "name": "today.comes.saintsfield.Runtime",
-    "rootNamespace": "",
+    "name": "Saintsfield.Runtime",
+    "rootNamespace": "Saintsfield",
     "references": [
         "GUID:1491147abca9d7d4bb7105af628b223e"
     ],

@@ -1,5 +1,4 @@
 using System;
-using UnityEngine.Events;
 
 namespace SaintsField.Events
 {

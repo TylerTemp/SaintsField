@@ -30,6 +30,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     return GetComponentInChildrenOptimized(getComponentInChildrenPayload.CompType, getComponentInChildrenPayload.IncludeInactive, getComponentInChildrenPayload.ExcludeSelf, property, info);
                 case GetComponentInParentsPayload getComponentInParentsPayload:
                     return GetComponentInParentsOptimized(getComponentInParentsPayload.CompType, getComponentInParentsPayload.IncludeInactive, getComponentInParentsPayload.ExcludeSelf, getComponentInParentsPayload.Limit, property, info);
+                case GetInSiblingsPayload getInSiblingsPayload:
+                    return GetInSiblingsOptimized(getInSiblingsPayload.IncludeInactive, getInSiblingsPayload.CompType, property, info);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(optimizationPayload), optimizationPayload, null);
             }
@@ -529,6 +531,105 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // UnityEngine.Object result = componentInParent;
             // Debug.Log($"fieldType={fieldType}, type={type}, propPath={targetProperty.propertyPath}");
             foreach (Component componentInParent in componentsInParents.Where(each => PrefabCanSignCheck(property.serializedObject.targetObject, each)))
+            {
+                if (fieldType != type)
+                {
+                    if(fieldType == typeof(GameObject))
+                    {
+                        results.Add(componentInParent.gameObject);
+                    }
+                    else
+                    {
+                        results.Add(interfaceType == null
+                            ? componentInParent.GetComponent(fieldType)
+                            : componentInParent.GetComponents(fieldType).FirstOrDefault(interfaceType.IsInstanceOfType));
+                    }
+                }
+                else
+                {
+                    results.Add(componentInParent);
+                }
+            }
+
+            return ("", results.Count > 0, results);
+        }
+
+        private static (string error, bool hasElement, IEnumerable<object> results) GetInSiblingsOptimized(bool includeInactive, Type compType, SerializedProperty property, MemberInfo info)
+        {
+            (string error, Type fieldType, Type interfaceType) = GetExpectedTypeOfProp(property, info);
+            if (error != "")
+            {
+                return (error, false, null);
+            }
+
+            if (interfaceType != null && fieldType != typeof(Component) && !fieldType.IsSubclassOf(typeof(Component)) && typeof(Component).IsSubclassOf(fieldType))
+            {
+                fieldType = typeof(Component);
+            }
+
+            Type type = compType ?? fieldType;
+
+            Transform transform;
+            switch (property.serializedObject.targetObject)
+            {
+                case Component component:
+                    transform = component.transform;
+                    break;
+                case GameObject gameObject:
+                    transform = gameObject.transform;
+                    break;
+                default:
+                    return ("GetInSiblings can only be used on Component or GameObject", false, null);
+            }
+
+            Transform parent = transform.parent;
+            if (parent == null)
+            {
+                return ("", false, Array.Empty<object>());
+            }
+
+            var children = parent.Cast<Transform>().Where(each => !ReferenceEquals(each, transform)).ToArray();
+
+            bool isGameObject = type == typeof(GameObject);
+
+            List<Component> fineComponents = new List<Component>();
+
+            foreach (Transform curCheckingTrans in children)
+            {
+                if(!includeInactive && !curCheckingTrans.gameObject.activeSelf)
+                {
+                    continue;
+                }
+                if (isGameObject)
+                {
+                    // componentInParent = curCheckingTrans;
+                    fineComponents.Add(curCheckingTrans);
+                }
+                else
+                {
+                    // componentInParent = interfaceType == null
+                    //     ? curCheckingTrans.GetComponent(type)
+                    //     : curCheckingTrans.GetComponents(type).FirstOrDefault(interfaceType.IsInstanceOfType);
+                    // Debug.Log($"{type}: {curCheckingTrans}");
+                    fineComponents.AddRange(interfaceType == null
+                        ? curCheckingTrans.GetComponents(type)
+                        : curCheckingTrans.GetComponents(type).Where(interfaceType.IsInstanceOfType).ToArray()
+                    );
+                }
+            }
+
+            // Debug.Log(componentsInParents.Count);
+
+            if (fineComponents.Count == 0)
+            {
+                return ("", false, Array.Empty<object>());
+            }
+
+            List<Object> results = new List<Object>();
+
+            // UnityEngine.Object result = componentInParent;
+            // Debug.Log($"fieldType={fieldType}, type={type}, propPath={targetProperty.propertyPath}");
+            foreach (Component componentInParent in fineComponents.Where(each => PrefabCanSignCheck(property.serializedObject.targetObject, each)))
             {
                 if (fieldType != type)
                 {

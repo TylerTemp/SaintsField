@@ -70,7 +70,7 @@ namespace SaintsField.Utils
 
         [LayoutStart("./GetComponentInScene.EXP", ELayout.Horizontal)]
         [Ordered, FieldLabelText("Override GetComponentInParent.EXP")] public bool getComponentInSceneExpOverride;
-        [Ordered] [ShowInInspector, PlayaHideIf(nameof(getComponentInSceneExpOverride)), LabelText(null)] public const EXP GetComponentInSceneExpDefault = GetComponentInSceneAttribute.DefaultEXP;
+        [Ordered] [ShowInInspector, PlayaHideIf(nameof(getComponentInSceneExpOverride)), LabelText(null)] public const EXP GetComponentInSceneExpDefault = FindObjectsByTypeAttribute.DefaultEXP;
         [LayoutEnd(".")]
         [Ordered] [EnumToggleButtons, FieldDefaultExpand, ShowIf(nameof(getComponentInSceneExpOverride)), NoLabel] public EXP getComponentInSceneExp = GetComponentInSceneExpDefault;
 

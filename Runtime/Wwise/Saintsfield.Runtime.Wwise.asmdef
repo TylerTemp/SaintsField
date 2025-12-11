@@ -1,11 +1,9 @@
 {
-    "name": "today.comes.saintsfield.Samples.Wwise",
-    "rootNamespace": "",
+    "name": "Saintsfield.Runtime.Wwise",
+    "rootNamespace": "Saintsfield",
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
-        "GUID:55b98396b7628454da7ce17a99ac5e67",
-        "GUID:8b6bbe69048c4f84dbb927d80daf7d97",
-        "GUID:191b33495a10a9b4c9a1e91c142c07d8"
+        "GUID:55b98396b7628454da7ce17a99ac5e67"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,6 +1,6 @@
 {
-    "name": "today.comes.saintsfield.Runtime.Spine",
-    "rootNamespace": "",
+    "name": "Saintsfield.Runtime.Addressable",
+    "rootNamespace": "Saintsfield",
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0"
     ],
@@ -11,13 +11,14 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [
-        "SAINTSFIELD_SPINE_CSHARP"
+        "SAINTSFIELD_ADDRESSABLE",
+        "!SAINTSFIELD_ADDRESSABLE_DISABLE"
     ],
     "versionDefines": [
         {
-            "name": "com.esotericsoftware.spine.spine-csharp",
+            "name": "com.unity.addressables",
             "expression": "",
-            "define": "SAINTSFIELD_SPINE_CSHARP"
+            "define": "SAINTSFIELD_ADDRESSABLE"
         }
     ],
     "noEngineReferences": false

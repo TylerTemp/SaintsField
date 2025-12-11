@@ -1,14 +1,22 @@
 {
-    "name": "today.comes.saintsfield.Runtime.Addressable",
-    "rootNamespace": "",
+    "name": "Saintsfield.Editor.Addressable",
+    "rootNamespace": "SaintsField",
     "references": [
-        "GUID:9b261077c7a2ac34886513ec1345f8e0"
+        "Saintsfield.Editor",
+        "Saintsfield.Runtime",
+        "Unity.Addressables.Editor",
+        "Saintsfield.Runtime.Addressable",
+        "Unity.Addressables"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "Sirenix.OdinInspector.Editor.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [
         "SAINTSFIELD_ADDRESSABLE",
