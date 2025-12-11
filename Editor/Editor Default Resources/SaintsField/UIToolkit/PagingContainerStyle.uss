@@ -17,13 +17,13 @@
 }
 
 .left-page-button {
-    background-image: url("project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-left.png?fileID=2800000&guid=9bba20b448ef9bf4492563cdc5c95f4f&type=3#classic-dropdown-left");
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-left.png?fileID=2800000&guid=9bba20b448ef9bf4492563cdc5c95f4f&type=3#classic-dropdown-left");
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
 .right-page-button {
-    background-image: url("project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-right.png?fileID=2800000&guid=55dad5685bb71954aa8919431bffb168&type=3#classic-dropdown-right");
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/classic-dropdown-right.png?fileID=2800000&guid=55dad5685bb71954aa8919431bffb168&type=3#classic-dropdown-right");
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }

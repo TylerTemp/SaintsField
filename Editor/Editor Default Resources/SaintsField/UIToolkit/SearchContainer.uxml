@@ -1,5 +1,5 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/SearchContainerStyle.uss?fileID=7433441132597879392&amp;guid=914656e24b44b95488ae352dceae078b&amp;type=3#SearchContainerStyle" />
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/SearchContainerStyle.uss?fileID=7433441132597879392&amp;guid=914656e24b44b95488ae352dceae078b&amp;type=3#SearchContainerStyle" />
     <uie:ToolbarSearchField placeholder-text="Search" class="search-field" />
     <ui:VisualElement name="LoadingIcon" picking-mode="Ignore" class="loading-icon" style="height: 100%;" />
 </ui:UXML>

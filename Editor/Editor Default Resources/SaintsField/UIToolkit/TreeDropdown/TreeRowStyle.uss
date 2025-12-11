@@ -42,7 +42,7 @@
     height: 15px;
     flex-shrink: 0;
     -unity-background-scale-mode: scale-to-fit;
-    /*background-image: url("project://database/Assets/SaintsField/Editor/Editor%20Default%20Resources/SaintsField/checkbox-outline-blank.png?fileID=2800000&guid=49e87dfab57d490419c09d9859ac93c1&type=3#checkbox-outline-blank");*/
+    /*background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/checkbox-outline-blank.png?fileID=2800000&guid=49e87dfab57d490419c09d9859ac93c1&type=3#checkbox-outline-blank");*/
     padding: 0;
     margin: 0;
 }
