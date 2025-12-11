@@ -2071,6 +2071,31 @@ private string DisplayActualValue(float av) => $"<color=gray>Actual Value: {av}"
 
 [![video](https://github.com/user-attachments/assets/82381ab1-9405-4fdc-bf5f-5c9debb56136)](https://github.com/user-attachments/assets/bb322c3a-56ba-48a4-bcba-7c3908ae2c34)
 
+`PropRange` can work with `ShowInInspector`
+
+```csharp
+[ShowInInspector, PropRange(nameof(min), nameof(max))]
+public int RawPropRange
+{
+    get => propRange;
+    set => propRange = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/06c450ee-9fb4-457c-b0aa-4aeb26a8de35)
+
+`PropRange` can work with `Button` parameters
+
+```csharp
+[Button]
+private int ButtonParamPropRange([PropRange(0, 10)] int rangeInt)
+{
+    return rangeInt;
+}
+```
+
+![](https://github.com/user-attachments/assets/b3f1ae17-273f-46ee-bb37-18382b8436d4)
+
 #### `MinMaxSlider` ####
 
 A range slider for `Vector2` or `Vector2Int`

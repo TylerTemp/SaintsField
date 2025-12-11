@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
-using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -88,7 +87,13 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                 foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
                 {
-                    VisualElement paraContainer = new VisualElement();
+                    VisualElement paraContainer = new VisualElement
+                    {
+                        style =
+                        {
+                            marginRight = 4,
+                        },
+                    };
                     root.Add(paraContainer);
 
                     Type paraType = parameterInfo.ParameterType;
@@ -102,6 +107,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         paraValue = paraType.IsValueType ? Activator.CreateInstance(paraType) : null;
                     }
                     parameterValues[index] = paraValue;
+
+                    Attribute[] attributes = parameterInfo.GetCustomAttributes().ToArray();
 
                     bool paraValueChanged = true;
                     paraContainer.schedule.Execute(() =>
@@ -127,7 +134,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             },
                             false,
                             InAnyHorizontalLayout,
-                            Array.Empty<Attribute>(),
+                            attributes,
                             FieldWithInfo.Targets
                         ).result;
                         // ReSharper disable once InvertIf
@@ -335,6 +342,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     style =
                     {
                         display = DisplayStyle.None,
+                        marginRight = 4,
                     },
                 };
                 _returnValueContainer = new VisualElement();
@@ -350,7 +358,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     {
                         position = Position.Absolute,
                         top = 0,
-                        right = 0,
+                        right = -4,
                     },
                 });
 

@@ -60,7 +60,7 @@ namespace SaintsField
 
             if (sceneAsset == null)
             {
-                Debug.Log($"guid {guid} asset is null");
+                Debug.LogWarning($"guid {guid} asset is null for SceneReference");
                 return;
             }
 

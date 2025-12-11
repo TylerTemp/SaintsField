@@ -13066,6 +13066,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 169648641493696654
       type: {class: Issue241DictInterface/Key2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
@@ -13395,6 +13397,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 6921583410868652843
       type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
       data:
@@ -18510,7 +18514,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: -2
+          rid: 6921583410868652861
         IsVRef: 0
       valueArray: []
       valueList: []
@@ -18544,7 +18548,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652861
+          rid: 6921583410868652863
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -18561,7 +18565,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: -2
+          rid: 6921583410868652865
         IsVRef: 0
       valueArray: []
       valueList: []
@@ -18611,7 +18615,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652863
+          rid: -2
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -18644,7 +18648,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652865
+          rid: -2
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -20190,7 +20194,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
         VRef:
-          rid: -2
+          rid: 6921583477705932880
         IsVRef: 0
       valueArray: []
       valueList: []
@@ -20202,7 +20206,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583477705932880
+          rid: 6921583477705932884
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -20221,7 +20225,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: -2
+          rid: 6921583477705932885
         IsVRef: 0
       valueArray: []
       valueList: []
@@ -20240,7 +20244,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583477705932884
+          rid: -2
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -20255,7 +20259,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583477705932885
+          rid: -2
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -25970,6 +25974,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 6921583410868652841
       type: {class: Issue236DictionaryEnum/CollectableType, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
@@ -27032,6 +27038,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 6921583410868652839
       type: {class: DictionaryEnumLabel/GuildHintID, ns: SaintsField.Samples.Scripts.IssueAndTesting.Testing, asm: today.comes.saintsfield.Samples}
       data:

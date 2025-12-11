@@ -12,10 +12,17 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             Debug.Log("Button clicked");
         }
 
-        [Button]
-        private void OnButtonParams(UnityEngine.Object myObj, int myInt, string myStr = "hi")
+        private enum MyEnum
         {
-            Debug.Log($"{myObj}, {myInt}, {myStr}");
+            En1,
+            En2,
+            En3,
+        }
+
+        [Button]
+        private void OnButtonParams(UnityEngine.Object myObj, int myInt, MyEnum en, string myStr = "hi")
+        {
+            Debug.Log($"{myObj}, {myInt}, {en}, {myStr}");
         }
 
         private interface IParam
@@ -79,5 +86,17 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [Button(hideReturnValue: true)]  // Hide the returned value
         private int ReturnIgnored() => Random.Range(0, 100);
+
+        [Button]
+        private int ButtonParamPropRange([PropRange(0, 10)] int rangeInt)
+        {
+            return rangeInt;
+        }
+
+        [Button]
+        private void ButtonParamPropLayer([Layer] int layerI)
+        {
+            // return (layerI, layerS);
+        }
     }
 }

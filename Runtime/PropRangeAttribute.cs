@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
     public class PropRangeAttribute: PropertyAttribute, ISaintsAttribute, IAdaptable
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Field;
