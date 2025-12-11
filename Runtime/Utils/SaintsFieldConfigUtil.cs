@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 #endif
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField.Utils
 {
 
@@ -98,19 +99,19 @@ namespace SaintsField.Utils
 
         public static int GetFoldoutSpaceImGui() => IsConfigLoaded? Config.foldoutSpaceImGui: SaintsFieldConfig.FoldoutSpaceImGuiDefault;
 
-        public static EXP GetComponentExp(EXP defaultValue) => IsConfigLoaded? Config.getComponentExp: defaultValue;
+        public static EXP GetComponentExp(EXP defaultValue) => IsConfigLoaded && Config.getComponentExpOverride? Config.getComponentExp: defaultValue;
 
-        public static EXP GetComponentInChildrenExp(EXP defaultValue) => IsConfigLoaded? Config.getComponentInChildrenExp: defaultValue;
-        public static EXP GetComponentInParentExp(EXP defaultValue) => IsConfigLoaded? Config.getComponentInParentExp: defaultValue;
-        public static EXP GetComponentInParentsExp(EXP defaultValue) => IsConfigLoaded? Config.getComponentInParentsExp: defaultValue;
-        public static EXP GetComponentInSceneExp(EXP defaultValue) => IsConfigLoaded? Config.getComponentInSceneExp: defaultValue;
-        public static EXP GetPrefabWithComponentExp(EXP defaultValue) => IsConfigLoaded? Config.getPrefabWithComponentExp: defaultValue;
-        public static EXP GetScriptableObjectExp(EXP defaultValue) => IsConfigLoaded? Config.getScriptableObjectExp: defaultValue;
-        public static EXP GetByXPathExp(EXP defaultValue) => IsConfigLoaded? Config.getByXPathExp: defaultValue;
+        public static EXP GetComponentInChildrenExp(EXP defaultValue) => IsConfigLoaded && Config.getComponentInChildrenExpOverride? Config.getComponentInChildrenExp: defaultValue;
+        public static EXP GetComponentInParentExp(EXP defaultValue) => IsConfigLoaded && Config.getComponentInParentExpOverride? Config.getComponentInParentExp: defaultValue;
+        public static EXP GetComponentInParentsExp(EXP defaultValue) => IsConfigLoaded && Config.getComponentInParentsExpOverride? Config.getComponentInParentsExp: defaultValue;
+        public static EXP GetComponentInSceneExp(EXP defaultValue) => IsConfigLoaded && Config.getComponentInSceneExpOverride? Config.getComponentInSceneExp: defaultValue;
+        public static EXP GetPrefabWithComponentExp(EXP defaultValue) => IsConfigLoaded && Config.getPrefabWithComponentExpOverride? Config.getPrefabWithComponentExp: defaultValue;
+        public static EXP GetScriptableObjectExp(EXP defaultValue) => IsConfigLoaded && Config.getScriptableObjectExpOverride? Config.getScriptableObjectExp: defaultValue;
+        public static EXP GetByXPathExp(EXP defaultValue) => IsConfigLoaded && Config.getByXPathExpOverride? Config.getByXPathExp: defaultValue;
         public static EXP GetComponentByPathExp(EXP defaultValue) => IsConfigLoaded? Config.getComponentByPathExp: defaultValue;
         public static EXP FindComponentExp(EXP defaultValue) => IsConfigLoaded? Config.findComponentExp: defaultValue;
 
-        public static int ResizableTextAreaMinRow() => IsConfigLoaded? Config.resizableTextAreaMinRow: 3;
+        public static int ResizableTextAreaMinRow() => IsConfigLoaded && Config.resizableTextAreaMinRowOverride? Config.resizableTextAreaMinRow: SaintsFieldConfig.ResizableTextAreaMinRowDefault;
         public static bool DisableOnValueChangedWatchArrayFieldUIToolkit() => IsConfigLoaded && Config.disableOnValueChangedWatchArrayFieldUIToolkit;
 
         // public static int GetByXPathDelayMs() => IsConfigLoaded? Config.getByXPathDelayMs: 0;

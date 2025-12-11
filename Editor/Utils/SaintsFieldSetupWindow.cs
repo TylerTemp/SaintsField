@@ -125,12 +125,12 @@ namespace SaintsField.Editor.Utils
         private static bool CodeAnalysisInstalled() => AppDomain.CurrentDomain.GetAssemblies()
             .Any(a => a.FullName.StartsWith("Microsoft.CodeAnalysis.CSharp,"));
 
-        private string CodeAnalysisIntallInfo() => "<u>Code Analysis</u> is " +
+        private string CodeAnalysisInstallInfo() => "<u>Code Analysis</u> is " +
                                                    (CodeAnalysisInstalled()? "<color=green>installed</color>": "<color=brown>not installed</color>")
                                                    + " in this project";
 
         [Ordered]
-        [AboveText("$" + nameof(CodeAnalysisIntallInfo), 5, 5)]
+        [AboveText("$" + nameof(CodeAnalysisInstallInfo), 5, 5)]
         [LayoutStart("./Code Analysis Install Buttons", ELayout.Horizontal)]
         [PlayaDisableIf(nameof(CodeAnalysisInstalled))]
         [Button("Install")]

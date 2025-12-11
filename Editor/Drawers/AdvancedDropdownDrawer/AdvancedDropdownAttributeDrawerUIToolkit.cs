@@ -34,7 +34,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             dropdownButton.name = NameButton(property);
             dropdownButton.userData = initMetaInfo.CurValues;
             string display = GetMetaStackDisplay(initMetaInfo);
-            UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXml(GetMetaStackDisplay(initMetaInfo), "", null, null, null), _richTextDrawer);
+            UIToolkitUtils.SetLabel(dropdownButton.ButtonLabelElement, RichTextDrawer.ParseRichXmlWithProvider(GetMetaStackDisplay(initMetaInfo), this), _richTextDrawer);
             dropdownButton.ButtonLabelElement.userData = display;
 
             dropdownButton.AddToClassList(ClassAllowDisable);

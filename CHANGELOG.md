@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.5.5 ##
+
+1.  Fix: `ResizeableTextArea` did not work with `OnValueChanged`
+2.  Add: `ResizeableTextArea` now works with `ShowInInspector`
+3.  Add: You can now config in `Edit` - `Project Settings` - `SaintsField` to tweak configs
+4.  Add: Config now have a override toggle to allow you not to override the default settings
+5.  Fix: `ShowInInspector` for enum flags now display multiple bits name instead of all the toggled names to match the behavor of Unity
+
 ## 5.5.4 ##
 
 1.  Add: `[OnValueChanged]` now response to array/list size changes if you have `SaintsEditor` enabled. `[OnArraySizeChanged]` is now deprecated.

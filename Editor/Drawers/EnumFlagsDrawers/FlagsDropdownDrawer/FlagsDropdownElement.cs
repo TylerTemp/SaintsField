@@ -52,7 +52,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
             foreach (int key in _metaInfo.BitValueToName.Keys)
             {
-                if (key == 0) continue;
+                if (key == 0)
+                {
+                    continue;
+                }
 
                 if ((newValue & key) == key)
                 {
@@ -88,7 +91,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             foreach ((int keyIndex, int index) in selectedNameKeys.WithIndex())
             {
                 if (!_metaInfo.BitValueToName.TryGetValue(keyIndex, out EnumFlagsUtil.EnumDisplayInfo displayInfo))
+                {
                     continue;
+                }
 
                 // Debug.Log($"append {displayInfo.Name}:{displayInfo.RichName}");
                 AddLabelRichText(Label, displayInfo);

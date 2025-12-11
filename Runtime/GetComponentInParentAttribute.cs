@@ -13,13 +13,14 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class GetComponentInParentAttribute: GetComponentInParentsAttribute
     {
+        public const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
         public override int Limit => 1;
 
         public override string GroupBy { get; }
 
         public GetComponentInParentAttribute(Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
-            ParseOptions(SaintsFieldConfigUtil.GetComponentInParentExp(EXP.NoPicker | EXP.NoAutoResignToNull));
+            ParseOptions(SaintsFieldConfigUtil.GetComponentInParentExp(DefaultEXP));
             ParseArguments(compType, excludeSelf);
             GroupBy = groupBy;
 

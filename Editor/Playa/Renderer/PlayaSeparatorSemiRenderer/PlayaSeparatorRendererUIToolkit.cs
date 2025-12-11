@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
-            PreCheckResult result = UpdatePreCheckUIToolkit();
+            PreCheckResult result = base.OnUpdateUIToolKit(root);
 
             if (_playaSeparatorAttribute.Title == null)
             {

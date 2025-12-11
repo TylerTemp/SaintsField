@@ -187,8 +187,9 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
-        private string _preRichLabelXml;
+        private string _preRichLabelXml = "";
         private RichTextDrawer _richTextDrawer;
+        private Label _changeLabelTarget;
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
@@ -201,11 +202,32 @@ namespace SaintsField.Editor.Playa.Renderer
 
             VisualElement container= root.Q<VisualElement>(NameContainer());
 
-            if (preCheckResult.HasRichLabel && _preRichLabelXml != preCheckResult.RichLabelXml || preCheckResult.RichLabelXml.Contains("<field"))
+            // Debug.Log($"_preRichLabelXml={_preRichLabelXml}, {_preRichLabelXml==null}, {_preRichLabelXml==""}, preCheckResult.RichLabelXml {preCheckResult.RichLabelXml==null}, {preCheckResult.RichLabelXml==""}");
+            // Debug.Log($"preCheckResult.HasRichLabel={preCheckResult.HasRichLabel}; _preRichLabelXml={_preRichLabelXml}; preCheckResult.RichLabelXml={preCheckResult.RichLabelXml}, notEqual={_preRichLabelXml != preCheckResult.RichLabelXml}");
+            if (preCheckResult.HasRichLabel && (_preRichLabelXml != preCheckResult.RichLabelXml ||
+                                                (preCheckResult.RichLabelXml?.Contains("<field") ?? false)))
             {
-                _preRichLabelXml = preCheckResult.RichLabelXml;
-                IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(preCheckResult.RichLabelXml, this);
-                UIToolkitUtils.SetLabel(UIToolkitUtils.TryFindLabel(container), chunks, _richTextDrawer ??= new RichTextDrawer());
+                _changeLabelTarget ??= UIToolkitUtils.TryFindLabel(container);
+
+                if (_changeLabelTarget != null)
+                {
+                    _preRichLabelXml = preCheckResult.RichLabelXml;
+
+                    if (preCheckResult.RichLabelXml is null)
+                    {
+                        UIToolkitUtils.SetDisplayStyle(_changeLabelTarget, DisplayStyle.None);
+                    }
+                    else
+                    {
+                        UIToolkitUtils.SetDisplayStyle(_changeLabelTarget, DisplayStyle.Flex);
+                        IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(preCheckResult.RichLabelXml, this);
+                        UIToolkitUtils.SetLabel(_changeLabelTarget, chunks, _richTextDrawer ??= new RichTextDrawer());
+                    }
+                }
+                // Debug.Log($"change {_preRichLabelXml} -> {preCheckResult.RichLabelXml}");
+                // _preRichLabelXml = preCheckResult.RichLabelXml;
+                // IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(preCheckResult.RichLabelXml, this);
+                // UIToolkitUtils.SetLabel(UIToolkitUtils.TryFindLabel(container), chunks, _richTextDrawer ??= new RichTextDrawer());
             }
 
             (string error, object value) = GetValue(FieldWithInfo);

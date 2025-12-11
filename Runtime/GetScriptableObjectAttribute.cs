@@ -7,11 +7,14 @@ using SaintsField.SaintsXPathParser;
 #endif
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     public class GetScriptableObjectAttribute: GetByXPathAttribute
     {
+        // ReSharper disable once InconsistentNaming
+        public const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
         public override string GroupBy { get; }
 
         // ReSharper disable once MemberCanBePrivate.Global
@@ -21,7 +24,7 @@ namespace SaintsField
         {
             PathSuffix = string.IsNullOrEmpty(pathSuffix)? null: pathSuffix + ".asset";
 
-            ParseOptions(SaintsFieldConfigUtil.GetScriptableObjectExp(EXP.NoPicker | EXP.NoAutoResignToNull));
+            ParseOptions(SaintsFieldConfigUtil.GetScriptableObjectExp(DefaultEXP));
             ParseXPath(pathSuffix);
             GroupBy = groupBy;
 

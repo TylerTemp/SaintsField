@@ -1,9 +1,11 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
+using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
@@ -393,6 +395,11 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 UnityEditor.PopupWindow.Show(worldBound, sa);
             };
 
+            if (setterOrNull == null)
+            {
+                newDropdownButton.SetEnabled(false);
+            }
+
             DrawEnumUIToolkitUpdateButtonLabel(newDropdownButton);
 
             return newDropdownButton;
@@ -456,28 +463,89 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             }
 
             List<string> labels = new List<string>();
-            foreach (DrawInfo.EnumValueInfo drawInfoEnumValue in refDrawPayload.DrawInfo.EnumValues)
+            if (refDrawPayload.DrawInfo.IsFlags)
             {
-                if (refDrawPayload.DrawInfo.IsFlags)
+                if (refDrawPayload.DrawInfo.IsULong)
                 {
-                    if (refDrawPayload.DrawInfo.IsULong)
+                    Dictionary<ulong, DrawInfo.EnumValueInfo> onNumberToInfo =
+                        new Dictionary<ulong, DrawInfo.EnumValueInfo>();
+                    foreach (DrawInfo.EnumValueInfo drawInfoEnumValue in refDrawPayload.DrawInfo.EnumValues)
                     {
-                        if (((ulong)refDrawPayload.Value & (ulong)drawInfoEnumValue.Value) != 0)
+                        ulong payloadValue = (ulong)refDrawPayload.Value;
+                        ulong infoValue = (ulong)drawInfoEnumValue.Value;
+                        if ((payloadValue & infoValue) == infoValue)  // it's on
                         {
-                            labels.Add(drawInfoEnumValue.Label);
+                            bool foundConflict = false;
+                            foreach (ulong alreadyOn in onNumberToInfo.Keys.ToArray())
+                            {
+                                ulong onBits = alreadyOn & infoValue;
+                                if (onBits == infoValue)  // im the sub bits, skip
+                                {
+                                    foundConflict = true;
+                                    break;
+                                }
+
+                                if (onBits == alreadyOn)  // im the super bits, use me instead
+                                {
+                                    onNumberToInfo.Remove(alreadyOn);
+                                    onNumberToInfo[infoValue] = drawInfoEnumValue;
+                                    foundConflict = true;
+                                    break;
+                                }
+                            }
+
+                            if (!foundConflict)
+                            {
+                                onNumberToInfo[infoValue] = drawInfoEnumValue;
+                            }
                         }
                     }
-                    else
-                    {
-                        long longValue = Convert.ToInt64(refDrawPayload.Value);
-                        long infoValue = Convert.ToInt64(drawInfoEnumValue.Value);
-                        if ((longValue & infoValue) != 0)
-                        {
-                            labels.Add(drawInfoEnumValue.Label);
-                        }
-                    }
+
+                    labels.AddRange(onNumberToInfo.Select(each => each.Value.Label));
                 }
                 else
+                {
+                    Dictionary<long, DrawInfo.EnumValueInfo> onNumberToInfo =
+                        new Dictionary<long, DrawInfo.EnumValueInfo>();
+                    foreach (DrawInfo.EnumValueInfo drawInfoEnumValue in refDrawPayload.DrawInfo.EnumValues)
+                    {
+                        long payloadValue = Convert.ToInt64(refDrawPayload.Value);
+                        long infoValue = Convert.ToInt64(drawInfoEnumValue.Value);
+                        if ((payloadValue & infoValue) == infoValue)  // it's on
+                        {
+                            bool foundConflict = false;
+                            foreach (long alreadyOn in onNumberToInfo.Keys.ToArray())
+                            {
+                                long onBits = alreadyOn & infoValue;
+                                if (onBits == infoValue)  // im the sub bits, skip
+                                {
+                                    foundConflict = true;
+                                    break;
+                                }
+
+                                if (onBits == alreadyOn)  // im the super bits, use me instead
+                                {
+                                    onNumberToInfo.Remove(alreadyOn);
+                                    onNumberToInfo[infoValue] = drawInfoEnumValue;
+                                    foundConflict = true;
+                                    break;
+                                }
+                            }
+
+                            if (!foundConflict)
+                            {
+                                onNumberToInfo[infoValue] = drawInfoEnumValue;
+                            }
+                        }
+                    }
+
+                    labels.AddRange(onNumberToInfo.Select(each => each.Value.Label));
+                }
+            }
+            else
+            {
+                foreach ((DrawInfo.EnumValueInfo drawInfoEnumValue, int index) in refDrawPayload.DrawInfo.EnumValues
+                             .WithIndex())
                 {
                     if (drawInfoEnumValue.Value.Equals(refDrawPayload.Value))
                     {

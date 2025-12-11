@@ -12,6 +12,7 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class GetComponentInSceneAttribute: GetByXPathAttribute
     {
+        public const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
         public override string GroupBy { get; }
 
         // ReSharper disable once NotAccessedField.Global
@@ -21,7 +22,7 @@ namespace SaintsField
 
         public GetComponentInSceneAttribute(bool includeInactive = false, Type compType = null, string groupBy = "")
         {
-            ParseOptions(SaintsFieldConfigUtil.GetComponentInSceneExp(EXP.NoPicker | EXP.NoAutoResignToNull));
+            ParseOptions(SaintsFieldConfigUtil.GetComponentInSceneExp(DefaultEXP));
             ParseArguments(includeInactive, compType);
             GroupBy = groupBy;
 

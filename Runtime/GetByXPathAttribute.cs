@@ -11,12 +11,14 @@ using SaintsField.SaintsXPathParser;
 #endif
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class GetByXPathAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute, IPlayaArraySizeAttribute
     {
+        public const EXP DefaultEXP = EXP.None;
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public virtual string GroupBy => "";
 
@@ -115,7 +117,7 @@ namespace SaintsField
             XPathInfoAndList = new[] { xPathInfoOrList };
         }
 
-        public GetByXPathAttribute(params string[] ePaths) : this(SaintsFieldConfigUtil.GetByXPathExp(EXP.None), ePaths)
+        public GetByXPathAttribute(params string[] ePaths) : this(SaintsFieldConfigUtil.GetByXPathExp(DefaultEXP), ePaths)
         {
         }
 

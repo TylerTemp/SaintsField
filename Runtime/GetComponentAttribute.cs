@@ -7,6 +7,7 @@ using SaintsField.Utils;
 using SaintsField.SaintsXPathParser;
 #endif
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
@@ -14,11 +15,13 @@ namespace SaintsField
     {
         public override string GroupBy { get; }
 
-        public readonly Type CompType;
+        // public readonly Type CompType;
+        // ReSharper disable once InconsistentNaming
+        public const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
 
         public GetComponentAttribute(Type compType = null, string groupBy = "")
         {
-            ParseOptions(SaintsFieldConfigUtil.GetComponentExp(EXP.NoPicker | EXP.NoAutoResignToNull));
+            ParseOptions(SaintsFieldConfigUtil.GetComponentExp(DefaultEXP));
             ParseXPath(compType);
             GroupBy = groupBy;
 
@@ -29,7 +32,7 @@ namespace SaintsField
         {
             ParseOptions(exp);
             ParseXPath(compType);
-            CompType = compType;
+            // CompType = compType;
             GroupBy = groupBy;
 
             OptimizationPayload = new GetComponentPayload(compType);

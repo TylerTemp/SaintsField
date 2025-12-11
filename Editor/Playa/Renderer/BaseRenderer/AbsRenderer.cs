@@ -138,7 +138,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             LabelTextAttribute richLabelAttribute = fieldWithInfo.PlayaAttributes.OfType<LabelTextAttribute>().FirstOrDefault();
             bool hasRichLabel = richLabelAttribute != null;
 
-            string richLabelXml = "";
+            string richLabelXml = null;
             // ReSharper disable once InvertIf
             if (hasRichLabel)
             {

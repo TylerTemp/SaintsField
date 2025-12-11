@@ -13,6 +13,7 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class GetComponentInParentsAttribute: GetByXPathAttribute
     {
+        public const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
         public virtual int Limit => 0;
 
         public bool IncludeInactive;
@@ -23,7 +24,7 @@ namespace SaintsField
 
         public GetComponentInParentsAttribute(bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
-            ParseOptions(SaintsFieldConfigUtil.GetComponentInParentsExp(EXP.NoPicker | EXP.NoAutoResignToNull));
+            ParseOptions(SaintsFieldConfigUtil.GetComponentInParentsExp(DefaultEXP));
             ParseArguments(includeInactive, compType, excludeSelf);
             GroupBy = groupBy;
 

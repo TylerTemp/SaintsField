@@ -28,27 +28,35 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
         // private static string NameLabelPlaceholder(SerializedProperty property) =>
         //     $"{property.propertyPath}__ResizableTextArea_LabelPlaceholder";
 
-        private static string NameResiable(SerializedProperty property) => $"{property.propertyPath}__ResizableTextArea";
+        private static string NameResizable(SerializedProperty property) => $"{property.propertyPath}__ResizableTextArea";
         // private static string NameTextArea(SerializedProperty property) => $"{property.propertyPath}__ResizableTextArea";
+
+        private static float MinHeight => 47 / 3f * SaintsFieldConfigUtil.ResizableTextAreaMinRow();
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            const float singleLineHeight = 47 / 3f;
+            ResizableTextArea r = MakeResizableTextArea(GetPreferredLabel(property));
+            r.TextField.bindingPath = property.propertyPath;
+            r.name = NameResizable(property);
 
-            float minHeight = singleLineHeight * SaintsFieldConfigUtil.ResizableTextAreaMinRow();
+            UIToolkitUtils.AddContextualMenuManipulator(r.labelElement, property, () => Util.PropertyChangedCallback(property, info, null));
 
+            return r;
+        }
+
+        private static ResizableTextArea MakeResizableTextArea(string label)
+        {
             TextField textField = new TextField
             {
-                value = property.stringValue,
-                // name = NameTextArea(property),
+                // bindingPath = property.propertyPath,
                 multiline = true,
                 style =
                 {
                     whiteSpace = WhiteSpace.Normal,
-                    minHeight = minHeight,
+                    minHeight = MinHeight,
                     marginRight = 0,
                 },
             };
@@ -59,64 +67,29 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             VisualElement textInput = textField.Q(name: "unity-text-input");
             if (textInput != null)
             {
-                textInput.style.minHeight = minHeight;
+                textInput.style.minHeight = MinHeight;
             }
 
-            textField.BindProperty(property);
+            // textField.BindProperty(property);
 
-            ResizableTextArea r = new ResizableTextArea(GetPreferredLabel(property), textField)
+            ResizableTextArea r = new ResizableTextArea(label, textField)
             {
                 style =
                 {
                     flexDirection = FlexDirection.Column,
                 },
-                name = NameResiable(property),
+                // name = NameResizable(property),
             };
-
-            UIToolkitUtils.AddContextualMenuManipulator(r.labelElement, property, () => Util.PropertyChangedCallback(property, info, null));
-            r.BindProperty(property);
-
             return r;
-
-            // textField.style.minHeight = singleLineHeight * SaintsFieldConfigUtil.ResizableTextAreaMinRow();
-
-            // return r;
         }
 
-        // protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-        //     int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
-        //     Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        // {
-        //     ResizableTextArea resizableTextArea = container.Q<ResizableTextArea>(name: NameResiable(property));
-        //     resizableTextArea.TextField.RegisterValueChangedCallback(changed =>
-        //     {
-        //         property.stringValue = changed.newValue;
-        //         property.serializedObject.ApplyModifiedProperties();
-        //
-        //         onValueChangedCallback?.Invoke(changed.newValue);
-        //     });
-        //
-        //     resizableTextArea.TextField.TrackPropertyValue(property, newProp =>
-        //     {
-        //         if (resizableTextArea.value != newProp.stringValue)
-        //         {
-        //             resizableTextArea.TextField.SetValueWithoutNotify(newProp.stringValue);
-        //         }
-        //     });
-        //
-        //     UIToolkitUtils.AddContextualMenuManipulator(resizableTextArea.labelElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
-        //
-        //     resizableTextArea.labelElement.AddManipulator(new ContextualMenuManipulator(evt =>
-        //     {
-        //         evt.menu.AppendAction("Clear", _ =>
-        //         {
-        //             property.stringValue = string.Empty;
-        //             property.serializedObject.ApplyModifiedProperties();
-        //             onValueChangedCallback.Invoke(property.stringValue);
-        //         });
-        //     }));
-        // }
-
+        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            ResizableTextArea resizableTextArea = container.Q<ResizableTextArea>(name: NameResizable(property));
+            resizableTextArea.TrackPropertyValue(property, _ => onValueChangedCallback.Invoke(property.stringValue));
+        }
     }
 }
 #endif

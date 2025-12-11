@@ -19,6 +19,7 @@ using SaintsField.Editor.Drawers.ProgressBarDrawer;
 using SaintsField.Editor.Drawers.PropRangeDrawer;
 using SaintsField.Editor.Drawers.RateDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
+using SaintsField.Editor.Drawers.ResizableTextAreaDrawer;
 using SaintsField.Editor.Drawers.SaintsDictionary;
 using SaintsField.Editor.Drawers.SceneDrawer;
 #if UNITY_2021_2_OR_NEWER
@@ -152,18 +153,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         protected virtual PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
-            return UpdatePreCheckUIToolkit();
-        }
-
-        protected PreCheckResult HelperOnUpdateUIToolKitRawBase()
-        {
-            return UpdatePreCheckUIToolkit();
-        }
-
-        protected PreCheckResult UpdatePreCheckUIToolkit()
-        {
             return UpdatePreCheckUIToolkitInternal(FieldWithInfo, _rootElement);
         }
+
+        // protected PreCheckResult HelperOnUpdateUIToolKitRawBase()
+        // {
+        //     return UpdatePreCheckUIToolkit();
+        // }
+
+        // protected PreCheckResult UpdatePreCheckUIToolkit()
+        // {
+        //
+        // }
 
         // TODO: paging & searching
         private PreCheckResult UpdatePreCheckUIToolkitInternal(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
@@ -1316,6 +1317,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             return (AnimatorStateAttributeDrawer.UIToolkitValueEditString(
                                 oldElement,
                                 animatorStateAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ResizableTextAreaAttribute resizableTextAreaAttribute:
+                            return (ResizableTextAreaAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                resizableTextAreaAttribute,
                                 label,
                                 (string) value,
                                 beforeSet,

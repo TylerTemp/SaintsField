@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
         }
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
-            PreCheckResult result = UpdatePreCheckUIToolkit();
+            PreCheckResult result = base.OnUpdateUIToolKit(root);
             VisualElement labelContainer = root.Q<VisualElement>(FieldWithInfo.MemberId);
             UpdateContainer(labelContainer, this);
             return result;

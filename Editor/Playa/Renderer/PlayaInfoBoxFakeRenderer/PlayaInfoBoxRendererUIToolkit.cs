@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
-            PreCheckResult result = UpdatePreCheckUIToolkit();
+            PreCheckResult result = base.OnUpdateUIToolKit(root);
             HelpBox helpBox = root.Q<HelpBox>(FieldWithInfo.MemberId);
             UpdateInfoBox(helpBox, this);
             return result;

@@ -30,7 +30,12 @@ namespace SaintsField.Editor.Utils
         #region Config
 
         [MenuItem(MenuRoot + "Create or Edit SaintsField Config")]
-        public static void CreateOrEditSaintsFieldConfig()
+        private static void CreateOrEditSaintsFieldConfig()
+        {
+            Selection.activeObject = EnsureCreateSaintsFieldConfig();
+        }
+
+        public static SaintsFieldConfig EnsureCreateSaintsFieldConfig()
         {
             SaintsFieldConfig saintsFieldConfig;
             if (SaintsFieldConfigUtil.ReloadConfig())
@@ -62,7 +67,7 @@ namespace SaintsField.Editor.Utils
                 saintsFieldConfig = SaintsFieldConfigUtil.Config;
             }
 
-            Selection.activeObject = saintsFieldConfig;
+            return saintsFieldConfig;
         }
 
         #endregion

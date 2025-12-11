@@ -2517,12 +2517,6 @@ namespace SaintsField.Editor.Utils
             else
             {
                 element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
-                // element.RegisterValueChangedCallback(evt =>
-                // {
-                //     object newValue = transformer(evt.newValue);
-                //     beforeSet?.Invoke(newValue);
-                //     setterOrNull.Invoke(newValue);
-                // });
             }
         }
 
@@ -2644,6 +2638,14 @@ namespace SaintsField.Editor.Utils
                 helpBox.style.display = DisplayStyle.Flex;
             }
 
+        }
+
+        public static void SetDisplayStyle(VisualElement target, DisplayStyle displayStyle)
+        {
+            if (target.style.display != displayStyle)
+            {
+                target.style.display = displayStyle;
+            }
         }
     }
 #endif

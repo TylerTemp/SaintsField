@@ -8,6 +8,7 @@ using SaintsField.Utils;
 using SaintsField.SaintsXPathParser;
 #endif
 
+// ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
@@ -15,19 +16,22 @@ namespace SaintsField
     {
         public override string GroupBy { get; }
 
-        public readonly Type CompType;
-        public readonly bool IncludeInactive;
-        public readonly bool ExcludeSelf;
+        // ReSharper disable once InconsistentNaming
+        public new const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
+
+        // public readonly Type CompType;
+        // public readonly bool IncludeInactive;
+        // public readonly bool ExcludeSelf;
 
         public GetComponentInChildrenAttribute(bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
-            ParseOptions(SaintsFieldConfigUtil.GetComponentInChildrenExp(EXP.NoPicker | EXP.NoAutoResignToNull));
+            ParseOptions(SaintsFieldConfigUtil.GetComponentInChildrenExp(DefaultEXP));
             ParseArguments(includeInactive, compType, excludeSelf);
             GroupBy = groupBy;
 
-            CompType = compType;
-            IncludeInactive = includeInactive;
-            ExcludeSelf = excludeSelf;
+            // CompType = compType;
+            // IncludeInactive = includeInactive;
+            // ExcludeSelf = excludeSelf;
 
             OptimizationPayload = new GetComponentInChildrenPayload(compType, includeInactive, excludeSelf);
         }

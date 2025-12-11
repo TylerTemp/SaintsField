@@ -5,6 +5,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class ResizableTextAreaExample : MonoBehaviour
     {
+        [OnValueChanged(":Debug.Log")]
         [ResizableTextArea, FieldLabelText("<icon=star.png /><label />"), BelowButton(nameof(ChangeValue))] public string shortValue;
         [ResizableTextArea] public string _long;
         [FieldLabelText(null), ResizableTextArea] public string _noLabel;
@@ -28,7 +29,9 @@ namespace SaintsField.Samples.Scripts
 
         private void ChangeValue(string oldValue)
         {
-            shortValue = string.IsNullOrEmpty(oldValue) ? $"Randome {UnityEngine.Random.Range(0, 10)}" : "";
+            shortValue = string.IsNullOrEmpty(oldValue) ? $"Random {UnityEngine.Random.Range(0, 10)}" : "";
         }
+
+        [TextArea] public string defaultTextArea;
     }
 }

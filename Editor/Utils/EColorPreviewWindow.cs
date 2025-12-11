@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Playa;
 using SaintsField.Utils;
-using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor.Utils
@@ -26,6 +25,7 @@ namespace SaintsField.Editor.Utils
 
             [LayoutStart("Color", ELayout.Horizontal)]
             [NoLabel] public Color color;
+            [NoLabel] public string displayName;
             [NoLabel] public string hex;
 
             [LayoutStart("RGB", ELayout.TitleBox)]
@@ -51,10 +51,8 @@ namespace SaintsField.Editor.Utils
         private string EColorInfoLabel(EColorInfo eColorInfo) =>
             $"<color={eColorInfo.name}>██ EColor ██</color>.{eColorInfo.name}";
 
-        private bool EColorInfoSearch(EColorInfo eColorInfo, int _, IReadOnlyList<ListSearchToken> tokens)
-        {
-            return RuntimeUtil.SimpleSearch(eColorInfo.name.ToString(), tokens);
-        }
+        private bool EColorInfoSearch(EColorInfo eColorInfo, int _, IReadOnlyList<ListSearchToken> tokens) =>
+            RuntimeUtil.SimpleSearch(eColorInfo.name.ToString(), tokens);
 
         public override void OnEditorEnable()
         {
@@ -70,6 +68,7 @@ namespace SaintsField.Editor.Utils
                     {
                         // name = $"<color={each.ToString().ToLower()}>██ EColor.{each}</color>",
                         name = each,
+                        displayName = each.ToString(),
                         color = color,
                         hex = ColorUtility.ToHtmlStringRGB(color),
                         r = color.r,

@@ -96,14 +96,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.5.4**
+**5.5.5**
 
-1.  Add: `[OnValueChanged]` now response to array/list size changes if you have `SaintsEditor` enabled. `[OnArraySizeChanged]` is now deprecated.
-2.  Add: `OnValueChanged`, `Button`-s etc now works with method overloading, and will find the first matched method possible.
-3.  Add: All the callback now support up-walk with syntax `../MyCallback`
-4.  Fix: `ListDrawerSettings` now can remember it's foldout status
-5.  Fix: if a list is expanded, fix `RichLabel` changes the first element label instead of list itself
-6.  Add: `Window` - `Saints` - `EColor Preview` to view all the pre-set colors
+1.  Fix: `ResizeableTextArea` did not work with `OnValueChanged`
+2.  Add: `ResizeableTextArea` now works with `ShowInInspector`
+3.  Add: You can now config in `Edit` - `Project Settings` - `SaintsField` to tweak configs
+4.  Add: Configs now have a override toggle to allow you not to override the default settings
+5.  Fix: `ShowInInspector` for enum flags now display multiple bits name instead of all the toggled names to match the behavor of Unity
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4552,6 +4551,19 @@ using SaintsField;
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/202a742a-965c-4e68-a829-4a8aa4c8fe9e)](https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922)
 
+It works with `ShowInInspector`
+
+```csharp
+[ShowInInspector, ResizableTextArea]
+public string RawTa
+{
+    get => ta;
+    set => ta = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/3d7ab248-b705-48d1-b324-0d8e77b85bc5)
+
 #### `LeftToggle` ####
 
 A toggle button on the left of the bool field. Only works on boolean field.
@@ -5239,7 +5251,7 @@ You can install it using any method below:
 
     ![](https://github.com/user-attachments/assets/42138dfb-1e11-409d-a4c0-36cf8c5a8bb4)
 
-7.  Go `Window` - `Saints` - `Enable Code Analysis...`
+7.  Go `Edit` - `Project Settings` - `SaintsField`
 
 [**OpenUPM Uplink**](https://openupm.com/nuget/#using-uplinked-unitynuget)
 
@@ -5247,7 +5259,7 @@ You can install it using any method below:
 openupm add org.nuget.microsoft.codeanalysis.csharp
 ```
 
-Then go `Window` - `Saints` - `Enable Code Analysis...`
+Then go `Edit` - `Project Settings` - `SaintsField`
 
 
 **NuGet for Unity**:
@@ -5259,7 +5271,7 @@ Then go `Window` - `Saints` - `Enable Code Analysis...`
 3.  Type `Microsoft.CodeAnalysis.CSharp` and hit `Search`, on the result, click `Install` (the newest version should work just fine)
 
     ![](https://github.com/user-attachments/assets/766775cd-9e7c-4361-8bab-abab8bda39e8)
-4.  Go `Window` - `Saints` - `Enable Code Analysis...`
+4.  Go `Edit` - `Project Settings` - `SaintsField`
 
 Or you can manually install related dll to Unity.
 
@@ -7749,7 +7761,12 @@ using SaintsField.I2Loc;
 
 ## SaintsEditor ##
 
-`SaintsEditor` is a `UnityEditor.Editor` level component.
+`SaintsEditor` is a `UnityEditor.Editor` level component, which gives:
+
+1.  All attributes that requires `SaintsEditor` to be enabled
+2.  Auto kick-in sub-editor. A serializable class/struct now automatically use `SaintsRow` (`SaintsEditor`) to allow many attributes works
+3.  Auto kick-in drawer. Unity by default loading attribute from top to buttom, left to right. If you write `[Range(0, 100), OnValueChanged]` by default won't work because `Range` (Unity attribute) won't fallback. 
+    `SaintsEdtior` will handle the order to make `OnValueChanged` (SaintsField attributes) to work with `Range` (other attributes)
 
 Namespace: `SaintsField.Playa`
 
@@ -7757,7 +7774,7 @@ Please note, any `Editor` level component can not work together with each other 
 
 ### Setup ###
 
-`Window` - `Saints` - `Enable SaintsEditor`.
+`Edit` - `Project Settings` - `SaintsField`
 
 If you want to do it manually, check [ApplySaintsEditor.cs](https://github.com/TylerTemp/SaintsField/blob/master/Editor/Playa/ApplySaintsEditor.cs) for more information
 
