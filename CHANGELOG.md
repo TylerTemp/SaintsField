@@ -1,10 +1,16 @@
 # Changelog
 
-## WIP ##
+## 5.6.0 ##
 
 1.  Add: `FindObjectsByType` to replace `GetComponentInScene`. (You can still use the old name) Add `GetInScene` which by default include inactive objects.
 2.  Add: `GetInSiblings` to get sibling objects
 3.  Rename asmdef. (Unity by default uses GUID for asmdef reference. This change should not impact your current work unless you manually turned it off)
+4.  Fix: `Separator` title color didn't change when it's not a callback
+5.  Fix: `ShowInInspector` method parameters renderer used a horizental style rendering
+6.  Fix: `ShowInInspector` did not update value if it's a class/struct after first rendering
+7.  Fix: `AxisInput` shown duplicated options in dropdown
+8.  Fix: `ValueButton` might shown an incorrect expanding button with nothing else until you click it
+9.  Add: `PropRange`, `MinMaxSlider` etc now support function parameters decoration for `Button`, `ShowInInspector`
 
 ## 5.5.5 ##
 

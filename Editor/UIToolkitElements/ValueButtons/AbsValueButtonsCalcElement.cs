@@ -8,7 +8,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 {
     public abstract class AbsValueButtonsCalcElement<T>: VisualElement where T: AbsValueButton
     {
-        public AbsValueButtonsCalcElement()
+        protected AbsValueButtonsCalcElement()
         {
             style.flexDirection = FlexDirection.Row;
             style.overflow = Overflow.Hidden;
@@ -24,7 +24,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 
         private bool _ready;
 
-        public abstract AbsValueButton CreateValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks);
+        protected abstract AbsValueButton CreateValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks);
 
         public void SetButtonLabels(IEnumerable<IReadOnlyList<RichTextDrawer.RichTextChunk>> buttonChunks)
         {

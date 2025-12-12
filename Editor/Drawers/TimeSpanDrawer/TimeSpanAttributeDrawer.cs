@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.SaintsSerialization;
 using UnityEditor;
@@ -72,7 +73,6 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
             long ticks = isLong? (long) value: ((TimeSpan)value).Ticks;
             if (oldElement is TimeSpanField dtField)
             {
-                // Debug.Log($"old element set ticks {ticks}");
                 dtField.SetValueWithoutNotify(ticks);
                 return null;
             }
@@ -84,28 +84,11 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
 
             TimeSpanField element = new TimeSpanField(label, timeSpanElement);
 
-            element.AddToClassList(ClassAllowDisable);
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
 
-            if (labelGrayColor)
+            if (setterOrNull != null)
             {
-                element.labelElement.style.color = AbsRenderer.ReColor;
-            }
-            if (inHorizontalLayout)
-            {
-                element.style.flexDirection = FlexDirection.Column;
-            }
-            else
-            {
-                element.AddToClassList(TimeSpanField.alignedFieldUssClassName);
-            }
-            if (setterOrNull == null)
-            {
-                element.SetEnabled(false);
-                element.AddToClassList(AbsRenderer.ClassSaintsFieldEditingDisabled);
-            }
-            else
-            {
-                element.AddToClassList(ClassAllowDisable);
                 element.RegisterValueChangedCallback(evt =>
                 {
                     object invokeValue;

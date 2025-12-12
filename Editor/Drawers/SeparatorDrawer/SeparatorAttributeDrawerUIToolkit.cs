@@ -76,10 +76,10 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
 
             VisualElement root = new VisualElement
             {
-                // style =
-                // {
-                //     marginLeft = 4,
-                // },
+                style =
+                {
+                    marginLeft = 4,
+                },
             };
 
             VisualElement titleElement = null;

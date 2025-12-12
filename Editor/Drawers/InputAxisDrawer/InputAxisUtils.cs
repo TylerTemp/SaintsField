@@ -17,8 +17,12 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
 
                 for (int index = 0; index < axesProperty.arraySize; index++)
                 {
-                    axisNames.Add(axesProperty.GetArrayElementAtIndex(index).FindPropertyRelative("m_Name")
-                        .stringValue);
+                    string name = axesProperty.GetArrayElementAtIndex(index).FindPropertyRelative("m_Name")
+                        .stringValue;
+                    if(!axisNames.Contains(name))
+                    {
+                        axisNames.Add(name);
+                    }
                 }
             }
 

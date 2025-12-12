@@ -23,13 +23,13 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
             switch (parameterType)
             {
                 case AnimatorControllerParameterType.Float:
-                    return "FloatField@4x";
+                    return "float-field.png";
                 case AnimatorControllerParameterType.Int:
-                    return "IntegerField@4x";
+                    return "integer-field.png";
                 case AnimatorControllerParameterType.Bool:
-                    return "ToolbarToggle@4x";
+                    return "toolbar-toggle.png";
                 case AnimatorControllerParameterType.Trigger:
-                    return "EventTrigger Icon";
+                    return "event-trigger.png";
                 default:
                     return null;
             }

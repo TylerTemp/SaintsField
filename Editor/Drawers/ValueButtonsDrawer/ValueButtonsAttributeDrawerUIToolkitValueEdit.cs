@@ -71,7 +71,15 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 UIToolkitUtils.UIToolkitValueEditAfterProcess(uiToolkitFieldWrapper, setterOrNull,
                     labelGrayColor, inHorizontalLayout);
 
-                SubPanel = new VisualElement();
+                SubPanel = new VisualElement
+                {
+                    name = "ui-toolkit-wrapper-subpanel",
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 1,
+                    },
+                };
                 Add(SubPanel);
 
                 ValueButtonsArrangeElement.BindSubContainer(SubPanel);
@@ -95,6 +103,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
 
             RichTextDrawer.EmptyRichTextTagProvider emptyRichTextTagProvider = new RichTextDrawer.EmptyRichTextTagProvider();
+            // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (IAdvancedDropdownList info in metaInfo.DropdownListValue)
             {
                 IReadOnlyList<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(
@@ -107,12 +116,16 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             wrapper.ValueButtonsArrangeElement.schedule.Execute(() =>
             {
-                wrapper.SubPanel.style.display = wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
-                wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
-                    wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                bool doneOnce = false;
                 wrapper.ValueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
                 {
-                    // leftExpandButton.SetEnabled(hasSubRow);
+                    if (!doneOnce)
+                    {
+                        wrapper.SubPanel.style.display = wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                        wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
+                            wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                    }
+                    doneOnce = true;
                     DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
                     if (wrapper.LeftExpandButton.style.display != display)
                     {
@@ -136,54 +149,6 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
         {
             return UIToolkitValueEdit(oldElement, valueButtonsAttribute, label, value, enumType, beforeSet,
                 setterOrNull, labelGrayColor, inHorizontalLayout, allAttributes, targets);
-            // if (oldElement is UIToolkitWrapper oldF)
-            // {
-            //     ValueEditRefreshCurValue(oldF, value);
-            //     return null;
-            // }
-            //
-            // UIToolkitWrapper wrapper = new UIToolkitWrapper(label, labelGrayColor, inHorizontalLayout, setterOrNull);
-            //
-            // AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfoShowInInspector(enumType, valueButtonsAttribute, value, targets[0], false, true);
-            //
-            // List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
-            //
-            // RichTextDrawer.EmptyRichTextTagProvider emptyRichTextTagProvider = new RichTextDrawer.EmptyRichTextTagProvider();
-            // foreach (IAdvancedDropdownList info in metaInfo.DropdownListValue)
-            // {
-            //     IReadOnlyList<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(
-            //         info.displayName, emptyRichTextTagProvider).ToArray();
-            //     rawInfos.Add(new ValueButtonRawInfo(chunks, false, info.value));
-            // }
-            // wrapper.ValueButtonsArrangeElement.UpdateButtons(
-            //     rawInfos
-            // );
-            //
-            // wrapper.ValueButtonsArrangeElement.schedule.Execute(() =>
-            // {
-            //     wrapper.SubPanel.style.display = wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
-            //     wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
-            //         wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-            //     wrapper.ValueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
-            //     {
-            //         // leftExpandButton.SetEnabled(hasSubRow);
-            //         DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
-            //         if (wrapper.LeftExpandButton.style.display != display)
-            //         {
-            //             wrapper.LeftExpandButton.style.display = display;
-            //         }
-            //         ValueEditRefreshCurValue(wrapper, value);
-            //     });
-            //     wrapper.ValueButtonsArrangeElement.OnButtonClicked.AddListener(clickedValue =>
-            //     {
-            //         beforeSet?.Invoke(wrapper.Value);
-            //         setterOrNull?.Invoke(clickedValue);
-            //     });
-            //     ValueEditRefreshCurValue(wrapper, value);
-            // });
-            //
-            // ValueEditRefreshCurValue(wrapper, value);
-            // return wrapper;
         }
 
         private static void ValueEditRefreshCurValue(UIToolkitWrapper wrapper, object curValue)

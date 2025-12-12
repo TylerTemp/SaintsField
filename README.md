@@ -96,14 +96,17 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.5.5**
+**5.6.0**
 
-1.  Fix: `ResizeableTextArea` did not work with `OnValueChanged`
-2.  Add: `ResizeableTextArea` now works with `ShowInInspector`
-3.  Add: You can now config in `Edit` - `Project Settings` - `SaintsField` to tweak configs
-4.  Add: Config now have a override toggle to allow you not to override the default settings
-5.  Fix: `ShowInInspector` for enum flags now display multiple bits name instead of all the toggled names to match the behavor of Unity
-6.  Fix: right click menu fallback error on Unity 6k.3
+1.  Add: `FindObjectsByType` to replace `GetComponentInScene`. (You can still use the old name) Add `GetInScene` which by default include inactive objects.
+2.  Add: `GetInSiblings` to get sibling objects
+3.  Rename asmdef. (Unity by default uses GUID for asmdef reference. This change should not impact your current work unless you manually turned it off)
+4.  Fix: `Separator` title color didn't change when it's not a callback
+5.  Fix: `ShowInInspector` method parameters renderer used a horizental style rendering
+6.  Fix: `ShowInInspector` did not update value if it's a class/struct after first rendering
+7.  Fix: `AxisInput` shown duplicated options in dropdown
+8.  Fix: `ValueButton` might shown an incorrect expanding button with nothing else until you click it
+9.  Add: `PropRange`, `MinMaxSlider` etc now support function parameters decoration for `Button`, `ShowInInspector`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1060,17 +1063,23 @@ It can work with `ShowInInspector`
 
 ![](https://github.com/user-attachments/assets/8f22ea70-29d9-4e3c-a823-1bf4a1880167)
 
-It can work with `Button` parameters
+It can work with `ShowInInspector`/`Button` parameters and return value
 
 ```csharp
+[ShowInInspector]
+private (int i, string s, LayerMask mask) Layer([Layer] int layerI, [Layer] string layerS, [Layer] LayerMask layerMask)
+{
+    return (layerI, layerS, layerMask);
+}
+
 [Button]
-private (int i, string s, LayerMask mask) ButtonParamPropLayer([Layer] int layerI, [Layer] string layerS, [Layer] LayerMask layerMask)
+private (int i, string s, LayerMask mask) Layer([Layer] int layerI, [Layer] string layerS, [Layer] LayerMask layerMask)
 {
     return (layerI, layerS, layerMask);
 }
 ```
 
-![](https://github.com/user-attachments/assets/fe8482d8-ae02-4bb2-9af9-aa1ff071972a)
+![](https://github.com/user-attachments/assets/1ade5956-9427-45fd-bbb4-0b9036bd0ea5)
 
 #### `Scene` ####
 
@@ -1106,9 +1115,15 @@ private string sceneSRaw
 ![](https://github.com/user-attachments/assets/4dd7b6d3-1518-4dac-a7c8-a6715b779013)
 
 
-It can work with `Button` parameters
+It can work with `ShowInInspector`/`Button` parameters and return value
 
 ```csharp
+[ShowInInspector]
+private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sceneS)
+{
+    return (sceneI, sceneS);
+}
+
 [Button]
 private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sceneS)
 {
@@ -1116,13 +1131,13 @@ private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sc
 }
 ```
 
-![](https://github.com/user-attachments/assets/b7a67b5a-3cf4-4840-b87b-8003f583c2b9)
+![](https://github.com/user-attachments/assets/7c6d5296-215c-416e-9179-4baa02387dd1)
 
 #### `SortingLayer` ####
 
 A dropdown selector for sorting layer, plus an "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
 
-*   AllowMultiple: No
+*   Allow Multiple: No
 
 ```csharp
 using SaintsField;
@@ -1131,13 +1146,43 @@ using SaintsField;
 [SortingLayer] public int _sortingLayerInt;
 ```
 
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/f6633689-012b-4d55-af32-885aa2a2e3cf)
+![image](https://github.com/user-attachments/assets/a93d73c7-b7eb-4a95-9b24-7c05f96f3e38)
+
+It can work with `ShowInInspector`
+
+```csharp
+[ShowInInspector, SortingLayer] private string SortingLayerString
+{
+    get => _sortingLayerString;
+    set => _sortingLayerString = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/d733da4a-aa83-4f6c-a974-a8c966f237c5)
+
+It can work with `ShowInInspector`/`Button` parameters and return value
+
+```csharp
+[ShowInInspector]
+private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sceneS)
+{
+    return (sceneI, sceneS);
+}
+
+[Button]
+private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sceneS)
+{
+    return (sceneI, sceneS);
+}
+```
+
+![](https://github.com/user-attachments/assets/a3862780-3f81-4ba1-a64a-ef51ef55e0c3)
 
 #### `Tag` ####
 
 A dropdown selector for a tag.
 
-*   AllowMultiple: No
+*   Allow Multiple: No
 
 ```csharp
 using SaintsField;
@@ -1145,7 +1190,32 @@ using SaintsField;
 [Tag] public string tag;
 ```
 
-![tag](https://github.com/TylerTemp/SaintsField/assets/6391063/1a705bce-60ac-4434-826f-69c34055450c)
+![tag](https://github.com/user-attachments/assets/145a86b2-2abd-4bcf-9f91-9d091df1e8be)
+
+It can work with `ShowInInspector`
+
+```csharp
+[ShowInInspector, Tag]
+private string ShowTag
+{
+    get => _tag;
+    set => _tag = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/28e77b99-2c06-468b-9d63-dcac890d8fd6)
+
+It can work with `ShowInInspector`/`Button` parameters and return value
+
+```csharp
+[ShowInInspector]
+private string Tag([Tag] string myTag) => myTag;
+
+[Button]
+private string Tag([Tag] string myTag) => myTag;
+```
+
+![](https://github.com/user-attachments/assets/4a424fd4-c32e-40cc-8c55-7661b0eeb7c4)
 
 #### `InputAxis` ####
 
@@ -1159,11 +1229,38 @@ using SaintsField;
 [InputAxis] public string inputAxis;
 ```
 
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/68dc47d9-7211-48df-bbd1-c11faa536bd1)
+![image](https://github.com/user-attachments/assets/21ad4a9c-9f52-44dc-b0f7-b027ed7e6025)
+
+It can work with `ShowInInspector`
+
+```csharp
+[ShowInInspector, InputAxis]
+private string ShowInputAxis
+{
+    get => inputAxis;
+    set => inputAxis = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/08365fb1-a3d7-42dc-9e37-3b7a2d5e1197)
+
+It can work with `ShowInInspector`/`Button` parameters and return value
+
+```csharp
+[ShowInInspector]
+private string ShowInputAxis([InputAxis] string myInput) => myInput;
+
+[Button]
+private string ShowInputAxis([InputAxis] string myInput) => myInput;
+```
+
+![](https://github.com/user-attachments/assets/e68caea9-b7dd-4103-8f33-aca67a11ef96)
 
 #### `ShaderParam` ####
 
 Select a shader parameter from a `shader`, `material` or `renderer`. (Requires Unity 2021.2+)
+
+For string, it will save the name. For int, it will save the hash.
 
 **Parameters**:
 
@@ -1190,6 +1287,31 @@ private Shader GetShader() => targetRenderer.sharedMaterial.shader;
 ```
 
 ![image](https://github.com/user-attachments/assets/80ba6891-2a7e-41e5-8887-74e29479f1d9)
+
+It works with `ShowInInspector`
+
+```csharp
+[ShowInInspector, ShaderParam]
+public int ShowShaderParamInt
+{
+    get => shaderParamInt;
+    set => shaderParamInt = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/0932c1dc-c647-4728-981a-cb06002d53e8)
+
+It works with `ShowInInspector`/`Button` parameters and return value
+
+```csharp
+[ShowInInspector]
+private string ShowShaderParam([ShaderParam] string shaderS) => shaderS;
+
+[Button]
+private string ShowShaderParam([ShaderParam] string shaderS) => shaderS;
+```
+
+![](https://github.com/user-attachments/assets/6d46c784-25d7-4e69-992b-f8d920601ad0)
 
 #### `ShaderKeyword` ####
 
@@ -1218,6 +1340,33 @@ private Shader GetShader() => targetRenderer.sharedMaterial.shader;
 ```
 
 ![image](https://github.com/user-attachments/assets/aff67ea7-1dbc-4f8c-8eaa-572456b7dd07)
+
+It works with `ShowInInspector`
+
+```csharp
+[ShowInInspector, ShaderKeyword]
+private string ShowShaderKeywordString
+{
+    get => shaderKeywordString;
+    set => shaderKeywordString = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/a087d6a5-014e-4ed1-9ede-209199eabdbd)
+
+It works with `ShowInInspector`/`Button` parameters & return value
+
+```csharp
+[ShowInInspector]
+[ShaderParam]
+private string ShowShaderParam([ShaderParam] string shaderS) => shaderS;
+
+[Button]
+[ShaderParam]
+private string ShowShaderParam([ShaderParam] string shaderS) => shaderS;
+```
+
+![](https://github.com/user-attachments/assets/a1a41a57-d605-43dd-b836-30e0dc01e3dd)
 
 ### Toggle & Switch ###
 
@@ -2026,28 +2175,7 @@ private void DictExternalAdd()
 
 [![video](https://github.com/user-attachments/assets/dd3e7add-36f3-4f59-918c-58022d68cac6)](https://github.com/user-attachments/assets/57baefa0-144c-4c7f-8100-dd7b102d3935)
 
-**Supported Attributes**: `ShowInInspector` can work together with the following attributes
-
-*   `DateTime`
-*   `TimeSpan`
-*   `Layer`
-*   `SortingLayer`
-*   `Guid`
-*   `Tag`
-*   `InputAxis`
-*   `ShaderParam`
-*   `ShaderKeyword`
-*   `Rate`
-*   `PropRange`
-*   `MinMaxSlider`
-*   `ProgressBar`
-*   `LabelText`
-*   `AnimParams`
-*   `AnimState`
-*   `CurveRange`
-*   `ListDrawerSettings`
-*   `SaintsDictionary`
-*   `ValueButtons`
+**Supported Attributes**: `ShowInInspector` can work together with many attributes, please see each attribute section to know if it's been supported.
 
 ### Numerical ###
 
@@ -2065,7 +2193,7 @@ Parameters:
 
 *   `int max` maximum value of the rating. Must be greater than `min`.
 
-*   AllowMultiple: No
+*   Allow Multiple: No
 
 ```csharp
 using SaintsField;
@@ -2076,6 +2204,33 @@ using SaintsField;
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/c3a0509e-b211-4a62-92c8-7bc8c3866cf4)](https://github.com/TylerTemp/SaintsField/assets/6391063/a506681f-92f8-42ab-b08d-483b26b2f7c3)
+
+It works with `ShowInInspector`:
+
+```csharp
+[ShowInInspector, Rate(0, 5)]
+public int ShowRate0To5
+{
+    get => rate0To5;
+    set => rate0To5 = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/f0f35c9b-12cd-41a6-b8a8-7bf5b0502270)
+
+It works with `ShowInInspector`/`Button` parameters and return value:
+
+```csharp
+[ShowInInspector]
+[Rate(1, 5)]
+private int ShowRate([Rate(0, 5)] int rate) => rate;
+
+[Button]
+[Rate(1, 5)]
+private int ShowRate([Rate(0, 5)] int rate) => rate;
+```
+
+![](https://github.com/user-attachments/assets/69762ee9-fcca-44f4-8e69-802fd7b4ebc7)
 
 #### `PropRange` ####
 
@@ -2134,17 +2289,17 @@ public int RawPropRange
 
 ![](https://github.com/user-attachments/assets/06c450ee-9fb4-457c-b0aa-4aeb26a8de35)
 
-`PropRange` can work with `Button` parameters
+`PropRange` can work with `ShowInInspector`/`Button` parameters and return value
 
 ```csharp
-[Button]
-private int ButtonParamPropRange([PropRange(0, 10)] int rangeInt)
-{
-    return rangeInt;
-}
+[ShowInInspector]
+private int ShowPropR([PropRange(0, 100)] int p) => p;
+
+[ShowInInspector]
+private int ShowPropR([PropRange(0, 100)] int p) => p;
 ```
 
-![](https://github.com/user-attachments/assets/b3f1ae17-273f-46ee-bb37-18382b8436d4)
+![](https://github.com/user-attachments/assets/8227f4f1-9342-4068-b37d-c755eb70e8e8)
 
 #### `MinMaxSlider` ####
 
@@ -2196,6 +2351,31 @@ public float DynamicMax { get; private set; }
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/3da0ea31-d830-4ac6-ab1d-8305764162f5)](https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47)
+
+`MinMaxSlider` can work with `ShowInInspector`
+
+```csharp
+[ShowInInspector, MinMaxSlider(-1f, 3f, 0.3f)]
+private Vector2 ShowVector2Step03
+{
+    get => vector2Step03;
+    set => vector2Step03 = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/d773165a-8c60-422d-8e6b-a8417810f80b)
+
+`MinMaxSlider` can work with `ShowInInspector`/`Button` parameters and return value
+
+```csharp
+[ShowInInspector]
+private Vector2Int MinMaxV2([MinMaxSlider(-10, 10)] Vector2Int minMax) => minMax;
+
+[ShowInInspector]
+private Vector2Int MinMaxV2([MinMaxSlider(-10, 10)] Vector2Int minMax) => minMax;
+```
+
+![](https://github.com/user-attachments/assets/7862cf54-e594-4a15-a0e8-1b6cac8ed746)
 
 #### `ProgressBar` ####
 
@@ -2251,6 +2431,31 @@ private string Title(float curValue, float min, float max, string label) => curV
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/74085d85-e447-4b6b-a3ff-1bd2f26c5d73)](https://github.com/TylerTemp/SaintsField/assets/6391063/11ad0700-32ba-4280-ae7b-6b6994c9de83)
 
+`ProgressBar` can work with `ShowInInspector`
+
+```csharp
+[ShowInInspector, ProgressBar(0, 10)]
+public int ShowMyHp
+{
+    get => myHp;
+    set => myHp = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/28504546-fd72-41ee-8451-1fa45a5e9c32)
+
+`ProgressBar` can work with `ShowInInspector`/`Button` parameters and return value
+
+```csharp
+[ShowInInspector]
+private int ProgressBar([ProgressBar(0, 10)] int hp) => hp;
+
+[Button]
+private int ProgressBar([ProgressBar(0, 10)] int hp) => hp;
+```
+
+![](https://github.com/user-attachments/assets/d7c7a763-91b9-4b3f-a30b-94ef8f60c65d)
+
 ### Animation ###
 
 #### `AnimatorParam` ###
@@ -2279,6 +2484,31 @@ private int animParamHash;
 ```
 
 ![animator_params](https://github.com/TylerTemp/SaintsField/assets/6391063/3cd5fb6d-1a75-457c-9bbd-e1e6b377a83c)
+
+It works with `ShowInInspector`:
+
+```csharp
+[ShowInInspector, AnimatorParam(nameof(MyAnimator))]
+public int ShowAnimParamHash
+{
+    get => animParamHash;
+    set => animParamHash = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/099db2e9-8681-4626-afca-f5a6084fd8f5)
+
+```csharp
+[ShowInInspector]
+[AnimatorParam]
+private int ShowAnimatorParam([AnimatorParam] string animName) => Animator.StringToHash(animName);
+
+[Button]
+[AnimatorParam]
+private int ShowAnimatorParam([AnimatorParam] string animName) => Animator.StringToHash(animName);
+```
+
+![](https://github.com/user-attachments/assets/8ca9967d-71d2-4b2f-8ab5-20110853550f)
 
 #### `AnimatorState` ###
 
@@ -2319,6 +2549,33 @@ public AnimatorStateBase stateBase;
 
 ![animator_state](https://github.com/user-attachments/assets/6c4b972a-a69e-4890-9b67-a0d141eefed7)
 
+It works with `ShowInInspector`:
+
+```csharp
+[ShowInInspector]
+private AnimatorState ShowAnimatorState
+{
+    get => animatorState;
+    set => animatorState = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/33d72883-7a80-4876-a3ac-4eda5c0fe06c)
+
+It works with `ShowInInspector`/`Button` parameters and return value
+
+```csharp
+[ShowInInspector]
+[AnimatorState]
+private string ShowAnimatorState([AnimatorState] string animName) => animName;
+
+[Button]
+[AnimatorState]
+private string ShowAnimatorState([AnimatorState] string animName) => animName;
+```
+
+![](https://github.com/user-attachments/assets/cae46858-ca50-44fc-b37e-38a03de83978)
+
 #### `CurveRange` ####
 
 A curve drawer for `AnimationCurve` which allow to set bounds and color
@@ -2352,6 +2609,32 @@ public AnimationCurve curve2;
 
 ![curverange](https://github.com/TylerTemp/SaintsField/assets/6391063/7c10ebb4-ab93-4192-ad05-5e2c3addcfe9)
 
+It works with `ShowInInspector`:
+
+```csharp
+[ShowInInspector, CurveRange(EColor.Orange)]
+public AnimationCurve ShowCurve1
+{
+    get => curve1;
+    set => curve1 = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/ffb9ad62-8c09-486f-b4a6-b128e4cdd132)
+
+It works with `ShowInInspector`/`Button` parameters and return value
+
+```csharp
+[ShowInInspector]
+[CurveRange(EColor.Aquamarine)]
+private AnimationCurve ShowCurveRange([CurveRange(EColor.YellowNice)] AnimationCurve animCurve) => animCurve;
+
+[Button]
+[CurveRange(EColor.Aquamarine)]
+private AnimationCurve ShowCurveRange([CurveRange(EColor.YellowNice)] AnimationCurve animCurve) => animCurve;
+```
+
+![](https://github.com/user-attachments/assets/1c431f75-6ad2-4c94-b0d6-46a8ea76d37c)
 
 ### Auto Getter ###
 
@@ -4495,6 +4778,32 @@ public string ShowClickAButton
 }
 ```
 
+It works with `ShowInInspector`/`Button` parameters & return value
+
+```csharp
+[ShowInInspector]
+[ValueButtons(nameof(ValueButtonsResultProvider))]
+private int ShowValueButton([ValueButtons(nameof(ValueButtonsOptionProvider))] int opt) => opt;
+
+[Button]
+[ValueButtons(nameof(ValueButtonsResultProvider))]
+private int ShowValueButton([ValueButtons(nameof(ValueButtonsOptionProvider))] int opt) => opt;
+
+private AdvancedDropdownList<int> ValueButtonsOptionProvider() => new AdvancedDropdownList<int>
+{
+    { "<icon=lightMeter/greenLight/>", 2 },
+    { "<icon=lightMeter/redLight/>", 4 },
+};
+
+private AdvancedDropdownList<int> ValueButtonsResultProvider() => new AdvancedDropdownList<int>
+{
+    { "<icon=toggle on focus@2x/>", 2 },
+    { "<icon=toggle focus@2x/>", 4 },
+};
+```
+
+![](https://github.com/user-attachments/assets/1f3b2546-d6f6-4dda-b20a-19641c2bcfb6)
+
 #### `OptionsValueButtons` / `PairsValueButtons` ####
 
 Select an option directly in the attribute.
@@ -5219,6 +5528,33 @@ public DateTime MyDateTime => new DateTime(dt);
 
 [![video](https://github.com/user-attachments/assets/2d3bdbce-c00e-4045-9efa-a825bedf0ad0)](https://github.com/user-attachments/assets/96441a7c-8cee-4614-b1e6-3843a193a1e4)
 
+It works with `ShowInInspector`
+
+```csharp
+[ShowInInspector, DateTime]
+private long ShowDt
+{
+    get => dt;
+    set => dt = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/1a4716ce-5e2f-4645-aed8-3d8f6dbf40e2)
+
+It works with `ShowInInspector`/`Button` parameters & return value
+
+```csharp
+[ShowInInspector]
+[DateTime]
+private long ShowDatetime([DateTime] long dt) => dt;
+
+[Button]
+[DateTime]
+private long ShowDatetime([DateTime] long dt) => dt;
+```
+
+![](https://github.com/user-attachments/assets/d6a4b413-4fc6-44ca-a362-734fe147aa9d)
+
 #### `TimeSpan` ####
 
 Allows you to set a timespan using `long` type.
@@ -5243,6 +5579,33 @@ private long _showTsLong;
 
 ![](https://github.com/user-attachments/assets/995de9da-0493-45b7-9b60-7d382b9efcb1)
 
+It works with `ShowInInspector`
+
+```csharp
+[ShowInInspector, TimeSpan]
+private long ShowTsLong
+{
+    get => dt;
+    set => dt = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/2d4fa4fa-6c39-4b43-b842-ab2b40f43d63)
+
+It works with `ShowInInspector`/`Button` parameters & return value
+
+```csharp
+[ShowInInspector]
+[TimeSpan]
+private long ShowTimeSpan([TimeSpan] long ts) => ts;
+
+[Button]
+[TimeSpan]
+private long ShowTimeSpan([TimeSpan] long ts) => ts;
+```
+
+![](https://github.com/user-attachments/assets/f9b849f0-0605-4967-8108-17bf508401ff)
+
 #### `Guid` ####
 
 Allows you to set a Guid using `string` type.
@@ -5264,6 +5627,33 @@ using SaintsField;
 Invalid input will get a notice
 
 ![](https://github.com/user-attachments/assets/3ba4ac5b-1661-4190-a62a-44bec0332f94)
+
+It works with `ShowInInspector`
+
+```csharp
+[ShowInInspector, Guid]
+public string ShowGuidString
+{
+    get => guidString;
+    set => guidString = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/2f808cf6-159e-49d1-b0e7-af33cd311552)
+
+It works with `ShowInInspector`/`Button` parameters & return value
+
+```csharp
+[ShowInInspector]
+[Guid]
+private string ShowGuid([Guid] string guidString) => guidString;
+
+[Button]
+[Guid]
+private string ShowGuid([Guid] string guidString) => guidString;
+```
+
+![](https://github.com/user-attachments/assets/1f0e9e6d-4d74-48c4-b1e1-b55416d98bc9)
 
 ## Layout System ##
 

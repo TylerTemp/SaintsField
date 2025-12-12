@@ -13,18 +13,23 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
         private void LongChanged(long d) => Debug.Log(d);
 
-        // [ShowInInspector] private long v => dt;
-        //
-        // [ShowInInspector]
-        // private DateTime _showDt;
-        //
-        // [ShowInInspector, DateTime]
-        // private long _showDtLong;
-        //
-        // [LayoutStart("H", ELayout.Horizontal | ELayout.TitleBox)]
-        // [DateTime]
-        // public long d1;
-        // [DateTime]
-        // public long l;
+        [ShowInInspector, DateTime]
+        private long ShowDt
+        {
+            get => dt;
+            set => dt = value;
+        }
+
+        [ShowInInspector]
+        private DateTime _showDt;
+
+        [ShowInInspector, DateTime]
+        private long _showDtLong;
+
+        [LayoutStart("H", ELayout.Horizontal | ELayout.TitleBox)]
+        [DateTime]
+        public long d1;
+        [DateTime]
+        public long l;
     }
 }

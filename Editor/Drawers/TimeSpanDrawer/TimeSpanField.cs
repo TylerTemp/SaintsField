@@ -5,8 +5,21 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
 {
     public class TimeSpanField: BaseField<long>
     {
+        private readonly TimeSpanElement _timeSpanElement;
         public TimeSpanField(string label, TimeSpanElement timeSpanElement) : base(label, timeSpanElement)
         {
+            _timeSpanElement = timeSpanElement;
+        }
+
+        public override void SetValueWithoutNotify(long newValue)
+        {
+            _timeSpanElement.SetValueWithoutNotify(newValue);
+        }
+
+        public override long value
+        {
+            get => _timeSpanElement.value;
+            set => _timeSpanElement.value = value;
         }
     }
 }

@@ -161,11 +161,17 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             valueButtonsArrangeElement.schedule.Execute(() =>
             {
-                subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
-                leftExpandButton.RegisterValueChangedCallback(evt =>
-                    subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+
+                bool doneOnce = false;
                 valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
                 {
+                    if (!doneOnce)
+                    {
+                        subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                        leftExpandButton.RegisterValueChangedCallback(evt =>
+                            subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                    }
+                    doneOnce = true;
                     // leftExpandButton.SetEnabled(hasSubRow);
                     DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
                     if (leftExpandButton.style.display != display)

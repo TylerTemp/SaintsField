@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts
     public class InputAxisExample: SaintsMonoBehaviour
     {
         [InputAxis]
-        [FieldLabelText("<icon=star.png /><label/>")]
+        // [FieldLabelText("<icon=star.png /><label/>")]
         [OnValueChanged(nameof(OnValueChanged))]
         public string inputAxis;
 

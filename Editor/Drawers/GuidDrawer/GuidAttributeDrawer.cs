@@ -135,7 +135,7 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
                     if (Guid.TryParse(evt.newValue, out Guid guid))
                     {
                         beforeSet?.Invoke(value);
-                        setterOrNull(guid);
+                        setterOrNull(guid.ToString());
                     }
                 });
             }

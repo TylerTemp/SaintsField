@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Linq;
-using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
@@ -17,7 +16,7 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
     public partial class RealTimeCalculatorRenderer
     {
         private string NameContainer() => $"saints-field--real-time-calculator--{GetName(FieldWithInfo)}";
-        private string ClassResultContainer() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-result-container";
+        // private string ClassResultContainer() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-result-container";
 
         private static StyleSheet _ussClassSaintsFieldEditingDisabledHide;
         private VisualElement _returnValueContainer;
@@ -100,7 +99,13 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
 
                 foreach ((ParameterInfo parameterInfo, int index) in parameters.WithIndex())
                 {
-                    VisualElement paraContainer = new VisualElement();
+                    VisualElement paraContainer = new VisualElement
+                    {
+                        style =
+                        {
+                            marginRight = 4,
+                        },
+                    };
                     root.Add(paraContainer);
 
                     Type paraType = parameterInfo.ParameterType;
@@ -116,6 +121,7 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                     _parameterValues[index] = paraValue;
 
                     bool paraValueChanged = true;
+                    Attribute[] attributes = parameterInfo.GetCustomAttributes().ToArray();
                     paraContainer.schedule.Execute(() =>
                     {
                         if (!paraValueChanged)
@@ -135,8 +141,8 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                                 paraValueChanged = true;
                             },
                             false,
-                            true,
-                            Array.Empty<Attribute>(),
+                            InAnyHorizontalLayout,
+                            attributes,
                             FieldWithInfo.Targets
                         ).result;
                         // ReSharper disable once InvertIf
@@ -158,7 +164,7 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                         height = 1,
                         marginTop = 3,
                         marginBottom = 3,
-                    }
+                    },
                 });
             }
 
@@ -178,7 +184,13 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
 
             if (hasParameters)
             {
-                _returnValueContainer = new VisualElement();
+                _returnValueContainer = new VisualElement
+                {
+                    style =
+                    {
+                        marginRight = 4,
+                    },
+                };
                 root.Add(_returnValueContainer);
             }
             else
@@ -217,13 +229,14 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
             VisualElement container= root.Q<VisualElement>(NameContainer());
 
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
-            // Debug.Log(string.Join(", ", _parameterValues));
+            // Debug.Log($"_parameterValues={string.Join(", ", _parameterValues)}");
 
             object[] returnValues = FieldWithInfo.Targets.Select(t => methodInfo.Invoke(t, _parameterValues)).ToArray();
+            // Debug.Log($"returnValues={string.Join(", ", returnValues)}");
 
             Debug.Assert(_returnValueContainer != null);
             object value = returnValues[0];
-            // Debug.Log($"returnValue={returnValue}");
+            // Debug.Log($"returnValue[0]={value}");
 
             DataPayload userData = (DataPayload)container.userData;
             bool valueIsNull = RuntimeUtil.IsNull(value);
@@ -235,6 +248,7 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
             else
             {
                 isEqual = userData.HasDrawer && Util.GetIsEqual(userData.Value, value);
+                // Debug.Log($"isEqual={isEqual} for {userData.Value}=={value}");
             }
             if(isEqual && userData.IsGeneralCollection)
             {
@@ -283,7 +297,18 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                 }
 
                 Type type = RuntimeUtil.IsNull(value) ? methodInfo.ReturnType : value.GetType();
-                (VisualElement result, bool isNestedField) = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetName(FieldWithInfo), type, value, null, _ => {}, false, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo), FieldWithInfo.Targets);
+                (VisualElement result, bool isNestedField) = UIToolkitValueEdit(
+                    fieldElementOrNull,
+                    NoLabel? null: GetName(FieldWithInfo),
+                    type,
+                    value,
+                    null,
+                    _ => {},
+                    false,
+                    InAnyHorizontalLayout,
+                    ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo),
+                    FieldWithInfo.Targets);
+                // Debug.Log($"fill value {value} get {result}");
                 if(result!=null)
                 {
                     if (isNestedField && result is Foldout { value: false } fo)
@@ -302,73 +327,7 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
                 {
                     userData.HasDrawer = false;
                 }
-
-                // StyleEnum<DisplayStyle> displayStyle = child.style.display;
-                // fieldElement.Clear();
-                // fieldElement.userData = value;
-                // fieldElement.Add(child = UIToolkitValueEdit(GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, GetSetterOrNull(FieldWithInfo)));
-                // child.style.display = displayStyle;
             }
-
-            // bool returnIsNull = RuntimeUtil.IsNull(value);
-            // bool preIsNull = RuntimeUtil.IsNull(_preValue);
-            // if (returnIsNull && preIsNull)
-            // {
-            //     return baseResult;
-            // }
-            //
-            // bool isCollection = !returnIsNull
-            //                     && value is not UnityEngine.Object
-            //                     && (value.GetType().IsArray || value is IEnumerable);
-            //
-            // bool isEqual;
-            // if (isCollection)
-            // {
-            //     if (preIsNull)
-            //     {
-            //         isEqual = false;
-            //     }
-            //     else if (_preValue is IEnumerable preIe)
-            //     {
-            //         isEqual = preIe.Cast<object>().SequenceEqual(((IEnumerable)value).Cast<object>());
-            //     }
-            //     else
-            //     {
-            //         isEqual = Util.GetIsEqual(value, _preValue);
-            //     }
-            // }
-            // else
-            // {
-            //     isEqual = Util.GetIsEqual(value, _preValue);
-            // }
-            //
-            // // Debug.Log(isEqual);
-            //
-            // if (!isEqual)
-            // {
-            //     _preValue = value;
-            //     string labelName = NoLabel ? null : GetName(FieldWithInfo);
-            //     (VisualElement result, bool isNestedField) = UIToolkitValueEdit(
-            //         _returnValueContainer.Children().FirstOrDefault(),
-            //         labelName,
-            //         methodInfo.ReturnType,
-            //         value,
-            //         null,
-            //         _ => { },
-            //         false,
-            //         false
-            //     );
-            //     if (result != null)
-            //     {
-            //         if (isNestedField && result is Foldout { value: false } fo)
-            //         {
-            //             fo.RegisterCallback<AttachToPanelEvent>(_ => fo.value = true);
-            //             // fo.value = true;
-            //         }
-            //         _returnValueContainer.Clear();
-            //         _returnValueContainer.Add(result);
-            //     }
-            // }
 
             return baseResult;
         }

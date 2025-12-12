@@ -2671,7 +2671,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             payload.State = UIToolkitValueEditPayloadState.GenericType;
 
-            if (genFoldout.value && !payload.IsFullFilled)
+            // if (genFoldout.value && !payload.IsFullFilled)
+            if (genFoldout.value)  // if expanded, we always call FillExpandIfNeeded because we need to update value (as it might have changed)
             {
                 payload.IsFullFilled = true;
                 FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, targets);

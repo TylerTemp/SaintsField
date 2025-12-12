@@ -75,7 +75,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 UIToolkitUtils.UIToolkitValueEditAfterProcess(uiToolkitFieldWrapper, setterOrNull,
                     labelGrayColor, inHorizontalLayout);
 
-                SubPanel = new VisualElement();
+                SubPanel = new VisualElement
+                {
+                    name = "edit-sub-panel",
+                };
                 Add(SubPanel);
 
                 FlagButtonsArrangeElement.BindSubContainer(SubPanel);

@@ -7,7 +7,6 @@ using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -122,12 +121,6 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
             List<string> paths = new List<string>();
             if (go == null) return paths;
 
-            void AddUnique(string p)
-            {
-                if (!string.IsNullOrEmpty(p) && !paths.Contains(p))
-                    paths.Add(p);
-            }
-
             // Prefab stage (prefab mode / isolated view)
             PrefabStage stage = PrefabStageUtility.GetPrefabStage(go);
             if (stage != null)
@@ -139,7 +132,9 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
             // Try the nearest instance root explicitly
             GameObject root = PrefabUtility.GetNearestPrefabInstanceRoot(go);
             if (root != null)
+            {
                 AddUnique(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(root));
+            }
 
             // If object itself is part of a prefab asset (project view)
             AddUnique(AssetDatabase.GetAssetPath(go));
@@ -154,6 +149,12 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
             }
 
             return paths;
+
+            void AddUnique(string p)
+            {
+                if (!string.IsNullOrEmpty(p) && !paths.Contains(p))
+                    paths.Add(p);
+            }
         }
 
         private void TryAddGuidFromObject(Object uObject)
@@ -214,7 +215,11 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
                 }
             }
 
+#if UNITY_6000_3_OR_NEWER
+            genericDropdownMenu.DropDown((_dropdownBoundElement ?? this).worldBound, _dropdownButton, DropdownMenuSizeMode.Auto);
+#else
             genericDropdownMenu.DropDown((_dropdownBoundElement ?? this).worldBound, _dropdownButton, true);
+#endif
         }
 
         private void WatchEachInput(ChangeEvent<string> _)

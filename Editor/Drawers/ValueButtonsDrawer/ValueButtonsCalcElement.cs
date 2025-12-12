@@ -6,7 +6,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 {
     public class ValueButtonsCalcElement: AbsValueButtonsCalcElement<ValueButton>
     {
-        public override AbsValueButton CreateValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
+        protected override AbsValueButton CreateValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
         {
             return new ValueButton(chunks);
         }

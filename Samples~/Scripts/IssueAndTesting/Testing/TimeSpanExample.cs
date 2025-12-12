@@ -23,7 +23,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         private TimeSpan _showTs;
 
         [ShowInInspector, TimeSpan]
-        private long _showTsLong;
+        private long ShowTsLong
+        {
+            get => dt;
+            set => dt = value;
+        }
 
         [LayoutStart("H", ELayout.Horizontal | ELayout.TitleBox)]
         [TimeSpan]

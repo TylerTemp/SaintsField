@@ -61,11 +61,11 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                     case ShaderPropertyType.Color:
                         return "d_color_picker";
                     case ShaderPropertyType.Float:
-                        return "FloatField";
+                        return "float-field.png";
                     case ShaderPropertyType.Vector:
                         return "Vector3Field@4x";
                     case ShaderPropertyType.Range:
-                        return "Slider@4x";
+                        return "slider.png";
                     case ShaderPropertyType.Texture:
                         return "d_Texture Icon";
                     case ShaderPropertyType.Int:

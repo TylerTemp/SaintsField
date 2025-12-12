@@ -51,11 +51,11 @@ namespace SaintsField.Editor.Core
             }
         }
 
-        private readonly Dictionary<TextureCacheKey, Texture> _textureCache = new Dictionary<TextureCacheKey, Texture>();
+        private readonly Dictionary<TextureCacheKey, Texture2D> _textureCache = new Dictionary<TextureCacheKey, Texture2D>();
 
         public void Dispose()
         {
-            foreach (Texture cacheValue in _textureCache.Values)
+            foreach (Texture2D cacheValue in _textureCache.Values)
             {
                 UnityEngine.Object.DestroyImmediate(cacheValue);
             }
@@ -709,7 +709,7 @@ namespace SaintsField.Editor.Core
                         ColorPresent = curChunk.IconColor,
                         IconPath = curChunk.Content,
                     };
-                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture) || texture == null)
+                    if (!_textureCache.TryGetValue(cacheKey, out Texture2D texture) || texture == null)
                     {
                         texture = Tex.TextureTo(
                             Util.LoadResource<Texture2D>(curChunk.Content),
@@ -784,7 +784,7 @@ namespace SaintsField.Editor.Core
                         IconPath = curChunk.Content,
                     };
 
-                    if (!_textureCache.TryGetValue(cacheKey, out Texture texture) || texture == null)
+                    if (!_textureCache.TryGetValue(cacheKey, out Texture2D texture) || texture == null)
                     {
                         texture = Util.LoadResource<Texture2D>(curChunk.Content);
                         if (texture != null && texture.width != 1 && texture.height != 1)
@@ -793,14 +793,41 @@ namespace SaintsField.Editor.Core
                         }
                     }
 
-                    Image img = new Image
+                    // Image img = new Image
+                    // {
+                    //     image = texture,
+                    //     scaleMode = ScaleMode.ScaleToFit,
+                    //     tintColor = Colors.GetColorByStringPresent(curChunk.IconColor),
+                    //     pickingMode = PickingMode.Ignore,
+                    //     style =
+                    //     {
+                    //         flexShrink = 0,
+                    //         // marginTop = 2,
+                    //         // marginBottom = 2,
+                    //         // paddingLeft = 1,
+                    //         // paddingRight = 1,
+                    //         maxHeight = 15,
+                    //         alignSelf = Align.Center,
+                    //         width = ImageWidth,
+                    //         height = SaintsPropertyDrawer.SingleLineHeight - 2,
+                    //     },
+                    // };
+                    VisualElement img = new VisualElement
                     {
-                        image = texture,
-                        scaleMode = ScaleMode.ScaleToFit,
-                        tintColor = Colors.GetColorByStringPresent(curChunk.IconColor),
                         pickingMode = PickingMode.Ignore,
                         style =
                         {
+                            backgroundImage = texture,
+                            unityBackgroundImageTintColor = Colors.GetColorByStringPresent(curChunk.IconColor),
+#if UNITY_2022_2_OR_NEWER
+                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
+#else
+                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+#endif
+
                             flexShrink = 0,
                             // marginTop = 2,
                             // marginBottom = 2,
@@ -812,7 +839,7 @@ namespace SaintsField.Editor.Core
                             height = SaintsPropertyDrawer.SingleLineHeight - 2,
                         },
                     };
-                    img.style.flexShrink = 0;
+                    // img.style.flexShrink = 0;
 
 #if EXT_INSPECTOR_LOG
                     Debug.Log($"#draw# icon <{curChunk.Content} {curChunk.IconColor}/>");
@@ -823,9 +850,9 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private Texture GetTexture2D(TextureCacheKey cacheKey, RichTextChunk curChunk, float height)
+        private Texture2D GetTexture2D(TextureCacheKey cacheKey, RichTextChunk curChunk, float height)
         {
-            if (_textureCache.TryGetValue(cacheKey, out Texture texture) && texture != null)
+            if (_textureCache.TryGetValue(cacheKey, out Texture2D texture) && texture != null)
             {
                 return texture;
             }
