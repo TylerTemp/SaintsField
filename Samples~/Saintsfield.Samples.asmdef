@@ -1,6 +1,6 @@
 {
-    "name": "Saintsfield.Samples",
-    "rootNamespace": "Saintsfield",
+    "name": "SaintsField.Samples",
+    "rootNamespace": "SaintsField",
     "references": [
         "Saintsfield.Runtime",
         "Saintsfield.Editor",

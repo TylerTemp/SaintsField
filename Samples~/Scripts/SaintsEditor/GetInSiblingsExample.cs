@@ -1,7 +1,7 @@
 using SaintsField;
 using UnityEngine;
 
-namespace Saintsfield.Samples.Scripts.SaintsEditor
+namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class GetInSiblingsExample : SaintsMonoBehaviour
     {

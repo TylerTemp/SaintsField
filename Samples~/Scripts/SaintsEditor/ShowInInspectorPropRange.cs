@@ -1,7 +1,7 @@
 using SaintsField;
 using SaintsField.Playa;
 
-namespace Saintsfield.Samples.Scripts.SaintsEditor
+namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class ShowInInspectorPropRange : SaintsMonoBehaviour
     {
