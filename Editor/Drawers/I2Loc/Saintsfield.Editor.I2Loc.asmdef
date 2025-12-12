@@ -1,10 +1,10 @@
 {
     "name": "Saintsfield.Editor.I2Loc",
-    "rootNamespace": "Saintsfield",
+    "rootNamespace": "",
     "references": [
-        "today.comes.saintsfield.Runtime",
-        "today.comes.saintsfield.Editor",
-        "today.comes.saintsfield.Runtime.I2Loc",
+        "Saintsfield.Runtime",
+        "Saintsfield.Editor",
+        "Saintsfield.Runtime.I2Loc",
         "com.inter-illusion.i2"
     ],
     "includePlatforms": [
