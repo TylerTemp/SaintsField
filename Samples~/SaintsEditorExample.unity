@@ -1287,18 +1287,18 @@ MonoBehaviour:
   letUnitySerInt: 64
   letUnitySerString: fdsfds
   customDt:
-    value__SaintsSerialized__:
+    customValue__SaintsSerialized__:
       propertyType: 5
       longValue: 0
       uLongValue: 0
       stringValue: 
       V: {fileID: 0}
       VRef:
-        rid: 6921583612233515131
+        rid: -2
       IsVRef: 0
   customInt:
-    value: 67
-    value__SaintsSerialized__:
+    customValue: 0
+    customValue__SaintsSerialized__:
       propertyType: 0
       longValue: 0
       uLongValue: 0
@@ -1413,11 +1413,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6921583612233515131
-      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: today.comes.saintsfield.Samples}
-      data:
-        common: 0
-        structString: This is a struct!
 --- !u!4 &203542844
 Transform:
   m_ObjectHideFlags: 0
@@ -5417,10 +5412,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SerTimeSpanExample
   myClass:
-    _dtArray__SaintsSerialized__: []
+    _dtArray__SaintsSerialized__:
+    - propertyType: 6
+      longValue: 0
+      uLongValue: 0
+      stringValue: 
+      V: {fileID: 0}
+      VRef:
+        rid: -2
+      IsVRef: 0
   _dt__SaintsSerialized__:
     propertyType: 6
-    longValue: 0
+    longValue: 3208270000000
     uLongValue: 0
     stringValue: 
     V: {fileID: 0}
@@ -8872,6 +8875,10 @@ PrefabInstance:
     - target: {fileID: 4764221709687061224, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7819265653788610906, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+      propertyPath: _guid__SaintsSerialized__.stringValue
+      value: e588d558-2dad-4062-acae-dacc2f8d2935
       objectReference: {fileID: 0}
     - target: {fileID: 7819265653788610906, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
       propertyPath: _guidList__SaintsSerialized__.Array.size

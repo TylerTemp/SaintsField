@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
+using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -13,7 +14,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 {
-    public partial class SaintsInterfaceDrawer
+    public partial class SaintsInterfaceDrawer: ISaintsSerializedActualDrawer
     {
         private class Helper : IMakeRenderer, IDOTweenPlayRecorder
         {
@@ -31,8 +32,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 return new HelpBox($"Failed to get type for {property.propertyPath}", HelpBoxMessageType.Error);
             }
 
-            (string error, IWrapProp saintsInterfaceProp, int curInArrayIndex, object _) =
-                GetSerName(property, info);
+            (string error, IWrapProp saintsInterfaceProp, int _, object _) = GetSerName(property, info);
             if (error != "")
             {
                 return new HelpBox(error, HelpBoxMessageType.Error);
@@ -81,6 +81,12 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             UIToolkitUtils.AddContextualMenuManipulator(saintsInterfaceField, property, () => {});
 
             return saintsInterfaceField;
+        }
+
+        public void OnAwakeActualDrawer(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            // throw new NotImplementedException();
         }
     }
 }

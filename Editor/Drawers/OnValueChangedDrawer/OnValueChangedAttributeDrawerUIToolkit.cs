@@ -38,13 +38,17 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
             Action<object> onValueChangedCallback,
             object newValue)
         {
-            // Debug.Log($"OK I got a new value {newValue}; {this}");
-            // string propPath = property.propertyPath;
-            // int propIndex = SerializedUtils.PropertyPathIndex(propPath);
+            // Debug.Log($"OK I got a new value {newValue}; {property.propertyPath}; {this}");
+            string propPath = property.propertyPath;
+            int propIndex = SerializedUtils.PropertyPathIndex(propPath);
             // string error = InvokeCallback(((OnValueChangedAttribute)saintsAttribute).Callback, newValue, propIndex,
             //     parent);
 
-            (string error, object _) = Util.GetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, parent, null);
+            IReadOnlyList<object> overrideParams = propIndex < 0
+                ? new[] { newValue }
+                : new[] { newValue, propIndex };
+
+            (string error, object _) = Util.GetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, parent, overrideParams);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             UIToolkitUtils.SetHelpBox(helpBox, error);
         }

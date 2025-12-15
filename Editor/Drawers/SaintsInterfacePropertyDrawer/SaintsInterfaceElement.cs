@@ -20,7 +20,6 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
     {
         private readonly SerializedProperty _valueProp;
         private readonly SerializedProperty _vRef;
-        private readonly ExpandButtonElement _referenceExpandButton;
         private readonly VisualElement _saintsRowElement;
         private readonly GeneralUObjectPicker _objectContainer;
         private readonly VisualElement _referenceContainer;
@@ -79,12 +78,12 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             bool expand = allAttributes.Any(each => each is DefaultExpandAttribute)
                           || _vRef.isExpanded;
 
-            _referenceExpandButton = new ExpandButtonElement
+            ExpandButtonElement referenceExpandButton = new ExpandButtonElement
             {
                 value = expand,
             };
-            _referenceExpandButton.SetViewDataKey(_vRef.propertyPath);
-            referenceHContainer.Add(_referenceExpandButton);
+            referenceExpandButton.SetViewDataKey(_vRef.propertyPath);
+            referenceHContainer.Add(referenceExpandButton);
 
             UIToolkitUtils.DropdownButtonField dropdownBtn = UIToolkitUtils.ReferenceDropdownButtonField("", _vRef, this, () => GetTypesImplementingInterface(interfaceType));
             referenceHContainer.Add(dropdownBtn);
@@ -110,9 +109,9 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 true, new SaintsRowAttribute(inline: true), makeRenderer, doTweenPlayRecorder, parentObj, new RichTextDrawer.EmptyRichTextTagProvider());
             _referenceContainer.Add(_saintsRowElement);
 
-            UpdateExpand(_referenceExpandButton.value);
+            UpdateExpand(referenceExpandButton.value);
             // _referenceExpandButton.clicked += UpdateExpand;
-            _referenceExpandButton.OnValueChanged.AddListener(UpdateExpand);
+            referenceExpandButton.OnValueChanged.AddListener(UpdateExpand);
 
             UpdateVRefChange(isVRef.boolValue);
 

@@ -188,19 +188,19 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             // Debug.Log(info.DeclaringType);
             // Debug.Log(info.ReflectedType);
 
-            SaintsSerializedActualAttribute saintsSerializedActual = ReflectCache.GetCustomAttributes<SaintsSerializedActualAttribute>(info).FirstOrDefault();
-            // Debug.Log($"{saintsSerializedActual?.Path}/{saintsSerializedActual?.PathType}");
-            if (saintsSerializedActual != null)
-            {
-                if (label.EndsWith("__Saints Serialized__"))
-                {
-                    label = label[..^"__Saints Serialized__".Length];
-                }
-                // Debug.Log($"{info.Name}/{property.propertyPath}/{saintsSerializedActual.Name}/{saintsSerializedActual.ElementType}");
-                VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, (FieldInfo)info, inHorizontalLayout, parent, richTextTagProvider);
-                root.Add(renderSerializedActual);
-                return;
-            }
+            // SaintsSerializedActualAttribute saintsSerializedActual = ReflectCache.GetCustomAttributes<SaintsSerializedActualAttribute>(info).FirstOrDefault();
+            // // Debug.Log($"{saintsSerializedActual?.Path}/{saintsSerializedActual?.PathType}");
+            // if (saintsSerializedActual != null)
+            // {
+            //     if (label.EndsWith("__Saints Serialized__"))
+            //     {
+            //         label = label[..^"__Saints Serialized__".Length];
+            //     }
+            //     // Debug.Log($"{info.Name}/{property.propertyPath}/{saintsSerializedActual.Name}/{saintsSerializedActual.ElementType}");
+            //     VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, (FieldInfo)info, inHorizontalLayout, parent, richTextTagProvider);
+            //     root.Add(renderSerializedActual);
+            //     return;
+            // }
 
             // Debug.Log($"{property.propertyPath}: {inHorizontalLayout}");
             object value = null;
@@ -331,75 +331,75 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 #endif
         }
 
-        private static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual,
-            string label, SerializedProperty property, FieldInfo serInfo, bool inHorizontalLayout, object parent, IRichTextTagProvider richTextTagProvider)
-        {
-            // Debug.Log(property.propertyPath);
-            Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);
-
-            EnumToggleButtonsAttribute enumToggle = null;
-            FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
-            FlagsDropdownAttribute flagsDropdownAttribute = null;
-            DateTimeAttribute dateTimeAttribute = null;
-            TimeSpanAttribute timeSpanAttribute = null;
-            foreach (Attribute attribute in attributes)
-            {
-                switch (attribute)
-                {
-                    case EnumToggleButtonsAttribute et:
-                        enumToggle = et;
-                        break;
-                    case FlagsTreeDropdownAttribute ftd:
-                        flagsTreeDropdownAttribute = ftd;
-                        break;
-                    case FlagsDropdownAttribute fd:
-                        flagsDropdownAttribute = fd;
-                        break;
-                    case DateTimeAttribute dt:
-                        dateTimeAttribute = dt;
-                        break;
-                    case TimeSpanAttribute ts:
-                        timeSpanAttribute = ts;
-                        break;
-                }
-            }
-
-            SaintsPropertyType propertyType = (SaintsPropertyType)property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
-
-            switch (propertyType)
-            {
-                case SaintsPropertyType.EnumLong:
-#if UNITY_2022_1_OR_NEWER
-                case SaintsPropertyType.EnumULong:
-#endif
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
-                    Debug.Log($"saintsrow serInfo={serInfo.Name} attrs = {string.Join(", ", attributes.Select(a => a.GetType().Name))}");
-#endif
-
-                    if (enumToggle != null)
-                    {
-                        return EnumToggleButtonsAttributeDrawer.RenderSerializedActual(saintsSerializedActual, enumToggle, label, property, serInfo, parent, richTextTagProvider);
-                    }
-                    return TreeDropdownAttributeDrawer.RenderSerializedActual(saintsSerializedActual, (ISaintsAttribute)flagsTreeDropdownAttribute ?? flagsDropdownAttribute, label, property, parent);
-                    // return null;
-                }
-                case SaintsPropertyType.Interface:
-                {
-                    return SaintsInterfaceDrawer.RenderSerializedActual(saintsSerializedActual, label, property, attributes, inHorizontalLayout, serInfo, parent);
-                }
-                case SaintsPropertyType.DateTime:
-                    return DateTimeAttributeDrawer.RenderSerializedActual(dateTimeAttribute, label, property, inHorizontalLayout);
-                case SaintsPropertyType.TimeSpan:
-                    return TimeSpanAttributeDrawer.RenderSerializedActual(timeSpanAttribute, label, property, attributes, inHorizontalLayout);
-                case SaintsPropertyType.Guid:
-                    return GuidAttributeDrawer.RenderSerializedActual(label, property, inHorizontalLayout);
-                case SaintsPropertyType.Undefined:
-                case SaintsPropertyType.ClassOrStruct:
-                default:
-                    return null;
-            }
-        }
+//         private static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual,
+//             string label, SerializedProperty property, FieldInfo serInfo, bool inHorizontalLayout, object parent, IRichTextTagProvider richTextTagProvider)
+//         {
+//             // Debug.Log(property.propertyPath);
+//             Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);
+//
+//             EnumToggleButtonsAttribute enumToggle = null;
+//             FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
+//             FlagsDropdownAttribute flagsDropdownAttribute = null;
+//             DateTimeAttribute dateTimeAttribute = null;
+//             TimeSpanAttribute timeSpanAttribute = null;
+//             foreach (Attribute attribute in attributes)
+//             {
+//                 switch (attribute)
+//                 {
+//                     case EnumToggleButtonsAttribute et:
+//                         enumToggle = et;
+//                         break;
+//                     case FlagsTreeDropdownAttribute ftd:
+//                         flagsTreeDropdownAttribute = ftd;
+//                         break;
+//                     case FlagsDropdownAttribute fd:
+//                         flagsDropdownAttribute = fd;
+//                         break;
+//                     case DateTimeAttribute dt:
+//                         dateTimeAttribute = dt;
+//                         break;
+//                     case TimeSpanAttribute ts:
+//                         timeSpanAttribute = ts;
+//                         break;
+//                 }
+//             }
+//
+//             SaintsPropertyType propertyType = (SaintsPropertyType)property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
+//
+//             switch (propertyType)
+//             {
+//                 case SaintsPropertyType.EnumLong:
+// #if UNITY_2022_1_OR_NEWER
+//                 case SaintsPropertyType.EnumULong:
+// #endif
+//                 {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
+//                     Debug.Log($"saintsrow serInfo={serInfo.Name} attrs = {string.Join(", ", attributes.Select(a => a.GetType().Name))}");
+// #endif
+//
+//                     if (enumToggle != null)
+//                     {
+//                         return EnumToggleButtonsAttributeDrawer.RenderSerializedActual(saintsSerializedActual, enumToggle, label, property, serInfo, parent, richTextTagProvider);
+//                     }
+//                     return TreeDropdownAttributeDrawer.RenderSerializedActual(saintsSerializedActual, (ISaintsAttribute)flagsTreeDropdownAttribute ?? flagsDropdownAttribute, label, property, parent);
+//                     // return null;
+//                 }
+//                 case SaintsPropertyType.Interface:
+//                 {
+//                     return SaintsInterfaceDrawer.RenderSerializedActual(saintsSerializedActual, label, property, attributes, inHorizontalLayout, serInfo, parent);
+//                 }
+//                 case SaintsPropertyType.DateTime:
+//                     return DateTimeAttributeDrawer.RenderSerializedActual(dateTimeAttribute, label, property, inHorizontalLayout);
+//                 case SaintsPropertyType.TimeSpan:
+//                     return TimeSpanAttributeDrawer.RenderSerializedActual(timeSpanAttribute, label, property, attributes, inHorizontalLayout);
+//                 case SaintsPropertyType.Guid:
+//                     return GuidAttributeDrawer.RenderSerializedActual(label, property, inHorizontalLayout);
+//                 case SaintsPropertyType.Undefined:
+//                 case SaintsPropertyType.ClassOrStruct:
+//                 default:
+//                     return null;
+//             }
+//         }
 
         // private static Type GetElementType(Type rawType)
         // {

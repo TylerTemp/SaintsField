@@ -49,20 +49,18 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             Third,
         }
 
-        [SaintsSerialized, EnumToggleButtons] private TestLongEnumNormal _longNormal;
-        [SaintsSerialized, EnumToggleButtons] private LongEnum _longFlags;
-        [SaintsSerialized, EnumToggleButtons] private TestULongEnumNormal _uLongNormal;
-        [SaintsSerialized, EnumToggleButtons] private TestULongEnum _uLongFlags;
+        [SaintsSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private TestLongEnumNormal _longNormal;
+        [SaintsSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private LongEnum _longFlags;
+        [SaintsSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private TestULongEnumNormal _uLongNormal;
+        [SaintsSerialized, EnumToggleButtons, OnValueChanged(":Debug.Log")] private TestULongEnum _uLongFlags;
 
-        [NonSerialized, SaintsSerialized] public TestULongEnumNormal ULongEnumNormalNoButton;
+        [SaintsSerialized, OnValueChanged(":Debug.Log")] private TestULongEnumNormal ULongEnumNormalNoButton;
+        [SaintsSerialized, OnValueChanged(":Debug.Log")] private LongEnum LongEnumPub;
+        [SaintsSerialized, OnValueChanged(":Debug.Log")] private LongEnum[] LongEnumPubArr;
 
-        [NonSerialized, SaintsSerialized] public LongEnum LongEnumPub;
-
-        [NonSerialized, SaintsSerialized] public LongEnum[] LongEnumPubArr;
-
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum ULongEnumPub;
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnum[] ULongEnumPubs;
-        [NonSerialized, SaintsSerialized, EnumToggleButtons] public TestULongEnumNormal ULongEnumNormalPub;
+        [SaintsSerialized, EnumToggleButtons] private TestULongEnum ULongEnumPub;
+        [SaintsSerialized, EnumToggleButtons] private TestULongEnum[] ULongEnumPubs;
+        [SaintsSerialized, EnumToggleButtons] private TestULongEnumNormal ULongEnumNormalPub;
         [SaintsSerialized] private TestULongEnum _uLongEnumPri;
         [field: SaintsSerialized] public TestULongEnum ULongEnumProp { get; private set; }
 

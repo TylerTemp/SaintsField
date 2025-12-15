@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public partial class SerTimeSpanExample : SaintsMonoBehaviour
     {
-        [SaintsSerialized]
+        [SaintsSerialized, OnValueChanged(":Debug.Log")]
         private TimeSpan _dt;
 
         [Serializable]

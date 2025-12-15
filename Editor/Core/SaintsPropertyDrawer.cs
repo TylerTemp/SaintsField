@@ -770,7 +770,7 @@ namespace SaintsField.Editor.Core
 
         #region IRichTextTagProvider
 
-        private SerializedProperty _thisProperty;
+        protected SerializedProperty _thisProperty;
 
         public string GetLabel()
         {
@@ -779,7 +779,8 @@ namespace SaintsField.Editor.Core
                 return "";
             }
 
-            return _thisProperty.displayName;
+            // Debug.Log($"GetLabel={GetPreferredLabel(_thisProperty)} for {_thisProperty.propertyType}");
+            return GetPreferredLabel(_thisProperty);
         }
 
         private Type _thisPropertyType;

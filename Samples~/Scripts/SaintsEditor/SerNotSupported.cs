@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.Interface;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public partial struct CustomType<T>
         {
             [SaintsSerialized]
-            public T value;
+            public T customValue;
         }
 
         public CustomType<DateTime> customDt;

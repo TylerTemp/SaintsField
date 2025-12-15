@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(DateTimeAttribute), true)]
-    public class DateTimeAttributeDrawer: SaintsPropertyDrawer
+    public partial class DateTimeAttributeDrawer: SaintsPropertyDrawer
     {
         protected override bool UseCreateFieldUIToolKit => true;
 
@@ -39,20 +39,6 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
         }
 
 
-        public static DateTimeField RenderSerializedActual(ISaintsAttribute dateTimeAttribute, string label, SerializedProperty property, bool inHorizontal)
-        {
-            DateTimeField r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)), label);
-            if (inHorizontal)
-            {
-                r.style.flexDirection = FlexDirection.Column;
-            }
-            else
-            {
-                r.AddToClassList(DateTimeField.alignedFieldUssClassName);
-            }
-
-            return r;
-        }
 
         private static DateTimeField MakeElement(SerializedProperty property, string label)
         {

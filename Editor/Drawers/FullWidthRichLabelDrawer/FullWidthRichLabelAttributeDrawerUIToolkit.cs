@@ -132,6 +132,8 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
 
             if (richXmlUserData.Xml != xml || (xml?.Contains("<field") ?? false))
             {
+                // Debug.Log(GetPreferredLabel(property));
+                // Debug.Log(GetLabel());
                 // fullWidthLabelContainer.userData = xml;
                 if (string.IsNullOrEmpty(xml))
                 {
@@ -144,7 +146,9 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
                 }
                 else
                 {
-                    RichTextDrawer.RichTextChunk[] newChunks = RichTextDrawer.ParseRichXml(xml, property.displayName, property, info, parent).ToArray();
+                    // Always refresh the property for the provider because the drawer creator is not perfect
+                    _thisProperty = property;
+                    RichTextDrawer.RichTextChunk[] newChunks = RichTextDrawer.ParseRichXmlWithProvider(xml, this).ToArray();
 
                     // ReSharper disable once InvertIf
                     if(!newChunks.SequenceEqual(richXmlUserData.Chunks))

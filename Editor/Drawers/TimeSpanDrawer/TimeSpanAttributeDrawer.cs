@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(TimeSpanAttribute), true)]
-    public class TimeSpanAttributeDrawer: SaintsPropertyDrawer
+    public partial class TimeSpanAttributeDrawer: SaintsPropertyDrawer
     {
         protected override bool UseCreateFieldUIToolKit => true;
 
@@ -36,21 +36,6 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             container.Q<TimeSpanField>().TrackPropertyValue(property, p => onValueChangedCallback(p.longValue));
-        }
-
-        public static VisualElement RenderSerializedActual(ISaintsAttribute timeSpanAttribute, string label, SerializedProperty property, IReadOnlyList<Attribute> allAttributes, bool inHorizontal)
-        {
-            VisualElement r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue)), label, allAttributes.Any(each => each is DefaultExpandAttribute));
-            if (inHorizontal)
-            {
-                r.style.flexDirection = FlexDirection.Column;
-            }
-            else
-            {
-                r.AddToClassList(TimeSpanField.alignedFieldUssClassName);
-            }
-
-            return r;
         }
 
         private static TimeSpanField MakeElement(SerializedProperty property, string label, bool defaultExpanded)

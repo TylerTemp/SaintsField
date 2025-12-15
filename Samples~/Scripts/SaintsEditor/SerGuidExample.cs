@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public partial class SerGuidExample : SaintsMonoBehaviour
     {
-        [SaintsSerialized]
+        [SaintsSerialized, OnValueChanged(":Debug.Log")]
         private Guid _guid;
 
         [SaintsSerialized]

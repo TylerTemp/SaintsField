@@ -15,14 +15,17 @@ using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 {
-    public partial class EnumToggleButtonsAttributeDrawer: ISaintsSerializedPropertyDrawer
+    public partial class EnumToggleButtonsAttributeDrawer: ISaintsSerializedActualDrawer
     {
-        public static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual, ISaintsAttribute enumToggle, string label, SerializedProperty property, MemberInfo info, object parent, IRichTextTagProvider richTextTagProvider)
+
+        private Type _enumType;
+
+
+        public VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual, ISaintsAttribute enumToggle, string label, SerializedProperty property, MemberInfo info, object parent, IRichTextTagProvider richTextTagProvider)
         {
             Type targetType = ReflectUtils.SaintsSerializedActualGetType(saintsSerializedActual, parent);
             if (targetType == null)
@@ -37,6 +40,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 case SaintsPropertyType.EnumLong:
                 {
                     EnumMetaInfo metaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
+                    _enumType = metaInfo.EnumType;
                     // foreach (EnumMetaInfo.EnumValueInfo metaInfoEnumValue in metaInfo.EnumValues)
                     // {
                     //     Debug.Log(metaInfoEnumValue);
@@ -353,6 +357,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 case SaintsPropertyType.EnumULong:
                 {
                     EnumMetaInfo metaInfo = EnumFlagsUtil.GetEnumMetaInfo(targetType);
+                    _enumType = metaInfo.EnumType;
+
                     if (!metaInfo.IsFlags)
                     {
                         VisualElement container = new VisualElement();
@@ -670,6 +676,37 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 case SaintsPropertyType.Guid:
                 default:
                     return null;
+            }
+        }
+
+        public void OnAwakeActualDrawer(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            SaintsPropertyType propertyType = (SaintsPropertyType)property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
+            switch (propertyType)
+            {
+                case SaintsPropertyType.EnumLong:
+                {
+                    SerializedProperty actualProp = property.FindPropertyRelative(nameof(SaintsSerializedProperty.longValue));
+                    container.TrackPropertyValue(actualProp, _ => onValueChangedCallback.Invoke(Enum.ToObject(_enumType, actualProp.longValue)));
+                }
+                    break;
+#if UNITY_2022_1_OR_NEWER
+                case SaintsPropertyType.EnumULong:
+                {
+                    SerializedProperty actualProp = property.FindPropertyRelative(nameof(SaintsSerializedProperty.uLongValue));
+                    container.TrackPropertyValue(actualProp, _ => onValueChangedCallback.Invoke(Enum.ToObject(_enumType, actualProp.ulongValue)));
+                }
+                    break;
+#endif
+                case SaintsPropertyType.Undefined:
+                case SaintsPropertyType.ClassOrStruct:
+                case SaintsPropertyType.Interface:
+                case SaintsPropertyType.DateTime:
+                case SaintsPropertyType.TimeSpan:
+                case SaintsPropertyType.Guid:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, null);
             }
         }
     }

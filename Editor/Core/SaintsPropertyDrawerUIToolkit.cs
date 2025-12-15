@@ -9,7 +9,6 @@ using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
-using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Utils;

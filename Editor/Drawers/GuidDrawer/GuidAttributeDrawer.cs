@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(GuidAttribute), true)]
-    public class GuidAttributeDrawer: SaintsPropertyDrawer
+    public partial class GuidAttributeDrawer: SaintsPropertyDrawer
     {
         protected override bool UseCreateFieldUIToolKit => true;
 
@@ -51,23 +51,6 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
             element.AddToClassList(ClassAllowDisable);
 
             return element;
-        }
-
-        public static VisualElement RenderSerializedActual(string label, SerializedProperty property, bool inHorizontal)
-        {
-            VisualElement r = MakeElement(property.FindPropertyRelative(nameof(SaintsSerializedProperty.stringValue)), label);
-            if (inHorizontal)
-            {
-                r.style.flexDirection = FlexDirection.Column;
-            }
-            else
-            {
-                r.AddToClassList(GuidStringField.alignedFieldUssClassName);
-            }
-
-            UIToolkitUtils.AddContextualMenuManipulator(r, property, () => {});
-
-            return r;
         }
 
         public static VisualElement UIToolkitValueEditGuid(VisualElement oldElement, string label, Guid value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
