@@ -129,6 +129,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 
         private void CheckArrange()
         {
+            CalcArrangeDone = false;
             if (_subContainer == null)
             {
                 // Debug.Log("No SubContainer, skip");
@@ -153,6 +154,8 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
         }
 
         public readonly UnityEvent<bool> OnCalcArrangeDone = new UnityEvent<bool>();
+        public bool CalcArrangeDone { get; private set; }
+        public bool CalcArrangeDoneHasRow { get; private set; }
 
         private void OnCalcReadyEvent(IReadOnlyList<(IReadOnlyList<RichTextDrawer.RichTextChunk>, float)> results)
         {
@@ -267,7 +270,9 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
                 removed.RemoveFromHierarchy();
             }
 
-            OnCalcArrangeDone.Invoke(splitRowInfos.Count > 1);
+            CalcArrangeDone = true;
+            // CalcArrangeDoneHasRow = true;
+            OnCalcArrangeDone.Invoke(CalcArrangeDoneHasRow = splitRowInfos.Count > 1);
 
             // if (processedIndex < _subRows.Count)
             // {

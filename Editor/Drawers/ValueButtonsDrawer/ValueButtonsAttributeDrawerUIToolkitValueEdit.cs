@@ -116,23 +116,14 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             wrapper.ValueButtonsArrangeElement.schedule.Execute(() =>
             {
-                bool doneOnce = false;
-                wrapper.ValueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
+                    wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                wrapper.ValueButtonsArrangeElement.OnCalcArrangeDone.AddListener(OnCalcArrangeDone);
+                if (wrapper.ValueButtonsArrangeElement.CalcArrangeDone)
                 {
-                    if (!doneOnce)
-                    {
-                        wrapper.SubPanel.style.display = wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
-                        wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
-                            wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                    }
-                    doneOnce = true;
-                    DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
-                    if (wrapper.LeftExpandButton.style.display != display)
-                    {
-                        wrapper.LeftExpandButton.style.display = display;
-                    }
-                    ValueEditRefreshCurValue(wrapper, value);
-                });
+                    wrapper.SubPanel.style.display = wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                    OnCalcArrangeDone(wrapper.ValueButtonsArrangeElement.CalcArrangeDoneHasRow);
+                }
                 wrapper.ValueButtonsArrangeElement.OnButtonClicked.AddListener(clickedValue =>
                 {
                     beforeSet?.Invoke(wrapper.Value);
@@ -143,6 +134,16 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             ValueEditRefreshCurValue(wrapper, value);
             return wrapper;
+
+            void OnCalcArrangeDone(bool hasSubRow)
+            {
+                DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
+                if (wrapper.LeftExpandButton.style.display != display)
+                {
+                    wrapper.LeftExpandButton.style.display = display;
+                }
+                ValueEditRefreshCurValue(wrapper, value);
+            }
         }
 
         public static VisualElement UIToolkitValueEditEnum(VisualElement oldElement, ValueButtonsAttribute valueButtonsAttribute, string label, object value, Type enumType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)

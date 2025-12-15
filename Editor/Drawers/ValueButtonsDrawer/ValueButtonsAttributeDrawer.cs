@@ -161,25 +161,15 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             valueButtonsArrangeElement.schedule.Execute(() =>
             {
+                leftExpandButton.RegisterValueChangedCallback(evt =>
+                    subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
 
-                bool doneOnce = false;
-                valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(OnCalcArrangeDone);
+                if (valueButtonsArrangeElement.CalcArrangeDone)
                 {
-                    if (!doneOnce)
-                    {
-                        subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
-                        leftExpandButton.RegisterValueChangedCallback(evt =>
-                            subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                    }
-                    doneOnce = true;
-                    // leftExpandButton.SetEnabled(hasSubRow);
-                    DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
-                    if (leftExpandButton.style.display != display)
-                    {
-                        leftExpandButton.style.display = display;
-                    }
-                    RefreshCurValue();
-                });
+                    subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                    OnCalcArrangeDone(valueButtonsArrangeElement.CalcArrangeDoneHasRow);
+                }
                 valueButtonsArrangeElement.OnButtonClicked.AddListener(value =>
                 {
                     ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
@@ -193,6 +183,15 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             });
 
             return;
+
+            void OnCalcArrangeDone(bool hasSubRow) {
+                DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
+                if (leftExpandButton.style.display != display)
+                {
+                    leftExpandButton.style.display = display;
+                }
+                RefreshCurValue();
+            }
 
             void RefreshCurValue()
             {
