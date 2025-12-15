@@ -96,18 +96,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.6.0**
+**5.6.1**
 
-1.  Add: `FindObjectsByType` to replace `GetComponentInScene`. (You can still use the old name) Add `GetInScene` which by default include inactive objects.
-2.  Add: `GetInSiblings` to get sibling objects
-3.  Rename asmdef. (Unity by default uses GUID for asmdef reference. This change should not impact your current work unless you manually turned it off)
-4.  Fix: `Separator` title color didn't change when it's not a callback
-5.  Fix: `ShowInInspector` method parameters renderer used a horizental style rendering
-6.  Fix: `ShowInInspector` did not update value if it's a class/struct after first rendering
-7.  Fix: `AxisInput` shown duplicated options in dropdown
-8.  Fix: `ValueButton` might shown an incorrect expanding button with nothing else until you click it
-9.  Add: `PropRange`, `MinMaxSlider` etc now support function parameters decoration for `Button`, `ShowInInspector`
-
+1.  Fix: For Extended Serialization, `enum`, `DateTime`, `TimeSpan`, `Guid` now works with `OnValueChanged`
+2.  Fix: `OnValueChanged` might gives incorrect callback value for SaintsField wrapped types
+ 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
@@ -8434,10 +8427,6 @@ public class ToggleInputRenderer: AbsRenderer
 
 ## Extended Serialization ##
 
-> [!WARNING]
-> This feature is still experimental.
-> Not work with `OnValueChanged`.
-
 `SaintsEditor` supports some types that usually can not be serialized. To use this function:
 
 1.  Ensure the type is supported by this functionality
@@ -8447,9 +8436,6 @@ public class ToggleInputRenderer: AbsRenderer
 If a field is not supported, the default serialization provided by Unity will be used.
 
 ### `Dictionary<,>` ###
-
-> [!WARNING]
-> This feature is still experimental
 
 You can mark a `dictionary` directly for serialization. SaintsField will internally use `SaintsDictionary` to serialize it.
 
@@ -8479,9 +8465,6 @@ public partial class SerDictionaryExample : MonoBehaviour
 
 ### `HashSet<>` ###
 
-> [!WARNING]
-> This feature is still experimental
-
 You can mark a `HashSet` directly for serialization. SaintsField will internally use `SaintsHashSet` to serialize it.
 
 It support serializable types, abstract class/struct types, and interface types as element type.
@@ -8502,7 +8485,7 @@ public partial class SerDictionaryExample : MonoBehaviour
 ### `interface`  ###
 
 > [!WARNING]
-> This feature is still experimental
+> Not work with `OnValueChanged` yet
 
 Serialize any interface type, either of a Unity Object, or a serializable class/struct.
 
@@ -8536,9 +8519,6 @@ public partial class SerInterfaceExample : SaintsMonoBehaviour
 ![](https://github.com/user-attachments/assets/73f25e31-affb-43c5-a7c6-0bc0c47e3a8f)
 
 ### `long`/`ulong` Enum ###
-
-> [!WARNING]
-> This feature is still experimental
 
 You can serialize a `long`/`ulong` base typed `enum` with `SaintsSerialized`, which is not supported by Unity.
 
@@ -8595,10 +8575,6 @@ This can work with `EnumToggleButtons`.
 
 ### `DateTime`  ###
 
-
-> [!WARNING]
-> This feature is still experimental
-
 Serialize a `DateTime` type.
 
 **IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set class/struct to `partial`, and all the class/struct's parent class/struct.
@@ -8632,9 +8608,6 @@ public partial class SerDateTimeExample : MonoBehaviour
 [![video](https://github.com/user-attachments/assets/4acd7add-0f25-4f79-aa12-4112157e503d)](https://github.com/user-attachments/assets/7f7ba667-681b-48ff-86ae-171623204636)
 
 ### `TimeSpan`  ###
-
-> [!WARNING]
-> This feature is still experimental
 
 Serialize a `TimeSpan` type.
 
@@ -8671,9 +8644,6 @@ public partial class SerTimeSpanExample : MonoBehaviour
 ![](https://github.com/user-attachments/assets/cd6b1135-6935-4366-940a-6f0c2a550c2f)
 
 ### `Guid` ###
-
-> [!WARNING]
-> This feature is still experimental
 
 Serialize a `Guid` type.
 

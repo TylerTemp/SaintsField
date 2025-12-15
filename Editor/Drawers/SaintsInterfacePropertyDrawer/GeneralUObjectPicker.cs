@@ -17,17 +17,17 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
     public class GeneralUObjectPicker: BindableElement, INotifyValueChanged<Object>
     {
         private readonly ObjectField _objectField;
-        private readonly Type UObjectType;
-        private readonly Type SerializableType;
-        private readonly Object SerializedObjectTarget;
+        private readonly Type _uObjectType;
+        private readonly Type _serializableType;
+        private readonly Object _serializedObjectTarget;
 
         public GeneralUObjectPicker(string bindingPath, Object initValue, Type uObjectType, Type serializableType, Object serializedObjectTarget)
         {
             this.bindingPath = bindingPath;
 
-            UObjectType = uObjectType;
-            SerializableType = serializableType;
-            SerializedObjectTarget = serializedObjectTarget;
+            _uObjectType = uObjectType;
+            _serializableType = serializableType;
+            _serializedObjectTarget = serializedObjectTarget;
 
             style.flexDirection = FlexDirection.Row;
 
@@ -161,9 +161,9 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
         {
             SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
             // objectPickerWindowUIToolkit.ResetClose();
-            objectPickerWindowUIToolkit.titleContent = new GUIContent(SerializableType == null
-                ? $"Select {UObjectType.Name}"
-                : $"Select {SerializableType.Name} of {UObjectType.Name}");
+            objectPickerWindowUIToolkit.titleContent = new GUIContent(_serializableType == null
+                ? $"Select {_uObjectType.Name}"
+                : $"Select {_serializableType.Name} of {_uObjectType.Name}");
             Object curValueObj = value;
             bool curValueObjIsNull = RuntimeUtil.IsNull(curValueObj);
 
@@ -233,7 +233,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             if(!_useCache)
             {
                 _useCache = true;
-                CheckResourceLoad(UObjectType, SerializableType);
+                CheckResourceLoad(_uObjectType, _serializableType);
             }
             // FieldInterfaceSelectWindow.Open(valueProp.objectReferenceValue, valueType, interfaceType, fieldResult =>
             // {
@@ -254,7 +254,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             _enumeratorAssets = StartEnumeratorAssets(fieldType, interfaceType);
 
             // Object target = valueProp.serializedObject.targetObject;
-            Object target = SerializedObjectTarget;
+            Object target = _serializedObjectTarget;
             // Scene targetScene;
             IEnumerable<GameObject> rootGameObjects = null;
             // bool sceneFound = false;

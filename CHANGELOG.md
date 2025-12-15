@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.6.1 ##
+
+1.  Fix: For Extended Serialization, `enum`, `DateTime`, `TimeSpan`, `Guid` now works with `OnValueChanged`
+2.  Fix: `OnValueChanged` might gives incorrect callback value for SaintsField wrapped types
+
 ## 5.6.0 ##
 
 1.  Add: `FindObjectsByType` to replace `GetComponentInScene`. (You can still use the old name) Add `GetInScene` which by default include inactive objects.
