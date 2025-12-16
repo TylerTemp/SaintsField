@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: for Extended Serialization, `interface` could not switch from object mode to Unity Object mode
+2.  Fix: for Extended Serialization, `interface` now works with `OnValueChanged`
+
 ## 5.6.1 ##
 
 1.  Fix: For Extended Serialization, `enum`, `DateTime`, `TimeSpan`, `Guid` now works with `OnValueChanged`

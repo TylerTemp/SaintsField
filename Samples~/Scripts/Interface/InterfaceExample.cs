@@ -5,18 +5,10 @@ namespace SaintsField.Samples.Scripts.Interface
 {
     public class InterfaceExample: MonoBehaviour
     {
-        public SaintsObjInterface<IInterface1> i1;
+        [OnValueChanged(":Debug.Log")]
+        public SaintsInterface<IInterface1> i1;
 
         public SaintsInterface<Component, IInterface1> myInter1;
-
-        // for old unity
-        [Serializable]
-        public class Interface1 : SaintsInterface<Component, IInterface1>
-        {
-            public Interface1(Component obj) : base(obj)
-            {
-            }
-        }
 
         [Serializable]
         private struct NorStructInterface1 : IInterface1
@@ -26,6 +18,11 @@ namespace SaintsField.Samples.Scripts.Interface
 
             public void Method1()
             {
+            }
+
+            public override string ToString()
+            {
+                return $"<SInterface1 common={common} structString={structString}>";
             }
         }
 
@@ -41,13 +38,13 @@ namespace SaintsField.Samples.Scripts.Interface
 
             public override string ToString()
             {
-                return $"<NorClassInterface1 common={common} classString={classString}>";
+                return $"<CInterface1 common={common} classString={classString}>";
             }
         }
 
-        public Interface1 myInherentInterface1;
+        public SaintsInterface<IInterface1> myInherentInterface1;
         [FieldLabelText("<label />")]
-        public Interface1[] myInherentInterface1Lis;
+        public SaintsInterface<IInterface1>[] myInherentInterface1Lis;
 
         public SaintsInterface<Component, IInterface2> myInter2;
         public SaintsInterface<ScriptableObject, IInterface2> mySoInter2;

@@ -19,7 +19,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 
         protected abstract AbsValueButtonsRow<T> MakeValueButtonsRow();
 
-        public AbsValueButtonsArrangeElement(AbsValueButtonsCalcElement<T> valueButtonsCalcElement, AbsValueButtonsRow<T> mainRow)
+        protected AbsValueButtonsArrangeElement(AbsValueButtonsCalcElement<T> valueButtonsCalcElement, AbsValueButtonsRow<T> mainRow)
         {
             style.position = Position.Relative;
 

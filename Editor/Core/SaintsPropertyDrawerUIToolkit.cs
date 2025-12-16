@@ -1024,7 +1024,7 @@ namespace SaintsField.Editor.Core
                     if (isReference || property.propertyType == SerializedPropertyType.Generic)
                     {
                         TrackPropertyManagedUIToolkit(onValueChangedCallback, property,
-                            property, fieldInfo, trackerMain, parent);
+                            SerializedUtils.PropertyPathIndex(property.propertyPath), fieldInfo, trackerMain, parent);
                     }
                 }
                   // this does not work on some unity version, e.g. 2022.3.14f1, for serialized class
@@ -1248,7 +1248,7 @@ namespace SaintsField.Editor.Core
             if (isReference)
             {
                 TrackPropertyManagedUIToolkit(onValueChangedCallback, property,
-                    property, fieldInfo, trackerMain,
+                    SerializedUtils.PropertyPathIndex(property.propertyPath), fieldInfo, trackerMain,
                     parent);
             }
 
@@ -1300,12 +1300,12 @@ namespace SaintsField.Editor.Core
 
         }
 
-        private static void TrackPropertyManagedUIToolkit(Action<object> onValueChangedCallback, SerializedProperty watchSubProperty, SerializedProperty getValueProperty, MemberInfo memberInfo, VisualElement tracker, object newFetchParent)
+        public static void TrackPropertyManagedUIToolkit(Action<object> onValueChangedCallback, SerializedProperty watchSubProperty, int propertyIndex, MemberInfo memberInfo, VisualElement tracker, object newFetchParent)
         {
 #if UNITY_2021_3_OR_NEWER
             foreach ((string _, SerializedProperty subProperty) in SaintsRowAttributeDrawer.GetSerializableFieldInfo(watchSubProperty))
             {
-                int propertyIndex = SerializedUtils.PropertyPathIndex(getValueProperty.propertyPath);
+                // int propertyIndex = SerializedUtils.PropertyPathIndex(getValueProperty.propertyPath);
                 VisualElement subTracker = tracker.Q<VisualElement>(name: UIToolkitOnChangedTrackerName(subProperty));
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
                 Debug.Log($"Try add sub track: {subProperty.propertyPath}; real value prop = {getValueProperty.propertyPath}, index={propertyIndex}/{subTracker}");

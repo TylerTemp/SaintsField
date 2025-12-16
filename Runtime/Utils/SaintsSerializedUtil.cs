@@ -62,6 +62,10 @@ namespace SaintsField.Utils
                 // ReSharper disable once InvertIf
                 if (obj is UnityEngine.Object uObj)
                 {
+                    if (serializedProp.IsVRef)
+                    {
+                        return (false, default);
+                    }
                     return (true, new SaintsSerializedProperty
                     {
                         propertyType = SaintsPropertyType.Interface,
@@ -70,6 +74,10 @@ namespace SaintsField.Utils
                     });
                 }
 
+                if (!serializedProp.IsVRef)
+                {
+                    return (false, default);
+                }
                 return (true, new SaintsSerializedProperty
                 {
                     propertyType = SaintsPropertyType.Interface,

@@ -126,7 +126,7 @@ namespace Saintsfield.Editor.Drawers.SaintsSerializedActualDrawerDrawer
                     // VisualElement element = drawer.RenderSerializedActual(saintsSerializedActual,
                     //     label, property, attributes, inHorizontalLayout, serInfo, parent);
                     return (SaintsInterfaceDrawer.RenderSerializedActual(saintsSerializedActual,
-                        label, property, attributes, inHorizontalLayout, serInfo, parent), null);
+                        label, property, attributes, inHorizontalLayout, serInfo, parent), (SaintsInterfaceDrawer)MakePropertyDrawer(typeof(SaintsInterfaceDrawer), serInfo, null, label));
                 }
                 case SaintsPropertyType.DateTime:
                 {
