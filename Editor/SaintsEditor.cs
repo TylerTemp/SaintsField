@@ -584,6 +584,8 @@ namespace SaintsField.Editor
                                         Debug.Log($"wrap {fieldInfo.Name} to {serInfo.Name}");
 #endif
 
+                                        // Debug.Log($"keys={string.Join(",", serializedPropertyDict.Keys)}");
+
                                         thisDepthInfos.Add(new SaintsFieldWithInfo
                                         {
                                             ClassStructType = systemType,

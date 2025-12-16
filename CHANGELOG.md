@@ -1,9 +1,12 @@
 # Changelog
 
-## WIP ##
+## 5.6.2 ##
 
 1.  Fix: for Extended Serialization, `interface` could not switch from object mode to Unity Object mode
 2.  Fix: for Extended Serialization, `interface` now works with `OnValueChanged`
+3.  Improve: Extended Serialization now can detect types better
+4.  Fix: for Extended Serialization, when editing in inspector, plus button for `Dictionary`, `HashSet` might not work
+5.  Fix: In some rare edge condition, `ValueButton` could not properly render in inspector
 
 ## 5.6.1 ##
 

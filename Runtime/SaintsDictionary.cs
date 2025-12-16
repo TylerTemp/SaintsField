@@ -12,12 +12,12 @@ namespace SaintsField
     [Serializable]
     public class SaintsDictionary<TKey, TValue>: IDictionary, IDictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
-        [SerializeField]
-        private List<SaintsWrap<TKey>> _saintsKeys = new List<SaintsWrap<TKey>>();
+        // [SerializeField]
+        public List<SaintsWrap<TKey>> _saintsKeys = new List<SaintsWrap<TKey>>();
         [SerializeField] private WrapType _wrapTypeKey;
 
-        [SerializeField]
-        private List<SaintsWrap<TValue>> _saintsValues = new List<SaintsWrap<TValue>>();
+        // [SerializeField]
+        public List<SaintsWrap<TValue>> _saintsValues = new List<SaintsWrap<TValue>>();
         [SerializeField] private WrapType _wrapTypeValue;
 
         [SerializeField]

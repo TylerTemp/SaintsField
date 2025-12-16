@@ -9,6 +9,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
     public partial class SerEnumULong : SaintsMonoBehaviour
     {
         // [Serializable]
+
         [Flags]
         public enum LongEnum: long
         {

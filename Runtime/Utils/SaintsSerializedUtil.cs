@@ -119,9 +119,10 @@ namespace SaintsField.Utils
         {
             if (obj == null)
             {
-                // Debug.Log("OnBeforeSerializeDictionary skip null");
+                // Debug.Log("OnBeforeSerializeDictionary is null, set to empty saintsDictionary");
                 // return (true, new SaintsDictionary<TKey, TValue>());
-                return (false, null);
+                // return (false, null);
+                return (true, new SaintsDictionary<TKey, TValue>());
             }
 
             // ReSharper disable once UseNegatedPatternInIsExpression
@@ -634,10 +635,36 @@ namespace SaintsField.Utils
                 case null:
                 {
                     // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
-                    return (false, null);
+                    // return (false, null);
+                    return (true, new Dictionary<TKey, TValue>());
                 }
                 case Dictionary<TKey, TValue> originDictionary:
                 {
+                    int index = 0;
+                    foreach (SaintsWrap<TKey> keyWrap in saintsSerializedProperty._saintsKeys)
+                    {
+                        TKey keyV = keyWrap.value;
+                        if(index >= saintsSerializedProperty._saintsValues.Count)
+                        {
+                            break;
+                        }
+
+                        SaintsWrap<TValue> valueV = saintsSerializedProperty._saintsValues[index];
+
+                        if (originDictionary.TryGetValue(keyV, out TValue value))
+                        {
+                            if((object)value != (object)keyV)
+                            {
+                                originDictionary[keyV] = valueV.value;
+                            }
+                        }
+                        else
+                        {
+                            originDictionary[keyV] = valueV.value;
+                        }
+
+                        index++;
+                    }
                     foreach (KeyValuePair<TKey, TValue> kv in saintsSerializedProperty)
                     {
                         if (originDictionary.TryGetValue(kv.Key, out TValue value))
@@ -658,7 +685,7 @@ namespace SaintsField.Utils
                         originDictionary.Remove(removeKey);
                     }
 
-                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}");
+                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}/{saintsSerializedProperty._saintsKeys.Count}");
                     return (true, originDictionary);
                 }
                 default:
@@ -666,6 +693,7 @@ namespace SaintsField.Utils
                     return (false, null);
             }
         }
+
         public static (bool assign, HashSet<T> result) OnAfterDeserializeHashSet<T>(object originValue, SaintsHashSet<T> saintsSerializedProperty)
         {
             switch (originValue)
@@ -673,13 +701,13 @@ namespace SaintsField.Utils
                 case null:
                 {
                     // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
-                    return (false, null);
+                    return (true, new HashSet<T>());
                 }
                 case HashSet<T> originalHashSet:
                 {
-                    foreach (T kv in saintsSerializedProperty)
+                    foreach (SaintsWrap<T> serWrap in saintsSerializedProperty._saintsList)
                     {
-                        originalHashSet.Add(kv);
+                        originalHashSet.Add(serWrap.value);
                     }
 
                     foreach (T removeKey in originalHashSet.Except(saintsSerializedProperty).ToArray())
@@ -702,13 +730,13 @@ namespace SaintsField.Utils
                 case null:
                 {
                     // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
-                    return (false, null);
+                    return (true, new HashSet<T>());
                 }
                 case HashSet<T> originalHashSet:
                 {
-                    foreach (T kv in saintsSerializedProperty)
+                    foreach (SaintsWrap<T> serWrap in saintsSerializedProperty._saintsList)
                     {
-                        originalHashSet.Add(kv);
+                        originalHashSet.Add(serWrap.value);
                     }
 
                     foreach (T removeKey in originalHashSet.Except(saintsSerializedProperty).ToArray())

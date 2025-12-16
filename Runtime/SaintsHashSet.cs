@@ -21,8 +21,8 @@ namespace SaintsField
 
         ISerializationCallbackReceiver
     {
-        [SerializeField]
-        private List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
+        // [SerializeField]
+        public List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
         [SerializeField] private int _saintsSerializedVersion;
         private const int SaintsSerializedVersionRuntime = 2;
         [SerializeField] private WrapType _wrapType;

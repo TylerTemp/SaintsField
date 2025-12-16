@@ -96,10 +96,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.6.1**
+**5.6.2**
 
-1.  Fix: For Extended Serialization, `enum`, `DateTime`, `TimeSpan`, `Guid` now works with `OnValueChanged`
-2.  Fix: `OnValueChanged` might gives incorrect callback value for SaintsField wrapped types
+1.  Fix: for Extended Serialization, `interface` could not switch from object mode to Unity Object mode
+2.  Fix: for Extended Serialization, `interface` now works with `OnValueChanged`
+3.  Improve: Extended Serialization now can detect types better
+4.  Fix: for Extended Serialization, when editing in inspector, plus button for `Dictionary`, `HashSet` might not work
+5.  Fix: In some rare edge condition, `ValueButton` could not properly render in inspector
  
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -8462,6 +8465,12 @@ public partial class SerDictionaryExample : MonoBehaviour
 ```
 
 ![](https://github.com/user-attachments/assets/37166a71-cd58-4765-aec4-5c9aabdb02b1)
+
+Because it uses `SaintsDictionary` internally, if you want to receive the field value for `OnValueChanged`, you need to use `SaintsDictionary<,>` instead.
+
+```csharp
+
+```
 
 ### `HashSet<>` ###
 

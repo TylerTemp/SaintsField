@@ -7,7 +7,16 @@ namespace SaintsField.Samples.Scripts.SaintsDictExamples
 {
     public class SaintsDictExample : SaintsMonoBehaviour
     {
+        [OnValueChanged(nameof(DebugDict))]
         public SaintsDictionary<string, GameObject> genDict;
+
+        private void DebugDict(SaintsDictionary<string, GameObject> dict)
+        {
+            foreach(var kv in dict)
+            {
+                Debug.Log($"Key: {kv.Key}, Value: {kv.Value}");
+            }
+        }
 
         [ShowInInspector]
         private GameObject DebugKey(string key)

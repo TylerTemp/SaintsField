@@ -1335,64 +1335,14 @@ MonoBehaviour:
       rid: -2
     IsVRef: 0
   dictType__SaintsSerialized__:
-    _saintsKeys:
-    - value: 0
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 1
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
+    _saintsKeys: []
     _wrapTypeKey: 4
-    _saintsValues:
-    - valueField:
-        propertyType: 4
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    - valueField:
-        propertyType: 4
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 1
+    _saintsValues: []
     _wrapTypeValue: 1
     saintsSerializedVersion: 2
   dateTimeType__SaintsSerialized__:
     propertyType: 5
-    longValue: 638973792000000000
+    longValue: 0
     uLongValue: 0
     stringValue: 
     V: {fileID: 0}
@@ -1502,225 +1452,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerHashSetExample
   stringHashSet__SaintsSerialized__:
-    _saintsList:
-    - value: 1
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: 169648373862236253
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 2
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: 169648373862236259
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
+    _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
   refHashSet__SaintsSerialized__:
-    _saintsList:
-    - valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
-        VRef:
-          rid: 169648373862236261
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    - valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: 169648373862236263
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 1
+    _saintsList: []
     _saintsSerializedVersion: 2
-    _wrapType: 1
+    _wrapType: 4
   noPolymorphism__SaintsSerialized__:
-    _saintsList:
-    - value:
-        absC: 
-        sub1: 
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
+    _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
   polymorphism__SaintsSerialized__:
-    _saintsList:
-    - value:
-        absC: 
-        sub1: 
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    _saintsSerializedVersion: 2
-    _wrapType: 1
-  stringHashSetArr__SaintsSerialized__:
-  - _saintsList:
-    - value: 1
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 2
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
+    _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
-  stringHashSetLis__SaintsSerialized__:
-  - _saintsList:
-    - value: 1
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 3
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _saintsSerializedVersion: 2
-    _wrapType: 4
-  polymorphismArr__SaintsSerialized__:
-  - _saintsList:
-    - value:
-        absC: 
-        sub1: 
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    _saintsSerializedVersion: 2
-    _wrapType: 1
-  polymorphismLis__SaintsSerialized__:
-  - _saintsList:
-    - value:
-        absC: 
-        sub1: 
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    _saintsSerializedVersion: 2
-    _wrapType: 1
+  stringHashSetArr__SaintsSerialized__: []
+  stringHashSetLis__SaintsSerialized__: []
+  polymorphismArr__SaintsSerialized__: []
+  polymorphismLis__SaintsSerialized__: []
   references:
     version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 169648373862236253
-      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: today.comes.saintsfield.Samples}
-      data:
-        common: 0
-        structString: 
-    - rid: 169648373862236259
-      type: {class: SaintsDictReference/Sub1, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        absC: 
-        sub1: 
-    - rid: 169648373862236261
-      type: {class: SaintsDictReference/Sub1, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        absC: 
-        sub1: 
-    - rid: 169648373862236263
-      type: {class: SaintsDictReference/Sub2, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        absC: 
-        sub1: 
-        sub2: 
+    RefIds: []
 --- !u!4 &214392494
 Transform:
   m_ObjectHideFlags: 0
@@ -5412,18 +5165,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SerTimeSpanExample
   myClass:
-    _dtArray__SaintsSerialized__:
-    - propertyType: 6
-      longValue: 0
-      uLongValue: 0
-      stringValue: 
-      V: {fileID: 0}
-      VRef:
-        rid: -2
-      IsVRef: 0
+    _dtArray__SaintsSerialized__: []
   _dt__SaintsSerialized__:
     propertyType: 6
-    longValue: 3208270000000
+    longValue: 0
     uLongValue: 0
     stringValue: 
     V: {fileID: 0}
@@ -7746,6 +7491,63 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &1817068470
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1817068472}
+  - component: {fileID: 1817068471}
+  m_Layer: 0
+  m_Name: WwiseGlobal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1817068471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1817068470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffc8aa5f3a58c3c4da8aa49f0cd1f4f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkInitializer
+  InitializationSettings: {fileID: 11400000, guid: bd2dd1604dd283b458c27308c87d7b32, type: 2}
+  basePath: 
+  language: 
+  defaultPoolSize: 0
+  lowerPoolSize: 0
+  streamingPoolSize: 0
+  memoryCutoffThreshold: 0
+  monitorPoolSize: 0
+  monitorQueuePoolSize: 0
+  callbackManagerBufferSize: 0
+  spatialAudioPoolSize: 0
+  maxSoundPropagationDepth: 0
+  engineLogging: 0
+--- !u!4 &1817068472
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1817068470}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1823937746
 GameObject:
   m_ObjectHideFlags: 0
@@ -8788,20 +8590,100 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: dictIntToStruct__SaintsSerialized__._saintsKeys.Array.size
+      propertyPath: 'managedReferences[3614753699029844075]'
+      value: SaintsField.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699029844076]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699029844079]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699248473011]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699248473014]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699248996356]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699248996359]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699248996442]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699248996446]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699248996857]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699248996864]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: 'managedReferences[3614753699248996882]'
+      value: mscorlib System.Int32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: managedReferences[3614753699029844075].common
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _dictInterface__SaintsSerialized__._wrapTypeValue
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: dictIntToStruct__SaintsSerialized__._saintsValues.Array.size
+      propertyPath: managedReferences[3614753699029844075].structString
+      value: xxx
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: simpleDict__SaintsSerialized__._saintsKeys.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: simpleDict__SaintsSerialized__._saintsValues.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: dictIntToStruct__SaintsSerialized__._saintsKeys.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: dictIntToStruct__SaintsSerialized__._saintsValues.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
       propertyPath: _saintsDictInterfaceArr.Array.data[0].saintsSerializedVersion
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: simpleDict__SaintsSerialized__._saintsValues.Array.data[0].value
+      value: s
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: simpleDict__SaintsSerialized__._saintsKeys.Array.data[0].wrapType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
       propertyPath: dictIntToStruct__SaintsSerialized__._saintsKeys.Array.data[0].value
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: simpleDict__SaintsSerialized__._saintsValues.Array.data[0].wrapType
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
       propertyPath: dictIntToStruct__SaintsSerialized__._saintsKeys.Array.data[0].wrapType
@@ -8812,6 +8694,22 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: simpleDict__SaintsSerialized__._saintsKeys.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _dictInterfaceArr__SaintsSerialized__.Array.data[0]._saintsKeys.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: simpleDict__SaintsSerialized__._saintsValues.Array.data[0].valueField.VRef
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _dictInterfaceArr__SaintsSerialized__.Array.data[0]._saintsValues.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
       propertyPath: dictIntToStruct__SaintsSerialized__._saintsKeys.Array.data[0].valueField.VRef
       value: -2
       objectReference: {fileID: 0}
@@ -8819,11 +8717,88 @@ PrefabInstance:
       propertyPath: dictIntToStruct__SaintsSerialized__._saintsValues.Array.data[0].valueField.VRef
       value: -2
       objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _dictInterfaceArr__SaintsSerialized__.Array.data[0]._saintsValues.Array.data[0].wrapType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _dictInterfaceArr__SaintsSerialized__.Array.data[0]._saintsKeys.Array.data[0].valueField.VRef
+      value: 3614753699029844075
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _dictInterfaceArr__SaintsSerialized__.Array.data[0]._saintsValues.Array.data[0].valueField.VRef
+      value: 3614753699248996882
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _dictInterfaceArr__SaintsSerialized__.Array.data[0]._saintsValues.Array.data[0].valueField.IsVRef
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      propertyPath: _dictInterfaceArr__SaintsSerialized__.Array.data[0]._saintsValues.Array.data[0].valueField.propertyType
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2370357191292358950, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3442031997421319487}
   m_SourcePrefab: {fileID: 100100000, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+--- !u!1 &3442031997421319486 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2370357191292358950, guid: fcea4d371757bbb45977557cc1049963, type: 3}
+  m_PrefabInstance: {fileID: 3442031997421319485}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3442031997421319487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3442031997421319486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 340f017213ff85e4eaf4aeb930af46a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.SubSerPartExample
+  normalClass:
+    _simpleDict__SaintsSerialized__:
+      _saintsKeys:
+      - value: 0
+        valueField:
+          propertyType: 0
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 4
+      _wrapTypeKey: 4
+      _saintsValues:
+      - valueField:
+          propertyType: 4
+          longValue: 0
+          uLongValue: 0
+          stringValue: 
+          V: {fileID: 0}
+          VRef:
+            rid: -2
+          IsVRef: 0
+        valueArray: []
+        valueList: []
+        wrapType: 1
+      _wrapTypeValue: 1
+      saintsSerializedVersion: 2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1001 &5363600775475268543
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8913,6 +8888,60 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7aba8e6dfb79a87409e1e04f8817b3bb, type: 3}
+--- !u!4 &6266185908092116083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8392187471970743583}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8392187471970743583
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6266185908092116083}
+  - component: {fileID: 8392187471970743584}
+  m_Layer: 0
+  m_Name: SerDictionarySub
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &8392187471970743584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8392187471970743583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 340f017213ff85e4eaf4aeb930af46a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.SubSerPartExample
+  normalClass:
+    _simpleDict__SaintsSerialized__:
+      _saintsKeys: []
+      _wrapTypeKey: 4
+      _saintsValues: []
+      _wrapTypeValue: 1
+      saintsSerializedVersion: 2
+  references:
+    version: 2
+    RefIds: []
 --- !u!1001 &8813428999584467601
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9010,6 +9039,7 @@ SceneRoots:
   - {fileID: 315419262}
   - {fileID: 8813428999584467601}
   - {fileID: 3442031997421319485}
+  - {fileID: 6266185908092116083}
   - {fileID: 203542844}
   - {fileID: 5363600775475268543}
   - {fileID: 1569099617}
@@ -9024,3 +9054,4 @@ SceneRoots:
   - {fileID: 113869390}
   - {fileID: 851986020}
   - {fileID: 1779100557}
+  - {fileID: 1817068472}
