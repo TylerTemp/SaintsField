@@ -5,14 +5,17 @@ using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
-    public partial class SubSerPartExample : MonoBehaviour
+    public partial class SubSerPartExample : SaintsMonoBehaviour
     {
         [Serializable]
         public partial class NormalClass
         {
-            [SaintsSerialized] private Dictionary<int, string> _simpleDict;
+            [SaintsSerialized] public Dictionary<int, string> _simpleDict;
         }
 
         public NormalClass normalClass;
+
+        [ShowInInspector]
+        public Dictionary<int, string> _simpleDict => normalClass._simpleDict;
     }
 }

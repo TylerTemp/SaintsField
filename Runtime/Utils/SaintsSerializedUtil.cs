@@ -117,7 +117,7 @@ namespace SaintsField.Utils
 
         public static (bool assign, SaintsDictionary<TKey, TValue> result) OnBeforeSerializeDictionary<TKey, TValue>(SaintsDictionary<TKey, TValue> serializedProp, object obj)
         {
-            if (obj == null)
+            if (serializedProp == null)
             {
                 // Debug.Log("OnBeforeSerializeDictionary is null, set to empty saintsDictionary");
                 // return (true, new SaintsDictionary<TKey, TValue>());
@@ -634,62 +634,58 @@ namespace SaintsField.Utils
             {
                 case null:
                 {
-                    // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
+                    Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
                     // return (false, null);
                     return (true, new Dictionary<TKey, TValue>());
                 }
                 case Dictionary<TKey, TValue> originDictionary:
                 {
                     int index = 0;
+                    List<TKey> keys = new List<TKey>();
                     foreach (SaintsWrap<TKey> keyWrap in saintsSerializedProperty._saintsKeys)
                     {
                         TKey keyV = keyWrap.value;
+                        TValue valueV;
                         if(index >= saintsSerializedProperty._saintsValues.Count)
                         {
-                            break;
+                            valueV = default;
+                            // break;
+                        }
+                        else
+                        {
+                            SaintsWrap<TValue> valueWrap = saintsSerializedProperty._saintsValues[index];
+                            valueV = valueWrap.value;
                         }
 
-                        SaintsWrap<TValue> valueV = saintsSerializedProperty._saintsValues[index];
+                        keys.Add(keyV);
 
                         if (originDictionary.TryGetValue(keyV, out TValue value))
                         {
                             if((object)value != (object)keyV)
                             {
-                                originDictionary[keyV] = valueV.value;
+                                originDictionary[keyV] = valueV;
                             }
                         }
                         else
                         {
-                            originDictionary[keyV] = valueV.value;
+                            Debug.Log($"add {keyV}={valueV}");
+                            originDictionary[keyV] = valueV;
                         }
 
                         index++;
                     }
-                    foreach (KeyValuePair<TKey, TValue> kv in saintsSerializedProperty)
-                    {
-                        if (originDictionary.TryGetValue(kv.Key, out TValue value))
-                        {
-                            if((object)value != (object)kv.Value)
-                            {
-                                originDictionary[kv.Key] = kv.Value;
-                            }
-                        }
-                        else
-                        {
-                            originDictionary[kv.Key] = kv.Value;
-                        }
-                    }
 
-                    foreach (TKey removeKey in originDictionary.Keys.Except(saintsSerializedProperty.Keys).ToArray())
+                    foreach (TKey removeKey in originDictionary.Keys.Except(keys).ToArray())
                     {
+                        Debug.Log($"remove {removeKey}");
                         originDictionary.Remove(removeKey);
                     }
 
-                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}/{saintsSerializedProperty._saintsKeys.Count}");
+                    Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}/{saintsSerializedProperty._saintsKeys.Count}={saintsSerializedProperty._saintsValues.Count}");
                     return (true, originDictionary);
                 }
                 default:
-                    // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
+                    Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
                     return (false, null);
             }
         }
@@ -705,12 +701,16 @@ namespace SaintsField.Utils
                 }
                 case HashSet<T> originalHashSet:
                 {
+                    List<T> keys = new List<T>(saintsSerializedProperty._saintsList.Count);
+                    // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                     foreach (SaintsWrap<T> serWrap in saintsSerializedProperty._saintsList)
                     {
-                        originalHashSet.Add(serWrap.value);
+                        T v = serWrap.value;
+                        keys.Add(v);
+                        originalHashSet.Add(v);
                     }
 
-                    foreach (T removeKey in originalHashSet.Except(saintsSerializedProperty).ToArray())
+                    foreach (T removeKey in originalHashSet.Except(keys).ToArray())
                     {
                         originalHashSet.Remove(removeKey);
                     }

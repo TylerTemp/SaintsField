@@ -724,6 +724,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         IEnumerable allKeyList = keysField.GetValue(keysParent) as IEnumerable;
                         Debug.Assert(allKeyList != null, $"key list {keysField.Name} is null");
                         (object value, int index)[] indexedValue = allKeyList.Cast<object>().WithIndex().ToArray();
+                        if(propIndex >= indexedValue.Length)
+                        {
+                            Debug.LogWarning($"Mismatch key index {propIndex} out of range, wait for serialization process");
+                            return;
+                        }
                         object thisKey = indexedValue[propIndex].value;
                         // Debug.Log($"checking with {thisKey}");
                         foreach ((object existKey, int _) in indexedValue.Where(each => each.index != propIndex))
