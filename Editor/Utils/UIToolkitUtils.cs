@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer;
-using SaintsField.Editor.Drawers.LayerDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Interfaces;
@@ -14,11 +13,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Playa;
-using SaintsField.Utils;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 #endif
@@ -52,7 +48,7 @@ namespace SaintsField.Editor.Utils
             StyleSheet rotateUss = Util.LoadResource<StyleSheet>("UIToolkit/SaintsRotate.uss");
             element.styleSheets.Add(rotateUss);
             element.AddToClassList("saints-rotate");
-            element.RegisterCallback<TransitionEndEvent>(e =>
+            element.RegisterCallback<TransitionEndEvent>(_ =>
             {
                 // Debug.Log(buttonRotator.style.rotate);
                 element.RemoveFromClassList("saints-rotate");
@@ -2295,7 +2291,6 @@ namespace SaintsField.Editor.Utils
                     {
                         GameObject go = new GameObject();
                         Component result = go.AddComponent(type);
-
                         try
                         {
                             object defaultValue = fieldInfo.GetValue(result);
@@ -2312,13 +2307,45 @@ namespace SaintsField.Editor.Utils
                             Debug.LogError(e);
                         }
 
-                        UnityEngine.Object.DestroyImmediate(go);
+                        // UnityEngine.Object.DestroyImmediate(go);
                     });
 
                 }));
 
                 return;
             }
+
+            if (type.IsSubclassOf(typeof(ScriptableObject)))
+            {
+                element.AddManipulator(new ContextualMenuManipulator(evt =>
+                {
+                    evt.menu.AppendAction("Reset", _ =>
+                    {
+                        ScriptableObject result = ScriptableObject.CreateInstance(type);
+                        try
+                        {
+                            object defaultValue = fieldInfo.GetValue(result);
+
+                            if (isUObj && uObj != null)
+                            {
+                                Undo.RecordObject(uObj, $"SaintsField Reset {fieldInfo.Name}");
+                            }
+
+                            fieldInfo.SetValue(parent, defaultValue);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError(e);
+                        }
+
+                        UnityEngine.Object.DestroyImmediate(result);
+                    });
+
+                }));
+
+                return;
+            }
+
 
             element.AddManipulator(new ContextualMenuManipulator(evt =>
             {
