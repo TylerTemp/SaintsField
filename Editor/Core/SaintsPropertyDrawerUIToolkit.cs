@@ -633,12 +633,7 @@ namespace SaintsField.Editor.Core
             Debug.Log($"Done property gui {property.propertyPath}/{this}");
 #endif
 
-            int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-
-            if(propIndex == -1)
-            {
-                UIToolkitUtils.AddContextualMenuReset(rootElement, fieldInfo, parent);
-            }
+            UIToolkitUtils.AddContextualMenuReset(rootElement, property, fieldInfo, parent);
 
             return rootElement;
         }

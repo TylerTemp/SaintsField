@@ -5,7 +5,6 @@ using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 {

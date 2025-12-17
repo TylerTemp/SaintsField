@@ -645,6 +645,8 @@ namespace SaintsField.Editor.Utils
           object parent)
         {
             SerializedPropertyType propertyType = property.propertyType;
+            int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            bool canAddContextReset = propIndex == -1;
             // Debug.Log($"CreateOrUpdateFieldRawFallback process {property.propertyPath}/{property.propertyType}/{property.isArray}/hor={inHorizontalLayout}");
             switch (propertyType)
             {
@@ -763,7 +765,7 @@ namespace SaintsField.Editor.Utils
                                 }
                             }).Every(100);
 
-                            AddContextualMenuReset(listViewToggle, fieldInfo, parent);
+                            AddContextualMenuReset(listViewToggle, property, fieldInfo, parent);
                         }
 
                         listView.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
@@ -841,7 +843,7 @@ namespace SaintsField.Editor.Utils
                         };
                         longField.BindProperty(property);
                         ApplyBasicStyles(longField, inHorizontalLayout);
-                        AddContextualMenuReset(longField, fieldInfo, parent);
+                        AddContextualMenuReset(longField, property, fieldInfo, parent);
                         return longField;
                     }
                     #endregion
@@ -867,7 +869,7 @@ namespace SaintsField.Editor.Utils
                         };
                         unsignedLongField.BindProperty(property);
                         ApplyBasicStyles(unsignedLongField, inHorizontalLayout);
-                        AddContextualMenuReset(unsignedLongField, fieldInfo, parent);
+                        AddContextualMenuReset(unsignedLongField, property, fieldInfo, parent);
                         return unsignedLongField;
 #else
                         if (originalField is LongField unsignedLongField)
@@ -913,7 +915,8 @@ namespace SaintsField.Editor.Utils
                         };
                         integerField.BindProperty(property);
                         ApplyBasicStyles(integerField, inHorizontalLayout);
-                        AddContextualMenuReset(integerField, fieldInfo, parent);
+                        AddContextualMenuReset(integerField, property, fieldInfo, parent);
+
                         return integerField;
                     }
                     #endregion
@@ -939,7 +942,8 @@ namespace SaintsField.Editor.Utils
                         };
                         unsignedIntegerField.BindProperty(property);
                         ApplyBasicStyles(unsignedIntegerField, inHorizontalLayout);
-                        AddContextualMenuReset(unsignedIntegerField, fieldInfo, parent);
+                        AddContextualMenuReset(unsignedIntegerField, property, fieldInfo, parent);
+
                         return unsignedIntegerField;
 #else
                         if (originalField is IntegerField unsignedIntegerField)
@@ -985,7 +989,8 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         ApplyBasicStyles(element, inHorizontalLayout);
-                        AddContextualMenuReset(element, fieldInfo, parent);
+                        AddContextualMenuReset(element, property, fieldInfo, parent);
+
                         return element;
                     }
                     #endregion
@@ -1010,7 +1015,7 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         ApplyBasicStyles(element, inHorizontalLayout);
-                        AddContextualMenuReset(element, fieldInfo, parent);
+                        AddContextualMenuReset(element, property, fieldInfo, parent);
 
                         return element;
                     }
@@ -1036,7 +1041,8 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         ApplyBasicStyles(element, inHorizontalLayout);
-                        AddContextualMenuReset(element, fieldInfo, parent);
+                        AddContextualMenuReset(element, property, fieldInfo, parent);
+
                         return element;
                     }
                     #endregion
@@ -1061,7 +1067,7 @@ namespace SaintsField.Editor.Utils
                         };
                         element.BindProperty(property);
                         ApplyBasicStyles(element, inHorizontalLayout);
-                        AddContextualMenuReset(element, fieldInfo, parent);
+                        AddContextualMenuReset(element, property, fieldInfo, parent);
                         return element;
                     }
                     #endregion
@@ -1115,7 +1121,7 @@ namespace SaintsField.Editor.Utils
                     {
                         toggle.AddToClassList(Toggle.alignedFieldUssClassName);
                     }
-                    AddContextualMenuReset(toggle, fieldInfo, parent);
+                    AddContextualMenuReset(toggle, property, fieldInfo, parent);
                     return toggle;
                 }
                 case SerializedPropertyType.Float:
@@ -1160,8 +1166,11 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     floatField.BindProperty(property);
-                    ApplyBasicStyles(floatField, inHorizontalLayout);
-                    AddContextualMenuReset(floatField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        ApplyBasicStyles(floatField, inHorizontalLayout);
+                    }
+                    AddContextualMenuReset(floatField, property, fieldInfo, parent);
 
                     return floatField;
                 }
@@ -1184,7 +1193,10 @@ namespace SaintsField.Editor.Utils
                     };
                     textField.BindProperty(property);
                     ApplyBasicStyles(textField, inHorizontalLayout);
-                    AddContextualMenuReset(textField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(textField, property, fieldInfo, parent);
+                    }
                     return textField;
                 }
                 case SerializedPropertyType.Color:
@@ -1207,7 +1219,10 @@ namespace SaintsField.Editor.Utils
 
                     colorField.BindProperty(property);
                     ApplyBasicStyles(colorField, inHorizontalLayout);
-                    AddContextualMenuReset(colorField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(colorField, property, fieldInfo, parent);
+                    }
                     return colorField;
                 }
                 case SerializedPropertyType.ObjectReference:
@@ -1244,7 +1259,10 @@ namespace SaintsField.Editor.Utils
                             Util.LoadResource<StyleSheet>("UIToolkit/UnityObjectFieldLabelDisplayNone.uss");
                         objectField.styleSheets.Add(_unityObjectFieldLabelDisplayNone);
                     }
-                    AddContextualMenuReset(objectField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(objectField, property, fieldInfo, parent);
+                    }
 
                     return objectField;
                 }
@@ -1267,7 +1285,10 @@ namespace SaintsField.Editor.Utils
                     };
                     layerMaskField.BindProperty(property);
                     ApplyBasicStyles(layerMaskField, inHorizontalLayout);
-                    AddContextualMenuReset(layerMaskField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(layerMaskField, property, fieldInfo, parent);
+                    }
                     return layerMaskField;
                 }
                 case SerializedPropertyType.Enum:
@@ -1338,7 +1359,10 @@ namespace SaintsField.Editor.Utils
                     {
                         vector2Field.AddToClassList(Vector2Field.alignedFieldUssClassName);
                     }
-                    AddContextualMenuReset(vector2Field, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(vector2Field, property, fieldInfo, parent);
+                    }
                     return vector2Field;
                 }
                 case SerializedPropertyType.Vector3:
@@ -1379,7 +1403,10 @@ namespace SaintsField.Editor.Utils
                         vector3Field.AddToClassList(Vector3Field.alignedFieldUssClassName);
                     }
 
-                    AddContextualMenuReset(vector3Field, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(vector3Field, property, fieldInfo, parent);
+                    }
                     return vector3Field;
                 }
                 case SerializedPropertyType.Vector4:
@@ -1419,7 +1446,10 @@ namespace SaintsField.Editor.Utils
                     {
                         vector4Field.AddToClassList(Vector4Field.alignedFieldUssClassName);
                     }
-                    AddContextualMenuReset(vector4Field, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(vector4Field, property, fieldInfo, parent);
+                    }
                     return vector4Field;
                 }
                 case SerializedPropertyType.Rect:
@@ -1459,7 +1489,10 @@ namespace SaintsField.Editor.Utils
                     {
                         rectField.AddToClassList(RectField.alignedFieldUssClassName);
                     }
-                    AddContextualMenuReset(rectField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(rectField, property, fieldInfo, parent);
+                    }
                     return rectField;
                 }
                 case SerializedPropertyType.ArraySize:
@@ -1482,7 +1515,10 @@ namespace SaintsField.Editor.Utils
                     };
                     integerField.BindProperty(property);
                     ApplyBasicStyles(integerField, inHorizontalLayout);
-                    AddContextualMenuReset(integerField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(integerField, property, fieldInfo, parent);
+                    }
                     return integerField;
                 }
                 case SerializedPropertyType.Character:
@@ -1505,7 +1541,10 @@ namespace SaintsField.Editor.Utils
                     };
                     textField.BindProperty(property);
                     ApplyBasicStyles(textField, inHorizontalLayout);
-                    AddContextualMenuReset(textField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(textField, property, fieldInfo, parent);
+                    }
                     return textField;
                 }
                 case SerializedPropertyType.AnimationCurve:
@@ -1527,7 +1566,10 @@ namespace SaintsField.Editor.Utils
                     };
                     curveField.BindProperty(property);
                     ApplyBasicStyles(curveField, inHorizontalLayout);
-                    AddContextualMenuReset(originalField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(originalField, property, fieldInfo, parent);
+                    }
 
                     return curveField;
                 }
@@ -1567,7 +1609,10 @@ namespace SaintsField.Editor.Utils
                     {
                         boundsField.AddToClassList(BoundsField.alignedFieldUssClassName);
                     }
-                    AddContextualMenuReset(boundsField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(boundsField, property, fieldInfo, parent);
+                    }
                     return boundsField;
                 }
                 case SerializedPropertyType.Gradient:
@@ -1603,7 +1648,10 @@ namespace SaintsField.Editor.Utils
                     };
                     gradientField.BindProperty(property);
                     ApplyBasicStyles(gradientField, inHorizontalLayout);
-                    AddContextualMenuReset(gradientField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(gradientField, property, fieldInfo, parent);
+                    }
                     return gradientField;
                 }
                 case SerializedPropertyType.Quaternion:
@@ -1628,7 +1676,10 @@ namespace SaintsField.Editor.Utils
                     };
                     integerField.BindProperty(property);
                     ApplyBasicStyles(integerField, inHorizontalLayout);
-                    AddContextualMenuReset(integerField, fieldInfo, parent);
+                    if(canAddContextReset)
+                    {
+                        AddContextualMenuReset(integerField, property, fieldInfo, parent);
+                    }
                     return integerField;
                 }
                 case SerializedPropertyType.Vector2Int:
@@ -1668,7 +1719,7 @@ namespace SaintsField.Editor.Utils
                     {
                         vector2IntField.AddToClassList(Vector2IntField.alignedFieldUssClassName);
                     }
-                    AddContextualMenuReset(vector2IntField, fieldInfo, parent);
+                    AddContextualMenuReset(vector2IntField, property, fieldInfo, parent);
                     return vector2IntField;
                 }
                 case SerializedPropertyType.Vector3Int:
@@ -1708,7 +1759,7 @@ namespace SaintsField.Editor.Utils
                     {
                         vector3IntField.AddToClassList(Vector3IntField.alignedFieldUssClassName);
                     }
-                    AddContextualMenuReset(vector3IntField, fieldInfo, parent);
+                    AddContextualMenuReset(vector3IntField, property, fieldInfo, parent);
                     return vector3IntField;
                 }
                 case SerializedPropertyType.RectInt:
@@ -1748,7 +1799,7 @@ namespace SaintsField.Editor.Utils
                     {
                         rectIntField.AddToClassList(RectIntField.alignedFieldUssClassName);
                     }
-                    AddContextualMenuReset(rectIntField, fieldInfo, parent);
+                    AddContextualMenuReset(rectIntField, property, fieldInfo, parent);
                     return rectIntField;
                 }
                 case SerializedPropertyType.BoundsInt:
@@ -1788,7 +1839,7 @@ namespace SaintsField.Editor.Utils
                     {
                         boundsIntField.AddToClassList(BoundsIntField.alignedFieldUssClassName);
                     }
-                    AddContextualMenuReset(boundsIntField, fieldInfo, parent);
+                    AddContextualMenuReset(boundsIntField, property, fieldInfo, parent);
                     return boundsIntField;
                 }
                 case SerializedPropertyType.Hash128:
@@ -1810,7 +1861,7 @@ namespace SaintsField.Editor.Utils
                     };
                     hash128Field.BindProperty(property);
                     ApplyBasicStyles(hash128Field, inHorizontalLayout);
-                    AddContextualMenuReset(hash128Field, fieldInfo, parent);
+                    AddContextualMenuReset(hash128Field, property, fieldInfo, parent);
                     return hash128Field;
                 }
                 default:
@@ -2267,38 +2318,39 @@ namespace SaintsField.Editor.Utils
             }));
         }
 
-        public static void AddContextualMenuReset(VisualElement element, FieldInfo fieldInfo, object parent)
+        public static void AddContextualMenuReset(VisualElement element, SerializedProperty property, FieldInfo fieldInfo, object parent)
         {
+            int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            if (propIndex >= 0)
+            {
+                return;
+            }
+
             Type type = parent?.GetType();
             if (type == null)
             {
                 return;
             }
 
-            bool isUObj = false;
-            UnityEngine.Object uObj = null;
-            if (parent is UnityEngine.Object parentUObj)
-            {
-                isUObj = true;
-                uObj = parentUObj;
-            }
+            string label = $"Reset {fieldInfo.Name}";
 
             if (type.IsSubclassOf(typeof(Component)))
             {
                 element.AddManipulator(new ContextualMenuManipulator(evt =>
                 {
-                    evt.menu.AppendAction("Reset", _ =>
+                    evt.menu.AppendSeparator();
+                    evt.menu.AppendAction(label, _ =>
                     {
                         GameObject go = new GameObject();
                         Component result = go.AddComponent(type);
+                        if (SerializedUtils.IsOk(property))
+                        {
+                            Undo.RecordObject(property.serializedObject.targetObject, $"SaintsField Reset {fieldInfo.Name}");
+                        }
+
                         try
                         {
                             object defaultValue = fieldInfo.GetValue(result);
-
-                            if (isUObj && uObj != null)
-                            {
-                                Undo.RecordObject(uObj, $"SaintsField Reset {fieldInfo.Name}");
-                            }
 
                             fieldInfo.SetValue(parent, defaultValue);
                         }
@@ -2319,17 +2371,17 @@ namespace SaintsField.Editor.Utils
             {
                 element.AddManipulator(new ContextualMenuManipulator(evt =>
                 {
-                    evt.menu.AppendAction("Reset", _ =>
+                    evt.menu.AppendSeparator();
+                    evt.menu.AppendAction(label, _ =>
                     {
                         ScriptableObject result = ScriptableObject.CreateInstance(type);
+                        if (SerializedUtils.IsOk(property))
+                        {
+                            Undo.RecordObject(property.serializedObject.targetObject, $"SaintsField Reset {fieldInfo.Name}");
+                        }
                         try
                         {
                             object defaultValue = fieldInfo.GetValue(result);
-
-                            if (isUObj && uObj != null)
-                            {
-                                Undo.RecordObject(uObj, $"SaintsField Reset {fieldInfo.Name}");
-                            }
 
                             fieldInfo.SetValue(parent, defaultValue);
                         }
@@ -2346,19 +2398,20 @@ namespace SaintsField.Editor.Utils
                 return;
             }
 
-
             element.AddManipulator(new ContextualMenuManipulator(evt =>
             {
-                evt.menu.AppendAction("Reset", _ =>
+                evt.menu.AppendSeparator();
+                evt.menu.AppendAction(label, _ =>
                 {
+                    if (SerializedUtils.IsOk(property))
+                    {
+                        Undo.RecordObject(property.serializedObject.targetObject, $"SaintsField Reset {fieldInfo.Name}");
+                    }
+
                     try
                     {
                         object fresh = Activator.CreateInstance(type, true);
                         object defaultValue = fieldInfo.GetValue(fresh);
-                        if (isUObj && uObj != null)
-                        {
-                            Undo.RecordObject(uObj, $"SaintsField Reset {fieldInfo.Name}");
-                        }
                         fieldInfo.SetValue(parent, defaultValue);
                     }
                     catch (Exception e)
