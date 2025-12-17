@@ -24,7 +24,7 @@ namespace SaintsField.Editor.UIToolkitElements
             set => _dropdownRoot = value;
         }
 
-        public ScenePickerBaseElement()
+        protected ScenePickerBaseElement()
         {
             if (_sceneElement == null)
             {
@@ -48,7 +48,7 @@ namespace SaintsField.Editor.UIToolkitElements
         protected abstract bool CurrentIsPayload(IScenePickerPayload payload);
         protected abstract void PostProcessDropdownList(AdvancedDropdownList<IScenePickerPayload> dropdown);
 
-        protected const string EditorIconPath = "d_editicon.sml";
+        // protected const string EditorIconPath = "d_editicon.sml";
 
         private void MakeDropdown()
         {
@@ -60,12 +60,13 @@ namespace SaintsField.Editor.UIToolkitElements
             }
 
             bool selected = false;
-            IScenePickerPayload selectedResult = default;
+            IScenePickerPayload selectedResult = null;
             foreach (IScenePickerPayload payload in GetScenePickerPayloads())
             {
                 // dropdown.Add(path, (path, index));
-                dropdown.Add(new AdvancedDropdownList<IScenePickerPayload>(payload.Name, payload));
+                dropdown.Add(payload.Name, payload);
 
+                // ReSharper disable once InvertIf
                 if (CurrentIsPayload(payload))
                 {
                     selected = true;
@@ -74,6 +75,7 @@ namespace SaintsField.Editor.UIToolkitElements
             }
 
             PostProcessDropdownList(dropdown);
+            dropdown.SelfCompact();
             // dropdown.AddSeparator();
             // dropdown.Add("Edit Scenes In Build...", ("", -2), false, "d_editicon.sml");
 
@@ -94,43 +96,6 @@ namespace SaintsField.Editor.UIToolkitElements
                 (curItem, _) =>
                 {
                     SetSelectedPayload((IScenePickerPayload) curItem);
-                    // (string path, int index) = ((string path, int index))curItem;
-                    // switch (index)
-                    // {
-                    //     case -1:
-                    //     {
-                    //         Debug.Assert(isString);
-                    //         property.stringValue = "";
-                    //         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, "");
-                    //         property.serializedObject.ApplyModifiedProperties();
-                    //         onValueChangedCallback.Invoke("");
-                    //     }
-                    //         break;
-                    //     case -2:
-                    //     {
-                    //         SceneUtils.OpenBuildSettings();
-                    //     }
-                    //         break;
-                    //     default:
-                    //     {
-                    //         if (isString)
-                    //         {
-                    //             property.stringValue = path;
-                    //             ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, path);
-                    //             property.serializedObject.ApplyModifiedProperties();
-                    //             onValueChangedCallback.Invoke(path);
-                    //         }
-                    //         else
-                    //         {
-                    //             property.intValue = index;
-                    //             ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, index);
-                    //             property.serializedObject.ApplyModifiedProperties();
-                    //             onValueChangedCallback.Invoke(index);
-                    //         }
-                    //     }
-                    //         break;
-                    // }
-
                     return null;
                 }
             );

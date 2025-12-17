@@ -93,6 +93,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                 }
             }
 
+            advancedDropdownList.SelfCompact();
+
             #region Get Cur Value
 
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> curStack;

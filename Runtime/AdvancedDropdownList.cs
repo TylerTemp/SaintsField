@@ -79,7 +79,7 @@ namespace SaintsField
         }
 
         // this will parse "/"
-        public virtual void Add(string displayNames, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
+        public void Add(string displayNames, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
         {
             AddByNames(this, new Queue<string>(RuntimeUtil.SeparatePath(displayNames)), value, disabled, icon, extraSearches);
         }
@@ -195,22 +195,26 @@ namespace SaintsField
         {
             if (isSeparator)
             {
+                // Debug.Log($"skip separator");
                 return;
             }
 
             if (_typeChildren.Count == 0)
             {
+                // Debug.Log($"skip as typeChildren 0 for {displayName}");
                 return;
             }
 
             foreach (AdvancedDropdownList<T> child in _typeChildren)
             {
-                child.SelfCompact();
+                child.IterCompact();
             }
 
+            // merge single foldout, but not single item
             // ReSharper disable once InvertIf
-            if (_typeChildren.Count == 1)  // merge this
+            if (_typeChildren.Count == 1 && _typeChildren[0]._typeChildren.Count != 0)
             {
+                // Debug.Log($"merge {this.displayName} with {_typeChildren[0].displayName}");
                 AdvancedDropdownList<T> child = _typeChildren[0];
                 string myName = displayName;
                 string childName = child.displayName;
@@ -221,18 +225,20 @@ namespace SaintsField
                 if (child._typeChildren.Count > 0)
                 {
                     _typeChildren = child._typeChildren.ToList();
-                    // Debug.Log($"set children to {_typeValue}");
+                    // Debug.Log($"{displayName} set children to {string.Join("|", _typeChildren.Select(each => each.displayName))}");
                 }
                 else
                 {
                     _typeValue = child._typeValue;
-                    // Debug.Log($"set value to {_typeValue}");
+                    // Debug.Log($"{displayName} set value to {_typeValue}");
                     _typeChildren.Clear();
                 }
+                // Debug.Log($"again IterCompact {this.displayName}");
+                // IterCompact();
             }
-            // else  // check child common prefix merge
+            // else
             // {
-            //
+            //     Debug.Log($"not merge {this.displayName} with {string.Join("|", _typeChildren.Select(each => each.displayName))}");
             // }
         }
     }
