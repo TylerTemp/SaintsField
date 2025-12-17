@@ -106,7 +106,9 @@ namespace: `SaintsField`
 7.  Fix: `DateTime`, `TimeSpan` drawer might get overflow in some narrow inspector window
 8.  Fix: for Extended Serialization, the `Dictionary`, `HashSet` and the array/list version of them is null rather than an empty instance when attach that component to a `gameObject`
 9.  Add: `SaintsEvent` installer in setup window
- 
+
+Extended Serialization experiment tag is now removed.
+
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
 See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/CHANGELOG.md).
