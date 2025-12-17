@@ -107,6 +107,10 @@ namespace SaintsField.Editor.UIToolkitElements
                 // _labelLow = label.ToLower();
                 _searches.Add(label.ToLower());
                 UIToolkitUtils.SetLabel(labelElement, RichTextDrawer.ParseRichXml(label, "", null, null, null), _richTextDrawer);
+                foreach (Label subLabel in labelElement.Query<Label>().ToList())
+                {
+                    subLabel.style.whiteSpace = WhiteSpace.NoWrap;
+                }
                 // labelElement.text = label;
             }
             RefreshIcon();

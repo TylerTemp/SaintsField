@@ -63,7 +63,10 @@ namespace SaintsField.Editor.UIToolkitElements
             {
                 _labelLow = label.ToLower();
                 UIToolkitUtils.SetLabel(labelElement, RichTextDrawer.ParseRichXml(label, "", null, null, null), _richTextDrawer);
-                // labelElement.text = label;
+                foreach (Label subLabel in labelElement.Query<Label>().ToList())
+                {
+                    subLabel.style.whiteSpace = WhiteSpace.NoWrap;
+                }
                 // Debug.Log($"set label text to {label}");
             }
 
