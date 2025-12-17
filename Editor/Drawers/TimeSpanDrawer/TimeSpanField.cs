@@ -8,6 +8,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
         private readonly TimeSpanElement _timeSpanElement;
         public TimeSpanField(string label, TimeSpanElement timeSpanElement) : base(label, timeSpanElement)
         {
+            style.flexShrink = 1;
             _timeSpanElement = timeSpanElement;
         }
 

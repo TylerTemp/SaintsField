@@ -16,6 +16,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public NormalClass normalClass;
 
         [ShowInInspector]
-        public Dictionary<int, string> _simpleDict => normalClass._simpleDict;
+        public Dictionary<int, string> SimpleDict => normalClass._simpleDict;
     }
 }

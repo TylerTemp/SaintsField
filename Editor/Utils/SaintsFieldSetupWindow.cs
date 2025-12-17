@@ -43,6 +43,7 @@ namespace SaintsField.Editor.Utils
 
         private bool _loadingSaintsEditor;
         private bool _loadingCodeAnalysis;
+        private bool _loadingUnitySerialization;
         private const string ManifestFile = "Packages/manifest.json";
 
 
@@ -66,11 +67,12 @@ namespace SaintsField.Editor.Utils
         {
             _loadingSaintsEditor = false;
             _loadingCodeAnalysis = false;
+            _loadingUnitySerialization = false;
         }
 
+        #region Saints Editor
         [Ordered]
-
-        [LayoutStart("Saints Editor", ELayout.TitleBox)]
+        [LayoutStart("SaintsEditor", ELayout.TitleBox)]
 
         [AboveText(
             "<u>SaintsEditor</u> enables many functions for this plugin. <color=yellow>Note</color>: if you have other inspector like OdinInspector, Tri-Inspector, EditorAttributes enabled, only one will actually work",
@@ -111,13 +113,17 @@ namespace SaintsField.Editor.Utils
 
         [LayoutEnd]
 
-        [Ordered]
-        [Separator(10)]
+        #endregion
+
+        #region Code Analysis
+
 #if !SAINTSFIELD_NEWTONSOFT_JSON
         [LayoutDisableIf(true)]
         [InfoBox("Package com.unity.nuget.newtonsoft-json not installed", EMessageType.Error)]
 #endif
-        [LayoutStart("Code Analysis", ELayout.TitleBox)]
+        [Ordered]
+        [Separator(10)]
+        [LayoutStart("Layout System", ELayout.TitleBox)]
         [AboveText("<u>Code Analysis</u> allows layout system to function more preciously on field orders", 5, 5)]
         [Separator(5)]
         [InfoBox("Loading, please wait...", show: nameof(_loadingCodeAnalysis))]
@@ -236,13 +242,13 @@ namespace SaintsField.Editor.Utils
             return result;
         }
 
-        private readonly struct ProcessScopedRegisty
+        private readonly struct ProcessScopedRegistry
         {
             public readonly bool Delete;
             public readonly int Index;
             public readonly ScopedRegistries CleanedScopedRegistries;
 
-            public ProcessScopedRegisty(bool delete, int index, ScopedRegistries cleanedScopedRegistries)
+            public ProcessScopedRegistry(bool delete, int index, ScopedRegistries cleanedScopedRegistries)
             {
                 Delete = delete;
                 Index = index;
@@ -261,7 +267,7 @@ namespace SaintsField.Editor.Utils
 
             manifest.dependencies.Remove("org.nuget.microsoft.codeanalysis.csharp");
 
-            List<ProcessScopedRegisty> results = new List<ProcessScopedRegisty>();
+            List<ProcessScopedRegistry> results = new List<ProcessScopedRegistry>();
 
             ManifestBase result = manifest;
             if (manifest.scopedRegistries != null)
@@ -275,12 +281,12 @@ namespace SaintsField.Editor.Utils
                         if (newScopes.Count == 0)
                         {
                             Debug.Log($"Delete {scopedRegistry.name}({scopedRegistry.url}) at {index}");
-                            results.Add(new ProcessScopedRegisty(true, index, default));
+                            results.Add(new ProcessScopedRegistry(true, index, default));
                         }
                         else
                         {
                             Debug.Log($"Update {scopedRegistry.name}({scopedRegistry.url}) at {index} with {string.Join(":", newScopes)}");
-                            results.Add(new ProcessScopedRegisty(false, index, new ScopedRegistries
+                            results.Add(new ProcessScopedRegistry(false, index, new ScopedRegistries
                             {
                                 name = scopedRegistry.name,
                                 url = scopedRegistry.url,
@@ -290,7 +296,7 @@ namespace SaintsField.Editor.Utils
                     }
                 }
 
-                foreach (ProcessScopedRegisty processScopedRegisty in results)
+                foreach (ProcessScopedRegistry processScopedRegisty in results)
                 {
                     if (processScopedRegisty.Delete)
                     {
@@ -329,8 +335,6 @@ namespace SaintsField.Editor.Utils
             "<color=brown>not enabled</color>"
 #endif
             + " in this project", 5, 5)]
-        [LayoutStart("./Code Analysis Enable Buttons", ELayout.Horizontal)]
-
         [Ordered]
 #if SAINTSFIELD_CODE_ANALYSIS
         [PlayaDisableIf(true)]
@@ -360,5 +364,85 @@ namespace SaintsField.Editor.Utils
                 Application.OpenURL("https://github.com/TylerTemp/SaintsField/?tab=readme-ov-file#setup");
             }
         }
+
+        [LayoutEnd]
+        #endregion
+
+        #region Unity Serialization
+
+        [Ordered]
+        [Separator(10)]
+#if !SAINTSFIELD_NEWTONSOFT_JSON
+        [LayoutDisableIf(true)]
+        [InfoBox("Package com.unity.nuget.newtonsoft-json not installed", EMessageType.Error)]
+#endif
+
+        [LayoutStart("SaintsEvent", ELayout.TitleBox)]
+        [AboveText("SaintsEvent requires <u>Unity Serialization</u> to be installed in this project.", 5, 5)]
+        [Separator(5)]
+        [AboveText(
+            "<u>SaintsEvent</u> is " +
+#if SAINTSFIELD_SERIALIZATION
+            "<color=green>enabled</color>"
+#else
+            "<color=brown>not enabled</color>"
+#endif
+            + " in this project", 5, 5)]
+        [Separator(5)]
+        [InfoBox("Loading, please wait...", show: nameof(_loadingCodeAnalysis))]
+
+        [LayoutStart("./SaintsEvent Install Buttons", ELayout.Horizontal)]
+#if SAINTSFIELD_SERIALIZATION
+        [PlayaDisableIf(true)]
+#endif
+        [Button("Install")]
+        private void InstallUnitySerialization()
+        {
+#if SAINTSFIELD_NEWTONSOFT_JSON
+            string content = File.ReadAllText(ManifestFile);
+            Manifest manifest = JsonConvert.DeserializeObject<Manifest>(content);
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (KeyValuePair<string, string> manifestDependency in manifest.dependencies)
+            {
+                // Debug.Log($"dependencies: {manifestDependency.Key}={manifestDependency.Value}");
+                // ReSharper disable once InvertIf
+                if (manifestDependency.Key == "com.unity.serialization")
+                {
+                    Debug.Log($"Already found dependencies {manifestDependency.Key}");
+                    return;
+                }
+            }
+
+            manifest.dependencies["com.unity.serialization"] = "3.1.5";
+            Debug.Log($"Add dependencies com.unity.serialization={manifest.dependencies["com.unity.serialization"]}");
+
+            string jsonResult = JsonConvert.SerializeObject(manifest, Formatting.Indented);
+            Debug.Log(jsonResult);
+            _loadingCodeAnalysis = true;
+            File.WriteAllText(ManifestFile, jsonResult + "\n");
+#endif
+        }
+
+        [Ordered]
+        [Button("Uninstall")]
+#if !SAINTSFIELD_SERIALIZATION
+        [PlayaDisableIf(true)]
+#endif
+        private void UninstallUnitySerialization()
+        {
+#if SAINTSFIELD_NEWTONSOFT_JSON
+            string content = File.ReadAllText(ManifestFile);
+            Manifest manifest = JsonConvert.DeserializeObject<Manifest>(content);
+
+            manifest.dependencies.Remove("com.unity.serialization");
+
+            string jsonResult = JsonConvert.SerializeObject(manifest, Formatting.Indented);
+            Debug.Log(jsonResult);
+            _loadingCodeAnalysis = true;
+            File.WriteAllText(ManifestFile, jsonResult + "\n");
+#endif
+        }
+
+        #endregion
     }
 }

@@ -9,6 +9,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
 
         public DateTimeField(string label, DateTimeElement dateTimeElement) : base(label, dateTimeElement)
         {
+            style.flexShrink = 1;
             _dateTimeElement = dateTimeElement;
             dateTimeElement.SetGetWorldBound(() => worldBound);
         }

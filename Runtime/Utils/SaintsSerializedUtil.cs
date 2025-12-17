@@ -634,7 +634,7 @@ namespace SaintsField.Utils
             {
                 case null:
                 {
-                    Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
+                    // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
                     // return (false, null);
                     return (true, new Dictionary<TKey, TValue>());
                 }
@@ -668,7 +668,7 @@ namespace SaintsField.Utils
                         }
                         else
                         {
-                            Debug.Log($"add {keyV}={valueV}");
+                            // Debug.Log($"add {keyV}={valueV}");
                             originDictionary[keyV] = valueV;
                         }
 
@@ -677,15 +677,15 @@ namespace SaintsField.Utils
 
                     foreach (TKey removeKey in originDictionary.Keys.Except(keys).ToArray())
                     {
-                        Debug.Log($"remove {removeKey}");
+                        // Debug.Log($"remove {removeKey}");
                         originDictionary.Remove(removeKey);
                     }
 
-                    Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}/{saintsSerializedProperty._saintsKeys.Count}={saintsSerializedProperty._saintsValues.Count}");
+                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}/{saintsSerializedProperty._saintsKeys.Count}={saintsSerializedProperty._saintsValues.Count}");
                     return (true, originDictionary);
                 }
                 default:
-                    Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
+                    // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
                     return (false, null);
             }
         }

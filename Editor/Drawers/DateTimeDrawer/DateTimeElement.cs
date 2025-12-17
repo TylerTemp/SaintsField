@@ -191,6 +191,11 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
 
             Button timeNowButton = new Button(() =>
             {
+                if (value == 0)
+                {
+                    value = DateTime.Now.Ticks;
+                    return;
+                }
                 DateTime oldDt = new DateTime(value);
                 DateTime newDt = new DateTime(oldDt.Year, oldDt.Month, oldDt.Day, DateTime.Now.Hour,
                     DateTime.Now.Minute, DateTime.Now.Second, DateTime.Now.Millisecond, oldDt.Kind);

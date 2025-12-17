@@ -318,46 +318,6 @@ namespace SaintsField.Editor.Utils
 
         #endregion
 
-
-        #region Enable Extended Serialization
-
-#if SAINTSFIELD_SERIALIZED
-
-        [MenuItem(MenuRoot + "Extended Serialization/Disable This Feature")]
-        public static void DisableExtendedSerialization()
-        {
-            RemoveCompileDefine("SAINTSFIELD_SERIALIZED");
-        }
-
-        #region SAINTSFIELD_SERIALIZED_DEBUG
-#if SAINTSFIELD_SERIALIZED_DEBUG
-
-        [MenuItem(MenuRoot + "Extended Serialization/Disable Debug")]
-        public static void DisableExtendedSerializationDebug()
-        {
-            RemoveCompileDefine("SAINTSFIELD_SERIALIZED_DEBUG");
-        }
-#else
-
-        [MenuItem(MenuRoot + "Extended Serialization/Enable Debug")]
-        public static void EnableExtendedSerializationDebug()
-        {
-            AddCompileDefine("SAINTSFIELD_SERIALIZED_DEBUG");
-        }
-
-#endif
-        #endregion
-
-#else
-        [MenuItem(MenuRoot + "Enable Extended Serialization")]
-        public static void EnableExtendedSerialization()
-        {
-            AddCompileDefine("SAINTSFIELD_SERIALIZED");
-        }
-#endif
-
-        #endregion
-
 #if SAINTSFIELD_DEBUG
         [MenuItem(MenuRoot + "IMGUI Debugger" )]
         public static void OpenIMGUIDebugger()

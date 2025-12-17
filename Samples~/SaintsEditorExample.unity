@@ -5092,23 +5092,39 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48d2dcb1a1ddc0547a5aa71b4e51ed8d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerDateTimeExample
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerDateTimeExample
   myClass:
-    _dtArray__SaintsSerialized__: []
+    _dtArray__SaintsSerialized__:
+    - propertyType: 5
+      longValue: 639015642630212993
+      uLongValue: 0
+      stringValue: 
+      V: {fileID: 0}
+      VRef:
+        rid: -2
+      IsVRef: 0
   s: 
   _dt__SaintsSerialized__:
     propertyType: 5
-    longValue: 0
+    longValue: 639010458595620000
     uLongValue: 0
     stringValue: 
     V: {fileID: 0}
     VRef:
       rid: -2
     IsVRef: 0
-  _dtList__SaintsSerialized__: []
+  _dtList__SaintsSerialized__:
+  - propertyType: 5
+    longValue: 639015642637861423
+    uLongValue: 0
+    stringValue: 
+    V: {fileID: 0}
+    VRef:
+      rid: -2
+    IsVRef: 0
   dt__SaintsSerialized__:
     propertyType: 5
-    longValue: 0
+    longValue: 639015642645521662
     uLongValue: 0
     stringValue: 
     V: {fileID: 0}
@@ -8764,41 +8780,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.SubSerPartExample
   normalClass:
     _simpleDict__SaintsSerialized__:
-      _saintsKeys:
-      - value: 0
-        valueField:
-          propertyType: 0
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 4
+      _saintsKeys: []
       _wrapTypeKey: 4
-      _saintsValues:
-      - valueField:
-          propertyType: 4
-          longValue: 0
-          uLongValue: 0
-          stringValue: 
-          V: {fileID: 0}
-          VRef:
-            rid: -2
-          IsVRef: 0
-        valueArray: []
-        valueList: []
-        wrapType: 1
+      _saintsValues: []
       _wrapTypeValue: 1
       saintsSerializedVersion: 2
   references:
     version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    RefIds: []
 --- !u!1001 &5363600775475268543
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8937,7 +8926,7 @@ MonoBehaviour:
       _saintsKeys: []
       _wrapTypeKey: 4
       _saintsValues: []
-      _wrapTypeValue: 1
+      _wrapTypeValue: 4
       saintsSerializedVersion: 2
   references:
     version: 2

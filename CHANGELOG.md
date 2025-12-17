@@ -7,6 +7,12 @@
 3.  Improve: Extended Serialization now can detect types better
 4.  Fix: for Extended Serialization, when editing in inspector, plus button for `Dictionary`, `HashSet` might not work
 5.  Fix: In some rare edge condition, `ValueButton` could not properly render in inspector
+6.  Improve: When click the `Now` button in `DateTime`, set datetime to now if the date is zero
+7.  Fix: `DateTime`, `TimeSpan` drawer might get overflow in some narrow inspector window
+8.  Fix: for Extended Serialization, the `Dictionary`, `HashSet` and the array/list version of them is null rather than an empty instance when attach that component to a `gameObject`
+9.  Add: `SaintsEvent` installer in setup window
+
+Extended Serialization experiment tag is now removed.
 
 ## 5.6.1 ##
 
