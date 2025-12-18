@@ -1,21 +1,21 @@
 ﻿using System;
-using System.Collections;
+using System.Linq;
+using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
 using UnityEditor;
-using System.Linq;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
-using SaintsField.Editor.Utils;
-using SaintsField.SaintsSerialization;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SaintsField.Editor.Playa.Renderer
+namespace Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 {
-    public partial class NativeFieldPropertyRenderer: AbsRenderer
+    public partial class ShowInInspectorFieldRenderer: AbsRenderer
     {
+        protected override bool AllowGuiColor => true;
+
         protected bool RenderField;
 
-        public NativeFieldPropertyRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
+        public ShowInInspectorFieldRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
             RenderField = fieldWithInfo.PlayaAttributes.Any(each => each is ShowInInspectorAttribute);
             if (RenderField && FieldWithInfo.PropertyInfo != null)

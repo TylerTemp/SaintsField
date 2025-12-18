@@ -1,9 +1,9 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SaintsField.Editor.Playa.Renderer
+namespace Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 {
-    public partial class NativeFieldPropertyRenderer
+    public partial class ShowInInspectorFieldRenderer
     {
         protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
         {

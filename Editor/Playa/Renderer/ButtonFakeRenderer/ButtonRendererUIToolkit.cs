@@ -35,6 +35,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
         private VisualElement _returnValueContainer;
         private VisualElement _returnContainer;
 
+        private Button _buttonElement;
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
             container.style.flexGrow = 1;
@@ -156,7 +158,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 UpdateOneMoreTime = true,
                 Enumerators = new List<IEnumerator>(),
             };
-            Button buttonElement = null;
+
             IVisualElementScheduledItem buttonTask = null;
             Image buttonRotator = new Image
             {
@@ -177,7 +179,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             UIToolkitUtils.KeepRotate(buttonRotator);
             buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator)).StartingIn(200);
 
-            buttonElement = new Button(() =>
+            _buttonElement = new Button(() =>
             {
                 SaintsContext.SerializedProperty = _serializedProperty;
                 object[] returnValues = FieldWithInfo.Targets.Select(t => methodInfo.Invoke(t, parameterValues)).ToArray();
@@ -221,11 +223,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 if (buttonUserData.Enumerators.Count > 0)
                 {
                     // ButtonUserData buttonUserData = (ButtonUserData) buttonElement.userData;
-                    // ReSharper disable once AccessToModifiedClosure
-                    // ReSharper disable once PossibleNullReferenceException
-                    // ReSharper disable once AccessToModifiedClosure
-                    // ReSharper disable once PossibleNullReferenceException
-                    buttonTask = buttonElement.schedule.Execute(() =>
+                    buttonTask = _buttonElement.schedule.Execute(() =>
                     {
                         List<IEnumerator> finishedEnumerators = new List<IEnumerator>();
                         // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
@@ -283,7 +281,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             //     }
             // }
 
-            buttonElement.Clear();
+            _buttonElement.Clear();
             VisualElement buttonLabelContainer = new VisualElement
             {
                 style =
@@ -294,7 +292,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 },
                 name = ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]),
             };
-            buttonElement.Add(buttonLabelContainer);
+            _buttonElement.Add(buttonLabelContainer);
             foreach (VisualElement element in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXmlWithProvider(buttonText, this)))
             {
                 buttonLabelContainer.Add(element);
@@ -306,7 +304,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             // buttonRotator.transform.rotation = Quaternion.Euler(0, 0, 180);
             // buttonRotator.AddToClassList("saints-rotate-360");
 
-            buttonElement.Add(buttonRotator);
+            _buttonElement.Add(buttonRotator);
 
             bool needUpdate = _buttonAttribute.IsCallback;
 
@@ -323,16 +321,16 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             string methodNameFriendly = ObjectNames.NicifyVariableName(methodInfo.Name);
 
             _onSearchFieldUIToolkit.AddListener(Search);
-            buttonElement.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
+            _buttonElement.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
 
             if (!hasParameters && !hasReturnValue)
             {
-                return (buttonElement, needUpdate);
+                return (_buttonElement, needUpdate);
             }
-            buttonElement.style.marginTop = buttonElement.style.marginBottom = buttonElement.style.marginLeft = buttonElement.style.marginRight = 0;
-            buttonElement.style.borderTopLeftRadius = buttonElement.style.borderTopRightRadius = 0;
-            buttonElement.style.borderLeftWidth = buttonElement.style.borderRightWidth = buttonElement.style.borderBottomWidth = 0;
-            root.Add(buttonElement);
+            _buttonElement.style.marginTop = _buttonElement.style.marginBottom = _buttonElement.style.marginLeft = _buttonElement.style.marginRight = 0;
+            _buttonElement.style.borderTopLeftRadius = _buttonElement.style.borderTopRightRadius = 0;
+            _buttonElement.style.borderLeftWidth = _buttonElement.style.borderRightWidth = _buttonElement.style.borderBottomWidth = 0;
+            root.Add(_buttonElement);
 
             // ReSharper disable once InvertIf
             if(hasReturnValue)
@@ -374,9 +372,9 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     ? DisplayStyle.Flex
                     : DisplayStyle.None;
 
-                if (buttonElement.style.display != display)
+                if (_buttonElement.style.display != display)
                 {
-                    buttonElement.style.display = display;
+                    _buttonElement.style.display = display;
                 }
             }
         }

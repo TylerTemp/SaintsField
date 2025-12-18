@@ -7,6 +7,8 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
 {
     public partial class PlayaFullWidthRichLabelRenderer: AbsRenderer
     {
+        protected override bool AllowGuiColor => true;
+
         private readonly BelowTextAttribute _playaBelowRichLabelAttribute;
 
         public PlayaFullWidthRichLabelRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, BelowTextAttribute playaBelowRichLabelAttribute) : base(serializedObject, fieldWithInfo)

@@ -18,6 +18,7 @@ using SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer;
 using SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer;
+using Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.Table;
 using SaintsField.Editor.Playa.RendererGroup;
 using SaintsField.Editor.Utils;
@@ -1336,7 +1337,7 @@ namespace SaintsField.Editor
 
                 case SaintsRenderType.NonSerializedField:
                 case SaintsRenderType.NativeProperty:
-                    yield return new []{new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo)};
+                    yield return new []{new ShowInInspectorFieldRenderer(serializedObject, fieldWithInfo)};
                     yield break;
                     // return WrapAroundSaintsRenderer(new NativeFieldPropertyRenderer(serializedObject, fieldWithInfo),
                     //     fieldWithInfo, serializedObject);

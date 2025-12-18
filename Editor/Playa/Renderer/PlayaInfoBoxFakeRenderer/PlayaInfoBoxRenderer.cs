@@ -6,6 +6,8 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 {
     public partial class PlayaInfoBoxRenderer: AbsRenderer
     {
+        protected override bool AllowGuiColor => true;
+
         private readonly InfoBoxAttribute _playaInfoBoxAttribute;
 
         public PlayaInfoBoxRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo, InfoBoxAttribute playaInfoBoxAttribute) : base(serializedObject, fieldWithInfo)

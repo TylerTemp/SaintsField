@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
+using SaintsField.Editor.Drawers.GUIColor;
 #if (WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE) && !SAINTSFIELD_WWISE_DISABLE
 using SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer;
 #endif
@@ -16,6 +17,7 @@ using SaintsField.Wwise;
 #endif
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
@@ -25,26 +27,65 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         public bool InDirectHorizontalLayout { get; set; }
         public bool NoLabel { get; set; }
 
+        protected abstract bool AllowGuiColor { get; }
+
         // ReSharper disable InconsistentNaming
         public readonly SaintsFieldWithInfo FieldWithInfo;
         // protected readonly SerializedObject SerializedObject;
         // ReSharper enable InconsistentNaming
 
-        public struct PreCheckResult
+        public readonly struct PreCheckResult
         {
-            public bool IsShown;
-            public bool IsDisabled;
+            public readonly bool IsShown;
+            public readonly bool IsDisabled;
             // public int ArraySize;  // NOTE: -1=No Limit, 0=0, 1=More Than 0
-            public (int min, int max) ArraySize;
-            public bool HasRichLabel;
-            public string RichLabelXml;
+            public readonly (int min, int max) ArraySize;
+            public readonly bool HasRichLabel;
+            public readonly string RichLabelXml;
+
+            public PreCheckResult(bool isShown, bool isDisabled, (int min, int max) arraySize,
+                bool hasRichLabel, string richLabelXml)
+            {
+                IsShown = isShown;
+                IsDisabled = isDisabled;
+                ArraySize = arraySize;
+                HasRichLabel = hasRichLabel;
+                RichLabelXml = richLabelXml;
+            }
         }
 
-        // ReSharper disable once UnusedParameter.Local
+        private readonly GUIColorAttribute _guiColorAttribute;
+
         protected AbsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             FieldWithInfo = fieldWithInfo;
-            // SerializedObject = serializedObject;
+            _guiColorAttribute = fieldWithInfo.PlayaAttributes.OfType<GUIColorAttribute>().FirstOrDefault();
+        }
+
+        public bool HasGuiColor()
+        {
+            if(!AllowGuiColor)
+            {
+                return false;
+            }
+            return _guiColorAttribute != null;
+        }
+
+        public string ApplyGuiColor(VisualElement result)
+        {
+            if (!HasGuiColor())
+            {
+                return "";
+            }
+            (string error, Color color) = GUIColorAttributeDrawer.GetColor(_guiColorAttribute, FieldWithInfo.SerializedProperty,
+                (MemberInfo)FieldWithInfo.FieldInfo ?? (MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
+
+            if (error == "")
+            {
+                UIToolkitUtils.ApplyColor(result, color);
+            }
+
+            return error;
         }
 
         protected static MemberInfo GetMemberInfo(SaintsFieldWithInfo info)
@@ -67,11 +108,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         {
             if (fieldWithInfo.PlayaAttributes == null)
             {
-                return new PreCheckResult
-                {
-                    IsShown = true,
-                    ArraySize = (-1, -1),
-                };
+                return new PreCheckResult(true, false, (-1, -1), false, "");
             }
 
             List<ToggleCheckInfo> preCheckInternalInfos = new List<ToggleCheckInfo>(fieldWithInfo.PlayaAttributes.Count);
@@ -161,15 +198,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
-            return new PreCheckResult
-            {
-                IsDisabled = disableIfResult,
-                IsShown = showIfResult,
-                ArraySize = arraySize,
-
-                HasRichLabel = hasRichLabel,
-                RichLabelXml = richLabelXml,
-            };
+            return new PreCheckResult(showIfResult, disableIfResult, arraySize, hasRichLabel, richLabelXml);
         }
 
         private bool _getByXPathKeepUpdate = true;

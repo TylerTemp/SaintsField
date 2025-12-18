@@ -6,6 +6,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 {
     public partial class ListDrawerSettingsRenderer: SerializedFieldBaseRenderer, IMakeRenderer, IDOTweenPlayRecorder
     {
+        protected override bool AllowGuiColor => false;
         private bool _arraySizeCondition;
         private bool _richLabelCondition;
         private bool _tableCondition;

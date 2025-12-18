@@ -16,6 +16,8 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
             _editorType = editorType;
         }
 
+        protected override bool AllowGuiColor => true;
+
         public override void OnDestroy()
         {
 

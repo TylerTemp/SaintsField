@@ -8,6 +8,8 @@ namespace SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer
         {
         }
 
+        protected override bool AllowGuiColor => false;
+
         public override void OnDestroy()
         {
         }

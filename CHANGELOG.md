@@ -1,5 +1,12 @@
 # Changelog
 
+## WIP ##
+
+1.  Add: `Reset Field` context menu to reset a field to default value
+2.  Fix: Dropdown compact mode might not merge some empty pages
+3.  Fix: `TreeDropdown` text overlap when the text is long
+4.  Add: `GUIColor` now works with `ShowInInspector`, `Button`, `InfoBox` etc.
+
 ## 5.6.2 ##
 
 1.  Fix: for Extended Serialization, `interface` could not switch from object mode to Unity Object mode

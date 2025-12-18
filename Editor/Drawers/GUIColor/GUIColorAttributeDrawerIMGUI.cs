@@ -8,7 +8,7 @@ namespace SaintsField.Editor.Drawers.GUIColor
 {
     public partial class GUIColorAttributeDrawer
     {
-        private static Dictionary<string, Color> _idToOriginalColor = new Dictionary<string, Color>();
+        private static readonly Dictionary<string, Color> _idToOriginalColor = new Dictionary<string, Color>();
 
         private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
 

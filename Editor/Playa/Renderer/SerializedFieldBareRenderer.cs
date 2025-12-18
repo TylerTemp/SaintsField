@@ -8,6 +8,7 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public partial class SerializedFieldBareRenderer: AbsRenderer
     {
+
         public SerializedFieldBareRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
             if (fieldWithInfo.PlayaAttributes.Any(each => each is DefaultExpandAttribute))
@@ -15,6 +16,8 @@ namespace SaintsField.Editor.Playa.Renderer
                 fieldWithInfo.SerializedProperty.isExpanded = true;
             }
         }
+
+        protected override bool AllowGuiColor => false;
 
         public override void OnDestroy()
         {

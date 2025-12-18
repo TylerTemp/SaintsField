@@ -223,6 +223,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             return null;
         }
 
+        protected override bool AllowGuiColor => true;
+
         public override void OnDestroy()
         {
             OnDestroyIMGUI();

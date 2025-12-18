@@ -18121,7 +18121,7 @@ MonoBehaviour:
   lightGreen: {fileID: 0}
   transparentBlue: {fileID: 0}
   rangeField: 6
-  dynamicColor: {r: 0.8679245, g: 0.70958126, b: 0.38892844, a: 1}
+  dynamicColor: {r: 0.6415094, g: 0.5551944, b: 0.37824848, a: 1}
   textArea: 
   validate: 0
 --- !u!1 &1150219406
@@ -24428,7 +24428,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1573654648}
-  - component: {fileID: 1573654647}
   m_Layer: 0
   m_Name: WwiseGlobal
   m_TagString: Untagged
@@ -24436,31 +24435,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1573654647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1573654646}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffc8aa5f3a58c3c4da8aa49f0cd1f4f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkInitializer
-  InitializationSettings: {fileID: 11400000, guid: bd2dd1604dd283b458c27308c87d7b32, type: 2}
-  basePath: 
-  language: 
-  defaultPoolSize: 0
-  lowerPoolSize: 0
-  streamingPoolSize: 0
-  memoryCutoffThreshold: 0
-  monitorPoolSize: 0
-  monitorQueuePoolSize: 0
-  callbackManagerBufferSize: 0
-  spatialAudioPoolSize: 0
-  maxSoundPropagationDepth: 0
-  engineLogging: 0
 --- !u!4 &1573654648
 Transform:
   m_ObjectHideFlags: 0

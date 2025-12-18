@@ -40,6 +40,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Inherent
             _serializedObject = serializedObject;
         }
 
+        protected override bool AllowGuiColor => true;
+
         public override void OnDestroy()
         {
         }

@@ -8,6 +8,8 @@ namespace SaintsField.Editor.Playa.Renderer.RealTimeCalculatorFakeRenderer
 {
     public partial class RealTimeCalculatorRenderer: AbsRenderer
     {
+        protected override bool AllowGuiColor => true;
+
         private readonly SerializedObject _serializedObject;
 
         public RealTimeCalculatorRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)

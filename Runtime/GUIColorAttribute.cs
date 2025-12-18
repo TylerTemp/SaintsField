@@ -1,11 +1,15 @@
 using System;
+using System.Diagnostics;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField
 {
-    public class GUIColorAttribute: PropertyAttribute, ISaintsAttribute
+    [Conditional("UNITY_EDITOR")]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
+    public class GUIColorAttribute: PropertyAttribute, ISaintsAttribute, IPlayaAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => "";
@@ -40,16 +44,9 @@ namespace SaintsField
 
         public GUIColorAttribute(EColor eColor, float alpha = 1f)
         {
-            if(alpha >= 1f)
-            {
-                Color = eColor.GetColor();
-            }
-            else
-            {
-                Color c = eColor.GetColor();
-                c.a = alpha;
-                Color = c;
-            }
+            Color c = eColor.GetColor();
+            c.a = alpha;
+            Color = c;
         }
     }
 }

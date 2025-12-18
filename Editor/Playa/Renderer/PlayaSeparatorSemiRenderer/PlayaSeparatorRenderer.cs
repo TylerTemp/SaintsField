@@ -7,6 +7,8 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
 {
     public partial class PlayaSeparatorRenderer: AbsRenderer
     {
+        protected override bool AllowGuiColor => true;
+
         private readonly SeparatorAttribute _playaSeparatorAttribute;
         private readonly string _colorHex;
 

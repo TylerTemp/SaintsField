@@ -12,13 +12,13 @@ namespace SaintsField.Editor.Drawers.GUIColor
     [CustomPropertyDrawer(typeof(GUIColorAttribute), true)]
     public partial class GUIColorAttributeDrawer: SaintsPropertyDrawer
     {
-        private static (string error, Color color) GetColor(GUIColorAttribute guiColorAttribute, SerializedProperty property, FieldInfo info, object target)
+        public static (string error, Color color) GetColor(GUIColorAttribute guiColorAttribute, SerializedProperty property, MemberInfo info, object target)
         {
             if (!guiColorAttribute.IsCallback)
             {
                 return ("", guiColorAttribute.Color);
             }
-            (string error, object result) = Util.FlatGetOf<object>(guiColorAttribute.Callback, null, property, info, target, null);
+            (string error, object result) = Util.GetOf<object>(guiColorAttribute.Callback, null, property, info, target, null);
             if (error != "")
             {
                 return (error, default);
@@ -27,6 +27,8 @@ namespace SaintsField.Editor.Drawers.GUIColor
             // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (result)
             {
+                case EColor eColor:
+                    return ("", eColor.GetColor());
                 case Color color:
                     return ("", color);
                 case string hex:

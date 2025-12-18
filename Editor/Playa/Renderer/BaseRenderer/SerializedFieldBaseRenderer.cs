@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
-using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
@@ -12,6 +11,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
     public abstract partial class SerializedFieldBaseRenderer: AbsRenderer
     {
+        protected override bool AllowGuiColor => false;
+
         protected SerializedFieldBaseRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)
         {
             if (fieldWithInfo.PlayaAttributes.Any(each => each is DefaultExpandAttribute))

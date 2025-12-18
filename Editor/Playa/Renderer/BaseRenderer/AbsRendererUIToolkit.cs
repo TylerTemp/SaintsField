@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.AnimatorParamDrawer;
@@ -32,8 +31,8 @@ using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
+using Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
@@ -95,6 +94,25 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 targetContainer.Add(target);
                 root.Add(targetContainer);
                 hasAnyChildren = true;
+            }
+
+            if (!targetNeedUpdate)
+            {
+                GUIColorAttribute guiColor = FieldWithInfo.PlayaAttributes.OfType<GUIColorAttribute>().FirstOrDefault();
+                if (guiColor != null)
+                {
+                    if (guiColor.IsCallback)
+                    {
+                        targetNeedUpdate = true;
+                    }
+                    else  // we need to update at least once to apply the color
+                    {
+                        UIToolkitUtils.OnAttachToPanelOnce(root, _ =>
+                        {
+                            root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement));
+                        });
+                    }
+                }
             }
 
             if (targetNeedUpdate)
@@ -167,10 +185,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         //
         // }
 
-        // TODO: paging & searching
+        private Color _preColor;
+
         private PreCheckResult UpdatePreCheckUIToolkitInternal(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo, false);
+            // Debug.Log($"{preCheckResult.HasGuiColor}/{preCheckResult.GuiColor}");
             if(result.enabledSelf != !preCheckResult.IsDisabled)
             {
                 result.SetEnabled(!preCheckResult.IsDisabled);
@@ -186,6 +206,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 result.style.display = preCheckResult.IsShown ? DisplayStyle.Flex : DisplayStyle.None;
             }
+
+            ApplyGuiColor(result);
 
             return preCheckResult;
         }
@@ -2770,7 +2792,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #endif
                     getValueSucceed = false;
                     string msg = e.InnerException?.Message ?? e.Message;
-                    if (oldItemElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField errorField)
+                    if (oldItemElement is ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField errorField)
                     {
                         errorField.SetErrorMessage(msg);
                     }
@@ -2778,7 +2800,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         oldElement?.RemoveFromHierarchy();
                         oldElement = null;
-                        NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField r = new NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField(
+                        ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField r = new ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField(
                             thisLabel,
                             new HelpBox(msg, HelpBoxMessageType.Error)
                         );
@@ -2789,7 +2811,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         }
                         else
                         {
-                            result.AddToClassList(NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField.alignedFieldUssClassName);
+                            result.AddToClassList(ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField.alignedFieldUssClassName);
                         }
 
                         if (labelGrayColor)
@@ -2803,7 +2825,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 if(getValueSucceed)
                 {
-                    if (oldItemElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField)
+                    if (oldItemElement is ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField)
                     {
                         oldItemElement.RemoveFromHierarchy();
                         oldItemElement = null;
@@ -2872,7 +2894,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     Debug.LogWarning(e.InnerException ?? e);
 #endif
                     string msg = e.InnerException?.Message ?? e.Message;
-                    if (oldItemElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField errorField)
+                    if (oldItemElement is ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField errorField)
                     {
                         errorField.SetErrorMessage(msg);
                     }
@@ -2880,7 +2902,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         oldItemElement?.RemoveFromHierarchy();
                         oldItemElement = null;
-                        NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField r = new NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField(
+                        ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField r = new ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField(
                             thisLabel,
                             new HelpBox(msg, HelpBoxMessageType.Error)
                         );
@@ -2891,7 +2913,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         }
                         else
                         {
-                            result.AddToClassList(NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField.alignedFieldUssClassName);
+                            result.AddToClassList(ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField.alignedFieldUssClassName);
                         }
 
                         if (labelGrayColor)
@@ -2903,7 +2925,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 if (getValueSucceed)
                 {
-                    if (oldItemElement is NativeFieldPropertyRenderer.NativeFieldPropertyRendererErrorField)
+                    if (oldItemElement is ShowInInspectorFieldRenderer.NativeFieldPropertyRendererErrorField)
                     {
                         oldItemElement.RemoveFromHierarchy();
                         oldItemElement = null;

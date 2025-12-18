@@ -809,15 +809,15 @@ Change the color of the field.
 
 **Override**:
 
-*   `GUIColorAttribute(EColor eColor, float alpha = 1f)`
+*   `GUIColor(EColor eColor, float alpha = 1f)`
 
     Use `EColor` with custom alpha value
 
-*   `GUIColorAttribute(string hexColorOrCallback)`
+*   `GUIColor(string hexColorOrCallback)`
 
     Use hex color which starts with `#`, or use a callback, to get the color
 
-*   `GUIColorAttribute(float r, float g, float b, float a = 1f)`
+*   `GUIColor(float r, float g, float b, float a = 1f)`
 
     Use rgb/rgba color (0-1 range)
 
@@ -852,6 +852,41 @@ private Color ValidateColor()
 ```
 
 [![video](https://github.com/user-attachments/assets/94c1aab5-e606-411b-b87b-6e98e632c579)](https://github.com/user-attachments/assets/9ce32483-17f9-4166-b878-f8e067761ca3)
+
+It works with `ShowInInspector`, `Button`, `InfoBox`, etc. too:
+
+```csharp
+[GUIColor(EColor.Gold)]
+[InfoBox("This is colored gold using <b><u><color=white>GUIColor</color></u></b> attribute.")]
+[Button]
+private void ButtonGold(){}
+
+[ShowInInspector]
+[GUIColor("#00FF00")]
+private int _greenInt = 42;
+
+[ShowInInspector]
+[GUIColor(EColor.Burlywood)]
+private int Calc([PropRange(0,  10)] int v) => v + Random.Range(1, 9) * 100;
+
+[ShowInInspector]
+[GUIColor("$" + nameof(GetColor))]
+[InfoBox("Dynamic callback")]
+private DateTime _dt;
+
+private byte _color255;
+
+private Color GetColor()
+{
+    _color255 = (byte)((_color255 + 10) % 256);
+    byte r = (byte)(_color255 * 1 % 256);
+    byte g = (byte)((_color255 * 2 + 100) % 256);
+    byte b = (byte)((_color255 * 3 + 100) % 256);
+    return new Color32(r, g, b, 255);
+}
+```
+
+[![video](https://github.com/user-attachments/assets/c2ae3a3f-b71d-464e-8d1a-05e39998501b)](https://github.com/user-attachments/assets/08b1b6ff-3816-42a1-b3ee-73f571a2a856)
 
 (UI Toolkit implementation code is partly from [EditorAttributes](https://github.com/v0lt13/EditorAttributes/),
 go give a star to them!)

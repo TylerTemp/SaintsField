@@ -309,6 +309,58 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        private class ButtonColorWrapper
+        {
+            private readonly Button button;
+            private bool _init;
+
+            public ButtonColorWrapper(Button button)
+            {
+                this.button = button;
+            }
+
+            private Color _hoverColor;
+            private Color _normalColor;
+            private Color _pressedColor;
+
+            public void WrapColorTo(Color newColor)
+            {
+                _normalColor = GetLighterColor(newColor);
+                _pressedColor = newColor / 4;
+                // _pressedColor = Color.red;
+                _hoverColor = newColor / 2;
+
+                EnsureBindColorEvent();
+                button.style.backgroundColor = _normalColor;
+            }
+
+            private void EnsureBindColorEvent()
+            {
+                if (_init)
+                {
+                    return;
+                }
+
+                _init = true;
+                button.RegisterCallback<PointerEnterEvent>(_ => button.style.backgroundColor = _hoverColor);
+                button.RegisterCallback<PointerLeaveEvent>(_ => button.style.backgroundColor = _normalColor);
+
+                button.RegisterCallback<PointerDownEvent>(_ => button.style.backgroundColor = _pressedColor,
+                TrickleDown.TrickleDown);
+                button.RegisterCallback<PointerUpEvent>(evt =>
+                {
+                    // if pointer still over button, return hover color; otherwise normal color
+                    bool inside = button.worldBound.Contains(evt.position);
+                    button.style.backgroundColor = inside ? _hoverColor : _normalColor;
+                    // button.style.backgroundColor = _hoverColor;
+                },
+                TrickleDown.TrickleDown);
+            }
+        }
+
+        private static readonly Dictionary<Button, ButtonColorWrapper> ButtonColorWrappers = new Dictionary<Button, ButtonColorWrapper>();
+
+        private static Color GetLighterColor(Color color) => color / 3;
 
         /// <summary>
         /// Applies a color to a visual element via the color attribute
@@ -318,25 +370,40 @@ namespace SaintsField.Editor.Utils
         /// <param name="color">The color attribute</param>
         public static void ApplyColor(VisualElement visualElement, Color color)
         {
+            // Color lighterColor = color;
+            // lighterColor.a = 0.6f;
+            Color lighterColor = GetLighterColor(color);
+
+            const float darkFactor = 0.4f; // smaller = darker
+            Color borderColor =  new Color(color.r * darkFactor, color.g * darkFactor, color.b * darkFactor, 1);
+
             List<Label> labels = visualElement.Query<Label>().ToList();
 
             foreach (Label label in labels)
+            {
                 label.style.color = color;
+            }
 
             List<TextElement> textElements = visualElement.Query<TextElement>().ToList();
 
             foreach (TextElement textElement in textElements)
+            {
                 textElement.style.color = color;
+            }
 
             List<ScrollView> scrollViews = visualElement.Query<ScrollView>(className: "unity-collection-view__scroll-view").ToList();
 
             foreach (ScrollView scrollView in scrollViews)
-                scrollView.style.backgroundColor = color / 3f;
+            {
+                scrollView.style.backgroundColor = lighterColor;
+            }
 
             List<VisualElement> inputFields = visualElement.Query(className: "unity-property-field__input").ToList();
 
             foreach (VisualElement inputField in inputFields)
-                inputField.style.backgroundColor = color / 3f;
+            {
+                inputField.style.backgroundColor = lighterColor;
+            }
 
             List<VisualElement> checkMarks = visualElement.Query(className: "unity-toggle__checkmark").ToList();
 
@@ -344,6 +411,27 @@ namespace SaintsField.Editor.Utils
             {
                 checkMark.style.unityBackgroundImageTintColor = color;
                 checkMark.parent.style.backgroundColor = StyleKeyword.Initial;
+            }
+
+            List<Button> buttons = visualElement.Query<Button>().ToList();
+            foreach (Button button in buttons)
+            {
+                if(!ButtonColorWrappers.TryGetValue(button, out ButtonColorWrapper buttonColorWrapper))
+                {
+                    ButtonColorWrappers[button] = buttonColorWrapper = new ButtonColorWrapper(button);
+                }
+                buttonColorWrapper.WrapColorTo(color);
+
+                // button.style.backgroundColor = lighterColor;
+                button.style.borderLeftColor = button.style.borderRightColor =
+                    button.style.borderTopColor = button.style.borderBottomColor = borderColor;
+            }
+
+            foreach (HelpBox helpBox in visualElement.Query<HelpBox>().ToList())
+            {
+                helpBox.style.backgroundColor = lighterColor;
+                helpBox.style.borderLeftColor = helpBox.style.borderRightColor =
+                    helpBox.style.borderTopColor = helpBox.style.borderBottomColor = borderColor;
             }
         }
 

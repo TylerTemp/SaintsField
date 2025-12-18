@@ -10,6 +10,8 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
 {
     public class OnValueChangedCollectionRenderer: AbsRenderer
     {
+        protected override bool AllowGuiColor => false;
+
         private readonly OnValueChangedAttribute _onValueChangedAttribute;
 
         public OnValueChangedCollectionRenderer(OnValueChangedAttribute onValueChangedAttribute, SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo) : base(serializedObject, fieldWithInfo)

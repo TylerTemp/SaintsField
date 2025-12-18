@@ -4,12 +4,13 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
 using SaintsField.Editor.Utils;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 {
-    public partial class ResultsRenderer: NativeFieldPropertyRenderer
+    public partial class ResultsRenderer: ShowInInspectorFieldRenderer
     {
         private readonly AutoRunnerWindowBase _autoRunner;
 

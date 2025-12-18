@@ -17,6 +17,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 {
     public partial class MethodBindRenderer: AbsRenderer
     {
+        protected override bool AllowGuiColor => false;
         private readonly SerializedObject _serializedObject;
 
         private readonly IPlayaMethodBindAttribute _methodBindAttribute;
