@@ -106,6 +106,7 @@ namespace SaintsField.Utils
                 AssetDatabase.CreateAsset(Config,
                     $"Assets/Editor Default Resources/{EditorResourcePath}");
                 AssetDatabase.SaveAssets();
+                IsConfigLoaded = true;
             }
 
             ConfigAssetPath = AssetDatabase.GetAssetPath(Config);
