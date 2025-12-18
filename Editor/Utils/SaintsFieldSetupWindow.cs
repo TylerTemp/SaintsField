@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Utils
 
         private bool _loadingSaintsEditor;
         private bool _loadingCodeAnalysis;
-        private bool _loadingUnitySerialization;
+        // private bool _loadingUnitySerialization;
         private const string ManifestFile = "Packages/manifest.json";
 
 
@@ -108,7 +108,7 @@ namespace SaintsField.Editor.Utils
         {
             _loadingSaintsEditor = false;
             _loadingCodeAnalysis = false;
-            _loadingUnitySerialization = false;
+            // _loadingUnitySerialization = false;
         }
 
         #region Saints Editor
@@ -452,12 +452,10 @@ namespace SaintsField.Editor.Utils
         #region Unity Serialization
 
         [Ordered]
-        [Separator(10)]
-#if !SAINTSFIELD_NEWTONSOFT_JSON
-        [LayoutDisableIf(true)]
-        // [InfoBox("Package com.unity.nuget.newtonsoft-json not installed, auto installer can not work", EMessageType.Error)]
-#endif
+        private (EMessageType, string) InstallUnitySerializationStatus = (EMessageType.None, "");
 
+        [Ordered]
+        [Separator(10)]
         [LayoutStart("SaintsEvent", ELayout.TitleBox)]
         [AboveText("SaintsEvent requires <u>Unity Serialization</u> to be installed in this project.", 5, 5)]
         [Separator(5)]
@@ -470,38 +468,66 @@ namespace SaintsField.Editor.Utils
 #endif
             + " in this project", 5, 5)]
         [Separator(5)]
-        [InfoBox("Loading, please wait...", show: nameof(_loadingUnitySerialization))]
+
+        [InfoBox("$" + nameof(InstallUnitySerializationStatus))]
+
+        // [InfoBox("Loading, please wait...", show: nameof(_loadingUnitySerialization))]
 
         [LayoutStart("./SaintsEvent Install Buttons", ELayout.Horizontal)]
 #if SAINTSFIELD_SERIALIZATION
         [PlayaDisableIf(true)]
 #endif
         [Button("Install")]
-        private void InstallUnitySerialization()
+        private IEnumerator InstallUnitySerialization()
         {
-#if SAINTSFIELD_NEWTONSOFT_JSON
-            string content = File.ReadAllText(ManifestFile);
-            Manifest manifest = JsonConvert.DeserializeObject<Manifest>(content);
-            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            foreach (KeyValuePair<string, string> manifestDependency in manifest.dependencies)
+            const string packageName = "com.unity.serialization";
+            AddRequest _addRequest = Client.Add(packageName);
+            int counter = 0;
+            bool wait = true;
+            while (wait)
             {
-                // Debug.Log($"dependencies: {manifestDependency.Key}={manifestDependency.Value}");
-                // ReSharper disable once InvertIf
-                if (manifestDependency.Key == "com.unity.serialization")
+                counter = (counter + 1) % 4;
+                switch (_addRequest.Status)
                 {
-                    Debug.Log($"Already found dependencies {manifestDependency.Key}");
-                    return;
+                    case StatusCode.InProgress:
+                        InstallUnitySerializationStatus = (EMessageType.Warning, $"Installing {packageName}, please wait{new string('.', counter)}");
+                        break;
+                    case StatusCode.Success:
+                        InstallUnitySerializationStatus = (EMessageType.Info, $"{packageName} Installed");
+                        wait = false;
+                        break;
+                    case StatusCode.Failure:
+                        InstallUnitySerializationStatus = (EMessageType.Error, $"{packageName} install failed: {_addRequest.Error.message}");
+                        wait = false;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
+                yield return null;
             }
-
-            manifest.dependencies["com.unity.serialization"] = "3.1.5";
-            Debug.Log($"Add dependencies com.unity.serialization={manifest.dependencies["com.unity.serialization"]}");
-
-            string jsonResult = JsonConvert.SerializeObject(manifest, Formatting.Indented);
-            Debug.Log(jsonResult);
-            _loadingUnitySerialization = true;
-            File.WriteAllText(ManifestFile, jsonResult + "\n");
-#endif
+// #if SAINTSFIELD_NEWTONSOFT_JSON
+//             string content = File.ReadAllText(ManifestFile);
+//             Manifest manifest = JsonConvert.DeserializeObject<Manifest>(content);
+//             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+//             foreach (KeyValuePair<string, string> manifestDependency in manifest.dependencies)
+//             {
+//                 // Debug.Log($"dependencies: {manifestDependency.Key}={manifestDependency.Value}");
+//                 // ReSharper disable once InvertIf
+//                 if (manifestDependency.Key == "com.unity.serialization")
+//                 {
+//                     Debug.Log($"Already found dependencies {manifestDependency.Key}");
+//                     return;
+//                 }
+//             }
+//
+//             manifest.dependencies["com.unity.serialization"] = "3.1.5";
+//             Debug.Log($"Add dependencies com.unity.serialization={manifest.dependencies["com.unity.serialization"]}");
+//
+//             string jsonResult = JsonConvert.SerializeObject(manifest, Formatting.Indented);
+//             Debug.Log(jsonResult);
+//             _loadingUnitySerialization = true;
+//             File.WriteAllText(ManifestFile, jsonResult + "\n");
+// #endif
         }
 
         [Ordered]
@@ -509,19 +535,44 @@ namespace SaintsField.Editor.Utils
 #if !SAINTSFIELD_SERIALIZATION
         [PlayaDisableIf(true)]
 #endif
-        private void UninstallUnitySerialization()
+        private IEnumerator UninstallUnitySerialization()
         {
-#if SAINTSFIELD_NEWTONSOFT_JSON
-            string content = File.ReadAllText(ManifestFile);
-            Manifest manifest = JsonConvert.DeserializeObject<Manifest>(content);
-
-            manifest.dependencies.Remove("com.unity.serialization");
-
-            string jsonResult = JsonConvert.SerializeObject(manifest, Formatting.Indented);
-            Debug.Log(jsonResult);
-            _loadingCodeAnalysis = true;
-            File.WriteAllText(ManifestFile, jsonResult + "\n");
-#endif
+            const string packageName = "com.unity.serialization";
+            RemoveRequest removeRequest = Client.Remove(packageName);
+            int counter = 0;
+            bool wait = true;
+            while (wait)
+            {
+                counter = (counter + 1) % 4;
+                switch (removeRequest.Status)
+                {
+                    case StatusCode.InProgress:
+                        InstallUnitySerializationStatus = (EMessageType.Warning, $"Uninstalling {packageName}, please wait{new string('.', counter)}");
+                        break;
+                    case StatusCode.Success:
+                        InstallUnitySerializationStatus = (EMessageType.Info, $"{packageName} Uninstalled");
+                        wait = false;
+                        break;
+                    case StatusCode.Failure:
+                        InstallUnitySerializationStatus = (EMessageType.Error, $"{packageName} uninstall failed: {removeRequest.Error.message}");
+                        wait = false;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                yield return null;
+            }
+// #if SAINTSFIELD_NEWTONSOFT_JSON
+//             string content = File.ReadAllText(ManifestFile);
+//             Manifest manifest = JsonConvert.DeserializeObject<Manifest>(content);
+//
+//             manifest.dependencies.Remove("com.unity.serialization");
+//
+//             string jsonResult = JsonConvert.SerializeObject(manifest, Formatting.Indented);
+//             Debug.Log(jsonResult);
+//             _loadingCodeAnalysis = true;
+//             File.WriteAllText(ManifestFile, jsonResult + "\n");
+// #endif
         }
 
         #endregion
