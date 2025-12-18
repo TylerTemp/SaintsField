@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         protected AbsRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             FieldWithInfo = fieldWithInfo;
-            _guiColorAttribute = fieldWithInfo.PlayaAttributes.OfType<GUIColorAttribute>().FirstOrDefault();
+            _guiColorAttribute = fieldWithInfo.PlayaAttributes?.OfType<GUIColorAttribute>().FirstOrDefault();
         }
 
         public bool HasGuiColor()
