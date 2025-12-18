@@ -95,7 +95,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.1**
+**5.7.2**
 
 1.  Add: `Reset Field` context menu to reset a field to default value
 2.  Fix: Dropdown compact mode might not merge some empty pages

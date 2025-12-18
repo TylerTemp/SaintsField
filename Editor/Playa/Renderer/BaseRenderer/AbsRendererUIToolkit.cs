@@ -98,7 +98,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if (!targetNeedUpdate)
             {
-                GUIColorAttribute guiColor = FieldWithInfo.PlayaAttributes.OfType<GUIColorAttribute>().FirstOrDefault();
+                GUIColorAttribute guiColor = FieldWithInfo.PlayaAttributes?.OfType<GUIColorAttribute>().FirstOrDefault();
                 if (guiColor != null)
                 {
                     if (guiColor.IsCallback)
