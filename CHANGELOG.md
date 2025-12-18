@@ -1,12 +1,14 @@
 # Changelog
 
-## WIP ##
+## 5.7.0 ##
 
 1.  Add: `Reset Field` context menu to reset a field to default value
 2.  Fix: Dropdown compact mode might not merge some empty pages
 3.  Fix: `TreeDropdown` text overlap when the text is long
 4.  Add: `GUIColor` now works with `ShowInInspector`, `Button`, `InfoBox` etc.
-
+5.  Add: When first install, the config file will be created, and the setup window will pop up
+6.  Add: If no `com.unity.nuget.newtonsoft-json` installed, the setup window can now help you install it automatically
+ 
 ## 5.6.2 ##
 
 1.  Fix: for Extended Serialization, `interface` could not switch from object mode to Unity Object mode

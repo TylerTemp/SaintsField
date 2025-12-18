@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +8,10 @@ using Newtonsoft.Json;
 #endif
 using SaintsField.Editor.Linq;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
+using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 
 namespace SaintsField.Editor.Utils
@@ -20,6 +24,43 @@ namespace SaintsField.Editor.Utils
         public static void Open()
         {
             GetWindow<SaintsFieldSetupWindow>("SaintsField Setup").Show();
+        }
+
+        [InitializeOnLoadMethod]
+        private static void WatchConfigLoad()
+        {
+
+            if (SaintsFieldConfigUtil.Config != null)
+            {
+                CheckConfigOpen(SaintsFieldConfigUtil.Config);
+            }
+            else
+            {
+                SaintsFieldConfigUtil.OnConfigLoaded.AddListener(CheckConfigOpen);
+            }
+        }
+
+        // Note: if user installed the package with unity closed, then open the UnityEditor
+        // the window will not pop up no matter what
+        // This is acceptable, because without this static, the window will pop up many times with blank window
+        // as the UnityEditor processing
+        private static bool _pop;
+
+        private static void CheckConfigOpen(SaintsFieldConfig config)
+        {
+            if (_pop)
+            {
+                return;
+            }
+
+            _pop = true;
+            if (!config.GetSetupWindowPopOnce())
+            {
+                Debug.Log($"setupWindowPopOnce false, pop setup window for SaintsField");
+                GetWindow<SaintsFieldSetupWindow>("SaintsField Setup").Show();
+                EditorUtility.SetDirty(config);
+                config.setupWindowPopOnce = true;
+            }
         }
 
         // ReSharper disable InconsistentNaming
@@ -115,15 +156,55 @@ namespace SaintsField.Editor.Utils
 
         #endregion
 
+        #region Json
+#if !SAINTSFIELD_NEWTONSOFT_JSON
+        [Ordered]
+        private (EMessageType, string) InstallJsonStatus = (EMessageType.None, "");
+
+        [Ordered]
+        [InfoBox("Package com.unity.nuget.newtonsoft-json not installed, auto installer can not work", EMessageType.Error)]
+        [InfoBox("$" + nameof(InstallJsonStatus))]
+        [Button("Install newtonsoft-json")]
+        private IEnumerator InstallJson()
+        {
+            AddRequest _addRequest = Client.Add("com.unity.nuget.newtonsoft-json");
+            int counter = 0;
+            bool wait = true;
+            while (wait)
+            {
+                counter = (counter + 1) % 4;
+                switch (_addRequest.Status)
+                {
+                    case StatusCode.InProgress:
+                        InstallJsonStatus = (EMessageType.Warning, $"Installing Newtonsoft.Json, please wait{new string('.', counter)}");
+                        break;
+                    case StatusCode.Success:
+                        InstallJsonStatus = (EMessageType.Info, "Newtonsoft.Json Installed");
+                        wait = false;
+                        break;
+                    case StatusCode.Failure:
+                        InstallJsonStatus = (EMessageType.Error, $"Newtonsoft.Json install failed: {_addRequest.Error.message}");
+                        wait = false;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                yield return null;
+            }
+        }
+#endif
+        #endregion
+
         #region Code Analysis
 
+        [Separator(10)]
 #if !SAINTSFIELD_NEWTONSOFT_JSON
         [LayoutDisableIf(true)]
-        [InfoBox("Package com.unity.nuget.newtonsoft-json not installed", EMessageType.Error)]
+        // [InfoBox("Package com.unity.nuget.newtonsoft-json not installed, auto installer can not work", EMessageType.Error)]
 #endif
         [Ordered]
-        [Separator(10)]
         [LayoutStart("Layout System", ELayout.TitleBox)]
+
         [AboveText("<u>Code Analysis</u> allows layout system to function more preciously on field orders", 5, 5)]
         [Separator(5)]
         [InfoBox("Loading, please wait...", show: nameof(_loadingCodeAnalysis))]
@@ -374,7 +455,7 @@ namespace SaintsField.Editor.Utils
         [Separator(10)]
 #if !SAINTSFIELD_NEWTONSOFT_JSON
         [LayoutDisableIf(true)]
-        [InfoBox("Package com.unity.nuget.newtonsoft-json not installed", EMessageType.Error)]
+        // [InfoBox("Package com.unity.nuget.newtonsoft-json not installed, auto installer can not work", EMessageType.Error)]
 #endif
 
         [LayoutStart("SaintsEvent", ELayout.TitleBox)]
@@ -389,7 +470,7 @@ namespace SaintsField.Editor.Utils
 #endif
             + " in this project", 5, 5)]
         [Separator(5)]
-        [InfoBox("Loading, please wait...", show: nameof(_loadingCodeAnalysis))]
+        [InfoBox("Loading, please wait...", show: nameof(_loadingUnitySerialization))]
 
         [LayoutStart("./SaintsEvent Install Buttons", ELayout.Horizontal)]
 #if SAINTSFIELD_SERIALIZATION
@@ -418,7 +499,7 @@ namespace SaintsField.Editor.Utils
 
             string jsonResult = JsonConvert.SerializeObject(manifest, Formatting.Indented);
             Debug.Log(jsonResult);
-            _loadingCodeAnalysis = true;
+            _loadingUnitySerialization = true;
             File.WriteAllText(ManifestFile, jsonResult + "\n");
 #endif
         }

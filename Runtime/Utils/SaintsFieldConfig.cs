@@ -112,17 +112,28 @@ namespace SaintsField.Utils
         [FieldInfoBox("Deprecated", EMessageType.Warning)]
         [Ordered] [EnumToggleButtons, FieldDefaultExpand] public EXP findComponentExp = EXP.NoPicker | EXP.NoAutoResignToNull;
 
-#if UNITY_EDITOR
-        public readonly UnityEvent OnDeleteConfig = new UnityEvent();
-
-        [LayoutEnd]
-        [Button("Delete Config File"), Ordered]
-        private void DeleteConfig()
+        [LayoutStart("Hidden Configs", ELayout.Collapse)] [Ordered]
+        public bool setupWindowPopOnce;
+        public bool GetSetupWindowPopOnce()
         {
-            DestroyImmediate(this, true);
-            AssetDatabase.DeleteAsset(SaintsFieldConfigUtil.ConfigAssetPath);
-            OnDeleteConfig.Invoke();
-        }
+#if SAINTSFIELD_SAINTS_EDITOR_APPLY
+            return true;
+#else
+            return setupWindowPopOnce;
 #endif
+        }
+
+// #if UNITY_EDITOR
+//         public readonly UnityEvent OnDeleteConfig = new UnityEvent();
+//
+//         [LayoutEnd]
+//         [Button("Delete Config File"), Ordered]
+//         private void DeleteConfig()
+//         {
+//             DestroyImmediate(this, true);
+//             AssetDatabase.DeleteAsset(SaintsFieldConfigUtil.ConfigAssetPath);
+//             OnDeleteConfig.Invoke();
+//         }
+// #endif
     }
 }

@@ -67,22 +67,22 @@ namespace SaintsField.Editor.Utils
 
                     createConfigButton.clicked += () =>
                     {
-                        AddConfigInspector(configContainer).OnDeleteConfig.AddListener(OnDeleteConfig);
+                        AddConfigInspector(configContainer);//.OnDeleteConfig.AddListener(OnDeleteConfig);
                         createConfigButton.style.display = DisplayStyle.None;
                     };
 
                     if (SaintsFieldConfigUtil.IsConfigLoaded)
                     {
-                        AddConfigInspector(configContainer).OnDeleteConfig.AddListener(OnDeleteConfig);
+                        AddConfigInspector(configContainer); //.OnDeleteConfig.AddListener(OnDeleteConfig);
                     }
 
-                    return;
-
-                    void OnDeleteConfig()
-                    {
-                        configContainer.Clear();
-                        createConfigButton.style.display = DisplayStyle.Flex;
-                    }
+                    // return;
+                    //
+                    // void OnDeleteConfig()
+                    // {
+                    //     configContainer.Clear();
+                    //     createConfigButton.style.display = DisplayStyle.Flex;
+                    // }
                 },
                 keywords = new System.Collections.Generic.HashSet<string>(new[] { "SaintsField" }),
             };

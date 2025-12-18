@@ -1,7 +1,9 @@
 
 using System;
 using UnityEditor;
+using UnityEngine.Events;
 #if UNITY_EDITOR
+using System.IO;
 using UnityEngine;
 #endif
 
@@ -9,33 +11,33 @@ using UnityEngine;
 namespace SaintsField.Utils
 {
 
-#if UNITY_EDITOR
-    [InitializeOnLoad]
-#pragma warning disable CS0618
-    public class SaintsFieldConfigDeleteWatcher : AssetModificationProcessor
-#pragma warning restore CS0618
-    {
-        // ReSharper disable once EmptyConstructor
-        static SaintsFieldConfigDeleteWatcher()
-        {
-        }
-
-        public static AssetDeleteResult OnWillDeleteAsset(string assetPath, RemoveAssetOptions rao)
-        {
-            // Debug.Log("deleted - unity callback: " + assetPath);
-            // Debug.Log(rao);
-            if (SaintsFieldConfigUtil.IsConfigLoaded && SaintsFieldConfigUtil.ConfigAssetPath == assetPath)
-            {
-                SaintsFieldConfigUtil.IsConfigLoaded = false;
-                SaintsFieldConfigUtil.Config = null;
-                Debug.Log($"SaintsField config deleted: {assetPath}");
-            }
-
-            return AssetDeleteResult.DidNotDelete;
-        }
-
-    }
-#endif
+// #if UNITY_EDITOR
+//     [InitializeOnLoad]
+// #pragma warning disable CS0618
+//     public class SaintsFieldConfigDeleteWatcher : AssetModificationProcessor
+// #pragma warning restore CS0618
+//     {
+//         // ReSharper disable once EmptyConstructor
+//         static SaintsFieldConfigDeleteWatcher()
+//         {
+//         }
+//
+//         public static AssetDeleteResult OnWillDeleteAsset(string assetPath, RemoveAssetOptions rao)
+//         {
+//             // Debug.Log("deleted - unity callback: " + assetPath);
+//             // Debug.Log(rao);
+//             if (SaintsFieldConfigUtil.IsConfigLoaded && SaintsFieldConfigUtil.ConfigAssetPath == assetPath)
+//             {
+//                 SaintsFieldConfigUtil.IsConfigLoaded = false;
+//                 SaintsFieldConfigUtil.Config = null;
+//                 Debug.Log($"SaintsField config deleted: {assetPath}");
+//             }
+//
+//             return AssetDeleteResult.DidNotDelete;
+//         }
+//
+//     }
+// #endif
 
     public static class SaintsFieldConfigUtil
     {
@@ -44,6 +46,8 @@ namespace SaintsField.Utils
         public static SaintsFieldConfig Config;
         public static string ConfigAssetPath = "";
         public static bool IsConfigLoaded;
+
+        public static readonly UnityEvent<SaintsFieldConfig> OnConfigLoaded = new UnityEvent<SaintsFieldConfig>();
 
 #if UNITY_EDITOR
 // #if UNITY_2019_2_OR_NEWER
@@ -82,15 +86,30 @@ namespace SaintsField.Utils
             }
 
             IsConfigLoaded = Config != null;
-            if (IsConfigLoaded)
+            if (!IsConfigLoaded)
             {
-                ConfigAssetPath = AssetDatabase.GetAssetPath(Config);
+                if (!Directory.Exists("Assets/Editor Default Resources"))
+                {
+                    Debug.Log($"Create folder: Assets/Editor Default Resources");
+                    AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
+                }
+
+                if (!Directory.Exists("Assets/Editor Default Resources/SaintsField"))
+                {
+                    Debug.Log($"Create folder: Assets/Editor Default Resources/SaintsField");
+                    AssetDatabase.CreateFolder("Assets/Editor Default Resources", "SaintsField");
+                }
+
+                Config = ScriptableObject.CreateInstance<SaintsFieldConfig>();
+                Debug.Log(
+                    $"Create saintsFieldConfig: Assets/Editor Default Resources/{EditorResourcePath}");
+                AssetDatabase.CreateAsset(Config,
+                    $"Assets/Editor Default Resources/{EditorResourcePath}");
+                AssetDatabase.SaveAssets();
             }
-            else
-            {
-                Config = null;
-                ConfigAssetPath = "";
-            }
+
+            ConfigAssetPath = AssetDatabase.GetAssetPath(Config);
+            OnConfigLoaded.Invoke(Config);
 #if SAINTSFIELD_DEBUG
             Debug.Log($"SaintsField config load: {IsConfigLoaded}, {ConfigAssetPath}");
 #endif
