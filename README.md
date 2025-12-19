@@ -95,14 +95,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.2**
+**5.7.3**
 
-1.  Add: `Reset Field` context menu to reset a field to default value
-2.  Fix: Dropdown compact mode might not merge some empty pages
-3.  Fix: `TreeDropdown` text overlap when the text is long
-4.  Add: `GUIColor` now works with `ShowInInspector`, `Button`, `InfoBox` etc.
-5.  Add: When first install, the config file will be created, and the setup window will pop up
-6.  Add: If no `com.unity.nuget.newtonsoft-json` installed, the setup window can now help you install it automatically
+1.  Fix: `FieldAboveText`/`FieldBelowText` can not find a dynamic text member
+2.  Add: `TreeDropdown` now works with `ShowInInspector`
 
 Extended Serialization experiment tag is now removed.
 
@@ -263,6 +259,8 @@ Hide the label for the field. When using on an array/list, hide label for every 
 
 `[NoLabel]` is a shortcut for `[FieldLabelText(null)]`
 
+Note: `NoLabel` does not work with `ShowInInspector`. Use `LabelText(null)` instead.
+
 ```csharp
 [NoLabel] [ProgressBar(0, 100)] public int mp;
 [NoLabel] [PairsValueButtons("<icon=lightMeter/greenLight/>", true, "<icon=lightMeter/redLight/>", false)] public bool allowed;
@@ -348,26 +346,32 @@ public class ClassPlayaAboveRichLabelExample : MonoBehaviour
 
 Like `AboveText` /  `BelowText`, but it can be applied to an array/list to draw text above/below each element (instead of the label of array/list itself)
 
+Using on a single field, it can show text on field like `AboveText` / `BelowText` does. Useful if you can not enable `SaintsEditor`
+
 *   `string|null richTextXml` Same as `RichLabel`
 *   `bool isCallback=false` Same as `RichLabel`
 *   `string groupBy = ""` See `GroupBy` section
-*   AllowMultiple: Yes
+*   Allow Multiple: Yes
 
 ```csharp
 using SaintsField;
 
-[SerializeField]
-[FieldAboveText("┌<icon=eye.png/><label />┐")]
-[LabelText("├<icon=eye.png/><label />┤")]
-[FieldBelowText("$" + nameof(BelowLabel))]
-[FieldBelowText("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", groupBy: "example")]
-[FieldBelowText("==================================", groupBy: "example")]
-private int _intValue;
+[FieldAboveText("<color=DodgerBlue>┌<field/></color> at [<index/>]")]
+[FieldBelowText("$" + nameof(GetAboveText))]
+public string[] lis;
 
-private string BelowLabel() => "└<icon=eye.png/><label />┘";
+private string GetAboveText(string value, int index)
+{
+    bool isEven = index % 2 == 0;
+    return isEven ? $"<color={EColor.SoftRed}>└Event" : $"<color={EColor.HotPink}>└Odd";
+}
+
+[FieldAboveText("Can also be used on single fields: <label/>(raw value)=<field/>")]
+[FieldBelowText("$" + nameof(singleField))]  // callback, as parsed value
+public string singleField;
 ```
 
-![full_width_label](https://github.com/TylerTemp/SaintsField/assets/6391063/9283e25a-34b3-4192-8a07-5d97a4e55406)
+![full_width_label](https://github.com/user-attachments/assets/f9837146-f853-4a22-a0e0-4365d4ff3251)
 
 #### `OverlayText` ####
 
@@ -4182,7 +4186,6 @@ This is the recommended way to make a searchable dropdown.
 
 First, it can make a quick searchable dropdown:
 
-
 ```csharp
 [TreeDropdown(nameof(BookDrop))] public string bookName;
 
@@ -4288,6 +4291,44 @@ public MyStruct myStruct;
 ```
 
 ![](https://github.com/user-attachments/assets/c9f42bf2-632a-496a-8ffc-74b2abbaceb9)
+
+It can work with `ShowInInspector`
+
+```csharp
+using SainsField;
+
+[ShowInInspector, TreeDropdown(nameof(GetItems))]
+public string SelectedItem
+{
+    get => _selectItem;
+    set => _selectItem = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/27813b8a-497a-4572-b58d-fb3705d16a1d)
+
+It can work with `Button`/`ShowInInspcetor` function parameters
+
+```csharp
+using SainsField;
+using SainsField.Playa;
+
+[ShowInInspector]
+[TreeDropdown(nameof(GetItems))]  // change the returned value display
+private string SelectItemWithButton([TreeDropdown(nameof(GetItems))] string item)
+{
+    return item;
+}
+
+[Button]
+[TreeDropdown(nameof(GetItems))]  // change the returned value display
+private string SelectItemWithButton([TreeDropdown(nameof(GetItems))] string item)
+{
+    return item;
+}
+```
+
+![](https://github.com/user-attachments/assets/c2534cdd-a257-4b27-9346-ea439741cdff)
 
 #### `OptionsTreeDropdown` / `PairsTreeDropdown` ####
 

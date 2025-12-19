@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Linq;
+using Saintsfield.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -114,7 +115,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
         public static ListViewWrapper UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object rawListValue,
             object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor,
-            bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+            bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render list start {listValue.Length}/{label}/{valueType}");
@@ -588,7 +589,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
                     Debug.Log($"list index={index}, elementType={elementType}, actualValue={actualValue}, rawValues={string.Join(",", payload.RawValues)}");
 #endif
-                VisualElement item = UIToolkitValueEdit(
+                VisualElement item = UIToolkitEdit.UIToolkitValueEdit(
                     firstChild,
                     $"Element {actualIndex}",
                     elementType,
@@ -607,7 +608,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     false,
                     inHorizontalLayout,
                     allAttributes,
-                    targets).result;
+                    targets,
+                    richTextTagProvider).result;
                 if (item != null)
                 {
                     visualElement.Clear();

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField;
 using SaintsField.Editor.Core;
+using Saintsfield.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
@@ -125,7 +126,7 @@ namespace Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             Type fieldType = GetFieldType(FieldWithInfo);
             string labelName = NoLabel ? null : GetNiceName(FieldWithInfo);
             // FieldWithInfo.Targets;
-            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets);
+            (VisualElement result, bool isNestedField) = UIToolkitEdit.UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets, this);
 
             _onSearchFieldUIToolkit.AddListener(Search);
             container.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
@@ -313,7 +314,7 @@ namespace Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
                 bool isSaintsSerialized = FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute);
 
-                (VisualElement result, bool _) = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets);
+                (VisualElement result, bool _) = UIToolkitEdit.UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets, this);
                 // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {

@@ -86,12 +86,13 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         }
 
 
-// #if SAINTSFIELD_DEBUG
-//         public SaintsTreeDropdownElement DebugGetElement()
-//         {
-//             return new SaintsTreeDropdownElement(_metaInfo, _allowUnSelect);
-//         }
-// #endif
+#if SAINTSFIELD_DEBUG
+        // ReSharper disable once UnusedMember.Global
+        public SaintsTreeDropdownElement DebugGetElement()
+        {
+            return new SaintsTreeDropdownElement(_metaInfo, _allowUnSelect);
+        }
+#endif
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
         public override void OnClose()

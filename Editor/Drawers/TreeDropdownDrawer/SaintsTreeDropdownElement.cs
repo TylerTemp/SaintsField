@@ -29,7 +29,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         private readonly bool _allowToggle;
 
         private readonly IReadOnlyList<TreeRowAbsElement> _flatList;
-        public readonly ToolbarSearchField ToolbarSearchField;
+        private readonly ToolbarSearchField _toolbarSearchField;
+        private readonly ScrollView _scrollView;
 
         public SaintsTreeDropdownElement(AdvancedDropdownMetaInfo metaInfo, bool toggle)
         {
@@ -39,7 +40,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             // CleanableTextInputFullWidth cleanableTextInput = new CleanableTextInputFullWidth(null);
             // Add(cleanableTextInput);
-            ToolbarSearchField = new ToolbarSearchField
+            _toolbarSearchField = new ToolbarSearchField
             {
                 style =
                 {
@@ -47,7 +48,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     width = StyleKeyword.None,
                 },
             };
-            Add(ToolbarSearchField);
+            Add(_toolbarSearchField);
 
             HashSet<object> curValues = metaInfo.CurValues.ToHashSet();
 
@@ -95,11 +96,13 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             _flatList = flatList;
 
             Add(treeContainer);
+            _scrollView = treeContainer;
+            treeContainer.RegisterCallback<GeometryChangedEvent>(OnTreeGeometryChanged);
 
 #if UNITY_6000_0_OR_NEWER
-            ToolbarSearchField.placeholderText = "Search";
+            _toolbarSearchField.placeholderText = "Search";
 #endif
-            ToolbarSearchField.RegisterCallback<NavigationMoveEvent>(evt =>
+            _toolbarSearchField.RegisterCallback<NavigationMoveEvent>(evt =>
             {
                 if (evt.direction == NavigationMoveEvent.Direction.Down)
                 {
@@ -109,7 +112,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             RegisterCallback<AttachToPanelEvent>(_ =>
             {
-                ToolbarSearchField.Q<TextField>().Q("unity-text-input").Focus();
+                _toolbarSearchField.Q<TextField>().Q("unity-text-input").Focus();
                 if(CurrentFocus != null)
                 {
                     treeContainer.schedule
@@ -119,7 +122,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
             });
 
-            ToolbarSearchField.RegisterValueChangedCallback(evt =>
+            _toolbarSearchField.RegisterValueChangedCallback(evt =>
             {
                 string searchText = evt.newValue;
 
@@ -268,9 +271,32 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             });
         }
 
+        private bool _hasHorizontalScrollerOnce = false;
+
+        private void OnTreeGeometryChanged(GeometryChangedEvent evt)
+        {
+            // Debug.Log(_scrollView.horizontalScroller);
+            float width = _scrollView.horizontalScroller.resolvedStyle.width;
+            if (double.IsNaN(width) || width <= 0)
+            {
+                _hasHorizontalScrollerOnce = false;
+            }
+            else
+            {
+                // Debug.Log(width);
+                _hasHorizontalScrollerOnce = true;
+            }
+        }
+
         public int GetMaxHeight()
         {
-            int result = SaintsPropertyDrawer.SingleLineHeight + 2 + 18;  // search bar height + border + scroller
+            // int result = SaintsPropertyDrawer.SingleLineHeight + 2 + 18;  // search bar height + border + scroller
+            int result = SaintsPropertyDrawer.SingleLineHeight + 2;  // search bar height + border
+            if (_hasHorizontalScrollerOnce)
+            {
+                result += 18;
+            }
+
             foreach (TreeRowAbsElement treeRowAbsElement in _flatList)
             {
                 if (treeRowAbsElement is TreeRowSepElement)
@@ -391,7 +417,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
         public void SetSearch(string search)
         {
-            ToolbarSearchField.value = search;
+            _toolbarSearchField.value = search;
         }
     }
 }

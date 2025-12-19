@@ -184,7 +184,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::NoLabelExample
   mp: 40
   allowed: 0
-  direction: 6
+  direction: 12
   transArray:
   - {fileID: 9394716}
   - {fileID: 231733039}
@@ -1911,6 +1911,57 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   range: {x: 2, y: 10}
+--- !u!1 &208005631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 208005633}
+  - component: {fileID: 208005632}
+  m_Layer: 0
+  m_Name: FieldText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &208005632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208005631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4025df19b83e12d44886a20318d6df41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.FieldTextExample
+  lis:
+  - first
+  - second
+  - third
+  - forth
+  - fifth
+  singleField: My <color=BlueViolet>Content!
+--- !u!4 &208005633
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208005631}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &208575304
 GameObject:
   m_ObjectHideFlags: 0
@@ -13125,45 +13176,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e9c0e99cc43e434da64553e13666b59, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictCustomDrawer
   eToState:
     _saintsKeys:
     - value: 0
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652843
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 1
-      valueField:
-        propertyType: 4
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: 6921583410868652844
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 2
-      valueField:
-        propertyType: 4
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: 6921583410868652844
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13178,54 +13203,14 @@ MonoBehaviour:
         <animationClip>k__BackingField: {fileID: 0}
         <subStateMachineNameChain>k__BackingField: []
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652845
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value:
-        <layerIndex>k__BackingField: 0
-        <stateNameHash>k__BackingField: 0
-        <stateName>k__BackingField: 
-        <stateSpeed>k__BackingField: 0
-        <stateTag>k__BackingField: 
-        <animationClip>k__BackingField: {fileID: 0}
-        <subStateMachineNameChain>k__BackingField: []
-      valueField:
-        propertyType: 4
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: 6921583410868652846
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value:
-        <layerIndex>k__BackingField: 0
-        <stateNameHash>k__BackingField: 0
-        <stateName>k__BackingField: 
-        <stateSpeed>k__BackingField: 0
-        <stateTag>k__BackingField: 
-        <animationClip>k__BackingField: {fileID: 0}
-        <subStateMachineNameChain>k__BackingField: []
-      valueField:
-        propertyType: 4
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: 6921583410868652846
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13233,29 +13218,29 @@ MonoBehaviour:
     saintsSerializedVersion: 2
   eToV3:
     _saintsKeys:
-    - value: 0
+    - value: 1
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652847
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 1
+    - value: 0
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652848
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13263,27 +13248,27 @@ MonoBehaviour:
     _saintsValues:
     - value: {x: 0, y: 0, z: 0}
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583431157285789
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
     - value: {x: 0, y: 0, z: 0}
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583431157285790
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13291,16 +13276,16 @@ MonoBehaviour:
     saintsSerializedVersion: 2
   eToStateOld:
     _saintsKeys:
-    - value: 0
+    - value: 2
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652851
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13315,14 +13300,14 @@ MonoBehaviour:
         <animationClip>k__BackingField: {fileID: 0}
         <subStateMachineNameChain>k__BackingField: []
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652852
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13330,16 +13315,16 @@ MonoBehaviour:
     saintsSerializedVersion: 2
   eToV3Old:
     _saintsKeys:
-    - value: 0
+    - value: 3
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652853
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13347,14 +13332,14 @@ MonoBehaviour:
     _saintsValues:
     - value: {x: 0, y: 0, z: 0}
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583431157285791
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13366,14 +13351,14 @@ MonoBehaviour:
         key: 
         ks: []
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652855
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13383,14 +13368,14 @@ MonoBehaviour:
         ss: 
         si: 0
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652856
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -13401,88 +13386,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6921583410868652843
-      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        value__: 0
-    - rid: 6921583410868652844
-      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        value__: 0
-    - rid: 6921583410868652845
-      type: {class: AnimatorState, ns: SaintsField, asm: today.comes.saintsfield.Runtime}
-      data:
-        <layerIndex>k__BackingField: 0
-        <stateNameHash>k__BackingField: 0
-        <stateName>k__BackingField: 
-        <stateSpeed>k__BackingField: 0
-        <stateTag>k__BackingField: 
-        <animationClip>k__BackingField: {fileID: 0}
-        <subStateMachineNameChain>k__BackingField: []
-    - rid: 6921583410868652846
-      type: {class: AnimatorState, ns: SaintsField, asm: today.comes.saintsfield.Runtime}
-      data:
-        <layerIndex>k__BackingField: 0
-        <stateNameHash>k__BackingField: 0
-        <stateName>k__BackingField: 
-        <stateSpeed>k__BackingField: 0
-        <stateTag>k__BackingField: 
-        <animationClip>k__BackingField: {fileID: 0}
-        <subStateMachineNameChain>k__BackingField: []
-    - rid: 6921583410868652847
-      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        value__: 0
-    - rid: 6921583410868652848
-      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        value__: 0
-    - rid: 6921583410868652851
-      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        value__: 0
-    - rid: 6921583410868652852
-      type: {class: AnimatorState, ns: SaintsField, asm: today.comes.saintsfield.Runtime}
-      data:
-        <layerIndex>k__BackingField: 0
-        <stateNameHash>k__BackingField: 0
-        <stateName>k__BackingField: 
-        <stateSpeed>k__BackingField: 0
-        <stateTag>k__BackingField: 
-        <animationClip>k__BackingField: {fileID: 0}
-        <subStateMachineNameChain>k__BackingField: []
-    - rid: 6921583410868652853
-      type: {class: SaintsDictCustomDrawer/MyEnum, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        value__: 0
-    - rid: 6921583410868652855
-      type: {class: SaintsDictCustomDrawer/MyKeyStruct, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        key: 
-        ks: []
-    - rid: 6921583410868652856
-      type: {class: SaintsDictCustomDrawer/MyValueStruct, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        ss: 
-        si: 0
-    - rid: 6921583431157285789
-      type: {class: Vector3, ns: UnityEngine, asm: UnityEngine.CoreModule}
-      data:
-        x: 0
-        y: 0
-        z: 0
-    - rid: 6921583431157285790
-      type: {class: Vector3, ns: UnityEngine, asm: UnityEngine.CoreModule}
-      data:
-        x: 0
-        y: 0
-        z: 0
-    - rid: 6921583431157285791
-      type: {class: Vector3, ns: UnityEngine, asm: UnityEngine.CoreModule}
-      data:
-        x: 0
-        y: 0
-        z: 0
 --- !u!1 &788337258 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2922177853963676715, guid: b0b472ae658b67548b06851d1d8a93e1, type: 3}
@@ -20186,29 +20089,29 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a5c28012707660540a0707264f76b1ca, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsHashSetExamples.ReferenceHashSetExample
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsHashSetExamples.ReferenceHashSetExample
   refHashSet:
     _saintsList:
     - valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
-        V: {fileID: 11400000, guid: acbdb6bc952a66445aada8fe5d4663b2, type: 2}
+        V: {fileID: 2088148949201590726, guid: fdfbcff14e723de4cbd3c692157fe642, type: 3}
         VRef:
-          rid: 6921583477705932880
+          rid: -2
         IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 1
     - valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583477705932884
+          rid: 3614753745556471928
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -20227,7 +20130,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583477705932885
+          rid: -2
         IsVRef: 0
       valueArray: []
       valueList: []
@@ -20240,28 +20143,13 @@ MonoBehaviour:
         absC: 
         sub1: 
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: -2
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    - value:
-        absC: 
-        sub1: 
-      valueField:
-        propertyType: 4
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
+          rid: 3614753745556471929
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -20273,22 +20161,16 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6921583477705932880
-      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: today.comes.saintsfield.Samples}
+    - rid: 3614753745556471928
+      type: {class: InterfaceExample/NorStructInterface1, ns: SaintsField.Samples.Scripts.Interface, asm: SaintsField.Samples}
       data:
         common: 0
         structString: 
-    - rid: 6921583477705932884
-      type: {class: SaintsDictReference/Sub1, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
+    - rid: 3614753745556471929
+      type: {class: SaintsDictReference/Sub1, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: SaintsField.Samples}
       data:
         absC: 
         sub1: 
-    - rid: 6921583477705932885
-      type: {class: SaintsDictReference/Sub2, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: today.comes.saintsfield.Samples}
-      data:
-        absC: 
-        sub1: 
-        sub2: 
 --- !u!1 &1299589590
 GameObject:
   m_ObjectHideFlags: 0
@@ -24419,37 +24301,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectIt: 1
---- !u!1 &1573654646
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1573654648}
-  m_Layer: 0
-  m_Name: WwiseGlobal
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1573654648
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1573654646}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1578091333
 GameObject:
   m_ObjectHideFlags: 0
@@ -39979,4 +39830,4 @@ SceneRoots:
   - {fileID: 1451422003}
   - {fileID: 1712558647}
   - {fileID: 9394716}
-  - {fileID: 1573654648}
+  - {fileID: 208005633}

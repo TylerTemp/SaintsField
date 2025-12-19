@@ -130,6 +130,8 @@ namespace SaintsField.Editor.Core
             //         Index = index,
             //     })
             //     .ToArray();
+            string preferredLabel = GetPreferredLabel(property);
+
             List<SaintsPropertyInfo> saintsPropertyDrawers = new List<SaintsPropertyInfo>();
             bool alreadyHasFieldDrawer = false;
             foreach ((ISaintsAttribute value, int index) in iSaintsAttributes.WithIndex())
@@ -144,7 +146,7 @@ namespace SaintsField.Editor.Core
                 }
                 saintsPropertyDrawers.Add(new SaintsPropertyInfo
                 {
-                    Drawer = GetOrCreateSaintsDrawerByAttr(value),
+                    Drawer = GetOrCreateSaintsDrawerByAttr(property, value, preferredLabel),
                     Attribute = value,
                     Index = index,
                 });
@@ -153,7 +155,7 @@ namespace SaintsField.Editor.Core
             SaintsPropertyDrawers = saintsPropertyDrawers;
 
             // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
-            if (string.IsNullOrEmpty(GetPreferredLabel(property)))
+            if (string.IsNullOrEmpty(preferredLabel))
             {
                 SaintsPropertyDrawers.RemoveAll(each => each.Attribute is FieldLabelTextAttribute rl && string.IsNullOrEmpty(rl.RichTextXml));
 
@@ -169,7 +171,7 @@ namespace SaintsField.Editor.Core
                         found = true;
                         SaintsPropertyDrawers[richLabelIndex] = new SaintsPropertyInfo
                         {
-                            Drawer = GetOrCreateSaintsDrawerByAttr(noLabelAttribute),
+                            Drawer = GetOrCreateSaintsDrawerByAttr(property, noLabelAttribute, preferredLabel),
                             Attribute = noLabelAttribute,
                             Index = richLabelIndex,
                         };
@@ -181,7 +183,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
-                        Drawer = GetOrCreateSaintsDrawerByAttr(noLabelAttribute),
+                        Drawer = GetOrCreateSaintsDrawerByAttr(property, noLabelAttribute, preferredLabel),
                         Attribute = noLabelAttribute,
                         Index = SaintsPropertyDrawers.Count,
                     });
@@ -214,7 +216,7 @@ namespace SaintsField.Editor.Core
 
                     LeftToggleAttributeDrawer leftToggleAttributeDrawer =
                         (LeftToggleAttributeDrawer)
-                        GetOrCreateSaintsDrawerByAttr(leftToggleAttribute);
+                        GetOrCreateSaintsDrawerByAttr(property, leftToggleAttribute, preferredLabel);
                     // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
                     SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
@@ -247,7 +249,7 @@ namespace SaintsField.Editor.Core
 
                             FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
                                 (FullWidthRichLabelAttributeDrawer)
-                                GetOrCreateSaintsDrawerByAttr(aboveRichLabelAttribute);
+                                GetOrCreateSaintsDrawerByAttr(property, aboveRichLabelAttribute, preferredLabel);
                             // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
                             SaintsPropertyDrawers[index] = new SaintsPropertyInfo
                             {
@@ -266,7 +268,7 @@ namespace SaintsField.Editor.Core
                     NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
                     SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
-                        Drawer = GetOrCreateSaintsDrawerByAttr(noLabelAttribute),
+                        Drawer = GetOrCreateSaintsDrawerByAttr(property, noLabelAttribute, preferredLabel),
                         Attribute = noLabelAttribute,
                         Index = SaintsPropertyDrawers.Count,
                     });
@@ -280,7 +282,7 @@ namespace SaintsField.Editor.Core
 
                     FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
                         (FullWidthRichLabelAttributeDrawer)
-                        GetOrCreateSaintsDrawerByAttr(aboveRichLabelAttribute);
+                        GetOrCreateSaintsDrawerByAttr(property, aboveRichLabelAttribute, preferredLabel);
                     // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
                     SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {

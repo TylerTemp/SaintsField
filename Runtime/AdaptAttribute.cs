@@ -1,8 +1,12 @@
+using System.Diagnostics;
 using SaintsField.Interfaces;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace SaintsField
 {
+    [Conditional("UNITY_EDITOR")]
+    [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property)]
     public class AdaptAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;

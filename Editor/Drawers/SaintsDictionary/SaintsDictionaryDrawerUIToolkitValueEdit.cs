@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Saintsfield.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
@@ -57,7 +58,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             // value
             public UnityEvent<bool, object, object> OnFinished = new UnityEvent<bool, object, object>();
 
-            public PairPanel(Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets)
+            public PairPanel(Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
             {
                 const int pairPanelBorderWidth = 1;
                 Color pairPanelBorderColor = EColor.EditorEmphasized.GetColor();
@@ -121,7 +122,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         return;
                     }
 
-                    VisualElement r = AbsRenderer.UIToolkitValueEdit(
+                    VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                         addPairKeyContainer.Children().FirstOrDefault(),
                         "Key",
                         dictKeyType,
@@ -148,7 +149,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         false,
                         inHorizontalLayout,
                         Array.Empty<Attribute>(),
-                        targets
+                        targets,
+                        richTextTagProvider
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -171,7 +173,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         return;
                     }
 
-                    VisualElement r = AbsRenderer.UIToolkitValueEdit(
+                    VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                         addPairValueContainer.Children().FirstOrDefault(),
                         "Value",
                         dictValueType,
@@ -185,7 +187,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         false,
                         inHorizontalLayout,
                         Array.Empty<Attribute>(),
-                        targets
+                        targets,
+                        richTextTagProvider
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -224,7 +227,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             public readonly ListViewPagerFooterStruct FooterStruct;
             public readonly PairPanel PairPanel;
 
-            public SaintsDictionaryWrapper(string label, bool nullable, MultiColumnListView listView, Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets)
+            public SaintsDictionaryWrapper(string label, bool nullable, MultiColumnListView listView, Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
             {
                 VisualElement header = new VisualElement();
                 Add(header);
@@ -299,7 +302,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 Add(FooterStruct.Root);
 
                 // panel for adding
-                Add(PairPanel = new PairPanel(dictKeyType, dictValueType, payload, inHorizontalLayout, targets));
+                Add(PairPanel = new PairPanel(dictKeyType, dictValueType, payload, inHorizontalLayout, targets, richTextTagProvider));
 
                 FooterStruct.AddButton.clicked += () =>
                 {
@@ -326,7 +329,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
         public static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object rawDictValue,
             bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet,
-            Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+            Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
         {
 
             if (oldElement is SaintsDictionaryWrapper dictField)
@@ -400,7 +403,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 },
                 itemsSource = payload.GetKeys().ToList(),
                 userData = payload,
-            }, dictKeyType, dictValueType, payload, inHorizontalLayout, targets);
+            }, dictKeyType, dictValueType, payload, inHorizontalLayout, targets, richTextTagProvider);
 
             // Size
             if (isReadOnly)
@@ -514,7 +517,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                         keyChanged = false;
 
-                        VisualElement editing = AbsRenderer.UIToolkitValueEdit(keyChild, "", dictKeyType, key, oldKey =>
+                        VisualElement editing = UIToolkitEdit.UIToolkitValueEdit(keyChild, "", dictKeyType, key, oldKey =>
                         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
                             Debug.Log($"oldKey={oldKey}");
@@ -548,7 +551,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             // listView.itemsSource[sourceIndex] = newKey;
                             key = newKey;
                             keyChanged = true;
-                        }, false, true, Array.Empty<Attribute>(), targets).result;
+                        }, false, true, Array.Empty<Attribute>(), targets, richTextTagProvider).result;
 
                         if (editing != null)
                         {
@@ -617,11 +620,11 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                     VisualElement valueChild = element.Children().FirstOrDefault();
 
-                    VisualElement editing = AbsRenderer.UIToolkitValueEdit(valueChild, "", dictValueType, value, null, newValue =>
+                    VisualElement editing = UIToolkitEdit.UIToolkitValueEdit(valueChild, "", dictValueType, value, null, newValue =>
                     {
                         object refreshedKey = dictField.ListView.itemsSource[elementIndex];
                         payload.SetKeyValue(refreshedKey, newValue);
-                    }, false, true, Array.Empty<Attribute>(), targets).result;
+                    }, false, true, Array.Empty<Attribute>(), targets, richTextTagProvider).result;
 
                     if (editing != null)
                     {

@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Core
             {
                 if (saintsAttributeWithIndex.SaintsAttribute is FieldShowIfAttribute showIfAttribute)
                 {
-                    SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(saintsAttributeWithIndex);
+                    SaintsPropertyDrawer drawer = GetOrCreateSaintsDrawer(property, saintsAttributeWithIndex, GetPreferredLabel(property));
                     showAndResults.Add(drawer.GetThisDecoratorVisibility(showIfAttribute, property, fieldInfo, parent));
                 }
             }
@@ -168,7 +168,7 @@ namespace SaintsField.Editor.Core
                 .ToList();
 
             Dictionary<SaintsWithIndex, SaintsPropertyDrawer> usedAttributes = saintsAttributeWithIndexes
-                .ToDictionary(each => each, GetOrCreateSaintsDrawer);
+                .ToDictionary(each => each, each => GetOrCreateSaintsDrawer(property, each, GetPreferredLabel(property)));
 
             (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer)[] filedOrLabel = usedAttributes
                 .Where(each =>
@@ -477,7 +477,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.SaintsAttribute is null
                         ? this
-                        : GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                        : GetOrCreateSaintsDrawer(property, eachAttributeWithIndex, GetPreferredLabel(property));
 
                     // ReSharper disable once InvertIf
                     if (drawerInstance.WillDrawAbove(property, eachAttributeWithIndex.SaintsAttribute, fieldInfo,
@@ -586,7 +586,7 @@ namespace SaintsField.Editor.Core
                     // Debug.Log($"{eachAttributeWithIndex.Index}/{eachAttributeWithIndex.SaintsAttribute}");
                     SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.SaintsAttribute is null
                         ? this
-                        : GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                        : GetOrCreateSaintsDrawer(property, eachAttributeWithIndex, GetPreferredLabel(property));
                     float preLabelUseWidth =
                         drawerInstance.DrawPreLabelImGui(new Rect(labelFieldRowRect)
                         {
@@ -631,7 +631,7 @@ namespace SaintsField.Editor.Core
                 }
                 else
                 {
-                    SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
+                    SaintsPropertyDrawer labelDrawerInstance = GetOrCreateSaintsDrawer(property, labelAttributeWithIndex, GetPreferredLabel(property));
                     // UsedAttributesTryAdd(labelAttributeWithIndex, labelDrawerInstance);
                     // completelyDisableLabel = labelDrawerInstance.WillDrawLabel(property, label, labelAttributeWithIndex.SaintsAttribute);
                     bool hasLabelSpace =
@@ -710,7 +710,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.SaintsAttribute is null
                         ? this
-                        : GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                        : GetOrCreateSaintsDrawer(property, eachAttributeWithIndex, GetPreferredLabel(property));
                     float curWidth =
                         drawerInstance.GetPostFieldWidth(fieldUseRectWithPost, property, GUIContent.none,
                             eachAttributeWithIndex.SaintsAttribute, eachAttributeWithIndex.Index, onGUIPayload,
@@ -750,7 +750,7 @@ namespace SaintsField.Editor.Core
                     else
                     {
                         // Debug.Log(fieldAttribute);
-                        SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(fieldAttributeWithIndex);
+                        SaintsPropertyDrawer fieldDrawerInstance = GetOrCreateSaintsDrawer(property, fieldAttributeWithIndex, GetPreferredLabel(property));
                         // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
                         // GUI.SetNextControlName(_fieldControlName);
                         fieldDrawerInstance.DrawField(fieldUseRectNoPost, property, useGuiContent,
@@ -843,7 +843,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.SaintsAttribute is null
                         ? this
-                        : GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                        : GetOrCreateSaintsDrawer(property, eachAttributeWithIndex, GetPreferredLabel(property));
                     drawerInstance.DrawOverlay(labelFieldRowRect, property, bugFixCopyLabel,
                         eachAttributeWithIndex.SaintsAttribute, hasLabelWidth, fieldInfo, parent);
                     // ReSharper disable once InvertIf
@@ -875,7 +875,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.SaintsAttribute is null
                         ? this
-                        : GetOrCreateSaintsDrawer(eachAttributeWithIndex);
+                        : GetOrCreateSaintsDrawer(property, eachAttributeWithIndex, GetPreferredLabel(property));
                     // Debug.Log($"get instance {eachAttribute}: {drawerInstance}");
                     // ReSharper disable once InvertIf
                     if (drawerInstance.WillDrawBelow(property, allAttributes, eachAttributeWithIndex.SaintsAttribute,
@@ -953,7 +953,7 @@ namespace SaintsField.Editor.Core
             {
                 SaintsPropertyDrawer drawer = saintsWithIndex.SaintsAttribute is null
                     ? this
-                    : GetOrCreateSaintsDrawer(saintsWithIndex);
+                    : GetOrCreateSaintsDrawer(property, saintsWithIndex, GetPreferredLabel(property));
                 drawer.OnPropertyEndImGui(property, label,
                     saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, onGUIPayload, fieldInfo, parent);
             }

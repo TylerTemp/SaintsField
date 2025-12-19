@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
+using Saintsfield.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -119,7 +120,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         {
                             return;
                         }
-                        VisualElement r = UIToolkitValueEdit(
+                        VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                             paraContainer.Children().FirstOrDefault(),
                             parameterInfo.Name,
                             paraType,
@@ -137,7 +138,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             false,
                             InAnyHorizontalLayout,
                             attributes,
-                            FieldWithInfo.Targets
+                            FieldWithInfo.Targets,
+                            this
                         ).result;
                         // ReSharper disable once InvertIf
                         if (r != null)
@@ -189,7 +191,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     Debug.Assert(_returnValueContainer != null);
                     _returnValueContainer.Clear();
                     object returnValue = returnValues[0];
-                    VisualElement r = UIToolkitValueEdit(
+                    VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                         _returnValueContainer.Children().FirstOrDefault(),
                         "<color=green>[return]</color>",
                         methodInfo.ReturnType,
@@ -199,7 +201,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         false,
                         InAnyHorizontalLayout,
                         ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo),
-                        FieldWithInfo.Targets
+                        FieldWithInfo.Targets,
+                        this
                     ).result;
                     if (r != null)
                     {

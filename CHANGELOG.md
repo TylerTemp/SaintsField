@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.7.3 ##
+
+1.  Fix: `FieldAboveText`/`FieldBelowText` can not find a dynamic text member
+2.  Add: `TreeDropdown` now works with `ShowInInspector`
+
 ## 5.7.2 ##
 
 1.  Add: `Reset Field` context menu to reset a field to default value

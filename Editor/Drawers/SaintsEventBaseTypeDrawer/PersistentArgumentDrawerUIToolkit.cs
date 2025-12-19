@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements;
+using Saintsfield.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Events;
@@ -450,7 +452,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     return;
                 }
 
-                (VisualElement result, bool isNestedField) = AbsRenderer.UIToolkitValueEdit(
+                (VisualElement result, bool isNestedField) = UIToolkitEdit.UIToolkitValueEdit(
                     payload.RenderElement, payload.Type.Name, payload.Type, payload.Value, null, newValue =>
                     {
                         // Debug.Log($"Update Value {newValue}");
@@ -503,7 +505,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         // Debug.Log($"re-render SerializedValueEditorRepaint");
                         SerializedValueEditorRepaint();
 
-                    }, false, true, ReflectCache.GetCustomAttributes(info), property.serializedObject.targetObjects);
+                    }, false, true, ReflectCache.GetCustomAttributes(info), property.serializedObject.targetObjects, new RichTextDrawer.EmptyRichTextTagProvider());
 
                 if (result != null)
                 {

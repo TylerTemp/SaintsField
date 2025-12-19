@@ -617,16 +617,17 @@ namespace SaintsField.Editor.Core
             return drawerInfo.IsSaints ? drawerInfo.DrawerType : null;
         }
 
-        private SaintsPropertyDrawer GetOrCreateSaintsDrawer(SaintsWithIndex saintsAttributeWithIndex)
+        private SaintsPropertyDrawer GetOrCreateSaintsDrawer(SerializedProperty property, SaintsWithIndex saintsAttributeWithIndex, string preferredLabel)
         {
-            if (_cachedDrawer.TryGetValue(saintsAttributeWithIndex, out SaintsPropertyDrawer drawer))
-            {
-                return drawer;
-            }
-
-            // Debug.Log($"create new drawer for {saintsAttributeWithIndex.SaintsAttribute}[{saintsAttributeWithIndex.Index}]");
-            // Type drawerType = PropertyAttributeToDrawers[saintsAttributeWithIndex.SaintsAttribute.GetType()].First(each => each.isSaints).drawerType;
-            return _cachedDrawer[saintsAttributeWithIndex] = GetOrCreateSaintsDrawerByAttr(saintsAttributeWithIndex.SaintsAttribute);
+            // if (_cachedDrawer.TryGetValue(saintsAttributeWithIndex, out SaintsPropertyDrawer drawer))
+            // {
+            //     return drawer;
+            // }
+            //
+            // // Debug.Log($"create new drawer for {saintsAttributeWithIndex.SaintsAttribute}[{saintsAttributeWithIndex.Index}]");
+            // // Type drawerType = PropertyAttributeToDrawers[saintsAttributeWithIndex.SaintsAttribute.GetType()].First(each => each.isSaints).drawerType;
+            // return _cachedDrawer[saintsAttributeWithIndex] = GetOrCreateSaintsDrawerByAttr(saintsAttributeWithIndex.SaintsAttribute);
+            return GetOrCreateSaintsDrawerByAttr(property, saintsAttributeWithIndex.SaintsAttribute, preferredLabel);
         }
 
         public static (Attribute attrOrNull, Type drawerType) GetFallbackDrawerType(MemberInfo info, SerializedProperty property, IEnumerable<Attribute> allAttributes)
@@ -694,7 +695,7 @@ namespace SaintsField.Editor.Core
             // return PropertyFieldFallbackUIToolkit(property);
         }
 
-        private SaintsPropertyDrawer GetOrCreateSaintsDrawerByAttr(ISaintsAttribute saintsAttribute)
+        private SaintsPropertyDrawer GetOrCreateSaintsDrawerByAttr(SerializedProperty property, ISaintsAttribute saintsAttribute, string preferredLabel)
         {
             Type attributeType = saintsAttribute.GetType();
             // if (!PropertyAttributeToPropertyDrawers.TryGetValue(attributeType,
@@ -722,7 +723,9 @@ namespace SaintsField.Editor.Core
                 throw new Exception($"No drawer found for {saintsAttribute}");
             }
 
-            SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
+            // SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)Activator.CreateInstance(drawerType);
+            SaintsPropertyDrawer saintsPropertyDrawer = (SaintsPropertyDrawer)MakePropertyDrawer(drawerType, fieldInfo, (Attribute)saintsAttribute, preferredLabel);
+            saintsPropertyDrawer._thisProperty = property;
             saintsPropertyDrawer.InHorizontalLayout = InHorizontalLayout;
 
 #if UNITY_2022_2_OR_NEWER  // don't bother with too old Unity
