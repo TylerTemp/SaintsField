@@ -17,7 +17,7 @@ namespace SaintsField
 
         // public readonly Type CompType;
         // ReSharper disable once InconsistentNaming
-        public const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
+        public new const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
 
         public GetComponentAttribute(Type compType = null, string groupBy = "")
         {

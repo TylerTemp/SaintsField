@@ -14,7 +14,7 @@ namespace SaintsField
     public class GetScriptableObjectAttribute: GetByXPathAttribute
     {
         // ReSharper disable once InconsistentNaming
-        public const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
+        public new const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
         public override string GroupBy { get; }
 
         // ReSharper disable once MemberCanBePrivate.Global

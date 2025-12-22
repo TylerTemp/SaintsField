@@ -21,8 +21,11 @@ namespace SaintsField
         // [SerializeField, Obsolete]
         // public T[] value = {};
 
+        // ReSharper disable once InconsistentNaming
         [SerializeField] public List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         [SerializeField] private int _saintsSerializedVersion;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
         private const int SaintsSerializedVersionRuntime = 2;
         [SerializeField] private WrapType _wrapType;
         private T[] _array = Array.Empty<T>();

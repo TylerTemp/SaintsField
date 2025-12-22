@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
-// using JetBrains.Annotations;
+#if SAINTSFIELD_BUTTON_IMPLICIT_USE
+using JetBrains.Annotations;
+#endif
 using SaintsField.Utils;
 
 namespace SaintsField.Playa
 {
-    // [MeansImplicitUse]  // https://github.com/TylerTemp/SaintsField/pull/171#issuecomment-3680042013
+#if SAINTSFIELD_BUTTON_IMPLICIT_USE
+    [MeansImplicitUse]  // https://github.com/TylerTemp/SaintsField/pull/171#issuecomment-3680042013
+#endif
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Method)]
     public class ButtonAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute

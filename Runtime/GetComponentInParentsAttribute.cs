@@ -13,7 +13,7 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class GetComponentInParentsAttribute: GetByXPathAttribute
     {
-        public const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
+        public new const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
         public virtual int Limit => 0;
 
         public bool IncludeInactive;

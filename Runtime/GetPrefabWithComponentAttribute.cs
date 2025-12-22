@@ -12,7 +12,8 @@ namespace SaintsField
     [Conditional("UNITY_EDITOR")]
     public class GetPrefabWithComponentAttribute: GetByXPathAttribute
     {
-        public const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
+        // ReSharper disable once InconsistentNaming
+        public new const EXP DefaultEXP = EXP.NoPicker | EXP.NoAutoResignToNull;
         public override string GroupBy { get; }
 
         // ReSharper disable once NotAccessedField.Global
