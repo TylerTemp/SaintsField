@@ -70,7 +70,12 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             if (_enabled && target.HasPointerCapture(evt.pointerId))
             {
                 Vector3 pointerDelta = evt.position - _pointerStartPosition;
-                target.style.translate = _targetStartPosition + (Vector2)pointerDelta;
+#if UNITY_6000_3_OR_NEWER
+                target.style.translate
+#else
+                target.transform.position
+#endif
+                    = _targetStartPosition + (Vector2)pointerDelta;
 
                 bool captured = false;
                 foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
@@ -86,7 +91,12 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                         (bool isOver, Vector2 offset) = colorPaletteLabels.DragOver(evt.originalMousePosition, _targetLabel);
                         if (isOver)
                         {
-                            target.style.translate = (Vector2)pointerDelta - offset;
+#if UNITY_6000_3_OR_NEWER
+                            target.style.translate
+#else
+                            target.transform.position
+#endif
+                            = (Vector2)pointerDelta - offset;
                             captured = true;
                         }
                     }
@@ -156,7 +166,13 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
             if (!captured)
             {
-                _targetLabel.style.translate = _targetStartPosition;
+                _targetLabel.
+#if UNITY_6000_3_OR_NEWER
+                style.translate
+#else
+                transform.position
+#endif
+                = _targetStartPosition;
             }
 
             // VisualElement slotsContainer = root.Q<VisualElement>("slots");

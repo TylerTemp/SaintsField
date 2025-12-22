@@ -71,7 +71,13 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 //     Debug.Log($"no pre! {pointerDelta.x} : {_targetStartBounds}");
                 // }
                 // target.transform.position = (Vector2)pointerDelta;
-                target.style.translate = (Vector2)pointerDelta - offsetPos;
+                target.
+#if UNITY_6000_3_OR_NEWER
+                    style.translate
+#else
+                    transform.position
+#endif
+                    = (Vector2)pointerDelta - offsetPos;
             }
         }
 
