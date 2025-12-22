@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using JetBrains.Annotations;
+// using JetBrains.Annotations;
 using SaintsField.Utils;
 
 namespace SaintsField.Playa
 {
-    [MeansImplicitUse]
+    // [MeansImplicitUse]  // https://github.com/TylerTemp/SaintsField/pull/171#issuecomment-3680042013
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Method)]
     public class ButtonAttribute: Attribute, IPlayaAttribute, IPlayaMethodAttribute
