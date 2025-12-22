@@ -1090,6 +1090,52 @@ namespace SaintsField.Editor.Utils
                 return (e.Message, defaultValue);
             }
 
+            if (property != null && target != null)
+            {
+                Type targetType = target.GetType();
+                // Debug.Log(targetType);
+                if (targetType.IsValueType)
+                {
+                    // Debug.Log("is value type");
+
+                    string originPath = property.propertyPath;
+                    string[] propPaths = originPath.Split(SerializedUtils.DotSplitSeparator);
+
+                    (SerializedUtils.FieldOrProp targetFieldOrProp, object targetParent) = SerializedUtils.GetFieldInfoAndDirectParentByPathSegments(property, propPaths.SkipLast(1));
+                    if (targetParent != null)
+                    {
+                        if (targetFieldOrProp.IsField)
+                        {
+                            // Debug.Log($"write back {targetFieldOrProp.FieldInfo.Name} with {target}");
+                            try
+                            {
+                                targetFieldOrProp.FieldInfo.SetValue(targetParent, target);
+                            }
+                            catch (Exception e)
+                            {
+#if SAINTSFIELD_DEBUG
+                                Debug.LogException(e);
+#endif
+                            }
+                        }
+                        else if(targetFieldOrProp.PropertyInfo.CanWrite)
+                        {
+                            // Debug.Log($"write back {targetFieldOrProp.PropertyInfo.Name} with {target}");
+                            try
+                            {
+                                targetFieldOrProp.PropertyInfo.SetValue(targetParent, target);
+                            }
+                            catch (Exception e)
+                            {
+#if SAINTSFIELD_DEBUG
+                                Debug.LogException(e);
+#endif
+                            }
+                        }
+                    }
+                }
+            }
+
             return ("", genResult);
         }
 
