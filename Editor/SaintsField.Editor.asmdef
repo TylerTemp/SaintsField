@@ -1,8 +1,8 @@
 {
-    "name": "Saintsfield.Editor",
-    "rootNamespace": "Saintsfield",
+    "name": "SaintsField.Editor",
+    "rootNamespace": "SaintsField",
     "references": [
-        "Saintsfield.Runtime",
+        "SaintsField.Runtime",
         "Unity.Addressables.Editor",
         "Unity.AI.Navigation.Editor",
         "GUID:390b3c03330b4d14c909ce1485f4fd21",
@@ -10,11 +10,11 @@
         "Unity.Netcode.Editor",
         "GUID:ee6baafdecd94804a8714654c4bd097f",
         "GUID:cbf7c4c34691e9f43a94d9e15caf5bab",
-        "Saintsfield.Runtime.Wwise",
+        "SaintsField.Runtime.Wwise",
         "AK.Wwise.Unity.API.WwiseTypes",
         "AK.Wwise.Unity.API.Editor",
-        "Saintsfield.Runtime.TypeReference",
-        "Saintsfield.Runtime.Events",
+        "SaintsField.Runtime.TypeReference",
+        "SaintsField.Runtime.Events",
         "Unity.Collections",
         "Unity.Serialization"
     ],

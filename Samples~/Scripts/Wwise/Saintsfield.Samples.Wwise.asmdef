@@ -1,9 +1,9 @@
 {
-    "name": "Saintsfield.Samples.Wwise",
-    "rootNamespace": "Saintsfield",
+    "name": "SaintsField.Samples.Wwise",
+    "rootNamespace": "SaintsField",
     "references": [
-        "Saintsfield.Runtime",
-        "Saintsfield.Runtime.Wwise",
+        "SaintsField.Runtime",
+        "SaintsField.Runtime.Wwise",
         "AK.Wwise.Unity.API.WwiseTypes",
         "AK.Wwise.Unity.API.Editor"
     ],

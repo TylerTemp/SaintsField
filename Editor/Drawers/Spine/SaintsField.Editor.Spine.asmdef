@@ -1,10 +1,10 @@
 {
-    "name": "Saintsfield.Editor.Spine",
-    "rootNamespace": "Saintsfield",
+    "name": "SaintsField.Editor.Spine",
+    "rootNamespace": "SaintsField",
     "references": [
-        "Saintsfield.Editor",
-        "Saintsfield.Runtime.Spine",
-        "Saintsfield.Runtime",
+        "SaintsField.Editor",
+        "SaintsField.Runtime.Spine",
+        "SaintsField.Runtime",
         "spine-unity",
         "spine-csharp"
     ],

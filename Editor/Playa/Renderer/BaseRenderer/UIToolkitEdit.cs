@@ -31,7 +31,7 @@ using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
-using Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
+using SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
@@ -40,7 +40,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace Saintsfield.Editor.Playa.Renderer.BaseRenderer
+namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
     public static class UIToolkitEdit
     {

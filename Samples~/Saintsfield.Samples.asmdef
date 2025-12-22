@@ -2,13 +2,13 @@
     "name": "SaintsField.Samples",
     "rootNamespace": "SaintsField",
     "references": [
-        "Saintsfield.Runtime",
-        "Saintsfield.Editor",
+        "SaintsField.Runtime",
+        "SaintsField.Editor",
         "Unity.Addressables",
         "DOTween.Modules",
         "AYellowpaper.SerializedCollections",
         "NaughtyAttributes.Core",
-        "Saintsfield.Runtime.Addressable",
+        "SaintsField.Runtime.Addressable",
         "Unity.Netcode.Runtime",
         "Unity.Mathematics",
         "Obvious.Soap",
@@ -16,8 +16,8 @@
         "Kybernetik.UltEvents",
         "AYellowpaper.SerializeInterfaces",
         "com.inter-illusion.i2",
-        "Saintsfield.Runtime.TypeReference",
-        "Saintsfield.Runtime.Events"
+        "SaintsField.Runtime.TypeReference",
+        "SaintsField.Runtime.Events"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

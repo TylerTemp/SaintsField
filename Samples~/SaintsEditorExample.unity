@@ -3178,7 +3178,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2177c041b6e5037498effb5f19db2bc8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Saintsfield.Samples::Saintsfield.Samples.Scripts.SaintsEditor.ShowInInspectorPropRange
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.ShowInInspectorPropRange
   min: 0
   max: 23
   propRange: 9
@@ -3614,7 +3614,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6322e97add3d70f499cbf3e8ae8a668f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Saintsfield.Samples::Saintsfield.Samples.Scripts.SaintsEditor.GetInSiblingsExample
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.GetInSiblingsExample
   sr: {fileID: 1736933214}
   srArray:
   - {fileID: 1736933214}
@@ -7508,7 +7508,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53fc4606abb2630419af2f2c24e3ce50, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Saintsfield.Samples::Saintsfield.Samples.Scripts.SaintsEditor.ParamDec
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.ParamDec
 --- !u!4 &1779100557
 Transform:
   m_ObjectHideFlags: 0

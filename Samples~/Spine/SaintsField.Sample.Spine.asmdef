@@ -1,6 +1,6 @@
 {
-    "name": "today.comes.saintsfield.Sample.Spine",
-    "rootNamespace": "",
+    "name": "SaintsField.Sample.Spine",
+    "rootNamespace": "SaintsField",
     "references": [
         "GUID:3ae0f0d40cb1ecc438fa8b5be1e00178",
         "GUID:8fe65b11b7a93604a98cc78ef9aed695",

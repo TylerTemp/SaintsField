@@ -1,12 +1,9 @@
 {
-    "name": "Saintsfield.Editor.Addressable",
+    "name": "SaintsField.Editor.AiNavigation",
     "rootNamespace": "SaintsField",
     "references": [
-        "Saintsfield.Editor",
-        "Saintsfield.Runtime",
-        "Unity.Addressables.Editor",
-        "Saintsfield.Runtime.Addressable",
-        "Unity.Addressables"
+        "SaintsField.Editor",
+        "SaintsField.Runtime"
     ],
     "includePlatforms": [
         "Editor"
@@ -19,14 +16,14 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "SAINTSFIELD_ADDRESSABLE",
-        "!SAINTSFIELD_ADDRESSABLE_DISABLE"
+        "SAINTSFIELD_AI_NAVIGATION",
+        "!SAINTSFIELD_AI_NAVIGATION_DISABLED"
     ],
     "versionDefines": [
         {
-            "name": "com.unity.addressables",
+            "name": "com.unity.ai.navigation",
             "expression": "",
-            "define": "SAINTSFIELD_ADDRESSABLE"
+            "define": "SAINTSFIELD_AI_NAVIGATION"
         }
     ],
     "noEngineReferences": false

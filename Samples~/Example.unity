@@ -13085,17 +13085,17 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67656cfd91b48724d9b3582fb14c7a6d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue241DictInterface
   iDict:
     _saintsKeys:
     - valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 169648641493696654
+          rid: 3614753828970430579
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -13103,13 +13103,13 @@ MonoBehaviour:
     _wrapTypeKey: 1
     _saintsValues:
     - valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583427232728041
+          rid: 3614753828970430580
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -13119,14 +13119,12 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 169648641493696654
-      type: {class: Issue241DictInterface/Key2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+    - rid: 3614753828970430579
+      type: {class: Issue241DictInterface/Key1, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
       data:
-        k2: 
-    - rid: 6921583427232728041
-      type: {class: Issue241DictInterface/Value2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+        k1: 
+    - rid: 3614753828970430580
+      type: {class: Issue241DictInterface/Value2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
       data:
         v2: 
 --- !u!1 &787857617
@@ -18359,19 +18357,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 040fcf9507b8f814b82cfbea74d3b77b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue301SaintsDictionaryField
   oneField:
     _saintsKeys:
     - value: 0
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652857
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -18380,14 +18378,14 @@ MonoBehaviour:
     - value:
         f1: 
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652858
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -18397,14 +18395,14 @@ MonoBehaviour:
     _saintsKeys:
     - value: 0
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652859
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -18419,7 +18417,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652861
+          rid: -2
         IsVRef: 0
       valueArray: []
       valueList: []
@@ -18430,14 +18428,14 @@ MonoBehaviour:
     _saintsKeys:
     - value: 0
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652860
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -18447,14 +18445,14 @@ MonoBehaviour:
         f1: 
         f2: 
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652863
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -18470,7 +18468,7 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652865
+          rid: -2
         IsVRef: 0
       valueArray: []
       valueList: []
@@ -18498,14 +18496,14 @@ MonoBehaviour:
     _saintsKeys:
     - value: 0
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652862
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -18514,50 +18512,23 @@ MonoBehaviour:
     - value:
         f1: 
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
           rid: -2
-        IsVRef: 1
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
     _wrapTypeValue: 4
     saintsSerializedVersion: 2
   oneFieldLabel:
-    _saintsKeys:
-    - value: 0
-      valueField:
-        propertyType: 4
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: 6921583410868652864
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 4
+    _saintsKeys: []
     _wrapTypeKey: 4
-    _saintsValues:
-    - value:
-        f1: 
-      valueField:
-        propertyType: 4
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 1
-      valueArray: []
-      valueList: []
-      wrapType: 4
+    _saintsValues: []
     _wrapTypeValue: 4
     saintsSerializedVersion: 2
   references:
@@ -18565,38 +18536,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6921583410868652857
-      type: {class: Int32, ns: System, asm: mscorlib}
-      data: 
-    - rid: 6921583410868652858
-      type: {class: Issue301SaintsDictionaryField/OneField, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
-      data:
-        f1: 
-    - rid: 6921583410868652859
-      type: {class: Int32, ns: System, asm: mscorlib}
-      data: 
-    - rid: 6921583410868652860
-      type: {class: Int32, ns: System, asm: mscorlib}
-      data: 
-    - rid: 6921583410868652861
-      type: {class: Issue301SaintsDictionaryField/TwoField, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
-      data:
-        f1: 
-        f2: 
-    - rid: 6921583410868652862
-      type: {class: Int32, ns: System, asm: mscorlib}
-      data: 
-    - rid: 6921583410868652863
-      type: {class: Issue301SaintsDictionaryField/OneFieldAttr, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
-      data:
-        f1: 
-    - rid: 6921583410868652864
-      type: {class: Int32, ns: System, asm: mscorlib}
-      data: 
-    - rid: 6921583410868652865
-      type: {class: Issue301SaintsDictionaryField/OneFieldLabel, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
-      data:
-        f1: 
 --- !u!1 &1171136839
 GameObject:
   m_ObjectHideFlags: 0
@@ -25765,34 +25704,34 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9f18adcd70a82e40a4167bcec5264cc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue236DictionaryEnum
   colors:
     _saintsKeys:
     - value: 3
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652841
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
     _wrapTypeKey: 4
     _saintsValues:
-    - value: {r: 0, g: 0, b: 0, a: 0}
+    - value: {r: 0, g: 1, b: 1, a: 1}
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583431157285788
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -25803,17 +25742,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6921583410868652841
-      type: {class: Issue236DictionaryEnum/CollectableType, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
-      data:
-        value__: 0
-    - rid: 6921583431157285788
-      type: {class: Color, ns: UnityEngine, asm: UnityEngine.CoreModule}
-      data:
-        r: 0
-        g: 0
-        b: 0
-        a: 0
 --- !u!1 &1700820806 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6492530958215482544, guid: b0b472ae658b67548b06851d1d8a93e1, type: 3}
@@ -26824,24 +26752,24 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9ba566336dd27b4397f954640c6f4c0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: today.comes.saintsfield.Samples::DictionaryEnumLabel
-  dropEnums: 1
-  buttonEnums: 2
-  flagsEnums: 1
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.DictionaryEnumLabel
+  dropEnums: 0
+  buttonEnums: 0
+  flagsEnums: 0
   treeEnums: 0
   flagsTreeEnums: 0
   namedEnumDict:
     _saintsKeys:
-    - value: 2
+    - value: 1
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652839
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -26849,14 +26777,14 @@ MonoBehaviour:
     _saintsValues:
     - value: 2
       valueField:
-        propertyType: 4
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583410868652840
-        IsVRef: 1
+          rid: -2
+        IsVRef: 0
       valueArray: []
       valueList: []
       wrapType: 4
@@ -26867,14 +26795,6 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 6921583410868652839
-      type: {class: DictionaryEnumLabel/GuildHintID, ns: SaintsField.Samples.Scripts.IssueAndTesting.Testing, asm: today.comes.saintsfield.Samples}
-      data:
-        value__: 0
-    - rid: 6921583410868652840
-      type: {class: DictionaryEnumLabel/GuildHintID, ns: SaintsField.Samples.Scripts.IssueAndTesting.Testing, asm: today.comes.saintsfield.Samples}
-      data:
-        value__: 0
 --- !u!1 &1780388858
 GameObject:
   m_ObjectHideFlags: 0

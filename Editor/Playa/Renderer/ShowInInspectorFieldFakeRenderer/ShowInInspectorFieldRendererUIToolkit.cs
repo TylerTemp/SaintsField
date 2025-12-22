@@ -6,13 +6,13 @@ using System.Linq;
 using System.Reflection;
 using SaintsField;
 using SaintsField.Editor.Core;
-using Saintsfield.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEngine.UIElements;
 
-namespace Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
+namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 {
     public partial class ShowInInspectorFieldRenderer
     {

@@ -1,6 +1,6 @@
 {
-    "name": "today.comes.saintsfield.Editor.DOTweenDetectPanel",
-    "rootNamespace": "",
+    "name": "SaintsField.Editor.DOTweenDetectPanel",
+    "rootNamespace": "SaintsField",
     "references": [],
     "includePlatforms": [
         "Editor"

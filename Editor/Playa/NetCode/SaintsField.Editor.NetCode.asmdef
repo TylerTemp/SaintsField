@@ -1,6 +1,6 @@
 {
-    "name": "today.comes.saintsfield.Editor.NetCode",
-    "rootNamespace": "",
+    "name": "SaintsField.Editor.NetCode",
+    "rootNamespace": "SaintsField",
     "references": [
         "GUID:9f4f5bf029cebb64f983b7bdc29f62a1",
         "GUID:1491147abca9d7d4bb7105af628b223e",

@@ -1,6 +1,6 @@
 {
-    "name": "Saintsfield.Runtime.Addressable",
-    "rootNamespace": "Saintsfield",
+    "name": "SaintsField.Runtime.Addressable",
+    "rootNamespace": "SaintsField",
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0"
     ],

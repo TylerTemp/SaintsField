@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
+namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 {
     public partial class ShowInInspectorFieldRenderer: AbsRenderer
     {

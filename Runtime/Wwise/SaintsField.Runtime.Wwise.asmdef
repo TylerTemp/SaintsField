@@ -1,6 +1,6 @@
 {
-    "name": "Saintsfield.Runtime.Wwise",
-    "rootNamespace": "Saintsfield",
+    "name": "SaintsField.Runtime.Wwise",
+    "rootNamespace": "SaintsField",
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
         "GUID:55b98396b7628454da7ce17a99ac5e67"

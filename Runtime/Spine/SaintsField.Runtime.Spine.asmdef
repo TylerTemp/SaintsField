@@ -1,8 +1,8 @@
 {
-    "name": "Saintsfield.Runtime.Spine",
-    "rootNamespace": "Saintsfield",
+    "name": "SaintsField.Runtime.Spine",
+    "rootNamespace": "SaintsField",
     "references": [
-        "Saintsfield.Runtime"
+        "SaintsField.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

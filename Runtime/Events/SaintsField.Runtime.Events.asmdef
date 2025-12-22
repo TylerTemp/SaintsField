@@ -1,6 +1,6 @@
 {
-    "name": "Saintsfield.Runtime.Events",
-    "rootNamespace": "Saintsfield",
+    "name": "SaintsField.Runtime.Events",
+    "rootNamespace": "SaintsField",
     "references": [
         "GUID:e0cd26848372d4e5c891c569017e11f1",
         "GUID:2765e68924a08a94ea0ea66b31c0168f",

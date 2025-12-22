@@ -2,7 +2,7 @@
     "name": "SaintsField.Samples.SaintsEvent",
     "rootNamespace": "SaintsField",
     "references": [
-        "Saintsfield.Runtime.Events"
+        "SaintsField.Runtime.Events"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
