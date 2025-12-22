@@ -175,8 +175,11 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                         });
                     }
                 }
-
+#if UNITY_6000_3_OR_NEWER
+                genericDropdownMenu.DropDown(dropdownButtonField.ButtonElement.worldBound, dropdownButtonField, DropdownMenuSizeMode.Auto);
+#else
                 genericDropdownMenu.DropDown(dropdownButtonField.ButtonElement.worldBound, dropdownButtonField, true);
+#endif
             }
         }
     }

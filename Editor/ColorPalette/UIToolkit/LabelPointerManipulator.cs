@@ -50,7 +50,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 return;
             }
 
-            _targetStartPosition = target.transform.position;
+            _targetStartPosition = target.resolvedStyle.translate;
             _pointerStartPosition = evt.position;
 
             foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
@@ -70,7 +70,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
             if (_enabled && target.HasPointerCapture(evt.pointerId))
             {
                 Vector3 pointerDelta = evt.position - _pointerStartPosition;
-                target.transform.position = _targetStartPosition + (Vector2)pointerDelta;
+                target.style.translate = _targetStartPosition + (Vector2)pointerDelta;
 
                 bool captured = false;
                 foreach (ColorInfoArray.Container container in _allColorPaletteLabels)
@@ -86,7 +86,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                         (bool isOver, Vector2 offset) = colorPaletteLabels.DragOver(evt.originalMousePosition, _targetLabel);
                         if (isOver)
                         {
-                            target.transform.position = (Vector2)pointerDelta - offset;
+                            target.style.translate = (Vector2)pointerDelta - offset;
                             captured = true;
                         }
                     }
@@ -156,7 +156,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
             if (!captured)
             {
-                _targetLabel.transform.position = _targetStartPosition;
+                _targetLabel.style.translate = _targetStartPosition;
             }
 
             // VisualElement slotsContainer = root.Q<VisualElement>("slots");

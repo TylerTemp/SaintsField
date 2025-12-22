@@ -2137,101 +2137,101 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
                     inHorizontalLayout, allAttributes, targets, richTextTagProvider), false);
 
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
-                // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
-                return (MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly,
-                    dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
-                    inHorizontalLayout, targets, richTextTagProvider), false);
-#else  // WTF Unity, backport it!
-                // ReSharper disable once AssignNullToNotNullAttribute
-                object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
-
-                Foldout foldout = new Foldout
-                {
-                    text = $"{label} <color=#808080ff>(Dictionary x{kvPairs.Length})</color>",
-                };
-                foldout.AddToClassList("saintsfield-dictionary");
-
-                const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                              BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
-
-
-                foreach ((object kvPair, int index) in kvPairs.WithIndex())
-                {
-                    string kvContainerName = $"kv-{index}";
-                    VisualElement kvContainerOldElement = oldElement?.Q<VisualElement>(name: kvContainerName);
-                    bool hasOldContainer = kvContainerOldElement != null;
-                    VisualElement kvContainer = hasOldContainer ? kvContainerOldElement : null;
-
-                    Type kvPairType = kvPair.GetType();
-                    PropertyInfo keyProp = kvPairType.GetProperty("Key", bindAttr);
-                    if (keyProp == null)
-                    {
-                        foldout.Add(new HelpBox($"Failed to obtain key on element {index}: {kvPair}", HelpBoxMessageType.Error));
-                        continue;
-                    }
-                    PropertyInfo valueProp = kvPairType.GetProperty("Value", bindAttr);
-                    if (valueProp == null)
-                    {
-                        foldout.Add(new HelpBox($"Failed to obtain value on element {index}: {kvPair}", HelpBoxMessageType.Error));
-                        continue;
-                    }
-
-                    object dictKey = keyProp.GetValue(kvPair);
-                    string keyElemName = $"key-{index}";
-                    VisualElement oldKeyElement = kvContainer?.Q<VisualElement>(name: keyElemName);
-                    VisualElement newKeyElement = UIToolkitValueEdit(
-                        oldKeyElement,
-                        $"{dictKey} <color=#808080ff>(Key {index})</color>",
-                        keyProp.PropertyType,
-                        dictKey,
-                        null,
-                        null,
-                        false,
-                        inHorizontalLayout,
-                        allAttributes,
-                        neverNullable
-                    ).result;
-                    if (newKeyElement != null)
-                    {
-                        newKeyElement.name = keyElemName;
-                        foldout.Add(newKeyElement);
-                    }
-
-                    string valueContainerName = $"value-container-{index}";
-                    VisualElement oldValueContainer = kvContainer?.Q<VisualElement>(name: valueContainerName);
-                    object dictValue = valueProp.GetValue(kvPair);
-                    VisualElement newValueContainer = UIToolkitValueEdit(
-                        oldValueContainer,
-                        $"{dictValue} <color=#808080ff>(Value {index})</color>",
-                        valueProp.PropertyType,
-                        dictValue,
-                        null,
-                        null,
-                        false,
-                        inHorizontalLayout,
-                        allAttributes,
-                        neverNullable
-                    ).result;
-                    if (newValueContainer != null)
-                    {
-                        newValueContainer.name = valueContainerName;
-                        newValueContainer.style.paddingLeft = SaintsPropertyDrawer.IndentWidth;
-                        foldout.Add(newValueContainer);
-                    }
-                    // VisualElement valueContainer = new VisualElement
-                    // {
-                    //     style =
-                    //     {
-                    //         paddingLeft = SaintsPropertyDrawer.IndentWidth,
-                    //     },
-                    // };
-                    // valueContainer.Add(UIToolkitLayout(dictValue, $"{dictValue} <color=#808080ff>(Value {index})</color>"));
-                    // foldout.Add(valueContainer);
-                }
-
-                return (foldout, false);
-#endif
+// #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
+//                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
+//                 return (MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly,
+//                     dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
+//                     inHorizontalLayout, targets, richTextTagProvider), false);
+// #else  // WTF Unity, backport it!
+//                 // ReSharper disable once AssignNullToNotNullAttribute
+//                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
+//
+//                 Foldout foldout = new Foldout
+//                 {
+//                     text = $"{label} <color=#808080ff>(Dictionary x{kvPairs.Length})</color>",
+//                 };
+//                 foldout.AddToClassList("saintsfield-dictionary");
+//
+//                 const BindingFlags bindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+//                                               BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+//
+//
+//                 foreach ((object kvPair, int index) in kvPairs.WithIndex())
+//                 {
+//                     string kvContainerName = $"kv-{index}";
+//                     VisualElement kvContainerOldElement = oldElement?.Q<VisualElement>(name: kvContainerName);
+//                     bool hasOldContainer = kvContainerOldElement != null;
+//                     VisualElement kvContainer = hasOldContainer ? kvContainerOldElement : null;
+//
+//                     Type kvPairType = kvPair.GetType();
+//                     PropertyInfo keyProp = kvPairType.GetProperty("Key", bindAttr);
+//                     if (keyProp == null)
+//                     {
+//                         foldout.Add(new HelpBox($"Failed to obtain key on element {index}: {kvPair}", HelpBoxMessageType.Error));
+//                         continue;
+//                     }
+//                     PropertyInfo valueProp = kvPairType.GetProperty("Value", bindAttr);
+//                     if (valueProp == null)
+//                     {
+//                         foldout.Add(new HelpBox($"Failed to obtain value on element {index}: {kvPair}", HelpBoxMessageType.Error));
+//                         continue;
+//                     }
+//
+//                     object dictKey = keyProp.GetValue(kvPair);
+//                     string keyElemName = $"key-{index}";
+//                     VisualElement oldKeyElement = kvContainer?.Q<VisualElement>(name: keyElemName);
+//                     VisualElement newKeyElement = UIToolkitValueEdit(
+//                         oldKeyElement,
+//                         $"{dictKey} <color=#808080ff>(Key {index})</color>",
+//                         keyProp.PropertyType,
+//                         dictKey,
+//                         null,
+//                         null,
+//                         false,
+//                         inHorizontalLayout,
+//                         allAttributes,
+//                         neverNullable
+//                     ).result;
+//                     if (newKeyElement != null)
+//                     {
+//                         newKeyElement.name = keyElemName;
+//                         foldout.Add(newKeyElement);
+//                     }
+//
+//                     string valueContainerName = $"value-container-{index}";
+//                     VisualElement oldValueContainer = kvContainer?.Q<VisualElement>(name: valueContainerName);
+//                     object dictValue = valueProp.GetValue(kvPair);
+//                     VisualElement newValueContainer = UIToolkitValueEdit(
+//                         oldValueContainer,
+//                         $"{dictValue} <color=#808080ff>(Value {index})</color>",
+//                         valueProp.PropertyType,
+//                         dictValue,
+//                         null,
+//                         null,
+//                         false,
+//                         inHorizontalLayout,
+//                         allAttributes,
+//                         neverNullable
+//                     ).result;
+//                     if (newValueContainer != null)
+//                     {
+//                         newValueContainer.name = valueContainerName;
+//                         newValueContainer.style.paddingLeft = SaintsPropertyDrawer.IndentWidth;
+//                         foldout.Add(newValueContainer);
+//                     }
+//                     // VisualElement valueContainer = new VisualElement
+//                     // {
+//                     //     style =
+//                     //     {
+//                     //         paddingLeft = SaintsPropertyDrawer.IndentWidth,
+//                     //     },
+//                     // };
+//                     // valueContainer.Add(UIToolkitLayout(dictValue, $"{dictValue} <color=#808080ff>(Value {index})</color>"));
+//                     // foldout.Add(valueContainer);
+//                 }
+//
+//                 return (foldout, false);
+// #endif
             }
             #endregion
 

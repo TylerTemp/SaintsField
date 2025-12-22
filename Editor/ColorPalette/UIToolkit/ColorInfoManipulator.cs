@@ -11,7 +11,6 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
         // private Vector2 _targetStartPosition;
         private Vector3 _pointerStartPosition;
-        private Rect _targetStartBounds;
         private bool _enabled;
 
         public ColorInfoManipulator(ColorInfoArray colorInfoArray, ColorInfoArray.Container container)
@@ -42,7 +41,6 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
         private void PointerDownHandler(PointerDownEvent evt)
         {
             // _targetStartPosition = target.transform.position;
-            _targetStartBounds = target.worldBound;
             _pointerStartPosition = evt.position;
 
             _colorInfoArray.FrozenPositions(_container);
@@ -73,7 +71,7 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
                 //     Debug.Log($"no pre! {pointerDelta.x} : {_targetStartBounds}");
                 // }
                 // target.transform.position = (Vector2)pointerDelta;
-                target.transform.position = (Vector2)pointerDelta - offsetPos;
+                target.style.translate = (Vector2)pointerDelta - offsetPos;
             }
         }
 
@@ -93,12 +91,14 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
 
         private void PointerCaptureOutHandler(PointerCaptureOutEvent evt)
         {
-            if (_enabled)
+            if (!_enabled)
             {
-                _colorInfoArray.DragEnd(evt.originalMousePosition, _container);
-                target.style.translate = StyleKeyword.Null;
-                _enabled = false;
+                return;
             }
+
+            _colorInfoArray.DragEnd(evt.originalMousePosition, _container);
+            target.style.translate = StyleKeyword.Null;
+            _enabled = false;
         }
     }
 }

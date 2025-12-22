@@ -1303,6 +1303,7 @@ namespace SaintsField.Editor
                     {
                         switch (playaAttribute)
                         {
+                            // ReSharper disable once RedundantDiscardDesignation
                             case TableAttribute _:
                                 yield return new[]{new TableRenderer(serializedObject, fieldWithInfo)};
                                 yield break;
@@ -1310,6 +1311,7 @@ namespace SaintsField.Editor
 
 
 
+                            // ReSharper disable once RedundantDiscardDesignation
                             case ListDrawerSettingsAttribute _:
                                 yield return new []{new ListDrawerSettingsRenderer(serializedObject, fieldWithInfo)};
                                 yield break;
@@ -1317,7 +1319,6 @@ namespace SaintsField.Editor
                                 //     fieldWithInfo, serializedObject);
                                 // return pre.Append(new SaintsFieldWithRenderer(tableAttribute, new TableRenderer(serializedObject, fieldWithInfo))).Concat(post);
                                 // Break the switch, but continue the logic
-                                break;
                         }
                     }
 

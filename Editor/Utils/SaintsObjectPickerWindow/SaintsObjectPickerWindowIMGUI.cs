@@ -644,7 +644,18 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         private static IEnumerable<ItemInfo> HelperFetchAllSceneObject()
         {
-            HierarchyProperty property = new HierarchyProperty(HierarchyType.GameObjects, false);
+#if UNITY_6000_3_OR_NEWER
+            HierarchyIterator
+#else
+            HierarchyProperty
+#endif
+            property = new
+#if UNITY_6000_3_OR_NEWER
+                HierarchyIterator
+#else
+            HierarchyProperty
+#endif
+                (HierarchyType.GameObjects, false);
 
             while (property.Next(null))
             {
@@ -653,13 +664,30 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 {
                     continue;
                 }
-                yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.instanceID, Label = property.name, GuiLabel = new GUIContent(property.name)};
+                yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.
+#if UNITY_6000_3_OR_NEWER
+                        entityId
+#else
+            instanceID
+#endif
+                    , Label = property.name, GuiLabel = new GUIContent(property.name)};
             }
         }
 
         private static IEnumerable<ItemInfo> HelperFetchAllAssets()
         {
-            HierarchyProperty property = new HierarchyProperty(HierarchyType.Assets, false);
+#if UNITY_6000_3_OR_NEWER
+            HierarchyIterator
+#else
+            HierarchyProperty
+#endif
+                property = new
+#if UNITY_6000_3_OR_NEWER
+                    HierarchyIterator
+#else
+            HierarchyProperty
+#endif
+                    (HierarchyType.Assets, false);
 
             // property.SetSearchFilter(search, 0);
 
@@ -685,7 +713,13 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                     continue;
                 }
 
-                yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.instanceID, Label = property.name, GuiLabel = new GUIContent(property.name)};
+                yield return new ItemInfo { Object = go, Icon = property.icon, InstanceID = property.
+#if UNITY_6000_3_OR_NEWER
+                        entityId
+#else
+            instanceID
+#endif
+                    , Label = property.name, GuiLabel = new GUIContent(property.name)};
             }
         }
 

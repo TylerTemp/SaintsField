@@ -277,6 +277,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 return $"{ass}/{nameSpace}/{internalTag}{name}";
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             if (eType.HasFlagFast(EType.GroupAssembly))
             {
                 // ReSharper disable once ConvertIfStatementToReturnStatement
@@ -293,6 +294,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             {
                 return $"{ass}:{nameSpace}/{name}";
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             return $"{name}:{nameSpace}({ass})";
         }

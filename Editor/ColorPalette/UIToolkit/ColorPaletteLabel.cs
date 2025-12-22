@@ -14,8 +14,10 @@ namespace SaintsField.Editor.ColorPalette.UIToolkit
     // ReSharper disable once PartialTypeWithSinglePart
     public partial class ColorPaletteLabel: BindableElement, INotifyValueChanged<string>
     {
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlTraits : BindableElement.UxmlTraits { }
         public new class UxmlFactory : UxmlFactory<ColorPaletteLabel, UxmlTraits> { }
+#endif
 
         private readonly DualButtonChip _dualButtonChip;
         private readonly CancelableTextInput _cancelableTextInput;

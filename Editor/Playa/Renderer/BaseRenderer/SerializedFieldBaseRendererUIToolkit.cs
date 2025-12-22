@@ -53,7 +53,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 _container = null;
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             OnArraySizeChangedAttribute onArraySizeChangedAttribute = FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
+#pragma warning restore CS0618 // Type or member is obsolete
             if (onArraySizeChangedAttribute != null)
             {
                 OnArraySizeChangedUIToolkit(onArraySizeChangedAttribute.Callback, result, FieldWithInfo.SerializedProperty, (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);

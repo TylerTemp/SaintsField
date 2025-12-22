@@ -15,8 +15,10 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
     // ReSharper disable once PartialTypeWithSinglePart
     public partial class ParamTypeButton: BindableElement, INotifyValueChanged<int>
     {
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlTraits : BindableElement.UxmlTraits { }
         public new class UxmlFactory : UxmlFactory<ParamTypeButton, UxmlTraits> { }
+#endif
 
         private static VisualTreeAsset _treeAsset;
         private const string ClassBoth = "call-state-button-both";
@@ -69,7 +71,11 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
                     bound.width = 150;
                 }
 
+#if UNITY_6000_3_OR_NEWER
+                genericDropdownMenu.DropDown(bound, _button, DropdownMenuSizeMode.Auto);
+#else
                 genericDropdownMenu.DropDown(bound, _button, true);
+#endif
             };
         }
 

@@ -16,7 +16,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 {
     public partial class SaintsDictionaryDrawer
     {
-        private class SaintsDictionaryTable : TreeView
+        private class SaintsDictionaryTable :
+#if UNITY_6000_2_OR_NEWER
+            TreeView<int>
+#else
+            TreeView
+#endif
         {
             private readonly SerializedProperty _property;
             private readonly SerializedProperty _keysProp;
@@ -38,7 +43,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             public readonly SwapEvent IndexSwapEvent = new SwapEvent();
 
             public SaintsDictionaryTable(
-                TreeViewState state, MultiColumnHeader multiColumnHeader,
+#if UNITY_6000_2_OR_NEWER
+                TreeViewState<int>
+#else
+                TreeViewState
+#endif
+                    state, MultiColumnHeader multiColumnHeader,
                 SerializedProperty property,
                 SerializedProperty keysProp, SerializedProperty valuesProp,
                 FieldInfo keysField, FieldInfo valuesField, FieldInfo info, object parent
@@ -78,11 +88,41 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             //     Debug.Log(header);
             // }
 
-            protected override TreeViewItem BuildRoot()
-            {
-                TreeViewItem root = new TreeViewItem {id = -1, depth = -1, displayName = "Root"};
+            protected override
+#if UNITY_6000_2_OR_NEWER
+                TreeViewItem<int>
+#else
+                TreeViewItem
+#endif
 
-                List<TreeViewItem> allItems = _itemIndexToPropertyIndex.Select(index => new TreeViewItem { id = index, depth = 0, displayName = $"{index}" }).ToList();
+                BuildRoot()
+            {
+#if UNITY_6000_2_OR_NEWER
+                TreeViewItem<int>
+#else
+                TreeViewItem
+#endif
+                    root = new
+#if UNITY_6000_2_OR_NEWER
+                        TreeViewItem<int>
+#else
+                    TreeViewItem
+#endif
+                    {id = -1, depth = -1, displayName = "Root"};
+
+                List<
+#if UNITY_6000_2_OR_NEWER
+                    TreeViewItem<int>
+#else
+                    TreeViewItem
+#endif
+                > allItems = _itemIndexToPropertyIndex.Select(index => new
+#if UNITY_6000_2_OR_NEWER
+                    TreeViewItem<int>
+#else
+                    TreeViewItem
+#endif
+                    { id = index, depth = 0, displayName = $"{index}" }).ToList();
 
                 // Utility method that initializes the TreeViewItem.children and .parent for all items.
                 SetupParentsAndChildrenFromDepths(root, allItems);
@@ -93,7 +133,12 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             protected override void RowGUI(RowGUIArgs args)
             {
-                TreeViewItem item = args.item;
+#if UNITY_6000_2_OR_NEWER
+                TreeViewItem<int>
+#else
+                    TreeViewItem
+#endif
+                item = args.item;
                 for (int i = 0; i < args.GetNumVisibleColumns(); i++)
                 {
                     CellGUI(args.GetCellRect(i), item, args.GetColumn(i));
@@ -101,7 +146,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 }
             }
 
-            protected override float GetCustomRowHeight(int row, TreeViewItem item)
+            protected override float GetCustomRowHeight(int row,
+#if UNITY_6000_2_OR_NEWER
+                TreeViewItem<int>
+#else
+                    TreeViewItem
+#endif
+                item)
             {
                 int index = item.id;
                 SerializedProperty keyProp = _keysProp.GetArrayElementAtIndex(index);
@@ -135,7 +186,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 return Mathf.Max(keyHeight, valueHeight);
             }
 
-            private void CellGUI(Rect getCellRect, TreeViewItem item, int getColumn)
+            private void CellGUI(Rect getCellRect,
+#if UNITY_6000_2_OR_NEWER
+                TreeViewItem<int>
+#else
+                    TreeViewItem
+#endif
+                item, int getColumn)
             {
                 int index = item.id;
                 bool isKeyColumn = getColumn == 0;

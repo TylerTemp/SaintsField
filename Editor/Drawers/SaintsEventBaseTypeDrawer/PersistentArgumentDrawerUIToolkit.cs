@@ -8,7 +8,6 @@ using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Events;
 using SaintsField.Interfaces;
@@ -143,7 +142,12 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     bound.width = 150;
                 }
 
+#if UNITY_6000_3_OR_NEWER
+                genericDropdownMenu.DropDown(bound, dropdownButton, DropdownMenuSizeMode.Auto);
+#else
                 genericDropdownMenu.DropDown(bound, dropdownButton, true);
+#endif
+
             };
 
             // serialized

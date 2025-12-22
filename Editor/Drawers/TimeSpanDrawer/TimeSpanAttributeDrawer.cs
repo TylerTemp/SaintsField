@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            TimeSpanField r = MakeElement(property, GetPreferredLabel(property), allAttributes.Any(each => each is DefaultExpandAttribute));
+            TimeSpanField r = MakeElement(property, GetPreferredLabel(property), allAttributes.Any(each => each is FieldDefaultExpandAttribute));
             r.AddToClassList(TimeSpanField.alignedFieldUssClassName);
             return r;
         }

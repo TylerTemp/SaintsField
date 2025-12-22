@@ -59,7 +59,11 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
                     bound.width = 150;
                 }
 
+#if UNITY_6000_3_OR_NEWER
+                genericDropdownMenu.DropDown(bound, _button, DropdownMenuSizeMode.Auto);
+#else
                 genericDropdownMenu.DropDown(bound, _button, true);
+#endif
             };
         }
 

@@ -90,8 +90,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
             bool isArray = FieldWithInfo.SerializedProperty.isArray;
+#pragma warning disable CS0618 // Type or member is obsolete
             OnArraySizeChangedAttribute onArraySizeChangedAttribute =
                 FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
+#pragma warning restore CS0618 // Type or member is obsolete
             int arraySize = -1;
             if (isArray && onArraySizeChangedAttribute != null)
             {
