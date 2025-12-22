@@ -22,9 +22,9 @@ namespace SaintsField.Editor.Playa.Renderer.Table
         private readonly VisualElement _emptyNotice;
         private readonly VisualElement _tableContentContainer;
 
-        private readonly HashSet<string> valueTableHeaders;
-        private readonly bool headerIsHide;
-        private readonly Type elementType;
+        private readonly HashSet<string> _valueTableHeaders;
+        private readonly bool _headerIsHide;
+        private readonly Type _elementType;
 
         private int _preArraySize;
         private MultiColumnListView _multiColumnListView;
@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             this.TrackPropertyValue(fieldWithInfo.SerializedProperty, _ => OnArrayPropertyChanged());
 
-            elementType =
+            _elementType =
                 ReflectUtils.GetElementType(fieldWithInfo.FieldInfo?.FieldType ??
                                             fieldWithInfo.PropertyInfo.PropertyType);
 
@@ -86,11 +86,11 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             }
             TableHeadersAttribute tableHeadersAttribute = ReflectCache.GetCustomAttributes<TableHeadersAttribute>(info)
                 .FirstOrDefault();
-            valueTableHeaders = new HashSet<string>();
-            headerIsHide = true;
+            _valueTableHeaders = new HashSet<string>();
+            _headerIsHide = true;
             if (tableHeadersAttribute != null)
             {
-                headerIsHide = tableHeadersAttribute.IsHide;
+                _headerIsHide = tableHeadersAttribute.IsHide;
                 foreach (TableHeadersAttribute.Header header in tableHeadersAttribute.Headers)
                 {
                     // string rawName = header.Name;
@@ -129,7 +129,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                         rawNames.Add(header.Name);
                     }
 
-                    valueTableHeaders.UnionWith(rawNames.SelectMany(each => new[]{each, ObjectNames.NicifyVariableName(each)}));
+                    _valueTableHeaders.UnionWith(rawNames.SelectMany(each => new[]{each, ObjectNames.NicifyVariableName(each)}));
                 }
             }
             #endregion
@@ -245,7 +245,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                 }
                             }
 
-                            bool headerHide = HeaderDefaultHide(columnName, valueTableHeaders, headerIsHide);
+                            bool headerHide = HeaderDefaultHide(columnName, _valueTableHeaders, _headerIsHide);
                             if (headerHide)
                             {
                                 columnToDefaultHide[columnName] = true;
@@ -282,10 +282,10 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
                         string id = string.Join(";", memberIds);
 
-                        bool visible = true;
+                        bool thisIsVisible = true;
                         if (columnToDefaultHide.TryGetValue(columnName, out bool hide))
                         {
-                            visible = !hide;
+                            thisIsVisible = !hide;
                         }
 
                         multiColumnListView.columns.Add(new Column
@@ -293,7 +293,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                             name = id,
                             title = columnName,
                             stretchable = true,
-                            visible = visible,
+                            visible = thisIsVisible,
                             makeCell = () =>
                             {
                                 VisualElement itemContainer = new VisualElement();
@@ -313,7 +313,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                 {
                                     ObjectField arrayItemProp = new ObjectField("")
                                     {
-                                        objectType = elementType,
+                                        objectType = _elementType,
                                     };
 
                                     element.Clear();
@@ -360,11 +360,11 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                     // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                                     foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                                     {
-                                        foreach (AbsRenderer renderer in SaintsEditor.HelperMakeRenderer(arrayProp.serializedObject, saintsFieldWithInfo))
+                                        foreach (IReadOnlyList<AbsRenderer> renderers in SaintsEditor.HelperMakeRenderer(arrayProp.serializedObject, saintsFieldWithInfo))
                                         {
                                             // Debug.Log(renderer);
                                             // ReSharper disable once InvertIf
-                                            if (renderer != null)
+                                            foreach (AbsRenderer renderer in renderers)
                                             {
                                                 renderer.NoLabel = noLabel;
                                                 renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
@@ -414,7 +414,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                             }
                         }
 
-                        bool headerHide = HeaderDefaultHide(columnName, valueTableHeaders, headerIsHide);
+                        bool headerHide = HeaderDefaultHide(columnName, _valueTableHeaders, _headerIsHide);
                         if (headerHide)
                         {
                             columnToDefaultHide[columnName] = true;
@@ -449,10 +449,10 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
                         string id = string.Join(";", memberIds);
 
-                        bool visible = true;
+                        bool thisIsVisible = true;
                         if (columnToDefaultHide.TryGetValue(columnName, out bool hide))
                         {
-                            visible = !hide;
+                            thisIsVisible = !hide;
                         }
 
                         Column curColumn = new Column
@@ -460,7 +460,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                             name = id,
                             title = columnName,
                             stretchable = true,
-                            visible = visible,
+                            visible = thisIsVisible,
                         };
                         multiColumnListView.columns.Add(curColumn);
 
@@ -479,9 +479,9 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                             SerializedProperty targetProp = (SerializedProperty)multiColumnListView.itemsSource[index];
                             targetProp.isExpanded = true;
 
-                            (PropertyAttribute[] _, object parentRefreshed) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(targetProp);
+                            (PropertyAttribute[] _, object thisParentRefreshed) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(targetProp);
 
-                            (string error, int index, object value) targetPropValue = Util.GetValue(targetProp, info, parentRefreshed);
+                            (string error, int index, object value) targetPropValue = Util.GetValue(targetProp, info, thisParentRefreshed);
                             if (targetPropValue.error != "")
                             {
                                 element.Clear();
@@ -519,9 +519,9 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                 // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
                                 foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                                 {
-                                    foreach (AbsRenderer renderer in SaintsEditor.HelperMakeRenderer(arrayProp.serializedObject, saintsFieldWithInfo))
+                                    foreach (IReadOnlyList<AbsRenderer> renderers in SaintsEditor.HelperMakeRenderer(arrayProp.serializedObject, saintsFieldWithInfo))
                                     {
-                                        if(renderer != null)
+                                        foreach (AbsRenderer renderer in renderers)
                                         {
                                             renderer.NoLabel = noLabel;
                                             renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
@@ -531,6 +531,16 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                                 element.Add(fieldElement);
                                             }
                                         }
+                                        // if(renderer != null)
+                                        // {
+                                        //     renderer.NoLabel = noLabel;
+                                        //     renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
+                                        //     VisualElement fieldElement = renderer.CreateVisualElement();
+                                        //     if (fieldElement != null)
+                                        //     {
+                                        //         element.Add(fieldElement);
+                                        //     }
+                                        // }
                                     }
                                 }
                             }
@@ -597,7 +607,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                         selected.serializedObject.ApplyModifiedProperties();
                     }
                 }
-            });
+                });
 
                 _tableContentContainer.Add(multiColumnListView);
 
