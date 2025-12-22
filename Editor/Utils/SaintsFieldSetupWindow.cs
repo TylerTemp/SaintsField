@@ -82,10 +82,10 @@ namespace SaintsField.Editor.Utils
         }
         // ReSharper enable InconsistentNaming
 
-#pragma warning disable CS0414 // Type or member is obsolete
+#pragma warning disable CS0414 // Type or member is only assigned
         private bool _loadingSaintsEditor;
         private bool _loadingCodeAnalysis;
-#pragma warning restore CS0414 // Type or member is obsolete
+#pragma warning restore CS0414 // Type or member is only assigned
         // private bool _loadingUnitySerialization;
         private const string ManifestFile = "Packages/manifest.json";
 
