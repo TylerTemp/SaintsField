@@ -95,12 +95,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.3**
+**5.7.4**
 
-1.  Fix: `FieldAboveText`/`FieldBelowText` can not find a dynamic text member
-2.  Add: `TreeDropdown` now works with `ShowInInspector`
-
-Extended Serialization experiment tag is now removed.
+1.  Change: `Button` no longer use `MeansImplicitUse`. Add `SAINTSFIELD_BUTTON_IMPLICIT_USE` macro instead.
+2.  Fix: `OnValueChanged`, `Button` (including inline buttons) now can in-place change a struct's value [#240](https://github.com/TylerTemp/SaintsField/issues/240), [#287](https://github.com/TylerTemp/SaintsField/issues/287)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

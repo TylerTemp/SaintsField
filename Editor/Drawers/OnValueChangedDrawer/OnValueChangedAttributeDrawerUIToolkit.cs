@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
                 ? new[] { newValue }
                 : new[] { newValue, propIndex };
 
-            Debug.Log(useParent);
+            // Debug.Log(useParent);
 
             (string error, object _) = Util.GetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, useParent, overrideParams);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
