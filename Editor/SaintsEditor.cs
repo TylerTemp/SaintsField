@@ -93,7 +93,7 @@ namespace SaintsField.Editor
                 .ToDictionary(each => each, serializedObject.FindProperty);
             // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
             // return HelperGetRenderers(serializedPropertyDict, saintsSerializedProp, serializedObject, makeRenderer, targets);
-            return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, targets);
+            return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer,  null, null, targets);
         }
 
         // public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(Type objectType, IEnumerable<IPlayaClassAttribute> playaClassAttributes, SerializedObject serializedObject, IReadOnlyList<object> targets)
@@ -341,6 +341,8 @@ namespace SaintsField.Editor
         public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(
             SerializedObject serializedObject,
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
+            object targetParent,
+            MemberInfo targetMemberInfo,
             IReadOnlyList<object> targets)
         {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
@@ -391,6 +393,8 @@ namespace SaintsField.Editor
                             InherentDepth = inherentDepth,
                             Order = int.MinValue,
                             PlayaAttributes = startClassAttributes,
+                            TargetParent = targetParent,
+                            TargetMemberInfo = targetMemberInfo,
                             Targets = targets,
                             RenderType = SaintsRenderType.ClassStruct,
                             MemberId = "StartClassStruct",
@@ -498,6 +502,8 @@ namespace SaintsField.Editor
                                         PlayaAttributes = playaAttributes,
                                         // PlayaAttributesQueue = playaAttributes,
                                         // LayoutBases = layoutBases,
+                                        TargetParent = targetParent,
+                                        TargetMemberInfo = targetMemberInfo,
                                         Targets = targets,
 
                                         RenderType = SaintsRenderType.SerializedField,
@@ -547,6 +553,8 @@ namespace SaintsField.Editor
                                             PlayaAttributes = playaAttributes,
                                             // PlayaAttributesQueue = playaAttributes,
                                             // LayoutBases = layoutBases,
+                                            TargetParent = targetParent,
+                                            TargetMemberInfo = targetMemberInfo,
                                             Targets = targets,
 
                                             RenderType = SaintsRenderType.NonSerializedField,
@@ -593,6 +601,8 @@ namespace SaintsField.Editor
                                             PlayaAttributes = playaAttributes,
                                             // PlayaAttributesQueue = playaAttributes,
                                             // LayoutBases = layoutBases,
+                                            TargetParent = targetParent,
+                                            TargetMemberInfo = targetMemberInfo,
                                             Targets = targets,
 
                                             RenderType = SaintsRenderType.SerializedField,
@@ -628,6 +638,8 @@ namespace SaintsField.Editor
                                         PlayaAttributes = playaAttributes,
                                         // PlayaAttributesQueue = playaAttributes,
                                         // LayoutBases = layoutBases,
+                                        TargetParent = targetParent,
+                                        TargetMemberInfo = targetMemberInfo,
                                         Targets = targets,
 
                                         RenderType = SaintsRenderType.NativeProperty,
@@ -679,6 +691,8 @@ namespace SaintsField.Editor
                                     PlayaAttributes = playaAttributes,
                                     // PlayaAttributesQueue = playaAttributes,
                                     // LayoutBases = layoutBases,
+                                    TargetParent = targetParent,
+                                    TargetMemberInfo = targetMemberInfo,
                                     Targets = targets,
 
                                     // memberType = MemberTypes.Method,
@@ -721,6 +735,8 @@ namespace SaintsField.Editor
                                     PlayaAttributes = playaAttributes,
                                     // PlayaAttributesQueue = playaAttributes,
                                     // LayoutBases = layoutBases,
+                                    TargetParent = targetParent,
+                                    TargetMemberInfo = targetMemberInfo,
                                     Targets = targets,
 
                                     // memberType = MemberTypes.Method,
@@ -754,6 +770,8 @@ namespace SaintsField.Editor
                             InherentDepth = inherentDepth,
                             Order = int.MinValue,
                             PlayaAttributes = endClassAttributes,
+                            TargetParent = targetParent,
+                            TargetMemberInfo = targetMemberInfo,
                             Targets = targets,
                             RenderType = SaintsRenderType.ClassStruct,
                             MemberId = "EndClassStruct",
@@ -777,6 +795,8 @@ namespace SaintsField.Editor
                         PlayaAttributes = Array.Empty<IPlayaAttribute>(),
                         // PlayaAttributesQueue = new List<IPlayaAttribute>(),
                         // LayoutBases = Array.Empty<ISaintsLayoutBase>(),
+                        TargetParent = targetParent,
+                        TargetMemberInfo = targetMemberInfo,
                         Targets = targets,
 
                         RenderType = SaintsRenderType.InjectedSerializedField,
@@ -795,7 +815,7 @@ namespace SaintsField.Editor
                 .ThenBy(each => each.value.Order)
                 .ThenBy(each => each.index)
                 .Select(each => each.value)
-                ;
+            ;
         }
 
         // private static int MemberLisCompare(MemberInfo a, MemberInfo b,IReadOnlyList<CodeAnalysisUtils.MemberContainer> codeAnalysisMembers)
@@ -878,9 +898,11 @@ namespace SaintsField.Editor
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
             SerializedObject serializedObject,
             IMakeRenderer makeRenderer,
+            object targetParent,
+            MemberInfo targetMemberInfo,
             IReadOnlyList<object> targets)
         {
-            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedObject, serializedPropertyDict, targets).ToArray();
+            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedObject, serializedPropertyDict, targetParent, targetMemberInfo, targets).ToArray();
 
             // let's handle some HeaderGUI here... not a good idea but...
             bool anyChange = false;

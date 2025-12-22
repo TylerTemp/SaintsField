@@ -13,9 +13,21 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
         {
             SaintsContext.SerializedProperty = property;
 
-            if (property.serializedObject.targetObjects.Length < 2)
+            if (property.serializedObject.targetObjects.Length <= 1)
             {
-                yield return Util.GetOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, target, null);
+                object useParent = target;
+                if(target != null && target.GetType().IsValueType)
+                {
+                    (SerializedUtils.FieldOrProp _, object refreshedParent) =
+                        SerializedUtils.GetFieldInfoAndDirectParent(property);
+                    if (refreshedParent != null)
+                    {
+                        // Debug.Log($"rewrite parent {refreshedParent}");
+                        useParent = refreshedParent;
+                    }
+                }
+
+                yield return Util.GetOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, useParent, null);
                 yield break;
             }
 

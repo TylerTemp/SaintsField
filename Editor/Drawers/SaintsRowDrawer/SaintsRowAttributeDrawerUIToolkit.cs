@@ -3,18 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Drawers.DateTimeDrawer;
-using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
-using SaintsField.Editor.Drawers.GuidDrawer;
-using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
-using SaintsField.Editor.Drawers.TimeSpanDrawer;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
-using SaintsField.SaintsSerialization;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -292,22 +284,11 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             Dictionary<string, SerializedProperty> serializedFieldNames = GetSerializableFieldInfo(property)
                 .ToDictionary(each => each.name, each => each.property);
 
+            // Debug.Log(parent);
             IReadOnlyList<ISaintsRenderer> renderer =
-                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, new []{value});
+                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, parent, info, new []{value});
 
-             VisualElement bodyElement = new VisualElement();
-
-             // Type objectType = value.GetType();
-             // IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
-
-             // foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(objectType, playaClassAttributes, property.serializedObject, new[]{value}))
-             // {
-             //     VisualElement rendererElement = saintsRenderer.CreateVisualElement();
-             //     if (rendererElement != null)
-             //     {
-             //         bodyElement.Add(rendererElement);
-             //     }
-             // }
+            VisualElement bodyElement = new VisualElement();
 
             // this... fixed by adding Bind()... wtf...
             foreach (ISaintsRenderer saintsRenderer in renderer)
@@ -330,94 +311,6 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));
 #endif
         }
-
-//         private static VisualElement RenderSerializedActual(SaintsSerializedActualAttribute saintsSerializedActual,
-//             string label, SerializedProperty property, FieldInfo serInfo, bool inHorizontalLayout, object parent, IRichTextTagProvider richTextTagProvider)
-//         {
-//             // Debug.Log(property.propertyPath);
-//             Attribute[] attributes = ReflectCache.GetCustomAttributes(serInfo);
-//
-//             EnumToggleButtonsAttribute enumToggle = null;
-//             FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
-//             FlagsDropdownAttribute flagsDropdownAttribute = null;
-//             DateTimeAttribute dateTimeAttribute = null;
-//             TimeSpanAttribute timeSpanAttribute = null;
-//             foreach (Attribute attribute in attributes)
-//             {
-//                 switch (attribute)
-//                 {
-//                     case EnumToggleButtonsAttribute et:
-//                         enumToggle = et;
-//                         break;
-//                     case FlagsTreeDropdownAttribute ftd:
-//                         flagsTreeDropdownAttribute = ftd;
-//                         break;
-//                     case FlagsDropdownAttribute fd:
-//                         flagsDropdownAttribute = fd;
-//                         break;
-//                     case DateTimeAttribute dt:
-//                         dateTimeAttribute = dt;
-//                         break;
-//                     case TimeSpanAttribute ts:
-//                         timeSpanAttribute = ts;
-//                         break;
-//                 }
-//             }
-//
-//             SaintsPropertyType propertyType = (SaintsPropertyType)property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType)).intValue;
-//
-//             switch (propertyType)
-//             {
-//                 case SaintsPropertyType.EnumLong:
-// #if UNITY_2022_1_OR_NEWER
-//                 case SaintsPropertyType.EnumULong:
-// #endif
-//                 {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
-//                     Debug.Log($"saintsrow serInfo={serInfo.Name} attrs = {string.Join(", ", attributes.Select(a => a.GetType().Name))}");
-// #endif
-//
-//                     if (enumToggle != null)
-//                     {
-//                         return EnumToggleButtonsAttributeDrawer.RenderSerializedActual(saintsSerializedActual, enumToggle, label, property, serInfo, parent, richTextTagProvider);
-//                     }
-//                     return TreeDropdownAttributeDrawer.RenderSerializedActual(saintsSerializedActual, (ISaintsAttribute)flagsTreeDropdownAttribute ?? flagsDropdownAttribute, label, property, parent);
-//                     // return null;
-//                 }
-//                 case SaintsPropertyType.Interface:
-//                 {
-//                     return SaintsInterfaceDrawer.RenderSerializedActual(saintsSerializedActual, label, property, attributes, inHorizontalLayout, serInfo, parent);
-//                 }
-//                 case SaintsPropertyType.DateTime:
-//                     return DateTimeAttributeDrawer.RenderSerializedActual(dateTimeAttribute, label, property, inHorizontalLayout);
-//                 case SaintsPropertyType.TimeSpan:
-//                     return TimeSpanAttributeDrawer.RenderSerializedActual(timeSpanAttribute, label, property, attributes, inHorizontalLayout);
-//                 case SaintsPropertyType.Guid:
-//                     return GuidAttributeDrawer.RenderSerializedActual(label, property, inHorizontalLayout);
-//                 case SaintsPropertyType.Undefined:
-//                 case SaintsPropertyType.ClassOrStruct:
-//                 default:
-//                     return null;
-//             }
-//         }
-
-        // private static Type GetElementType(Type rawType)
-        // {
-        //     if (rawType.IsArray)
-        //     {
-        //         return rawType.GetElementType();
-        //     }
-        //
-        //     Type listType = SaintsEditorUtils.GetList(rawType);
-        //     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-        //     // ReSharper disable once ConvertIfStatementToReturnStatement
-        //     if (listType == null)
-        //     {
-        //         return rawType;
-        //     }
-        //
-        //     return listType.GetGenericArguments()[0];
-        // }
     }
 }
 #endif

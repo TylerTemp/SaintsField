@@ -38,6 +38,17 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
             Action<object> onValueChangedCallback,
             object newValue)
         {
+            object useParent = parent;
+            if(parent != null && parent.GetType().IsValueType)
+            {
+                (SerializedUtils.FieldOrProp _, object refreshedParent) =
+                    SerializedUtils.GetFieldInfoAndDirectParent(property);
+                if (refreshedParent != null)
+                {
+                    // Debug.Log($"rewrite parent {refreshedParent}");
+                    useParent = refreshedParent;
+                }
+            }
             // Debug.Log($"OK I got a new value {newValue}; {property.propertyPath}; {this}");
             string propPath = property.propertyPath;
             int propIndex = SerializedUtils.PropertyPathIndex(propPath);
@@ -48,7 +59,9 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
                 ? new[] { newValue }
                 : new[] { newValue, propIndex };
 
-            (string error, object _) = Util.GetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, parent, overrideParams);
+            Debug.Log(useParent);
+
+            (string error, object _) = Util.GetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, useParent, overrideParams);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             UIToolkitUtils.SetHelpBox(helpBox, error);
         }

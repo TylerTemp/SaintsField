@@ -14789,13 +14789,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   foo1:
-    fooInline: 5
-    foo: 40
-  fwb:
-    baseValue: 0
-    finalValue: 0
-    baseValue2: 0
-    finalValue2: 0
+    fooInline: 14
+    foo: 56
 --- !u!1 &887127787
 GameObject:
   m_ObjectHideFlags: 0
@@ -15615,8 +15610,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.StructValueChange
   myStruct:
-    intChange: 5
-    myString: 
+    intChange: 8
+    myString: Hi 8
 --- !u!1 &936058398
 GameObject:
   m_ObjectHideFlags: 0
@@ -17992,8 +17987,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floatWithBaseValue:
-    baseValue: 1.14
-    finalValue: 0
+    baseValue: 2.09
+    finalValue: 2.09
   floatWithBaseValueFix:
     baseValue: 2.29
     finalValue: 2.29
@@ -23906,11 +23901,6 @@ MonoBehaviour:
   foo1:
     fooInline: 0
     foo: 3
-  fwb:
-    baseValue: 0
-    finalValue: 0
-    baseValue2: 0
-    finalValue2: 0
 --- !u!1 &1551478299
 GameObject:
   m_ObjectHideFlags: 0

@@ -285,14 +285,13 @@ namespace SaintsField.Editor.TroubleshootEditor
                 return result;
             }
 
-            Dictionary<string, SerializedProperty> serializedPropertyDict;
             using (SerializedObject serializedObject = new SerializedObject(inspectTarget))
             {
                 string[] serializableFields = SaintsEditor.GetSerializedProperties(serializedObject).ToArray();
                 // Debug.Log($"serializableFields={string.Join(",", serializableFields)}");
-                serializedPropertyDict = serializableFields
+                Dictionary<string, SerializedProperty> serializedPropertyDict = serializableFields
                     .ToDictionary(each => each, serializedObject.FindProperty);
-                foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor.HelperGetSaintsFieldWithInfo(serializedObject, serializedPropertyDict, new[]{inspectTarget}))
+                foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor.HelperGetSaintsFieldWithInfo(serializedObject, serializedPropertyDict, null, null, new[]{inspectTarget}))
                 {
                     // Debug.Log(saintsFieldWithInfo.RenderType);
                     if (saintsFieldWithInfo.RenderType == SaintsRenderType.SerializedField)

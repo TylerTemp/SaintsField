@@ -905,6 +905,8 @@ namespace SaintsField.Editor.Utils
                         return referencePickerAttributeDrawer.CreatePropertyGUI(property);
                     }
 
+                    // Debug.Log(fieldInfo.Name);
+
                     return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout,
                         null, makeRenderer, doTweenPlayRecorder, parent, new RichTextDrawer.EmptyRichTextTagProvider());
                 }

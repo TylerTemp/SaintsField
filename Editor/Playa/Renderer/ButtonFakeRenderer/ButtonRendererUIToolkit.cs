@@ -10,6 +10,7 @@ using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -181,10 +182,95 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             UIToolkitUtils.KeepRotate(buttonRotator);
             buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator)).StartingIn(200);
 
+            bool isValueType = FieldWithInfo.Targets[0].GetType().IsValueType;
+
             _buttonElement = new Button(() =>
             {
                 SaintsContext.SerializedProperty = _serializedProperty;
-                object[] returnValues = FieldWithInfo.Targets.Select(t => methodInfo.Invoke(t, parameterValues)).ToArray();
+                object[] returnValues = FieldWithInfo.Targets.Select(eachTarget =>
+                {
+                    object useTarget = eachTarget;
+                    if (isValueType && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
+                    {
+                        switch (FieldWithInfo.TargetMemberInfo)
+                        {
+                            case FieldInfo fieldInfo:
+                            {
+                                try
+                                {
+                                    useTarget = fieldInfo.GetValue(FieldWithInfo.TargetParent);
+                                }
+                                catch (Exception e)
+                                {
+#if SAINTSFIELD_DEBUG
+                                    Debug.LogException(e);
+#endif
+                                }
+                            }
+                                break;
+                            case PropertyInfo propertyInfo:
+                            {
+                                if (propertyInfo.CanRead)
+                                {
+                                    try
+                                    {
+                                        useTarget = propertyInfo.GetValue(FieldWithInfo.TargetParent);
+                                    }
+                                    catch (Exception e)
+                                    {
+#if SAINTSFIELD_DEBUG
+                                        Debug.LogException(e);
+#endif
+                                    }
+                                }
+                            }
+                                break;
+                        }
+                    }
+
+                    object result = methodInfo.Invoke(useTarget, parameterValues);
+
+                    if (isValueType && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
+                    {
+                        // Debug.Log($"write back {FieldWithInfo.TargetParent}:{FieldWithInfo.TargetMemberInfo.Name}");
+                        switch (FieldWithInfo.TargetMemberInfo)
+                        {
+                            case FieldInfo fieldInfo:
+                            {
+                                try
+                                {
+                                    fieldInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                }
+                                catch (Exception e)
+                                {
+#if SAINTSFIELD_DEBUG
+                                    Debug.LogException(e);
+#endif
+                                }
+                            }
+                                break;
+                            case PropertyInfo propertyInfo:
+                            {
+                                if (propertyInfo.CanWrite)
+                                {
+                                    try
+                                    {
+                                        propertyInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                    }
+                                    catch (Exception e)
+                                    {
+#if SAINTSFIELD_DEBUG
+                                        Debug.LogException(e);
+#endif
+                                    }
+                                }
+                            }
+                                break;
+                        }
+                    }
+
+                    return result;
+                }).ToArray();
 
                 if (hasReturnValue)
                 {
