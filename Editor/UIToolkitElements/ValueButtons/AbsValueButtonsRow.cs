@@ -12,7 +12,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
     {
         public readonly UnityEvent<object> OnButtonClicked = new UnityEvent<object>();
 
-        public AbsValueButtonsRow()
+        protected AbsValueButtonsRow()
         {
             style.flexDirection = FlexDirection.Row;
         }

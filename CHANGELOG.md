@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.7.5 ##
+
+1.  Fix: `OnValueChanged`, `Button` (including inline buttons) could not in-place change a struct's value inside an array/list
+2.  Fix: `LabelText` now can read real-time value inside a struct
+3.  Improve: `ValueButtons`, `EnumToggleButtons` now center the label on the button
+
 ## 5.7.4 ##
 
 1.  Change: `Button` no longer use `MeansImplicitUse`. Add `SAINTSFIELD_BUTTON_IMPLICIT_USE` macro instead.

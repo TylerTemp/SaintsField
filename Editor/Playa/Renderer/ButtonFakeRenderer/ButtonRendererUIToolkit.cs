@@ -182,7 +182,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             UIToolkitUtils.KeepRotate(buttonRotator);
             buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator)).StartingIn(200);
 
-            bool isValueType = FieldWithInfo.Targets[0].GetType().IsValueType;
+            bool isStruct = ReflectUtils.TypeIsStruct(FieldWithInfo.Targets[0].GetType());
 
             _buttonElement = new Button(() =>
             {
@@ -190,7 +190,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 object[] returnValues = FieldWithInfo.Targets.Select(eachTarget =>
                 {
                     object useTarget = eachTarget;
-                    if (isValueType && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
+                    object rawMemberValue = eachTarget;
+                    if (isStruct && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
                     {
                         switch (FieldWithInfo.TargetMemberInfo)
                         {
@@ -198,7 +199,12 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             {
                                 try
                                 {
-                                    useTarget = fieldInfo.GetValue(FieldWithInfo.TargetParent);
+                                    useTarget = rawMemberValue =  fieldInfo.GetValue(FieldWithInfo.TargetParent);
+                                    if (FieldWithInfo.TargetMemberIndex != -1)
+                                    {
+                                        useTarget = GetCollectionIndex(useTarget, FieldWithInfo.TargetMemberIndex);
+                                    }
+                                    // Debug.Log($"useTarget={useTarget}");
                                 }
                                 catch (Exception e)
                                 {
@@ -214,7 +220,11 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                                 {
                                     try
                                     {
-                                        useTarget = propertyInfo.GetValue(FieldWithInfo.TargetParent);
+                                        useTarget = rawMemberValue = propertyInfo.GetValue(FieldWithInfo.TargetParent);
+                                        if (FieldWithInfo.TargetMemberIndex != -1)
+                                        {
+                                            useTarget = GetCollectionIndex(useTarget, FieldWithInfo.TargetMemberIndex);
+                                        }
                                     }
                                     catch (Exception e)
                                     {
@@ -230,22 +240,33 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                     object result = methodInfo.Invoke(useTarget, parameterValues);
 
-                    if (isValueType && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
+                    if (isStruct && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
                     {
                         // Debug.Log($"write back {FieldWithInfo.TargetParent}:{FieldWithInfo.TargetMemberInfo.Name}");
                         switch (FieldWithInfo.TargetMemberInfo)
                         {
                             case FieldInfo fieldInfo:
                             {
-                                try
+                                if (FieldWithInfo.TargetMemberIndex != -1)
                                 {
-                                    fieldInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                    if(rawMemberValue != null)
+                                    {
+                                        Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex,
+                                            useTarget);
+                                    }
                                 }
-                                catch (Exception e)
+                                else
                                 {
+                                    try
+                                    {
+                                        fieldInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                    }
+                                    catch (Exception e)
+                                    {
 #if SAINTSFIELD_DEBUG
-                                    Debug.LogException(e);
+                                        Debug.LogException(e);
 #endif
+                                    }
                                 }
                             }
                                 break;
@@ -253,15 +274,26 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             {
                                 if (propertyInfo.CanWrite)
                                 {
-                                    try
+                                    if (FieldWithInfo.TargetMemberIndex != -1)
                                     {
-                                        propertyInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                        if(rawMemberValue != null)
+                                        {
+                                            Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex,
+                                                useTarget);
+                                        }
                                     }
-                                    catch (Exception e)
+                                    else
                                     {
+                                        try
+                                        {
+                                            propertyInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                        }
+                                        catch (Exception e)
+                                        {
 #if SAINTSFIELD_DEBUG
-                                        Debug.LogException(e);
+                                            Debug.LogException(e);
 #endif
+                                        }
                                     }
                                 }
                             }
@@ -467,6 +499,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 }
             }
         }
+
+
 
         // private RichTextDrawer _richTextDrawer;
 

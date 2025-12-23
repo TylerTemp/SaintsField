@@ -1,18 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Drawers.GUIColor;
-#if (WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE) && !SAINTSFIELD_WWISE_DISABLE
-using SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer;
-#endif
 using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 #if (WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE) && !SAINTSFIELD_WWISE_DISABLE
+using SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer;
 using SaintsField.Wwise;
 #endif
 using UnityEditor;
@@ -223,6 +222,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     return (min, max);
                 }
 #if (WWISE_2024_OR_LATER || WWISE_2023_OR_LATER || WWISE_2022_OR_LATER || WWISE_2021_OR_LATER || WWISE_2020_OR_LATER || WWISE_2019_OR_LATER || WWISE_2018_OR_LATER || WWISE_2017_OR_LATER || WWISE_2016_OR_LATER || SAINTSFIELD_WWISE) && !SAINTSFIELD_WWISE_DISABLE
+                // ReSharper disable once RedundantDiscardDesignation
                 case GetWwiseAttribute _:
                 {
                     if (!_getByXPathKeepUpdate)
@@ -233,6 +233,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                     return (-1, -1);
 #endif
+                // ReSharper disable once RedundantDiscardDesignation
                 case GetByXPathAttribute _:
                 {
                     if (!_getByXPathKeepUpdate)
@@ -247,86 +248,142 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
         }
 
+//         protected IReadOnlyList<object> GetFreshTargets()
+//         {
+//             bool isStruct = ReflectUtils.TypeIsStruct(FieldWithInfo.Targets[0].GetType());
+//             if (!isStruct || FieldWithInfo.TargetParent == null || FieldWithInfo.TargetMemberInfo == null)
+//             {
+//                 return FieldWithInfo.Targets;
+//             }
+//
+//             List<object> refreshedTargets = new List<object>(FieldWithInfo.Targets.Count);
+//             foreach (var target in FieldWithInfo.Targets)
+//             {
+//                 switch (FieldWithInfo.TargetMemberInfo)
+//                 {
+//                     case FieldInfo fieldInfo:
+//                     {
+//                         try
+//                         {
+//                             object useTarget = fieldInfo.GetValue(FieldWithInfo.TargetParent);
+//                             if (FieldWithInfo.TargetMemberIndex != -1)
+//                             {
+//                                 useTarget = GetCollectionIndex(useTarget, FieldWithInfo.TargetMemberIndex);
+//                             }
+//                             refreshedTargets.Add(useTarget);
+//                             // Debug.Log($"useTarget={useTarget}");
+//                         }
+//                         catch (Exception e)
+//                         {
+// #if SAINTSFIELD_DEBUG
+//                             Debug.LogException(e);
+// #endif
+//                             refreshedTargets.Add(target);
+//                         }
+//                     }
+//                         break;
+//                     case PropertyInfo propertyInfo:
+//                     {
+//                         if (propertyInfo.CanRead)
+//                         {
+//                             try
+//                             {
+//                                 object useTarget = propertyInfo.GetValue(FieldWithInfo.TargetParent);
+//                                 if (FieldWithInfo.TargetMemberIndex != -1)
+//                                 {
+//                                     useTarget = GetCollectionIndex(useTarget, FieldWithInfo.TargetMemberIndex);
+//                                 }
+//                                 refreshedTargets.Add(useTarget);
+//                             }
+//                             catch (Exception e)
+//                             {
+// #if SAINTSFIELD_DEBUG
+//                                 Debug.LogException(e);
+// #endif
+//                             }
+//                         }
+//                     }
+//                         break;
+//                 }
+//             }
+//         }
+//
+        // This is wrapped inside try-catch already
+        protected static object GetCollectionIndex(object collectionInfo, int targetMemberIndex)
+        {
+            switch (collectionInfo)
+            {
+                case Array arr:
+                {
+                    return arr.GetValue(targetMemberIndex);
+                }
+                case IList lis:
+                {
+                    return lis[targetMemberIndex];
+                }
+                default:
+                    throw new Exception(
+                        $"{collectionInfo} is not a supported collection type: {collectionInfo?.GetType()}");
+            }
+        }
+
         protected static (string error, object rawResult) GetCallback(SaintsFieldWithInfo fieldWithInfo, string by)
         {
             object target = fieldWithInfo.Targets[0];
-
-            // types.Reverse();
-            foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
+            bool isStruct = ReflectUtils.TypeIsStruct(fieldWithInfo.Targets[0].GetType());
+            // Debug.Log($"isStruct={isStruct}/fieldWithInfo.TargetParent={fieldWithInfo.TargetParent}/fieldWithInfo.TargetMemberInfo={fieldWithInfo.TargetMemberInfo}/fieldWithInfo.TargetMemberIndex={fieldWithInfo.TargetMemberIndex}");
+            if (isStruct && fieldWithInfo.TargetParent != null && fieldWithInfo.TargetMemberInfo != null)
             {
-                (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-                    ReflectUtils.GetProp(eachType, by);
-                switch (getPropType)
+                switch (fieldWithInfo.TargetMemberInfo)
                 {
-                    case ReflectUtils.GetPropType.Field:
+                    case FieldInfo fieldInfo:
                     {
-                        return ("", ((FieldInfo)fieldOrMethodInfo).GetValue(target));
-                    }
-
-                    case ReflectUtils.GetPropType.Property:
-                    {
-                        return ("", ((PropertyInfo)fieldOrMethodInfo).GetValue(target));
-                    }
-                    case ReflectUtils.GetPropType.Method:
-                    {
-                        MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-
-                        object curValue;
-
-                        switch (fieldWithInfo.RenderType)
-                        {
-                            case SaintsRenderType.SerializedField:
-                                // this can not be a list element because Editor component do not obtain it
-                                curValue = fieldWithInfo.FieldInfo.GetValue(target);
-                                break;
-                            case SaintsRenderType.NonSerializedField:
-                                curValue = fieldWithInfo.FieldInfo.GetValue(target);
-                                break;
-                            case SaintsRenderType.NativeProperty:
-                                curValue = fieldWithInfo.PropertyInfo.GetValue(target);
-                                break;
-                            case SaintsRenderType.Method:
-                                curValue = fieldWithInfo.MethodInfo;
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException(nameof(fieldWithInfo.RenderType), fieldWithInfo.RenderType, null);
-                        }
-
-                        (string paramError, object[] passParams) = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), new[]{curValue});
-                        if (paramError != "")
-                        {
-                            continue;
-                        }
-
-                        // Debug.Log($"passParams={passParams[0]==null}, length={passParams.Length}, curValue==null={curValue==null}");
-
                         try
                         {
-                            return ("", methodInfo.Invoke(
-                                target,
-                                passParams
-                            ));
-                        }
-                        catch (TargetInvocationException e)
-                        {
-                            Debug.LogException(e);
-                            Debug.Assert(e.InnerException != null);
-                            return (e.InnerException.Message, null);
+                            target = fieldInfo.GetValue(fieldWithInfo.TargetParent);
+                            if (fieldWithInfo.TargetMemberIndex >= 0)
+                            {
+                                target = GetCollectionIndex(fieldInfo.GetValue(fieldWithInfo.TargetParent),
+                                    fieldWithInfo.TargetMemberIndex);
+                            }
                         }
                         catch (Exception e)
                         {
-                            // _error = e.Message;
+#if SAINTSFIELD_DEBUG
                             Debug.LogException(e);
-                            return (e.Message, null);
+#endif
                         }
                     }
-                    case ReflectUtils.GetPropType.NotFound:
-                        continue;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
+                        break;
+                    case PropertyInfo propertyInfo:
+                    {
+                        if (propertyInfo.CanRead)
+                        {
+                            try
+                            {
+                                target = propertyInfo.GetValue(fieldWithInfo.TargetParent);
+                                if (fieldWithInfo.TargetMemberIndex >= 0)
+                                {
+                                    target = GetCollectionIndex(propertyInfo.GetValue(fieldWithInfo.TargetParent),
+                                        fieldWithInfo.TargetMemberIndex);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+#if SAINTSFIELD_DEBUG
+                                Debug.LogException(e);
+#endif
+                            }
+                        }
+                    }
+                        break;
                 }
             }
-            return ($"{by} not found in {GetMemberInfo(fieldWithInfo).Name}", null);
+
+            (string error, object result) result = Util.GetOf<object>(by, null, fieldWithInfo.SerializedProperty,
+                (MemberInfo)fieldWithInfo.FieldInfo ?? fieldWithInfo.PropertyInfo, target, null);
+            // Debug.Log(r);
+            return result;
         }
 
         public abstract void OnDestroy();

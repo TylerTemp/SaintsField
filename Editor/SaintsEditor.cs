@@ -93,7 +93,7 @@ namespace SaintsField.Editor
                 .ToDictionary(each => each, serializedObject.FindProperty);
             // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
             // return HelperGetRenderers(serializedPropertyDict, saintsSerializedProp, serializedObject, makeRenderer, targets);
-            return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer,  null, null, targets);
+            return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer,  null, null, -1, targets);
         }
 
         // public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(Type objectType, IEnumerable<IPlayaClassAttribute> playaClassAttributes, SerializedObject serializedObject, IReadOnlyList<object> targets)
@@ -343,6 +343,7 @@ namespace SaintsField.Editor
             IReadOnlyDictionary<string, SerializedProperty> serializedPropertyDict,
             object targetParent,
             MemberInfo targetMemberInfo,
+            int targetMemberIndex,
             IReadOnlyList<object> targets)
         {
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
@@ -395,6 +396,7 @@ namespace SaintsField.Editor
                             PlayaAttributes = startClassAttributes,
                             TargetParent = targetParent,
                             TargetMemberInfo = targetMemberInfo,
+                            TargetMemberIndex = targetMemberIndex,
                             Targets = targets,
                             RenderType = SaintsRenderType.ClassStruct,
                             MemberId = "StartClassStruct",
@@ -504,6 +506,7 @@ namespace SaintsField.Editor
                                         // LayoutBases = layoutBases,
                                         TargetParent = targetParent,
                                         TargetMemberInfo = targetMemberInfo,
+                                        TargetMemberIndex = targetMemberIndex,
                                         Targets = targets,
 
                                         RenderType = SaintsRenderType.SerializedField,
@@ -555,6 +558,7 @@ namespace SaintsField.Editor
                                             // LayoutBases = layoutBases,
                                             TargetParent = targetParent,
                                             TargetMemberInfo = targetMemberInfo,
+                                            TargetMemberIndex = targetMemberIndex,
                                             Targets = targets,
 
                                             RenderType = SaintsRenderType.NonSerializedField,
@@ -603,6 +607,7 @@ namespace SaintsField.Editor
                                             // LayoutBases = layoutBases,
                                             TargetParent = targetParent,
                                             TargetMemberInfo = targetMemberInfo,
+                                            TargetMemberIndex = targetMemberIndex,
                                             Targets = targets,
 
                                             RenderType = SaintsRenderType.SerializedField,
@@ -640,6 +645,7 @@ namespace SaintsField.Editor
                                         // LayoutBases = layoutBases,
                                         TargetParent = targetParent,
                                         TargetMemberInfo = targetMemberInfo,
+                                        TargetMemberIndex = targetMemberIndex,
                                         Targets = targets,
 
                                         RenderType = SaintsRenderType.NativeProperty,
@@ -693,6 +699,7 @@ namespace SaintsField.Editor
                                     // LayoutBases = layoutBases,
                                     TargetParent = targetParent,
                                     TargetMemberInfo = targetMemberInfo,
+                                    TargetMemberIndex = targetMemberIndex,
                                     Targets = targets,
 
                                     // memberType = MemberTypes.Method,
@@ -737,6 +744,7 @@ namespace SaintsField.Editor
                                     // LayoutBases = layoutBases,
                                     TargetParent = targetParent,
                                     TargetMemberInfo = targetMemberInfo,
+                                    TargetMemberIndex = targetMemberIndex,
                                     Targets = targets,
 
                                     // memberType = MemberTypes.Method,
@@ -772,6 +780,7 @@ namespace SaintsField.Editor
                             PlayaAttributes = endClassAttributes,
                             TargetParent = targetParent,
                             TargetMemberInfo = targetMemberInfo,
+                            TargetMemberIndex = targetMemberIndex,
                             Targets = targets,
                             RenderType = SaintsRenderType.ClassStruct,
                             MemberId = "EndClassStruct",
@@ -797,6 +806,7 @@ namespace SaintsField.Editor
                         // LayoutBases = Array.Empty<ISaintsLayoutBase>(),
                         TargetParent = targetParent,
                         TargetMemberInfo = targetMemberInfo,
+                        TargetMemberIndex = targetMemberIndex,
                         Targets = targets,
 
                         RenderType = SaintsRenderType.InjectedSerializedField,
@@ -900,9 +910,10 @@ namespace SaintsField.Editor
             IMakeRenderer makeRenderer,
             object targetParent,
             MemberInfo targetMemberInfo,
+            int targetMemberIndex,
             IReadOnlyList<object> targets)
         {
-            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedObject, serializedPropertyDict, targetParent, targetMemberInfo, targets).ToArray();
+            IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedObject, serializedPropertyDict, targetParent, targetMemberInfo, targetMemberIndex, targets).ToArray();
 
             // let's handle some HeaderGUI here... not a good idea but...
             bool anyChange = false;

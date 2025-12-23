@@ -44,6 +44,11 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             DrawChunks();
         }
 
+        public void SetLabelCenter()
+        {
+            _label.style.justifyContent = Justify.Center;
+        }
+
         public void ResetChunks(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
         {
             Chunks = chunks;

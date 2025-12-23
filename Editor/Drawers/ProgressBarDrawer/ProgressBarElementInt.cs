@@ -25,6 +25,10 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                 {
                     flexGrow = 1,
                     flexShrink = 1,
+                    marginTop = 0,
+                    marginBottom = 0,
+                    marginLeft = 0,
+                    marginRight = 0,
                 },
             });
 

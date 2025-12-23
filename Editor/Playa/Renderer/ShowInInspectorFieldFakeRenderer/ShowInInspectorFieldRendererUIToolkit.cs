@@ -10,6 +10,7 @@ using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
@@ -231,6 +232,8 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 // UIToolkitUtils.SetLabel(UIToolkitUtils.TryFindLabel(container), chunks, _richTextDrawer ??= new RichTextDrawer());
             }
 
+            // Debug.Log(FieldWithInfo.FieldInfo?.Name);
+            // Debug.Log(FieldWithInfo.PropertyInfo?.Name);
             (string error, object value) = GetValue(FieldWithInfo);
             // Debug.Log($"error={error}, value={value}");
 

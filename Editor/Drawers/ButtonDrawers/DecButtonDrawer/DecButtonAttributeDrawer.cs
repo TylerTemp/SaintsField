@@ -16,7 +16,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             if (property.serializedObject.targetObjects.Length <= 1)
             {
                 object useParent = target;
-                if(target != null && target.GetType().IsValueType)
+                if(target != null && ReflectUtils.TypeIsStruct(target.GetType()))
                 {
                     (SerializedUtils.FieldOrProp _, object refreshedParent) =
                         SerializedUtils.GetFieldInfoAndDirectParent(property);

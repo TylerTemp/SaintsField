@@ -8,7 +8,9 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
     {
         protected override ValueButton MakeValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
         {
-            return new ValueButton(chunks);
+            ValueButton result =  new ValueButton(chunks);
+            result.SetLabelCenter();
+            return result;
         }
     }
 }

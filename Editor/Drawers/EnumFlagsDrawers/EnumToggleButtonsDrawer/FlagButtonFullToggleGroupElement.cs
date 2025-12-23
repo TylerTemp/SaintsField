@@ -12,9 +12,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
         public readonly Button HToggleButton;
         public readonly Button HCheckAllButton;
         public readonly Button HEmptyButton;
-        public readonly Texture2D _checkboxCheckedTexture2D;
-        public readonly Texture2D _checkboxEmptyTexture2D;
-        public readonly Texture2D _checkboxIndeterminateTexture2D;
+        private readonly Texture2D _checkboxCheckedTexture2D;
+        private readonly Texture2D _checkboxEmptyTexture2D;
+        private readonly Texture2D _checkboxIndeterminateTexture2D;
 
         public FlagButtonFullToggleGroupElement()
         {

@@ -15,7 +15,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
         protected override FlagButton MakeValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
         {
-            return new FlagButton(_isULong, chunks);
+            FlagButton result = new FlagButton(_isULong, chunks);
+            result.SetLabelCenter();
+            return result;
         }
     }
 }

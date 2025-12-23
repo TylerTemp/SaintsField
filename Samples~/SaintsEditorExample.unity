@@ -8873,7 +8873,7 @@ MonoBehaviour:
       _saintsKeys: []
       _wrapTypeKey: 4
       _saintsValues: []
-      _wrapTypeValue: 1
+      _wrapTypeValue: 4
       saintsSerializedVersion: 2
   references:
     version: 2

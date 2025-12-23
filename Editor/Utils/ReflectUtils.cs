@@ -680,5 +680,7 @@ namespace SaintsField.Editor.Utils
 
             return null;
         }
+
+        public static bool TypeIsStruct(Type type) => type.IsValueType && !type.IsEnum && !type.IsPrimitive;
     }
 }

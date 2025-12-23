@@ -23,6 +23,6 @@ namespace SaintsField.Samples.Scripts
 
         [NoLabel] [EnumToggleButtons] public Direction direction;
 
-        [NoLabel] [GetComponentInChildren] public Transform[] transArray;
+        [NoLabel] [GetInChildren] public Transform[] transArray;
     }
 }

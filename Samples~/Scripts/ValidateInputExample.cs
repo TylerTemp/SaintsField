@@ -43,6 +43,16 @@ namespace SaintsField.Samples.Scripts
             [ValidateInput(nameof(ValidateNested))]
             public int[] nestedValue;
             private string ValidateNested(int newValue, int index) => newValue < 0 ? $"Nested value at {index} should be positive, get {newValue}" : null;
+
+            [ValidateInput(nameof(SameValueSet))]
+            public int myValue;
+            public int sameValue;
+
+            private bool SameValueSet(int v)
+            {
+                sameValue = v;
+                return true;
+            }
         }
 
         public Nested[] nested;

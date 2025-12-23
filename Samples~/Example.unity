@@ -2625,7 +2625,10 @@ MonoBehaviour:
   withReqParams: 24
   withOptionalParams: -26
   valArr: 
-  nested: []
+  nested:
+  - nestedValue: 00000000
+    myValue: 19
+    sameValue: 19
 --- !u!4 &272774834
 Transform:
   m_ObjectHideFlags: 0
@@ -4098,7 +4101,11 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  rawScriptableArray: []
+  rawScriptableArray:
+  - {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+  - {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
+  - {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
+  - {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
 --- !u!1 &414579718
 GameObject:
   m_ObjectHideFlags: 0
@@ -15559,29 +15566,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 936021963}
-  - component: {fileID: 936021962}
   - component: {fileID: 936021964}
   m_Layer: 0
-  m_Name: WriterTest
+  m_Name: StructWriterTest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &936021962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 936021961}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9dc799bf7566d14469e89642d92a323c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.WriterTest
-  myStruct:
-    myString: x
 --- !u!4 &936021963
 Transform:
   m_ObjectHideFlags: 0
@@ -15609,9 +15601,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4c1e35ae15597944ad8183d60af6a7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.StructValueChange
-  myStruct:
-    intChange: 8
-    myString: Hi 8
+  foo1:
+    fooInline: 45
+    foo: 55
+  foos: []
+  floatWithBaseValue:
+    baseValue: 2.68
+    finalValue: 2.68
+  floatWithBaseValues:
+  - baseValue: 2.52
+    finalValue: 2.52
+  - baseValue: 0.71
+    finalValue: 0.71
+  nested:
+    nestedValue: 
+    myValue: 52
+    sameValue: 52
+  nestedLis:
+  - nestedValue: 
+    myValue: 35
+    sameValue: 35
+  labelRead:
+    number: 217
+    content: 
+  labelReadList: []
 --- !u!1 &936058398
 GameObject:
   m_ObjectHideFlags: 0
@@ -16703,7 +16716,7 @@ GameObject:
   - component: {fileID: 1036765201}
   - component: {fileID: 1036765200}
   m_Layer: 0
-  m_Name: EnumFlags
+  m_Name: EnumToggleButtonsExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17989,10 +18002,6 @@ MonoBehaviour:
   floatWithBaseValue:
     baseValue: 2.09
     finalValue: 2.09
-  floatWithBaseValueFix:
-    baseValue: 2.29
-    finalValue: 2.29
-    <AutoFinalValue>k__BackingField: 2.29
 --- !u!1 &1138076587 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5585713370949437822, guid: e27c0b99fd3f77142ac978f1ce2c7c72, type: 3}
@@ -19523,6 +19532,76 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneKey: 
   sceneKeySep: 
+--- !u!1 &1242835953
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1242835955}
+  - component: {fileID: 1242835954}
+  m_Layer: 0
+  m_Name: New Game Object
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1242835954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1242835953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4c1e35ae15597944ad8183d60af6a7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.StructValueChange
+  foo1:
+    fooInline: 2
+    foo: 2
+  foos:
+  - fooInline: 2
+    foo: 2
+  floatWithBaseValue:
+    baseValue: 1.21
+    finalValue: 1.21
+  floatWithBaseValues:
+  - baseValue: 1.12
+    finalValue: 1.12
+  nested:
+    nestedValue: deffffff23000000
+    myValue: 38
+    sameValue: 38
+  nestedLis:
+  - nestedValue: ebffffff30000000
+    myValue: 18
+    sameValue: 18
+  labelRead:
+    number: 30
+    content: 
+  labelReadList:
+  - number: 70
+    content: 
+--- !u!4 &1242835955
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1242835953}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1244097642
 GameObject:
   m_ObjectHideFlags: 0
@@ -34608,9 +34687,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SceneReferenceExample
   sceneRef:
-    guid: 65ad8bd450b80c5468397154b5f6c4cc
-    index: 1
-    path: Packages/today.comes.saintsfield/Samples/VolumeComponentTest/Example
+    guid: 1326ba3bbd4558245a4850948bd03f1a
+    index: 2
+    path: Packages/today.comes.saintsfield/Samples/Example
 --- !u!4 &2002997102 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1316916096917999234, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
@@ -39804,3 +39883,4 @@ SceneRoots:
   - {fileID: 9394716}
   - {fileID: 208005633}
   - {fileID: 936021963}
+  - {fileID: 1242835955}

@@ -285,8 +285,9 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 .ToDictionary(each => each.name, each => each.property);
 
             // Debug.Log(parent);
+            int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             IReadOnlyList<ISaintsRenderer> renderer =
-                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, parent, info, new []{value});
+                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, parent, info, propIndex, new []{value});
 
             VisualElement bodyElement = new VisualElement();
 

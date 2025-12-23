@@ -226,12 +226,11 @@ public string[] sindices;
 
 ![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
 
+
+
 #### `FieldLabelText` ####
 
 Like `LabelText`, but it can be applied to an array/list to change the element label (instead of the label of array/list itself)
-
-Use it on an array/list will apply it to all the direct child element instead of the field label itself.
-You can use this to modify elements of an array/list field, in this way:
 
 1.  Ensure you make it a callback: `isCallback=true`, or the `richTextXml` starts with `$`
 2.  It'll pass the element value and index to your function
@@ -278,10 +277,10 @@ public enum Direction
 
 [NoLabel] [EnumToggleButtons] public Direction direction;
 
-[NoLabel] [GetComponentInChildren] public Transform[] transArray;
+[NoLabel] [GetInChildren] public Transform[] transArray;
 ```
 
-![](https://github.com/user-attachments/assets/7299393b-a7a0-4873-bc03-54e559dcfd6a)
+![](https://github.com/user-attachments/assets/b5093a16-7b55-4d49-bd28-2e3726d213e8)
 
 #### `AboveText` / `BelowText` ####
 
@@ -693,7 +692,7 @@ public abstract class AbsSepMono : SaintsMonoBehaviour
 }
 
 // ChildSepMono.cs
-[Separator("Begin of <container.Type>", EAlign.Center)]
+[Separator("Begin of <container.Type/>", EAlign.Center)]
 public class ChildSepMono : AbsSepMono
 {
     public string childField;
@@ -2302,8 +2301,8 @@ public int max;
 [
     PropRange(0f, 1f, step: 0.05f),
     Adapt(EUnit.Percent),
-    OverlayRichLabel("<color=gray>%", end: true),
-    BelowRichLabel("$" + nameof(DisplayActualValue)),
+    OverlayText("<color=gray>%", end: true),
+    BelowText("$" + nameof(DisplayActualValue)),
 ] public float stepRange;
 
 private string DisplayActualValue(float av) => $"<color=gray>Actual Value: {av}";
@@ -2454,7 +2453,7 @@ public int maxValue;
         , titleCallback: nameof(Title)  // dynamic title, does not support rich label
     ),
 ]
-[RichLabel(null)]  // make this full width
+[NoLabel]  // make this full width
 public float fValue;
 
 private EColor BackgroundColor() => fValue <= 0? EColor.Brown: EColor.CharcoalGray;
@@ -3375,20 +3374,20 @@ using SaintsField;
 [SerializeField]
 [ReadOnly(nameof(_bool1))]
 [ReadOnly(nameof(_bool2))]
-[RichLabel("readonly=1||2")]
+[LabelText("readonly=1||2")]
 private string _ro1and2;
 
 
 [SerializeField]
 [ReadOnly(nameof(_bool1), nameof(_bool2))]
-[RichLabel("readonly=1&&2")]
+[LabelText("readonly=1&&2")]
 private string _ro1or2;
 
 
 [SerializeField]
 [ReadOnly(nameof(_bool1), nameof(_bool2))]
 [ReadOnly(nameof(_bool3), nameof(_bool4))]
-[RichLabel("readonly=(1&&2)||(3&&4)")]
+[LabelText("readonly=(1&&2)||(3&&4)")]
 private string _ro1234;
 ```
 
@@ -3567,37 +3566,37 @@ public bool _bool4;
 
 [FieldShowIf(nameof(_bool1))]
 [FieldShowIf(nameof(_bool2))]
-[RichLabel("<color=red>show=1||2")]
+[LabelText("<color=red>show=1||2")]
 public string _showIf1Or2;
 
 
 [FieldShowIf(nameof(_bool1), nameof(_bool2))]
-[RichLabel("<color=green>show=1&&2")]
+[LabelText("<color=green>show=1&&2")]
 public string _showIf1And2;
 
 [FieldHideIf(nameof(_bool1))]
 [FieldHideIf(nameof(_bool2))]
-[RichLabel("<color=blue>show=!1||!2")]
+[LabelText("<color=blue>show=!1||!2")]
 public string _hideIf1Or2;
 
 
 [FieldHideIf(nameof(_bool1), nameof(_bool2))]
-[RichLabel("<color=yellow>show=!(1||2)=!1&&!2")]
+[LabelText("<color=yellow>show=!(1||2)=!1&&!2")]
 public string _hideIf1And2;
 
 [FieldShowIf(nameof(_bool1))]
 [FieldHideIf(nameof(_bool2))]
-[RichLabel("<color=magenta>show=1||!2")]
+[LabelText("<color=magenta>show=1||!2")]
 public string _showIf1OrNot2;
 
 [FieldShowIf(nameof(_bool1), nameof(_bool2))]
 [FieldShowIf(nameof(_bool3), nameof(_bool4))]
-[RichLabel("<color=orange>show=(1&&2)||(3&&4)")]
+[LabelText("<color=orange>show=(1&&2)||(3&&4)")]
 public string _showIf1234;
 
 [FieldHideIf(nameof(_bool1), nameof(_bool2))]
 [FieldHideIf(nameof(_bool3), nameof(_bool4))]
-[RichLabel("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
+[LabelText("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
 public string _hideIf1234;
 ```
 
@@ -3735,37 +3734,37 @@ public bool _bool4;
 
 [ShowIf(nameof(_bool1))]
 [ShowIf(nameof(_bool2))]
-[RichLabel("<color=red>show=1||2")]
+[LabelText("<color=red>show=1||2")]
 public string _showIf1Or2;
 
 
 [ShowIf(nameof(_bool1), nameof(_bool2))]
-[RichLabel("<color=green>show=1&&2")]
+[LabelText("<color=green>show=1&&2")]
 public string _showIf1And2;
 
 [HideIf(nameof(_bool1))]
 [HideIf(nameof(_bool2))]
-[RichLabel("<color=blue>show=!1||!2")]
+[LabelText("<color=blue>show=!1||!2")]
 public string _hideIf1Or2;
 
 
 [HideIf(nameof(_bool1), nameof(_bool2))]
-[RichLabel("<color=yellow>show=!(1||2)=!1&&!2")]
+[LabelText("<color=yellow>show=!(1||2)=!1&&!2")]
 public string _hideIf1And2;
 
 [ShowIf(nameof(_bool1))]
 [HideIf(nameof(_bool2))]
-[RichLabel("<color=magenta>show=1||!2")]
+[LabelText("<color=magenta>show=1||!2")]
 public string _showIf1OrNot2;
 
 [ShowIf(nameof(_bool1), nameof(_bool2))]
 [ShowIf(nameof(_bool3), nameof(_bool4))]
-[RichLabel("<color=orange>show=(1&&2)||(3&&4)")]
+[LabelText("<color=orange>show=(1&&2)||(3&&4)")]
 public string _showIf1234;
 
 [HideIf(nameof(_bool1), nameof(_bool2))]
 [HideIf(nameof(_bool3), nameof(_bool4))]
-[RichLabel("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
+[LabelText("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
 public string _hideIf1234;
 ```
 
@@ -4411,7 +4410,7 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 ```csharp
 using SaintsField;
 
-[AdvancedDropdown(nameof(AdvDropdown)), BelowRichLabel(nameof(drops), true)] public int drops;
+[AdvancedDropdown(nameof(AdvDropdown)), BelowText(nameof(drops), true)] public int drops;
 
 public AdvancedDropdownList<int> AdvDropdown()
 {
@@ -4527,15 +4526,15 @@ If you add `RichLabel` to the `enum`, the item name will be changed to the `Rich
 [Serializable]
 public enum MyEnum
 {
-    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
+    [InspectorName("1")]  // RichLabel is optional. Just for you to have more fancy control
     First,
-    [RichLabel("2")]
+    [InspectorName("2")]
     Second,
-    [RichLabel("3")]
+    [InspectorName("3")]
     Third,
-    [RichLabel("4/0")]
+    [InspectorName("4/0")]
     ForthZero,
-    [RichLabel("4/1")]
+    [InspectorName("4/1")]
     ForthOne,
 }
 
@@ -4718,15 +4717,15 @@ If you add `RichLabel` to the `enum`, the item name will be changed to the `Rich
 [Serializable]
 public enum MyEnum
 {
-    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
+    [InspectorName("1")]  // InspectorName is optional. Just for you to have more fancy control
     First,
-    [RichLabel("2")]
+    [InspectorName("2")]
     Second,
-    [RichLabel("3")]
+    [InspectorName("3")]
     Third,
-    [RichLabel("4/0")]
+    [InspectorName("4/0")]
     ForthZero,
-    [RichLabel("4/1")]
+    [InspectorName("4/1")]
     ForthOne,
 }
 
@@ -4944,7 +4943,7 @@ public enum EnumNormal  // normal enum, not flags
 {
     First,
     Second,
-    [RichLabel("<color=lime><label /></color>")]
+    [InspectorName("<color=lime><label /></color>")]
     Third,
 }
 
@@ -5004,13 +5003,13 @@ using SaintsField;
 [Serializable, Flags]
 public enum F
 {
-    [RichLabel("[Null]")]  // RichLabel is optional
+    [InspectorName("[Null]")]  // InspectorName is optional
     Zero,
-    [RichLabel("Options/Value1")]
+    [InspectorName("Options/Value1")]
     One = 1,
-    [RichLabel("Options/Value2")]
+    [InspectorName("Options/Value2")]
     Two = 1 << 1,
-    [RichLabel("Options/Value3")]
+    [InspectorName("Options/Value3")]
     Three = 1 << 2,
     Four = 1 << 3,
 }
@@ -5034,7 +5033,7 @@ using SaintsField;
 
 [SerializeField, ResizableTextArea] private string _short;
 [SerializeField, ResizableTextArea] private string _long;
-[SerializeField, RichLabel(null), ResizableTextArea] private string _noLabel;
+[SerializeField, LabelText(null), ResizableTextArea] private string _noLabel;
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/202a742a-965c-4e68-a829-4a8aa4c8fe9e)](https://github.com/TylerTemp/SaintsField/assets/6391063/64ad9c16-19e2-482d-9186-60d42fb34922)
@@ -5060,7 +5059,7 @@ A toggle button on the left of the bool field. Only works on boolean field.
 using SaintsField;
 
 [LeftToggle] public bool myToggle;
-[LeftToggle, RichLabel("<color=green><label />")] public bool richToggle;
+[LeftToggle, LabelText("<color=green><label />")] public bool richToggle;
 ```
 
 ![left_toggle](https://github.com/TylerTemp/SaintsField/assets/6391063/bb3de042-bfd8-4fb7-b8d6-7f0db070a761)
@@ -5173,13 +5172,13 @@ public SaintsRowStruct defaultStruct;
 public enum BitMask
 {
     None = 0,  // this will be replaced for all/none button
-    [RichLabel("M<color=red>1</color>")]
+    [InspectorName("M<color=red>1</color>")]
     Mask1 = 1,
-    [RichLabel("M<color=green>2</color>")]
+    [InspectorName("M<color=green>2</color>")]
     Mask2 = 1 << 1,
-    [RichLabel("M<color=blue>3</color>")]
+    [InspectorName("M<color=blue>3</color>")]
     Mask3 = 1 << 2,
-    [RichLabel("M4")]
+    [InspectorName("M4")]
     Mask4 = 1 << 3,
     Mask5 = 1 << 4,
 }
@@ -5872,18 +5871,9 @@ Options are:
 *   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
 *   `CollapseBox` = `Background | Title | TitleOut | Collapse`
 
-**Known Issue**
-
-About `Horizental` style:
-
-1.  On IMGUI, `HorizontalScope` does **NOT** shrink when there are many items, and will go off-view without a scrollbar. Both `Odin` and `Markup-Attributes` have the same issue. However, `Markup-Attribute` uses `labelWidth` to make the situation a bit better, which `SaintsEditor` does not provide (at this point at least).
-2.  On UI Toolkit the label will be put into a new line above
-
-![layout_compare_with_other](https://github.com/TylerTemp/SaintsField/assets/6391063/1376b585-c381-46a9-b22d-5a96808dab7f)
-
 **Appearance**
 
-![layout](https://github.com/user-attachments/assets/1e2e6dfa-85a9-4225-ac8f-8beefc26ae52)
+![layout](https://github.com/user-attachments/assets/43afc0da-f801-4a2b-8a6a-fcd5cfb8a259)
 
 **Example**
 
@@ -5996,7 +5986,7 @@ public string hv1Item2;
 public string hv2Item1;
 
 [Ordered]
-[Layout("Root/V2/H", ELayout.Horizontal), RichLabel(null)]
+[Layout("Root/V2/H", ELayout.Horizontal), NoLabel]
 public string hv2Item2, hv2Item3;
 
 [Ordered]
@@ -6005,7 +5995,7 @@ public string hv2Item4;
 
 [Ordered]
 [Layout("Root/V3", ELayout.Horizontal)]
-[ResizableTextArea, RichLabel(null)]
+[ResizableTextArea, NoLabel]
 public string hv3Item1, hv3Item2;
 
 [Ordered]
@@ -6038,18 +6028,18 @@ public string allTogetherG12, allTogetherG22;
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
 
-By combining `Layout` with `Playa*`, you can create some complex layout struct:
+By combining `Layout` with `Seperator`/`InfoBox`, you can create some complex layout struct:
 
 ```csharp
 [LayoutStart("Equipment", ELayout.TitleBox | ELayout.Vertical)]
 [LayoutStart("./Head", ELayout.TitleBox)]
 public string st;
-[LayoutCloseHere]
 public MyStruct inOneStruct;
+[LayoutEnd(".")]
 
 [LayoutStart("./Upper Body", ELayout.TitleBox)]
 
-[PlayaInfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
+[InfoBox("Note：left hand can be empty, but not right hand", EMessageType.Warning)]
 
 [LayoutStart("./Horizontal", ELayout.Horizontal)]
 
@@ -6061,9 +6051,9 @@ public string g13;
 
 [LayoutStart("../Right Hand", ELayout.TitleBox)]
 public string g21;
-[RichLabel("<color=lime><label/>")]
+[LabelText("<color=lime><label/>")]
 public string g22;
-[RichLabel("$" + nameof(g23))]
+[LabelText("$" + nameof(g23))]
 public string g23;
 
 public bool toggle;
@@ -6200,13 +6190,19 @@ public string afterGroupLast;
 
 ### `LayoutCloseHere` / `LayoutTerminateHere` ###
 
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+> [!NOTE]
+> If you have code analysis enabled, you will not need this attribute. `LayoutEnd` should be enough.
+
 Include the current field into the coresponding group, then:
 *   `LayoutCloseHere` will close the most recent group, like a `LayoutEnd(".")`
 *   `LayoutTerminateHere` will close all groups, like a `LayoutEnd`
 
 `LayoutCloseHere` is useful when you're done with your subgroup, but you might add some field later, but at the point you don't have a field to put a `LayoutEnd`
 
-Note: if you have code analysis enabled, you will not need this attribute. `LayoutEnd` should be enough.
+
 
 ```csharp
 [LayoutStart("Tab", ELayout.TitleBox)] public string tab;
@@ -6405,8 +6401,6 @@ private void EditorButton()
 ```
 
 ![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
-
-
 
 ## Handles ##
 
@@ -8973,7 +8967,7 @@ namespace SaintsField.Samples.Scripts
         private const string ConstString = "This is a constant string";
 
         // using full type name
-        [AboveRichLabel("$:SaintsField.Samples.Scripts." + nameof(StaticCallback) + "." + nameof(StaticString))]
+        [AboveText("$:SaintsField.Samples.Scripts." + nameof(StaticCallback) + "." + nameof(StaticString))]
         // using only type name. This is slow and might find the incorrect target.
         // We'll first search the assembly of this object. If not found, then search all assemblies.
         [InfoBox("$:" + nameof(StaticCallback) + "." + nameof(ConstString))]
@@ -9105,19 +9099,19 @@ Some examples:
 using SaintsField;
 
 public bool boolValue;
-[EnableIf("!" + nameof(boolValue)), RichLabel("Reverse!")] public string boolValueEnableN;
+[EnableIf("!" + nameof(boolValue)), LabelText("Reverse!")] public string boolValueEnableN;
 
 [Range(0, 2)] public int int01;
 
-[EnableIf(nameof(int01), 1), RichLabel("default")] public string int01Enable1;
-[EnableIf(nameof(int01) + ">=", 1), RichLabel(">=1")] public string int01EnableGe1;
-[EnableIf("!" + nameof(int01) + "<=", 1), RichLabel("! <=1")] public string int01EnableNLe1;
+[EnableIf(nameof(int01), 1), LabelText("default")] public string int01Enable1;
+[EnableIf(nameof(int01) + ">=", 1), LabelText(">=1")] public string int01EnableGe1;
+[EnableIf("!" + nameof(int01) + "<=", 1), LabelText("! <=1")] public string int01EnableNLe1;
 
 [Range(0, 2)] public int int02;
 // we need the "==$" to tell the next string is a value callback, not a condition checker
-[EnableIf(nameof(int01) + "==$", nameof(int02)), RichLabel("==$")] public string int01Enable1Callback;
-[EnableIf(nameof(int01) + "<$", nameof(int02)), RichLabel("<$")] public string int01EnableLt1Callback;
-[EnableIf("!" + nameof(int01) + ">$", nameof(int02)), RichLabel("! >$")] public string int01EnableNGt1Callback;
+[EnableIf(nameof(int01) + "==$", nameof(int02)), LabelText("==$")] public string int01Enable1Callback;
+[EnableIf(nameof(int01) + "<$", nameof(int02)), LabelText("<$")] public string int01EnableLt1Callback;
+[EnableIf("!" + nameof(int01) + ">$", nameof(int02)), LabelText("! >$")] public string int01EnableNGt1Callback;
 
 // example of bitwise
 [Serializable]
@@ -9130,9 +9124,9 @@ public enum EnumOnOff
 [Space]
 [Range(0, 3)] public int enumOnOffBits;
 
-[EnableIf(nameof(enumOnOffBits) + "&", EnumOnOff.A), RichLabel("&01")] public string bitA;
-[EnableIf(nameof(enumOnOffBits) + "^", EnumOnOff.B), RichLabel("^10")] public string bitB;
-[EnableIf(nameof(enumOnOffBits) + "&==", EnumOnOff.B), RichLabel("hasFlag(B)")] public string hasFlagB;
+[EnableIf(nameof(enumOnOffBits) + "&", EnumOnOff.A), LabelText("&01")] public string bitA;
+[EnableIf(nameof(enumOnOffBits) + "^", EnumOnOff.B), LabelText("^10")] public string bitB;
+[EnableIf(nameof(enumOnOffBits) + "&==", EnumOnOff.B), LabelText("hasFlag(B)")] public string hasFlagB;
 ```
 
 **Default Value Comparison**
@@ -9158,9 +9152,9 @@ public enum EnumF
 [EnumFlags]
 public EnumF enumF;
 
-[EnableIf(nameof(enumF), EnumF.A), RichLabel("hasFlag(A)")] public string enumFEnableA;
-[EnableIf(nameof(enumF), EnumF.B), RichLabel("hasFlag(B)")] public string enumFEnableB;
-[EnableIf(nameof(enumF), EnumF.A | EnumF.B), RichLabel("hasFlag(A | B)")] public string enumFEnableAB;
+[EnableIf(nameof(enumF), EnumF.A), LabelText("hasFlag(A)")] public string enumFEnableA;
+[EnableIf(nameof(enumF), EnumF.B), LabelText("hasFlag(B)")] public string enumFEnableB;
+[EnableIf(nameof(enumF), EnumF.A | EnumF.B), LabelText("hasFlag(A | B)")] public string enumFEnableAB;
 ```
 
 ### Saints XPath-like Syntax ##
