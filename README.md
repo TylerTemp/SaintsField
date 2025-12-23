@@ -95,10 +95,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.4**
+**5.7.5**
 
-1.  Change: `Button` no longer use `MeansImplicitUse`. Add `SAINTSFIELD_BUTTON_IMPLICIT_USE` macro instead.
-2.  Fix: `OnValueChanged`, `Button` (including inline buttons) now can in-place change a struct's value [#240](https://github.com/TylerTemp/SaintsField/issues/240), [#287](https://github.com/TylerTemp/SaintsField/issues/287)
+1.  Fix: `OnValueChanged`, `Button` (including inline buttons) could not in-place change a struct's value inside an array/list
+2.  Fix: `LabelText` now can read real-time value inside a struct
+3.  Improve: `ValueButtons`, `EnumToggleButtons` now center the label on the button
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
