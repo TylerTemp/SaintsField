@@ -10,6 +10,7 @@ using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
+// ReSharper disable once RedundantUsingDirective
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -189,54 +190,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 SaintsContext.SerializedProperty = _serializedProperty;
                 object[] returnValues = FieldWithInfo.Targets.Select(eachTarget =>
                 {
-                    object useTarget = eachTarget;
-                    object rawMemberValue = eachTarget;
-                    if (isStruct && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
-                    {
-                        switch (FieldWithInfo.TargetMemberInfo)
-                        {
-                            case FieldInfo fieldInfo:
-                            {
-                                try
-                                {
-                                    useTarget = rawMemberValue =  fieldInfo.GetValue(FieldWithInfo.TargetParent);
-                                    if (FieldWithInfo.TargetMemberIndex != -1)
-                                    {
-                                        useTarget = GetCollectionIndex(useTarget, FieldWithInfo.TargetMemberIndex);
-                                    }
-                                    // Debug.Log($"useTarget={useTarget}");
-                                }
-                                catch (Exception e)
-                                {
-#if SAINTSFIELD_DEBUG
-                                    Debug.LogException(e);
-#endif
-                                }
-                            }
-                                break;
-                            case PropertyInfo propertyInfo:
-                            {
-                                if (propertyInfo.CanRead)
-                                {
-                                    try
-                                    {
-                                        useTarget = rawMemberValue = propertyInfo.GetValue(FieldWithInfo.TargetParent);
-                                        if (FieldWithInfo.TargetMemberIndex != -1)
-                                        {
-                                            useTarget = GetCollectionIndex(useTarget, FieldWithInfo.TargetMemberIndex);
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-#if SAINTSFIELD_DEBUG
-                                        Debug.LogException(e);
-#endif
-                                    }
-                                }
-                            }
-                                break;
-                        }
-                    }
+                    (object rawMemberValue, object useTarget) = GetRefreshedTarget(FieldWithInfo, eachTarget);
 
                     object result = methodInfo.Invoke(useTarget, parameterValues);
 

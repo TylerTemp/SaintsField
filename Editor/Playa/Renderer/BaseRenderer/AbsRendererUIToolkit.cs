@@ -1,45 +1,15 @@
 ﻿#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Drawers.AnimatorParamDrawer;
-using SaintsField.Editor.Drawers.AnimatorStateDrawer;
-using SaintsField.Editor.Drawers.CurveRangeDrawer;
-using SaintsField.Editor.Drawers.DateTimeDrawer;
-using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
-using SaintsField.Editor.Drawers.GuidDrawer;
-using SaintsField.Editor.Drawers.InputAxisDrawer;
-using SaintsField.Editor.Drawers.LayerDrawer;
-using SaintsField.Editor.Drawers.MinMaxSliderDrawer;
-using SaintsField.Editor.Drawers.ProgressBarDrawer;
-using SaintsField.Editor.Drawers.PropRangeDrawer;
-using SaintsField.Editor.Drawers.RateDrawer;
-using SaintsField.Editor.Drawers.ReferencePicker;
-using SaintsField.Editor.Drawers.ResizableTextAreaDrawer;
-using SaintsField.Editor.Drawers.SaintsDictionary;
-using SaintsField.Editor.Drawers.SceneDrawer;
 #if UNITY_2021_2_OR_NEWER
-using SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer;
-using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
 #endif
-using SaintsField.Editor.Drawers.SortingLayerDrawer;
-using SaintsField.Editor.Drawers.TagDrawer;
-using SaintsField.Editor.Drawers.TimeSpanDrawer;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
-using SaintsField.Editor.Drawers.ValueButtonsDrawer;
-using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
-using SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
 using SaintsField.Editor.Utils;
-using SaintsField.Utils;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
@@ -236,6 +206,61 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return type == null
                 ? "null"
                 : $"{type.Name}: <color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>{type.Namespace}</color>";
+        }
+
+        protected static (object rawMemberValue, object useTarget) GetRefreshedTarget(SaintsFieldWithInfo fieldWithInfo, object eachTarget)
+        {
+            bool isStruct = ReflectUtils.TypeIsStruct(eachTarget.GetType());
+            object useTarget = eachTarget;
+            object rawMemberValue = eachTarget;
+            if (isStruct && fieldWithInfo.TargetParent != null && fieldWithInfo.TargetMemberInfo != null)
+            {
+                switch (fieldWithInfo.TargetMemberInfo)
+                {
+                    case FieldInfo fieldInfo:
+                    {
+                        try
+                        {
+                            useTarget = rawMemberValue =  fieldInfo.GetValue(fieldWithInfo.TargetParent);
+                            if (fieldWithInfo.TargetMemberIndex != -1)
+                            {
+                                useTarget = GetCollectionIndex(useTarget, fieldWithInfo.TargetMemberIndex);
+                            }
+                            // Debug.Log($"useTarget={useTarget}");
+                        }
+                        catch (Exception e)
+                        {
+#if SAINTSFIELD_DEBUG
+                            Debug.LogException(e);
+#endif
+                        }
+                    }
+                        break;
+                    case PropertyInfo propertyInfo:
+                    {
+                        if (propertyInfo.CanRead)
+                        {
+                            try
+                            {
+                                useTarget = rawMemberValue = propertyInfo.GetValue(fieldWithInfo.TargetParent);
+                                if (fieldWithInfo.TargetMemberIndex != -1)
+                                {
+                                    useTarget = GetCollectionIndex(useTarget, fieldWithInfo.TargetMemberIndex);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+#if SAINTSFIELD_DEBUG
+                                Debug.LogException(e);
+#endif
+                            }
+                        }
+                    }
+                        break;
+                }
+            }
+
+            return (rawMemberValue, useTarget);
         }
 
         public string GetLabel()

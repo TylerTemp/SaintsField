@@ -10,25 +10,32 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue240SaintsRowStr
         [Serializable]
         public struct Foo1
         {
-            [BelowButton(nameof(FooInline))]
+            [AboveButton(nameof(FooInline))]
             public int fooInline;
+
+            [ShowInInspector]
+            private int _fooNonSerInline;
 
             private void FooInline()
             {
                 fooInline++;
+                _fooNonSerInline++;
             }
-
-            public int foo;
 
             [Button]
             private void IncrementFoo()
             {
-                foo++;
+                fooButton++;
+                _fooNonSerButton++;
             }
+
+            public int fooButton;
+            [ShowInInspector]
+            private int _fooNonSerButton;
 
             public override string ToString()
             {
-                return $"<Foo1 {fooInline}, {foo}>";
+                return $"<Foo1 {fooInline}, {fooButton}>";
             }
         }
     }

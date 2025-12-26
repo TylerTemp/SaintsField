@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
 using UnityEditor;
@@ -40,10 +39,12 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
         private static (string error, object value) GetValue(SaintsFieldWithInfo fieldWithInfo)
         {
+            (object _, object useTarget) = GetRefreshedTarget(fieldWithInfo, fieldWithInfo.Targets[0]);
+
             if (fieldWithInfo.FieldInfo != null)
             {
                 // Debug.Log($"getting {fieldWithInfo.FieldInfo.Name}");
-                return ("", fieldWithInfo.FieldInfo.GetValue(fieldWithInfo.Targets[0]));
+                return ("", fieldWithInfo.FieldInfo.GetValue(useTarget));
             }
 
             if (fieldWithInfo.PropertyInfo.CanRead)
@@ -51,7 +52,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 // Debug.Log($"getting {fieldWithInfo.PropertyInfo.Name}");
                 try
                 {
-                    return ("", fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Targets[0]));
+                    return ("", fieldWithInfo.PropertyInfo.GetValue(useTarget));
                 }
                 catch (Exception e)
                 {

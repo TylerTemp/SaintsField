@@ -14794,10 +14794,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe1027d8720786e4ca51c6e943fe60ee, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue240SaintsRowStructChange.FooComponent
   foo1:
-    fooInline: 14
-    foo: 56
+    fooInline: 11
+    fooButton: 17
 --- !u!1 &887127787
 GameObject:
   m_ObjectHideFlags: 0
@@ -23979,7 +23979,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   foo1:
     fooInline: 0
-    foo: 3
+    fooButton: 0
 --- !u!1 &1551478299
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.7.6 ##
+
+Fix: `ShowInInspector` inside `struct` can not read a real-time but cached value [#240](https://github.com/TylerTemp/SaintsField/issues/240)
+
 ## 5.7.5 ##
 
 1.  Fix: `OnValueChanged`, `Button` (including inline buttons) could not in-place change a struct's value inside an array/list

@@ -95,11 +95,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.5**
+**5.7.6**
 
-1.  Fix: `OnValueChanged`, `Button` (including inline buttons) could not in-place change a struct's value inside an array/list
-2.  Fix: `LabelText` now can read real-time value inside a struct
-3.  Improve: `ValueButtons`, `EnumToggleButtons` now center the label on the button
+Fix: `ShowInInspector` inside `struct` can not read a real-time but cached value [#240](https://github.com/TylerTemp/SaintsField/issues/240)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
