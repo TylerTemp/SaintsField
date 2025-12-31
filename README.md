@@ -95,9 +95,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.6**
+**5.7.7**
 
-Fix: `ShowInInspector` inside `struct` can not read a real-time but cached value [#240](https://github.com/TylerTemp/SaintsField/issues/240)
+Fix: `ReferencePicker` did not update its label, and did not update the foldout icon accordingly
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2892,7 +2892,7 @@ Automatically assign a sibling target.
 *   `bool includeInactive = true`
 
     Should inactive GameObject be included? `true` to include inactive GameObject.
- 
+
 *   `Type compType = null`
 
     The component type to assign. If null, it'll use the field type.

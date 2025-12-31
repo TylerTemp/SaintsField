@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.7.7 ##
+
+Fix: `ReferencePicker` did not update its label, and did not update the foldout icon accordingly
+
 ## 5.7.6 ##
 
 Fix: `ShowInInspector` inside `struct` can not read a real-time but cached value [#240](https://github.com/TylerTemp/SaintsField/issues/240)
@@ -28,7 +32,7 @@ Fix: `ShowInInspector` inside `struct` can not read a real-time but cached value
 4.  Add: `GUIColor` now works with `ShowInInspector`, `Button`, `InfoBox` etc.
 5.  Add: When first install, the config file will be created, and the setup window will pop up
 6.  Add: If no `com.unity.nuget.newtonsoft-json` installed, the setup window can now help you install it automatically
- 
+
 ## 5.6.2 ##
 
 1.  Fix: for Extended Serialization, `interface` could not switch from object mode to Unity Object mode
