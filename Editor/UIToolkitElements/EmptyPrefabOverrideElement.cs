@@ -3,6 +3,7 @@ using SaintsField.Editor.Core;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
@@ -94,11 +95,14 @@ namespace SaintsField.Editor.UIToolkitElements
 
         private readonly VisualElement _blueBar;
 
+        protected readonly UnityEvent PropertyChangedEvent = new UnityEvent();
+
         public FoldoutPrefabOverrideElement(SerializedProperty property)
         {
             this.TrackPropertyValue(property, p =>
             {
                 _overrideStyled = EmptyPrefabOverrideElement.OverrideStyle(p, _overrideStyled, this, _blueBar);
+                PropertyChangedEvent.Invoke();
             });
 
             _blueBar = new BlueBar

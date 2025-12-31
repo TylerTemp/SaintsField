@@ -19,7 +19,9 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
         {
             List<Object> targets = new List<Object>();
             string propPath = property.propertyPath;
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
             string addressablePropGuidPath = null;
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
 
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
             // ReSharper disable once InvertIf

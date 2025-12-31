@@ -2743,6 +2743,8 @@ namespace SaintsField.Editor.Utils
                 ));
             };
 
+            dropdownBtn.TrackPropertyValue(property, _ => dropdownBtn.ButtonLabelElement.text = GetReferencePropertyLabel(property));
+
             return dropdownBtn;
         }
 
