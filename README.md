@@ -95,9 +95,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.7**
+**5.7.8**
 
-Fix: `ReferencePicker` did not update its label, and did not update the foldout icon accordingly
+Fix: `ListView` & `ReferencePicker` property tracker clean-up so it does not give error now [#352](https://github.com/TylerTemp/SaintsField/issues/352)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
