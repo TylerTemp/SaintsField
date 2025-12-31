@@ -764,7 +764,16 @@ namespace SaintsField.Editor.Utils
                                 makeItem = () => new VisualElement(),
                                 bindItem = (element, index) =>
                                 {
-                                    SerializedProperty itemProp = property.GetArrayElementAtIndex(index);
+                                    SerializedProperty itemProp;
+                                    try
+                                    {
+                                        itemProp = property.GetArrayElementAtIndex(index);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Debug.LogWarning(e);
+                                        return;
+                                    }
                                     element.Clear();
 
                                     // Debug.Log($"draw item {itemProp.propertyPath}/rawType={rawType}/itemType={ReflectUtils.GetElementType(rawType)}");
@@ -825,6 +834,10 @@ namespace SaintsField.Editor.Utils
                             int curSize = property.arraySize;
                             listView.schedule.Execute(() =>
                             {
+                                if (!SerializedUtils.IsOk(property))
+                                {
+                                    return;
+                                }
                                 int newSize;
                                 try
                                 {
@@ -835,6 +848,10 @@ namespace SaintsField.Editor.Utils
                                     return;
                                 }
                                 catch (NullReferenceException)
+                                {
+                                    return;
+                                }
+                                catch (InvalidOperationException)
                                 {
                                     return;
                                 }
