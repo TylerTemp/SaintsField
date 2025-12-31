@@ -1,4 +1,5 @@
 #if UNITY_2021_3_OR_NEWER
+using System;
 using System.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
@@ -33,15 +34,28 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
 
             void RefreshFoldoutCheck()
             {
+                if (!SerializedUtils.IsOk(property))
+                {
+                    UIToolkitUtils.Unbind(this);
+                    return;
+                }
+
                 // Debug.Log(property.managedReferenceValue);
                 // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                if (property.managedReferenceValue == null)
+                try
                 {
-                    checkMark.style.visibility = Visibility.Hidden;
+                    if (property.managedReferenceValue == null)
+                    {
+                        checkMark.style.visibility = Visibility.Hidden;
+                    }
+                    else
+                    {
+                        checkMark.style.visibility = Visibility.Visible;
+                    }
                 }
-                else
+                catch (InvalidOperationException)
                 {
-                    checkMark.style.visibility = Visibility.Visible;
+                    // ignored
                 }
             }
         }

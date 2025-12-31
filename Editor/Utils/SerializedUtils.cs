@@ -393,6 +393,7 @@ namespace SaintsField.Editor.Utils
             {
                 int _ = property.serializedObject.targetObject.GetInstanceID();
                 string __ = property.propertyPath;
+                string ___ = property.displayName;
             }
             catch (NullReferenceException)
             {
@@ -403,6 +404,10 @@ namespace SaintsField.Editor.Utils
                 return false;
             }
             catch (ArgumentNullException)
+            {
+                return false;
+            }
+            catch (InvalidOperationException)
             {
                 return false;
             }

@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 10
+  serializedVersion: 9
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -42,8 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 13
-  m_BakeOnSceneLoad: 0
+  serializedVersion: 12
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,6 +66,9 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
+    m_FinalGather: 0
+    m_FinalGatherFiltering: 1
+    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -2219,7 +2222,7 @@ MonoBehaviour:
     - Sub1-2
 --- !u!95 &223760086
 Animator:
-  serializedVersion: 7
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2233,7 +2236,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -2829,11 +2831,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2855,11 +2852,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &292114046
 MeshFilter:
@@ -3846,7 +3841,7 @@ MonoBehaviour:
   animParamNameDisable: 
 --- !u!95 &380193380
 Animator:
-  serializedVersion: 7
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3860,7 +3855,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -4246,7 +4240,6 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &417627792
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4262,11 +4255,6 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4288,11 +4276,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: f6dd782be9f6242428748582d3c70a63, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -4302,6 +4288,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &417762861
 GameObject:
@@ -4549,11 +4536,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4575,11 +4557,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &435171143
 MeshFilter:
@@ -5640,11 +5620,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5666,11 +5641,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &551199329
 MeshFilter:
@@ -5934,7 +5907,6 @@ MonoBehaviour:
       - SubStateMachine2
 --- !u!212 &563946121
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5950,11 +5922,6 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5976,11 +5943,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}
   m_Color: {r: 0.058823526, g: 1, b: 0.5741613, a: 1}
   m_FlipX: 0
@@ -5990,6 +5955,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &575593403
 GameObject:
@@ -6041,7 +6007,6 @@ GameObject:
   m_IsActive: 1
 --- !u!212 &579857408
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -6057,11 +6022,6 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6083,11 +6043,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -6097,6 +6055,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &579857409
 Transform:
@@ -7001,15 +6960,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathAndResults:
-  - xPath: 'scene-root::/Issues*[0]//[@{GetComponent(EPathDebug).enabled}][last()]'
+  - xPath: scene-root::/Issues*[0]//[@{GetComponent(EPathDebug).enabled}][last()]
     results:
-    - 'SceneRoot::A{NameEmpty}``[]'
+    - SceneRoot::A{NameEmpty}``[]
     - '/None::A{StartsWith: IssuesEndsWith: Contains: }``[`@index Int{Equal 0}`]'
-    - '//None::A{NameEmpty}``[`@{`GetComponents=>EPathDebug[Int{Equal 0}]`.`FieldOrProperty=>enabled[]`}
-      Truly`][`@index{last()} Int{Equal -1}`]'
-  - xPath: '//[@{GetComponent(EPathDebug)}]'
+    - //None::A{NameEmpty}``[`@{`GetComponents=>EPathDebug[Int{Equal 0}]`.`FieldOrProperty=>enabled[]`}
+      Truly`][`@index{last()} Int{Equal -1}`]
+  - xPath: //[@{GetComponent(EPathDebug)}]
     results:
-    - '//A{NameEmpty}::None``[`@{`GetComponents=>(EPathDebug[Int{Equal 0}]`} Truly`]'
+    - //A{NameEmpty}::None``[`@{`GetComponents=>(EPathDebug[Int{Equal 0}]`} Truly`]
   - xPath: '[@{GetComponent(UnityEngine.BoxCollider)}]'
     results:
     - 'None::Match{NameEmpty}``[`@:Eval{`GetComponents=>UnityEngine.BoxCollider[Int{Equal
@@ -7330,7 +7289,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!199 &676684125
 ParticleSystemRenderer:
-  serializedVersion: 7
+  serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -7346,11 +7305,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7373,11 +7327,9 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -7409,6 +7361,7 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+  m_MaskInteraction: 0
 --- !u!198 &676684126
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -14098,11 +14051,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -14124,11 +14072,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &836531685
 MeshFilter:
@@ -15376,11 +15322,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -15402,11 +15343,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &911263181
 MeshFilter:
@@ -15779,11 +15718,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -15805,11 +15739,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &937423350
 MeshFilter:
@@ -16120,7 +16052,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &967363824
 Animator:
-  serializedVersion: 7
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -16134,7 +16066,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -16206,7 +16137,7 @@ MonoBehaviour:
     - SubStateMachine2
 --- !u!95 &972998066
 Animator:
-  serializedVersion: 7
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -16220,7 +16151,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -17512,11 +17442,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -17538,11 +17463,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1084255173
 GameObject:
@@ -19440,23 +19363,20 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
-  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
-  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -19572,8 +19492,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 142339351076478d999c809bf8f02511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneKey: 
-  sceneKeySep: 
 --- !u!1 &1242835953
 GameObject:
   m_ObjectHideFlags: 0
@@ -19760,11 +19678,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -19786,11 +19699,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1250645943
 MeshFilter:
@@ -21192,14 +21103,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue352AbstractReferencePicker
   _nodes:
-  - rid: 3614754042484883484
+  - rid: 3614754042526302241
   references:
     version: 2
     RefIds:
-    - rid: 3614754042484883484
+    - rid: 3614754042526302241
+      type: {class: Issue352AbstractReferencePicker/BarCompositeNode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
+      data:
+        _childNodes:
+        - rid: 3614754042526302242
+        _isTest: 0
+        _barValue: 0
+    - rid: 3614754042526302242
+      type: {class: Issue352AbstractReferencePicker/BarCompositeNode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
+      data:
+        _childNodes:
+        - rid: 3614754042526302243
+        _isTest: 0
+        _barValue: 0
+    - rid: 3614754042526302243
+      type: {class: Issue352AbstractReferencePicker/FooCompositeNode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
+      data:
+        _childNodes:
+        - rid: 3614754042526302244
+        - rid: 3614754042526302245
+        _isTest: 0
+        _fooValue: 0
+    - rid: 3614754042526302244
       type: {class: Issue352AbstractReferencePicker/ANode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
       data:
         _a: 0
+    - rid: 3614754042526302245
+      type: {class: Issue352AbstractReferencePicker/DNode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
+      data:
+        _d: 2.4
 --- !u!1 &1389853054
 GameObject:
   m_ObjectHideFlags: 0
@@ -21247,7 +21184,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
 --- !u!212 &1389853057
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -21263,11 +21199,6 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -21289,11 +21220,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -21303,6 +21232,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1395485384
 GameObject:
@@ -21979,10 +21909,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1452621600}
-  serializedVersion: 5
+  serializedVersion: 4
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_Drag: 0
+  m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -22108,7 +22038,6 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1457332499
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -22124,11 +22053,6 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -22150,11 +22074,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   m_Color: {r: 0.119199276, g: 0, b: 1, a: 1}
   m_FlipX: 0
@@ -22164,6 +22086,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &1457332500
 MonoBehaviour:
@@ -22439,7 +22362,7 @@ MonoBehaviour:
   myStruct:
     myString: 1
   myStructs:
-  - myString: 'first[0]'
+  - myString: first[0]
 --- !u!1 &1470035493
 GameObject:
   m_ObjectHideFlags: 0
@@ -22712,11 +22635,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -22738,11 +22656,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1483713352
 MeshFilter:
@@ -23408,7 +23324,6 @@ MonoBehaviour:
   sprite2: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
 --- !u!212 &1506377744
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -23424,11 +23339,6 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -23450,11 +23360,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -23464,6 +23372,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1509173911
 GameObject:
@@ -23956,11 +23865,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -23982,11 +23886,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1548456367
 MeshFilter:
@@ -24534,11 +24436,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -24560,11 +24457,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1578091337
 MeshFilter:
@@ -26195,11 +26090,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -26221,11 +26111,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1709981032
 MeshFilter:
@@ -27197,11 +27085,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -27223,11 +27106,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1782358262
 MeshFilter:
@@ -28403,7 +28284,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1866907087}
-  - component: {fileID: 1866907086}
   m_Layer: 0
   m_Name: WwiseGlobal
   m_TagString: Untagged
@@ -28411,31 +28291,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1866907086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1866907085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b588780e201149b4b8d9c2fbb8ef788a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  InitializationSettings: {fileID: 11400000, guid: 0e219929ad9a42240a345ecace740997, type: 2}
-  basePath: 
-  language: 
-  defaultPoolSize: 0
-  lowerPoolSize: 0
-  streamingPoolSize: 0
-  memoryCutoffThreshold: 0
-  monitorPoolSize: 0
-  monitorQueuePoolSize: 0
-  callbackManagerBufferSize: 0
-  spatialAudioPoolSize: 0
-  maxSoundPropagationDepth: 0
-  engineLogging: 0
 --- !u!4 &1866907087
 Transform:
   m_ObjectHideFlags: 0
@@ -28632,7 +28487,7 @@ GameObject:
   m_IsActive: 1
 --- !u!95 &1879161572
 Animator:
-  serializedVersion: 7
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -28646,7 +28501,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -28904,11 +28758,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -28930,11 +28779,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1904643336
 MeshFilter:
@@ -29360,7 +29207,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!199 &1944822170
 ParticleSystemRenderer:
-  serializedVersion: 7
+  serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -29376,11 +29223,6 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -29403,11 +29245,9 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -29439,6 +29279,7 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+  m_MaskInteraction: 0
 --- !u!198 &1944822172
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -34386,7 +34227,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1965382815
 Animator:
-  serializedVersion: 7
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -34400,7 +34241,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -34906,7 +34746,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SceneReferenceExample
   sceneRef:
     guid: 1326ba3bbd4558245a4850948bd03f1a
-    index: 2
+    index: 0
     path: Packages/today.comes.saintsfield/Samples/Example
 --- !u!4 &2002997102 stripped
 Transform:
@@ -35782,11 +35622,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -35808,11 +35643,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &2043659989
 MeshFilter:
@@ -36201,7 +36034,7 @@ MonoBehaviour:
   myStruct:
     myString: 2
   myStructs:
-  - myString: 'second[0]'
+  - myString: second[0]
 --- !u!1 &2090475749
 GameObject:
   m_ObjectHideFlags: 0
@@ -36344,7 +36177,6 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2096586617
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -36360,11 +36192,6 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -36386,11 +36213,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: cc3adf8682f6c60489c0a80ff150f631, type: 3}
   m_Color: {r: 0, g: 0.44848967, b: 1, a: 1}
   m_FlipX: 0
@@ -36400,6 +36225,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &2102148596
 GameObject:
@@ -36674,14 +36500,15 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2134144047}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 10
   m_Type: 1
+  m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 10, y: 10}
+  m_CookieSize: 10
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -36725,12 +36552,8 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
 --- !u!4 &2134144049
 Transform:
   m_ObjectHideFlags: 0
@@ -37055,131 +36878,131 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278585]'
+      propertyPath: managedReferences[6921583294834278585]
       value: Unity.VisualScripting.YamlDotNet Unity.VisualScripting.YamlDotNet.Core.Emitter/TagData
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278590]'
+      propertyPath: managedReferences[6921583294834278590]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278591]'
+      propertyPath: managedReferences[6921583294834278591]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278592]'
+      propertyPath: managedReferences[6921583294834278592]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278593]'
+      propertyPath: managedReferences[6921583294834278593]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278594]'
+      propertyPath: managedReferences[6921583294834278594]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278595]'
+      propertyPath: managedReferences[6921583294834278595]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278596]'
+      propertyPath: managedReferences[6921583294834278596]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278597]'
+      propertyPath: managedReferences[6921583294834278597]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278598]'
+      propertyPath: managedReferences[6921583294834278598]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278599]'
+      propertyPath: managedReferences[6921583294834278599]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278600]'
+      propertyPath: managedReferences[6921583294834278600]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278601]'
+      propertyPath: managedReferences[6921583294834278601]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278602]'
+      propertyPath: managedReferences[6921583294834278602]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278603]'
+      propertyPath: managedReferences[6921583294834278603]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278604]'
+      propertyPath: managedReferences[6921583294834278604]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278605]'
+      propertyPath: managedReferences[6921583294834278605]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278606]'
+      propertyPath: managedReferences[6921583294834278606]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278607]'
+      propertyPath: managedReferences[6921583294834278607]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278608]'
+      propertyPath: managedReferences[6921583294834278608]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278609]'
+      propertyPath: managedReferences[6921583294834278609]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278610]'
+      propertyPath: managedReferences[6921583294834278610]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278611]'
+      propertyPath: managedReferences[6921583294834278611]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278612]'
+      propertyPath: managedReferences[6921583294834278612]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278613]'
+      propertyPath: managedReferences[6921583294834278613]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278614]'
+      propertyPath: managedReferences[6921583294834278614]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583294834278615]'
+      propertyPath: managedReferences[6921583294834278615]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583314869157966]'
+      propertyPath: managedReferences[6921583314869157966]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583314869157971]'
+      propertyPath: managedReferences[6921583314869157971]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583314869157972]'
+      propertyPath: managedReferences[6921583314869157972]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorClassInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583314869157973]'
+      propertyPath: managedReferences[6921583314869157973]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
-      propertyPath: 'managedReferences[6921583314869157974]'
+      propertyPath: managedReferences[6921583314869157974]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
@@ -37587,11 +37410,6 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -37613,11 +37431,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1001 &1951425805536394670
 PrefabInstance:
@@ -37676,167 +37492,167 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583409857299263]'
+      propertyPath: managedReferences[6921583409857299263]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410441093729]'
+      propertyPath: managedReferences[6921583410441093729]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410441617613]'
+      propertyPath: managedReferences[6921583410441617613]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410447909529]'
+      propertyPath: managedReferences[6921583410447909529]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410447909543]'
+      propertyPath: managedReferences[6921583410447909543]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410447909549]'
+      propertyPath: managedReferences[6921583410447909549]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410447909578]'
+      propertyPath: managedReferences[6921583410447909578]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410452104390]'
+      propertyPath: managedReferences[6921583410452104390]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410452104391]'
+      propertyPath: managedReferences[6921583410452104391]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410452630250]'
+      propertyPath: managedReferences[6921583410452630250]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410452630251]'
+      propertyPath: managedReferences[6921583410452630251]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410452630252]'
+      propertyPath: managedReferences[6921583410452630252]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410454200531]'
+      propertyPath: managedReferences[6921583410454200531]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410454463887]'
+      propertyPath: managedReferences[6921583410454463887]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410468356639]'
+      propertyPath: managedReferences[6921583410468356639]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410471239826]'
+      propertyPath: managedReferences[6921583410471239826]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410479890810]'
+      propertyPath: managedReferences[6921583410479890810]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410479891191]'
+      propertyPath: managedReferences[6921583410479891191]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410488279356]'
+      propertyPath: managedReferences[6921583410488279356]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410488279833]'
+      propertyPath: managedReferences[6921583410488279833]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410494833226]'
+      propertyPath: managedReferences[6921583410494833226]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410572165747]'
+      propertyPath: managedReferences[6921583410572165747]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410574263159]'
+      propertyPath: managedReferences[6921583410574263159]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410581079378]'
+      propertyPath: managedReferences[6921583410581079378]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410586322628]'
+      propertyPath: managedReferences[6921583410586322628]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410597331846]'
+      propertyPath: managedReferences[6921583410597331846]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410607292489]'
+      propertyPath: managedReferences[6921583410607292489]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410610177958]'
+      propertyPath: managedReferences[6921583410610177958]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410632458916]'
+      propertyPath: managedReferences[6921583410632458916]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410643206155]'
+      propertyPath: managedReferences[6921583410643206155]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410643206319]'
+      propertyPath: managedReferences[6921583410643206319]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410644254941]'
+      propertyPath: managedReferences[6921583410644254941]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410647662722]'
+      propertyPath: managedReferences[6921583410647662722]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410647662956]'
+      propertyPath: managedReferences[6921583410647662956]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410649236135]'
+      propertyPath: managedReferences[6921583410649236135]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410766415150]'
+      propertyPath: managedReferences[6921583410766415150]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410766415337]'
+      propertyPath: managedReferences[6921583410766415337]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410768775008]'
+      propertyPath: managedReferences[6921583410768775008]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410776637688]'
+      propertyPath: managedReferences[6921583410776637688]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410778735966]'
+      propertyPath: managedReferences[6921583410778735966]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583410778735967]'
+      propertyPath: managedReferences[6921583410778735967]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/MyS
       objectReference: {fileID: 0}
     - target: {fileID: 6579630171785185653, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
@@ -38028,7 +37844,7 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[-2]'
+      propertyPath: managedReferences[-2]
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
@@ -38096,15 +37912,15 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583431157285792]'
+      propertyPath: managedReferences[6921583431157285792]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/Sub1
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583431157285793]'
+      propertyPath: managedReferences[6921583431157285793]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/Sub1
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
-      propertyPath: 'managedReferences[6921583431157285794]'
+      propertyPath: managedReferences[6921583431157285794]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictReference/Sub2
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
@@ -38677,23 +38493,23 @@ PrefabInstance:
       value: 6921583294834278589
       objectReference: {fileID: 0}
     - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
-      propertyPath: 'managedReferences[6921583294834278523]'
+      propertyPath: managedReferences[6921583294834278523]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.ReferenceExamples.ReferenceExample/Orange3
       objectReference: {fileID: 0}
     - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
-      propertyPath: 'managedReferences[6921583294834278586]'
+      propertyPath: managedReferences[6921583294834278586]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.ReferenceExamples.ReferenceExample/Orange2
       objectReference: {fileID: 0}
     - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
-      propertyPath: 'managedReferences[6921583294834278587]'
+      propertyPath: managedReferences[6921583294834278587]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.ReferenceExamples.ReferenceExample/Orange3
       objectReference: {fileID: 0}
     - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
-      propertyPath: 'managedReferences[6921583294834278588]'
+      propertyPath: managedReferences[6921583294834278588]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.ReferenceExamples.ReferenceExample/Orange
       objectReference: {fileID: 0}
     - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
-      propertyPath: 'managedReferences[6921583294834278589]'
+      propertyPath: managedReferences[6921583294834278589]
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.ReferenceExamples.ReferenceExample/Base2Fruit
       objectReference: {fileID: 0}
     - target: {fileID: 3460672450124566761, guid: 4cc0bf2f2be267e49bcfa2747a1f7c34, type: 3}
@@ -39415,11 +39231,11 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
-      propertyPath: 'myDataArr.Array.data[0]'
+      propertyPath: myDataArr.Array.data[0]
       value: fds
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
-      propertyPath: 'myDataArr.Array.data[1]'
+      propertyPath: myDataArr.Array.data[1]
       value: s
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
@@ -39523,11 +39339,11 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
-      propertyPath: 'managedReferences[6921583409857299213]'
+      propertyPath: managedReferences[6921583409857299213]
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
-      propertyPath: 'managedReferences[6921583410766415151]'
+      propertyPath: managedReferences[6921583410766415151]
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
@@ -39555,7 +39371,7 @@ PrefabInstance:
       value: 33
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
-      propertyPath: 'saintsArray.Array.data[0].value.Array.data[0]'
+      propertyPath: saintsArray.Array.data[0].value.Array.data[0]
       value: 
       objectReference: {fileID: 6004775636325262730}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
@@ -39647,7 +39463,7 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
-      propertyPath: 'state.<subStateMachineNameChain>k__BackingField.Array.data[0]'
+      propertyPath: state.<subStateMachineNameChain>k__BackingField.Array.data[0]
       value: SubStateMachine2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
@@ -39659,11 +39475,11 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
-      propertyPath: 'stateBase.<subStateMachineNameChain>k__BackingField.Array.data[0]'
+      propertyPath: stateBase.<subStateMachineNameChain>k__BackingField.Array.data[0]
       value: SubStateMachine1
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
-      propertyPath: 'stateBase.<subStateMachineNameChain>k__BackingField.Array.data[1]'
+      propertyPath: stateBase.<subStateMachineNameChain>k__BackingField.Array.data[1]
       value: Sub1-2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
@@ -39689,7 +39505,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &6004775636325262731
 Animator:
-  serializedVersion: 7
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -39703,7 +39519,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
