@@ -6,7 +6,7 @@ namespace SaintsField.ComponentHeader
     public readonly struct HeaderArea
     {
         /// <summary>
-        /// Rect.y for drwaing
+        /// Rect.y for drawing
         /// </summary>
         public readonly float Y;
         /// <summary>

@@ -370,9 +370,9 @@ namespace SaintsField.Editor.HeaderGUI
             float xLeft = headerArea.SpaceStartX;
             float xRight = rectangle.xMax;
 
-            string preLeftGrouBy = null;
+            string preLeftGroupBy = null;
             List<Rect> preLeftUsedRects = new List<Rect>();
-            string preRightGrouBy = null;
+            string preRightGroupBy = null;
             List<Rect> preRightUsedRects = new List<Rect>();
 
             foreach (RenderTargetInfo renderTargetInfo in renderTargetInfos)
@@ -383,7 +383,7 @@ namespace SaintsField.Editor.HeaderGUI
                     {
                         if (headerButtonAttribute.IsLeft)
                         {
-                            preLeftGrouBy = null;
+                            preLeftGroupBy = null;
                             if(preLeftUsedRects.Count > 0)
                             {
                                 xLeft = Mathf.Max(xLeft, preLeftUsedRects.Max(each => each.xMax));
@@ -392,7 +392,7 @@ namespace SaintsField.Editor.HeaderGUI
                         }
                         else
                         {
-                            preRightGrouBy = null;
+                            preRightGroupBy = null;
                             if(preRightUsedRects.Count > 0)
                             {
                                 xRight = Mathf.Min(xRight, preRightUsedRects.Min(each => each.x));
@@ -435,18 +435,18 @@ namespace SaintsField.Editor.HeaderGUI
                             // check if it's new group
                             if (headerDrawAttribute.IsLeft)
                             {
-                                if (preLeftGrouBy != headerDrawAttribute.GroupBy && preLeftUsedRects.Count > 0)
+                                if (preLeftGroupBy != headerDrawAttribute.GroupBy && preLeftUsedRects.Count > 0)
                                 {
-                                    preLeftGrouBy = headerDrawAttribute.GroupBy;
+                                    preLeftGroupBy = headerDrawAttribute.GroupBy;
                                     xLeft = Mathf.Max(xLeft, preLeftUsedRects.Max(each => each.xMax));
                                     preLeftUsedRects.Clear();
                                 }
                             }
                             else
                             {
-                                if (preRightGrouBy != headerDrawAttribute.GroupBy && preRightUsedRects.Count > 0)
+                                if (preRightGroupBy != headerDrawAttribute.GroupBy && preRightUsedRects.Count > 0)
                                 {
-                                    preRightGrouBy = headerDrawAttribute.GroupBy;
+                                    preRightGroupBy = headerDrawAttribute.GroupBy;
                                     xRight = Mathf.Min(xRight, preRightUsedRects.Min(each => each.x));
                                     preRightUsedRects.Clear();
                                 }
@@ -456,7 +456,7 @@ namespace SaintsField.Editor.HeaderGUI
                         {
                             if (headerDrawAttribute.IsLeft)
                             {
-                                preLeftGrouBy = null;
+                                preLeftGroupBy = null;
                                 if(preLeftUsedRects.Count > 0)
                                 {
                                     xLeft = Mathf.Max(xLeft, preLeftUsedRects.Max(each => each.xMax));
@@ -465,7 +465,7 @@ namespace SaintsField.Editor.HeaderGUI
                             }
                             else
                             {
-                                preRightGrouBy = null;
+                                preRightGroupBy = null;
                                 if(preRightUsedRects.Count > 0)
                                 {
                                     xRight = Mathf.Min(xRight, preRightUsedRects.Min(each => each.x));
@@ -498,12 +498,12 @@ namespace SaintsField.Editor.HeaderGUI
                                 if (headerDrawAttribute.IsLeft)
                                 {
                                     preLeftUsedRects.Add(headerUsed.UsedRect);
-                                    preLeftGrouBy = headerDrawAttribute.GroupBy;
+                                    preLeftGroupBy = headerDrawAttribute.GroupBy;
                                 }
                                 else
                                 {
                                     preRightUsedRects.Add(headerUsed.UsedRect);
-                                    preRightGrouBy = headerDrawAttribute.GroupBy;
+                                    preRightGroupBy = headerDrawAttribute.GroupBy;
                                 }
                             }
                         }
@@ -521,18 +521,18 @@ namespace SaintsField.Editor.HeaderGUI
                             // check if it's new group
                             if (headerLabelAttribute.IsLeft)
                             {
-                                if (preLeftGrouBy != headerLabelAttribute.GroupBy && preLeftUsedRects.Count > 0)
+                                if (preLeftGroupBy != headerLabelAttribute.GroupBy && preLeftUsedRects.Count > 0)
                                 {
-                                    preLeftGrouBy = headerLabelAttribute.GroupBy;
+                                    preLeftGroupBy = headerLabelAttribute.GroupBy;
                                     xLeft = Mathf.Max(xLeft, preLeftUsedRects.Max(each => each.xMax));
                                     preLeftUsedRects.Clear();
                                 }
                             }
                             else
                             {
-                                if (preRightGrouBy != headerLabelAttribute.GroupBy && preRightUsedRects.Count > 0)
+                                if (preRightGroupBy != headerLabelAttribute.GroupBy && preRightUsedRects.Count > 0)
                                 {
-                                    preRightGrouBy = headerLabelAttribute.GroupBy;
+                                    preRightGroupBy = headerLabelAttribute.GroupBy;
                                     xRight = Mathf.Min(xRight, preRightUsedRects.Min(each => each.x));
                                     preRightUsedRects.Clear();
                                 }
@@ -542,7 +542,7 @@ namespace SaintsField.Editor.HeaderGUI
                         {
                             if (headerLabelAttribute.IsLeft)
                             {
-                                preLeftGrouBy = null;
+                                preLeftGroupBy = null;
                                 if(preLeftUsedRects.Count > 0)
                                 {
                                     xLeft = Mathf.Max(xLeft, preLeftUsedRects.Max(each => each.xMax));
@@ -551,7 +551,7 @@ namespace SaintsField.Editor.HeaderGUI
                             }
                             else
                             {
-                                preRightGrouBy = null;
+                                preRightGroupBy = null;
                                 if(preRightUsedRects.Count > 0)
                                 {
                                     xRight = Mathf.Min(xRight, preRightUsedRects.Min(each => each.x));
@@ -585,12 +585,12 @@ namespace SaintsField.Editor.HeaderGUI
                                 if (headerLabelAttribute.IsLeft)
                                 {
                                     preLeftUsedRects.Add(headerUsed.UsedRect);
-                                    preLeftGrouBy = headerLabelAttribute.GroupBy;
+                                    preLeftGroupBy = headerLabelAttribute.GroupBy;
                                 }
                                 else
                                 {
                                     preRightUsedRects.Add(headerUsed.UsedRect);
-                                    preRightGrouBy = headerLabelAttribute.GroupBy;
+                                    preRightGroupBy = headerLabelAttribute.GroupBy;
                                 }
                             }
                         }
