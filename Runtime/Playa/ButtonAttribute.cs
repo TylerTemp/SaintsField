@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-#if SAINTSFIELD_BUTTON_IMPLICIT_USE
+#if SAINTSFIELD_IMPLICIT_USE
 using JetBrains.Annotations;
 #endif
 using SaintsField.Utils;
 
 namespace SaintsField.Playa
 {
-#if SAINTSFIELD_BUTTON_IMPLICIT_USE
+#if SAINTSFIELD_IMPLICIT_USE
     [MeansImplicitUse]  // https://github.com/TylerTemp/SaintsField/pull/171#issuecomment-3680042013
 #endif
     [Conditional("UNITY_EDITOR")]
