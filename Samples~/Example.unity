@@ -17317,6 +17317,63 @@ MonoBehaviour:
   disable1Or2: 
   enable1And2: 
   enable1Or2: 
+--- !u!1 &1063585363
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1063585365}
+  - component: {fileID: 1063585364}
+  m_Layer: 0
+  m_Name: WwiseGlobal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1063585364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1063585363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b588780e201149b4b8d9c2fbb8ef788a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InitializationSettings: {fileID: 11400000, guid: 0e219929ad9a42240a345ecace740997, type: 2}
+  basePath: 
+  language: 
+  defaultPoolSize: 0
+  lowerPoolSize: 0
+  streamingPoolSize: 0
+  memoryCutoffThreshold: 0
+  monitorPoolSize: 0
+  monitorQueuePoolSize: 0
+  callbackManagerBufferSize: 0
+  spatialAudioPoolSize: 0
+  maxSoundPropagationDepth: 0
+  engineLogging: 0
+--- !u!4 &1063585365
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1063585363}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1064608760
 GameObject:
   m_ObjectHideFlags: 0
@@ -21101,42 +21158,16 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6cbaad6ce90445e95d06a10a73bf033, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue352AbstractReferencePicker
+  m_EditorClassIdentifier: 
   _nodes:
-  - rid: 3614754042526302241
+  - rid: 3614754043555741742
   references:
     version: 2
     RefIds:
-    - rid: 3614754042526302241
-      type: {class: Issue352AbstractReferencePicker/BarCompositeNode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
+    - rid: 3614754043555741742
+      type: {class: Issue352AbstractReferencePicker/CNode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
       data:
-        _childNodes:
-        - rid: 3614754042526302242
-        _isTest: 0
-        _barValue: 0
-    - rid: 3614754042526302242
-      type: {class: Issue352AbstractReferencePicker/BarCompositeNode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
-      data:
-        _childNodes:
-        - rid: 3614754042526302243
-        _isTest: 0
-        _barValue: 0
-    - rid: 3614754042526302243
-      type: {class: Issue352AbstractReferencePicker/FooCompositeNode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
-      data:
-        _childNodes:
-        - rid: 3614754042526302244
-        - rid: 3614754042526302245
-        _isTest: 0
-        _fooValue: 0
-    - rid: 3614754042526302244
-      type: {class: Issue352AbstractReferencePicker/ANode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
-      data:
-        _a: 0
-    - rid: 3614754042526302245
-      type: {class: Issue352AbstractReferencePicker/DNode, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: SaintsField.Samples}
-      data:
-        _d: 2.4
+        _c: 0
 --- !u!1 &1389853054
 GameObject:
   m_ObjectHideFlags: 0
@@ -39918,3 +39949,4 @@ SceneRoots:
   - {fileID: 936021963}
   - {fileID: 1242835955}
   - {fileID: 1866907087}
+  - {fileID: 1063585365}
