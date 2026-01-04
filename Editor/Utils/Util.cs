@@ -1211,7 +1211,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private static Type FindTypeInAssmbly(Assembly assembly, IReadOnlyList<string> split)
+        private static Type FindTypeInAssembly(Assembly assembly, IReadOnlyList<string> split)
         {
             return split.Count > 1
                 ? assembly.GetType(string.Join(".", split), false)
@@ -1241,13 +1241,13 @@ namespace SaintsField.Editor.Utils
             if(target != null)
             {
                 Assembly assembly = target.GetType().Assembly;
-                type = FindTypeInAssmbly(assembly, split);
+                type = FindTypeInAssembly(assembly, split);
             }
             if (type == null && fullSearch)
             {
                 foreach (Assembly searchAssembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    type = FindTypeInAssmbly(searchAssembly, split);
+                    type = FindTypeInAssembly(searchAssembly, split);
                     if (type != null)
                     {
                         break;
@@ -2237,7 +2237,7 @@ namespace SaintsField.Editor.Utils
             }
 
             // Debug.Log($"get value at {arrayIndex} from rawValue {((IEnumerable)rawValue).Cast<object>().Count()}");
-            (string indexError, object indexResult) = GetValueAtIndex(rawValue, arrayIndex);
+            (string indexError, object indexResult) = GetValueAtIndexFromCollection(rawValue, arrayIndex);
             if (indexError != "")
             {
                 return (indexError, -1, null);
@@ -2297,7 +2297,7 @@ namespace SaintsField.Editor.Utils
         }
 
 
-        public static (string error, object result) GetValueAtIndex(object source, int index)
+        public static (string error, object result) GetValueAtIndexFromCollection(object source, int index)
         {
             // ReSharper disable once UseNegatedPatternInIsExpression
             if (!(source is IEnumerable enumerable))

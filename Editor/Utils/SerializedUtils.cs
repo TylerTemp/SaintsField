@@ -195,7 +195,7 @@ namespace SaintsField.Editor.Utils
                     }
 
                     // Debug.Log($"Get index from obj {useObject}[{elemIndex}]");
-                    sourceObj = Util.GetValueAtIndex(useObject, elemIndex).Item2;
+                    sourceObj = Util.GetValueAtIndexFromCollection(useObject, elemIndex).Item2;
                     // Debug.Log($"Get index from obj `{useObject}` returns {sourceObj}");
                     fieldOrProp = default;
                     // Debug.Log($"[index={elemIndex}]={targetObj}");

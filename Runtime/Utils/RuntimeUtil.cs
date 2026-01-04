@@ -227,7 +227,6 @@ namespace SaintsField.Utils
             }
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
         public static IEnumerable<RichTextParsedChunk> ParseRichXml(string richXml)
         {
             // Debug.Log($"get rich xml: {richXml}");
