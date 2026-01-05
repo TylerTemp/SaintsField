@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix `RichText` did not work with `<field.subField/>`
+2.  Fix `AboveText`, `BelowText` did not update with `<field/>` tag
+
 ## 5.7.8 ##
 
 Fix: `ListView` & `ReferencePicker` property tracker clean-up so it does not give error now [#352](https://github.com/TylerTemp/SaintsField/issues/352)

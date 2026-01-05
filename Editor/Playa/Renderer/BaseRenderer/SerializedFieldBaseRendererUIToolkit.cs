@@ -169,7 +169,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 string xml = preCheckResult.RichLabelXml;
                 // Debug.Log(xml);
                 UserDataPayload userDataPayload = (UserDataPayload) _container.userData;
-                if (xml != userDataPayload.XML)
+                if (xml != userDataPayload.XML || (xml ?? "").Contains("<field"))
                 {
                     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                     if (userDataPayload.RichTextDrawer == null)

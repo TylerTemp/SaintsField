@@ -354,38 +354,43 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         return "";
                     }
 
-                    bool hasError = false;
+                    // string error = "";
 
                     (string error, int index, object value) result = Util.GetValue(FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
-                    (string error, int index, object value) accResult = result;
-                    if (tagName == "field")
+                    // (string error, int index, object value) accResult = result;
+                    if (result.error != "")
                     {
-                        if (result.error != "")
-                        {
-                            hasError = true;
-                        }
+                        // error = result.error;
                     }
                     else
                     {
-                        string revName = tagName["field.".Length..];
+                        if (tagName == "field")
+                        {
+                        }
+                        else
+                        {
+                            string revName = tagName["field.".Length..];
 
-                        // string[] subFields = revName.Split(SerializedUtils.DotSplitSeparator);
-                        // object accParent = FieldWithInfo.Targets[0];
+                            (string error, object result) getOfValue = Util.GetOf<object>(revName, null,
+                                FieldWithInfo.SerializedProperty,
+                                FieldWithInfo.FieldInfo, result.value, null);
 
-                        (string error, object result) getOfValue = Util.GetOf<object>(revName, null, FieldWithInfo.SerializedProperty,
-                            FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0], null);
-
-                        hasError = getOfValue.error != "";
-                        accResult = (getOfValue.error, accResult.index, getOfValue.result);
+                            // hasError = getOfValue.error != "";
+                            // error = getOfValue.error;
+                            result = (getOfValue.error, result.index, getOfValue.result);
+                        }
                     }
 
-                    // ReSharper disable once ConvertIfStatementToReturnStatement
-                    if (hasError)
+                    // ReSharper disable once InvertIf
+                    if (result.error != "")
                     {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(result.error);
+#endif
                         return rawContent;
                     }
 
-                    return RichTextDrawer.TagStringFormatter(accResult.value, tagValue);
+                    return RichTextDrawer.TagStringFormatter(result.value, tagValue);
                 }
                 case SaintsRenderType.NonSerializedField:
                 case SaintsRenderType.Method:

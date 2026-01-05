@@ -62,8 +62,17 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             };
 
             UpdateContainer(container, this);
+            bool needUpdate = playaAboveRichLabelAttribute.IsCallback;
+            // ReSharper disable once InvertIf
+            if (!needUpdate)
+            {
+                if (!string.IsNullOrEmpty(playaAboveRichLabelAttribute.Content))
+                {
+                    needUpdate = playaAboveRichLabelAttribute.Content.Contains("<field");
+                }
+            }
 
-            return (container, playaAboveRichLabelAttribute.IsCallback);
+            return (container, needUpdate);
         }
 
         private static void UpdateContainer(VisualElement container, IRichTextTagProvider richTextTagProvider)
@@ -90,7 +99,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             }
 
             // Debug.Log($"{userData.XmlContent} == {xmlContent}: {userData.XmlContent == xmlContent}");
-            if (userData.XmlContent == xmlContent)
+            if (userData.XmlContent == xmlContent && !xmlContent.Contains("<field"))
             {
                 return;
             }
