@@ -94,7 +94,7 @@ namespace SaintsField.Samples.Scripts.RichLabelExamples
         [FieldLabelText("This is a long ride for people have nothing to")]
         public int richLabel2;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [FieldLabelText("This Is a Long Drive for Someone with Nothing to Think About")]
         public int richLabelDisabled;
 

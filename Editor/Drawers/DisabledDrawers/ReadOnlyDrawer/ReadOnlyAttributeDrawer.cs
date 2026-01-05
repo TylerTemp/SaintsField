@@ -6,8 +6,8 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers.ReadOnlyDrawer
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
-    [CustomPropertyDrawer(typeof(ReadOnlyAttribute), true)]
-    [CustomPropertyDrawer(typeof(DisableIfAttribute), true)]
+    [CustomPropertyDrawer(typeof(FieldReadOnlyAttribute), true)]
+    [CustomPropertyDrawer(typeof(FieldDisableIfAttribute), true)]
     public partial class ReadOnlyAttributeDrawer: SaintsPropertyDrawer
     {
         // protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,

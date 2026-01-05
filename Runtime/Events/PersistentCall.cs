@@ -18,8 +18,8 @@ namespace SaintsField.Events
         [SerializeField] public string methodName;
 
         [SerializeField] public bool isStatic;
-        [SerializeField, DisableIf(nameof(isStatic))] public Object target;
-        [SerializeField, EnableIf(nameof(isStatic)), TypeReference(EType.AllAssembly | EType.AllowInternal)]
+        [SerializeField, FieldDisableIf(nameof(isStatic))] public Object target;
+        [SerializeField, FieldEnableIf(nameof(isStatic)), TypeReference(EType.AllAssembly | EType.AllowInternal)]
         public TypeReference staticType;
 
         [SerializeField] public PersistentArgument[] persistentArguments;

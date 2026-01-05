@@ -39,11 +39,11 @@ namespace SaintsField.Samples.Scripts
 
         public MyStruct myStruct;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [EnumToggleButtons]
         public BitMask myMaskDisabled;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [EnumToggleButtons]
         [FieldLabelText("<icon=star.png /><label />")]
         public BitMask myMaskDisabledLabel;

@@ -55,9 +55,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             [MaterialToggle(nameof(matRenderer))] public Material mat2;
 
             [SepTitle(EColor.Aqua)]
-            [DisableIf(nameof(toggle), Toggle.On)]
+            [FieldDisableIf(nameof(toggle), Toggle.On)]
             public float disableIf;
-            [EnableIf(nameof(toggle), Toggle.On)]
+            [FieldEnableIf(nameof(toggle), Toggle.On)]
             public float enableIf;
             [FieldShowIf(nameof(toggle), Toggle.On)]
             public float showIf;

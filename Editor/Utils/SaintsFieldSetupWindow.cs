@@ -145,7 +145,7 @@ namespace SaintsField.Editor.Utils
 
         [Ordered]
 #if !SAINTSFIELD_SAINTS_EDITOR_APPLY
-        [PlayaDisableIf(true)]
+        [DisableIf(true)]
 #endif
         [Button("Disable")]
         private void DisableSaintsEditor()
@@ -221,7 +221,7 @@ namespace SaintsField.Editor.Utils
         [Ordered]
         [AboveText("$" + nameof(CodeAnalysisInstallInfo), 5, 5)]
         [LayoutStart("./Code Analysis Install Buttons", ELayout.Horizontal)]
-        [PlayaDisableIf(nameof(CodeAnalysisInstalled))]
+        [DisableIf(nameof(CodeAnalysisInstalled))]
         [Button("Install")]
         private void InstallCodeAnalysis()
         {
@@ -341,7 +341,7 @@ namespace SaintsField.Editor.Utils
 
         [Ordered]
         [Button("Uninstall")]
-        [PlayaEnableIf(nameof(CodeAnalysisInstalled))]
+        [EnableIf(nameof(CodeAnalysisInstalled))]
         private void UninstallCodeAnalysis()
         {
 #if SAINTSFIELD_NEWTONSOFT_JSON
@@ -420,7 +420,7 @@ namespace SaintsField.Editor.Utils
             + " in this project", 5, 5)]
         [Ordered]
 #if SAINTSFIELD_CODE_ANALYSIS
-        [PlayaDisableIf(true)]
+        [DisableIf(true)]
 #endif
         [Button("Force Enable")]
         private void EnableCodeAnalysis()
@@ -477,7 +477,7 @@ namespace SaintsField.Editor.Utils
 
         [LayoutStart("./SaintsEvent Install Buttons", ELayout.Horizontal)]
 #if SAINTSFIELD_SERIALIZATION
-        [PlayaDisableIf(true)]
+        [DisableIf(true)]
 #endif
         [Button("Install")]
         private IEnumerator InstallUnitySerialization()

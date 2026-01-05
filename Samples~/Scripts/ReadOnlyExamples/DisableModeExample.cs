@@ -6,10 +6,10 @@ namespace SaintsField.Samples.Scripts.ReadOnlyExamples
     {
         public bool boolVal;
 
-        [DisableIf(EMode.Edit)] public string disEditMode;
-        [DisableIf(EMode.Play)] public string disPlayMode;
+        [FieldDisableIf(EMode.Edit)] public string disEditMode;
+        [FieldDisableIf(EMode.Play)] public string disPlayMode;
 
-        [DisableIf(EMode.Edit, nameof(boolVal))] public string disEditAndBool;
-        [DisableIf(EMode.Edit), DisableIf(nameof(boolVal))] public string disEditOrBool;
+        [FieldDisableIf(EMode.Edit, nameof(boolVal))] public string disEditAndBool;
+        [FieldDisableIf(EMode.Edit), FieldDisableIf(nameof(boolVal))] public string disEditOrBool;
     }
 }

@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts
 
         private void OnValueChanged(string s) => Debug.Log(s);
 
-        [ReadOnly]
+        [FieldReadOnly]
         [InputAxis]
         [FieldLabelText("<icon=star.png /><label/>")]
         public string inputAxisDisabled;

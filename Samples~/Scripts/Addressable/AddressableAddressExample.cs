@@ -36,7 +36,7 @@ namespace SaintsField.Samples.Scripts.Addressable
         public string addressLabelAnd;
 
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
-        [ReadOnly]
+        [FieldReadOnly]
         [AddressableAddress][FieldLabelText("<icon=star.png /><label />")]
 #else
         [InfoBox("Please install Addressable to see this feature.", EMessageType.Error)]

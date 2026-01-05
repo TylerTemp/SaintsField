@@ -7,7 +7,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
     public class Issue75 : SaintsMonoBehaviour
     {
         [GetComponent, FieldHideIf] public Issue75 i75Hide;
-        [GetComponent, DisableIf] public Issue75 i75Disable;
+        [GetComponent, FieldDisableIf] public Issue75 i75Disable;
 
         [Button]
         private void PrintDebug()

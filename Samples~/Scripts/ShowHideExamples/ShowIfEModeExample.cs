@@ -5,25 +5,25 @@ namespace SaintsField.Samples.Scripts.ShowHideExamples
 {
     public class ShowIfEModeExample : MonoBehaviour
     {
-        [EnableIf(EMode.InstanceInScene)]
+        [FieldEnableIf(EMode.InstanceInScene)]
         public string instanceInScene = "Instances of prefabs in scenes";
 
-        [EnableIf(EMode.InstanceInPrefab)]
+        [FieldEnableIf(EMode.InstanceInPrefab)]
         public string instanceInPrefab = "Instances of prefabs nested inside other prefabs";
 
-        [EnableIf(EMode.Regular)]
+        [FieldEnableIf(EMode.Regular)]
         public string regular = "Regular prefab assets";
 
-        [EnableIf(EMode.Variant)]
+        [FieldEnableIf(EMode.Variant)]
         public string variant = "Prefab variant assets";
 
-        [EnableIf(EMode.NonPrefabInstance)]
+        [FieldEnableIf(EMode.NonPrefabInstance)]
         public string nonPrefabInstance = "Non-prefab component or gameobject instances in scenes";
 
-        [EnableIf(EMode.PrefabInstance)]
+        [FieldEnableIf(EMode.PrefabInstance)]
         public string prefabInstance = "Instances of regular prefabs, and prefab variants in scenes or nested in other prefabs";
 
-        [EnableIf(EMode.PrefabAsset)]
+        [FieldEnableIf(EMode.PrefabAsset)]
         public string prefabAsset = "Prefab assets and prefab variant assets";
     }
 }

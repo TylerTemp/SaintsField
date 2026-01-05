@@ -47,7 +47,7 @@ namespace SaintsField.Samples.Scripts
         [SerializeField, MinMaxSlider(nameof(DynamicMin), 100f)] private Vector2 _propLeftRange;
         [SerializeField, MinMaxSlider(-100f, nameof(DynamicMax))] private Vector2 _propRightRange;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [MinMaxSlider(-1f, 3f, 0.3f)]
         public Vector2 vector2Step03Disabled;
 

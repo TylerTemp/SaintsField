@@ -44,9 +44,9 @@ namespace SaintsField.Samples.Scripts.HeaderComponentExample
 
         private string _saveLabel = "";
 
-        [EnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public string nickName;
-        [EnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public string password;
-        [EnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public int age;
+        [FieldEnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public string nickName;
+        [FieldEnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public string password;
+        [FieldEnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public int age;
 
         private void OnChanged() => _saveLabel = "<color=lime><icon=save.png/>";
     }

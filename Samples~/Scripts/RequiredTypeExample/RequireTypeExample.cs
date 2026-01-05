@@ -14,7 +14,7 @@ namespace SaintsField.Samples.Scripts.RequiredTypeExample
         [RequireType(typeof(IMyInterface), typeof(SpriteRenderer)),
          FieldType(typeof(SpriteRenderer), false)] public GameObject fieldGo;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [RequireType(typeof(IMyInterface), typeof(SpriteRenderer)),
          FieldType(typeof(SpriteRenderer), false)] public GameObject fieldGoDisable;
 

@@ -23,10 +23,10 @@ namespace SaintsField.Editor.I2Setup
         [ValidateInput(nameof(ValidateAsmdefName))]
         public string i2LocAsdmefName = "I2AsmDef.asmdef";
 
-        [ReadOnly, Required("ASDMEF config not found")]
+        [FieldReadOnly, Required("ASDMEF config not found")]
         public string i2LocAsmdefPath;
 
-        [ReadOnly, Required("ASDMEF meta config not found")]
+        [FieldReadOnly, Required("ASDMEF meta config not found")]
         public string i2LocAsmdefMetaPath;
 
         private string ValidateAsmdefName(string value)
@@ -39,7 +39,7 @@ namespace SaintsField.Editor.I2Setup
             return "";
         }
 
-        [PlayaEnableIf(nameof(i2LocAsmdefPath), nameof(i2LocAsmdefMetaPath))]
+        [EnableIf(nameof(i2LocAsmdefPath), nameof(i2LocAsmdefMetaPath))]
         [Button("Copy I2 Asmdef")]
         // ReSharper disable once UnusedMember.Local
         private void CopyI2LocAsmdef()

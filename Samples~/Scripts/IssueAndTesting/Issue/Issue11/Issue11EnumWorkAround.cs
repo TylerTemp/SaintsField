@@ -15,7 +15,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue11
         public EnumState state;
 
 #if UNITY_EDITOR
-        [EnableIf(nameof(isOn))]
+        [FieldEnableIf(nameof(isOn))]
 #endif
         public string editable;
 

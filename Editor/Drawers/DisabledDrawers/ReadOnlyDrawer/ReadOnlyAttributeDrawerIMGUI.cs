@@ -84,9 +84,9 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers.ReadOnlyDrawer
         {
             List<bool> allResults = new List<bool>();
 
-            ReadOnlyAttribute[] targetAttributes =
-                SerializedUtils.GetAttributesAndDirectParent<ReadOnlyAttribute>(property).attributes;
-            foreach (ReadOnlyAttribute targetAttribute in targetAttributes)
+            FieldReadOnlyAttribute[] targetAttributes =
+                SerializedUtils.GetAttributesAndDirectParent<FieldReadOnlyAttribute>(property).attributes;
+            foreach (FieldReadOnlyAttribute targetAttribute in targetAttributes)
             {
                 (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) =
                     Util.ConditionChecker(targetAttribute.ConditionInfos, property, info, target);

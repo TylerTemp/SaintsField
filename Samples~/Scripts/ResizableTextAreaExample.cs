@@ -24,7 +24,7 @@ namespace SaintsField.Samples.Scripts
         [ResizableTextArea] public string[] arr;
         public MyStruct[] structArr;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [ResizableTextArea, FieldLabelText("<icon=star.png /><label />")] public string shortDisabled;
 
         private void ChangeValue(string oldValue)

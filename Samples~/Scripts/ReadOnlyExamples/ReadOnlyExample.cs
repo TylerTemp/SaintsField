@@ -15,11 +15,11 @@ namespace SaintsField.Samples.Scripts.ReadOnlyExamples
 
         private bool ByMethod() => ByBool;
 
-        [SerializeField, ReadOnly] private string isReadOnly;
-        [SerializeField, ReadOnly(nameof(ByBool))] private string rBool;
-        [SerializeField, ReadOnly(nameof(ByInt))] private string rInt;
-        [SerializeField, ReadOnly(nameof(ByReference))] private string rRef;
-        [SerializeField, ReadOnly(nameof(ByMethod))] private string rMethod;
-        [SerializeField, ReadOnly("No Such")] private string rNoSuch;
+        [SerializeField, FieldReadOnly] private string isReadOnly;
+        [SerializeField, FieldReadOnly(nameof(ByBool))] private string rBool;
+        [SerializeField, FieldReadOnly(nameof(ByInt))] private string rInt;
+        [SerializeField, FieldReadOnly(nameof(ByReference))] private string rRef;
+        [SerializeField, FieldReadOnly(nameof(ByMethod))] private string rMethod;
+        [SerializeField, FieldReadOnly("No Such")] private string rNoSuch;
     }
 }

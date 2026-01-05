@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts
          // RichLabel("<icon=star.png /><label />")
         ] private string _sortingLayerString;
         [SerializeField, SortingLayer] private int _sortingLayerInt;
-        [ReadOnly]
+        [FieldReadOnly]
         [SerializeField, SortingLayer] private int _sortingLayerDisabled;
 
         [ShowInInspector, SortingLayer] private string SortingLayerString

@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.DisabledDrawers.ReadOnlyDrawer
             VisualElement root = new VisualElement
             {
                 name = NameReadOnly(property, index),
-                userData = (ReadOnlyAttribute)saintsAttribute,
+                userData = (FieldReadOnlyAttribute)saintsAttribute,
             };
             root.AddToClassList(ClassReadOnly(property));
             return root;

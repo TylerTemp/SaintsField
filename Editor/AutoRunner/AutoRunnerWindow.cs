@@ -43,7 +43,7 @@ namespace SaintsField.Editor.AutoRunner
         protected override bool CheckOnValidate() => checkOnValidate;
 
 
-        [Ordered, ReadOnly, ProgressBar(maxCallback: nameof(_resourceTotal)), FieldBelowInfoBox("$" + nameof(_processingMessage))] public int processing;
+        [Ordered, FieldReadOnly, ProgressBar(maxCallback: nameof(_resourceTotal)), FieldBelowInfoBox("$" + nameof(_processingMessage))] public int processing;
 
         private string _processingMessage;
 
@@ -53,7 +53,7 @@ namespace SaintsField.Editor.AutoRunner
 
         [LayoutStart("Add Buttons", ELayout.Horizontal)]
 
-        [Ordered, Button, PlayaEnableIf(nameof(LackSceneInBuild))]
+        [Ordered, Button, EnableIf(nameof(LackSceneInBuild))]
         private void AddScenesInBuild()
         {
             sceneList = sceneList.Concat(GetLackSceneInBuild()).ToArray();
@@ -78,7 +78,7 @@ namespace SaintsField.Editor.AutoRunner
                 .Except(sceneList);
         }
 
-        [Ordered, Button, PlayaDisableIf(nameof(HasAllAssets))]
+        [Ordered, Button, DisableIf(nameof(HasAllAssets))]
         private void AddAllAssets()
         {
             folderSearches = folderSearches
@@ -110,7 +110,7 @@ namespace SaintsField.Editor.AutoRunner
 
         [LayoutStart("Addressable", ELayout.Horizontal)]
 
-        [Ordered, Button, PlayaEnableIf(nameof(LackSceneInAddressable))]
+        [Ordered, Button, EnableIf(nameof(LackSceneInAddressable))]
         private void AddAddressableScenes() => sceneList = sceneList.Concat(GetLackSceneInAddressable()).ToArray();
 
         private bool LackSceneInAddressable() => GetLackSceneInAddressable().Any();
@@ -134,7 +134,7 @@ namespace SaintsField.Editor.AutoRunner
                 .Except(sceneList);
         }
 
-        [Ordered, Button, PlayaEnableIf(nameof(LackAssetsInAddressable))]
+        [Ordered, Button, EnableIf(nameof(LackAssetsInAddressable))]
         private void AddAddressableAssets() => extraResources = extraResources.Concat(GetLackAssetsInAddressable()).ToArray();
 
         private bool LackAssetsInAddressable() => GetLackAssetsInAddressable().Any();

@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue11
         public bool boolValue;
 
         // DisableIf works on serialized property as expected
-        [field: SerializeField, DisableIf(nameof(boolValue))]
+        [field: SerializeField, FieldDisableIf(nameof(boolValue))]
         public Color ColorAutoProperty { get; private set; }
 
         // non serialized property needs `Playa` to help

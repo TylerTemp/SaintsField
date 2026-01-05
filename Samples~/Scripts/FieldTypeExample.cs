@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts
         [SerializeField, FieldType(typeof(Collider))]
         private Dummy dummy;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [SerializeField, FieldType(typeof(Collider))]
         private Dummy dummyDisabled;
 

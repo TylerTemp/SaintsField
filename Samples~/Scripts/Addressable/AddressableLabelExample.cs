@@ -14,7 +14,7 @@ namespace SaintsField.Samples.Scripts.Addressable
 #endif
         public string addressableLabel;
 
-        [ReadOnly]
+        [FieldReadOnly]
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
         [AddressableLabel]
         [FieldLabelText("<icon=star.png /><label />")]

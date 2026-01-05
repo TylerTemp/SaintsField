@@ -8,11 +8,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
         [ShowInInspector, Ordered]
         public const bool ConstTrue = true;
 
-        [DisableIf(nameof(ConstTrue)), Ordered] public string constTrueDisable;
+        [FieldDisableIf(nameof(ConstTrue)), Ordered] public string constTrueDisable;
 
         [ShowInInspector, Ordered]
         public static readonly bool StaticTrue = true;
 
-        [DisableIf(nameof(StaticTrue)), Ordered] public string staticTrueDisable;
+        [FieldDisableIf(nameof(StaticTrue)), Ordered] public string staticTrueDisable;
     }
 }

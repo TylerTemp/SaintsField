@@ -64,9 +64,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // disable/enable/show/hide
             bool ifCondition = FieldWithInfo.PlayaAttributes.Count(each => each is ShowIfAttribute
                                                                            // ReSharper disable once MergeIntoLogicalPattern
-                                                                           || each is PlayaEnableIfAttribute
+                                                                           || each is EnableIfAttribute
                                                                            // ReSharper disable once MergeIntoLogicalPattern
-                                                                           || each is PlayaDisableIfAttribute) > 0;
+                                                                           || each is DisableIfAttribute) > 0;
             _arraySizeCondition = FieldWithInfo.PlayaAttributes.Any(each => each is IPlayaArraySizeAttribute);
             _richLabelCondition = FieldWithInfo.PlayaAttributes.Any(each => each is LabelTextAttribute);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER

@@ -31,7 +31,7 @@ namespace SaintsField.Samples.Scripts.Required
         [Serializable]
         public struct Nest1
         {
-            [ReadOnly]
+            [FieldReadOnly]
             [Required] public GameObject n1;
             public Nest2 nest2;
         }

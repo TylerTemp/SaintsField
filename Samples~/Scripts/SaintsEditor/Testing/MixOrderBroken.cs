@@ -18,7 +18,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         {
         }
 
-        [ProgressBar(0, maxCallback: nameof(_maxCount)), NoLabel, ReadOnly]
+        [ProgressBar(0, maxCallback: nameof(_maxCount)), NoLabel, FieldReadOnly]
         public int progressBar;
 
         private int _maxCount = 100;

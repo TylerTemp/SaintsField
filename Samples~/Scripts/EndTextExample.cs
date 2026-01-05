@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts
         [EndText("$" + nameof(TakeAGuess))] public int guess;
         // [PostFieldRichLabel(nameof(Error), isCallback: true)] public GameObject errorCallback;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [EndText("<icon=star.png/>", padding: 0)] public Sprite starDisabled;
 
         public string TakeAGuess()

@@ -20,7 +20,7 @@ namespace SaintsField.Samples.Scripts
         private Shader GetShader() => targetRenderer.sharedMaterial.shader;
         [ShaderKeyword(nameof(GetShader))] public string shaderKeywordShader;
 
-        [ReadOnly, FieldLabelText("<icon=star.png/><label/>"), ShaderKeyword]
+        [FieldReadOnly, FieldLabelText("<icon=star.png/><label/>"), ShaderKeyword]
         public string readOnlyField;
 
         [Separator]

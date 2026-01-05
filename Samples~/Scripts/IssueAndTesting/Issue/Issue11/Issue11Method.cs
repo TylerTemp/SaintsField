@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue11
 {
     public class Issue11Method : MonoBehaviour
     {
-        [DisableIf(nameof(IsDisabledByMethod))] public string methodChecker;
+        [FieldDisableIf(nameof(IsDisabledByMethod))] public string methodChecker;
 
         public bool IsDisabledByMethod()
         {
@@ -20,7 +20,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue11
             private set {}
         }
 
-        [DisableIf(nameof(IsDisabledByProperty))] public string propertyChecker;
+        [FieldDisableIf(nameof(IsDisabledByProperty))] public string propertyChecker;
 
         public bool showMyMethod;
 

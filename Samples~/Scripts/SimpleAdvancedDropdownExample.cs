@@ -14,7 +14,7 @@ namespace SaintsField.Samples.Scripts
             [FieldAboveText(nameof(selectIt), true)]
             [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
             [AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdown;
-            [ReadOnly][AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdownDisable;
+            [FieldReadOnly][AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdownDisable;
 
             public AdvancedDropdownList<int> AdvDropdown()
             {

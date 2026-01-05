@@ -7,10 +7,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         public bool enableVisualDebug;
 
         [SepTitle("Separate Here", EColor.Black)]
-        [ReadOnly, SerializeField] private float _currentForwardSpeedInUnits;
-        [ReadOnly, SerializeField] private float _currentSpeedInUnits;
-        [ReadOnly, SerializeField] private float _currentSpeedInKmph;
-        [ReadOnly, SerializeField] private float _maxSpeedKmph;
+        [FieldReadOnly, SerializeField] private float _currentForwardSpeedInUnits;
+        [FieldReadOnly, SerializeField] private float _currentSpeedInUnits;
+        [FieldReadOnly, SerializeField] private float _currentSpeedInKmph;
+        [FieldReadOnly, SerializeField] private float _maxSpeedKmph;
 
         public int throttle;
         public int currentGear;

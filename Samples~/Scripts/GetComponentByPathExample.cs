@@ -24,7 +24,7 @@ namespace SaintsField.Samples.Scripts
         [GetComponentByPath("//Sth")] public GameObject slash2Sth;
         [GetComponentByPath("///Sth")] public GameObject slash3Sth;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [GetComponentByPath("/no", "./DirectSub1")] public GameObject directSubMultiDisabled;
 
         [FieldSeparator("GetByXPath")]

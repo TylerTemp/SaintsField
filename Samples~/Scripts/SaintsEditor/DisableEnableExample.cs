@@ -7,25 +7,25 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
     {
         public bool boolValue;
 
-        [PlayaDisableIf] public int[] justDisable;
-        [PlayaEnableIf] public int[] justEnable;
+        [DisableIf] public int[] justDisable;
+        [EnableIf] public int[] justEnable;
 
-        [PlayaDisableIf(nameof(boolValue))] public int[] disableIf;
-        [PlayaEnableIf(nameof(boolValue))] public int[] enableIf;
+        [DisableIf(nameof(boolValue))] public int[] disableIf;
+        [EnableIf(nameof(boolValue))] public int[] enableIf;
 
-        [PlayaDisableIf("!" + nameof(boolValue))] public int[] NDisableIf;
-        [PlayaEnableIf("!" + nameof(boolValue))] public int[] NEnableIf;
+        [DisableIf("!" + nameof(boolValue))] public int[] NDisableIf;
+        [EnableIf("!" + nameof(boolValue))] public int[] NEnableIf;
 
-        [PlayaDisableIf(EMode.Edit)] public int[] disableEdit;
-        [PlayaDisableIf(EMode.Play)] public int[] disablePlay;
-        [PlayaEnableIf(EMode.Edit)] public int[] enableEdit;
-        [PlayaEnableIf(EMode.Play)] public int[] enablePlay;
+        [DisableIf(EMode.Edit)] public int[] disableEdit;
+        [DisableIf(EMode.Play)] public int[] disablePlay;
+        [EnableIf(EMode.Edit)] public int[] enableEdit;
+        [EnableIf(EMode.Play)] public int[] enablePlay;
 
-        [Button, PlayaDisableIf(nameof(boolValue))] private void DisableIfBtn() => Debug.Log("DisableIfBtn");
-        [Button, PlayaEnableIf(nameof(boolValue))] private void EnableIfBtn() => Debug.Log("EnableIfBtn");
-        [Button, PlayaDisableIf(EMode.Edit)] private void DisableEditBtn() => Debug.Log("DisableEditBtn");
-        [Button, PlayaDisableIf(EMode.Play)] private void DisablePlayBtn() => Debug.Log("DisablePlayBtn");
-        [Button, PlayaEnableIf(EMode.Edit)] private void EnableEditBtn() => Debug.Log("EnableEditBtn");
-        [Button, PlayaEnableIf(EMode.Play)] private void EnablePlayBtn() => Debug.Log("EnablePlayBtn");
+        [Button, DisableIf(nameof(boolValue))] private void DisableIfBtn() => Debug.Log("DisableIfBtn");
+        [Button, EnableIf(nameof(boolValue))] private void EnableIfBtn() => Debug.Log("EnableIfBtn");
+        [Button, DisableIf(EMode.Edit)] private void DisableEditBtn() => Debug.Log("DisableEditBtn");
+        [Button, DisableIf(EMode.Play)] private void DisablePlayBtn() => Debug.Log("DisablePlayBtn");
+        [Button, EnableIf(EMode.Edit)] private void EnableEditBtn() => Debug.Log("EnableEditBtn");
+        [Button, EnableIf(EMode.Play)] private void EnablePlayBtn() => Debug.Log("EnablePlayBtn");
     }
 }

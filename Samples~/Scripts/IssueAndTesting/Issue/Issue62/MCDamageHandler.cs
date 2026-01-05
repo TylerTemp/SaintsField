@@ -58,7 +58,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue62
 		public bool kickback = true;
 		// [GetComponent,ReadOnly,EnableIf(nameof(kickback)),HideIf(nameof(isRelay))]
 		// public NavMeshAgent agent;
-		[GetComponent,ReadOnly,EnableIf(nameof(kickback)),FieldHideIf(nameof(isRelay))]
+		[GetComponent,FieldReadOnly,FieldEnableIf(nameof(kickback)),FieldHideIf(nameof(isRelay))]
 		public Rigidbody rigid;
 		// [GetComponent,ReadOnly]
 		// public MCArmor _selfArmor;
@@ -70,7 +70,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue62
 		[SepTitle("DEATH",EColor.Black)]
 		[FieldHideIf(nameof(isRelay))]
 		public bool destroyOnDeath = true;
-		[EnableIf(nameof(destroyOnDeath)),FieldHideIf(nameof(isRelay))]
+		[FieldEnableIf(nameof(destroyOnDeath)),FieldHideIf(nameof(isRelay))]
 		public float deathDelay = 1f;
 		[Tooltip("can be instantiated even when destroy is off, usable as a jetisson FX")]
 		[FieldHideIf(nameof(isRelay))]

@@ -124,7 +124,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             fieldWithInfo.Targets[0]
                         ));
                         break;
-                    case PlayaEnableIfAttribute enableIfAttribute:
+                    case EnableIfAttribute enableIfAttribute:
                         preCheckInternalInfos.Add(new ToggleCheckInfo
                         (
                             ToggleType.Enable,
@@ -132,7 +132,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             fieldWithInfo.Targets[0]
                         ));
                         break;
-                    case PlayaDisableIfAttribute disableIfAttribute:
+                    case DisableIfAttribute disableIfAttribute:
                         preCheckInternalInfos.Add(new ToggleCheckInfo
                         (
                             ToggleType.Disable,

@@ -14,10 +14,10 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [Serializable]
         public struct LootWeightQuantityStruct
         {
-            [ReadOnly]
+            [FieldReadOnly]
             public string DisplayName;
             public LootDrop Loot;
-            [ReadOnly]
+            [FieldReadOnly]
             public string Chance;
             public int Weight;
             public int MinQuantity;

@@ -27,7 +27,7 @@ namespace SaintsField.Samples.Scripts
         public MyStruct myStruct;
         public MyStruct[] myStructs;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [LeftToggle] public bool richToggleDisabled;
     }
 }

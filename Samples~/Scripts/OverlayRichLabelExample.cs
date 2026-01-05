@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts
         [Space]
         [OverlayText("not ok", end: true)] public GameObject notSupported;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [OverlayText("<icon=eye.png/>", padding: 1)] public string textDisabled;
 
         public string TakeAGuess()

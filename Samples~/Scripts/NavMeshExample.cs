@@ -42,7 +42,7 @@ namespace SaintsField.Samples.Scripts
         }
 #endif
 
-        [ReadOnly]
+        [FieldReadOnly]
 #if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
         [NavMeshArea]
 #else
@@ -62,7 +62,7 @@ namespace SaintsField.Samples.Scripts
         private void AreaMaskChanged() => Debug.Log($"areaMask: {areaMask}");
 #endif
 
-        [ReadOnly]
+        [FieldReadOnly]
 #if SAINTSFIELD_AI_NAVIGATION && !SAINTSFIELD_AI_NAVIGATION_DISABLED
         [NavMeshAreaMask]
 #else

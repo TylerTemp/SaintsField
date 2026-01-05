@@ -18,7 +18,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
         [
             GetScriptableObject,
             Expandable,
-            ReadOnly,
+            FieldReadOnly,
         ]
         public Scriptable scriptable;
     }

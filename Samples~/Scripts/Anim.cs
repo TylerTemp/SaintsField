@@ -39,7 +39,7 @@ namespace SaintsField.Samples.Scripts
             set => animStateName = value;
         }
 
-        [ReadOnly]
+        [FieldReadOnly]
         [AnimatorState]
         public string animStateDisabled;
 
@@ -69,7 +69,7 @@ namespace SaintsField.Samples.Scripts
         [AnimatorParam(nameof(MyAnimator))]
         public int[] animParamHashes;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [AnimatorParam]
         public string animParamNameDisable;
     }

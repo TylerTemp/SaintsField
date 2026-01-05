@@ -101,7 +101,7 @@ namespace SaintsField.Samples.Scripts.ReferenceExamples
         [SerializeReference, ReferencePicker]
         public IRefInterface[] myInterfaces;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [SerializeReference, ReferencePicker]
         public IRefInterface myInterfaceDisabled = new ClassSub2();
 

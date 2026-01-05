@@ -17,7 +17,7 @@ namespace SaintsField.Samples.Scripts
          , SpriteToggle(nameof(_sprite))
         ] private Sprite _sprite2;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [SerializeField, SpriteToggle] private Sprite _spriteDisabled;
     }
 }

@@ -32,7 +32,7 @@ namespace SaintsField.Samples.Scripts.EPathExample
             }
 #endif
 
-            [ResizableTextArea, ReadOnly, Ordered] public string[] results;
+            [ResizableTextArea, FieldReadOnly, Ordered] public string[] results;
 
         }
 

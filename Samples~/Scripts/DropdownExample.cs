@@ -113,7 +113,7 @@ namespace SaintsField.Samples.Scripts
 
         [SerializeField] private MyData my;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [Dropdown(nameof(GetDropdownItems))]
         public float floatVDisabled;
 

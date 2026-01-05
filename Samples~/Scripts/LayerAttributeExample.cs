@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts
         [Layer] public string layerString;
         [Layer] public int layerInt;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [Layer] public int layerIntDisabled;
 
         public LayerMask myLayerMask;

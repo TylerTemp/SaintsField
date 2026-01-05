@@ -1,25 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Diagnostics;
-using System.Linq;
-using SaintsField.Condition;
 
 namespace SaintsField.Playa
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class PlayaDisableIfAttribute: Attribute, IPlayaAttribute
+    public class PlayaDisableIfAttribute: DisableIfAttribute
     {
-        public readonly IReadOnlyList<ConditionInfo> ConditionInfos;
-
-        public PlayaDisableIfAttribute(params object[] by)
+        public PlayaDisableIfAttribute(params object[] by) : base(by)
         {
-            ConditionInfos = Parser.Parse(by).ToArray();
-        }
-
-        public override string ToString()
-        {
-            return $"<PlayaDisableIf conditions={string.Join(", ", ConditionInfos)}>";
         }
     }
 }

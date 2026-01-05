@@ -26,7 +26,7 @@ namespace SaintsField.Samples.Scripts
         [FieldAboveText(nameof(canSell), isCallback:true)]
         public bool canSell;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [FieldInfoBox("Can not be sold")]
         public bool canSellDisabled;
     }

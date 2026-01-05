@@ -34,7 +34,7 @@ namespace SaintsField.Samples.Scripts
         [ShowInInspector] private static bool _disableMe = true;
 
 #if UNITY_EDITOR
-        [DisableIf("$:" + nameof(_disableMe))]
+        [FieldDisableIf("$:" + nameof(_disableMe))]
         [RequiredIf("$:" + nameof(_disableMe), false)]
 #endif
         public string disableIf;

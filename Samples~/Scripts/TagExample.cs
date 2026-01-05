@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts
 
         [SerializeField, Tag] private string _tag2;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [SerializeField, Tag][FieldLabelText("<icon=star.png /><label/>")] private string _tagDisabled;
 
         [ShowInInspector, Tag]

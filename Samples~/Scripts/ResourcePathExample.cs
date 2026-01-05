@@ -49,7 +49,7 @@ namespace SaintsField.Samples.Scripts
             [FieldBelowText(nameof(OnLabel), true)]
             public string[] myResources;
 
-            [ReadOnly]
+            [FieldReadOnly]
             [ResourcePath(typeof(Dummy), typeof(BoxCollider))]
             public string myResourceDisabled;
 

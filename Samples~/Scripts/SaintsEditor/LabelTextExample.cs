@@ -92,7 +92,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [LabelText("This is a long ride for people have nothing to")]
         public int richLabel2;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [LabelText("This Is a Long Drive for Someone with Nothing to Think About")]
         public int richLabelDisabled;
 

@@ -20,7 +20,7 @@ namespace SaintsField.Samples.Scripts
         ]
         public string fullPathScene;
 
-        [ReadOnly]
+        [FieldReadOnly]
         [Scene] public string sceneDisabled;
 
         [ShowInInspector, Scene]
