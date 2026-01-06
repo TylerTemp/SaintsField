@@ -1476,7 +1476,7 @@ namespace SaintsField.Editor
                     case OnValueChangedAttribute onValueChangedAttribute:
                     {
                         SerializedProperty prop = fieldWithInfo.SerializedProperty;
-                        if(prop.propertyType == SerializedPropertyType.Generic && prop.isArray)
+                        if(prop is { propertyType: SerializedPropertyType.Generic, isArray: true })
                         {
                             // yield return new SaintsFieldWithRenderer(onValueChangedAttribute, new OnValueChangedCollectionRenderer(onValueChangedAttribute, serializedObject, fieldWithInfo));
                             preRenderers.Add(new SaintsFieldWithRenderer(onValueChangedAttribute, new OnValueChangedCollectionRenderer(onValueChangedAttribute, serializedObject, fieldWithInfo)));

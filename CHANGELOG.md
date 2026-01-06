@@ -1,9 +1,14 @@
 # Changelog
 
-## WIP ##
+## 5.7.9 ##
 
 1.  Fix `RichText` did not work with `<field.subField/>`
 2.  Fix `AboveText`, `BelowText` did not update with `<field/>` tag
+3.  Add: static callback now support nested type finding
+4.  Change: `PlayEnableIf`/`PlayaDisableIf` now is `EnableIf`/`DisableIf`. And the original ones are now `FieldEnableIf`/`FieldDisableIf`
+5.  Fix: `ShowIf`/`HideIf`/`EnableIf`/`DisableIf` now gives an error box if the callback have errors
+6.  Fix: `ShowInInspector` for struct/class, switching type did not clean the old fields
+7.  Add: `OnValueChanged` now works with `ShowInInspector`
 
 ## 5.7.8 ##
 

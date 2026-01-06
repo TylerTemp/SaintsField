@@ -1,6 +1,5 @@
 ﻿#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -95,6 +94,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if(targetNeedUpdate || hasAnyChildren)
             {
+                root.Add(_helpBox = new HelpBox("", HelpBoxMessageType.Error)
+                {
+                    style =
+                    {
+                        display = DisplayStyle.None,
+                    },
+                });
                 return _rootElement = root;
             }
 
@@ -102,42 +108,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
         protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container);
-
-        private static void MergeIntoGroup(Dictionary<string, VisualElement> groupElements, string groupBy, VisualElement root, VisualElement child)
-        {
-            if (string.IsNullOrEmpty(groupBy))
-            {
-                root.Add(child);
-                return;
-            }
-
-            bool exists = groupElements.TryGetValue(groupBy, out VisualElement groupElement);
-            if (!exists)
-            {
-                groupElement = new VisualElement
-                {
-                    style =
-                    {
-                        flexDirection = FlexDirection.Row,
-                    }
-                };
-                groupElement.AddToClassList($"{ClassSaintsFieldPlaya}-group-{groupBy}");
-                groupElements.Add(groupBy, groupElement);
-                root.Add(groupElement);
-            }
-
-            groupElement.Add(child);
-        }
-
-        private class InfoBoxUserData
-        {
-            public string XmlContent;
-            public EMessageType MessageType;
-
-            public InfoBoxAttribute InfoBoxAttribute;
-            public SaintsFieldWithInfo FieldWithInfo;
-            public RichTextDrawer RichTextDrawer;
-        }
 
 
         protected virtual PreCheckResult OnUpdateUIToolKit(VisualElement root)
@@ -156,6 +126,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         // }
 
         private Color _preColor;
+        private HelpBox _helpBox;
 
         private PreCheckResult UpdatePreCheckUIToolkitInternal(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
@@ -178,6 +149,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             ApplyGuiColor(result);
+
+            UIToolkitUtils.SetHelpBox(_helpBox, preCheckResult.Error);
 
             return preCheckResult;
         }

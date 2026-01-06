@@ -2319,13 +2319,21 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             bool useOld = genFoldout != null;
 
-            UIToolkitValueEditPayload payload = useOld
-                ? (UIToolkitValueEditPayload)genFoldout.userData
-                : new UIToolkitValueEditPayload
+            UIToolkitValueEditPayload payload;
+            if (useOld)
+            {
+                payload = (UIToolkitValueEditPayload)genFoldout.userData;
+            }
+            else
+            {
+                Type newType = value?.GetType();
+                // Debug.Log($"create type to {newType}");
+                payload = new UIToolkitValueEditPayload
                 {
                     IsFullFilled = false,
-                    UnityObjectOverrideType = value?.GetType(),
+                    UnityObjectOverrideType = newType,
                 };
+            }
 
             if (!useOld)
             {
@@ -2355,12 +2363,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     UIToolkitValueEditPayload refreshedPayload = (UIToolkitValueEditPayload)genFoldout.userData;
                     Type preType = refreshedPayload.UnityObjectOverrideType;
+                    // Debug.Log($"reset type to {newType}");
                     refreshedPayload.UnityObjectOverrideType = newType;
 
                     if (refreshedPayload.State == UIToolkitValueEditPayloadState.FieldObject && newType != null &&
                         typeof(Object).IsAssignableFrom(newType))
                     {
                         // string objFieldName = $"saintsfield-objectfield";
+                        // ReSharper disable once InvertIf
                         if (preType != newType)
                         {
                             // ObjectField preField = fieldsBodyNew.Q<ObjectField>(name: objFieldName);
@@ -2439,6 +2449,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             fieldsBodyNew.Clear();
                         }
 
+                        if (preType != newType)
+                        {
+                            fieldsBodyNew.Clear();
+                        }
+
                         // Debug.Log($"swap {preType} -> {newType}: {obj}; setter={setterOrNull}");
 
                         beforeSet?.Invoke(value);
@@ -2477,7 +2492,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
 
             Type valueActualType = payload.UnityObjectOverrideType ?? value?.GetType();
-            // Debug.Log($"valueActualType={valueActualType}");
+            // Debug.Log($"{payload.UnityObjectOverrideType?.Name}-{value?.GetType().Name}");
             if (valueActualType != null && typeof(Object).IsAssignableFrom(valueActualType))
             {
                 // ReSharper disable once PossibleInvalidCastException

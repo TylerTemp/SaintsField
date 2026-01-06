@@ -44,11 +44,19 @@ namespace SaintsField.Editor.Playa.Utils
             return new ToggleCheckInfo(toggleCheckInfo, errors, boolResults);
         }
 
-        public static (bool show, bool disable) GetToggleResult(List<ToggleCheckInfo> toggleCheckInfos)
+        public static (bool show, bool disable) GetToggleResult(IReadOnlyList<ToggleCheckInfo> toggleCheckInfos)
         {
-            if (!toggleCheckInfos.TrueForAll((each) => each.Errors.Count == 0))
+            // if (!toggleCheckInfos.TrueForAll((each) => each.Errors.Count == 0))
+            // {
+            //     Debug.Log($"!TrueForAll: {string.Join(", ", toggleCheckInfos.SelectMany(each => each.Errors))}");
+            //     return (true, false);
+            // }
+            foreach (ToggleCheckInfo toggleCheckInfo in toggleCheckInfos)
             {
-                return (true, false);
+                if (toggleCheckInfo.Errors.Count > 0)
+                {
+                    return (true, false);
+                }
             }
 
             List<bool> showResults = new List<bool>();
@@ -100,7 +108,7 @@ namespace SaintsField.Editor.Playa.Utils
                     case ToggleType.Disable:
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
                         Debug.Log(
-                            $"disable, count={preCheckInternalInfo.boolResults.Count}, values={string.Join(",", preCheckInternalInfo.boolResults)}");
+                            $"disable, count={toggleCheckInfo.BoolResults.Count}, values={string.Join(",", toggleCheckInfo.BoolResults)}");
 #endif
                         if (toggleCheckInfo.BoolResults.All(each => each))
                         {
@@ -137,10 +145,10 @@ namespace SaintsField.Editor.Playa.Utils
             Debug.Log(
                 $"showIfResult={showIfResult} (hasShow={hasShow}, show={show}, hide={hide})");
 #endif
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
-            Debug.Log(
-                $"disableIfResult={disableIfResult} (disable={disable}, enable={enable})");
-#endif
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
+//             Debug.Log(
+//                 $"disableIfResult={disableIfResult} (disable={disable}, enable={enable})");
+// #endif
 
             return (showIfResult, disableIfResult);
         }

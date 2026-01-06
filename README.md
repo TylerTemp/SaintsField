@@ -95,9 +95,15 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.8**
+**5.7.9**
 
-Fix: `ListView` & `ReferencePicker` property tracker clean-up so it does not give error now [#352](https://github.com/TylerTemp/SaintsField/issues/352)
+1.  Fix `RichText` did not work with `<field.subField/>`
+2.  Fix `AboveText`, `BelowText` did not update with `<field/>` tag
+3.  Add: static callback now support nested type finding
+4.  Change: `PlayEnableIf`/`PlayaDisableIf` now is `EnableIf`/`DisableIf`. And the original ones are now `FieldEnableIf`/`FieldDisableIf`
+5.  Fix: `ShowIf`/`HideIf`/`EnableIf`/`DisableIf` now gives an error box if the callback have errors
+6.  Fix: `ShowInInspector` for struct/class, switching type did not clean the old fields
+7.  Add: `OnValueChanged` now works with `ShowInInspector`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -3267,6 +3273,9 @@ public void SizeChanged(IReadOnlyList<MyClass> myClassNewValues) => Debug.Log($"
 
 #### `ReadOnly`/`DisableIf`/`EnableIf` ####
 
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
 A tool to set field enable/disable status. Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
 
 `ReadOnly` equals `DisableIf`, `EnableIf` is the opposite of `DisableIf`
@@ -3306,17 +3315,17 @@ using SaintsField;
 
 [ReadOnly(nameof(ShouldBeDisabled))] public string disableMe;
 
-private bool ShouldBeDisabled  // change the logic here
+private bool ShouldBeDisabled()  // change the logic here
 {
     return true;
 }
 
 // This also works on static/const callbacks using `$:`
-[DisableIf("$:" + nameof(Util) + "." + nameof(_shouldDisable))] public int disableThis;
+[DisableIf("$:" + nameof(Util) + "." + nameof(Util._shouldDisable))] public int disableThis;
 // you can put this under another file like `Util.cs`
 public static class Util
 {
-    [ShowInIspector] private static bool _shouldDisable;
+    public static bool _shouldDisable;
 }
 ```
 
@@ -3350,7 +3359,7 @@ public enum EnumToggle
 public EnumToggle enum1;
 public EnumToggle enum2;
 public bool bool1;
-public bool bool2 {
+public bool bool2() {
     return true;
 }
 
@@ -3415,214 +3424,58 @@ public bool boolVal;
 
 It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
-#### `PlayaEnableIf`/`PlayaDisableIf` ####
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-This is the same as `EnableIf`, `DisableIf`, plus it can be applied to array, `Button`
-
-Different from `EnableIf`/`DisableIf` in the following:
-1.  apply on an array will directly enable or disable the array itself, rather than each element.
-2.  Callback function can not receive value and index
-3.  this method can not detect foldout, which means using it on `Expandable`, the foldout button will also be disabled. For this case, use `DisableIf`/`EnableIf` instead.
+It works with `ShowInInspector` & `Button`
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
-[PlayaDisableIf] public int[] justDisable;
-[PlayaEnableIf] public int[] justEnable;
+[DisableIf] public int[] justDisable;
+[EnableIf] public int[] justEnable;
 
-[PlayaDisableIf(nameof(boolValue))] public int[] disableIf;
-[PlayaEnableIf(nameof(boolValue))] public int[] enableIf;
+[DisableIf(nameof(boolValue))] public int[] disableIf;
+[EnableIf(nameof(boolValue))] public int[] enableIf;
 
-[PlayaDisableIf(EMode.Edit)] public int[] disableEdit;
-[PlayaDisableIf(EMode.Play)] public int[] disablePlay;
-[PlayaEnableIf(EMode.Edit)] public int[] enableEdit;
-[PlayaEnableIf(EMode.Play)] public int[] enablePlay;
+[DisableIf(EMode.Edit)] public int[] disableEdit;
+[DisableIf(EMode.Play)] public int[] disablePlay;
+[EnableIf(EMode.Edit)] public int[] enableEdit;
+[EnableIf(EMode.Play)] public int[] enablePlay;
 
-[Button, PlayaDisableIf(nameof(boolValue))] private void DisableIfBtn() => Debug.Log("DisableIfBtn");
-[Button, PlayaEnableIf(nameof(boolValue))] private void EnableIfBtn() => Debug.Log("EnableIfBtn");
-[Button, PlayaDisableIf(EMode.Edit)] private void DisableEditBtn() => Debug.Log("DisableEditBtn");
-[Button, PlayaDisableIf(EMode.Play)] private void DisablePlayBtn() => Debug.Log("DisablePlayBtn");
-[Button, PlayaEnableIf(EMode.Edit)] private void EnableEditBtn() => Debug.Log("EnableEditBtn");
-[Button, PlayaEnableIf(EMode.Play)] private void EnablePlayBtn() => Debug.Log("EnablePlayBtn");
+[Button, DisableIf(nameof(boolValue))] private void DisableIfBtn() => Debug.Log("DisableIfBtn");
+[Button, EnableIf(nameof(boolValue))] private void EnableIfBtn() => Debug.Log("EnableIfBtn");
+[Button, DisableIf(EMode.Edit)] private void DisableEditBtn() => Debug.Log("DisableEditBtn");
+[Button, DisableIf(EMode.Play)] private void DisablePlayBtn() => Debug.Log("DisablePlayBtn");
+[Button, EnableIf(EMode.Edit)] private void EnableEditBtn() => Debug.Log("EnableEditBtn");
+[Button, EnableIf(EMode.Play)] private void EnablePlayBtn() => Debug.Log("EnablePlayBtn");
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
+#### `FieldEnableIf`/`FieldDisableIf`/`FieldReadOnly` ####
 
-#### `FieldShowIf` / `FieldHideIf` ####
+Like `EnableIf`/`DisableIf`, but:
 
-> [!WARNING]
-> Deprecated. Use `ShowIf`/`HideIf` instead.
+1.  When using on array/list, it works on every element of array/list rather than array/list itself
+2.  Only works on serialized field, not work with `ShowInInspector`, `Button`
+3.  Using on a single serialized field, it works just like `EnableIf`/`DisableIf`
 
-Only use this if you can **NOT** have `SaintsEditor` enabled. If you can not use `SaintsEditor`, you should be able to use an alternative `ShowIf`/`HideIf` provided by the editor plugin you're globally using.
-
-Show or hide the field based on a condition. Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
-
-Arguments:
-
-*   (Optional) `EMode editorMode`
-
-    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
-
-    See `Misc` - `EMode` for more information.
-
-*   `object by...`
-
-    callbacks or attributes for the condition. For more information, see `Callback` section.
-
-*   AllowMultiple: Yes
-
-You can use multiple `FieldShowIf`, `FieldShowIf`, and even a mix of the two.
-
-For `FieldShowIf`: The field will be shown if **ALL** condition is true (`and` operation)
-
-For `FieldShowIf`: The field will be hidden if **ANY** condition is true (`or` operation)
-
-For multiple attributes: The field will be shown if **ANY** condition is true (`or` operation)
-
-For example, `[FieldShowIf(A...), FieldShowIf(B...)]` will be shown if `FieldShowIf(A...) || FieldShowIf(B...)` is true.
-
-`FieldHideIf` is the opposite of `FieldShowIf`. Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
-
-*   `FieldHideIf(A)` == `FieldShowIf(!A)`
-*   `FieldHideIf(A, B)` == `FieldHideIf(A || B)` == `FieldShowIf(!(A || B))` == `FieldShowIf(!A && !B)`
-*   `[FieldHideIf(A), FieldHideIf(B)]` == `[FieldShowIf(!A), FieldShowIf(!B)]` == `FieldShowIf(!A || !B)`
-
-A simple example:
-
-```csharp
-using SaintsField;
-
-[FieldShowIf(nameof(ShouldShow))]
-public int showMe;
-
-public bool ShouldShow()  // change the logic here
-{
-    return true;
-}
-
-// This also works on static/const callbacks using `$:`
-[FieldHideIf("$:" + nameof(Util) + "." + nameof(_shouldHide))] public int hideMe;
-// you can put this under another file like `Util.cs`
-public static class Util
-{
-    [ShowInIspector] private static bool _shouldHide;
-}
-```
-
-It also supports `enum` types. The syntax is like this:
-
-```csharp
-using SaintsField;
-
-[Serializable]
-public enum EnumToggle
-{
-    Off,
-    On,
-}
-public EnumToggle enum1;
-[FieldShowIf(nameof(enum1), EnumToggle.On)] public string enum1Show;
-```
-
-A more complex example:
-
-```csharp
-using SaintsField;
-
-[Serializable]
-public enum EnumToggle
-{
-    Off,
-    On,
-}
-
-public EnumToggle enum1;
-public EnumToggle enum2;
-public bool bool1;
-public bool bool2 {
-    return true;
-}
-
-// example of checking two normal callbacks and two enum callbacks
-[FieldShowIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12;
-```
-
-A more complex example about logic operation:
-
-```csharp
-using SaintsField;
-
-public bool _bool1;
-public bool _bool2;
-public bool _bool3;
-public bool _bool4;
-
-[FieldShowIf(nameof(_bool1))]
-[FieldShowIf(nameof(_bool2))]
-[LabelText("<color=red>show=1||2")]
-public string _showIf1Or2;
-
-
-[FieldShowIf(nameof(_bool1), nameof(_bool2))]
-[LabelText("<color=green>show=1&&2")]
-public string _showIf1And2;
-
-[FieldHideIf(nameof(_bool1))]
-[FieldHideIf(nameof(_bool2))]
-[LabelText("<color=blue>show=!1||!2")]
-public string _hideIf1Or2;
-
-
-[FieldHideIf(nameof(_bool1), nameof(_bool2))]
-[LabelText("<color=yellow>show=!(1||2)=!1&&!2")]
-public string _hideIf1And2;
-
-[FieldShowIf(nameof(_bool1))]
-[FieldHideIf(nameof(_bool2))]
-[LabelText("<color=magenta>show=1||!2")]
-public string _showIf1OrNot2;
-
-[FieldShowIf(nameof(_bool1), nameof(_bool2))]
-[FieldShowIf(nameof(_bool3), nameof(_bool4))]
-[LabelText("<color=orange>show=(1&&2)||(3&&4)")]
-public string _showIf1234;
-
-[FieldHideIf(nameof(_bool1), nameof(_bool2))]
-[FieldHideIf(nameof(_bool3), nameof(_bool4))]
-[LabelText("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
-public string _hideIf1234;
-```
-
-[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/1625472e-5769-4c16-81a3-637511437e1d)](https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0)
-
-Example about EMode:
-
-```csharp
-using SaintsField;
-
-public bool boolValue;
-
-[FieldShowIf(EMode.Edit)] public string showEdit;
-[FieldShowIf(EMode.Play)] public string showPlay;
-
-[FieldShowIf(EMode.Edit, nameof(boolValue))] public string showEditAndBool;
-[FieldShowIf(EMode.Edit), FieldShowIf(nameof(boolValue))] public string showEditOrBool;
-
-[FieldHideIf(EMode.Edit)] public string hideEdit;
-[FieldHideIf(EMode.Play)] public string hidePlay;
-
-[FieldHideIf(EMode.Edit, nameof(boolValue))] public string hideEditOrBool;
-[FieldHideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
-```
+This can be helpful if you can not enable SaintsEditor.
 
 It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
+```csharp
+// Control by field/property
+public bool enable;
+[FieldEnableIf(nameof(enable))] public string byField;
+
+// Control by callback
+[FieldEnableIf(nameof(ShouldEnable))] public string byCallback;
+// You can omit the parameter if you do not need it
+public bool ShouldEnable(string input) => input.Length < 6;
+
+[FieldEnableIf(nameof(ShouldEnableElement))] public string[] forArray;
+public bool ShouldEnableElement(string element, int index) => index % 2 == 0;
+```
 
 #### `ShowIf`/`HideIf` ####
 
@@ -3832,6 +3685,175 @@ public bool boolValue;
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/eb07de01-3210-4f4b-be58-b5fadd899f1a)
+
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
+
+#### `FieldShowIf` / `FieldHideIf` ####
+
+> [!WARNING]
+> Deprecated. Use `ShowIf`/`HideIf` instead.
+
+Only use this if you can **NOT** have `SaintsEditor` enabled. If you can not use `SaintsEditor`, you should be able to use an alternative `ShowIf`/`HideIf` provided by the editor plugin you're globally using.
+
+Show or hide the field based on a condition. Supports callbacks (function/field/property) and **enum** types. by using multiple arguments and decorators, you can make logic operation with it.
+
+Arguments:
+
+*   (Optional) `EMode editorMode`
+
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
+
+*   `object by...`
+
+    callbacks or attributes for the condition. For more information, see `Callback` section.
+
+*   AllowMultiple: Yes
+
+You can use multiple `FieldShowIf`, `FieldShowIf`, and even a mix of the two.
+
+For `FieldShowIf`: The field will be shown if **ALL** condition is true (`and` operation)
+
+For `FieldShowIf`: The field will be hidden if **ANY** condition is true (`or` operation)
+
+For multiple attributes: The field will be shown if **ANY** condition is true (`or` operation)
+
+For example, `[FieldShowIf(A...), FieldShowIf(B...)]` will be shown if `FieldShowIf(A...) || FieldShowIf(B...)` is true.
+
+`FieldHideIf` is the opposite of `FieldShowIf`. Please note "the opposite" is like the logic operation, like `!(A && B)` is `!A || !B`, `!(A || B)` is `!A && !B`.
+
+*   `FieldHideIf(A)` == `FieldShowIf(!A)`
+*   `FieldHideIf(A, B)` == `FieldHideIf(A || B)` == `FieldShowIf(!(A || B))` == `FieldShowIf(!A && !B)`
+*   `[FieldHideIf(A), FieldHideIf(B)]` == `[FieldShowIf(!A), FieldShowIf(!B)]` == `FieldShowIf(!A || !B)`
+
+A simple example:
+
+```csharp
+using SaintsField;
+
+[FieldShowIf(nameof(ShouldShow))]
+public int showMe;
+
+public bool ShouldShow()  // change the logic here
+{
+    return true;
+}
+
+// This also works on static/const callbacks using `$:`
+[FieldHideIf("$:" + nameof(Util) + "." + nameof(_shouldHide))] public int hideMe;
+// you can put this under another file like `Util.cs`
+public static class Util
+{
+    [ShowInIspector] private static bool _shouldHide;
+}
+```
+
+It also supports `enum` types. The syntax is like this:
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public enum EnumToggle
+{
+    Off,
+    On,
+}
+public EnumToggle enum1;
+[FieldShowIf(nameof(enum1), EnumToggle.On)] public string enum1Show;
+```
+
+A more complex example:
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public enum EnumToggle
+{
+    Off,
+    On,
+}
+
+public EnumToggle enum1;
+public EnumToggle enum2;
+public bool bool1;
+public bool bool2 {
+    return true;
+}
+
+// example of checking two normal callbacks and two enum callbacks
+[FieldShowIf(nameof(bool1), nameof(bool2), nameof(enum1), EnumToggle.On, nameof(enum2), EnumToggle.On)] public string bool12AndEnum12;
+```
+
+A more complex example about logic operation:
+
+```csharp
+using SaintsField;
+
+public bool _bool1;
+public bool _bool2;
+public bool _bool3;
+public bool _bool4;
+
+[FieldShowIf(nameof(_bool1))]
+[FieldShowIf(nameof(_bool2))]
+[LabelText("<color=red>show=1||2")]
+public string _showIf1Or2;
+
+
+[FieldShowIf(nameof(_bool1), nameof(_bool2))]
+[LabelText("<color=green>show=1&&2")]
+public string _showIf1And2;
+
+[FieldHideIf(nameof(_bool1))]
+[FieldHideIf(nameof(_bool2))]
+[LabelText("<color=blue>show=!1||!2")]
+public string _hideIf1Or2;
+
+
+[FieldHideIf(nameof(_bool1), nameof(_bool2))]
+[LabelText("<color=yellow>show=!(1||2)=!1&&!2")]
+public string _hideIf1And2;
+
+[FieldShowIf(nameof(_bool1))]
+[FieldHideIf(nameof(_bool2))]
+[LabelText("<color=magenta>show=1||!2")]
+public string _showIf1OrNot2;
+
+[FieldShowIf(nameof(_bool1), nameof(_bool2))]
+[FieldShowIf(nameof(_bool3), nameof(_bool4))]
+[LabelText("<color=orange>show=(1&&2)||(3&&4)")]
+public string _showIf1234;
+
+[FieldHideIf(nameof(_bool1), nameof(_bool2))]
+[FieldHideIf(nameof(_bool3), nameof(_bool4))]
+[LabelText("<color=pink>show=!(1||2)||!(3||4)=(!1&&!2)||(!3&&!4)")]
+public string _hideIf1234;
+```
+
+[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/1625472e-5769-4c16-81a3-637511437e1d)](https://github.com/TylerTemp/SaintsField/assets/6391063/dc7f8b78-de4c-4b12-a383-005be04c10c0)
+
+Example about EMode:
+
+```csharp
+using SaintsField;
+
+public bool boolValue;
+
+[FieldShowIf(EMode.Edit)] public string showEdit;
+[FieldShowIf(EMode.Play)] public string showPlay;
+
+[FieldShowIf(EMode.Edit, nameof(boolValue))] public string showEditAndBool;
+[FieldShowIf(EMode.Edit), FieldShowIf(nameof(boolValue))] public string showEditOrBool;
+
+[FieldHideIf(EMode.Edit)] public string hideEdit;
+[FieldHideIf(EMode.Play)] public string hidePlay;
+
+[FieldHideIf(EMode.Edit, nameof(boolValue))] public string hideEditOrBool;
+[FieldHideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
+```
 
 It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
@@ -6964,6 +6986,24 @@ private void OnChanged() => _saveLabel = "<color=lime><icon=save.png/>";
 ```
 
 [![video](https://github.com/user-attachments/assets/510d5964-fab5-4df8-8681-0b86c833d676)](https://github.com/user-attachments/assets/6720a80c-a8d5-42d8-ba91-503874c68af0)
+
+It works with `ShowInInspector`
+
+```csharp
+public interface IMyInterface
+{
+}
+
+// ... implements...
+
+[OnValueChanged(nameof(ChangeCallback)), ShowInInspector]
+public IMyInterface myInterface;
+
+private void ChangeCallback(IMyInterface value)
+{
+    Debug.Log(value);
+}
+```
 
 ### `HeaderLabel` / `HeaderLeftLabel` ###
 

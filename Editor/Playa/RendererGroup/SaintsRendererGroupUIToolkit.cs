@@ -19,6 +19,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
     public partial class SaintsRendererGroup
     {
 
+        private HelpBox _helpBox;
+
         public VisualElement CreateVisualElement()
         {
             const int radius = 3;
@@ -498,14 +500,29 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             root.name = $"saints-field-group--{_groupPath}";
 
+            root.Add(_helpBox = new HelpBox("", HelpBoxMessageType.Error)
+            {
+                style =
+                {
+                    display = DisplayStyle.None,
+                },
+            });
+
             return root;
         }
 
-        private static void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> notFilledToggleCheckInfos, VisualElement root, VisualElement body)
+        private void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> notFilledToggleCheckInfos, VisualElement root, VisualElement body)
         {
             List<ToggleCheckInfo> toggleCheckInfos = notFilledToggleCheckInfos
                 .Select(v => SaintsEditorUtils.FillResult(v, null))
                 .ToList();
+            string error = string.Join("\n", toggleCheckInfos.SelectMany(each => each.Errors));
+
+            UIToolkitUtils.SetHelpBox(_helpBox, error);
+            if (error != "")
+            {
+                return;
+            }
 
             (bool show, bool disable) = SaintsEditorUtils.GetToggleResult(toggleCheckInfos);
 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
@@ -75,6 +77,13 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
         private static Action<object> GetSetterOrNull(SaintsFieldWithInfo fieldWithInfo)
         {
+            OnValueChangedAttribute onValueChanged = fieldWithInfo.PlayaAttributes?.OfType<OnValueChangedAttribute>().FirstOrDefault();
+            string callback = "";
+            if (onValueChanged != null)
+            {
+                callback = onValueChanged.Callback;
+            }
+
             if (fieldWithInfo.FieldInfo != null)
             {
                 if (fieldWithInfo.FieldInfo.IsLiteral || fieldWithInfo.FieldInfo.IsInitOnly)
@@ -84,6 +93,16 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 return value =>
                 {
                     fieldWithInfo.FieldInfo.SetValue(fieldWithInfo.Targets[0], value);
+                    if (!string.IsNullOrEmpty(callback))
+                    {
+                        (object _, object useTarget) = GetRefreshedTarget(fieldWithInfo, fieldWithInfo.Targets[0]);
+                        (string error, object _) = Util.GetOf<object>(callback, null, fieldWithInfo.SerializedProperty,
+                            (MemberInfo)fieldWithInfo.FieldInfo ?? fieldWithInfo.PropertyInfo, useTarget, new[]{value});
+                        if (error != "")
+                        {
+                            Debug.LogError(error);
+                        }
+                    }
                     // Debug.Log(fieldWithInfo.SaintsSerializedProp?.propertyPath);
                     // SetAndApplySaintsSerialization(fieldWithInfo.SaintsSerializedProp, fieldWithInfo.FieldInfo.Name, value);
                 };
@@ -91,7 +110,17 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
             if (fieldWithInfo.PropertyInfo.CanWrite)
             {
-                return value => fieldWithInfo.PropertyInfo.SetValue(fieldWithInfo.Targets[0], value);
+                return value =>
+                {
+                    fieldWithInfo.PropertyInfo.SetValue(fieldWithInfo.Targets[0], value);
+                    (object _, object useTarget) = GetRefreshedTarget(fieldWithInfo, fieldWithInfo.Targets[0]);
+                    (string error, object _) = Util.GetOf<object>(callback, null, fieldWithInfo.SerializedProperty,
+                        (MemberInfo)fieldWithInfo.FieldInfo ?? fieldWithInfo.PropertyInfo, useTarget, new[]{value});
+                    if (error != "")
+                    {
+                        Debug.LogError(error);
+                    }
+                };
             }
 
             return null;

@@ -35,6 +35,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         public readonly struct PreCheckResult
         {
+            public readonly string Error;
             public readonly bool IsShown;
             public readonly bool IsDisabled;
             // public int ArraySize;  // NOTE: -1=No Limit, 0=0, 1=More Than 0
@@ -42,9 +43,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public readonly bool HasRichLabel;
             public readonly string RichLabelXml;
 
-            public PreCheckResult(bool isShown, bool isDisabled, (int min, int max) arraySize,
+            public PreCheckResult(string error, bool isShown, bool isDisabled, (int min, int max) arraySize,
                 bool hasRichLabel, string richLabelXml)
             {
+                Error = error;
                 IsShown = isShown;
                 IsDisabled = isDisabled;
                 ArraySize = arraySize;
@@ -107,7 +109,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         {
             if (fieldWithInfo.PlayaAttributes == null)
             {
-                return new PreCheckResult(true, false, (-1, -1), false, "");
+                return new PreCheckResult("", true, false, (-1, -1), false, "");
             }
 
             List<ToggleCheckInfo> preCheckInternalInfos = new List<ToggleCheckInfo>(fieldWithInfo.PlayaAttributes.Count);
@@ -159,16 +161,18 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 preCheckInternalInfos[i] = SaintsEditorUtils.FillResult(preCheckInternalInfos[i], fieldWithInfo.SerializedProperty);
             }
 
+            List<string> errors = preCheckInternalInfos.SelectMany(each => each.Errors).ToList();
+
             (bool showIfResult, bool disableIfResult) = SaintsEditorUtils.GetToggleResult(preCheckInternalInfos);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SHOW_HIDE
             Debug.Log(
                 $"showIfResult={showIfResult} (hasShow={hasShow}, show={show}, hide={hide})");
 #endif
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
-            Debug.Log(
-                $"disableIfResult={disableIfResult} (disable={disable}, enable={enable})");
-#endif
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_DISABLE_ENABLE
+//             Debug.Log(
+//                 $"disableIfResult={disableIfResult}");
+// #endif
 
 
             LabelTextAttribute richLabelAttribute = fieldWithInfo.PlayaAttributes.OfType<LabelTextAttribute>().FirstOrDefault();
@@ -187,7 +191,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                     else
                     {
-                        Debug.LogError(error);
+                        errors.Add(error);
+                        // Debug.LogError(error);
                         richLabelXml = ObjectNames.NicifyVariableName(GetMemberInfo(fieldWithInfo).Name);
                     }
                 }
@@ -197,7 +202,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
-            return new PreCheckResult(showIfResult, disableIfResult, arraySize, hasRichLabel, richLabelXml);
+            return new PreCheckResult(string.Join("\n", errors), showIfResult, disableIfResult, arraySize, hasRichLabel, richLabelXml);
         }
 
         private bool _getByXPathKeepUpdate = true;
