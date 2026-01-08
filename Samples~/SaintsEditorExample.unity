@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -38,13 +38,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -67,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -255,6 +251,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3625243
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -270,6 +267,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -291,9 +293,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -303,7 +307,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &9668360
 GameObject:
@@ -3588,6 +3591,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &930217590
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3603,6 +3607,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3624,9 +3633,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -3636,7 +3647,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &930217591
 MonoBehaviour:
@@ -4750,6 +4760,8 @@ Transform:
   - {fileID: 2064004130}
   - {fileID: 1035620225}
   - {fileID: 504820854}
+  - {fileID: 1608673354}
+  - {fileID: 1255519702}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1196999815
@@ -4926,6 +4938,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: 
   targetTransform: {fileID: 0}
+--- !u!1 &1255519701
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1255519702}
+  - component: {fileID: 1255519703}
+  m_Layer: 0
+  m_Name: NewParserTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1255519702
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1255519701}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1255519703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1255519701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7002e517a199e9f4abd29bcfc41fea54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.NewParserTest
+  testNested:
+    myS: 
+    go: {fileID: 0}
 --- !u!1 &1260684168
 GameObject:
   m_ObjectHideFlags: 0
@@ -6793,6 +6852,37 @@ MonoBehaviour:
     Weight: 7
     MinQuantity: 0
     MaxQuantity: 0
+--- !u!1 &1608673353
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1608673354}
+  m_Layer: 0
+  m_Name: Ser
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1608673354
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1608673353}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1630359510
 GameObject:
   m_ObjectHideFlags: 0
@@ -7262,6 +7352,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1708315049
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -7277,6 +7368,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7298,9 +7394,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -7310,7 +7408,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1736933212
 GameObject:
@@ -7347,6 +7444,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1736933214
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -7362,6 +7460,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7383,9 +7486,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -7395,7 +7500,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1757007196
 GameObject:
@@ -7550,6 +7654,7 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1776789733}
 --- !u!212 &1776789733
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -7565,6 +7670,11 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7586,9 +7696,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}
   m_Color: {r: 0.55980706, g: 0.44019294, b: 0, a: 1}
   m_FlipX: 0
@@ -7598,7 +7710,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1779100555
 GameObject:
@@ -7663,6 +7774,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7684,13 +7800,15 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!95 &1779100559
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -7704,6 +7822,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -8729,7 +8848,7 @@ PrefabInstance:
       value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 5029888576848882080, guid: 276f5131026be6641b983ee4760efb1c, type: 3}
-      propertyPath: searchScriptable.Array.data[3]
+      propertyPath: 'searchScriptable.Array.data[3]'
       value: 
       objectReference: {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
     - target: {fileID: 5029888576848882080, guid: 276f5131026be6641b983ee4760efb1c, type: 3}
@@ -8737,7 +8856,7 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5029888576848882080, guid: 276f5131026be6641b983ee4760efb1c, type: 3}
-      propertyPath: searchDelayScriptable.Array.data[4]
+      propertyPath: 'searchDelayScriptable.Array.data[4]'
       value: 
       objectReference: {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
     - target: {fileID: 5029888576848882080, guid: 276f5131026be6641b983ee4760efb1c, type: 3}
@@ -8802,7 +8921,7 @@ PrefabInstance:
       value: SerDictionary
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[-2]
+      propertyPath: 'managedReferences[-2]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
@@ -8810,51 +8929,51 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699029844075]
+      propertyPath: 'managedReferences[3614753699029844075]'
       value: SaintsField.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699029844076]
+      propertyPath: 'managedReferences[3614753699029844076]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699029844079]
+      propertyPath: 'managedReferences[3614753699029844079]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699248473011]
+      propertyPath: 'managedReferences[3614753699248473011]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699248473014]
+      propertyPath: 'managedReferences[3614753699248473014]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699248996356]
+      propertyPath: 'managedReferences[3614753699248996356]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699248996359]
+      propertyPath: 'managedReferences[3614753699248996359]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699248996442]
+      propertyPath: 'managedReferences[3614753699248996442]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699248996446]
+      propertyPath: 'managedReferences[3614753699248996446]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699248996857]
+      propertyPath: 'managedReferences[3614753699248996857]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699248996864]
+      propertyPath: 'managedReferences[3614753699248996864]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
-      propertyPath: managedReferences[3614753699248996882]
+      propertyPath: 'managedReferences[3614753699248996882]'
       value: mscorlib System.Int32
       objectReference: {fileID: 0}
     - target: {fileID: 9160051824825826174, guid: fcea4d371757bbb45977557cc1049963, type: 3}
