@@ -37,7 +37,8 @@ namespace SaintsField.Editor.Utils
                 Debug.Log($"Init for Config.SaintsFieldSourceParser.additionalfile");
                 File.WriteAllText(roslynConfigFile, "debug = 0\ndisabled = 0\n");
             }
-            const string roslynTempFile = saintsFieldFolder + "/Temp.SaintsFieldSourceParser.additionalfile";
+            const string roslynTempFileName = "Temp.SaintsFieldSourceParser.additionalfile";
+            const string roslynTempFile = saintsFieldFolder + "/" + roslynTempFileName;
             string writeTempContent = $"path = {projectRootPath.Replace("\\", "/")}/{preParserRelativeFolder}\n";
             bool checkIgnore = true;
             if (File.Exists(roslynTempFile))
@@ -62,7 +63,7 @@ namespace SaintsField.Editor.Utils
             {
                 const string ignoreFile = saintsFieldFolder + "/.gitignore";
                 Debug.Log($"Write ignore file: {ignoreFile}");
-                File.WriteAllText(ignoreFile, $"{roslynTempFile}\n{roslynTempFile}.meta\n");
+                File.WriteAllText(ignoreFile, $"{roslynTempFileName}\n{roslynTempFileName}.meta\n");
             }
         }
     }
