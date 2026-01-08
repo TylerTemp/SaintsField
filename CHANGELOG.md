@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.8.0 ##
+
+1.  Fix: layout system can not detect field order inside a general struct/class
+2.  Change: layout system no longer requires `Microsoft.CodeAnalysis.CSharp`. You can safely uninstall it from Package Manager
+
 ## 5.7.9 ##
 
 1.  Fix `RichText` did not work with `<field.subField/>`

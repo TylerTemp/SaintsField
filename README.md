@@ -95,15 +95,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.9**
+**5.8.0**
 
-1.  Fix `RichText` did not work with `<field.subField/>`
-2.  Fix `AboveText`, `BelowText` did not update with `<field/>` tag
-3.  Add: static callback now support nested type finding
-4.  Change: `PlayEnableIf`/`PlayaDisableIf` now is `EnableIf`/`DisableIf`. And the original ones are now `FieldEnableIf`/`FieldDisableIf`
-5.  Fix: `ShowIf`/`HideIf`/`EnableIf`/`DisableIf` now gives an error box if the callback have errors
-6.  Fix: `ShowInInspector` for struct/class, switching type did not clean the old fields
-7.  Add: `OnValueChanged` now works with `ShowInInspector`
+1.  Fix: layout system can not detect field order inside a general struct/class
+2.  Change: layout system no longer requires `Microsoft.CodeAnalysis.CSharp`. You can safely uninstall it from Package Manager
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -5756,9 +5751,7 @@ private string ShowGuid([Guid] string guidString) => guidString;
 
 Layout system allows you to group severral target (field, property, button etc) together. It also allows you to box it with/without a title box or foldout box.
 
-You can use this system once `SaintsEditor` is enabled in your project. However, because C# reflection can not give a correct order of targets between fields, properties, and method, the layout could gather targets incorrectly. Thus, it's highly recommended to install [Microsoft.CodeAnalysis.CSharp](https://www.nuget.org/packages/microsoft.codeanalysis.csharp/). This dependency will NOT be included in your build.
-
-Which means, though it works 90% of the time:
+The field can be groupd as:
 
 ```csharp
 using SaintsField.Playa;
@@ -5782,7 +5775,7 @@ public GameObjct out2;
 
 ![](https://github.com/user-attachments/assets/8b8342c0-166c-4df6-a345-0ec0c91b22c2)
 
-But if you mix some method, the method will not be placed where it anounced, because the limitation from C\# language
+You can also mix it with `Button` & `ShowInInspector`
 
 ```csharp
 [LayoutStart("Left Hand", ELayout.FoldoutBox)]
@@ -5802,67 +5795,14 @@ public int hp;
 public int mp;
 ```
 
-❌ Without `Microsoft.CodeAnalysis.CSharp`, it uses the default reflection order, which is field & property, then method:
-
-![](https://github.com/user-attachments/assets/0d019562-c10f-44c6-9597-e6957ee70342)
-
-✅ With `Microsoft.CodeAnalysis.CSharp`, it uses the source code declaration order:
-
 ![](https://github.com/user-attachments/assets/1368d7df-7505-44d3-8c03-703dce2f6fea)
 
-You can install it using any method below:
+This will generate:
 
-**Auto Installer**
+1.  Temp files under `Library/SaintsFieldTemp`
+2.  `Assets/Editor Default Resources/SaintsField/Temp.SaintsFieldSourceParser.additionalfile` (You should ignore this in your version control)
 
-1.  Go `Window` - `Saints` - `Enable Code Analysis...`
-2.  If it's not installed, click `Install` for "Code Analysis"
-3.  Click `Enable` for "Code Analysis"
-
-![](https://github.com/user-attachments/assets/d09344b0-9fbe-48b0-bad5-fbeb93e1164a)
-
-**Unity Package Manager + Unity NuGet**
-
-1.  Open `Project Settings` - `Package Manager`, click plus icon to add a scoped registries
-2.  Add:
-    *   Name: `Unity NuGet`
-    *   URL: `https://unitynuget-registry.openupm.com`
-    *   Scopes: `org.nuget`
-3.  Click `Save` button
-
-    ![](https://github.com/user-attachments/assets/aa48ab9a-b52b-4c10-a110-1f1a342d74d5)
-4.  Open `Window` - `Package Manager`, click the plus icon to add package by name
-
-    ![](https://github.com/user-attachments/assets/f8872324-5ce6-476f-be80-207ad60bb416)
-5.  Type `org.nuget.microsoft.codeanalysis.csharp` and hit `Add`
-
-    ![](https://github.com/user-attachments/assets/25f912e0-bb7a-43b3-8d89-a750652f84af)
-6.  Wait until you see the `Microsoft.CodeAnalysis.CSharp` under `Microsoft` part
-
-    ![](https://github.com/user-attachments/assets/42138dfb-1e11-409d-a4c0-36cf8c5a8bb4)
-
-7.  Go `Edit` - `Project Settings` - `SaintsField`
-
-[**OpenUPM Uplink**](https://openupm.com/nuget/#using-uplinked-unitynuget)
-
-```bash
-openupm add org.nuget.microsoft.codeanalysis.csharp
-```
-
-Then go `Edit` - `Project Settings` - `SaintsField`
-
-
-**NuGet for Unity**:
-
-1.  Install [NuGet for Unity](https://github.com/GlitchEnzo/NuGetForUnity?tab=readme-ov-file#how-do-i-install-nugetforunity)
-2.  Open `NuGet` - `Manage NuGet Packages`
-
-    ![](https://github.com/user-attachments/assets/98654064-2815-4769-b071-8863d74a4c78)
-3.  Type `Microsoft.CodeAnalysis.CSharp` and hit `Search`, on the result, click `Install` (the newest version should work just fine)
-
-    ![](https://github.com/user-attachments/assets/766775cd-9e7c-4361-8bab-abab8bda39e8)
-4.  Go `Edit` - `Project Settings` - `SaintsField`
-
-Or you can manually install related dll to Unity.
+You can change configs under `Assets/Editor Default Resources/SaintsField/Config.SaintsFieldSourceParser.additionalfile`
 
 ### `Layout` ###
 

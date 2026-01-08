@@ -52,6 +52,9 @@ namespace SaintsField.Editor
         {
             if (TypeToPreParsedComparer.TryGetValue(systemType, out MemberInfoComparerPreParsed cache))
             {
+#if SAINTSFIELD_DEBUG
+                Debug.Log($"return cache for {systemType}: {cache}");
+#endif
                 return cache;
             }
 
@@ -64,6 +67,9 @@ namespace SaintsField.Editor
             string baseFolder = $"{SaintsFieldConfig.PreParserRelativeFolder}/{ass.GetName().Name}";
             if (!Directory.Exists(baseFolder))
             {
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning($"folder not found {baseFolder}");
+#endif
                 return null;
             }
 
