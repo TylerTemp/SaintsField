@@ -67,9 +67,9 @@ namespace SaintsField.Editor
             string baseFolder = $"{SaintsFieldConfig.PreParserRelativeFolder}/{ass.GetName().Name}";
             if (!Directory.Exists(baseFolder))
             {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"folder not found {baseFolder}");
-#endif
+// #if SAINTSFIELD_DEBUG
+//                 Debug.LogWarning($"folder not found {baseFolder}");
+// #endif
                 return null;
             }
 
