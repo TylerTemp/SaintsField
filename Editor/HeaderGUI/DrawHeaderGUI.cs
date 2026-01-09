@@ -20,7 +20,7 @@ namespace SaintsField.Editor.HeaderGUI
 #endif
         public static void DelayInit()
         {
-            EditorApplication.delayCall += EnsureInitLoad;
+            EditorApplication.delayCall += () => EnsureInitLoad();
             EditorApplication.delayCall += LoadTypeToRenderTargetInfo;
             EditorApplication.delayCall += ManuallyUpdate;
         }
@@ -35,17 +35,17 @@ namespace SaintsField.Editor.HeaderGUI
 
         private static bool _initLoad;
 
-        public static void EnsureInitLoad()
+        public static bool EnsureInitLoad()
         {
             if (_initLoad)
             {
-                return;
+                return true;
             }
 
-            InitLoad();
+            return InitLoad();
         }
 
-        private static void InitLoad()
+        private static bool InitLoad()
         {
             const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Static;
             if(_sEditorHeaderItemsMethods == null)
@@ -54,15 +54,15 @@ namespace SaintsField.Editor.HeaderGUI
             }
             if (_sEditorHeaderItemsMethods == null)
             {
-                return;  // API is changed internally, and it's now gone
+                return false;  // API is changed internally, and it's now gone
             }
 
             IList value = (IList)_sEditorHeaderItemsMethods.GetValue(null);
             // Debug.Log($"value={value}");
             if (value == null)
             {
-                EditorApplication.delayCall += InitLoad;
-                return;
+                // EditorApplication.delayCall += InitLoad;
+                return false;
             }
 
             Type delegateType = value.GetType().GetGenericArguments()[0];
@@ -76,6 +76,7 @@ namespace SaintsField.Editor.HeaderGUI
             // ReSharper disable once AssignNullToNotNullAttribute
             value.Add(Delegate.CreateDelegate(delegateType, methodInfo));
             _initLoad = true;
+            return true;
         }
 
         public enum MemberType

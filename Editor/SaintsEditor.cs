@@ -730,42 +730,50 @@ namespace SaintsField.Editor
         {
             IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedObject, serializedPropertyDict, targetParent, targetMemberInfo, targetMemberIndex, targets).ToArray();
 
-            // let's handle some HeaderGUI here... not a good idea but...
-            bool anyChange = false;
-            // target.GetType()
 
-            AbsComponentHeaderAttribute[] classAttributes = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(targets[0].GetType());
-            foreach ((AbsComponentHeaderAttribute componentHeaderAttribute, int order) in classAttributes.WithIndex(-classAttributes.Length))
+            if(DrawHeaderGUI.EnsureInitLoad())
             {
-                bool added = DrawHeaderGUI.AddAttributeIfNot(
-                    componentHeaderAttribute,
-                    null,
-                    targets[0],
-                    order);
-                if (added)
-                {
-                    anyChange = true;
-                }
-            }
-            foreach ((SaintsFieldWithInfo saintsFieldWithInfo, int index) in fieldWithInfosSorted.WithIndex())
-            {
-                IReadOnlyList<IPlayaAttribute> playaAttributes = saintsFieldWithInfo.PlayaAttributes;
-                foreach (AbsComponentHeaderAttribute componentHeaderAttribute in playaAttributes.OfType<AbsComponentHeaderAttribute>())
+                // let's handle some HeaderGUI here... not a good idea but...
+                bool anyChange = false;
+                AbsComponentHeaderAttribute[] classAttributes =
+                    ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(targets[0].GetType());
+                foreach ((AbsComponentHeaderAttribute componentHeaderAttribute, int order) in classAttributes.WithIndex(
+                             -classAttributes.Length))
                 {
                     bool added = DrawHeaderGUI.AddAttributeIfNot(
                         componentHeaderAttribute,
-                        saintsFieldWithInfo.MethodInfo ?? (MemberInfo)saintsFieldWithInfo.FieldInfo ?? saintsFieldWithInfo.PropertyInfo,
+                        null,
                         targets[0],
-                        index);
+                        order);
                     if (added)
                     {
                         anyChange = true;
                     }
                 }
-            }
-            if (anyChange)
-            {
-                DrawHeaderGUI.RefreshAddAttributeIfNot(targets[0].GetType());
+
+                foreach ((SaintsFieldWithInfo saintsFieldWithInfo, int index) in fieldWithInfosSorted.WithIndex())
+                {
+                    IReadOnlyList<IPlayaAttribute> playaAttributes = saintsFieldWithInfo.PlayaAttributes;
+                    foreach (AbsComponentHeaderAttribute componentHeaderAttribute in playaAttributes
+                                 .OfType<AbsComponentHeaderAttribute>())
+                    {
+                        bool added = DrawHeaderGUI.AddAttributeIfNot(
+                            componentHeaderAttribute,
+                            saintsFieldWithInfo.MethodInfo ?? (MemberInfo)saintsFieldWithInfo.FieldInfo ??
+                            saintsFieldWithInfo.PropertyInfo,
+                            targets[0],
+                            index);
+                        if (added)
+                        {
+                            anyChange = true;
+                        }
+                    }
+                }
+
+                if (anyChange)
+                {
+                    DrawHeaderGUI.RefreshAddAttributeIfNot(targets[0].GetType());
+                }
             }
 
             IReadOnlyList<RendererGroupInfo> chainedGroups = ChainSaintsFieldWithInfo(fieldWithInfosSorted, serializedObject, makeRenderer);
