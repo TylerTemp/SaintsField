@@ -5,11 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.RendererGroup.TabGroup;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
-using SaintsField.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
@@ -20,6 +19,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
     {
 
         private HelpBox _helpBox;
+        private Dictionary<string, List<VisualElement>> fieldToVisualElement;
 
         public VisualElement CreateVisualElement()
         {
@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             Texture2D dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
             Texture2D dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
 
-            Dictionary<string, List<VisualElement>> fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
+            fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
             string curTab = null;
 
             VisualElement root = new VisualElement
@@ -59,69 +59,56 @@ namespace SaintsField.Editor.Playa.RendererGroup
             bool hasTitle = _eLayout.HasFlagFast(ELayout.Title) || _eLayout.HasFlagFast(ELayout.TitleOut);
             bool hasTab = _eLayout.HasFlagFast(ELayout.Tab);
 
-            Toolbar toolbar = new Toolbar
-            {
-                style =
-                {
-                    flexGrow = 1,
-                    marginLeft = 1,
-                    marginRight = 0,
-                },
-            };
+            // Toolbar toolbar = new Toolbar
+            // {
+            //     style =
+            //     {
+            //         flexGrow = 1,
+            //         marginLeft = 1,
+            //         marginRight = 0,
+            //     },
+            // };
 
-            ToolbarToggle[] toolbarToggles = _orderedKeys
-                .Select(each => new ToolbarToggle
-                {
-                    text = each,
-                    style =
-                    {
-                        flexGrow = 1,
-                        unityTextAlign = TextAnchor.MiddleCenter,
-                        unityFontStyleAndWeight = FontStyle.Bold,
-                    },
-                })
-                .ToArray();
-
-            List<Action<string>> switchTabActions = new List<Action<string>>
-            {
-                tab =>
-                {
-                    foreach (ToolbarToggle toolbarToggle in toolbarToggles)
-                    {
-                        toolbarToggle.SetValueWithoutNotify(toolbarToggle.text == tab);
-                    }
-
-                    foreach((string groupPath, List<VisualElement> visualElements) in fieldToVisualElement)
-                    {
-                        bool display = tab == null || groupPath == tab;
-                        visualElements.ForEach(visualElement => visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None);
-                    }
-                },
-            };
+            // List<Action<string>> switchTabActions = new List<Action<string>>
+            // {
+            //     tab =>
+            //     {
+            //         foreach (ToolbarToggle toolbarToggle in toolbarToggles)
+            //         {
+            //             toolbarToggle.SetValueWithoutNotify(toolbarToggle.text == tab);
+            //         }
+            //
+            //         foreach((string groupPath, List<VisualElement> visualElements) in fieldToVisualElement)
+            //         {
+            //             bool display = tab == null || groupPath == tab;
+            //             visualElements.ForEach(visualElement => visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None);
+            //         }
+            //     },
+            // };
 
             // ReSharper disable once ConvertToLocalFunction
-            Action<string> switchTab = tab =>
-            {
-                foreach (Action<string> switchTabAction in switchTabActions)
-                {
-                    switchTabAction.Invoke(tab);
-                }
-            };
+            // Action<string> switchTab = tab =>
+            // {
+            //     foreach (Action<string> switchTabAction in switchTabActions)
+            //     {
+            //         switchTabAction.Invoke(tab);
+            //     }
+            // };
 
-            foreach (ToolbarToggle toolbarToggle in toolbarToggles)
-            {
-                toolbarToggle.RegisterValueChangedCallback(evt =>
-                {
-                    if (evt.newValue)
-                    {
-                        switchTab(curTab = toolbarToggle.text);
-                    }
-                    else
-                    {
-                        toolbarToggle.SetValueWithoutNotify(true);
-                    }
-                });
-            }
+            // foreach (ToolbarToggle toolbarToggle in toolbarToggles)
+            // {
+            //     toolbarToggle.RegisterValueChangedCallback(evt =>
+            //     {
+            //         if (evt.newValue)
+            //         {
+            //             switchTab(curTab = toolbarToggle.text);
+            //         }
+            //         else
+            //         {
+            //             toolbarToggle.SetValueWithoutNotify(true);
+            //         }
+            //     });
+            // }
 
             VisualElement body = new VisualElement
             {
@@ -139,29 +126,29 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 body.style.paddingBottom = 3;
             }
 
-            // ReSharper disable once ConvertToLocalFunction
-            Action<bool> foldoutAction = show =>
-            {
-                if (show)
-                {
-                    if (hasTitle)
-                    {
-                        toolbar.style.display = DisplayStyle.Flex;
-                    }
-                    switchTab(curTab);
-                }
-                else
-                {
-                    if (hasTitle)
-                    {
-                        toolbar.style.display = DisplayStyle.None;
-                    }
-                    foreach (List<VisualElement> visualElements in fieldToVisualElement.Values)
-                    {
-                        visualElements.ForEach(visualElement => visualElement.style.display = DisplayStyle.None);
-                    }
-                }
-            };
+            // // ReSharper disable once ConvertToLocalFunction
+            // Action<bool> foldoutAction = show =>
+            // {
+            //     if (show)
+            //     {
+            //         if (hasTitle)
+            //         {
+            //             toolbar.style.display = DisplayStyle.Flex;
+            //         }
+            //         switchTab(curTab);
+            //     }
+            //     else
+            //     {
+            //         if (hasTitle)
+            //         {
+            //             toolbar.style.display = DisplayStyle.None;
+            //         }
+            //         foreach (List<VisualElement> visualElements in fieldToVisualElement.Values)
+            //         {
+            //             visualElements.ForEach(visualElement => visualElement.style.display = DisplayStyle.None);
+            //         }
+            //     }
+            // };
 
             if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
             {
@@ -240,6 +227,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             // alignItems = Align.FlexEnd,
                         },
                     };
+                    titleRow.Add(title);
+
                     Image foldoutImage = new Image
                     {
                         image = _foldout? dropdownIcon: dropdownRightIcon,
@@ -251,41 +240,19 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             marginLeft = -imageSize,
                         },
                     };
-
                     title.Add(foldoutImage);
+
+                    TabToolbar tabToolbar = new TabToolbar(_orderedKeys, false);
+                    titleRow.Add(tabToolbar);
 
                     body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
                     title.clicked += () =>
                     {
-                        // _foldout = !_foldout;
-                        if (_foldout)  // need collapse
-                        {
-                            foreach (ToolbarToggle toolbarToggle in toolbarToggles)
-                            {
-                                toolbarToggle.SetValueWithoutNotify(false);
-                            }
-                        }
-                        else
-                        {
-                            ToolbarToggle targetToolbar = toolbarToggles.FirstOrDefault(each => each.text == curTab);
-                            if (targetToolbar != null)
-                            {
-                                targetToolbar.value = true;
-                            }
-                        }
-
                         _foldout = !_foldout;
                         body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
                         foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
+                        tabToolbar.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
                     };
-
-                    switchTabActions.Add(_ =>
-                    {
-                        _foldout = true;
-                        body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
-                        foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
-                    });
-                    titleRow.Add(title);
                 }
                 else
                 {
@@ -326,56 +293,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
             // foldout-tabs:
             if (hasFoldout && !hasTitle && hasTab)
             {
-                // toolbar.Add(foldout);
-                foldoutToggle = new ToolbarToggle
-                {
-                    value = true,
-                    style =
-                    {
-                        paddingTop = 0,
-                        paddingRight = 0,
-                        paddingBottom = 0,
-                        paddingLeft = 0,
-                    },
-                };
-                Image foldoutImage = new Image
-                {
-                    image = dropdownIcon,
-                    tintColor = Color.gray,
-                };
-                foldoutToggle.style.width = SaintsPropertyDrawer.SingleLineHeight;
-                foldoutToggle.Add(foldoutImage);
-                foldoutToggle.RegisterValueChangedCallback(evt =>
-                {
-                    _foldout = evt.newValue;
-                    foldoutToggle.value = _foldout;
-                    foldoutAction(_foldout);
-                    foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
-
-                    if (!_foldout)
-                    {
-                        foreach (ToolbarToggle toolbarToggle in toolbarToggles)
-                        {
-                            toolbarToggle.SetValueWithoutNotify(false);
-                        }
-                    }
-                });
-
-                toolbar.Add(foldoutToggle);
-
-                foreach (ToolbarToggle eachTab in toolbarToggles)
-                {
-                    toolbar.Add(eachTab);
-                    eachTab.RegisterValueChangedCallback(evt =>
-                    {
-                        if (evt.newValue)
-                        {
-                            foldoutToggle.value = true;
-                        }
-                    });
-                }
-
-                titleRow.Add(toolbar);
+                TabToolbar tabToolbar = new TabToolbar(_orderedKeys, true);
+                titleRow.Add(tabToolbar);
             }
 
             // tabs
@@ -383,11 +302,30 @@ namespace SaintsField.Editor.Playa.RendererGroup
             if((!hasFoldout && hasTitle && hasTab) || (hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
             {
                 // TODO: 2023_3+ these is a TabView can be used
-                foreach (ToolbarToggle eachTab in toolbarToggles)
+                // foreach (ToolbarToggle eachTab in toolbarToggles)
+                // {
+                //     toolbar.Add(eachTab);
+                // }
+                // titleRow.Add(toolbar);
+                TabToolbar tabToolbar = new TabToolbar(_orderedKeys, true);
+                titleRow.Add(tabToolbar);
+
+                tabToolbar.OnValueChanged.AddListener((tab, expand) =>
                 {
-                    toolbar.Add(eachTab);
-                }
-                titleRow.Add(toolbar);
+                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                    if (expand)
+                    {
+                        SetDisplayGroups(tab);
+                    }
+                    else
+                    {
+                        SetDisplayGroups(null);
+                    }
+                });
+                SetDisplayGroups(_orderedKeys[0]);
+                tabToolbar.SetValueWithoutNotification(_orderedKeys[0]);
+
+                Debug.Log($"titleRow.Add(toolbar): {string.Join(",", _orderedKeys)}");
             }
 
             foreach ((string groupPath, ISaintsRenderer renderer) in _renderers)
@@ -452,21 +390,21 @@ namespace SaintsField.Editor.Playa.RendererGroup
             //     labels.ForEach(UIToolkitUtils.FixLabelWidthUIToolkit);
             // }, 200);
 
-            if (_eLayout.HasFlagFast(ELayout.Tab))
-            {
-                // ReSharper disable once ConvertToLocalFunction
-                EventCallback<AttachToPanelEvent> switchOnAttach = null;
-                switchOnAttach = _ =>
-                {
-                    root.UnregisterCallback(switchOnAttach);
-                    toolbarToggles[0].value = true;
-                    if (foldoutToggle != null)
-                    {
-                        foldoutToggle.value = _foldout;
-                    }
-                };
-                root.RegisterCallback(switchOnAttach);
-            }
+            // if (_eLayout.HasFlagFast(ELayout.Tab))
+            // {
+            //     // ReSharper disable once ConvertToLocalFunction
+            //     EventCallback<AttachToPanelEvent> switchOnAttach = null;
+            //     switchOnAttach = _ =>
+            //     {
+            //         root.UnregisterCallback(switchOnAttach);
+            //         toolbarToggles[0].value = true;
+            //         if (foldoutToggle != null)
+            //         {
+            //             foldoutToggle.value = _foldout;
+            //         }
+            //     };
+            //     root.RegisterCallback(switchOnAttach);
+            // }
 
             float marginTop = _config.MarginTop > 0 ? _config.MarginTop : 2;
 
@@ -509,6 +447,15 @@ namespace SaintsField.Editor.Playa.RendererGroup
             });
 
             return root;
+        }
+
+        private void SetDisplayGroups(string tab)
+        {
+            foreach((string groupPath, List<VisualElement> visualElements) in fieldToVisualElement)
+            {
+                bool display = tab == null || groupPath == tab;
+                visualElements.ForEach(visualElement => visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None);
+            }
         }
 
         private void LoopCheckTogglesUIToolkit(List<ToggleCheckInfo> notFilledToggleCheckInfos, VisualElement root, VisualElement body)

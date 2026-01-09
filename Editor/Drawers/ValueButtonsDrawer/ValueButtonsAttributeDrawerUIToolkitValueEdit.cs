@@ -4,11 +4,8 @@ using System.Linq;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
-using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
