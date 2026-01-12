@@ -113,12 +113,16 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 return value =>
                 {
                     fieldWithInfo.PropertyInfo.SetValue(fieldWithInfo.Targets[0], value);
-                    (object _, object useTarget) = GetRefreshedTarget(fieldWithInfo, fieldWithInfo.Targets[0]);
-                    (string error, object _) = Util.GetOf<object>(callback, null, fieldWithInfo.SerializedProperty,
-                        (MemberInfo)fieldWithInfo.FieldInfo ?? fieldWithInfo.PropertyInfo, useTarget, new[]{value});
-                    if (error != "")
+                    if (!string.IsNullOrEmpty(callback))
                     {
-                        Debug.LogError(error);
+                        (object _, object useTarget) = GetRefreshedTarget(fieldWithInfo, fieldWithInfo.Targets[0]);
+                        (string error, object _) = Util.GetOf<object>(callback, null, fieldWithInfo.SerializedProperty,
+                            (MemberInfo)fieldWithInfo.FieldInfo ?? fieldWithInfo.PropertyInfo, useTarget,
+                            new[] { value });
+                        if (error != "")
+                        {
+                            Debug.LogError(error);
+                        }
                     }
                 };
             }

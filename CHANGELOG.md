@@ -4,6 +4,7 @@
 
 1.  Fix: incorrect GC alloc in Custom editor window [#354](https://github.com/TylerTemp/SaintsField/issues/354)
 2.  Improve: Tabs in layout system now can break lines if there are way too many tabs
+3.  Fix: `ShowInInspector` for property tried to invoke a `OnValueChanged` even there is not one
 
 ## 5.8.0 ##
 

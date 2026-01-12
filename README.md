@@ -95,10 +95,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.0**
+**5.8.1**
 
-1.  Fix: layout system can not detect field order inside a general struct/class
-2.  Change: layout system no longer requires `Microsoft.CodeAnalysis.CSharp`. You can safely uninstall it from Package Manager
+1.  Fix: incorrect GC alloc in Custom editor window [#354](https://github.com/TylerTemp/SaintsField/issues/354)
+2.  Improve: Tabs in layout system now can break lines if there are way too many tabs
+3.  Fix: `ShowInInspector` for property tried to invoke a `OnValueChanged` even there is not one
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
