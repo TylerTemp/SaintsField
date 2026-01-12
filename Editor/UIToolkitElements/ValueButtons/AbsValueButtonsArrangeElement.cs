@@ -12,14 +12,14 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 {
     public abstract class AbsValueButtonsArrangeElement<T>: VisualElement where T: AbsValueButton
     {
-        private readonly AbsValueButtonsCalcElement<T> _valueButtonsCalcElement;
+        private readonly AbsValueButtonsCalcElement _valueButtonsCalcElement;
         private readonly AbsValueButtonsRow<T> _mainRow;
         private readonly List<AbsValueButtonsRow<T>> _subRows = new List<AbsValueButtonsRow<T>>();
         public readonly UnityEvent<object> OnButtonClicked = new UnityEvent<object>();
 
         protected abstract AbsValueButtonsRow<T> MakeValueButtonsRow();
 
-        protected AbsValueButtonsArrangeElement(AbsValueButtonsCalcElement<T> valueButtonsCalcElement, AbsValueButtonsRow<T> mainRow)
+        protected AbsValueButtonsArrangeElement(AbsValueButtonsCalcElement valueButtonsCalcElement, AbsValueButtonsRow<T> mainRow)
         {
             style.position = Position.Relative;
 
@@ -32,42 +32,52 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             Add(_mainRow = mainRow);
             _mainRow.OnButtonClicked.AddListener(OnButtonClicked.Invoke);
 
-            RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
-            _valueButtonsCalcElement.ReadyEvent.AddListener(OnCalcReadyEvent);
-            RegisterCallback<AttachToPanelEvent>(_ => CheckWidth());
+            // RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
+            _valueButtonsCalcElement.AddReadyListener(OnCalcReadyEvent);
+            // RegisterCallback<AttachToPanelEvent>(_ => CheckWidth());
+            UIToolkitUtils.OnAttachToPanelOnce(this, _ =>
+            {
+                schedule.Execute(LoopCheck).Every(150);
+            });
+        }
+
+        private void LoopCheck()
+        {
+            if (_results != null && _rearrangeDone)
+            {
+                return;
+            }
+
+            // if (_pending)
+            // {
+            //     return;
+            // }
+            // Debug.Log("Check width...");
+
+            CheckWidth();
         }
 
         private float _selfWidth = -1;
         private float _subWidth = -1;
 
-        private void OnGeometryChangedEvent(GeometryChangedEvent _)
-        {
-            // Debug.Log("OnGeometryChangedEvent");
-            // if (SubContainer != null && SubContainer.style.display == DisplayStyle.None)
-            // {
-            //     return;
-            // }
+        // private void OnGeometryChangedEvent(GeometryChangedEvent _)
+        // {
+        //     // Debug.Log("OnGeometryChangedEvent");
+        //     // if (SubContainer != null && SubContainer.style.display == DisplayStyle.None)
+        //     // {
+        //     //     return;
+        //     // }
+        //
+        //     CheckWidth();
+        // }
 
-            CheckWidth();
-        }
-
-        private bool CheckWidth()
+        private void CheckWidth()
         {
             bool changed = false;
-            float resolvedWidth = resolvedStyle.width;
-            if (!double.IsNaN(resolvedWidth) && resolvedWidth > 0)
-            {
-                float useWidth = Mathf.Max(1, resolvedWidth - 18);  // remove the button space
-                if (Math.Abs(_selfWidth - useWidth) > float.Epsilon)
-                {
-                    changed = true;
-                    _selfWidth = useWidth;
-                }
-            }
 
             if (_subContainer != null)
             {
-                var subResolvedWidth = _subContainer.resolvedStyle.width;
+                float subResolvedWidth = _subContainer.resolvedStyle.width;
                 if (!double.IsNaN(subResolvedWidth) && subResolvedWidth > 0)
                 {
                     if (Math.Abs(_subWidth - subResolvedWidth) > float.Epsilon)
@@ -80,25 +90,44 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             else
             {
                 // Debug.Log("No subcontainer set, skip");
-                return false;
+                // return false;
+                return;
             }
 
-            if (_selfWidth > 0 && _subWidth > 0 && changed)
+            float resolvedWidth = resolvedStyle.width;
+            if (!double.IsNaN(resolvedWidth) && resolvedWidth > 0)
             {
-                // Debug.Log($"width changed {_selfWidth}, {_subWidth}, CheckArrange");
-                CheckArrange();
-                return true;
+                float useWidth = Mathf.Max(1, resolvedWidth - 18);  // remove the button space
+                if (Math.Abs(_selfWidth - useWidth) > float.Epsilon)
+                {
+                    changed = true;
+                    _selfWidth = useWidth;
+                }
             }
 
-            if (_selfWidth > 0 && _subWidth > 0 && !_pending)
+            if (changed || !_rearrangeDone)
             {
-                // Debug.Log($"width not pending check range, CheckArrange");
-                CheckArrange();
-                return true;
+                _rearrangeDone = false;
+                // Debug.Log("DoReArrange");
+                DoReArrange();
             }
 
-            // Debug.Log($"no width changed {_selfWidth}, {_subWidth}(null={SubContainer == null}), _pending={_pending}");
-            return false;
+            // if (_selfWidth > 0 && _subWidth > 0 && changed)
+            // {
+            //     // Debug.Log($"width changed {_selfWidth}, {_subWidth}, CheckArrange");
+            //     // CheckArrange();
+            //     return true;
+            // }
+            //
+            // if (_selfWidth > 0 && _subWidth > 0 && !_pending)
+            // {
+            //     // Debug.Log($"width not pending check range, CheckArrange");
+            //     // CheckArrange();
+            //     return true;
+            // }
+            //
+            // // Debug.Log($"no width changed {_selfWidth}, {_subWidth}(null={SubContainer == null}), _pending={_pending}");
+            // return false;
         }
 
         private VisualElement _subContainer;
@@ -106,7 +135,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
         public void BindSubContainer(VisualElement target)
         {
             _subContainer = target;
-            _subContainer.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
+            // _subContainer.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
             // Debug.Log("BindSubContainer, CheckWidth");
             CheckWidth();
             // Debug.Log("BindSubContainer, CheckArrange");
@@ -117,58 +146,90 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 
         public void UpdateButtons(IReadOnlyList<ValueButtonRawInfo> options)
         {
+            _results = null;
+            _rearrangeDone = false;
             _curRawOptions = options;
+            _valueButtonsCalcElement.SetButtonLabels(_curRawOptions.Select(each => each.DisplayChunks));
             // Debug.Log($"UpdateButtons {options.Count}, CheckArrange");
-            if (!CheckWidth())
-            {
-                CheckArrange();
-            }
+            // if (!CheckWidth())
+            // {
+            //     CheckArrange();
+            // }
         }
 
-        private bool _pending;
+        // private bool _pending;
 
-        private void CheckArrange()
+        // private void CheckArrange()
+        // {
+        //     _calcArrangeDone = false;
+        //     if (_subContainer == null)
+        //     {
+        //         // Debug.Log("No SubContainer, skip");
+        //         return;
+        //     }
+        //
+        //     if (_curRawOptions == null)
+        //     {
+        //         // Debug.Log("No curRawOptions, skip");
+        //         return;
+        //     }
+        //
+        //     if (_selfWidth < 0 || _subWidth < 0)
+        //     {
+        //         // Debug.Log("No width, skip");
+        //         return;
+        //     }
+        //
+        //     _pending = true;
+        //     // Debug.Log($"Start to calc {curRawOptions.Count}, set pending={_pending}");
+        //     _valueButtonsCalcElement.SetButtonLabels(_curRawOptions.Select(each => each.DisplayChunks));
+        // }
+
+        // private readonly UnityEvent<bool> _onCalcArrangeDone = new UnityEvent<bool>();
+        // private bool _calcArrangeDone;
+        // private bool _calcArrangeDoneHasRow;
+
+        private UnityAction<bool> _onCalcArrangeDoneCallback;
+
+        public void OnCalcArrangeDoneAddListener(UnityAction<bool> callback)
         {
-            CalcArrangeDone = false;
-            if (_subContainer == null)
+            // Debug.Log($"OnCalcArrangeDoneAddListener, {_results != null}, _rearrangeDone={_rearrangeDone}");
+            if (_results != null && _rearrangeDone)
             {
-                // Debug.Log("No SubContainer, skip");
+                callback.Invoke(_results.Count > 0);
+            }
+            // Debug.Log($"OnCalcArrangeDoneAddListener: {callback}");
+            _onCalcArrangeDoneCallback = callback;
+            // _onCalcArrangeDone.AddListener(callback);
+        }
+
+        private IReadOnlyList<(IReadOnlyList<RichTextDrawer.RichTextChunk>, float)> _results;
+        private bool _rearrangeDone;
+
+        private void OnCalcReadyEvent(IReadOnlyList<(IReadOnlyList<RichTextDrawer.RichTextChunk>, float)> results)
+        {
+            _results = results;
+            // Debug.Log("OnCalcReadyEvent");
+            // if (CheckWidth())  // width changed, skip and wait for next call
+            // {
+            //     // Debug.Log("OnCalcReadyEvent width changed, skip and wait for next call");
+            //     return;
+            // }
+            //
+            // _pending = false;
+
+            DoReArrange();
+        }
+
+        private void DoReArrange()
+        {
+            if (_results == null || _results.Count != _curRawOptions.Count)
+            {
+                // Debug.Log($"_results={_results}, count {_results?.Count}-{_curRawOptions?.Count}");
                 return;
             }
 
             if (_curRawOptions == null)
-            {
-                // Debug.Log("No curRawOptions, skip");
-                return;
-            }
-
-            if (_selfWidth < 0 || _subWidth < 0)
-            {
-                // Debug.Log("No width, skip");
-                return;
-            }
-
-            _pending = true;
-            // Debug.Log($"Start to calc {curRawOptions.Count}, set pending={_pending}");
-            _valueButtonsCalcElement.SetButtonLabels(_curRawOptions.Select(each => each.DisplayChunks));
-        }
-
-        public readonly UnityEvent<bool> OnCalcArrangeDone = new UnityEvent<bool>();
-        public bool CalcArrangeDone { get; private set; }
-        public bool CalcArrangeDoneHasRow { get; private set; }
-
-        private void OnCalcReadyEvent(IReadOnlyList<(IReadOnlyList<RichTextDrawer.RichTextChunk>, float)> results)
-        {
-            // Debug.Log("OnCalcReadyEvent");
-            if (CheckWidth())  // width changed, skip and wait for next call
-            {
-                // Debug.Log("OnCalcReadyEvent width changed, skip and wait for next call");
-                return;
-            }
-
-            _pending = false;
-
-            if (_curRawOptions == null || results.Count != _curRawOptions.Count)
             {
                 // Debug.Log("No curRawOptions || count mismatch, skip");
                 return;  // wait for the next calc
@@ -176,17 +237,19 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 
             if (_selfWidth < 0 || _subWidth < 0)
             {
-                // Debug.Log("No width, skip");
+                // Debug.Log($"No width {_selfWidth}/{_subWidth}, skip");
                 return;
             }
+
+            // Debug.Log("Start range");
 
             int rowIndex = 0;
             float accWidth = _selfWidth;
             List<List<ValueButtonRawInfo>> splitRowInfos = new List<List<ValueButtonRawInfo>>();
 
-            for (int index = 0; index < results.Count; index++)
+            for (int index = 0; index < _results.Count; index++)
             {
-                (IReadOnlyList<RichTextDrawer.RichTextChunk> resultChunks, float resultWidth) = results[index];
+                (IReadOnlyList<RichTextDrawer.RichTextChunk> resultChunks, float resultWidth) = _results[index];
                 ValueButtonRawInfo valueButtonRawInfo = _curRawOptions[index];
                 if (!resultChunks.SequenceEqual(valueButtonRawInfo.DisplayChunks))
                 {
@@ -270,9 +333,11 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
                 removed.RemoveFromHierarchy();
             }
 
-            CalcArrangeDone = true;
+            // _calcArrangeDone = true;
             // CalcArrangeDoneHasRow = true;
-            OnCalcArrangeDone.Invoke(CalcArrangeDoneHasRow = splitRowInfos.Count > 1);
+            _rearrangeDone = true;
+            // Debug.Log($"Invoke range {_onCalcArrangeDoneCallback}");
+            _onCalcArrangeDoneCallback?.Invoke(splitRowInfos.Count > 1);
 
             // if (processedIndex < _subRows.Count)
             // {

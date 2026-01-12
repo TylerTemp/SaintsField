@@ -164,12 +164,11 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 leftExpandButton.RegisterValueChangedCallback(evt =>
                     subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
 
-                valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(OnCalcArrangeDone);
-                if (valueButtonsArrangeElement.CalcArrangeDone)
+                valueButtonsArrangeElement.OnCalcArrangeDoneAddListener(b =>
                 {
                     subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
-                    OnCalcArrangeDone(valueButtonsArrangeElement.CalcArrangeDoneHasRow);
-                }
+                    OnCalcArrangeDone(b);
+                });
                 valueButtonsArrangeElement.OnButtonClicked.AddListener(value =>
                 {
                     ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
@@ -184,7 +183,8 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             return;
 
-            void OnCalcArrangeDone(bool hasSubRow) {
+            void OnCalcArrangeDone(bool hasSubRow)
+            {
                 DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
                 if (leftExpandButton.style.display != display)
                 {

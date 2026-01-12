@@ -4,7 +4,7 @@ using SaintsField.Editor.UIToolkitElements.ValueButtons;
 
 namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 {
-    public class ValueButtonsCalcElement: AbsValueButtonsCalcElement<ValueButton>
+    public class ValueButtonsCalcElement: AbsValueButtonsCalcElement
     {
         protected override AbsValueButton CreateValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
         {

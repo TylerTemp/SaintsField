@@ -64,9 +64,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
             return _fancyBoxLeftIconButtonStyle;
         }
 
-        // TODO: dispose it, but... does it really matters
-        private static Texture2D _dropdownIcon;
-        private static Texture2D _dropdownRightIcon;
 
         private static (Texture2D dropdownIcon, Texture2D dropdownRightIcon) GetDropdownIcons()
         {

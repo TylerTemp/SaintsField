@@ -4,7 +4,7 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
 {
     public class TabButtonsArrangeElement: AbsValueButtonsArrangeElement<TabButton>
     {
-        public TabButtonsArrangeElement(AbsValueButtonsCalcElement<TabButton> valueButtonsCalcElement) : base(valueButtonsCalcElement, MakeRow())
+        public TabButtonsArrangeElement(AbsValueButtonsCalcElement valueButtonsCalcElement) : base(valueButtonsCalcElement, MakeRow())
         {
         }
 

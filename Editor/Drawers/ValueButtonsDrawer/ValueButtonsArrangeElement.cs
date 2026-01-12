@@ -4,7 +4,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 {
     public class ValueButtonsArrangeElement: AbsValueButtonsArrangeElement<ValueButton>
     {
-        public ValueButtonsArrangeElement(AbsValueButtonsCalcElement<ValueButton> valueButtonsCalcElement) : base(valueButtonsCalcElement, MakeRow())
+        public ValueButtonsArrangeElement(AbsValueButtonsCalcElement valueButtonsCalcElement) : base(valueButtonsCalcElement, MakeRow())
         {
         }
 

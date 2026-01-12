@@ -131,13 +131,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public string hv3Item1, hv3Item2;
 
         [Ordered]
-        [Layout("Root/Buggy")]
-        [FieldInfoBox("Sadly, Horizontal is buggy in IMGUI")]
-        public string buggy = "See below:";
+        [Layout("Root/Horizontal")]
+        [FieldInfoBox("This works in UI Toolkit")]
+        public string fine = "See below:";
 
         [Ordered]
-        [Layout("Root/Buggy/H", ELayout.Horizontal)]
-        public string buggy1, buggy2, buggy3;
+        [Layout("Root/Horizontal/H", ELayout.Horizontal)]
+        public string fine1, fine2, fine3;
 
         [Ordered]
         [Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]

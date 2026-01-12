@@ -240,6 +240,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
         public static EnumMetaInfo GetEnumMetaInfo(Type enumType)
         {
             bool isFlags = Attribute.IsDefined(enumType, typeof(FlagsAttribute));
+            // Debug.Log($"enumType isFlags={isFlags}");
             List<EnumMetaInfo.EnumValueInfo> enumNormalValues = new List<EnumMetaInfo.EnumValueInfo>();
             EnumMetaInfo.EnumValueInfo nothingValue = new EnumMetaInfo.EnumValueInfo();
             EnumMetaInfo.EnumValueInfo everythingValue = new EnumMetaInfo.EnumValueInfo();
@@ -274,28 +275,31 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                         }
                     }
                 }
+                // Debug.Log($"add info {info.Value}");
                 enumNormalValues.Add(info);
             }
 
-            // object everythingBit = Convert.ChangeType(isULong ? uLongValue : longValue, enumType.GetEnumUnderlyingType());
-            object everythingBit;
+            object everythingBit = 0;
+            if (isFlags)
+            {
 
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (isULong)
-            {
-                everythingBit = Enum.ToObject(enumType, uLongValue);
-            }
-            else
-            {
-                everythingBit = Enum.ToObject(enumType, longValue);
-            }
+                // object everythingBit = Convert.ChangeType(isULong ? uLongValue : longValue, enumType.GetEnumUnderlyingType());
 
-            int foundEverythingIndex = -1;
-            for (int everythingIndex = 0; everythingIndex < enumNormalValues.Count; everythingIndex++)
-            {
-                EnumMetaInfo.EnumValueInfo enumNormalValue = enumNormalValues[everythingIndex];
-                if (isFlags)
+
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                if (isULong)
                 {
+                    everythingBit = Enum.ToObject(enumType, uLongValue);
+                }
+                else
+                {
+                    everythingBit = Enum.ToObject(enumType, longValue);
+                }
+
+                int foundEverythingIndex = -1;
+                for (int everythingIndex = 0; everythingIndex < enumNormalValues.Count; everythingIndex++)
+                {
+                    EnumMetaInfo.EnumValueInfo enumNormalValue = enumNormalValues[everythingIndex];
                     // Debug.Log($"each={enumNormalValue.Value}/{(ulong)enumNormalValue.Value}; everythingBit={everythingBit}");
                     if (enumNormalValue.Value.Equals(everythingBit))
                     {
@@ -304,11 +308,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                         break;
                     }
                 }
-            }
 
-            if (foundEverythingIndex != -1)
-            {
-                enumNormalValues.RemoveAt(foundEverythingIndex);
+                if (foundEverythingIndex != -1)
+                {
+                    enumNormalValues.RemoveAt(foundEverythingIndex);
+                }
             }
 
             return new EnumMetaInfo(enumNormalValues, everythingValue, nothingValue, everythingBit, isFlags, enumType);

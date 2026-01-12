@@ -121,13 +121,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 ? ReflectUtils.GetElementType(info.FieldType)
                 : info.FieldType;
             // EnumToggleButtonsAttribute enumToggleButtonsAttribute = (EnumToggleButtonsAttribute) saintsAttribute;
-            EnumMetaInfo metaInfo = EnumFlagsUtil.GetEnumMetaInfo(rawType);
-            if (!metaInfo.IsFlags)
+            bool isFlags = Attribute.IsDefined(rawType, typeof(FlagsAttribute));
+            if (!isFlags)
             {
                 ValueButtonsAttributeDrawer.UtilOnAwakeUIToolkit(this, property, saintsAttribute, container,
                     onValueChangedCallback, info, parent);
                 return;
             }
+            EnumMetaInfo metaInfo = EnumFlagsUtil.GetEnumMetaInfo(rawType);
 
             FlagButtonFullToggleGroupElement flagButtonFullToggleGroupElement =
                 container.Q<FlagButtonFullToggleGroupElement>(name: NameFullToggleGroup(property));
@@ -170,6 +171,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                         new RichTextDrawer.RichTextChunk(enumValueInfo.OriginalLabel, false, enumValueInfo.OriginalLabel),
                     };
                 }
+                // Debug.Log($"Add {enumValueInfo.Value}");
                 rawInfos.Add(new ValueButtonRawInfo(chunks, false, enumValueInfo.Value));
             }
 
@@ -193,11 +195,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
             flagButtonsArrangeElement.schedule.Execute(() =>
             {
-                subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
                 leftExpandButton.RegisterValueChangedCallback(evt =>
                     subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                flagButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                flagButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>
                 {
+                    subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
                     // leftExpandButton.SetEnabled(hasSubRow);
                     DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
                     if (leftExpandButton.style.display != display)

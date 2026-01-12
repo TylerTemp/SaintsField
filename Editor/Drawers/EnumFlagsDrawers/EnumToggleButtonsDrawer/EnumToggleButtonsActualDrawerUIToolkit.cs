@@ -80,7 +80,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
                             leftExpandButton.RegisterValueChangedCallback(evt =>
                                 subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                            valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                            valueButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>
                             {
                                 DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
                                 if (leftExpandButton.style.display != display)
@@ -302,7 +302,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
                             leftExpandButton.RegisterValueChangedCallback(evt =>
                                 subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                            flagButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                            flagButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>
                             {
                                 // leftExpandButton.SetEnabled(hasSubRow);
                                 DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
@@ -394,7 +394,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
                             leftExpandButton.RegisterValueChangedCallback(evt =>
                                 subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                            valueButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                            valueButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>
                             {
                                 DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
                                 if (leftExpandButton.style.display != display)
@@ -616,7 +616,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
                             leftExpandButton.RegisterValueChangedCallback(evt =>
                                 subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                            flagButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                            flagButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>
                             {
                                 // leftExpandButton.SetEnabled(hasSubRow);
                                 DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;

@@ -5,7 +5,7 @@ using SaintsField.Editor.UIToolkitElements.ValueButtons;
 
 namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
 {
-    public class TabButtonsCalcElement: AbsValueButtonsCalcElement<TabButton>
+    public class TabButtonsCalcElement: AbsValueButtonsCalcElement
     {
         protected override AbsValueButton CreateValueButton(IReadOnlyList<RichTextDrawer.RichTextChunk> chunks)
         {

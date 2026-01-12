@@ -115,12 +115,12 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             {
                 wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
                     wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                wrapper.ValueButtonsArrangeElement.OnCalcArrangeDone.AddListener(OnCalcArrangeDone);
-                if (wrapper.ValueButtonsArrangeElement.CalcArrangeDone)
+                wrapper.ValueButtonsArrangeElement.OnCalcArrangeDoneAddListener(b =>
                 {
-                    wrapper.SubPanel.style.display = wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
-                    OnCalcArrangeDone(wrapper.ValueButtonsArrangeElement.CalcArrangeDoneHasRow);
-                }
+                    wrapper.SubPanel.style.display =
+                        wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                    OnCalcArrangeDone(b);
+                });
                 wrapper.ValueButtonsArrangeElement.OnButtonClicked.AddListener(clickedValue =>
                 {
                     beforeSet?.Invoke(wrapper.Value);

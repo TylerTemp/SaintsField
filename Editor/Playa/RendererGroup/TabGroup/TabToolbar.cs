@@ -3,6 +3,7 @@ using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.UIToolkitElements;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
@@ -14,17 +15,12 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
         private readonly LeftExpandButton _leftExpandButton;
 
         // public readonly UnityEvent<bool> ExpandEvent = new UnityEvent<bool>();
-        public readonly UnityEvent<string, bool> OnValueChanged = new UnityEvent<string, bool>();
+        private readonly UnityEvent<string> _onValueChanged = new UnityEvent<string>();
         private string _curValue;
         private bool _ready;
 
         public TabToolbar(IReadOnlyList<string> orderedKeys, bool hasExpand)
         {
-            if (orderedKeys.Count <= 1)
-            {
-                return;
-            }
-
             style.flexGrow = 1;
             style.flexShrink = 1;
             // style.marginLeft = 1;
@@ -42,7 +38,7 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
             };
             Add(mainRow);
 
-            _leftExpandButton = new LeftExpandButton()
+            _leftExpandButton = new LeftExpandButton
             {
                 style =
                 {
@@ -50,7 +46,7 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
                 },
             };
             mainRow.Add(_leftExpandButton);
-            _leftExpandButton.RegisterValueChangedCallback(evt => OnValueChanged.Invoke(_curValue, evt.newValue));
+            _leftExpandButton.RegisterValueChangedCallback(evt => _onValueChanged.Invoke(evt.newValue? _curValue: ""));
 
             // VisualElement valueButtonsArrangeElementWrapper = new VisualElement
             // {
@@ -86,26 +82,23 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
             Add(subPanel);
             _tabButtonsArrangeElement.BindSubContainer(subPanel);
 
-            _tabButtonsArrangeElement.RegisterCallback<AttachToPanelEvent>(_ =>
+            _tabButtonsArrangeElement.OnCalcArrangeDoneAddListener(_ =>
             {
-                _tabButtonsArrangeElement.OnCalcArrangeDone.AddListener(_ =>
+                _ready = true;
+                if (!string.IsNullOrEmpty(_curValue))
                 {
-                    _ready = true;
-                    if (!string.IsNullOrEmpty(_curValue))
-                    {
-                        _tabButtonsArrangeElement.RefreshCurValue(_curValue);
-                    }
-                });
-                _tabButtonsArrangeElement.UpdateButtons(
-                    orderedKeys
-                        .Select(each =>
-                            new ValueButtonRawInfo(
-                                RichTextDrawer.ParseRichXmlWithProvider(each, new RichTextDrawer.EmptyRichTextTagProvider()).ToArray(),
-                                false,
-                                each))
-                        .ToArray()
-                );
+                    _tabButtonsArrangeElement.RefreshCurValue(_curValue);
+                }
             });
+            _tabButtonsArrangeElement.UpdateButtons(
+                orderedKeys
+                    .Select(each =>
+                        new ValueButtonRawInfo(
+                            RichTextDrawer.ParseRichXmlWithProvider(each, new RichTextDrawer.EmptyRichTextTagProvider()).ToArray(),
+                            false,
+                            each))
+                    .ToArray()
+            );
             // _tabButtonsArrangeElement.UpdateButtons(
             //     orderedKeys
             //         .Select(each =>
@@ -126,7 +119,11 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
             {
                 _curValue = (string)value;
                 _tabButtonsArrangeElement.RefreshCurValue(_curValue);
-                OnValueChanged.Invoke(_curValue, _leftExpandButton.value);
+                if (!_leftExpandButton.value)
+                {
+                    _leftExpandButton.SetValueWithoutNotify(true);
+                }
+                _onValueChanged.Invoke(_curValue);
             });
 
             // _tabButtonsArrangeElement.OnButtonClicked.AddListener(value =>
@@ -135,6 +132,14 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
             // });
         }
 
+        public void OnValueChangedAddListener(UnityAction<string> callback)
+        {
+            if (_ready)
+            {
+                callback.Invoke(_curValue);
+            }
+            _onValueChanged.AddListener(callback);
+        }
 
         public void SetValueWithoutNotification(string curValue)
         {
@@ -143,7 +148,6 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
             {
                 _tabButtonsArrangeElement.RefreshCurValue(curValue);
             }
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (string.IsNullOrEmpty(curValue))
             {
                 _leftExpandButton.SetValueWithoutNotify(false);

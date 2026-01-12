@@ -5744,12 +5744,19 @@ private string ShowGuid([Guid] string guidString) => guidString;
 
 ## Layout System ##
 
-### Setup ###
+### Overview ###
 
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 Layout system allows you to group severral target (field, property, button etc) together. It also allows you to box it with/without a title box or foldout box.
+
+This will generate:
+
+1.  Temp files under `Library/SaintsFieldTemp`
+2.  `Assets/Editor Default Resources/SaintsField/Temp.SaintsFieldSourceParser.additionalfile` (You should ignore this in your version control)
+
+You can change configs under `Assets/Editor Default Resources/SaintsField/Config.SaintsFieldSourceParser.additionalfile`
 
 The field can be groupd as:
 
@@ -5797,12 +5804,9 @@ public int mp;
 
 ![](https://github.com/user-attachments/assets/1368d7df-7505-44d3-8c03-703dce2f6fea)
 
-This will generate:
+All together showcase:
 
-1.  Temp files under `Library/SaintsFieldTemp`
-2.  `Assets/Editor Default Resources/SaintsField/Temp.SaintsFieldSourceParser.additionalfile` (You should ignore this in your version control)
-
-You can change configs under `Assets/Editor Default Resources/SaintsField/Config.SaintsFieldSourceParser.additionalfile`
+![](https://github.com/user-attachments/assets/53cb154e-2bb3-4cd1-a7eb-17ded8e943d5)
 
 ### `Layout` ###
 
@@ -5817,7 +5821,31 @@ A layout decorator to group fields.
 *   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
 *   `float marginBottom = -1f` add some space after the layout. `-1` for using default spacing.
 
-Options are:
+For more information, see `LayoutStart` below
+
+### `LayoutStart` / `LayoutEnd` ###
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+`LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
+
+`LayoutStart(name)` is the same as `Layout(name, keepGrouping: true)`
+
+For `LayoutStart`:
+
+*   `string groupBy` same as `Layout`
+*   `ELayout layout=0` same as `Layout`
+*   `float marginTop = -1f` same as `Layout`
+*   `float marginBottom = -1f` same as `Layout`
+
+For `LayoutEnd`:
+
+*   `string groupBy=null` same as `Layout`. When `null`, close all existing groups.
+
+It supports `./SubGroup` to create a nested subgroup:
+
+`ELayout` Options are:
 
 *   `Vertical`
 *   `Horizontal`
@@ -5832,162 +5860,108 @@ Options are:
 *   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
 *   `CollapseBox` = `Background | Title | TitleOut | Collapse`
 
-**Appearance**
-
-![layout](https://github.com/user-attachments/assets/43afc0da-f801-4a2b-8a6a-fcd5cfb8a259)
-
-**Example**
+Example of title:
 
 ```csharp
-using SaintsField;
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
+[LayoutStart("Titled", ELayout.Title)]
+public string t1;
+public string t2;
+public string t3;
 
-[Layout("Titled", ELayout.Title | ELayout.TitleOut)]
-public string titledItem1, titledItem2;
+[LayoutStart("TitledBox", ELayout.TitleBox)]
+public string b1;
+public string b2;
+public string b3;
 
-// title
-[Layout("Titled Box", ELayout.Background | ELayout.TitleOut)]
-public string titledBoxItem1;
-[Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
-public string titledBoxItem2;
-
-// foldout
-[LayoutStart("Collapse", ELayout.CollapseBox)]
-public string collapseItem1;
-public string collapseItem2;
-
-[LayoutStart("Foldout", ELayout.FoldoutBox)]
-public string foldoutItem1;
-public string foldoutItem2;
-
-// tabs
-[Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
-[LayoutStart("./Tab1")]
-public string tab1Item1;
-public int tab1Item2;
-
-[LayoutStart("../Tab2")]
-public string tab2Item1;
-public int tab2Item2;
-
-[LayoutStart("../Tab3")]
-public string tab3Item1;
-public int tab3Item2;
-
-// nested groups
-[LayoutStart("Nested", ELayout.Background | ELayout.TitleOut)]
-public int nestedOne;
-
-[LayoutStart("./Nested Group 1", ELayout.TitleOut)]
-public int nestedTwo;
-public int nestedThree;
-
-[LayoutStart("./Nested Group 2", ELayout.TitleOut)]
-public int nestedFour;
-public string nestedFive;
-
-// Unlabeled Box
-[Layout("Unlabeled Box", ELayout.Background)]
-public int unlabeledBoxItem1, unlabeledBoxItem2;
-
-// Foldout In A Box
-[Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
-public int foldoutInABoxItem1, foldoutInABoxItem2;
-
-// Complex example. Button and ShowInInspector works too
-[Ordered]
-[Layout("Root", ELayout.Tab | ELayout.Foldout | ELayout.Background)]
-[Layout("Root/V1")]
-[SepTitle("Basic", EColor.Pink)]
-public string hv1Item1;
-
-[Ordered]
-[Layout("Root/V1/buttons", ELayout.Horizontal)]
-[Button("Root/V1 Button1")]
-public void RootV1Button()
-{
-    Debug.Log("Root/V1 Button");
-}
-[Ordered]
-[Layout("Root/V1/buttons")]
-[Button("Root/V1 Button2")]
-public void RootV1Button2()
-{
-    Debug.Log("Root/V1 Button");
-}
-
-[Ordered]
-[Layout("Root/V1")]
-[ShowInInspector]
-public static Color color1 = Color.red;
-
-[Ordered]
-[DOTweenPlay("Tween1", "Root/V1")]
-public Tween RootV1Tween1()
-{
-    return DOTween.Sequence();
-}
-
-[Ordered]
-[DOTweenPlay("Tween2", "Root/V1")]
-public Tween RootV1Tween2()
-{
-    return DOTween.Sequence();
-}
-
-[Ordered]
-[Layout("Root/V1")]
-public string hv1Item2;
-
-// public string below;
-
-[Ordered]
-[Layout("Root/V2")]
-public string hv2Item1;
-
-[Ordered]
-[Layout("Root/V2/H", ELayout.Horizontal), NoLabel]
-public string hv2Item2, hv2Item3;
-
-[Ordered]
-[Layout("Root/V2")]
-public string hv2Item4;
-
-[Ordered]
-[Layout("Root/V3", ELayout.Horizontal)]
-[ResizableTextArea, NoLabel]
-public string hv3Item1, hv3Item2;
-
-[Ordered]
-[Layout("Root/Buggy")]
-[InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
-public string buggy = "See below:";
-
-[Ordered]
-[Layout("Root/Buggy/H", ELayout.Horizontal)]
-public string buggy1, buggy2, buggy3;
-
-[Ordered]
-[Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]
-[Layout("Title+Tab/g1")]
-public string titleTabG11, titleTabG21;
-
-[Ordered]
-[Layout("Title+Tab/g2")]
-public string titleTabG12, titleTabG22;
-
-[Ordered]
-[Layout("All Together", ELayout.Tab | ELayout.Foldout | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
-[Layout("All Together/g1")]
-public string allTogetherG11, allTogetherG21;
-
-[Ordered]
-[Layout("All Together/g2")]
-public string allTogetherG12, allTogetherG22;
+[LayoutStart("TitledOut", ELayout.TitleOut)]
+public string o1;
+public string o2;
+public string o3;
 ```
 
-[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
+![](https://github.com/user-attachments/assets/0af3657b-44e1-4edb-a785-4214a2a57cd9)
+
+Example of foldout:
+
+```csharp
+[LayoutStart("Grouped", ELayout.Foldout)]
+public string t1;
+public string t2;
+public string t3;
+
+[LayoutStart("GroupedBox", ELayout.Foldout |  ELayout.TitleBox)]
+public string b1;
+public string b2;
+public string b3;
+
+[LayoutStart("GroupedOut", ELayout.Foldout | ELayout.TitleOut)]
+public string o1;
+public string o2;
+public string o3;
+```
+
+![](https://github.com/user-attachments/assets/aef58e72-bfcc-42dd-8e76-788366d80857)
+
+Example of tabs:
+
+```csharp
+[LayoutStart("Tabs", ELayout.Tab)]
+[LayoutStart("./Tab1")]
+public string t1;
+public string t2;
+public string t3;
+
+[LayoutStart("../Tab2")]
+public string b1;
+public string b2;
+public string b3;
+
+[LayoutStart("../Tab3")]
+public string o1;
+public string o2;
+public string o3;
+
+// Mix with title
+
+[LayoutStart("MixedTabs", ELayout.Tab | ELayout.TitleBox | ELayout.Foldout)]
+[LayoutStart("./Tab1")]
+public string mt1;
+public string mt2;
+public string mt3;
+
+[LayoutStart("../Tab2")]
+public string mb1;
+public string mb2;
+public string mb3;
+
+[LayoutStart("../Tab3")]
+public string mo1;
+public string mo2;
+public string mo3;
+```
+
+![](https://github.com/user-attachments/assets/788df076-ae32-4b66-bca0-fdb05185e801)
+
+Example of horizental
+
+```csharp
+[LayoutStart("Horizontal", ELayout.Horizontal)]
+public string t1;
+public string t2;
+public string t3;
+
+[LayoutStart("HorizontalBox", ELayout.Horizontal | ELayout.TitleBox)]
+public string b1;
+public string b2;
+public string b3;
+
+[LayoutStart("HorizontalFoldout", ELayout.Horizontal | ELayout.FoldoutBox)]
+public string o1;
+public string o2;
+public string o3;
+```
+
+![](https://github.com/user-attachments/assets/6e926991-b0ae-4221-be52-fac43a187968)
 
 By combining `Layout` with `Seperator`/`InfoBox`, you can create some complex layout struct:
 
@@ -6022,29 +5996,7 @@ public bool toggle;
 
 ![image](https://github.com/user-attachments/assets/d2185e50-845a-47a5-abb4-fae0faac7ba4)
 
-If titled box is too heavy, you can use `PlayaSeparator` instead. See `PlayaSeparator` section for more information
-
-### `LayoutStart` / `LayoutEnd` ###
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-`LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
-
-`LayoutStart(name)` is the same as `Layout(name, keepGrouping: true)`
-
-For `LayoutStart`:
-
-*   `string groupBy` same as `Layout`
-*   `ELayout layout=0` same as `Layout`
-*   `float marginTop = -1f` same as `Layout`
-*   `float marginBottom = -1f` same as `Layout`
-
-For `LayoutEnd`:
-
-*   `string groupBy=null` same as `Layout`. When `null`, close all existing groups.
-
-It supports `./SubGroup` to create a nested subgroup:
+If titled box is too heavy, you can use `Separator` instead. See `Separator` section for more information
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example

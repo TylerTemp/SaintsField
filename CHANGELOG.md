@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.8.1 ##
+
+1.  Fix: incorrect GC alloc in Custom editor window [#354](https://github.com/TylerTemp/SaintsField/issues/354)
+2.  Improve: Tabs in layout system now can break lines if there are way too many tabs
+
 ## 5.8.0 ##
 
 1.  Fix: layout system can not detect field order inside a general struct/class

@@ -1,9 +1,7 @@
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Playa.RendererGroup.TabGroup;
 using SaintsField.Editor.Playa.Utils;
@@ -11,7 +9,6 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 
 namespace SaintsField.Editor.Playa.RendererGroup
 {
@@ -19,17 +16,22 @@ namespace SaintsField.Editor.Playa.RendererGroup
     {
 
         private HelpBox _helpBox;
-        private Dictionary<string, List<VisualElement>> fieldToVisualElement;
+        private Dictionary<string, List<VisualElement>> _fieldToVisualElement;
+
+        public static readonly Color FancyBgColor = new Color(0.2509804f, 0.2509804f, 0.2509804f);
+        private static readonly Color FancyBorderColor = EColor.MidnightAsh.GetColor();
+
+        // private static Texture2D dropdownIcon;
+        // private static Texture2D dropdownRightIcon;
 
         public VisualElement CreateVisualElement()
         {
             const int radius = 3;
 
-            Texture2D dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
-            Texture2D dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
+            _dropdownIcon ??= Util.LoadResource<Texture2D>("classic-dropdown.png");
+            _dropdownRightIcon ??= Util.LoadResource<Texture2D>("classic-dropdown-right.png");
 
-            fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
-            string curTab = null;
+            _fieldToVisualElement = new Dictionary<string, List<VisualElement>>();
 
             VisualElement root = new VisualElement
             {
@@ -43,8 +45,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     width = new StyleLength(Length.Percent(100)),
                 },
             };
-
-            ToolbarToggle foldoutToggle = null;
 
             VisualElement titleRow = new VisualElement
             {
@@ -171,7 +171,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     {
                         // boxed
                         title.style.backgroundColor = new Color(53f / 255, 53f / 255, 53f / 255, 1f);
-                        title.style.borderBottomColor = EColor.MidnightAsh.GetColor();
+                        title.style.borderBottomColor = FancyBgColor;
                     }
                     else
                     {
@@ -217,7 +217,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             borderBottomLeftRadius = 0,
                             borderBottomRightRadius = 0,
                             backgroundColor = new Color(53f / 255, 53f / 255, 53f / 255, 1f),
-                            borderBottomColor = EColor.MidnightAsh.GetColor(),
+                            borderBottomColor = FancyBorderColor,
                             // borderBottomWidth = 1f,
                             borderLeftWidth = 0,
                             borderRightWidth = 0,
@@ -231,7 +231,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                     Image foldoutImage = new Image
                     {
-                        image = _foldout? dropdownIcon: dropdownRightIcon,
+                        image = _foldout? _dropdownIcon: _dropdownRightIcon,
                         tintColor = Color.gray,
                         style =
                         {
@@ -242,16 +242,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     };
                     title.Add(foldoutImage);
 
-                    TabToolbar tabToolbar = new TabToolbar(_orderedKeys, false);
-                    titleRow.Add(tabToolbar);
-
                     body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
                     title.clicked += () =>
                     {
                         _foldout = !_foldout;
                         body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
-                        foldoutImage.image = _foldout ? dropdownIcon : dropdownRightIcon;
-                        tabToolbar.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
+                        foldoutImage.image = _foldout ? _dropdownIcon : _dropdownRightIcon;
+                        // tabToolbar.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
                     };
                 }
                 else
@@ -291,41 +288,40 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
 
             // foldout-tabs:
-            if (hasFoldout && !hasTitle && hasTab)
+            if (hasTab)
             {
-                TabToolbar tabToolbar = new TabToolbar(_orderedKeys, true);
-                titleRow.Add(tabToolbar);
-            }
-
-            // tabs
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if((!hasFoldout && hasTitle && hasTab) || (hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
-            {
-                // TODO: 2023_3+ these is a TabView can be used
-                // foreach (ToolbarToggle eachTab in toolbarToggles)
-                // {
-                //     toolbar.Add(eachTab);
-                // }
-                // titleRow.Add(toolbar);
-                TabToolbar tabToolbar = new TabToolbar(_orderedKeys, true);
-                titleRow.Add(tabToolbar);
-
-                tabToolbar.OnValueChanged.AddListener((tab, expand) =>
+                if (hasFoldout)
                 {
-                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                    if (expand)
-                    {
-                        SetDisplayGroups(tab);
-                    }
-                    else
-                    {
-                        SetDisplayGroups(null);
-                    }
-                });
-                SetDisplayGroups(_orderedKeys[0]);
-                tabToolbar.SetValueWithoutNotification(_orderedKeys[0]);
+                    body.Add(SetupTabToolbar(false));
+                }
+                else
+                {
+                    titleRow.Add(SetupTabToolbar(true));
+                }
+            }
+            // if (hasFoldout && !hasTitle && hasTab)
+            // {
+            //     titleRow.Add(SetupTabToolbar(true));
+            // }
+            //
+            // // tabs
+            // // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            // if((!hasFoldout && hasTitle && hasTab) || (hasFoldout && hasTitle && hasTab) || (!hasFoldout && hasTitle && hasTab) | (!hasFoldout && !hasTitle && hasTab))
+            // {
+            //     titleRow.Add(SetupTabToolbar(!hasFoldout));
+            // }
 
-                Debug.Log($"titleRow.Add(toolbar): {string.Join(",", _orderedKeys)}");
+            TabToolbar SetupTabToolbar(bool hasExpand)
+            {
+                TabToolbar tabToolbar = new TabToolbar(_orderedKeys, hasExpand);
+
+                tabToolbar.OnValueChangedAddListener(SetDisplayGroups);
+                tabToolbar.SetValueWithoutNotification(_orderedKeys[0]);
+                UIToolkitUtils.OnAttachToPanelOnce(tabToolbar, _ =>
+                {
+                    SetDisplayGroups(_orderedKeys[0]);
+                });
+                return tabToolbar;
             }
 
             foreach ((string groupPath, ISaintsRenderer renderer) in _renderers)
@@ -343,9 +339,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 // ReSharper disable once InvertIf
                 if(fieldElement != null)
                 {
-                    if (!fieldToVisualElement.TryGetValue(groupId, out List<VisualElement> visualElements))
+                    if (!_fieldToVisualElement.TryGetValue(groupId, out List<VisualElement> visualElements))
                     {
-                        fieldToVisualElement[groupId] = visualElements = new List<VisualElement>();
+                        _fieldToVisualElement[groupId] = visualElements = new List<VisualElement>();
                     }
 
                     visualElements.Add(fieldElement);
@@ -359,15 +355,16 @@ namespace SaintsField.Editor.Playa.RendererGroup
             bool fancyBox = IsFancyBox(_eLayout);
             if(fancyBox)
             {
-                root.style.backgroundColor = new Color(64f/255, 64f/255, 64f/255, 1f);
+                root.style.backgroundColor = FancyBgColor;
                 root.style.borderTopWidth = 1;
                 root.style.borderLeftWidth = 1;
                 root.style.borderRightWidth = 1;
                 root.style.borderBottomWidth = 1;
-                root.style.borderLeftColor = EColor.MidnightAsh.GetColor();
-                root.style.borderRightColor = EColor.MidnightAsh.GetColor();
-                root.style.borderTopColor = EColor.MidnightAsh.GetColor();
-                root.style.borderBottomColor = EColor.MidnightAsh.GetColor();
+                root.style.borderLeftColor = FancyBorderColor;
+                root.style.borderRightColor = FancyBorderColor;
+                root.style.borderTopColor = FancyBorderColor;
+                root.style.borderBottomColor = FancyBorderColor;
+                root.style.paddingRight = 2;
             }
 
             root.Add(titleRow);
@@ -451,7 +448,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private void SetDisplayGroups(string tab)
         {
-            foreach((string groupPath, List<VisualElement> visualElements) in fieldToVisualElement)
+            foreach((string groupPath, List<VisualElement> visualElements) in _fieldToVisualElement)
             {
                 bool display = tab == null || groupPath == tab;
                 visualElements.ForEach(visualElement => visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None);

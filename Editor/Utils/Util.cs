@@ -2725,6 +2725,8 @@ namespace SaintsField.Editor.Utils
                     useLabel = EnumLabelRegex.Replace(value, enumValue.ToString());
                 }
 
+                // Debug.Log($"Found: {enumValue}");
+
                 yield return (enumValue, value, useLabel);
             }
         }

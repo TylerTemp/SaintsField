@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
             public string structString;
         }
 
-        [Serializable, Flags]
+        [Serializable]
         public enum MyEnum
         {
             EnumValue1,
@@ -20,26 +20,26 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
             EnumValue4,
         }
 
-        public string[] plainStrings;
-        public MyStruct plainStruct;
+        // public string[] plainStrings;
+        // public MyStruct plainStruct;
         [EnumToggleButtons]
         public MyEnum plainEnum;
 
-        [LayoutStart("Layout1", ELayout.FoldoutBox)]
-
-        public string[] l1Strings;
-        public MyStruct l1Struct;
-        [EnumToggleButtons]
-        public MyEnum l1Enum;
-
-        [LayoutStart("./Layout2", ELayout.FoldoutBox)]
-
-        public string[] l2Strings;
-        public MyStruct l2Struct;
-        [EnumToggleButtons]
-        public MyEnum l2Enum;
-
-        [EnumToggleButtons, FieldLabelText("<color=red><label/>")]
-        public MyEnum l2EnumLabel;
+        // [LayoutStart("Layout1", ELayout.FoldoutBox)]
+        //
+        // public string[] l1Strings;
+        // public MyStruct l1Struct;
+        // [EnumToggleButtons]
+        // public MyEnum l1Enum;
+        //
+        // [LayoutStart("./Layout2", ELayout.FoldoutBox)]
+        //
+        // public string[] l2Strings;
+        // public MyStruct l2Struct;
+        // [EnumToggleButtons]
+        // public MyEnum l2Enum;
+        //
+        // [EnumToggleButtons, FieldLabelText("<color=red><label/>")]
+        // public MyEnum l2EnumLabel;
     }
 }

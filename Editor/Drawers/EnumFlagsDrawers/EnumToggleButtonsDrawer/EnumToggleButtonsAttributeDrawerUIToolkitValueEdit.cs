@@ -156,11 +156,12 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
             wrapper.FlagButtonsArrangeElement.schedule.Execute(() =>
             {
-                wrapper.SubPanel.style.display = wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
                 wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
                     wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-                wrapper.FlagButtonsArrangeElement.OnCalcArrangeDone.AddListener(hasSubRow =>
+                wrapper.FlagButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>
                 {
+                    // Debug.Log("DONE CALC");
+                    wrapper.SubPanel.style.display = wrapper.LeftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
                     // leftExpandButton.SetEnabled(hasSubRow);
                     DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
                     if (wrapper.LeftExpandButton.style.display != display)

@@ -61,24 +61,40 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
         {
             if (IsOn(curValue))
             {
-                const float gray = 0.15f;
-                const float grayBorder = 0.45f;
-                style.backgroundColor = new Color(gray, gray, gray, 1f);
-                Color borderColor = new Color(grayBorder, 0.6f, grayBorder, 1f);
-                style.borderTopColor = style.borderBottomColor = borderColor;
-                if (isFirst)
-                {
-                    style.borderLeftColor = borderColor;
-                }
-                else if (isLast)
-                {
-                    style.borderRightColor = borderColor;
-                }
+                SetOnStyle(isFirst, isLast);
             }
             else
             {
-                style.backgroundColor = StyleKeyword.Null;
-                style.borderTopColor = style.borderBottomColor = style.borderLeftColor = style.borderRightColor = StyleKeyword.Null;
+                SetOffStyle(isFirst, isLast);
+            }
+        }
+
+        protected virtual void SetOnStyle(bool isFirst, bool isLast)
+        {
+            const float gray = 0.15f;
+            const float grayBorder = 0.45f;
+            style.backgroundColor = new Color(gray, gray, gray, 1f);
+            Color borderColor = new Color(grayBorder, 0.6f, grayBorder, 1f);
+            style.borderTopColor = style.borderBottomColor = borderColor;
+            if (isFirst)
+            {
+                style.borderLeftColor = borderColor;
+            }
+            else if (isLast)
+            {
+                style.borderRightColor = borderColor;
+            }
+
+            style.borderLeftWidth = 1;
+        }
+
+        protected virtual void SetOffStyle(bool isFirst, bool isLast)
+        {
+            style.backgroundColor = StyleKeyword.Null;
+            style.borderTopColor = style.borderBottomColor = style.borderLeftColor = style.borderRightColor = StyleKeyword.Null;
+            if(!isFirst)
+            {
+                style.borderLeftWidth = 0;
             }
         }
 
