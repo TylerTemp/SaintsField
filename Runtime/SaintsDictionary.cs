@@ -150,13 +150,15 @@ namespace SaintsField
                 // Debug.Log($"Balance add {addCount} to values");
             }
 #else
-            SerializedKeysClear();
-            SerializedValuesClear();
-            foreach (KeyValuePair<TKey, TValue> kvp in Dictionary)
-            {
-                SerializedKeyAdd(kvp.Key);
-                SerializedValueAdd(kvp.Value);
-            }
+            // This can be broken in build in creating prefab, see https://github.com/TylerTemp/SaintsField/issues/355
+            // Why AYellowWallpaper does not have this issue? Weired...
+            // SerializedKeysClear();
+            // SerializedValuesClear();
+            // foreach (KeyValuePair<TKey, TValue> kvp in Dictionary)
+            // {
+            //     SerializedKeyAdd(kvp.Key);
+            //     SerializedValueAdd(kvp.Value);
+            // }
 #endif
 
             // ReSharper disable once RedundantCheckBeforeAssignment
