@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.8.2 ##
+
+Fix: `SaintsDictionary` failed to deserialize data in build when instantiate a prefab [#355](https://github.com/TylerTemp/SaintsField/issues/355)
+
 ## 5.8.1 ##
 
 1.  Fix: incorrect GC alloc in Custom editor window [#354](https://github.com/TylerTemp/SaintsField/issues/354)

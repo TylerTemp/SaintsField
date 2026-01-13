@@ -95,11 +95,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.1**
+**5.8.2**
 
-1.  Fix: incorrect GC alloc in Custom editor window [#354](https://github.com/TylerTemp/SaintsField/issues/354)
-2.  Improve: Tabs in layout system now can break lines if there are way too many tabs
-3.  Fix: `ShowInInspector` for property tried to invoke a `OnValueChanged` even there is not one
+Fix: `SaintsDictionary` failed to deserialize data in build when instantiate a prefab [#355](https://github.com/TylerTemp/SaintsField/issues/355)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
