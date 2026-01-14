@@ -151,7 +151,7 @@ namespace SaintsField
             }
 #else
             // This can be broken in build in creating prefab, see https://github.com/TylerTemp/SaintsField/issues/355
-            // Why AYellowWallpaper does not have this issue? Weired...
+            // Why AYellowWallpaper does not have this issue? Weird...
             // SerializedKeysClear();
             // SerializedValuesClear();
             // foreach (KeyValuePair<TKey, TValue> kvp in Dictionary)

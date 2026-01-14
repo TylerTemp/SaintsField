@@ -14,7 +14,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
 {
     public partial class SaintsRendererGroup
     {
-
         private HelpBox _helpBox;
         private Dictionary<string, List<VisualElement>> _fieldToVisualElement;
 
@@ -110,13 +109,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
             //     });
             // }
 
+            bool inHorizontal = _eLayout.HasFlagFast(ELayout.Horizontal);
             VisualElement body = new VisualElement
             {
                 name = $"saints-field-group--body--{_groupPath}",
                 style =
                 {
                     flexGrow = 1,
-                    flexDirection = _eLayout.HasFlagFast(ELayout.Horizontal)? FlexDirection.Row :FlexDirection.Column,
+                    flexDirection = inHorizontal? FlexDirection.Row :FlexDirection.Column,
                 },
             };
             if (_eLayout.HasFlagFast(ELayout.Background))
@@ -332,8 +332,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 Debug.Log($"add item@{groupPath}->{groupId}: {renderer}");
 #endif
 
-                bool inHorizontal = EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
+                // bool inHorizontal = EnumFlagsUtil.HasFlag(_eLayout, ELayout.Horizontal);
                 renderer.InAnyHorizontalLayout = InAnyHorizontalLayout || inHorizontal;
+                renderer.InDirectHorizontalLayout = inHorizontal;
 
                 VisualElement fieldElement = renderer.CreateVisualElement();
                 // ReSharper disable once InvertIf
@@ -344,6 +345,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         _fieldToVisualElement[groupId] = visualElements = new List<VisualElement>();
                     }
 
+                    if (inHorizontal)
+                    {
+                        fieldElement.style.flexBasis = 0;
+                    }
                     visualElements.Add(fieldElement);
                     body.Add(fieldElement);
 

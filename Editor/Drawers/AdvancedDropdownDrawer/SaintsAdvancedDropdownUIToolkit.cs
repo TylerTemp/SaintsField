@@ -524,7 +524,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     {
                         style =
                         {
-                            width = Length.Percent(100),
+                            // width = Length.Percent(100),
                             unityTextAlign = TextAnchor.MiddleCenter,
                         },
                     });

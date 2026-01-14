@@ -43,20 +43,6 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
             style.flexDirection = FlexDirection.Row;
 
-            // VisualElement fieldContainer = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         // flexGrow = 1,
-            //         // flexShrink = 1,
-            //         flexWrap = Wrap.NoWrap,
-            //         flexDirection = FlexDirection.Row,
-            //         marginRight = 22,
-            //         // width = Length.Percent(100),
-            //         // position = Position.Relative,
-            //     },
-            // };
-
             VisualElement quickCheckButtons = new VisualElement
             {
                 style =

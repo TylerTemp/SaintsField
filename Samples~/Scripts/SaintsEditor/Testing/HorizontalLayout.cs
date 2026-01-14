@@ -27,7 +27,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [LayoutStart("./Horizontal", ELayout.Horizontal)]
 
         [LayoutStart("./Left Hand", ELayout.TitleBox)]
-        [BelowImage]
+        // [BelowImage]
         public Sprite g11;
         [FieldLabelText("$" + nameof(g22))]
         public string[] g23;

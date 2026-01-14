@@ -364,6 +364,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     flexGrow = 1,
                     flexDirection = FlexDirection.Row,
                     justifyContent = Justify.Center,
+                    alignItems = Align.Center,
                 },
                 name = ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]),
             };
@@ -453,8 +454,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 }
             }
         }
-
-
 
         // private RichTextDrawer _richTextDrawer;
 
@@ -554,8 +553,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 buttonUserData.RichTextDrawer ??= new RichTextDrawer();
 
                 IEnumerable<VisualElement> chunks = buttonUserData.RichTextDrawer.DrawChunksUIToolKit(
-                    RichTextDrawer.ParseRichXml(result,
-                        FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]));
+                    RichTextDrawer.ParseRichXmlWithProvider(result, this));
 
                 foreach (VisualElement chunk in chunks)
                 {

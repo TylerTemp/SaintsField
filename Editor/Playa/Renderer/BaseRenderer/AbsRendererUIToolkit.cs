@@ -23,6 +23,15 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         public virtual VisualElement CreateVisualElement()
         {
             int flexGrow;
+            // if (InDirectHorizontalLayout)
+            // {
+            //     flexGrow = 1;
+            // }
+            // else
+            // {
+            //     flexGrow = InAnyHorizontalLayout ? 0 : 1;
+            // }
+            // Debug.Log(InDirectHorizontalLayout);
             if (InDirectHorizontalLayout)
             {
                 flexGrow = 1;
@@ -38,8 +47,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     // flexGrow = 1,
                     // flexGrow = InAnyHorizontalLayout? 0: 1,
+                    // flexGrow = 1,
                     flexGrow = flexGrow,
-                    width = new StyleLength(Length.Percent(100)),
+                    flexShrink = 1,
+                    // width = new StyleLength(Length.Percent(100)),
                 },
                 name = ToString(),
             };
@@ -128,7 +139,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         private Color _preColor;
         private HelpBox _helpBox;
 
-        private PreCheckResult UpdatePreCheckUIToolkitInternal(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
+        protected PreCheckResult UpdatePreCheckUIToolkitInternal(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo, false);
             // Debug.Log($"{preCheckResult.HasGuiColor}/{preCheckResult.GuiColor}");

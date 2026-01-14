@@ -14,6 +14,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
         private static Texture2D _dropdownRightIcon;
 
         public bool InAnyHorizontalLayout { get; set; }
+        public bool InDirectHorizontalLayout { get; set; }
 
         public class Config
         {

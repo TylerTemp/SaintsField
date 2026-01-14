@@ -23,7 +23,6 @@ namespace SaintsField.Editor.AutoRunner
 
         [Layout("Dropdown", ELayout.Horizontal)]
         [
-            Ordered,
             AdvancedDropdown(nameof(ShowDropdown)),
             OnValueChanged(nameof(TargetChanged)),
             FieldLabelText("Select Target"),
@@ -32,7 +31,8 @@ namespace SaintsField.Editor.AutoRunner
         public AutoRunnerWindow inspectTarget;
 
         [Layout("Dropdown")]
-        [Ordered, Button("Save"), ShowIf(nameof(EditorInlineInspectNoFile))]
+        [Button("Save"), ShowIf(nameof(EditorInlineInspectNoFile))]
+        // ReSharper disable once UnusedMember.Local
         private void SaveToProject()
         {
             string defaultPath;
@@ -75,7 +75,7 @@ namespace SaintsField.Editor.AutoRunner
             return string.IsNullOrEmpty(AssetDatabase.GetAssetPath(editorInlineInspect));
         }
 
-        [Ordered, WindowInlineEditor(typeof(AutoRunnerEditor))]
+        [WindowInlineEditor(typeof(AutoRunnerEditor))]
         public AutoRunnerWindow editorInlineInspect;
 
         private AdvancedDropdownList<AutoRunnerWindow> ShowDropdown()

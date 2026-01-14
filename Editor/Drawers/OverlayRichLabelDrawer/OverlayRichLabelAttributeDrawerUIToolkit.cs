@@ -58,7 +58,6 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
 
                     flexShrink = 0,
                     flexGrow = 1,
-                    // width = Length.Percent(100),
                     top = 0,
                     bottom = 0,
                     left = 0,

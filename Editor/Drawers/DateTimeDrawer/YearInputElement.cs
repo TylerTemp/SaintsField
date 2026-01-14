@@ -28,7 +28,6 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
                 {
                     marginLeft = 0,
                     marginRight = 0,
-                    // height = Length.Percent(100),
                     minWidth = 50,
                 },
             };

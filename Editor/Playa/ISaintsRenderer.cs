@@ -12,6 +12,7 @@ namespace SaintsField.Editor.Playa
         VisualElement CreateVisualElement();
 #endif
         bool InAnyHorizontalLayout { get; set; }
+        bool InDirectHorizontalLayout { get; set; }
 
         void RenderIMGUI(float width);
 

@@ -83,7 +83,7 @@ namespace SaintsField.Editor.Core
             {
                 style =
                 {
-                    width = Length.Percent(100),
+                    // width = Length.Percent(100),
                 },
                 name = NameSaintsPropertyDrawerContainer(property),
             };
@@ -576,7 +576,7 @@ namespace SaintsField.Editor.Core
                     {
                         style =
                         {
-                            width = Length.Percent(100),
+                            // width = Length.Percent(100),
                         },
                         name = $"{property.propertyPath}__SaintsFieldBelow_{index}",
                     };
@@ -590,7 +590,7 @@ namespace SaintsField.Editor.Core
                         {
                             style =
                             {
-                                width = Length.Percent(100),
+                                // width = Length.Percent(100),
                             },
                             name = $"{property.propertyPath}__SaintsFieldBelow_{index}_{groupBy}",
                         };
@@ -617,7 +617,7 @@ namespace SaintsField.Editor.Core
             {
                 style =
                 {
-                    width = Length.Percent(100),
+                    // width = Length.Percent(100),
                 },
                 name = NameSaintsPropertyDrawerRoot(property),
                 // userData = this,

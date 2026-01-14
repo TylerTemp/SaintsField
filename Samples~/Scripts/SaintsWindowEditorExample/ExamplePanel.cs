@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts.SaintsWindowEditorExample
     {
 
 #if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/SaintsEditor")]
+        [MenuItem("Saints/Example/SaintsEditor")]
 #else
         [MenuItem("Window/Saints/Example/SaintsEditor")]
 #endif

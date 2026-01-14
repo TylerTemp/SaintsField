@@ -6102,11 +6102,11 @@ public string afterGroupLast;
 
 ### `LayoutCloseHere` / `LayoutTerminateHere` ###
 
+> [!WARNING]  
+> You don't need this for most of the time. The new layout system can handle this quite well.
+ 
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
-
-> [!NOTE]
-> If you have code analysis enabled, you will not need this attribute. `LayoutEnd` should be enough.
 
 Include the current field into the coresponding group, then:
 *   `LayoutCloseHere` will close the most recent group, like a `LayoutEnd(".")`
@@ -6274,45 +6274,6 @@ public string layoutEnd;
 ```
 
 [![video](https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca)](https://github.com/user-attachments/assets/fac5fce5-6458-4853-893c-23fa50f84872)
-
-### `Ordered` ###
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-> [!NOTE]
-> If you have code analysis enabled, you will not need this attribute. The order should be correct.
-
-`SaintsEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
-
-Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[Ordered] public string myStartField;
-
-[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
-[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
-
-[ShowInInspector, Ordered]
-public Color AutoColor
-{
-    get => Color.green;
-    set {}
-}
-
-[Button, Ordered]
-private void EditorButton()
-{
-    Debug.Log("EditorButton");
-}
-
-[Ordered] public string myOtherFieldUnderneath;
-```
-
-![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
 
 ## Handles ##
 

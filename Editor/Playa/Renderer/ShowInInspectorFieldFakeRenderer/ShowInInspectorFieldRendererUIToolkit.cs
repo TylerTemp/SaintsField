@@ -9,6 +9,7 @@ using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
@@ -36,7 +37,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
         private static StyleSheet _ussClassSaintsFieldEditingDisabledHide;
 
-        private string NameContainer() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}";
+        protected string NameContainer() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}";
         private string NameResult() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-result";
         private string NameErrorBox() => $"saints-field--native-property-field--{GetName(FieldWithInfo)}-error";
 
@@ -103,10 +104,14 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 },
                 name = NameContainer(),
             };
+            // Debug.Log(NameContainer());
             Action<object> setter = GetSetterOrNull(FieldWithInfo);
 
             if (error != "")
             {
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning(error);
+#endif
                 container.Add(MakeNativeFieldPropertyRendererErrorField(error));
                 container.userData = new DataPayload
                 {
@@ -200,7 +205,8 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 return preCheckResult;
             }
 
-            VisualElement container= root.Q<VisualElement>(NameContainer());
+            VisualElement container = root.Q<VisualElement>(name: NameContainer());
+            Debug.Assert(container != null, $"not found: {NameContainer()}");
 
             // Debug.Log($"_preRichLabelXml={_preRichLabelXml}, {_preRichLabelXml==null}, {_preRichLabelXml==""}, preCheckResult.RichLabelXml {preCheckResult.RichLabelXml==null}, {preCheckResult.RichLabelXml==""}");
             // Debug.Log($"preCheckResult.HasRichLabel={preCheckResult.HasRichLabel}; _preRichLabelXml={_preRichLabelXml}; preCheckResult.RichLabelXml={preCheckResult.RichLabelXml}, notEqual={_preRichLabelXml != preCheckResult.RichLabelXml}");
@@ -236,6 +242,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             // Debug.Log($"error={error}, value={value}");
 
             string nameErrorBox = NameErrorBox();
+            // Debug.Log(container);
             NativeFieldPropertyRendererErrorField errorHelpBox = container.Q<NativeFieldPropertyRendererErrorField>(nameErrorBox);
             if (error == "")
             {

@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: Auto Validator gives error on a field
+2.  Fix: layout system on horizontal now calculate width better, fix the issue that some elements might take all space
+
 ## 5.8.2 ##
 
 Fix: `SaintsDictionary` failed to deserialize data in build when instantiate a prefab [#355](https://github.com/TylerTemp/SaintsField/issues/355)

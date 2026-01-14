@@ -21,39 +21,39 @@ namespace SaintsField.Editor.AutoRunner
 #if !UNITY_2019_4_OR_NEWER
         [ListDrawerSettings]
 #endif
-        [Ordered, DefaultExpand] public SceneAsset[] sceneList = {};
+        [DefaultExpand] public SceneAsset[] sceneList = {};
 
         protected override IEnumerable<SceneAsset> GetSceneList() => sceneList;
 
-        [Ordered, FieldLabelText("$" + nameof(FolderSearchLabel)), DefaultExpand, FieldDefaultExpand] public FolderSearch[] folderSearches = {};
+        [FieldLabelText("$" + nameof(FolderSearchLabel)), DefaultExpand, FieldDefaultExpand] public FolderSearch[] folderSearches = {};
 
         protected override IEnumerable<FolderSearch> GetFolderSearches() => folderSearches;
 
-        [Ordered, LabelText("Extra Resources"), DefaultExpand, Expandable]
+        [LabelText("Extra Resources"), DefaultExpand, Expandable]
         public Object[] extraResources = Array.Empty<Object>();
 
         protected override IEnumerable<Object> GetExtraAssets() => extraResources;
 
-        [Ordered, LeftToggle] public bool skipHiddenFields = true;
+        [LeftToggle] public bool skipHiddenFields = true;
 
         protected override bool SkipHiddenFields() => skipHiddenFields;
 
-        [Ordered, LeftToggle] public bool checkOnValidate = true;
+        [LeftToggle] public bool checkOnValidate = true;
 
         protected override bool CheckOnValidate() => checkOnValidate;
 
-
-        [Ordered, FieldReadOnly, ProgressBar(maxCallback: nameof(_resourceTotal)), FieldBelowInfoBox("$" + nameof(_processingMessage))] public int processing;
+        [FieldReadOnly, ProgressBar(maxCallback: nameof(_resourceTotal)), FieldBelowInfoBox("$" + nameof(_processingMessage))] public int processing;
 
         private string _processingMessage;
 
         private int _resourceTotal = 1;
 
-        [Ordered, ShowInInspector, ShowIf(nameof(_processedItemCount))] private int _processedItemCount;
+        [ShowInInspector, ShowIf(nameof(_processedItemCount))] private int _processedItemCount;
 
         [LayoutStart("Add Buttons", ELayout.Horizontal)]
 
-        [Ordered, Button, EnableIf(nameof(LackSceneInBuild))]
+        [Button, EnableIf(nameof(LackSceneInBuild))]
+        // ReSharper disable once UnusedMember.Local
         private void AddScenesInBuild()
         {
             sceneList = sceneList.Concat(GetLackSceneInBuild()).ToArray();
@@ -78,7 +78,8 @@ namespace SaintsField.Editor.AutoRunner
                 .Except(sceneList);
         }
 
-        [Ordered, Button, DisableIf(nameof(HasAllAssets))]
+        [Button, DisableIf(nameof(HasAllAssets))]
+        // ReSharper disable once UnusedMember.Local
         private void AddAllAssets()
         {
             folderSearches = folderSearches
@@ -110,7 +111,8 @@ namespace SaintsField.Editor.AutoRunner
 
         [LayoutStart("Addressable", ELayout.Horizontal)]
 
-        [Ordered, Button, EnableIf(nameof(LackSceneInAddressable))]
+        [Button, EnableIf(nameof(LackSceneInAddressable))]
+        // ReSharper disable once UnusedMember.Local
         private void AddAddressableScenes() => sceneList = sceneList.Concat(GetLackSceneInAddressable()).ToArray();
 
         private bool LackSceneInAddressable() => GetLackSceneInAddressable().Any();
@@ -134,7 +136,8 @@ namespace SaintsField.Editor.AutoRunner
                 .Except(sceneList);
         }
 
-        [Ordered, Button, EnableIf(nameof(LackAssetsInAddressable))]
+        [Button, EnableIf(nameof(LackAssetsInAddressable))]
+        // ReSharper disable once UnusedMember.Local
         private void AddAddressableAssets() => extraResources = extraResources.Concat(GetLackAssetsInAddressable()).ToArray();
 
         private bool LackAssetsInAddressable() => GetLackAssetsInAddressable().Any();
@@ -174,7 +177,7 @@ namespace SaintsField.Editor.AutoRunner
 
         [LayoutStart("Start Buttons", ELayout.Horizontal)]
 
-        [Ordered, Button("Run!")]
+        [Button("Run!")]
         // ReSharper disable once UnusedMember.Local
         private IEnumerator Run()
         {
@@ -227,7 +230,7 @@ namespace SaintsField.Editor.AutoRunner
             // StartEditorCoroutine(R());
         }
 
-        [Ordered, Button, ShowIf(nameof(AllowToRestoreScene)), ShowIf(nameof(_isRunning))]
+        [Button, ShowIf(nameof(AllowToRestoreScene)), ShowIf(nameof(_isRunning))]
         // ReSharper disable once UnusedMember.Local
         private void StopAndRestoreScene()
         {
@@ -242,7 +245,8 @@ namespace SaintsField.Editor.AutoRunner
 
         // ReSharper disable once UnusedMember.Global
         [Separator(5), Separator(EColor.Gray), Separator(5)]
-        [Ordered, AutoRunnerWindowResults] public List<AutoRunnerResult> ShowResults => Results;
+        // ReSharper disable once UnusedMember.Global
+        [AutoRunnerWindowResults] public List<AutoRunnerResult> ShowResults => Results;
 
         public override void OnEditorEnable()
         {

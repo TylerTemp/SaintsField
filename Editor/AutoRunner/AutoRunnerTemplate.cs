@@ -34,7 +34,7 @@ namespace SaintsField.Editor.AutoRunner
         }
 
         [InfoBox("Here you can combine some auto getter to load some assets to auto run")]
-        [Ordered, LabelText("Extra Resources")]
+        [LabelText("Extra Resources")]
         [GetByXPath("resources::/*.prefab")]  // for example, get prefab under resources
         public Object[] extraResources;
 
@@ -42,18 +42,18 @@ namespace SaintsField.Editor.AutoRunner
         protected override IEnumerable<Object> GetExtraAssets() => extraResources;
 
         // here to tell if you want to skip the fields hidden by ShowIf/HideIf
-        [Ordered, LeftToggle] public bool skipHiddenFields = true;
+        [LeftToggle] public bool skipHiddenFields = true;
         protected override bool SkipHiddenFields() => skipHiddenFields;
 
         // here to tell if you want to check the `OnValidate()` function
-        [Ordered, LeftToggle] public bool checkOnValidate = true;
+        [LeftToggle] public bool checkOnValidate = true;
         protected override bool CheckOnValidate() => checkOnValidate;
 
         // private IEnumerator _running;
 
         [LayoutStart("Buttons", ELayout.Horizontal)]
 
-        [Ordered, Button("Run!")]
+        [Button("Run!")]
         // ReSharper disable once UnusedMember.Local
         private IEnumerator Run()
         {
@@ -79,7 +79,7 @@ namespace SaintsField.Editor.AutoRunner
         }
 
         // and, allow user to restore their scene when necessary
-        [Ordered, ShowIf(nameof(AllowToRestoreScene)), Button("Restore Scene")]
+        [ShowIf(nameof(AllowToRestoreScene)), Button("Restore Scene")]
         // ReSharper disable once UnusedMember.Local
         private void RestoreScene()
         {
@@ -90,7 +90,7 @@ namespace SaintsField.Editor.AutoRunner
 
         // at last, show the auto running results.
         // ReSharper disable once UnusedMember.Global
-        [Ordered, AutoRunnerWindowResults] public List<AutoRunnerResult> ShowResults => Results;
+        [AutoRunnerWindowResults] public List<AutoRunnerResult> ShowResults => Results;
 
         // important! Clean the cached results and release the loaded resources when closing the window
         public override void OnEditorDestroy()
