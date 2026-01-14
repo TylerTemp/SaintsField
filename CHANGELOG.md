@@ -1,9 +1,11 @@
 # Changelog
 
-## WIP ##
+## 5.8.3 ##
 
 1.  Fix: Auto Validator gives error on a field
 2.  Fix: layout system on horizontal now calculate width better, fix the issue that some elements might take all space
+3.  Fix: Value Buttons didn't re-calculate layout when width changes
+4.  Improve: layout system now support tags (color, icon etc.) for boxed group (tabs, titleBoxed, foldout etc.)
 
 ## 5.8.2 ##
 

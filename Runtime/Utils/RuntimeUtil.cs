@@ -59,6 +59,10 @@ namespace SaintsField.Utils
 
         public static IEnumerable<string> SeparatePath(string path)
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                yield break;
+            }
             List<RichTextParsedChunk> openTag = new List<RichTextParsedChunk>();
             List<RichTextParsedChunk> acc = new List<RichTextParsedChunk>();
             foreach (RichTextParsedChunk richTextParsedChunk in ParseRichXml(path))

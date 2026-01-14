@@ -2,11 +2,13 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Playa.RendererGroup.TabGroup;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -23,8 +25,12 @@ namespace SaintsField.Editor.Playa.RendererGroup
         // private static Texture2D dropdownIcon;
         // private static Texture2D dropdownRightIcon;
 
+        private RichTextDrawer _richTextDrawer;
+
         public VisualElement CreateVisualElement()
         {
+            _richTextDrawer ??= new RichTextDrawer();
+
             const int radius = 3;
 
             _dropdownIcon ??= Util.LoadResource<Texture2D>("classic-dropdown.png");
@@ -152,7 +158,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
             {
-                Label title = new Label(_groupPath.Split('/').Last())
+                Label title = new Label
                 {
                     style =
                     {
@@ -164,6 +170,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         borderTopRightRadius = radius,
                     },
                 };
+
+                UIToolkitUtils.SetLabel(title, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
+
                 title.RemoveFromClassList("unity-label");
                 if (_eLayout.HasFlagFast(ELayout.TitleOut))
                 {
@@ -201,9 +210,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                     Button title = new Button
                     {
-                        text = _groupPath.Split('/').Last(),
+                        // text = _groupPath.Split('/').Last(),
                         style =
                         {
+                            flexDirection = FlexDirection.Row,
+
                             unityFontStyleAndWeight = FontStyle.Bold,
                             marginTop = 0,
                             marginLeft = 0,
@@ -242,6 +253,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     };
                     title.Add(foldoutImage);
 
+                    Label titleLabel = new Label();
+                    title.Add(titleLabel);
+                    UIToolkitUtils.SetLabel(titleLabel, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
+
                     body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
                     title.clicked += () =>
                     {
@@ -255,9 +270,13 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 {
                     Foldout foldout = new Foldout
                     {
-                        text = _groupPath.Split('/').Last(),
+                        text = " ",
+                        // text = _groupPath.Split('/').Last(),
+                        // text = _groupPath.Last(),
                         value = _foldout,
                     };
+                    Label foldoutLabel = foldout.Q<Toggle>().Q<Label>();
+                    UIToolkitUtils.SetLabel(foldoutLabel, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
                     if (_eLayout.HasFlagFast(ELayout.TitleOut))
                     {
                         if (_eLayout.HasFlagFast(ELayout.Background))
@@ -265,7 +284,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             foldout.style.backgroundColor = new Color(53f / 255, 53f / 255, 53f / 255, 1f);
                         }
 
-                        Label foldoutLabel = foldout.Q<Label>(className: "unity-foldout__text");
+                        // Label foldoutLabel = foldout.Q<Label>(className: "unity-foldout__text");
                         foldoutLabel.style.flexGrow = 1;
                         if (_foldout)
                         {
@@ -311,23 +330,11 @@ namespace SaintsField.Editor.Playa.RendererGroup
             //     titleRow.Add(SetupTabToolbar(!hasFoldout));
             // }
 
-            TabToolbar SetupTabToolbar(bool hasExpand)
-            {
-                TabToolbar tabToolbar = new TabToolbar(_orderedKeys, hasExpand);
-
-                tabToolbar.OnValueChangedAddListener(SetDisplayGroups);
-                tabToolbar.SetValueWithoutNotification(_orderedKeys[0]);
-                UIToolkitUtils.OnAttachToPanelOnce(tabToolbar, _ =>
-                {
-                    SetDisplayGroups(_orderedKeys[0]);
-                });
-                return tabToolbar;
-            }
-
             foreach ((string groupPath, ISaintsRenderer renderer) in _renderers)
             {
                 // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                string groupId = groupPath.Substring(groupPath.LastIndexOf('/') + 1);
+                // string groupId = groupPath.Substring(groupPath.LastIndexOf('/') + 1);
+                string groupId = RuntimeUtil.SeparatePath(groupPath).LastOrDefault() ?? "";
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_EDITOR_LAYOUT
                 Debug.Log($"add item@{groupPath}->{groupId}: {renderer}");
 #endif
@@ -416,7 +423,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
             root.style.marginBottom = marginBottom;
 
             // sub container has some space left
-            if(_groupPath.Contains('/') && _eLayout.HasFlagFast(ELayout.Background) && _eLayout.HasFlagFast(ELayout.Title) && _eLayout.HasFlagFast(ELayout.TitleOut))
+            // if(_groupPath.Contains('/') && _eLayout.HasFlagFast(ELayout.Background) && _eLayout.HasFlagFast(ELayout.Title) && _eLayout.HasFlagFast(ELayout.TitleOut))
+            if(_groupPath.Count >= 2 && _eLayout.HasFlagFast(ELayout.Background) && _eLayout.HasFlagFast(ELayout.Title) && _eLayout.HasFlagFast(ELayout.TitleOut))
             {
                 root.style.marginLeft = 4;
             }
@@ -449,12 +457,27 @@ namespace SaintsField.Editor.Playa.RendererGroup
             });
 
             return root;
+
+            TabToolbar SetupTabToolbar(bool hasExpand)
+            {
+                TabToolbar tabToolbar = new TabToolbar(_orderedKeys, hasExpand);
+
+                tabToolbar.OnValueChangedAddListener(SetDisplayGroups);
+                tabToolbar.SetValueWithoutNotification(_orderedKeys[0]);
+                UIToolkitUtils.OnAttachToPanelOnce(tabToolbar, _ =>
+                {
+                    SetDisplayGroups(_orderedKeys[0]);
+                });
+                return tabToolbar;
+            }
         }
 
         private void SetDisplayGroups(string tab)
         {
+            // Debug.Log($"cur tab = {tab}");
             foreach((string groupPath, List<VisualElement> visualElements) in _fieldToVisualElement)
             {
+                // Debug.Log($"groupPath={groupPath}");
                 bool display = tab == null || groupPath == tab;
                 visualElements.ForEach(visualElement => visualElement.style.display = display ? DisplayStyle.Flex : DisplayStyle.None);
             }

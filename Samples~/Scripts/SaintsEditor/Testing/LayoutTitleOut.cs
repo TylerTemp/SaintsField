@@ -9,12 +9,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public string t2;
         public string t3;
 
-        [LayoutStart("TitledBox", ELayout.TitleBox)]
+        [LayoutStart("Titled <color=Chartreuse>Box", ELayout.TitleBox)]
         public string b1;
         public string b2;
         public string b3;
 
-        [LayoutStart("TitledOut", ELayout.TitleOut)]
+        [LayoutStart("Titled<icon=d_orangeLight/>", ELayout.TitleOut)]
         public string o1;
         public string o2;
         public string o3;

@@ -899,10 +899,13 @@ namespace SaintsField.Editor
                             {
                                 if (endGroupBy.StartsWith("."))
                                 {
-                                    string closeGroup = JoinGroupBy(keepGroupingInfo.AbsGroupBy, endGroupBy);
-                                    if(closeGroup.Contains('/'))
+                                    IReadOnlyList<string> closeGroupParts = JoinGroupBy(RuntimeUtil.SeparatePath(keepGroupingInfo.AbsGroupBy).ToArray(), RuntimeUtil.SeparatePath(endGroupBy).ToArray());
+                                    // string closeGroup;
+                                    // if(closeGroup.Contains('/'))
+                                    if(closeGroupParts.Count >= 2)
                                     {
-                                        List<string> splitCloseGroup = closeGroup.Split('/').ToList();
+                                        // List<string> splitCloseGroup = closeGroup.Split('/').ToList();
+                                        List<string> splitCloseGroup = new List<string>(closeGroupParts);
                                         splitCloseGroup.RemoveAt(splitCloseGroup.Count - 1);
                                         string openGroupTo = string.Join("/", splitCloseGroup);
                                         if (!rootToRendererGroupInfo.TryGetValue(openGroupTo,
@@ -924,13 +927,13 @@ namespace SaintsField.Editor
                                         stopGrouping = !useGroupInfo.Config.KeepGrouping;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                                        Debug.Log($"Layout close, {closeGroup}->{openGroupTo}: {keepGroupingInfo?.AbsGroupBy}");
+                                        Debug.Log($"Layout close, {string.Join('/', closeGroupParts)}->{openGroupTo}: {keepGroupingInfo?.AbsGroupBy}");
 #endif
                                     }
                                     else
                                     {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_LAYOUT
-                                        Debug.Log($"Layout close, {closeGroup}: null");
+                                        Debug.Log($"Layout close, {string.Join('/', closeGroupParts)}: null");
 #endif
                                         useGroupInfo = null;
                                         stopGrouping = true;
@@ -943,7 +946,8 @@ namespace SaintsField.Editor
                                     string parentGroupBy;
                                     if (endGroupBy.Contains('/'))
                                     {
-                                        List<string> endGroupBySplit = endGroupBy.Split('/').ToList();
+                                        // List<string> endGroupBySplit = endGroupBy.Split('/').ToList();
+                                        List<string> endGroupBySplit = RuntimeUtil.SeparatePath(endGroupBy).ToList();
                                         endGroupBySplit.RemoveAt(endGroupBySplit.Count - 1);
                                         parentGroupBy = string.Join("/", endGroupBySplit);
                                     }
@@ -988,7 +992,8 @@ namespace SaintsField.Editor
                                 string preGroupBy = keepGroupingInfo?.AbsGroupBy ?? preAbsGroupBy;
                                 if(preGroupBy != null)
                                 {
-                                    groupBy = JoinGroupBy(preGroupBy, groupBy);
+                                    IReadOnlyList<string> joinGroupBy = JoinGroupBy(RuntimeUtil.SeparatePath(preGroupBy).ToArray(), RuntimeUtil.SeparatePath(groupBy).ToArray());
+                                    groupBy = string.Join('/', joinGroupBy);
                                 }
                             }
                             preAbsGroupBy = groupBy;
@@ -1419,7 +1424,8 @@ namespace SaintsField.Editor
                 return (newRoot, info);
             }
 
-            string[] groupByParts = path.Split('/');
+            // string[] groupByParts = path.Split('/');
+            string[] groupByParts = RuntimeUtil.SeparatePath(path).ToArray();
             string rootGroup = groupByParts[0];
             if (!rootToRendererGroupInfo.TryGetValue(rootGroup, out RendererGroupInfo accInfo))
             {
@@ -1465,11 +1471,14 @@ namespace SaintsField.Editor
             return (newRoot, accInfo);
         }
 
-        private static string JoinGroupBy(string layoutGroupByAcc, string curGroupBy)
+        // private static string JoinGroupBy(string layoutGroupByAcc, string curGroupBy)
+        private static IReadOnlyList<string> JoinGroupBy(IReadOnlyList<string> layoutGroupByAcc, IReadOnlyList<string> curGroupBy)
         {
-            List<string> ori = layoutGroupByAcc.Split('/').ToList();
+            // List<string> ori = layoutGroupByAcc.Split('/').ToList();
+            List<string> ori = new List<string>(layoutGroupByAcc);
 
-            foreach (string eachPart in curGroupBy.Split('/'))
+            // foreach (string eachPart in curGroupBy.Split('/'))
+            foreach (string eachPart in curGroupBy)
             {
                 switch (eachPart)
                 {
@@ -1488,22 +1497,9 @@ namespace SaintsField.Editor
                 }
             }
 
-            return ori.Count == 0? "": string.Join("/", ori);
+            // return ori.Count == 0? "": string.Join("/", ori);
+            return ori;
         }
-
-        // private static IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
-        // {
-        //     // e.g "a/b/c/d"
-        //     // first yield: "a/b/c", "a/b/c/d"
-        //     // then yield: "a/b", "a/b/c"
-        //     // then yield: "a", "a/b"
-        //     string[] groupChunk = longestGroupGroupBy.Split('/');
-        //
-        //     for (int i = groupChunk.Length - 1; i > 0; i--)
-        //     {
-        //         yield return (string.Join("/", groupChunk, 0, i), string.Join("/", groupChunk, 0, i + 1));
-        //     }
-        // }
 
         public static IEnumerable<string> GetSerializedProperties(SerializedObject serializedObject)
         {

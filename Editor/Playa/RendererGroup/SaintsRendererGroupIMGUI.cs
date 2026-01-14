@@ -268,7 +268,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
                     {
                         titleRect.height = EditorGUIUtility.singleLineHeight;
-                        EditorGUI.LabelField(titleRect, _groupPath.Split('/').Last(), _titleLabelStyle);
+                        EditorGUI.LabelField(titleRect, _groupPath.Last(), _titleLabelStyle);
                         titleRect.y += titleRect.height;
                         titleUsedHeight += titleRect.height;
 
@@ -297,7 +297,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             titleRect.height = EditorGUIUtility.singleLineHeight;
 
-                            if (GUI.Button(titleRect, _groupPath.Split('/').Last(), GetFancyBoxLeftIconButtonStyle()))
+                            if (GUI.Button(titleRect, _groupPath.Last(), GetFancyBoxLeftIconButtonStyle()))
                             {
                                 _foldout = !_foldout;
                             }
@@ -317,7 +317,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         else
                         {
                             titleRect.height = EditorGUIUtility.singleLineHeight;
-                            _foldout = EditorGUI.Foldout(titleRect, _foldout, _groupPath.Split('/').Last(), true,
+                            _foldout = EditorGUI.Foldout(titleRect, _foldout, _groupPath.Last(), true,
                                 new GUIStyle(EditorStyles.foldout)
                                 {
                                     fontStyle = FontStyle.Bold,

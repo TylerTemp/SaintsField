@@ -32,7 +32,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             Add(_mainRow = mainRow);
             _mainRow.OnButtonClicked.AddListener(OnButtonClicked.Invoke);
 
-            // RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
+            RegisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
             _valueButtonsCalcElement.AddReadyListener(OnCalcReadyEvent);
             // RegisterCallback<AttachToPanelEvent>(_ => CheckWidth());
             UIToolkitUtils.OnAttachToPanelOnce(this, _ =>
@@ -60,16 +60,16 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
         private float _selfWidth = -1;
         private float _subWidth = -1;
 
-        // private void OnGeometryChangedEvent(GeometryChangedEvent _)
-        // {
-        //     // Debug.Log("OnGeometryChangedEvent");
-        //     // if (SubContainer != null && SubContainer.style.display == DisplayStyle.None)
-        //     // {
-        //     //     return;
-        //     // }
-        //
-        //     CheckWidth();
-        // }
+        private void OnGeometryChangedEvent(GeometryChangedEvent _)
+        {
+            // Debug.Log("OnGeometryChangedEvent");
+            // if (SubContainer != null && SubContainer.style.display == DisplayStyle.None)
+            // {
+            //     return;
+            // }
+
+            CheckWidth();
+        }
 
         private void CheckWidth()
         {

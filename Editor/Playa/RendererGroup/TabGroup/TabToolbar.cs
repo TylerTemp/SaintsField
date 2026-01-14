@@ -3,7 +3,6 @@ using System.Linq;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.UIToolkitElements;
-using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
@@ -99,21 +98,6 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
                             each))
                     .ToArray()
             );
-            // _tabButtonsArrangeElement.UpdateButtons(
-            //     orderedKeys
-            //         .Select(each =>
-            //             new ValueButtonRawInfo(
-            //                 RichTextDrawer.ParseRichXmlWithProvider(each, new RichTextDrawer.EmptyRichTextTagProvider()).ToArray(),
-            //                 false,
-            //                 each))
-            //         .ToArray()
-            // );
-
-            // _tabButtonsArrangeElement.OnCalcArrangeDone.AddListener(_ =>
-            // {
-            //     Debug.Log("done");
-            //     _tabButtonsArrangeElement.RefreshCurValue(curKey);
-            // });
 
             _tabButtonsArrangeElement.OnButtonClicked.AddListener(value =>
             {

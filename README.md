@@ -95,9 +95,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.2**
+**5.8.3**
 
-Fix: `SaintsDictionary` failed to deserialize data in build when instantiate a prefab [#355](https://github.com/TylerTemp/SaintsField/issues/355)
+1.  Fix: Auto Validator gives error on a field
+2.  Fix: layout system on horizontal now calculate width better, fix the issue that some elements might take all space
+3.  Fix: Value Buttons didn't re-calculate layout when width changes
+4.  Improve: layout system now support tags (color, icon etc.) for boxed group (tabs, titleBoxed, foldout etc.)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -5867,39 +5870,39 @@ public string t1;
 public string t2;
 public string t3;
 
-[LayoutStart("TitledBox", ELayout.TitleBox)]
+[LayoutStart("Titled <color=Chartreuse>Box", ELayout.TitleBox)]
 public string b1;
 public string b2;
 public string b3;
 
-[LayoutStart("TitledOut", ELayout.TitleOut)]
+[LayoutStart("Titled<icon=d_orangeLight/>", ELayout.TitleOut)]
 public string o1;
 public string o2;
 public string o3;
 ```
 
-![](https://github.com/user-attachments/assets/0af3657b-44e1-4edb-a785-4214a2a57cd9)
+![](https://github.com/user-attachments/assets/92e03303-0209-497c-a297-66d3c7a900e3)
 
 Example of foldout:
 
 ```csharp
-[LayoutStart("Grouped", ELayout.Foldout)]
+[LayoutStart("Foldout", ELayout.Foldout)]
 public string t1;
 public string t2;
 public string t3;
 
-[LayoutStart("GroupedBox", ELayout.Foldout |  ELayout.TitleBox)]
+[LayoutStart("Foldout <color=DeepSkyBlue>Box", ELayout.Foldout |  ELayout.TitleBox)]
 public string b1;
 public string b2;
 public string b3;
 
-[LayoutStart("GroupedOut", ELayout.Foldout | ELayout.TitleOut)]
+[LayoutStart("<icon=LensFlare Gizmo/>Foldout", ELayout.Foldout | ELayout.TitleOut)]
 public string o1;
 public string o2;
 public string o3;
 ```
 
-![](https://github.com/user-attachments/assets/aef58e72-bfcc-42dd-8e76-788366d80857)
+![](https://github.com/user-attachments/assets/f2d5a36d-7818-4738-ab67-9d49eb99d50c)
 
 Example of tabs:
 
@@ -5937,9 +5940,50 @@ public string mb3;
 public string mo1;
 public string mo2;
 public string mo3;
+
+// Colors + Icons
+
+[LayoutStart("Color Tab", ELayout.Tab)]
+
+[LayoutStart("./<color=#FCBF07><icon=d_AudioClip Icon/>Music")]
+public string m1;
+public string m2;
+public string m3;
+
+[LayoutStart("../<color=#34F42B><icon=greenLight/>Light")]
+public string l1;
+public string l2;
+public string l3;
+
+[LayoutStart("../<color=#B0FC58><icon=d_Cloth Icon/>Skin")]
+public string skin1;
+public string skin2;
+public string skin3;
+
+[LayoutStart("../<color=Aquamarine><icon=d_Settings Icon/>Settings")]
+public string s1;
+public string s2;
+public string s3;
+
+[LayoutStart("../<color=Bisque><icon=d_UnityEditor.GameView/>Controller")]
+public string g1;
+public string g2;
+public string g3;
+
+[LayoutStart("../<color=CadetBlue><icon=star.png/>Favorite")]
+public string f1;
+public string f2;
+public string f3;
+
+[LayoutStart("../<color=Chartreuse><icon=AudioSource Gizmo/>Audio")]
+public string a1;
+public string a2;
+public string a3;
 ```
 
 ![](https://github.com/user-attachments/assets/788df076-ae32-4b66-bca0-fdb05185e801)
+
+![](https://github.com/user-attachments/assets/cb3df1b5-465c-46bf-92d6-f76531cd134d)
 
 Example of horizental
 
