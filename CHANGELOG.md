@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: `Searchable` rendered twice
+2.  Add: config to display `Searchable` to all inspector. Default is on. 
+
 ## 5.8.3 ##
 
 1.  Fix: Auto Validator gives error on a field

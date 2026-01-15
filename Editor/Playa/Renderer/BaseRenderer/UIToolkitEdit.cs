@@ -116,6 +116,15 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         toggleLabel.style.minWidth = 0;
                     }
+
+                    VisualElement unityToggleInput = element.Q<VisualElement>(className: "unity-toggle__input");
+                    if(unityToggleInput != null)
+                    {
+                        element.style.flexDirection = FlexDirection.RowReverse;
+                        element.style.justifyContent = Justify.FlexEnd;
+                        unityToggleInput.style.flexGrow = 0;
+                        // unityToggleInput.style.flexGrow = 0;
+                    }
                 }
                 else
                 {

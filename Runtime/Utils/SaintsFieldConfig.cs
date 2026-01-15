@@ -18,7 +18,13 @@ namespace SaintsField.Utils
 
         public const int UpdateLoopDefaultMs = 100;
 
-        // [FieldSeparator(10)]
+        [LayoutStart("MonoBehavior Default Searchable", ELayout.TitleOut)]
+        [AboveText("This will add [Searchable] to all MonoBehavior")]
+        [LayoutStart("./Configs", ELayout.Horizontal)]
+        [FieldLabelText("Override Searchable")] public bool monoBehaviorSearchableOverride;
+        [ShowIf(nameof(monoBehaviorSearchableOverride)), FieldLabelText("Always Searchable")] public bool monoBehaviorSearchable = MonoBehaviorSearchableDefault;
+        [ShowInInspector, HideIf(nameof(monoBehaviorSearchableOverride)), LabelText("Always Searchable")] public const bool MonoBehaviorSearchableDefault = true;
+        [LayoutEnd]
 
         // [FieldInfoBox("The minimum row of resizable text area", EMessageType.None)]
         [LayoutStart("The minimum row of resizable text area", ELayout.Horizontal | ELayout.TitleOut)]

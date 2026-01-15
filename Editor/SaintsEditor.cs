@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.ComponentHeader;
@@ -1551,12 +1549,7 @@ namespace SaintsField.Editor
         //     return new VerticalGroup(layoutInfo);
         // }
 
-
-
-        public string GetRichLabel()
-        {
-            return _searchableShown ? "<icon=search.png/>" : "<color=gray><icon=search.png/>";
-        }
+        public bool IsSearchableOn() => _searchableShown;
 
         public virtual void OnEnable()
         {

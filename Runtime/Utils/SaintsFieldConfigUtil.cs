@@ -142,5 +142,20 @@ namespace SaintsField.Utils
 
         // ReSharper disable once SimplifyConditionalTernaryExpression
         public static bool GetValidateInputLoopCheckUIToolkit() => IsConfigLoaded? Config.validateInputLoopCheckUIToolkit: SaintsFieldConfig.ValidateInputLoopCheckDefault;
+        public static bool GetMonoBehaviorSearchable()
+        {
+            if (!IsConfigLoaded)
+            {
+                return SaintsFieldConfig.MonoBehaviorSearchableDefault;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (Config.monoBehaviorSearchableOverride)
+            {
+                return Config.monoBehaviorSearchable;
+            }
+
+            return SaintsFieldConfig.MonoBehaviorSearchableDefault;
+        }
     }
 }

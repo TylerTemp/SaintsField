@@ -7,7 +7,7 @@ namespace SaintsField.Editor.HeaderGUI
         // ReSharper disable once InconsistentNaming
         Object target { get; }
 
-        string GetRichLabel();
+        bool IsSearchableOn();
         void OnHeaderButtonClick();
     }
 }
