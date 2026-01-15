@@ -97,7 +97,7 @@ namespace SaintsField.Editor
                 {
                     style =
                     {
-                        flexGrow = 1,
+                        // flexGrow = 1,
                         display = DisplayStyle.None,
                         // width = Length.Percent(100),
                         width = StyleKeyword.None,

@@ -1,6 +1,6 @@
 # Changelog
 
-## WIP ##
+## 5.8.4 ##
 
 1.  Fix: `Searchable` rendered twice
 2.  Add: config to display `Searchable` to all inspector. Default is on. 

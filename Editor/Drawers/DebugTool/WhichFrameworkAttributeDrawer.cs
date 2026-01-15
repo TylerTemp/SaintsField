@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Drawers.DebugTool
     {
         #region IMGUI
 
-        private const string ImGuiContent = "You're using <color=red>IMGUI</color>.\n\nIMGUI is supported by SaintsField, but has a bit lower priority than UI Toolkit. Feel free to submit an issue if you have any problem.";
+        private const string ImGuiContent = "You're using <color=red>IMGUI</color>.\n\nIMGUI is no longer supported by SaintsField.";
 
         // private bool _overrideMessageType;
         // private EMessageType _messageType;
