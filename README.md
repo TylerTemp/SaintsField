@@ -95,12 +95,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.3**
+**5.8.4**
 
-1.  Fix: Auto Validator gives error on a field
-2.  Fix: layout system on horizontal now calculate width better, fix the issue that some elements might take all space
-3.  Fix: Value Buttons didn't re-calculate layout when width changes
-4.  Improve: layout system now support tags (color, icon etc.) for boxed group (tabs, titleBoxed, foldout etc.)
+1.  Fix: `Searchable` rendered twice
+2.  Add: config to display `Searchable` to all inspector. Default is on.
+3.  Add: Support for ScriptableRendererData [#356](https://github.com/TylerTemp/SaintsField/issues/356)
+4.  Fix: `SaintsEvent` error when UI Toolkit clone elements in Unity 6k.3, fix error when try to remove on empty list [#357](https://github.com/TylerTemp/SaintsField/issues/357)
+5.  Improve: `SaintsEvent` dropdown now uses `TreeDropdown`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
