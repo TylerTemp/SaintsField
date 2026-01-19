@@ -3,7 +3,10 @@
 ## 5.8.4 ##
 
 1.  Fix: `Searchable` rendered twice
-2.  Add: config to display `Searchable` to all inspector. Default is on. 
+2.  Add: config to display `Searchable` to all inspector. Default is on.
+3.  Add: Support for ScriptableRendererData [#356](https://github.com/TylerTemp/SaintsField/issues/356)
+4.  Fix: `SaintsEvent` error when UI Toolkit clone elements in Unity 6k.3, fix error when try to remove on empty list [#357](https://github.com/TylerTemp/SaintsField/issues/357)
+5.  Improve: `SaintsEvent` dropdown now uses `TreeDropdown`
 
 ## 5.8.3 ##
 

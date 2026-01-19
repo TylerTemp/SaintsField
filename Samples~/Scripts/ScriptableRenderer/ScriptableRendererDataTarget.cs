@@ -1,3 +1,4 @@
+using SaintsField.Playa;
 using SaintsField.ScriptableRenderer;
 using UnityEngine;
 
@@ -22,7 +23,11 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
         }
 #endif
 
+        [LayoutStart("Hor", ELayout.Horizontal | ELayout.FoldoutBox)]
+
         [CurveRange]
         public AnimationCurve curve1;
+
+        [ResizableTextArea] public string content;
     }
 }
