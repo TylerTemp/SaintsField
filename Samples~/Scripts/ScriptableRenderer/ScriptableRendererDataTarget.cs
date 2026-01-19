@@ -1,9 +1,7 @@
-using UnityEngine;
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
 using SaintsField.ScriptableRenderer;
-using UnityEngine.Rendering.Universal;
-#endif
-namespace SaintsField.Samples.Scripts.ScriptableRendererDataExample
+using UnityEngine;
+
+namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {
 #if SAINTSFIELD_DEBUG
     [CreateAssetMenu(

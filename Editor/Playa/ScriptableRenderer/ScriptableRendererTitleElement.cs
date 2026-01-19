@@ -56,11 +56,13 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
 
                 genericDropdownMenu.AddItem("Remove", false, onRemove.Invoke);
 
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
                 if(rendererFeatureSo?.targetObject?.GetType() == typeof(FullScreenPassRendererFeature))
                 {
                     genericDropdownMenu.AddSeparator("");
                     genericDropdownMenu.AddItem("Show All Advanced Properties", UnityEditor.Rendering.AdvancedProperties.enabled, () => UnityEditor.Rendering.AdvancedProperties.enabled = !UnityEditor.Rendering.AdvancedProperties.enabled);
                 }
+#endif
 
                 genericDropdownMenu.DropDown(
                     contextMenuButton.worldBound,
