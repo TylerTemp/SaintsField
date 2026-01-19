@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6813102869004525734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a735372e943b084b8bdcafe7bdd91c3, type: 3}
+  m_Name: MyRendererFeature
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.ScriptableRendererDataExample.MyRendererFeature
+  m_Active: 1
+  curve1:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c4af4c0e6adf4b4fa45a7d38d384c22, type: 3}
+  m_Name: ScriptableRendererDataTarget
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.ScriptableRendererDataExample.ScriptableRendererDataTarget
+  debugShaders:
+    debugReplacementPS: {fileID: 0}
+    hdrDebugViewPS: {fileID: 0}
+    probeVolumeSamplingDebugComputeShader: {fileID: 0}
+  probeVolumeResources:
+    probeVolumeDebugShader: {fileID: 0}
+    probeVolumeFragmentationDebugShader: {fileID: 0}
+    probeVolumeOffsetDebugShader: {fileID: 0}
+    probeVolumeSamplingDebugShader: {fileID: 0}
+    probeSamplingDebugMesh: {fileID: 0}
+    probeSamplingDebugTexture: {fileID: 0}
+    probeVolumeBlendStatesCS: {fileID: 0}
+  m_RendererFeatures:
+  - {fileID: -6813102869004525734}
+  m_RendererFeatureMap: 5a5fcaba09ff72a1
+  m_UseNativeRenderPass: 0
+  curve1:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

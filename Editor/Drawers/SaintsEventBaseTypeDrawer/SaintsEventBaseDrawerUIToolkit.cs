@@ -170,7 +170,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             saintsEventView.RemoveButton.clicked += () =>
             {
                 int[] selected = listView.selectedIndices.OrderByDescending(each => each).ToArray();
-                if (selected.Length == 0)
+                if (selected.Length == 0 && persistentCallProp.arraySize > 0)
                 {
                     selected = new[] { persistentCallProp.arraySize - 1 };
                 }

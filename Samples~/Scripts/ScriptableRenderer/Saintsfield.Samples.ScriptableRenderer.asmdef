@@ -1,0 +1,24 @@
+{
+    "name": "SaintsField.Samples.ScriptableRenderer",
+    "rootNamespace": "SaintsField",
+    "references": [
+        "SaintsField.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "SaintsField.Runtime.ScriptableRenderer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "",
+            "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -3456,7 +3456,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce80c99e8ba440c580d745ce53147594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples.EditorTest::SaintsField.CodeAnalTest
-  ms: {fileID: 0}
 --- !u!114 &889525107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3649,7 +3648,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba763499f3bd02e4686d26382434f342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.LayoutNestFoldout
+  plainStrings: []
+  plainStruct:
+    structString: 
   plainEnum: 1
+  l1Strings: []
+  l1Struct:
+    structString: 
+  l1Enum: 0
+  l2Strings: []
+  l2Struct:
+    structString: 
+  l2Enum: 0
+  l2EnumLabel: 0
 --- !u!1 &930217588
 GameObject:
   m_ObjectHideFlags: 0
@@ -5422,6 +5433,27 @@ MonoBehaviour:
   mo1: 
   mo2: 
   mo3: 
+  m1: 
+  m2: 
+  m3: 
+  l1: 
+  l2: 
+  l3: 
+  skin1: 
+  skin2: 
+  skin3: 
+  s1: 
+  s2: 
+  s3: 
+  g1: 
+  g2: 
+  g3: 
+  f1: 
+  f2: 
+  f3: 
+  a1: 
+  a2: 
+  a3: 
 --- !u!1 &1301169198
 GameObject:
   m_ObjectHideFlags: 0

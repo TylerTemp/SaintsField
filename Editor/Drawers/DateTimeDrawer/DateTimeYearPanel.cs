@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.DateTimeDrawer
 {
-#if UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
+#if UNITY_6000_0_OR_NEWER
     [UxmlElement]
 #endif
     // ReSharper disable once PartialTypeWithSinglePart

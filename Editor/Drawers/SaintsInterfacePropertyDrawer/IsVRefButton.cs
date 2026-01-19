@@ -5,13 +5,13 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 {
-#if UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
+#if UNITY_6000_0_OR_NEWER
     [UxmlElement]
 #endif
     // ReSharper disable once PartialTypeWithSinglePart
     public partial class IsVRefButton: BindableElement, INotifyValueChanged<bool>
     {
-#if !UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
+#if !UNITY_6000_0_OR_NEWER
         public new class UxmlTraits : BindableElement.UxmlTraits { }
         public new class UxmlFactory : UxmlFactory<IsVRefButton, UxmlTraits> { }
 #endif
