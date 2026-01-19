@@ -22,12 +22,5 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
             return new ScriptableRendererExample(this);
         }
 #endif
-
-        [LayoutStart("Hor", ELayout.Horizontal | ELayout.FoldoutBox)]
-
-        [CurveRange]
-        public AnimationCurve curve1;
-
-        [ResizableTextArea] public string content;
     }
 }

@@ -8435,12 +8435,32 @@ Please note: `NetworkVariable` and `NetworkList` will always be rendered at the 
 
 ### Scriptable Renderer Data ###
 
-`ScriptableRendererData` uses `ScriptableRendererDataEditor` with IMGUI.
+`ScriptableRendererData` uses `ScriptableRendererDataEditor` with IMGUI. Which makes `SaintsEditor` unable to kick-in.
 
-To use the functions in SaintsField, inherent from `SaintsScriptableRendererData`
+To use the functions in SaintsEditor, inherent from `SaintsScriptableRendererData`
 
 ```csharp
+using SaintsField.ScriptableRenderer;
 
+public class MyScriptableRendererData: SaintsScriptableRendererData 
+{
+    // ...
+}
+```
+
+Result:
+
+![](https://github.com/user-attachments/assets/0c5de2fb-53ae-471b-8b03-3c18040b1854)
+
+Note: this requires you to enable `SaintsEditor` in project too. If you can not, you also need to inherent from `SaintsScriptableRendererFeature`
+
+```csharp
+using SaintsField.ScriptableRenderer;
+
+public class MyRendererFeature: SaintsScriptableRendererFeature 
+{
+    // ...
+}
 ```
 
 ## Extended Serialization ##

@@ -1,3 +1,4 @@
+using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -6,7 +7,7 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {
     public class MyRendererFeature:
 #if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
-        ScriptableRendererFeature
+        SaintsField.ScriptableRenderer.SaintsScriptableRendererFeature
 #else
         UnityEngine.ScriptableObject
 #endif
@@ -39,7 +40,11 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
         }
 #endif
 
-        [CurveRange(EColor.Orange)]
+        [LayoutStart("Hor", ELayout.Horizontal | ELayout.FoldoutBox)]
+
+        [CurveRange]
         public AnimationCurve curve1;
+
+        [ResizableTextArea] public string content;
     }
 }
