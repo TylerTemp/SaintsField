@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Drawers.TypeReferenceTypeDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Events;
@@ -190,14 +191,14 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
 
                 AdvancedDropdownMetaInfo meta = GetTypeDropdownMeta(Type.GetType(propTypeAndAss.stringValue), typeDropdownGroups);
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(typeDropdownButtonField.worldBound);
-                SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
+                SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
                     meta,
                     typeDropdownButtonField.worldBound.width,
                     maxHeight,
                     false,
-                    (newDisplay, curItem) =>
+                    (curItem, _) =>
                     {
-                        typeDropdownButtonLabel.text = newDisplay;
+                        typeDropdownButtonLabel.text = FormatTypeNameAndAssmbleLabel(propTypeAndAss.stringValue);
                         TypeDropdownInfo newTypeInfo = (TypeDropdownInfo)curItem;
                         Type newType = newTypeInfo.Type;
                         propTypeAndAss.stringValue = TypeReference.GetTypeNameAndAssembly(newType);
@@ -208,6 +209,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         }
 
                         property.serializedObject.ApplyModifiedProperties();
+                        return new []{curItem};
                     }
                 );
                 UnityEditor.PopupWindow.Show(worldBound, sa);
@@ -224,68 +226,16 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             SerializedProperty propPersistentArguments = property.FindPropertyRelative(nameof(PersistentCall.persistentArguments));
             methodDropdownButtonField.Q<Button>().clicked += () =>
             {
-                // bool isStatic = isStaticProperty.boolValue;
-                // Object uObj = targetProperty.objectReferenceValue;
-                // string typeNameAndAss = propTypeAndAss.stringValue;
-                //
-                // Type type = uObj == null ? Type.GetType(typeNameAndAss) : uObj.GetType();
-                //
-                // if (type == null)
-                // {
-                //     return;
-                // }
-                //
-                // (bool isValidMethodInfo, IReadOnlyList<Type> methonParamTypes, Type returnType) = GetMethodParamsType(property);
-                // MethodSelect selectedMethod = default;
-                //
-                // const BindingFlags instanceFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-                // const BindingFlags staticFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
-                // BindingFlags bf = isStatic ? staticFlags : instanceFlags;
-                // List<MethodSelect> methodSelects = new List<MethodSelect>();
-                // foreach (Type subType in ReflectUtils.GetSelfAndBaseTypesFromType(type))
-                // {
-                //     foreach (MethodInfo methodInfo in subType.GetMethods(bf))
-                //     {
-                //         if (methodInfo.IsGenericMethod)  // this is not supported, so far...
-                //         {
-                //             continue;
-                //         }
-                //
-                //         if (methodInfo.DeclaringType != subType)
-                //         {
-                //             continue;
-                //         }
-                //
-                //         MethodSelect methodSelect = new MethodSelect(subType, methodInfo);
-                //         // ReSharper disable once InvertIf
-                //         if(!methodSelects.Contains(methodSelect))
-                //         {
-                //             methodSelects.Add(methodSelect);
-                //
-                //             // ReSharper disable once InvertIf
-                //             if (isValidMethodInfo)
-                //             {
-                //                 if (methodInfo.Name == propMethodName.stringValue &&
-                //                     methodInfo.ReturnType == returnType &&
-                //                     methodInfo.GetParameters().Select(p => p.ParameterType).SequenceEqual(methonParamTypes))
-                //                 {
-                //                     selectedMethod = methodSelect;
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
-
                 (MethodSelect selectedMethod, IReadOnlyList<MethodSelect> methodSelects) = GetMethods(property, isStaticProperty, targetProperty, propTypeAndAss, propMethodName);
 
-                AdvancedDropdownMetaInfo meta = GetMethodDropdownMeta(selectedMethod, methodSelects, false);
+                AdvancedDropdownMetaInfo meta = GetMethodDropdownMeta(selectedMethod, methodSelects);
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(methodDropdownButtonField.worldBound);
-                SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
+                SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
                     meta,
                     methodDropdownButtonField.worldBound.width,
                     maxHeight,
                     false,
-                    (_, curItem) =>
+                    (curItem, _) =>
                     {
                         MethodSelect mi = (MethodSelect)curItem;
                         if (mi.MethodInfo == null)
@@ -314,6 +264,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         }
 
                         property.serializedObject.ApplyModifiedProperties();
+                        return null;
                     }
                 );
                 UnityEditor.PopupWindow.Show(worldBound, sa);

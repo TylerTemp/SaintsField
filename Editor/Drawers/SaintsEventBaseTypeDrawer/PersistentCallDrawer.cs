@@ -144,39 +144,43 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
             };
         }
 
-        private static AdvancedDropdownMetaInfo GetMethodDropdownMeta(MethodSelect curMethod, IEnumerable<MethodSelect> methodInfos, bool isImGui)
+        private static AdvancedDropdownMetaInfo GetMethodDropdownMeta(MethodSelect curMethod,
+            IEnumerable<MethodSelect> methodInfos)
         {
             AdvancedDropdownList<MethodSelect> dropdownListValue = new AdvancedDropdownList<MethodSelect>
             {
                 { "[Null]", default },
             };
 
-            Type preType = null;
+            // Type preType = null;
 
             foreach (MethodSelect methodSelect in methodInfos)
             {
-                if (methodSelect.Type != preType)
-                {
-                    preType = methodSelect.Type;
-                    dropdownListValue.AddSeparator();
-                    string typeName = methodSelect.Type.Name;
-                    string typeNamespace = methodSelect.Type.Namespace;
-                    string typeShort = TypeReference.GetShortAssemblyName(methodSelect.Type.Assembly);
-                    string typePath = isImGui
-                        ? $"{typeName}.{typeNamespace}({typeShort})"
-                        : $"{typeName}<color=#add8e6>.{typeNamespace}({typeShort})</color>";
-                    dropdownListValue.Add(typePath, default, true);
-                    dropdownListValue.AddSeparator();
-                }
-
+                // if (methodSelect.Type != preType)
+                // {
+                //     preType = methodSelect.Type;
+                //     // dropdownListValue.AddSeparator();
+                //     string typeName = methodSelect.Type.Name;
+                //     string typeNamespace = methodSelect.Type.Namespace;
+                //     string typeShort = TypeReference.GetShortAssemblyName(methodSelect.Type.Assembly);
+                //     string typePath = isImGui
+                //         ? $"{typeName}.{typeNamespace}({typeShort})"
+                //         : $"{typeShort}/{typeNamespace}/{typeName}";
+                //     dropdownListValue.Add(typePath, default, true);
+                //     // dropdownListValue.AddSeparator();
+                // }
+                string typeName = methodSelect.Type.Name;
+                string typeNamespace = methodSelect.Type.Namespace;
+                string typeShort = TypeReference.GetShortAssemblyName(methodSelect.Type.Assembly);
                 MethodInfo methodInfo = methodSelect.MethodInfo;
-
                 string methodPath = StringifyMethod(
                     methodInfo.Name,
                     methodInfo.GetParameters().Select(each => each.ParameterType),
                     methodInfo.ReturnType);
 
-                dropdownListValue.Add(methodPath, methodSelect);
+                string fullPath = $"{typeShort}/{typeNamespace}/{typeName}/{methodPath}";
+
+                dropdownListValue.Add(fullPath, methodSelect);
             }
 
             return new AdvancedDropdownMetaInfo
