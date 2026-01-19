@@ -1,0 +1,18 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/ScriptableRenderer/TitleStyle.uss?fileID=7433441132597879392&amp;guid=3c00e87a70854c84da17e635c1cd49c2&amp;type=3#TitleStyle"/>
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/RightFoldoutRotate.uss?fileID=7433441132597879392&amp;guid=0a3ebc4f4793a5d48ba5bfc122a7eda4&amp;type=3#RightFoldoutRotate"/>
+    <ui:Button name="titleButton" class="titleButton">
+        <ui:VisualElement name="left" class="left" style="flex-grow: 1;">
+            <ui:VisualElement name="foldoutContainer" class="foldoutContainer">
+                <ui:VisualElement name="foldoutIcon" class="saints-right-foldout-rotate foldoutIcon" style="rotate: 90deg;"/>
+            </ui:VisualElement>
+            <ui:Toggle name="toggleActive" class="toggleActive"/>
+            <ui:Label text="Label" name="titleLabel" style="color: rgb(128, 128, 128);"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="right" class="right">
+            <ui:Button name="helpButton" class="iconButton helpButton" style="display: none;"/>
+            <ui:Button name="contextMenuButton" class="iconButton contextMenuButton"/>
+        </ui:VisualElement>
+    </ui:Button>
+    <ui:VisualElement name="content" style="flex-grow: 1;"/>
+</ui:UXML>

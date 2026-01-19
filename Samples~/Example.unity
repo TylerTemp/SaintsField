@@ -17674,12 +17674,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fruit:
-    rid: -2
+    rid: 4694674293314290248
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 4694674293314290248
+      type: {class: ReferencePickerBase/Base1Fruit, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8, asm: SaintsField.Samples}
+      data:
+        base1: {fileID: 0}
 --- !u!114 &1098124222
 MonoBehaviour:
   m_ObjectHideFlags: 0

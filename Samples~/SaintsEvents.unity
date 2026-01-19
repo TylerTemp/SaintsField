@@ -197,6 +197,18 @@ MonoBehaviour:
       returnType:
         _typeNameAndAssembly: System.Void, mscorlib
         _monoScriptGuid: 
+    - callState: 1
+      methodName: get_didStart
+      isStatic: 0
+      target: {fileID: 1896239866}
+      staticType:
+        _typeNameAndAssembly: SaintsField.Samples.Scripts.SaintsEventExamples.EventNotMatch,
+          SaintsField.Samples.SaintsEvent
+        _monoScriptGuid: 
+      persistentArguments: []
+      returnType:
+        _typeNameAndAssembly: System.Boolean, mscorlib
+        _monoScriptGuid: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
