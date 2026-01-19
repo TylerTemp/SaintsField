@@ -1,6 +1,8 @@
 using UnityEngine;
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+#endif
 
 namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {

@@ -1,5 +1,4 @@
 using SaintsField.Playa;
-using SaintsField.ScriptableRenderer;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.ScriptableRenderer
@@ -11,7 +10,7 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
 #endif
     public class ScriptableRendererDataTarget:
 #if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
-        SaintsScriptableRendererData
+        SaintsField.ScriptableRenderer.SaintsScriptableRendererData
 #else
         ScriptableObject
 #endif
