@@ -13,6 +13,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Playa;
 using UnityEngine;
@@ -1413,8 +1414,8 @@ namespace SaintsField.Editor.Utils
                         }
 
 
-                        FlagsDropdownAttribute flagsDropdownAttribute = new FlagsDropdownAttribute();
-                        FlagsDropdownAttributeDrawer flagsDropdownDrawer = (FlagsDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(FlagsDropdownAttributeDrawer), fieldInfo, flagsDropdownAttribute, label);
+                        FlagsTreeDropdownAttribute flagsDropdownAttribute = new FlagsTreeDropdownAttribute();
+                        FlagsTreeDropdownAttributeDrawer flagsDropdownDrawer = (FlagsTreeDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(FlagsTreeDropdownAttributeDrawer), fieldInfo, flagsDropdownAttribute, label);
                         flagsDropdownDrawer.OverridePropertyAttributes = new[] { flagsDropdownAttribute };
                         flagsDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
                         return flagsDropdownDrawer.CreatePropertyGUI(property);
@@ -1425,11 +1426,11 @@ namespace SaintsField.Editor.Utils
                         return null;
                     }
 
-                    AdvancedDropdownAttribute advancedDropdownAttribute = new AdvancedDropdownAttribute();
-                    AdvancedDropdownAttributeDrawer advancedDropdownDrawer = (AdvancedDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(AdvancedDropdownAttributeDrawer), fieldInfo, advancedDropdownAttribute, label);
-                    advancedDropdownDrawer.OverridePropertyAttributes = new[] { advancedDropdownAttribute };
-                    advancedDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
-                    return advancedDropdownDrawer.CreatePropertyGUI(property);
+                    TreeDropdownAttribute treeDropdownAttribute = new TreeDropdownAttribute();
+                    TreeDropdownAttributeDrawer treeDropdownDrawer = (TreeDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(TreeDropdownAttributeDrawer), fieldInfo, treeDropdownAttribute, label);
+                    treeDropdownDrawer.OverridePropertyAttributes = new[] { treeDropdownAttribute };
+                    treeDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
+                    return treeDropdownDrawer.CreatePropertyGUI(property);
                 }
                 case SerializedPropertyType.Vector2:
                 {
