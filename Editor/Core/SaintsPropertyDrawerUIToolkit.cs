@@ -618,6 +618,8 @@ namespace SaintsField.Editor.Core
                 style =
                 {
                     // width = Length.Percent(100),
+                    flexGrow = 1,
+                    flexShrink = 1,
                 },
                 name = NameSaintsPropertyDrawerRoot(property),
                 // userData = this,
