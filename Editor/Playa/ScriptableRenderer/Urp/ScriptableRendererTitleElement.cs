@@ -5,10 +5,10 @@ using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.Rendering.Universal.Urp;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Playa.ScriptableRenderer
+namespace SaintsField.Editor.Playa.ScriptableRenderer.Urp
 {
 #if UNITY_6000_0_OR_NEWER
     [UxmlElement]

@@ -1,25 +1,18 @@
-using SaintsField.Playa;
+using SaintsField.ScriptableRenderer.Urp;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts.ScriptableRenderer
+namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
 {
 #if SAINTSFIELD_DEBUG
     [CreateAssetMenu(
         fileName = "ScriptableRendererDataTarget",
         menuName = "SAINTSFIELD_DEBUG/ScriptableRendererDataTarget")]
 #endif
-    public class ScriptableRendererDataTarget:
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
-        SaintsField.ScriptableRenderer.SaintsScriptableRendererData
-#else
-        ScriptableObject
-#endif
+    public class ScriptableRendererDataTarget: SaintsScriptableRendererData
     {
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
         protected override UnityEngine.Rendering.Universal.ScriptableRenderer Create()
         {
             return new ScriptableRendererExample(this);
         }
-#endif
     }
 }

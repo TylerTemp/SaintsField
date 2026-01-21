@@ -1,4 +1,4 @@
-namespace SaintsField.Samples.Scripts.ScriptableRenderer
+namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
 {
     public class ScriptableRendererExample
 #if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
