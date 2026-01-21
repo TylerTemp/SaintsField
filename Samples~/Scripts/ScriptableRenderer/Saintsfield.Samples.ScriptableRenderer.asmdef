@@ -4,7 +4,8 @@
     "references": [
         "SaintsField.Runtime",
         "Unity.RenderPipelines.Universal.Runtime",
-        "SaintsField.Runtime.ScriptableRenderer"
+        "SaintsField.Runtime.ScriptableRenderer",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -37,6 +37,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  content: 
 --- !u!114 &-1312479251019426137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,12 +110,6 @@ MonoBehaviour:
   - {fileID: 3929410240289315763}
   m_RendererFeatureMap: 5a5fcaba09ff72a1a796ea331323c9edb31b3a6dcb118836
   m_UseNativeRenderPass: 0
-  curve1:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &3929410240289315763
 MonoBehaviour:
   m_ObjectHideFlags: 0
