@@ -1,12 +1,11 @@
 using SaintsField.Playa;
 using UnityEngine;
-
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace SaintsField.Samples.Scripts.ScriptableRenderer
+namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
 {
-    public class MyRendererFeature: SaintsField.ScriptableRenderer.SaintsScriptableRendererFeature
+    public class MyRendererFeature: SaintsField.ScriptableRenderer.Urp.SaintsScriptableRendererFeature
     {
 
         class MyPass : ScriptableRenderPass
@@ -33,7 +32,6 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
         {
             renderer.EnqueuePass(_pass);
         }
-
         [LayoutStart("Hor", ELayout.Horizontal | ELayout.FoldoutBox)]
 
         [CurveRange]

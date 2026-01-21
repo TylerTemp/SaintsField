@@ -290,7 +290,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             SerializedObject serializedRendererFeaturesEditor = rendererFeatureEditor?.serializedObject;
             // serializedRendererFeaturesEditor.Update();
 
-            ScriptableRendererTitleElement titleElement = new ScriptableRendererTitleElement(serializedRendererFeaturesEditor, () =>
+            Urp.ScriptableRendererTitleElement titleElement = new Urp.ScriptableRendererTitleElement(serializedRendererFeaturesEditor, () =>
             {
                 Type type = typeof(ScriptableRendererDataEditor);
 
