@@ -1,4 +1,5 @@
 using SaintsField.Playa;
+using SaintsField.ScriptableRenderer;
 using UnityEngine;
 // ReSharper disable once RedundantUsingDirective
 using UnityEngine.Rendering;
@@ -6,7 +7,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {
-    public class MyRendererFeature: SaintsField.ScriptableRenderer.Urp.SaintsScriptableRendererFeature
+    public class MyRendererFeature: SaintsScriptableRendererFeature
     {
         private class MyPass : ScriptableRenderPass
         {

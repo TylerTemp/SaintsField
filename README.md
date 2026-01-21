@@ -8453,6 +8453,38 @@ Result:
 
 ![](https://github.com/user-attachments/assets/0c5de2fb-53ae-471b-8b03-3c18040b1854)
 
+To use URP, inherent from `SaintsUniversalRendererData`:
+
+```csharp
+    public class MyUniversalRendererData : SaintsUniversalRendererData
+    {
+        [SerializeField, LabelText("<color=OrangeRed><icon=star.png/><label/>")] public AnimationCurve animationCurve;
+
+#if UNITY_EDITOR
+        internal class CreateSaintsUniversalRendererAsset : EndNameEditAction
+        {
+            public override void Action(int instanceId, string pathName, string resourceFile)
+            {
+                MyUniversalRendererData rendererData = CreateInstance<MyUniversalRendererData>();
+                // rendererData.postProcessData = PostProcessData.GetDefaultPostProcessData();
+                AssetDatabase.CreateAsset(rendererData, pathName);
+                ResourceReloader.ReloadAllNullIn(rendererData, UniversalRenderPipelineAsset.packagePath);
+                Selection.activeObject = rendererData;
+            }
+        }
+
+#if SAINTSFIELD_DEBUG
+        [MenuItem("Assets/Create/Rendering/My URP Universal Renderer", priority = CoreUtils.Sections.section3 + CoreUtils.Priorities.assetsCreateRenderingMenuPriority + 2)]
+#endif
+        private static void CreateUniversalRendererData()
+        {
+            Texture2D icon = CoreUtils.GetIconForType<ScriptableRendererData>();
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateSaintsUniversalRendererAsset >(), "New Custom Universal Renderer Data.asset", icon, null);
+        }
+#endif
+    }
+```
+
 Note: this requires you to enable `SaintsEditor` in project too. If you can not, you also need to inherent from `SaintsScriptableRendererFeature`
 
 ```csharp
