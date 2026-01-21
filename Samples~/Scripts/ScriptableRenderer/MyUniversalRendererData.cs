@@ -1,18 +1,16 @@
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEditor.ProjectWindowCallback;
-#endif
 
 using SaintsField.ScriptableRenderer.Urp;
+using UnityEditor;
+using UnityEditor.ProjectWindowCallback;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
+namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {
     public class MyUniversalRendererData : SaintsUniversalRendererData
     {
-        [SerializeField] public AnimationCurve animationCurve;
+        [SerializeField, LabelText("<color=OrangeRed><icon=star.png/><label/>")] public AnimationCurve animationCurve;
 
 #if UNITY_EDITOR
         internal class CreateSaintsUniversalRendererAsset : EndNameEditAction

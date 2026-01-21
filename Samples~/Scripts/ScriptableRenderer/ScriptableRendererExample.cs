@@ -1,4 +1,4 @@
-namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
+namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {
     public class ScriptableRendererExample : UnityEngine.Rendering.Universal.ScriptableRenderer
     {

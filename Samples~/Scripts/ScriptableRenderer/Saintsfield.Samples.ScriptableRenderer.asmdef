@@ -1,5 +1,5 @@
 {
-    "name": "SaintsField.Samples.ScriptableRenderer.Urp",
+    "name": "Saintsfield.Samples.ScriptableRenderer",
     "rootNamespace": "SaintsField",
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
@@ -22,6 +22,11 @@
             "name": "com.unity.render-pipelines.universal",
             "expression": "",
             "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL"
+        },
+        {
+          "name": "com.unity.render-pipelines.universal",
+          "expression": "17.0.0",
+          "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17"
         }
     ],
     "noEngineReferences": false

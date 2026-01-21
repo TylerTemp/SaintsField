@@ -1,7 +1,7 @@
 using SaintsField.ScriptableRenderer.Urp;
 using UnityEngine;
 
-namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
+namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {
 #if SAINTSFIELD_DEBUG
     [CreateAssetMenu(

@@ -1,30 +1,32 @@
 using SaintsField.Playa;
 using UnityEngine;
+// ReSharper disable once RedundantUsingDirective
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
+namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {
     public class MyRendererFeature: SaintsField.ScriptableRenderer.Urp.SaintsScriptableRendererFeature
     {
-
-        class MyPass : ScriptableRenderPass
+        private class MyPass : ScriptableRenderPass
         {
+#if !SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
             public override void Execute(
                 ScriptableRenderContext context,
                 ref RenderingData renderingData)
             {
                 // Custom rendering logic
             }
+#endif
         }
 
-        MyPass _pass;
+        private MyPass _pass;
 
         public override void Create()
         {
             _pass = new MyPass
             {
-                renderPassEvent = RenderPassEvent.AfterRenderingOpaques
+                renderPassEvent = RenderPassEvent.AfterRenderingOpaques,
             };
         }
 
@@ -37,6 +39,8 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
         [CurveRange]
         public AnimationCurve curve1;
 
+        // [LabelText("<color=Chartreuse>Hi! <label/>")]
+        [InfoBox("SaintsField rendered!")]
         [ResizableTextArea] public string content;
     }
 }
