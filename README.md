@@ -95,7 +95,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.5**
+**5.8.6**
 
 1.  Add: Support URP `UniversalRendererData` editor
 2.  Fix: Fields in `SaintsUniversalRendererData`, `SaintsScriptableRendererData` can now be rendered correctly

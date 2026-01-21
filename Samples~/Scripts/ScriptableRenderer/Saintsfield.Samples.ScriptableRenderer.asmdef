@@ -5,7 +5,8 @@
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
         "GUID:15fc0a57446b3144c949da3e2b9737a9",
         "GUID:df380645f10b7bc4b97d4f5eb6303d95",
-        "GUID:0718cca377a2460184e9e836d6f214ee"
+        "GUID:0718cca377a2460184e9e836d6f214ee",
+        "GUID:3eae0364be2026648bf74846acb8a731"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -24,9 +25,9 @@
             "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL"
         },
         {
-          "name": "com.unity.render-pipelines.universal",
-          "expression": "17.0.0",
-          "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17"
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "17.0.0",
+            "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17"
         }
     ],
     "noEngineReferences": false

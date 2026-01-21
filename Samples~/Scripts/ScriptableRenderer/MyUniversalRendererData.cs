@@ -1,6 +1,8 @@
 using SaintsField.ScriptableRenderer;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
+#endif
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -25,7 +27,7 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
         }
 
 #if SAINTSFIELD_DEBUG
-        [MenuItem("Assets/Create/Rendering/My URP Universal Renderer", priority = CoreUtils.Sections.section3 + CoreUtils.Priorities.assetsCreateRenderingMenuPriority + 2)]
+        [MenuItem("Assets/Create/Rendering/My URP Universal Renderer")]
 #endif
         private static void CreateUniversalRendererData()
         {
