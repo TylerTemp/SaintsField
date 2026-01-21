@@ -95,13 +95,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.4**
+**5.8.5**
 
-1.  Fix: `Searchable` rendered twice
-2.  Add: config to display `Searchable` to all inspector. Default is on.
-3.  Add: Support for ScriptableRendererData [#356](https://github.com/TylerTemp/SaintsField/issues/356)
-4.  Fix: `SaintsEvent` error when UI Toolkit clone elements in Unity 6k.3, fix error when try to remove on empty list [#357](https://github.com/TylerTemp/SaintsField/issues/357)
-5.  Improve: `SaintsEvent` dropdown now uses `TreeDropdown`
+1.  Add: Support URP `UniversalRendererData` editor
+2.  Fix: Fields in `SaintsUniversalRendererData`, `SaintsScriptableRendererData` can now be rendered correctly
+3.  Add: you can now use `SaintsEditorCore` to integerate `SaintsEditor` with other Editor plugin
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -8388,6 +8386,52 @@ public class ToggleInputRenderer: AbsRenderer
 
 [![video](https://github.com/user-attachments/assets/922d2cf8-267f-4c9c-b30e-c77fb4ed6675)](https://github.com/user-attachments/assets/6feb2f62-6396-4347-87ec-686874524a3a)
 
+
+### Integerate ###
+
+You can integrate `SaintsEditor` with other editors.
+
+```csharp
+public class MyEditorCore: SaintsEditorCore
+{
+    public MyEditorCore(UnityEditor.Editor editor, bool editorShowMonoScript) : base(editor, editorShowMonoScript)
+    {
+    }
+
+    public override IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+    {
+        if(fieldWithInfo.FieldInfo?.Name == "...")  // skip a field
+        {
+            return Array.Empty<IReadOnlyList<AbsRenderer>>();
+        }
+        if(fieldWithInfo.PlayaAttributes?.Any(each => each is ShowInInspectorAttribute || each is ButtonAttribute))  // render ShowInInspector/Button 
+        {
+            return base.MakeRenderer(so, fieldWithInfo);
+        }
+        // Otherwise, do not render it
+        return Array.Empty<IReadOnlyList<AbsRenderer>>();
+    }
+}
+```
+
+Then, in your editor script:
+
+```csharp
+[CustomEditor(typeof(MyTargetType), true)]
+public class IntegerateSaintsEditor: MyEditor 
+{
+    public override VisualElement CreateInspectorGUI() 
+    {
+        VisualElement root = new VisualElement();
+        root.Bind(serializedObject);
+        
+        root.Add(CreateInspectorGUI());  // Fill with default behavior
+        root.Add(new MyEditorCore(this).CreateInspectorGUI());  // Fill with SaintsEditor
+        return root;
+    }
+}
+```
+
 ### Netcode for Game Objects ###
 
 Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) uses a custom editor that
@@ -8456,34 +8500,15 @@ Result:
 To use URP, inherent from `SaintsUniversalRendererData`:
 
 ```csharp
-    public class MyUniversalRendererData : SaintsUniversalRendererData
-    {
-        [SerializeField, LabelText("<color=OrangeRed><icon=star.png/><label/>")] public AnimationCurve animationCurve;
+using SaintsField.ScriptableRenderer;
 
-#if UNITY_EDITOR
-        internal class CreateSaintsUniversalRendererAsset : EndNameEditAction
-        {
-            public override void Action(int instanceId, string pathName, string resourceFile)
-            {
-                MyUniversalRendererData rendererData = CreateInstance<MyUniversalRendererData>();
-                // rendererData.postProcessData = PostProcessData.GetDefaultPostProcessData();
-                AssetDatabase.CreateAsset(rendererData, pathName);
-                ResourceReloader.ReloadAllNullIn(rendererData, UniversalRenderPipelineAsset.packagePath);
-                Selection.activeObject = rendererData;
-            }
-        }
-
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Assets/Create/Rendering/My URP Universal Renderer", priority = CoreUtils.Sections.section3 + CoreUtils.Priorities.assetsCreateRenderingMenuPriority + 2)]
-#endif
-        private static void CreateUniversalRendererData()
-        {
-            Texture2D icon = CoreUtils.GetIconForType<ScriptableRendererData>();
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateSaintsUniversalRendererAsset >(), "New Custom Universal Renderer Data.asset", icon, null);
-        }
-#endif
-    }
+public class MyUniversalRendererData : SaintsUniversalRendererData
+{
+    // ...
+}
 ```
+
+![](https://github.com/user-attachments/assets/e25bc1a9-8b9e-48c6-84a1-9be7e8f6781e)
 
 Note: this requires you to enable `SaintsEditor` in project too. If you can not, you also need to inherent from `SaintsScriptableRendererFeature`
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.8.5 ##
+
+1.  Add: Support URP `UniversalRendererData` editor
+2.  Fix: Fields in `SaintsUniversalRendererData`, `SaintsScriptableRendererData` can now be rendered correctly
+3.  Add: you can now use `SaintsEditorCore` to integerate `SaintsEditor` with other Editor plugin
+
 ## 5.8.4 ##
 
 1.  Fix: `Searchable` rendered twice
