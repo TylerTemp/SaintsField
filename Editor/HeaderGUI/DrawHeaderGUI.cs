@@ -799,7 +799,7 @@ namespace SaintsField.Editor.HeaderGUI
 
         private static readonly Dictionary<object, ISearchable> SearchableSaintsEditors = new Dictionary<object, ISearchable>();
 
-        public static void SaintsEditorEnqueueSearchable(SaintsEditor saintsEditor)
+        public static void SaintsEditorEnqueueSearchable(ISearchable saintsEditor)
         {
             SearchableSaintsEditors[saintsEditor.target] = saintsEditor;
             // if (!SearchableSaintsEditors.Contains(saintsEditor))

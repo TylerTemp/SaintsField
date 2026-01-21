@@ -245,6 +245,13 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
 
             OnRenderingModeChanged(mRenderingMode, mDepthPrimingMode, overrideStencil, mDefaultStencilState);
 
+
+            #region SaintsEditor
+
+            root.Add(new SaintsUniversalRendererDataEditorCore(this, false).CreateInspectorGUI());
+
+            #endregion
+
             root.Add(new ScriptableRendererDataCore(this).CreateInspectorGUI());
 
             return root;

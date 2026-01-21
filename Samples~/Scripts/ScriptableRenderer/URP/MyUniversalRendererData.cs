@@ -4,6 +4,7 @@ using UnityEditor.ProjectWindowCallback;
 #endif
 
 using SaintsField.ScriptableRenderer;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -11,12 +12,14 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
 {
     public class MyUniversalRendererData : SaintsUniversalRendererData
     {
+        [SerializeField] public AnimationCurve animationCurve;
+
 #if UNITY_EDITOR
         internal class CreateSaintsUniversalRendererAsset : EndNameEditAction
         {
             public override void Action(int instanceId, string pathName, string resourceFile)
             {
-                var rendererData = CreateInstance<MyUniversalRendererData>();
+                MyUniversalRendererData rendererData = CreateInstance<MyUniversalRendererData>();
                 // rendererData.postProcessData = PostProcessData.GetDefaultPostProcessData();
                 AssetDatabase.CreateAsset(rendererData, pathName);
                 ResourceReloader.ReloadAllNullIn(rendererData, UniversalRenderPipelineAsset.packagePath);
@@ -27,9 +30,9 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer.URP
 #if SAINTSFIELD_DEBUG
         [MenuItem("Assets/Create/Rendering/My URP Universal Renderer", priority = CoreUtils.Sections.section3 + CoreUtils.Priorities.assetsCreateRenderingMenuPriority + 2)]
 #endif
-        static void CreateUniversalRendererData()
+        private static void CreateUniversalRendererData()
         {
-            var icon = CoreUtils.GetIconForType<ScriptableRendererData>();
+            Texture2D icon = CoreUtils.GetIconForType<ScriptableRendererData>();
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateSaintsUniversalRendererAsset >(), "New Custom Universal Renderer Data.asset", icon, null);
         }
 #endif
