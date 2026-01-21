@@ -41,6 +41,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 case "m_AssetVersion":
                 case "m_PrepassLayerMask":
                 case "m_TransparentLayerMask":
+                case "shaders":
                     return Array.Empty<IReadOnlyList<AbsRenderer>>();
                 default:
                     // Debug.Log(fieldWithInfo.FieldInfo.Name);

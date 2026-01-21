@@ -1,8 +1,11 @@
 using System;
+// ReSharper disable once RedundantUsingDirective
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
+// ReSharper disable once RedundantUsingDirective
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+// ReSharper disable once RedundantUsingDirective
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.ScriptableRenderer;
@@ -120,6 +123,15 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             }
 #endif
 
+            VisualElement renderingPathSub = new VisualElement
+            {
+                style =
+                {
+                    marginLeft = SaintsPropertyDrawer.IndentWidth,
+                },
+            };
+            renderingSection.Add(renderingPathSub);
+
             #region m_AccurateGbufferNormals
 
             SerializedProperty mAccurateGbufferNormals = serializedObject.FindProperty("m_AccurateGbufferNormals");
@@ -127,7 +139,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             {
                 tooltip = "Normals in G-buffer use octahedron encoding/decoding. This improves visual quality but might reduce performance.",
             };
-            renderingSection.Add(_mAccurateGbufferNormalsField);
+            renderingPathSub.Add(_mAccurateGbufferNormalsField);
 
             #endregion
 
@@ -136,13 +148,13 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             {
                 tooltip = "With depth priming enabled, Unity uses the depth buffer generated in the depth prepass to determine if a fragment should be rendered or skipped during the Base Camera opaque pass. Disabled: Unity does not perform depth priming. Auto: If there is a Render Pass that requires a depth prepass, Unity performs the depth prepass and depth priming. Forced: Unity performs the depth prepass and depth priming.",
             };
-            renderingSection.Add(_mDepthPrimingModeField);
+            renderingPathSub.Add(_mDepthPrimingModeField);
             _mDepthPrimingModeField.TrackPropertyValue(mDepthPrimingMode, p => OnRenderingModeChanged(mRenderingMode, p, overrideStencil, mDefaultStencilState));
 
             _depthPrimingMSAAWarningHelpBox = new HelpBox("Depth priming is not supported because MSAA is enabled.", HelpBoxMessageType.Warning);
-            renderingSection.Add(_depthPrimingMSAAWarningHelpBox);
+            renderingPathSub.Add(_depthPrimingMSAAWarningHelpBox);
             _depthPrimingModeInfoHelpBox = new HelpBox("On Android, iOS, and Apple TV, Unity performs depth priming only in Forced mode.", HelpBoxMessageType.Info);
-            renderingSection.Add(_depthPrimingModeInfoHelpBox);
+            renderingPathSub.Add(_depthPrimingModeInfoHelpBox);
 
             #region RenderPass
 #if URP_COMPATIBILITY_MODE
@@ -195,6 +207,21 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             });
             #endregion
 
+            #region RenderPass
+#if !UNITY_6000_3_OR_NEWER
+            SerializedProperty mUseNativeRenderPass = serializedObject.FindProperty("m_UseNativeRenderPass");
+            if (mUseNativeRenderPass != null)
+            {
+                TitleGroupElement renderPassSection = new TitleGroupElement("RenderPass", "This section contains properties related to render passes.");
+                root.Add(renderPassSection);
+                renderPassSection.Add(new PropertyField(mUseNativeRenderPass, "Native RenderPass")
+                {
+                    tooltip = "Enables URP to use RenderPass API. Has no effect on OpenGLES2",
+                });
+            }
+#endif
+            #endregion
+
 
             #region ShadowsSection
             TitleGroupElement shadowsSection = new TitleGroupElement("Shadows", "This section contains properties related to rendering shadows.");
@@ -217,7 +244,16 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             toggle.AddToClassList(PostProcessDataToggleField.alignedFieldUssClassName);
             postProcessingSection.Add(toggle);
 
-            postProcessingSection.Add(new PropertyField(serializedObject.FindProperty("postProcessData"), "Data")
+            VisualElement enabledSub = new VisualElement()
+            {
+                style =
+                {
+                    marginLeft = SaintsPropertyDrawer.IndentWidth,
+                },
+            };
+            postProcessingSection.Add(enabledSub);
+
+            enabledSub.Add(new PropertyField(serializedObject.FindProperty("postProcessData"), "Data")
             {
                 tooltip = "The asset containing references to shaders and Textures that the Renderer uses for post-processing.",
             });
@@ -237,6 +273,18 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             };
             overridesSection.Add(mDefaultStencilStateField);
             mDefaultStencilStateField.RegisterValueChangeCallback(_ => OnRenderingModeChanged(mRenderingMode, mDepthPrimingMode, overrideStencil, mDefaultStencilState));
+
+            #endregion
+
+            #region Compatibility
+
+            SerializedProperty mIntermediateTextureMode = serializedObject.FindProperty("m_IntermediateTextureMode");
+            TitleGroupElement compatibilitySection = new TitleGroupElement("Compatibility", null);
+            root.Add(compatibilitySection);
+            compatibilitySection.Add(new PropertyField(mIntermediateTextureMode, "Intermediate Texture")
+            {
+                tooltip = "Controls when URP renders via an intermediate texture.",
+            });
 
             #endregion
 
