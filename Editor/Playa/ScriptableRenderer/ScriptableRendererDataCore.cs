@@ -103,6 +103,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 style =
                 {
                     fontSize = 13,
+                    unityFontStyleAndWeight = FontStyle.Bold,
                     paddingTop = 5,
                     paddingBottom = 8,
                     borderBottomWidth = 1,

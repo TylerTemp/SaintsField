@@ -1594,12 +1594,5 @@ namespace SaintsField.Editor
         }
 
         // private UnityEvent<string> _onSearchUIToolkit = new UnityEvent<string>();
-
-        private void OnSearch(string search)
-        {
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-            OnSearchUIToolkit(search);
-#endif
-        }
     }
 }

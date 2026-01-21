@@ -23,7 +23,7 @@ namespace SaintsField.Editor
 
         private ToolbarSearchField _toolbarSearchField;
         private IReadOnlyList<ISaintsRenderer> _hasElementRenderersUIToolkit = Array.Empty<ISaintsRenderer>();
-        private IReadOnlyList<ISaintsRenderer> _allRenderersUIToolkit = Array.Empty<ISaintsRenderer>();
+        public IReadOnlyList<ISaintsRenderer> _allRenderersUIToolkit { get; private set; } = Array.Empty<ISaintsRenderer>();
 
         public SaintsEditorCore(UnityEditor.Editor editor, bool editorShowMonoScript)
         {

@@ -24,7 +24,6 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
         private static readonly Dictionary<string, bool> CustomViewDataCache = new Dictionary<string, bool>();
 
         private readonly VisualElement _foldoutIcon;
-        private readonly Label _titleLabel;
         private bool _expanded = true;
 
         public ScriptableRendererTitleElement() : this(null, null)
@@ -76,13 +75,13 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             };
             #endregion
 
-            _titleLabel = element.Q<Label>(name: "titleLabel");
+            Label titleLabel = element.Q<Label>(name: "titleLabel");
 
             if (rendererFeatureSo == null)
             {
                 _expanded = true;
                 RefreshExpand();
-                _titleLabel.text = "Missing";
+                titleLabel.text = "Missing";
                 return;
             }
 
@@ -92,18 +91,18 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             toggleActive.TrackPropertyValue(activeProperty, p =>
             {
                 bool active = p.boolValue;
-                _titleLabel.style.color = active ? Color.white : Color.gray;
+                titleLabel.style.color = active ? Color.white : Color.gray;
             });
-            _titleLabel.style.color = activeProperty.boolValue ? Color.white : Color.gray;
+            titleLabel.style.color = activeProperty.boolValue ? Color.white : Color.gray;
 
             SerializedProperty nameProperty = rendererFeatureSo.FindProperty("m_Name");
             // Debug.Log(nameProperty.stringValue);
-            _titleLabel.TrackPropertyValue(nameProperty, p =>
+            titleLabel.TrackPropertyValue(nameProperty, p =>
             {
                 // string newName = p.stringValue;
-                _titleLabel.text = GetCustomTitle(rendererFeatureSo.targetObject);
+                titleLabel.text = GetCustomTitle(rendererFeatureSo.targetObject);
             });
-            _titleLabel.text = GetCustomTitle(rendererFeatureSo.targetObject);
+            titleLabel.text = GetCustomTitle(rendererFeatureSo.targetObject);
 
             Button helpButton = element.Q<Button>(name: "helpButton");
             string helpURL = TryGetHelpURL(rendererFeatureSo.targetObject.GetType());
