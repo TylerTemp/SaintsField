@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.8.6 ##
+## 5.8.7 ##
 
 1.  Add: Support URP `UniversalRendererData` editor
 2.  Fix: Fields in `SaintsUniversalRendererData`, `SaintsScriptableRendererData` can now be rendered correctly

@@ -16,14 +16,14 @@ namespace SaintsField.Editor
     public class SaintsEditorCore: IMakeRenderer, IDOTweenPlayRecorder
     {
         private readonly UnityEditor.Editor _editor;
-        private UnityEngine.Object target => _editor;
-        private UnityEngine.Object[] targets => _editor.targets;
-        private SerializedObject serializedObject => _editor.serializedObject;
+        private UnityEngine.Object Target => _editor.target;
+        private UnityEngine.Object[] Targets => _editor.targets;
+        private SerializedObject SerializedObject => _editor.serializedObject;
         private readonly bool _editorShowMonoScript;
 
         private ToolbarSearchField _toolbarSearchField;
         private IReadOnlyList<ISaintsRenderer> _hasElementRenderersUIToolkit = Array.Empty<ISaintsRenderer>();
-        public IReadOnlyList<ISaintsRenderer> _allRenderersUIToolkit { get; private set; } = Array.Empty<ISaintsRenderer>();
+        public IReadOnlyList<ISaintsRenderer> AllRenderersUIToolkit { get; private set; } = Array.Empty<ISaintsRenderer>();
 
         public SaintsEditorCore(UnityEditor.Editor editor, bool editorShowMonoScript)
         {
@@ -33,14 +33,14 @@ namespace SaintsField.Editor
 
         public VisualElement CreateInspectorGUI()
         {
-            if (!target)
+            if (!Target)
             {
                 return new HelpBox("The target object is null. Check for missing scripts.", HelpBoxMessageType.Error);
             }
 
             VisualElement root = new VisualElement();
 
-            Type objectType = target.GetType();
+            Type objectType = Target.GetType();
             IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
 
             // foreach (ISaintsRenderer saintsRenderer in GetClassStructRenderer(objectType, playaClassAttributes, serializedObject, targets))
@@ -52,7 +52,7 @@ namespace SaintsField.Editor
             //     }
             // }
 
-            MonoScript monoScript = SaintsEditor.GetMonoScript(target);
+            MonoScript monoScript = SaintsEditor.GetMonoScript(Target);
             if(monoScript)
             {
                 ObjectField objectField = new ObjectField("Script")
@@ -63,7 +63,7 @@ namespace SaintsField.Editor
                     objectType = typeof(MonoScript),
                 };
                 objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
-                objectField.Bind(serializedObject);
+                objectField.Bind(SerializedObject);
                 objectField.SetEnabled(false);
                 if(!_editorShowMonoScript)
                 {
@@ -117,11 +117,11 @@ namespace SaintsField.Editor
 
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
 
-            _allRenderersUIToolkit = SaintsEditor.Setup(Array.Empty<string>(), serializedObject, this, targets);
+            AllRenderersUIToolkit = SaintsEditor.Setup(Array.Empty<string>(), SerializedObject, this, Targets);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
             List<ISaintsRenderer> usedRenderers = new List<ISaintsRenderer>();
-            foreach (ISaintsRenderer saintsRenderer in _allRenderersUIToolkit)
+            foreach (ISaintsRenderer saintsRenderer in AllRenderersUIToolkit)
             {
                 // Debug.Log($"renderer={saintsRenderer}");
                 VisualElement ve = saintsRenderer.CreateVisualElement();

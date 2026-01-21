@@ -37,7 +37,7 @@ namespace SaintsField.Editor
 
         private void OnDestroyUIToolkit()
         {
-            foreach (ISaintsRenderer saintsRenderer in _coreEditor?._allRenderersUIToolkit ?? Array.Empty<ISaintsRenderer>())
+            foreach (ISaintsRenderer saintsRenderer in _coreEditor?.AllRenderersUIToolkit ?? Array.Empty<ISaintsRenderer>())
             {
                 saintsRenderer.OnDestroy();
             }
