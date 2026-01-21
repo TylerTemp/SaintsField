@@ -178,6 +178,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 tooltip = "Controls after which pass URP copies the scene depth. It has a significant impact on mobile devices bandwidth usage. It also allows to force a depth prepass to generate it.",
             });
             // m_DepthAttachmentFormat
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
             _depthAttachmentFormatBtn = UIToolkitUtils.MakeDropdownButtonUIToolkit("Depth Attachment Format");
             renderingSection.Add(_depthAttachmentFormatBtn);
             _depthAttachmentFormatBtn.labelElement.tooltip = "Which format to use (if it is supported) when creating _CameraDepthAttachment.";
@@ -186,6 +187,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             _depthAttachmentFormatBtn.TrackPropertyValue(depthAttachmentFormatProp, UpdateDepthAttachmentFormatLabel);
             _depthAttachmentFormatBtn.ButtonElement.clicked += OnDepthAttachmentFormatClick;
             UIToolkitUtils.AddContextualMenuManipulator(_depthAttachmentFormatBtn, depthAttachmentFormatProp, () => {});
+#endif
 
             renderingSection.Add(new PropertyField(serializedObject.FindProperty("m_DepthTextureFormat"), "Depth Texture Format")
             {
@@ -338,6 +340,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             }
         }
 
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
         private void OnDepthAttachmentFormatClick()
         {
             SerializedProperty mDepthAttachmentFormatProp = serializedObject.FindProperty("m_DepthAttachmentFormat");
@@ -372,6 +375,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             UnityEditor.PopupWindow.Show(worldBound, sa);
         }
 
+
         private void UpdateDepthAttachmentFormatLabel(SerializedProperty mDepthAttachmentFormatProp)
         {
             int mDepthAttachmentFormat = mDepthAttachmentFormatProp.intValue;
@@ -388,6 +392,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             _depthAttachmentFormatBtn.ButtonLabelElement.text = $"<color=red>?</color> {mDepthAttachmentFormat}";
             _depthAttachmentFormatBtn.ButtonElement.tooltip = $"Invalid: {mDepthAttachmentFormat}";
         }
+
 
         private MethodInfo _populateCompatibleDepthFormatsMethod;
         private FieldInfo _mDepthFormatStringsField;
@@ -442,12 +447,16 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 }
             }
         }
+#endif
 
         private void OnRenderingModeChanged(SerializedProperty renderingModeProp, SerializedProperty mDepthPrimingMode, SerializedProperty overrideStencil, SerializedProperty mDefaultStencilState)
         {
             // ReSharper disable once MergeIntoLogicalPattern
-            bool mAccurateGbufferNormalsFieldDisplay = renderingModeProp.intValue == (int)RenderingMode.Deferred ||
-                                                renderingModeProp.intValue == (int)RenderingMode.DeferredPlus;
+            bool mAccurateGbufferNormalsFieldDisplay = renderingModeProp.intValue == (int)RenderingMode.Deferred
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
+                                                       || renderingModeProp.intValue == (int)RenderingMode.DeferredPlus
+#endif
+                                                       ;
             UIToolkitUtils.SetDisplayStyle(_mAccurateGbufferNormalsField, mAccurateGbufferNormalsFieldDisplay? DisplayStyle.Flex: DisplayStyle.None);
 
             // ReSharper disable once MergeIntoLogicalPattern
@@ -476,7 +485,9 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             UIToolkitUtils.SetDisplayStyle(_depthPrimingModeInfoHelpBox, depthPrimingModeInfoDisplay? DisplayStyle.Flex: DisplayStyle.None);
 
             bool usesDeferredLighting = renderingModeProp.intValue == (int)RenderingMode.Deferred;
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
             usesDeferredLighting |= renderingModeProp.intValue == (int)RenderingMode.DeferredPlus;
+#endif
 
             bool invalidStencilOverrideError = false;
             if (overrideStencil.boolValue && usesDeferredLighting)
