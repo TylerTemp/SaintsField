@@ -8,18 +8,11 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
         fileName = "ScriptableRendererDataTarget",
         menuName = "SAINTSFIELD_DEBUG/ScriptableRendererDataTarget")]
 #endif
-    public class ScriptableRendererDataTarget:
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
-        SaintsField.ScriptableRenderer.SaintsScriptableRendererData
-#else
-        ScriptableObject
-#endif
+    public class ScriptableRendererDataTarget: SaintsField.ScriptableRenderer.SaintsScriptableRendererData
     {
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
         protected override UnityEngine.Rendering.Universal.ScriptableRenderer Create()
         {
             return new ScriptableRendererExample(this);
         }
-#endif
     }
 }

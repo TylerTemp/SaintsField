@@ -1,20 +1,13 @@
 using SaintsField.Playa;
 using UnityEngine;
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
+
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-#endif
 
 namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {
-    public class MyRendererFeature:
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
-        SaintsField.ScriptableRenderer.SaintsScriptableRendererFeature
-#else
-        UnityEngine.ScriptableObject
-#endif
+    public class MyRendererFeature: SaintsField.ScriptableRenderer.SaintsScriptableRendererFeature
     {
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
 
         class MyPass : ScriptableRenderPass
         {
@@ -40,7 +33,6 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
         {
             renderer.EnqueuePass(_pass);
         }
-#endif
 
         [LayoutStart("Hor", ELayout.Horizontal | ELayout.FoldoutBox)]
 

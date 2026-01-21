@@ -1,12 +1,8 @@
 namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {
-    public class ScriptableRendererExample
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
-        : UnityEngine.Rendering.Universal.ScriptableRenderer
-#endif
+    public class ScriptableRendererExample : UnityEngine.Rendering.Universal.ScriptableRenderer
     {
 
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL
         public ScriptableRendererExample(UnityEngine.Rendering.Universal.ScriptableRendererData data) : base(data)
         {
         }
@@ -15,8 +11,6 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
         public override void Setup(UnityEngine.Rendering.ScriptableRenderContext context, ref UnityEngine.Rendering.Universal.RenderingData renderingData)
         {
         }
-#endif
-
 #endif
     }
 }
