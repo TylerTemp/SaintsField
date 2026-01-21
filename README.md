@@ -8425,7 +8425,7 @@ public class IntegerateSaintsEditor: MyEditor
         VisualElement root = new VisualElement();
         root.Bind(serializedObject);
         
-        root.Add(CreateInspectorGUI());  // Fill with default behavior
+        root.Add(base.CreateInspectorGUI());  // Fill with default behavior
         root.Add(new MyEditorCore(this).CreateInspectorGUI());  // Fill with SaintsEditor
         return root;
     }
