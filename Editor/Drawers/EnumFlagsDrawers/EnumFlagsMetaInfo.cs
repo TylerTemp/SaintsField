@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
 
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
 {
     public struct EnumFlagsMetaInfo
     {
-        public Dictionary<int, EnumFlagsUtil.EnumDisplayInfo> BitValueToName;
-        public int AllCheckedInt;
+        public Type EnumType;
+        public Dictionary<long, EnumFlagsUtil.EnumDisplayInfo> BitValueToName;
+        public long AllCheckedLong;
         public bool HasFlags;
     }
 }

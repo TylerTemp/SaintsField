@@ -27,12 +27,12 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             _checkboxIndeterminateTexture2D = Util.LoadResource<Texture2D>("checkbox-outline-indeterminate.png");
         }
 
-        private static IEnumerable<KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo>> GetDisplayBit(EnumFlagsMetaInfo metaInfo)
+        private static IEnumerable<KeyValuePair<long, EnumFlagsUtil.EnumDisplayInfo>> GetDisplayBit(EnumFlagsMetaInfo metaInfo)
         {
             if (metaInfo.HasFlags)
             {
                 return metaInfo.BitValueToName
-                    .Where(each => each.Key != 0 && each.Key != metaInfo.AllCheckedInt);
+                    .Where(each => each.Key != 0L && each.Key != metaInfo.AllCheckedLong);
 
             }
             return metaInfo.BitValueToName;

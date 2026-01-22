@@ -106,7 +106,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
                     return;
                 }
 
-                if ((clipboardInt & _enumMeta.AllCheckedInt) != clipboardInt)
+                if ((clipboardInt & _enumMeta.AllCheckedLong) != clipboardInt)
                 {
                     return;
                 }
@@ -123,7 +123,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
 
         private void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            AdvancedDropdownMetaInfo metaInfo = EnumFlagsUtil.GetDropdownMetaInfo(property.intValue, _enumMeta.AllCheckedInt, _enumMeta.BitValueToName);
+            EnumFlagsMetaInfo enumInfo =  EnumFlagsUtil.GetMetaInfo(property, info);
+            AdvancedDropdownMetaInfo metaInfo = EnumFlagsUtil.GetDropdownMetaInfo(EnumFlagsUtil.GetSerializedPropertyEnumValue(enumInfo.EnumType, property), _enumMeta.AllCheckedLong, _enumMeta.BitValueToName);
 
             (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 
@@ -134,26 +135,26 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer
                 true,
                 (curItem, on) =>
                 {
-                    int selectedValue = (int)curItem;
-                    int newMask;
+                    long selectedValue = (long)curItem;
+                    long newMask;
                     if (selectedValue == 0)
                     {
                         newMask = 0;
                     }
                     else if (on)
                     {
-                        newMask = property.intValue | selectedValue;
+                        newMask = EnumFlagsUtil.GetSerializedPropertyEnumValue(enumInfo.EnumType, property) | selectedValue;
                     }
                     else
                     {
                         newMask = EnumFlagsUtil.SetOffBit(property.intValue, selectedValue);
                     }
 
-                    property.intValue = newMask;
+                    EnumFlagsUtil.SetSerializedPropertyEnumValue(enumInfo.EnumType, property, newMask);
                     property.serializedObject.ApplyModifiedProperties();
                     onValueChangedCallback(curItem);
-                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newMask);
-                    return EnumFlagsUtil.GetDropdownMetaInfo(newMask, _enumMeta.AllCheckedInt, _enumMeta.BitValueToName).CurValues;
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, Enum.ToObject(enumInfo.EnumType, newMask));
+                    return EnumFlagsUtil.GetDropdownMetaInfo(newMask, _enumMeta.AllCheckedLong, _enumMeta.BitValueToName).CurValues;
                 }
             );
 

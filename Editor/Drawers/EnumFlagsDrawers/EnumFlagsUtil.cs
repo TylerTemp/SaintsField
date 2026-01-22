@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             public string RichName;
         }
 
-        private static string GetNameFromInt(IReadOnlyDictionary<int, EnumDisplayInfo> bitValueToName, int selectedInt, string fallback)
+        private static string GetNameFromLong(IReadOnlyDictionary<long, EnumDisplayInfo> bitValueToName, long selectedInt, string fallback)
         {
             if(bitValueToName.TryGetValue(selectedInt, out EnumDisplayInfo info))
             {
@@ -34,15 +34,25 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             return fallback;
         }
 
-        public static AdvancedDropdownMetaInfo GetDropdownMetaInfo(int curMask, int fullMask, IReadOnlyDictionary<int, EnumDisplayInfo> bitValueToName)
+        public static long GetSerializedPropertyEnumValue(Type enumType, SerializedProperty property)
         {
-            AdvancedDropdownList<object> dropdownListValue = new AdvancedDropdownList<object>
+            if (enumType.GetEnumUnderlyingType() == typeof(uint))
             {
-                {GetNameFromInt(bitValueToName, 0, "Nothing"), 0},
-                {GetNameFromInt(bitValueToName, fullMask,"Everything"), fullMask},
+                return property.uintValue;
+            }
+
+            return property.intValue;
+        }
+
+        public static AdvancedDropdownMetaInfo GetDropdownMetaInfo(long curMask, long fullMask, IReadOnlyDictionary<long, EnumDisplayInfo> bitValueToName)
+        {
+            AdvancedDropdownList<long> dropdownListValue = new AdvancedDropdownList<long>
+            {
+                {GetNameFromLong(bitValueToName, 0L, "Nothing"), 0},
+                {GetNameFromLong(bitValueToName, fullMask,"Everything"), fullMask},
             };
             dropdownListValue.AddSeparator();
-            foreach (KeyValuePair<int, EnumDisplayInfo> kv in bitValueToName.Where(each => each.Key != 0 & each.Key != fullMask))
+            foreach (KeyValuePair<long, EnumDisplayInfo> kv in bitValueToName.Where(each => each.Key != 0 & each.Key != fullMask))
             {
                 dropdownListValue.Add(kv.Value.HasRichName? kv.Value.RichName: kv.Value.Name, kv.Key);
             }
@@ -89,11 +99,16 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             Type enumType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;;
             bool hasFlags = enumType.GetCustomAttributes(typeof(FlagsAttribute), true).Length > 0;
 
-            Dictionary<int, EnumDisplayInfo> allIntToName = Enum
+            Dictionary<long, EnumDisplayInfo> allIntToName = Enum
                 .GetValues(enumType)
                 .Cast<object>()
                 .ToDictionary(
-                    each => (int) each,
+                    each =>
+                    {
+                        return Convert.ToInt64(each);
+                        // Debug.Log(each);
+                        // return (long)each;
+                    },
                     each =>
                     {
                         string normalName = Enum.GetName(enumType, each);
@@ -111,16 +126,17 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
                     }
                 );
 
-            int allCheckedInt = allIntToName.Keys.Aggregate(0, (acc, value) => acc | value);
-            Dictionary<int, EnumDisplayInfo> bitValueToName = allIntToName
+            long allCheckedInt = allIntToName.Keys.Aggregate(0L, (acc, value) => acc | value);
+            Dictionary<long, EnumDisplayInfo> bitValueToName = allIntToName
                 // .Where(each => each.Key != 0 && each.Key != allCheckedInt)
                 // .Where(each => each.Key != 0 && each.Key != allCheckedInt)
                 .ToDictionary(each => each.Key, each => each.Value);
             return new EnumFlagsMetaInfo
             {
+                EnumType = enumType,
                 HasFlags = hasFlags,
                 BitValueToName = bitValueToName,
-                AllCheckedInt = allCheckedInt,
+                AllCheckedLong = allCheckedInt,
             };
         }
 
@@ -316,6 +332,18 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers
             }
 
             return new EnumMetaInfo(enumNormalValues, everythingValue, nothingValue, everythingBit, isFlags, enumType);
+        }
+
+        public static void SetSerializedPropertyEnumValue(Type enumType, SerializedProperty property, long newMask)
+        {
+            if (enumType == typeof(uint))
+            {
+                property.uintValue = (uint)newMask;
+            }
+            else
+            {
+                property.intValue = (int)newMask;
+            }
         }
     }
 }

@@ -105,7 +105,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
                     return;
                 }
 
-                if ((clipboardInt & _enumMeta.AllCheckedInt) != clipboardInt)
+                if ((clipboardInt & _enumMeta.AllCheckedLong) != clipboardInt)
                 {
                     return;
                 }
@@ -122,7 +122,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
 
         private void MakeDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            AdvancedDropdownMetaInfo metaInfo = EnumFlagsUtil.GetDropdownMetaInfo(property.intValue, _enumMeta.AllCheckedInt, _enumMeta.BitValueToName);
+            AdvancedDropdownMetaInfo metaInfo = EnumFlagsUtil.GetDropdownMetaInfo(property.intValue, _enumMeta.AllCheckedLong, _enumMeta.BitValueToName);
 
             (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 

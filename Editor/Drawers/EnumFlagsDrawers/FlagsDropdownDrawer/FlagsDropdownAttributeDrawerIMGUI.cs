@@ -37,7 +37,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             FieldInfo info, object parent)
         {
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
-            AdvancedDropdownMetaInfo dropdownMetaInfo = EnumFlagsUtil.GetDropdownMetaInfo(property.intValue, metaInfo.AllCheckedInt, metaInfo.BitValueToName);
+            AdvancedDropdownMetaInfo dropdownMetaInfo = EnumFlagsUtil.GetDropdownMetaInfo(
+                EnumFlagsUtil.GetSerializedPropertyEnumValue(metaInfo.EnumType, property),
+                metaInfo.AllCheckedLong,
+                metaInfo.BitValueToName);
             _error = dropdownMetaInfo.Error;
 
             #region Dropdown

@@ -141,17 +141,18 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     return;
                 }
 
-                property.intValue = (int)userData;
+                EnumFlagsUtil.SetSerializedPropertyEnumValue(metaInfo.EnumType, property, Convert.ToInt64(userData));
                 property.serializedObject.ApplyModifiedProperties();
             };
             flagButtonFullToggleGroupElement.HCheckAllButton.clicked += () =>
             {
-                property.intValue = (int)metaInfo.EverythingBit;
+                long toggle = Convert.ToInt64(metaInfo.EverythingBit);
+                EnumFlagsUtil.SetSerializedPropertyEnumValue(metaInfo.EnumType, property, toggle);
                 property.serializedObject.ApplyModifiedProperties();
             };
             flagButtonFullToggleGroupElement.HEmptyButton.clicked += () =>
             {
-                property.intValue = 0;
+                EnumFlagsUtil.SetSerializedPropertyEnumValue(metaInfo.EnumType, property, 0);
                 property.serializedObject.ApplyModifiedProperties();
             };
 
@@ -210,14 +211,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 });
                 flagButtonsArrangeElement.OnButtonClicked.AddListener(value =>
                 {
-                    int toggle = (int)value;
+                    long toggle = Convert.ToInt64(value);
 
-                    int newValue = EnumFlagsUtil.ToggleBit(property.intValue, toggle);
+                    long newValue = EnumFlagsUtil.ToggleBit(property.intValue, toggle);
 
-                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
-                        parent, newValue);
-                    property.intValue = newValue;
+                    EnumFlagsUtil.SetSerializedPropertyEnumValue(metaInfo.EnumType, property, newValue);
                     property.serializedObject.ApplyModifiedProperties();
+                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
+                        parent, Enum.ToObject(metaInfo.EnumType, newValue));
                 });
                 RefreshCurValue();
                 flagButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshCurValue());

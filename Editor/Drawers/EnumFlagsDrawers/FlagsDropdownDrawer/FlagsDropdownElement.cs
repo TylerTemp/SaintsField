@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
                 return;
             }
 
-            if((newValue & _metaInfo.AllCheckedInt) == _metaInfo.AllCheckedInt)
+            if((newValue & _metaInfo.AllCheckedLong) == _metaInfo.AllCheckedLong)
             {
                 string label = "<b>Everything</b>";
 

@@ -146,12 +146,12 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 {
                     (Rect toggleAllButtonRect, Rect afterToggleAllButtonRect) =
                         RectUtils.SplitWidthRect(drawRect, EditorGUIUtility.singleLineHeight);
-                    using (new EditorGUI.DisabledScope(EnumFlagsUtil.IsOn(curValue, metaInfo.AllCheckedInt)))
+                    using (new EditorGUI.DisabledScope(EnumFlagsUtil.IsOn(curValue, metaInfo.AllCheckedLong)))
                     {
                         if (GUI.Button(toggleAllButtonRect, _checkboxCheckedTexture2D, _iconButtonStyle))
                         {
-                            property.intValue = metaInfo.AllCheckedInt;
-                            onGUIPayload.SetValue(metaInfo.AllCheckedInt);
+                            property.intValue = (int)metaInfo.AllCheckedLong;
+                            onGUIPayload.SetValue(metaInfo.AllCheckedLong);
                         }
                     }
 
@@ -197,7 +197,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 {
                     toggleTexture = _checkboxEmptyTexture2D;
                 }
-                else if (EnumFlagsUtil.IsOn(curValue, metaInfo.AllCheckedInt))
+                else if (EnumFlagsUtil.IsOn(curValue, metaInfo.AllCheckedLong))
                 {
                     toggleTexture = _checkboxCheckedTexture2D;
                 }
@@ -210,8 +210,8 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 {
                     if (curValue == 0)
                     {
-                        property.intValue = metaInfo.AllCheckedInt;
-                        onGUIPayload.SetValue(metaInfo.AllCheckedInt);
+                        property.intValue = (int)metaInfo.AllCheckedLong;
+                        onGUIPayload.SetValue(metaInfo.AllCheckedLong);
                     }
                     else
                     {
@@ -225,9 +225,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
             Rect accToggleBitFieldButtonRect = afterToggleButtonRect;
             // ReSharper disable once UseDeconstruction
-            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> kv in GetDisplayBit(metaInfo))
+            foreach (KeyValuePair<long, EnumFlagsUtil.EnumDisplayInfo> kv in GetDisplayBit(metaInfo))
             {
-                int bit = kv.Key;
+                long bit = kv.Key;
 
                 bool isOn = metaInfo.HasFlags? EnumFlagsUtil.IsOn(curValue, bit): curValue == bit;
 
@@ -254,10 +254,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     {
                         if (GUI.Button(drawRichRect, GUIContent.none, _miniButtonStyle))
                         {
-                            int newValue = metaInfo.HasFlags? EnumFlagsUtil.ToggleBit(curValue, bit):  bit;
+                            long newValue = metaInfo.HasFlags? EnumFlagsUtil.ToggleBit(curValue, bit):  bit;
                             if (newValue != curValue)
                             {
-                                property.intValue = newValue;
+                                property.intValue = (int)newValue;
                                 onGUIPayload.SetValue(newValue);
                             }
                         }
@@ -293,11 +293,11 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     {
                         if (GUI.Button(drawBitRect, bitButtonText, _miniButtonStyle))
                         {
-                            int newValue = metaInfo.HasFlags? EnumFlagsUtil.ToggleBit(curValue, bit): bit;
+                            long newValue = metaInfo.HasFlags? EnumFlagsUtil.ToggleBit(curValue, bit): bit;
                             if (newValue != curValue)
                             {
                                 // Debug.Log($"{curValue} -> {newValue}");
-                                property.intValue = newValue;
+                                property.intValue = (int)newValue;
                                 onGUIPayload.SetValue(newValue);
                             }
                         }
@@ -428,9 +428,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             float xOffset = 0;
             float yOffset = 0;
             // ReSharper disable once UseDeconstruction
-            foreach (KeyValuePair<int, EnumFlagsUtil.EnumDisplayInfo> kv in GetDisplayBit(metaInfo))
+            foreach (KeyValuePair<long, EnumFlagsUtil.EnumDisplayInfo> kv in GetDisplayBit(metaInfo))
             {
-                int bit = kv.Key;
+                long bit = kv.Key;
                 EnumFlagsUtil.EnumDisplayInfo displayInfo = kv.Value;
 
                 float useWidth;
@@ -454,7 +454,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     yOffset += EditorGUIUtility.singleLineHeight;
                     yield return new FlexButton
                     {
-                        Bit = bit,
+                        Bit = (int)bit,
                         X = 0,
                         YOffset = yOffset,
                         Width = useWidth,
@@ -468,7 +468,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     // Debug.Log($"K {displayInfo.Name} width={width}, xOffset={xOffset}, useWidth={useWidth}, leftWidth={leftWidth}");
                     yield return new FlexButton
                     {
-                        Bit = bit,
+                        Bit = (int)bit,
                         X = xOffset,
                         YOffset = yOffset,
                         Width = useWidth,

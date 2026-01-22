@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
     [CustomPropertyDrawer(typeof(FlagsDropdownAttribute), true)]
     public partial class FlagsDropdownAttributeDrawer: SaintsPropertyDrawer
     {
-        private static string GetSelectedNames(IReadOnlyDictionary<int, EnumFlagsUtil.EnumDisplayInfo> bitValueToName, int selectedInt)
+        private static string GetSelectedNames(IReadOnlyDictionary<long, EnumFlagsUtil.EnumDisplayInfo> bitValueToName, long selectedInt)
         {
             string[] names = bitValueToName.Where(kv => EnumFlagsUtil.IsOn(selectedInt, kv.Key)).Select(kv => kv.Value.HasRichName? kv.Value.RichName.Split('/').Last(): kv.Value.Name).ToArray();
             return names.Length == 0? "-":  string.Join(",", names);
