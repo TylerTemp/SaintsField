@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer.Urp
 
                 genericDropdownMenu.AddItem("Remove", false, onRemove.Invoke);
 
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER
                 if(rendererFeatureSo?.targetObject?.GetType() == typeof(FullScreenPassRendererFeature))
                 {
                     genericDropdownMenu.AddSeparator("");

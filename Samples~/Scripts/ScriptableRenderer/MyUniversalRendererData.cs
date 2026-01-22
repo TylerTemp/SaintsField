@@ -31,7 +31,7 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
 #endif
         private static void CreateUniversalRendererData()
         {
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER
             Texture2D icon = CoreUtils.GetIconForType<ScriptableRendererData>();
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateSaintsUniversalRendererAsset >(), "New Custom Universal Renderer Data.asset", icon, null);
 #endif

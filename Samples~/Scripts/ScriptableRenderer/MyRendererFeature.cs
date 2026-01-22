@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
     {
         private class MyPass : ScriptableRenderPass
         {
-#if !SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
+#if !SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER
             public override void Execute(
                 ScriptableRenderContext context,
                 ref RenderingData renderingData)

@@ -95,11 +95,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.7**
+**5.8.8**
 
-1.  Add: Support URP `UniversalRendererData` editor
-2.  Fix: Fields in `SaintsUniversalRendererData`, `SaintsScriptableRendererData` can now be rendered correctly
-3.  Add: you can now use `SaintsEditorCore` to integerate `SaintsEditor` with other Editor plugin
+1.  Fix: enum underlying of non-int (byte, short, uint etc) did not work [#359](https://github.com/TylerTemp/SaintsField/issues/359)
+2.  Fix: `SaintsEditorWindow` displays an unwanted field
+3.  Fix: Incorrect URP version checker which gives an error on URP 17.0.x [#360](https://github.com/TylerTemp/SaintsField/issues/360)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

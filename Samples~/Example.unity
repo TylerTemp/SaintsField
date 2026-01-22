@@ -26795,7 +26795,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86b1d7254bad0b247a3e1a45fc50fe88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue278EnumUnderNotInt
-  defaultPicker: 0
+  defaultPickerUInt: 5
+  treePickerSingleUInt: 0
+  treePickerUInt: 6
+  togglePickerUInt: 3
+  valuePickerUInt: 2
+  defaultPickerByte: 1
+  treePickerSingleByte: 2
+  treePickerByte: 3
+  togglePickerByte: 7
+  valuePickerByte: 2
 --- !u!1 &1762957544
 GameObject:
   m_ObjectHideFlags: 0

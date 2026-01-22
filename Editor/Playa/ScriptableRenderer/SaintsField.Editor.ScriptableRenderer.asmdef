@@ -29,8 +29,8 @@
         },
         {
             "name": "com.unity.render-pipelines.universal",
-            "expression": "17.0.0",
-            "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17"
+            "expression": "17.1.0",
+            "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER"
         }
     ],
     "noEngineReferences": false

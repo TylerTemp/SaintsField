@@ -190,7 +190,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 tooltip = "Controls after which pass URP copies the scene depth. It has a significant impact on mobile devices bandwidth usage. It also allows to force a depth prepass to generate it.",
             });
             // m_DepthAttachmentFormat
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER
             _depthAttachmentFormatBtn = UIToolkitUtils.MakeDropdownButtonUIToolkit("Depth Attachment Format");
             renderingSection.Add(_depthAttachmentFormatBtn);
             _depthAttachmentFormatBtn.labelElement.tooltip = "Which format to use (if it is supported) when creating _CameraDepthAttachment.";
@@ -388,7 +388,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             }
         }
 
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER
         private void OnDepthAttachmentFormatClick()
         {
             SerializedProperty mDepthAttachmentFormatProp = serializedObject.FindProperty("m_DepthAttachmentFormat");
@@ -501,7 +501,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
         {
             // ReSharper disable once MergeIntoLogicalPattern
             bool mAccurateGbufferNormalsFieldDisplay = renderingModeProp.intValue == (int)RenderingMode.Deferred
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER
                                                        || renderingModeProp.intValue == (int)RenderingMode.DeferredPlus
 #endif
                                                        ;
@@ -533,7 +533,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             UIToolkitUtils.SetDisplayStyle(_depthPrimingModeInfoHelpBox, depthPrimingModeInfoDisplay? DisplayStyle.Flex: DisplayStyle.None);
 
             bool usesDeferredLighting = renderingModeProp.intValue == (int)RenderingMode.Deferred;
-#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER
             usesDeferredLighting |= renderingModeProp.intValue == (int)RenderingMode.DeferredPlus;
 #endif
 
