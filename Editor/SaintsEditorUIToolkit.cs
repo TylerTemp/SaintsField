@@ -25,7 +25,7 @@ namespace SaintsField.Editor
         public override VisualElement CreateInspectorGUI()
         {
             _saintsEditorIMGUI = false;
-            _coreEditor = new SaintsEditorCore(this, EditorShowMonoScript);
+            _coreEditor = new SaintsEditorCore(this, EditorShowMonoScript, this);
             VisualElement root = _coreEditor.CreateInspectorGUI();
 
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
