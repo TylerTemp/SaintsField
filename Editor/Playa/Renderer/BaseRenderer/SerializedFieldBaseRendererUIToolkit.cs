@@ -41,6 +41,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 bindingPath = property.propertyPath;
             }
 
+#if UNITY_2023_2_OR_NEWER
             // [EventInterest(new System.Type[] {typeof (SerializedPropertyBindEvent)})]
             protected override void HandleEventBubbleUp(EventBase evt)
             {
@@ -50,6 +51,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 // this.Reset(evt1);
                 evt.StopPropagation();
             }
+#endif
         }
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
