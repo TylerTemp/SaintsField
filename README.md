@@ -95,9 +95,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.9**
+**5.9.0**
 
-Fix: some field might not get rendered if it uses relative path binding internally (e.g. `Physics LowLevel Settings 2D`)
+1.  **Breaking Changes**: Remove `DOTweenPlayStart`/`DOTweenPlayEnd` due to the complexity them introduce.
+2.  Fix: `DOTweenPlay` did not work.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

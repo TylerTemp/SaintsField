@@ -1,6 +1,6 @@
 # Changelog
 
-## WIP ##
+## 5.9.0 ##
 
 1.  **Breaking Changes**: Remove `DOTweenPlayStart`/`DOTweenPlayEnd` due to the complexity them introduce.
 2.  Fix: `DOTweenPlay` did not work.
