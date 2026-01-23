@@ -1,0 +1,349 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19300, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: Physics LowLevel Settings 2D
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.LowLevelPhysics2D.PhysicsLowLevelSettings2D
+  m_PhysicsLayerNames:
+    m_Names:
+    - Default
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+  m_UseFullLayers: 0
+  m_PhysicsWorldDefinition:
+    m_Gravity: {x: 0, y: -9.81}
+    m_SimulationType: 0
+    m_SimulationSubSteps: 4
+    m_SimulationWorkers: 64
+    m_TransformWriteMode: 1
+    m_TransformPlane: 0
+    m_TransformTweening: 1
+    m_SleepingAllowed: 1
+    m_ContinuousAllowed: 1
+    m_ContactFilterCallbacks: 0
+    m_PreSolveCallbacks: 0
+    m_AutoBodyUpdateCallbacks: 0
+    m_AutoContactCallbacks: 0
+    m_AutoTriggerCallbacks: 0
+    m_AutoJointThresholdCallbacks: 0
+    m_BounceThreshold: 1
+    m_ContactHitEventThreshold: 1
+    m_ContactFrequency: 30
+    m_ContactDamping: 10
+    m_ContactSpeed: 3
+    m_MaximumLinearSpeed: 400
+    m_DrawOptions: 4256
+    m_DrawFillOptions: 7
+    m_DrawThickness: 2
+    m_DrawFillAlpha: 0.1
+    m_DrawPointScale: 1
+    m_DrawNormalScale: 1
+    m_DrawImpulseScale: 1
+    m_DrawCapacity: 0
+    m_DrawColors:
+      transformAxisX: {r: 0, g: 1, b: 1, a: 1}
+      transformAxisY: {r: 0, g: 0.5019608, b: 0, a: 1}
+      bodyBad: {r: 1, g: 0, b: 0, a: 1}
+      bodyDisabled: {r: 0.4392157, g: 0.5019608, b: 0.5647059, a: 1}
+      bodyAwake: {r: 0.5647059, g: 0.93333334, b: 0.5647059, a: 1}
+      bodyStatic: {r: 0.4392157, g: 0.5019608, b: 0.5647059, a: 1}
+      bodyKinematic: {r: 0.11764706, g: 0.5647059, b: 1, a: 1}
+      bodyTimeOfImpactEvent: {r: 0, g: 1, b: 0, a: 1}
+      bodyFastCollisions: {r: 0.2509804, g: 0.8784314, b: 0.8156863, a: 1}
+      bodyMovingFast: {r: 0.6784314, g: 1, b: 0.18431373, a: 1}
+      bodySpeedCapped: {r: 1, g: 0.27058825, b: 0, a: 1}
+      shapeTrigger: {r: 0.9607843, g: 0.87058824, b: 0.7019608, a: 1}
+      shapeOther: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+      shapeBounds: {r: 0.4117647, g: 0.4117647, b: 0.4117647, a: 1}
+      contactSpeculative: {r: 0.827451, g: 0.827451, b: 0.827451, a: 1}
+      contactAdded: {r: 0, g: 0.5019608, b: 0, a: 1}
+      contactPersisted: {r: 0, g: 0, b: 1, a: 1}
+      contactNormal: {r: 0.4117647, g: 0.4117647, b: 0.4117647, a: 1}
+      contactImpulse: {r: 1, g: 0, b: 1, a: 1}
+      contactFriction: {r: 1, g: 1, b: 0, a: 1}
+      solverIsland: {r: 0.18431373, g: 0.30980393, b: 0.30980393, a: 1}
+  m_PhysicsBodyDefinition:
+    m_BodyType: 2
+    m_BodyConstraints: 0
+    m_TransformWriteMode: 3
+    m_Position: {x: 0, y: 0}
+    m_Rotation:
+      direction: {x: 1, y: 0}
+    m_LinearVelocity: {x: 0, y: 0}
+    m_AngularVelocity: 0
+    m_LinearDamping: 0
+    m_AngularDamping: 0
+    m_GravityScale: 1
+    m_SleepThreshold: 0.05
+    m_FastRotationAllowed: 0
+    m_FastCollisionsAllowed: 0
+    m_SleepingAllowed: 1
+    m_Awake: 1
+    m_Enabled: 1
+  m_PhysicsShapeDefinition:
+    surfaceMaterial:
+      m_Friction: 0.6
+      m_Bounciness: 0
+      m_FrictionMixing: 1
+      m_BouncinessMixing: 4
+      m_FrictionPriority: 0
+      m_BouncinessPriority: 0
+      m_RollingResistance: 0
+      m_TangentSpeed: 0
+      m_CustomColor:
+        serializedVersion: 2
+        rgba: 0
+    contactFilter:
+      m_Categories:
+        bitMask: 1
+      m_Contacts:
+        bitMask: 18446744073709551615
+      m_GroupIndex: 0
+    m_Density: 1
+    m_IsTrigger: 0
+    m_TriggerEvents: 0
+    m_ContactEvents: 0
+    m_HitEvents: 0
+    m_ContactFilterCallbacks: 0
+    m_PreSolveCallbacks: 0
+    m_StartStaticContacts: 1
+    m_StartMassUpdate: 1
+  m_PhysicsChainDefinition:
+    m_SurfaceMaterial:
+      m_Friction: 0.6
+      m_Bounciness: 0
+      m_FrictionMixing: 1
+      m_BouncinessMixing: 4
+      m_FrictionPriority: 0
+      m_BouncinessPriority: 0
+      m_RollingResistance: 0
+      m_TangentSpeed: 0
+      m_CustomColor:
+        serializedVersion: 2
+        rgba: 0
+    m_ContactFilter:
+      m_Categories:
+        bitMask: 1
+      m_Contacts:
+        bitMask: 18446744073709551615
+      m_GroupIndex: 0
+    m_IsLoop: 1
+    m_TriggerEvents: 0
+  m_PhysicsDistanceJointDefinition:
+    m_LocalAnchorA:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_LocalAnchorB:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_Distance: 1
+    m_EnableSpring: 0
+    m_SpringFrequency: 0
+    m_SpringDamping: 0
+    m_SpringLowerForce: -3.4028235e+38
+    m_SpringUpperForce: 3.4028235e+38
+    m_EnableMotor: 0
+    m_MotorSpeed: 0
+    m_MaxMotorForce: 0
+    m_EnableLimit: 0
+    m_MinDistanceLimit: 0
+    m_MaxDistanceLimit: 100000
+    m_ForceThreshold: 1000000
+    m_TorqueThreshold: 1000000
+    m_TuningFrequency: 60
+    m_TuningDamping: 2
+    m_DrawScale: 1
+    m_CollideConnected: 0
+  m_PhysicsFixedJointDefinition:
+    m_LocalAnchorA:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_LocalAnchorB:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_LinearFrequency: 0
+    m_LinearDamping: 0
+    m_AngularFrequency: 0
+    m_AngularDamping: 0
+    m_ForceThreshold: 1000000
+    m_TorqueThreshold: 1000000
+    m_TuningFrequency: 60
+    m_TuningDamping: 2
+    m_DrawScale: 1
+    m_CollideConnected: 0
+  m_PhysicsHingeJointDefinition:
+    m_LocalAnchorA:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_LocalAnchorB:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_EnableSpring: 0
+    m_SpringTargetAngle: 0
+    m_SpringFrequency: 0
+    m_SpringDamping: 0
+    m_EnableMotor: 0
+    m_MotorSpeed: 0
+    m_MaxMotorTorque: 0
+    m_EnableLimit: 0
+    m_LowerAngleLimit: 0
+    m_UpperAngleLimit: 0
+    m_ForceThreshold: 1000000
+    m_TorqueThreshold: 1000000
+    m_TuningFrequency: 60
+    m_TuningDamping: 2
+    m_DrawScale: 1
+    m_CollideConnected: 0
+  m_PhysicsRelativeJointDefinition:
+    m_LocalAnchorA:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_LocalAnchorB:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_LinearVelocity: {x: 0, y: 0}
+    m_AngularVelocity: 0
+    m_MaxForce: 0
+    m_MaxTorque: 0
+    m_SpringLinearFrequency: 0
+    m_SpringAngularFrequency: 0
+    m_SpringLinearDamping: 0
+    m_SpringAngularDamping: 0
+    m_SpringMaxForce: 0
+    m_SpringMaxTorque: 0
+    m_ForceThreshold: 1000000
+    m_TorqueThreshold: 1000000
+    m_TuningFrequency: 60
+    m_TuningDamping: 2
+    m_DrawScale: 1
+    m_CollideConnected: 0
+  m_PhysicsSliderJointDefinition:
+    m_LocalAnchorA:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_LocalAnchorB:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_EnableSpring: 0
+    m_SpringTargetTranslation: 0
+    m_SpringFrequency: 0
+    m_SpringDamping: 0
+    m_EnableMotor: 0
+    m_MotorSpeed: 0
+    m_MaxMotorForce: 0
+    m_EnableLimit: 0
+    m_LowerTranslationLimit: 0
+    m_UpperTranslationLimit: 0
+    m_ForceThreshold: 1000000
+    m_TorqueThreshold: 1000000
+    m_TuningFrequency: 60
+    m_TuningDamping: 2
+    m_DrawScale: 1
+    m_CollideConnected: 0
+  m_PhysicsWheelJointDefinition:
+    m_LocalAnchorA:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_LocalAnchorB:
+      position: {x: 0, y: 0}
+      rotation:
+        direction: {x: 1, y: 0}
+    m_EnableSpring: 1
+    m_SpringFrequency: 1
+    m_SpringDamping: 0.7
+    m_EnableMotor: 0
+    m_MotorSpeed: 0
+    m_MaxMotorTorque: 0
+    m_EnableLimit: 0
+    m_LowerTranslationLimit: 0
+    m_UpperTranslationLimit: 0
+    m_ForceThreshold: 1000000
+    m_TorqueThreshold: 1000000
+    m_TuningFrequency: 60
+    m_TuningDamping: 2
+    m_DrawScale: 1
+    m_CollideConnected: 0
+  m_ConcurrentSimulations: 2
+  m_LengthUnitsPerMeter: 1
+  m_DrawInBuild: 0
+  m_BypassLowLevel: 0
