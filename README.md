@@ -95,11 +95,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.8**
+**5.8.9**
 
-1.  Fix: enum underlying of non-int (byte, short, uint etc) did not work [#359](https://github.com/TylerTemp/SaintsField/issues/359)
-2.  Fix: `SaintsEditorWindow` displays an unwanted field
-3.  Fix: Incorrect URP version checker which gives an error on URP 17.0.x [#360](https://github.com/TylerTemp/SaintsField/issues/360)
+Fix: some field might not get rendered if it uses relative path binding internally (e.g. `Physics LowLevel Settings 2D`)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

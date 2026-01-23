@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.8.9 ##
+
+Fix: some field might not get rendered if it uses relative path binding internally (e.g. `Physics LowLevel Settings 2D`)
+
 ## 5.8.8 ##
 
 1.  Fix: enum underlying of non-int (byte, short, uint etc) did not work [#359](https://github.com/TylerTemp/SaintsField/issues/359)

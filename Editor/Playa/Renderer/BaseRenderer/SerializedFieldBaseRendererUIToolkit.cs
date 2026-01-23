@@ -31,6 +31,29 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         private bool _richLabelCondition;
         private bool _tableCondition;
 
+        private class BindableWrapper: VisualElement, IBindable
+        {
+            public IBinding binding { get; set; }
+            public string bindingPath { get; set; }
+
+            public BindableWrapper(SerializedProperty property)
+            {
+                bindingPath = property.propertyPath;
+            }
+
+#if UNITY_2023_2_OR_NEWER
+            // [EventInterest(new System.Type[] {typeof (SerializedPropertyBindEvent)})]
+            protected override void HandleEventBubbleUp(EventBase evt)
+            {
+                base.HandleEventBubbleUp(evt);
+                if (evt.ToString() != "UnityEditor.UIElements.SerializedPropertyBindEvent")
+                    return;
+                // this.Reset(evt1);
+                evt.StopPropagation();
+            }
+#endif
+        }
+
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
         {
             UserDataPayload userDataPayload = new UserDataPayload
@@ -42,10 +65,16 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if(result != null)
             {
-                _container = new VisualElement
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                if (FieldWithInfo.SerializedProperty == null)
                 {
-                    userData = userDataPayload
-                };
+                    _container = new VisualElement();
+                }
+                else
+                {
+                    _container = new BindableWrapper(FieldWithInfo.SerializedProperty);
+                }
+                _container.userData = userDataPayload;
                 _container.Add(result);
             }
             else
