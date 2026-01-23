@@ -15,10 +15,10 @@ namespace SaintsField.Samples.Scripts.EPathExample
         [Serializable]
         public class PathAndResults
         {
-            [ResizableTextArea, Ordered] public string xPath;
+            [ResizableTextArea] public string xPath;
 
 #if UNITY_EDITOR
-            [Button("Test"), Ordered]
+            [Button("Test")]
             private void Test()
             {
                 List<string> toStrings = new List<string>();
@@ -32,7 +32,7 @@ namespace SaintsField.Samples.Scripts.EPathExample
             }
 #endif
 
-            [ResizableTextArea, FieldReadOnly, Ordered] public string[] results;
+            [ResizableTextArea, FieldReadOnly] public string[] results;
 
         }
 

@@ -12,15 +12,15 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [GetComponent]
         public SpriteRenderer spriteRenderer;
 
-        [Button("Tween under me"), Ordered]
-        private void Nothing1() {}
-
-        [Layout("Color", ELayout.Foldout | ELayout.Background | ELayout.TitleOut), Ordered]
-        [ShowInInspector]
-        public const string Title = "This is Color Tween";
+        // [Button("Tween under me")]
+        // private void Nothing1() {}
+        //
+        // [Layout("Color", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
+        // [ShowInInspector]
+        // public const string Title = "This is Color Tween";
 
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-        [DOTweenPlayGroup(groupBy: "Color"), Ordered]
+        [DOTweenPlay("Color")]
         private Sequence PlayColor()
         {
             return DOTween.Sequence()
@@ -30,7 +30,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
                 .SetLoops(-1);
         }
 
-        [Ordered]
+        [DOTweenPlay("Color")]
         private Sequence PlayColor2()
         {
             return DOTween.Sequence()
@@ -40,7 +40,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
                 .SetLoops(-1);
         }
 
-        [Ordered]
+        [DOTweenPlay("Color")]
         private Sequence PlayColor3()
         {
             return DOTween.Sequence()
@@ -49,16 +49,15 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
                 .Append(spriteRenderer.DOColor(Color.cyan, 1f))
                 .SetLoops(-1);
         }
-
-        [DOTweenPlayEnd("Color"), Ordered]
-        public void DoNotIncludeMe() {}
 #endif
 
-        [Button("Tween above me"), Ordered]
-        private void Nothing2() {}
+        public void DoNotIncludeMe() {}
 
+//         [Button("Tween above me")]
+//         private void Nothing2() {}
+//
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-        [DOTweenPlay("Position"), Ordered]
+        [DOTweenPlay("Position")]
         private Sequence PlayTween2()
         {
             return DOTween.Sequence()

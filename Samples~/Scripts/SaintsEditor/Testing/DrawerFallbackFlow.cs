@@ -104,12 +104,12 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [Serializable]
         public struct SaintsStruct
         {
-            [ShowInInspector, Ordered] public string MyString => "My saintsRow!";
+            [ShowInInspector] public string MyString => "My saintsRow!";
 
             [LayoutStart("Group", ELayout.TitleBox)]
-            [Ordered] public string s1;
-            [Ordered] public int i1;
-            [Ordered] public GameObject go;
+            public string s1;
+            public int i1;
+            public GameObject go;
         }
 
         public SaintsStruct structWithoutRaw;

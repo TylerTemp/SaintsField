@@ -34,17 +34,19 @@ namespace SaintsField.Editor.TroubleshootEditor
         private string ProgressLabel() => _inProgress ? "Checking..." : "Done";
 
         [DebugTool.WhichFramework]
-        [Ordered, FieldLabelText("$" + nameof(ProgressLabel)), FieldReadOnly, ProgressBar(maxCallback: nameof(_maxCount))]
+        [FieldLabelText("$" + nameof(ProgressLabel)), FieldReadOnly, ProgressBar(maxCallback: nameof(_maxCount))]
         public int progress;
 
         [Serializable]
         private struct PropertyTypeToDrawer
         {
+            // ReSharper disable once NotAccessedField.Local
             public string propertyType;
+            // ReSharper disable once NotAccessedField.Local
             public string drawerType;
         }
 
-        [Ordered, ListDrawerSettings(searchable: true, numberOfItemsPerPage: 20)]
+        [ListDrawerSettings(searchable: true, numberOfItemsPerPage: 20)]
         [SerializeField]
         private List<PropertyTypeToDrawer> _propertyTypeToDrawers = new List<PropertyTypeToDrawer>();
 
@@ -56,7 +58,6 @@ namespace SaintsField.Editor.TroubleshootEditor
         private (EMessageType, string) _uScriptableObject = (EMessageType.Warning, null);
 
         // [Button("Check")]
-        [Ordered]
         [InfoBox("$" + nameof(_uObjectMessage))]
         [InfoBox("$" + nameof(_uComp))]
         [InfoBox("$" + nameof(_uMono))]
@@ -181,7 +182,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         private bool NotInProcess => !_inProgress;
 
-        [Ordered, FieldSeparator(5), FieldSeparator, FieldSeparator(5),
+        [FieldSeparator(5), FieldSeparator, FieldSeparator(5),
 
          FieldInfoBox("Please wait the checking process to finish", show: nameof(NotInProcess)),
 
@@ -223,7 +224,7 @@ namespace SaintsField.Editor.TroubleshootEditor
                 : (EMessageType.Warning, $"Your target is drawn by {editorType}, some attributes might not work.");
         }
 
-        [Ordered,
+        [
          FieldShowIf(nameof(NeedPickComponent)),
          AdvancedDropdown(nameof(PickComponent)),
          OnValueChanged(nameof(TroubleshootComponentChanged)),
@@ -254,7 +255,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 
         private void TroubleshootComponentChanged() => field = -1;
 
-        [Ordered,
+        [
          AdvancedDropdown(nameof(PickFieldName)),
          FieldShowIf(nameof(GetTroubleshootSerTarget)), FieldDisableIf(nameof(_inProgress)),
          OnValueChanged(nameof(RunTargetChecker)),
@@ -339,7 +340,7 @@ namespace SaintsField.Editor.TroubleshootEditor
         private (EMessageType, string) _fieldMessage = (EMessageType.Warning, null);
 #pragma warning restore CS0414
 
-        // [Ordered, ]
+        // []
         private void RunTargetChecker(int index)
         {
             Object inspectTarget = GetTroubleshootSerTarget();

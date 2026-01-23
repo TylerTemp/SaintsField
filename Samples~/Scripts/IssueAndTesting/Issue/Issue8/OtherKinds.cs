@@ -4,7 +4,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
 {
     public class OtherKinds : OtherKindsBase
     {
-        [SepTitle("Sub", EColor.Gray), Ordered]
+        [SepTitle("Sub", EColor.Gray)]
         public string sub;
     }
 }

@@ -17,7 +17,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [GetScriptableObject]
         public Scriptable[] mySoListRef;
 
-        [Ordered, Expandable]
+        [Expandable]
         public List<Scriptable> mySoList;
 
         [Button]

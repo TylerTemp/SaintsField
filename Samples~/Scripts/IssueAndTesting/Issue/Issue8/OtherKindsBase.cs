@@ -5,14 +5,14 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
 {
     public class OtherKindsBase : MonoBehaviour
     {
-        [ShowInInspector, Ordered]
+        [ShowInInspector]
         public const bool ConstTrue = true;
 
-        [FieldDisableIf(nameof(ConstTrue)), Ordered] public string constTrueDisable;
+        [FieldDisableIf(nameof(ConstTrue))] public string constTrueDisable;
 
-        [ShowInInspector, Ordered]
+        [ShowInInspector]
         public static readonly bool StaticTrue = true;
 
-        [FieldDisableIf(nameof(StaticTrue)), Ordered] public string staticTrueDisable;
+        [FieldDisableIf(nameof(StaticTrue))] public string staticTrueDisable;
     }
 }

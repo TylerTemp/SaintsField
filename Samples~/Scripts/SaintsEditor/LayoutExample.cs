@@ -63,7 +63,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         public int foldoutInABoxItem1, foldoutInABoxItem2;
 
         // Complex example. Button and ShowInInspector works too
-        [Ordered]
+
         [Layout("Root", ELayout.Tab | ELayout.Foldout | ELayout.Background)]
         // [Layout("Root", ELayout.Title | ELayout.TitleOutstanding | ELayout.Foldout | ELayout.Background)]
         // [Layout("Root", ELayout.Title)]
@@ -72,14 +72,14 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [SepTitle("Basic", EColor.Pink)]
         public string hv1Item1;
 
-        [Ordered]
+
         [Layout("Root/V1/buttons", ELayout.Horizontal)]
         [Button("Root/V1 Button1")]
         public void RootV1Button()
         {
             Debug.Log("Root/V1 Button");
         }
-        [Ordered]
+
         [Layout("Root/V1/buttons")]
         [Button("Root/V1 Button2")]
         public void RootV1Button2()
@@ -87,19 +87,19 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
             Debug.Log("Root/V1 Button");
         }
 
-        [Ordered]
+
         [Layout("Root/V1")]
         [ShowInInspector]
         public static Color color1 = Color.red;
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-        [Ordered]
+
         [DOTweenPlay("Tween1", "Root/V1")]
         public Tween RootV1Tween1()
         {
             return DOTween.Sequence();
         }
 
-        [Ordered]
+
         [DOTweenPlay("Tween2", "Root/V1")]
         public Tween RootV1Tween2()
         {
@@ -107,53 +107,53 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         }
 #endif
 
-        [Ordered]
+
         [Layout("Root/V1")]
         public string hv1Item2;
 
         // public string below;
 
-        [Ordered]
+
         [Layout("Root/V2")]
         public string hv2Item1;
 
-        [Ordered]
+
         [Layout("Root/V2/H", ELayout.Horizontal), FieldLabelText(null)]
         public string hv2Item2, hv2Item3;
 
-        [Ordered]
+
         [Layout("Root/V2")]
         public string hv2Item4;
 
-        [Ordered]
+
         [Layout("Root/V3", ELayout.Horizontal)]
         [ResizableTextArea, FieldLabelText(null)]
         public string hv3Item1, hv3Item2;
 
-        [Ordered]
+
         [Layout("Root/Horizontal")]
         [FieldInfoBox("This works in UI Toolkit")]
         public string fine = "See below:";
 
-        [Ordered]
+
         [Layout("Root/Horizontal/H", ELayout.Horizontal)]
         public string fine1, fine2, fine3;
 
-        [Ordered]
+
         [Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]
         [Layout("Title+Tab/g1")]
         public string titleTabG11, titleTabG21;
 
-        [Ordered]
+
         [Layout("Title+Tab/g2")]
         public string titleTabG12, titleTabG22;
 
-        [Ordered]
+
         [Layout("All Together", ELayout.Tab | ELayout.Foldout | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
         [Layout("All Together/g1")]
         public string allTogetherG11, allTogetherG21;
 
-        [Ordered]
+
         [Layout("All Together/g2")]
         public string allTogetherG12, allTogetherG22;
     }

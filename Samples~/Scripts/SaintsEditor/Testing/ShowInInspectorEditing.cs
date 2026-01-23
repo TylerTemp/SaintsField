@@ -46,34 +46,34 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             private MyEnum _myEnum;
         }
 
-        [ShowInInspector, Ordered] private bool _boolV;
-        [ShowInInspector, Ordered] private byte _byteV;
-        [ShowInInspector, Ordered] private sbyte _sbyteV;
-        [ShowInInspector, Ordered] private short _shortV = -5;
-        [ShowInInspector, Ordered] private ushort _ushortV = 0;
-        [ShowInInspector, Ordered] private long _longV = long.MaxValue;
-        [ShowInInspector, Ordered] private ulong _uLongV = ulong.MaxValue;
-        [ShowInInspector, Ordered] private float _floatV = 0.1234f;
-        [ShowInInspector, Ordered] private double _doubleV = 0.1234d;
-        [ShowInInspector, Ordered] private string _stringV = "Hi";
-        [ShowInInspector, Ordered] private char _charV = 'c';
-        [ShowInInspector, Ordered] private Vector2 _vector2V = Vector2.one;
-        [ShowInInspector, Ordered] private Vector3 _vector3V = Vector3.one;
-        [ShowInInspector, Ordered] private Vector4 _vector4V = Vector4.one;
-        [ShowInInspector, Ordered] private Vector2Int _vector2VInt = Vector2Int.one;
-        [ShowInInspector, Ordered] private Vector3Int _vector3VInt = Vector3Int.one;
-        [ShowInInspector, Ordered] private Color _colorV = Color.red;
-        [ShowInInspector, Ordered] private Bounds _boundsV = new Bounds(Vector3.one, Vector3.up);
-        [ShowInInspector, Ordered] private Rect _rectV = new Rect(0, 0, 1, 1);
-        [ShowInInspector, Ordered] private RectInt _rectIntV = new RectInt(0, 0, 1, 1);
-        [ShowInInspector, Ordered] private MyEnum _myEnum;
-        [ShowInInspector, Ordered] private GameObject _go;
-        [ShowInInspector, Ordered] private Transform _trans;
-        [ShowInInspector, Ordered] private Scriptable _so;
+        [ShowInInspector] private bool _boolV;
+        [ShowInInspector] private byte _byteV;
+        [ShowInInspector] private sbyte _sbyteV;
+        [ShowInInspector] private short _shortV = -5;
+        [ShowInInspector] private ushort _ushortV = 0;
+        [ShowInInspector] private long _longV = long.MaxValue;
+        [ShowInInspector] private ulong _uLongV = ulong.MaxValue;
+        [ShowInInspector] private float _floatV = 0.1234f;
+        [ShowInInspector] private double _doubleV = 0.1234d;
+        [ShowInInspector] private string _stringV = "Hi";
+        [ShowInInspector] private char _charV = 'c';
+        [ShowInInspector] private Vector2 _vector2V = Vector2.one;
+        [ShowInInspector] private Vector3 _vector3V = Vector3.one;
+        [ShowInInspector] private Vector4 _vector4V = Vector4.one;
+        [ShowInInspector] private Vector2Int _vector2VInt = Vector2Int.one;
+        [ShowInInspector] private Vector3Int _vector3VInt = Vector3Int.one;
+        [ShowInInspector] private Color _colorV = Color.red;
+        [ShowInInspector] private Bounds _boundsV = new Bounds(Vector3.one, Vector3.up);
+        [ShowInInspector] private Rect _rectV = new Rect(0, 0, 1, 1);
+        [ShowInInspector] private RectInt _rectIntV = new RectInt(0, 0, 1, 1);
+        [ShowInInspector] private MyEnum _myEnum;
+        [ShowInInspector] private GameObject _go;
+        [ShowInInspector] private Transform _trans;
+        [ShowInInspector] private Scriptable _so;
         // private void SetDummy() => _dummy = _so;
 
-        [ShowInInspector, Ordered] private MyClass _myClass;
-        [ShowInInspector, Ordered] private MyClass _myClassD = new MyClass
+        [ShowInInspector] private MyClass _myClass;
+        [ShowInInspector] private MyClass _myClassD = new MyClass
         {
             MyString = "Hi",
         };
@@ -83,46 +83,46 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public string MyString;
         }
 
-        [ShowInInspector, Ordered] private MyStruct _myStruct;
+        [ShowInInspector] private MyStruct _myStruct;
 
-        [ShowInInspector, Ordered] private Color[] _colors = {Color.red, Color.green, Color.blue};
-        [ShowInInspector, Ordered] private Color[] _colorEmptyArray;
+        [ShowInInspector] private Color[] _colors = {Color.red, Color.green, Color.blue};
+        [ShowInInspector] private Color[] _colorEmptyArray;
 
-        [Button, Ordered]
+        [Button]
         private void ArrayToNull()
         {
             _colorEmptyArray = null;
         }
 
-        [Button, Ordered]
+        [Button]
         private void ArrayChange0ToRed()
         {
             _colorEmptyArray[0] = Color.red;
         }
 
-        [Button, Ordered]
+        [Button]
         private void ArraySwap()
         {
             (_colorEmptyArray[0], _colorEmptyArray[1]) = (_colorEmptyArray[1], _colorEmptyArray[0]);
         }
 
-        [ShowInInspector, Ordered] private List<Color> _colorEmptyList;
-        [Button, Ordered]
+        [ShowInInspector] private List<Color> _colorEmptyList;
+        [Button]
         private void ListToNull() => _colorEmptyList = null;
-        [Button, Ordered]
+        [Button]
         private void ListChangeColor()
         {
             _colorEmptyList[0] = Color.red;
         }
-        [Button, Ordered]
+        [Button]
         private void ListChangeSize()
         {
             _colorEmptyList.Add(Color.blue);
         }
 
-        [ShowInInspector, Ordered] private MyClass[] _myClasses;
+        [ShowInInspector] private MyClass[] _myClasses;
 
-        [ShowInInspector, Ordered] private Dictionary<string, Color> _dictColors = new Dictionary<string, Color>
+        [ShowInInspector] private Dictionary<string, Color> _dictColors = new Dictionary<string, Color>
         {
             { "Red", Color.red },
             { "Green", Color.green },
@@ -146,7 +146,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public int MyInt { get; set; }
         }
 
-        [ShowInInspector, Ordered] private static Inter _inter;
+        [ShowInInspector] private static Inter _inter;
 
         public class GeneralDummyClass: IDummy
         {
@@ -160,9 +160,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public string GenDumString;
         }
 
-        [ShowInInspector, Ordered] private static IDummy _dummy;
+        [ShowInInspector] private static IDummy _dummy;
 
-        [Button, Ordered]
+        [Button]
         private void DebugDummy() => Debug.Log(_dummy);
 
 #if UNITY_EDITOR
@@ -184,7 +184,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [NonSerialized, ShowInInspector] public NullSwap _nullSwap;
 
-        [ShowInInspector, Ordered]
+        [ShowInInspector]
         private IEnumerable<int> _ie = Enumerable.Range(0, 3);
 
         private class MyList : IReadOnlyList<int>
@@ -211,23 +211,23 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             public int this[int index] => Lis[index];
         }
 
-        [ShowInInspector, Ordered] private MyList _myListNull;
-        [ShowInInspector, Ordered] private MyList _myListSome = new MyList { Lis = new[] { 1, 2 } };
+        [ShowInInspector] private MyList _myListNull;
+        [ShowInInspector] private MyList _myListSome = new MyList { Lis = new[] { 1, 2 } };
 
-        [Button, Ordered]
+        [Button]
         private void DictExternalAdd()
         {
             _myDictionaryNull["External"] = 1;
         }
-        [ShowInInspector, Ordered] private Dictionary<string, int> _myDictionaryNull;
+        [ShowInInspector] private Dictionary<string, int> _myDictionaryNull;
 
 
-        [ShowInInspector, Ordered] public Dictionary<MyEnum, int> MyDictionary = new Dictionary<MyEnum, int>
+        [ShowInInspector] public Dictionary<MyEnum, int> MyDictionary = new Dictionary<MyEnum, int>
         {
             {MyEnum.One, 1},
         };
 
-        [ShowInInspector, Ordered]
+        [ShowInInspector]
         private IReadOnlyDictionary<int, string> _readOnlyDict =
             new Dictionary<int, string>
             {
@@ -235,7 +235,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
                 {2, "Two"},
             };
 
-        [ShowInInspector, Ordered] public Dictionary<int, int[]> _intToInts = new Dictionary<int, int[]>();
+        [ShowInInspector] public Dictionary<int, int[]> _intToInts = new Dictionary<int, int[]>();
 
         public struct KeyStruct: IEquatable<KeyStruct>
         {
@@ -263,26 +263,26 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
             }
         }
 
-        [ShowInInspector, Ordered] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
+        [ShowInInspector] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
 
-        [ShowInInspector, Ordered, InfoBox("If getter gives error, we display an error box")]
+        [ShowInInspector, InfoBox("If getter gives error, we display an error box")]
         private int WrongGetter => throw new NotSupportedException("Expected Exception");
 
-        [ShowInInspector, Ordered, InfoBox("We don't handle if setter gives error")]
+        [ShowInInspector, InfoBox("We don't handle if setter gives error")]
         private int WrongSetter  // this will just give errors to console, we won't handle it.
         {
             get => 20;
             set => throw new NotSupportedException("Expected Exception");
         }
 
-        [ShowInInspector, Ordered, InfoBox("nested field can be error handled too")]
+        [ShowInInspector, InfoBox("nested field can be error handled too")]
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         private IEnumerator _ienumerator = new []{1, 2, 3}.GetEnumerator();
 
         [LayoutStart("IEnumerator", ELayout.Horizontal)]
-        [Button, Ordered] private void MoveIt() => _ienumerator.MoveNext();
+        [Button] private void MoveIt() => _ienumerator.MoveNext();
         [LayoutTerminateHere]
-        [Button, Ordered] private void ReCreateIt() => _ienumerator = new []{1, 2, 3}.GetEnumerator();
+        [Button] private void ReCreateIt() => _ienumerator = new []{1, 2, 3}.GetEnumerator();
 
         private class NestChange
         {
@@ -290,9 +290,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         }
 
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        [ShowInInspector, Ordered] private NestChange _nestChange = new NestChange();
+        [ShowInInspector] private NestChange _nestChange = new NestChange();
 
-        [Button, Ordered]
+        [Button]
         private void ChangeNestedValue()
         {
             _nestChange.NestedValue = (_nestChange.NestedValue + 1) % 3;

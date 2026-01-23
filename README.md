@@ -8110,54 +8110,6 @@ The check of each row means autoplay when you click the start in the global cont
 
 To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
 
-### `DOTweenPlayStart` / `DOTweenPlayEnd` ###
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-A convenient way to add many method to `DOTweenPlay`.
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[DOTweenPlayStart(groupBy: "Color")]
-private Sequence PlayColor()
-{
-    return DOTween.Sequence()
-        .Append(spriteRenderer.DOColor(Color.red, 1f))
-        .Append(spriteRenderer.DOColor(Color.green, 1f))
-        .Append(spriteRenderer.DOColor(Color.blue, 1f))
-        .SetLoops(-1);
-}
-
-private Sequence PlayColor2()  // this will be automaticlly added to DOTweenPlay
-{
-    return DOTween.Sequence()
-        .Append(spriteRenderer.DOColor(Color.cyan, 1f))
-        .Append(spriteRenderer.DOColor(Color.magenta, 1f))
-        .Append(spriteRenderer.DOColor(Color.yellow, 1f))
-        .SetLoops(-1);
-}
-
-// this will be automaticlly added to DOTweenPlay
-// Note: if you want to add this in DOTweenPlay but also stop the grouping, use:
-// [DOTweenPlay("Color", keepGrouping: false)]
-private Sequence PlayColor3()
-{
-    return DOTween.Sequence()
-        .Append(spriteRenderer.DOColor(Color.yellow, 1f))
-        .Append(spriteRenderer.DOColor(Color.magenta, 1f))
-        .Append(spriteRenderer.DOColor(Color.cyan, 1f))
-        .SetLoops(-1);
-}
-
-[DOTweenPlayEnd("Color")]
-public Sequence DoNotIncludeMe() => DOTween.Sequence();    // this will NOT be added
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/db6b60b5-0d1d-43e2-9ab9-b2c7912d7e8d)
-
 ## Wwise ##
 
 Wwise itself already has very nice drawer. SaintsField only provide some utility to make it easier to use.

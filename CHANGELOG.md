@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  **Breaking Changes**: Remove `DOTweenPlayStart`/`DOTweenPlayEnd` due to the complexity them introduce.
+2.  Fix: `DOTweenPlay` did not work.
+
 ## 5.8.9 ##
 
 Fix: some field might not get rendered if it uses relative path binding internally (e.g. `Physics LowLevel Settings 2D`)

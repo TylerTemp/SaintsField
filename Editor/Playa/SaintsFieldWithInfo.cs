@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Playa
     public struct SaintsFieldWithInfo
     {
         public int InherentDepth;
-        public int Order;
+        // public int Order;
 
         // public IReadOnlyList<ISaintsLayoutBase> LayoutBases;
         public IReadOnlyList<IPlayaAttribute> PlayaAttributes;

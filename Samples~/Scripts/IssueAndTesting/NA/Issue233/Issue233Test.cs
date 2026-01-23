@@ -48,18 +48,18 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue233
         [Serializable]
         public struct Nest1
         {
-            [Button, Ordered]
+            [Button]
             private void Nest1Btn() => Debug.Log("Call Nest1Btn");
 
-            [SaintsRow, Ordered]
+            [SaintsRow]
             public Nest2 n2;
-            [SaintsRow, Ordered]
+            [SaintsRow]
             public Nest2[] n2Array;
 
-            [field: SerializeField, Ordered]
+            [field: SerializeField]
             public int MyProperty { get; set; }
 
-            [Ordered]
+
             public string myString;
         }
 

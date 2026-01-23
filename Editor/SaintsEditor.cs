@@ -201,7 +201,7 @@ namespace SaintsField.Editor
                         fieldWithInfos.Add(new SaintsFieldWithInfo
                         {
                             InherentDepth = inherentDepth,
-                            Order = int.MinValue,
+                            // Order = int.MinValue,
                             PlayaAttributes = startClassAttributes,
                             TargetParent = targetParent,
                             TargetMemberInfo = targetMemberInfo,
@@ -306,9 +306,9 @@ namespace SaintsField.Editor
                                     // Debug.Log($"FieldType       : {fieldInfo.FieldType}");
                                     // Debug.Log($"IsFamily        : {fieldInfo.IsFamily}");
 
-                                    OrderedAttribute orderProp =
-                                        playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
-                                    int order = orderProp?.Order ?? int.MinValue;
+                                    // OrderedAttribute orderProp =
+                                    //     playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
+                                    // int order = orderProp?.Order ?? int.MinValue;
 
                                     // Debug.Log($"{fieldInfo.Name}/{string.Join(",", pendingSerializedProperties.Keys)}");
                                     thisDepthInfos.Add(new SaintsFieldWithInfo
@@ -327,7 +327,7 @@ namespace SaintsField.Editor
                                         MemberId = fieldInfo.Name,
                                         FieldInfo = fieldInfo,
                                         InherentDepth = inherentDepth,
-                                        Order = order,
+                                        // Order = order,
                                         // serializable = true,
                                     });
                                     memberDepthIds.Add(fieldInfo.Name);
@@ -342,24 +342,26 @@ namespace SaintsField.Editor
                                 else if (playaAttributes.Count > 0)
                                 {
                                     SaintsSerializedAttribute saintsSerializedAttribute = null;
-                                    OrderedAttribute orderProp = null;
+                                    // OrderedAttribute orderProp = null;
                                     foreach (IPlayaAttribute playa in playaAttributes)
                                     {
                                         switch (playa)
                                         {
-                                            case OrderedAttribute oa:
-                                                orderProp = oa;
-                                                break;
+                                            // case OrderedAttribute oa:
+                                            //     orderProp = oa;
+                                            //     break;
                                             case SaintsSerializedAttribute ssa:
                                                 saintsSerializedAttribute = ssa;
                                                 break;
                                         }
-                                        if(saintsSerializedAttribute != null && orderProp != null)
+                                        if(saintsSerializedAttribute != null
+                                           // && orderProp != null
+                                           )
                                         {
                                             break;
                                         }
                                     }
-                                    int order = orderProp?.Order ?? int.MinValue;
+                                    // int order = orderProp?.Order ?? int.MinValue;
 
                                     if(saintsSerializedAttribute == null)
                                     {
@@ -379,7 +381,7 @@ namespace SaintsField.Editor
                                             MemberId = fieldInfo.Name,
                                             FieldInfo = fieldInfo,
                                             InherentDepth = inherentDepth,
-                                            Order = order,
+                                            // Order = order,
                                             // serializable = false,
                                         });
                                     }
@@ -428,7 +430,7 @@ namespace SaintsField.Editor
                                             MemberId = serInfo.Name,
                                             FieldInfo = (FieldInfo)serInfo,
                                             InherentDepth = inherentDepth,
-                                            Order = order,
+                                            // Order = order,
                                             // serializable = false,
 
                                             SerializedProperty = serializedPropertyDict[serInfo.Name],
@@ -447,9 +449,9 @@ namespace SaintsField.Editor
 
                                 if (playaAttributes.Count > 0)
                                 {
-                                    OrderedAttribute orderProp =
-                                        playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
-                                    int order = orderProp?.Order ?? int.MinValue;
+                                    // OrderedAttribute orderProp =
+                                    //     playaAttributes.OfType<OrderedAttribute>().FirstOrDefault();
+                                    // int order = orderProp?.Order ?? int.MinValue;
                                     thisDepthInfos.Add(new SaintsFieldWithInfo
                                     {
                                         ClassStructType = systemType,
@@ -465,7 +467,7 @@ namespace SaintsField.Editor
                                         MemberId = propertyInfo.Name,
                                         PropertyInfo = propertyInfo,
                                         InherentDepth = inherentDepth,
-                                        Order = order,
+                                        // Order = order,
                                     });
                                     memberDepthIds.Add(propertyInfo.Name);
                                 }
@@ -483,10 +485,10 @@ namespace SaintsField.Editor
 
                                 // Attribute[] allMethodAttributes = methodInfo.GetCustomAttributes<Attribute>().ToArray();
 
-                                OrderedAttribute orderProp =
-                                    playaAttributes.FirstOrDefault(each =>
-                                        each is OrderedAttribute) as OrderedAttribute;
-                                int order = orderProp?.Order ?? int.MinValue;
+                                // OrderedAttribute orderProp =
+                                //     playaAttributes.FirstOrDefault(each =>
+                                //         each is OrderedAttribute) as OrderedAttribute;
+                                // int order = orderProp?.Order ?? int.MinValue;
 
                                 // wrong: inspector does not care about inherited/new method. It just needs to use the last one
                                 // right: we support method override now
@@ -520,7 +522,7 @@ namespace SaintsField.Editor
                                     MemberId = buttonId,
                                     MethodInfo = methodInfo,
                                     InherentDepth = inherentDepth,
-                                    Order = order,
+                                    // Order = order,
                                 });
                                 memberDepthIds.Add(buttonId);
 
@@ -541,10 +543,10 @@ namespace SaintsField.Editor
                                     break;
                                 }
 
-                                OrderedAttribute orderProp =
-                                    playaAttributes.FirstOrDefault(each =>
-                                        each is OrderedAttribute) as OrderedAttribute;
-                                int order = orderProp?.Order ?? int.MinValue;
+                                // OrderedAttribute orderProp =
+                                //     playaAttributes.FirstOrDefault(each =>
+                                //         each is OrderedAttribute) as OrderedAttribute;
+                                // int order = orderProp?.Order ?? int.MinValue;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD
                                 Debug.Log($"[{systemType}] event: {eventInfo.Name}");
@@ -564,7 +566,7 @@ namespace SaintsField.Editor
                                     RenderType = SaintsRenderType.Other,
                                     MemberId = $"?:{memberInfo.Name}",
                                     InherentDepth = inherentDepth,
-                                    Order = order,
+                                    // Order = order,
                                 });
                                 break;
                                 #endregion
@@ -589,7 +591,7 @@ namespace SaintsField.Editor
                         fieldWithInfos.Add(new SaintsFieldWithInfo
                         {
                             InherentDepth = inherentDepth,
-                            Order = int.MinValue,
+                            // Order = int.MinValue,
                             PlayaAttributes = endClassAttributes,
                             TargetParent = targetParent,
                             TargetMemberInfo = targetMemberInfo,
@@ -626,7 +628,7 @@ namespace SaintsField.Editor
                         SerializedProperty = pendingSer.Value,
                         FieldInfo = null,
                         InherentDepth = types.Count == 0? 0: types.Count - 1,
-                        Order = int.MinValue,
+                        // Order = int.MinValue,
                         // serializable = true,
                     });
                 }
@@ -635,7 +637,7 @@ namespace SaintsField.Editor
             return fieldWithInfos
                 .WithIndex()
                 .OrderBy(each => each.value.InherentDepth)
-                .ThenBy(each => each.value.Order)
+                // .ThenBy(each => each.value.Order)
                 .ThenBy(each => each.index)
                 .Select(each => each.value)
             ;
@@ -857,7 +859,7 @@ namespace SaintsField.Editor
 
                 bool stopGrouping = false;
 
-                IEnumerable<SaintsFieldWithRenderer> playaAndRenderers = GetPlayaAndRenderer(saintsFieldWithInfo, serializedObject, makeRenderer);
+                SaintsFieldWithRenderer[] playaAndRenderers = GetPlayaAndRenderer(saintsFieldWithInfo, serializedObject, makeRenderer).ToArray();
                 List<ISaintsLayoutToggle> layoutToggles = new List<ISaintsLayoutToggle>();
 
                 foreach (SaintsFieldWithRenderer rendererInfo in playaAndRenderers)
@@ -1236,6 +1238,12 @@ namespace SaintsField.Editor
                             //     serializedObject);
                             // baseRenderers.Add(new RealTimeCalculatorRenderer(serializedObject, fieldWithInfo));
                         }
+#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+                        if (playaAttribute is DOTweenPlayAttribute)
+                        {
+                            baseRenderers.Add(new DOTweenPlayRenderer(serializedObject, fieldWithInfo));
+                        }
+#endif
                         // else if (playaAttribute is SeparatorAttribute || playaAttribute is InfoBoxAttribute)
                         // {
                         //     needEmptyRenderer = true;
