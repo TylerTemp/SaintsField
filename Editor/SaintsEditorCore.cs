@@ -173,7 +173,7 @@ namespace SaintsField.Editor
 
         private bool _searchableShown;
 
-        private void OnHeaderButtonClick()
+        public void OnHeaderButtonClick()
         {
             _searchableShown = !_searchableShown;
             OnHeaderButtonClickUIToolkit();
@@ -193,7 +193,7 @@ namespace SaintsField.Editor
             }
         }
 
-        private void ResetSearchUIToolkit()
+        public void ResetSearchUIToolkit()
         {
             // ReSharper disable once InvertIf
             if (_toolbarSearchField.parent != null)

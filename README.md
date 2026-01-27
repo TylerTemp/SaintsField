@@ -103,9 +103,10 @@ namespace: `SaintsField`
 1.  Add: `SaintsDictionary` old version migration [#361](https://github.com/TylerTemp/SaintsField/issues/361)
 2.  Improve: Better look of tree dropdown
 3.  Add: `Copy` right click menu for `ShowInInspector`
-4.  **Breaking Changes**: Make `TreeDropdown` the major dropdown:
+4.  Fix: `[Searchable]` gave error when click
+5.  **Breaking Changes**: Make `TreeDropdown` the major dropdown:
 
-Old Name | New Name 
+Old Name | New Name
 ---------|----------
 `TreeDropdown` | `Dropdown`
 `Dropdown` | `MenuDropdown`
@@ -8375,7 +8376,7 @@ public class MyEditorCore: SaintsEditorCore
         {
             return Array.Empty<IReadOnlyList<AbsRenderer>>();
         }
-        if(fieldWithInfo.PlayaAttributes?.Any(each => each is ShowInInspectorAttribute || each is ButtonAttribute))  // render ShowInInspector/Button 
+        if(fieldWithInfo.PlayaAttributes?.Any(each => each is ShowInInspectorAttribute || each is ButtonAttribute))  // render ShowInInspector/Button
         {
             return base.MakeRenderer(so, fieldWithInfo);
         }
@@ -8389,13 +8390,13 @@ Then, in your editor script:
 
 ```csharp
 [CustomEditor(typeof(MyTargetType), true)]
-public class IntegerateSaintsEditor: MyEditor 
+public class IntegerateSaintsEditor: MyEditor
 {
-    public override VisualElement CreateInspectorGUI() 
+    public override VisualElement CreateInspectorGUI()
     {
         VisualElement root = new VisualElement();
         root.Bind(serializedObject);
-        
+
         root.Add(base.CreateInspectorGUI());  // Fill with default behavior
         root.Add(new MyEditorCore(this).CreateInspectorGUI());  // Fill with SaintsEditor
         return root;
@@ -8458,7 +8459,7 @@ To use the functions in SaintsEditor, inherent from `SaintsScriptableRendererDat
 ```csharp
 using SaintsField.ScriptableRenderer;
 
-public class MyScriptableRendererData: SaintsScriptableRendererData 
+public class MyScriptableRendererData: SaintsScriptableRendererData
 {
     // ...
 }
@@ -8486,7 +8487,7 @@ Note: this requires you to enable `SaintsEditor` in project too. If you can not,
 ```csharp
 using SaintsField.ScriptableRenderer;
 
-public class MyRendererFeature: SaintsScriptableRendererFeature 
+public class MyRendererFeature: SaintsScriptableRendererFeature
 {
     // ...
 }

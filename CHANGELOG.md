@@ -8,9 +8,10 @@
 1.  Add: `SaintsDictionary` old version migration [#361](https://github.com/TylerTemp/SaintsField/issues/361)
 2.  Improve: Better look of tree dropdown
 3.  Add: `Copy` right click menu for `ShowInInspector`
-4.  **Breaking Changes**: Make `TreeDropdown` the major dropdown:
+4.  Fix: `[Searchable]` gave error when click
+5.  **Breaking Changes**: Make `TreeDropdown` the major dropdown:
 
-Old Name | New Name 
+Old Name | New Name
 ---------|----------
 `TreeDropdown` | `Dropdown`
 `Dropdown` | `MenuDropdown`

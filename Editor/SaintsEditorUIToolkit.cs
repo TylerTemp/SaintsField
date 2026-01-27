@@ -11,11 +11,12 @@ namespace SaintsField.Editor
     {
         private void OnHeaderButtonClickUIToolkit()
         {
-            _toolbarSearchField.style.display = _searchableShown ? DisplayStyle.Flex : DisplayStyle.None;
-            if(_searchableShown)
-            {
-                _toolbarSearchField.Focus();
-            }
+            _coreEditor.OnHeaderButtonClick();
+            // _toolbarSearchField.style.display = _searchableShown ? DisplayStyle.Flex : DisplayStyle.None;
+            // if(_searchableShown)
+            // {
+            //     _toolbarSearchField.Focus();
+            // }
         }
 
         private ToolbarSearchField _toolbarSearchField;
@@ -45,12 +46,13 @@ namespace SaintsField.Editor
 
         private void ResetSearchUIToolkit()
         {
-            // ReSharper disable once InvertIf
-            if (_toolbarSearchField.parent != null)
-            {
-                _toolbarSearchField.parent.Focus();
-                _toolbarSearchField.value = "";
-            }
+            _coreEditor.ResetSearchUIToolkit();
+            // // ReSharper disable once InvertIf
+            // if (_toolbarSearchField.parent != null)
+            // {
+            //     _toolbarSearchField.parent.Focus();
+            //     _toolbarSearchField.value = "";
+            // }
         }
     }
 }
