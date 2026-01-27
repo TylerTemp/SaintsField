@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
 using UnityEngine;
 
@@ -13,15 +12,23 @@ namespace SaintsField
     public class SaintsDictionary<TKey, TValue>: IDictionary, IDictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
         // [SerializeField]
+        // ReSharper disable once InconsistentNaming
         public List<SaintsWrap<TKey>> _saintsKeys = new List<SaintsWrap<TKey>>();
         [SerializeField] private WrapType _wrapTypeKey;
 
         // [SerializeField]
+        // ReSharper disable once InconsistentNaming
         public List<SaintsWrap<TValue>> _saintsValues = new List<SaintsWrap<TValue>>();
         [SerializeField] private WrapType _wrapTypeValue;
 
         [SerializeField]
         protected int saintsSerializedVersion;
+
+        [SerializeField, Obsolete]
+        private List<TKey> _keys = new List<TKey>();
+
+        [SerializeField, Obsolete]
+        private List<TValue> _values = new List<TValue>();
 
         // prev 1, now 2
 
@@ -113,12 +120,42 @@ namespace SaintsField
             set => _dictionary = value;
         }
 
-        private ICollection _keys;
-        private ICollection _values;
+        // private ICollection _keys;
+        // private ICollection _values;
 
         public void OnBeforeSerialize()
         {
 #if UNITY_EDITOR
+
+            #region Version 4.x migrate
+#pragma warning disable CS0612 // Type or member is obsolete
+            bool oldMigrate = false;
+            if (saintsSerializedVersion == 0 && _keys.Count > 0 && _saintsKeys.Count == 0)
+            {
+                oldMigrate = true;
+                _wrapTypeKey = SaintsWrap<TKey>.GuessWrapType();
+                foreach (TKey key in _keys)
+                {
+                    SerializedKeyAdd(key);
+                }
+            }
+            if (saintsSerializedVersion == 0 && _values.Count > 0 && _saintsValues.Count == 0)
+            {
+                oldMigrate = true;
+                _wrapTypeValue = SaintsWrap<TValue>.GuessWrapType();
+                foreach (TValue value in _values)
+                {
+                    SerializedValueAdd(value);
+                }
+            }
+
+            if (oldMigrate)
+            {
+                saintsSerializedVersion = 2;
+            }
+#pragma warning restore CS0612 // Type or member is obsolete
+            #endregion
+
             if (saintsSerializedVersion == 1)
             {
                 // Debug.Assert(_wrapTypeKey == WrapType.Undefined, _wrapTypeKey);
@@ -168,7 +205,7 @@ namespace SaintsField
             }
         }
 
-        private bool _onAfterDeserializeOnce = false;
+        private bool _onAfterDeserializeOnce;
 
         private void EnsureOnAfterDeserializeOnce()
         {
