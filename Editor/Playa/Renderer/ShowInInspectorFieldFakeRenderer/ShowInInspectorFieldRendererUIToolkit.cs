@@ -202,6 +202,50 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 {
                     json = boolValue ? "true" : "false";
                 }
+                else if (newValue is Vector2 v2)
+                {
+                    json = JsonUtility.ToJson(v2);
+                }
+                else if (newValue is Vector3 v3)
+                {
+                    json = JsonUtility.ToJson(v3);
+                }
+                else if (newValue is Vector4 v4)
+                {
+                    json = JsonUtility.ToJson(v4);
+                }
+                else if (newValue is Vector2Int v2Int)
+                {
+                    json = JsonUtility.ToJson(v2Int);
+                }
+                else if (newValue is Vector3Int v3Int)
+                {
+                    json = JsonUtility.ToJson(v3Int);
+                }
+                else if (newValue is Color color)
+                {
+                    json = JsonUtility.ToJson(color);
+                }
+                // else if (newValue is Rect rect)
+                // {
+                //     json = JsonUtility.ToJson(rect);
+                // }
+                // else if (newValue is RectInt rectInt)
+                // {
+                //     json = JsonUtility.ToJson(rectInt);
+                // }
+                // else if (newValue is Bounds bounds)
+                // {
+                //     json = JsonUtility.ToJson(bounds);
+                // }
+                // else if (newValue is BoundsInt boundsInt)
+                // {
+                //     json = JsonUtility.ToJson(boundsInt);
+                // }
+                else if (newValue is UnityEngine.Object uObject)
+                {
+                    json = uObject.name;
+                }
                 else if (newValue.GetType().IsPrimitive || newValue is string || newValue.GetType().IsEnum)
                 {
                     json = newValue.ToString();
