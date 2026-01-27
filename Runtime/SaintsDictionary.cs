@@ -138,6 +138,7 @@ namespace SaintsField
                 {
                     SerializedKeyAdd(key);
                 }
+                _keys.Clear();
             }
             if (saintsSerializedVersion == 0 && _values.Count > 0 && _saintsValues.Count == 0)
             {
@@ -147,6 +148,7 @@ namespace SaintsField
                 {
                     SerializedValueAdd(value);
                 }
+                _values.Clear();
             }
 
             if (oldMigrate)

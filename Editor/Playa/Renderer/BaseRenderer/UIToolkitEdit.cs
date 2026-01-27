@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.AnimatorParamDrawer;
@@ -29,7 +28,6 @@ using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
 using SaintsField.Editor.Utils;
@@ -2598,482 +2596,482 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return element;
         }
 
-        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue,
-            bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet,
-            Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
-        {
-            // Debug.Log(dictKeyType);
-            // Debug.Log(dictValueType);
-
-            Foldout foldout = oldElement;
-            if (foldout != null && !foldout.ClassListContains("saintsfield-dictionary"))
-            {
-                foldout = null;
-            }
-
-            bool useOld = foldout != null;
-
-            if (foldout == null)
-            {
-                // Debug.Log($"Create new Foldout");
-                foldout = new Foldout
-                {
-                    text = label,
-                };
-                if (labelGrayColor)
-                {
-                    foldout.style.color = EColor.EditorSeparator.GetColor();
-                }
-                foldout.AddToClassList("saintsfield-dictionary");
-                VisualElement foldoutContent = foldout.Q<VisualElement>(className: "unity-foldout__content");
-                if (foldoutContent != null)
-                {
-                    foldoutContent.style.marginLeft = 0;
-                }
-
-                if(setterOrNull != null)
-                {
-                    // nullable
-                    foldout.Q<Toggle>().Add(new Button(() =>
-                    {
-                        beforeSet?.Invoke(rawDictValue);
-                        setterOrNull(null);
-                    })
-                    {
-                        // text = "x",
-                        tooltip = "Set to null",
-                        style =
-                        {
-                            position = Position.Absolute,
-                            // top = -EditorGUIUtility.singleLineHeight,
-                            top = 0,
-                            right = 0,
-                            width = EditorGUIUtility.singleLineHeight,
-                            height = EditorGUIUtility.singleLineHeight,
-
-                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
-#if UNITY_2022_2_OR_NEWER
-                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                        },
-                    });
-
-                }
-            }
-
-            MultiColumnListView listView = foldout.Q<MultiColumnListView>();
-            if (listView == null)
-            {
-                PropertyInfo keysProperty =  valueType.GetProperty("Keys");
-                Debug.Assert(keysProperty != null, $"Failed to get keys from {valueType}");
-
-                PropertyInfo indexerProperty = valueType.GetProperty("Item", new [] { dictKeyType });
-                Debug.Assert(keysProperty != null, $"Failed to get key indexer from {valueType}");
-
-                MethodInfo removeMethod = valueType.GetMethod("Remove", new[] { dictKeyType });
-                Debug.Assert(keysProperty != null, $"Failed to get `Remove` function from {valueType}");
-
-                MethodInfo containsKeyMethod = valueType.GetMethod("ContainsKey", new[] { dictKeyType });
-
-                Debug.Assert(rawDictValue != null, "Dictionary value should not be null");
-
-                DictionaryViewPayload payload = new DictionaryViewPayload(rawDictValue, keysProperty, indexerProperty, removeMethod, containsKeyMethod);
-
-                listView = new MultiColumnListView
-                {
-                    selectionType = SelectionType.Multiple,
-                    virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                    // showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
-                    showBoundCollectionSize = false,
-                    showFoldoutHeader = false,
-                    // headerTitle = label,
-                    showAddRemoveFooter = !isReadOnly,
-                    reorderMode = ListViewReorderMode.Animated,
-                    reorderable = false,
-                    style =
-                    {
-                        flexGrow = 1,
-                        position = Position.Relative,
-                    },
-                    itemsSource = payload.GetKeys().ToList(),
-                    userData = payload,
-                };
-
-                listView.columns.Add(new Column
-                {
-                    name = "Keys",
-                    // title = "Keys",
-                    stretchable = true,
-                    makeHeader = () =>
-                    {
-                        VisualElement header = new VisualElement();
-                        header.Add(new Label("Keys"));
-                        // ToolbarSearchField keySearch = new ToolbarSearchField
-                        // {
-                        //     // isDelayed = true,
-                        //     style =
-                        //     {
-                        //         marginRight = 3,
-                        //         display = saintsDictionaryAttribute?.Searchable ?? true
-                        //             ? DisplayStyle.Flex
-                        //             : DisplayStyle.None,
-                        //         width = Length.Percent(97f),
-                        //     },
-                        // };
-                        // TextField keySearchText = keySearch.Q<TextField>();
-                        // if (keySearchText != null)
-                        // {
-                        //     keySearchText.isDelayed = true;
-                        // }
-                        // header.Add(keySearch);
-                        // keySearch.RegisterValueChangedCallback(evt =>
-                        // {
-                        //     // Debug.Log($"key search {evt.newValue}");
-                        //     if(evt.newValue != preKeySearch)
-                        //     {
-                        //         RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
-                        //     }
-                        // });
-                        return header;
-                    },
-                    makeCell = () => new VisualElement(),
-                    bindCell = (element, elementIndex) =>
-                    {
-                        object key = listView.itemsSource[elementIndex];
-                        object oldValue = payload.GetValue(key);
-                        bool keyChanged = true;
-
-                        VisualElement keyChild = element.Children().FirstOrDefault();
-
-                        element.schedule.Execute(() =>
-                        {
-                            if (!keyChanged)
-                            {
-                                return;
-                            }
-
-                            keyChanged = false;
-
-                            VisualElement editing = UIToolkitValueEdit(keyChild, "", dictKeyType, key, oldKey =>
-                            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
-                                Debug.Log($"oldKey={oldKey}");
-#endif
-                                oldValue = payload.GetValue(oldKey);
-                                payload.DeleteKey(oldKey);
-                            }, newKey =>
-                            {
-                                if (RuntimeUtil.IsNull(newKey))
-                                {
-                                    Debug.LogWarning($"Setting key to null is not supported and is ignored");
-                                    return;
-                                }
-
-                                if (payload.ContainsKey(newKey))
-                                {
-                                    Debug.LogWarning($"Setting key {key} to existing key {newKey} is not supported and is ignored");
-                                    return;
-                                }
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
-                                Debug.Log($"dictionary editing key {key} -> {newKey}");
-#endif
-                                // object oldValue = payload.GetValue(key);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
-                                Debug.Log($"set key {key} -> {newKey} with value {oldValue}");
-#endif
-                                payload.DeleteKey(key);
-                                payload.SetKeyValue(newKey, oldValue);
-                                // int sourceIndex = listView.itemsSource.IndexOf(key);
-                                // listView.itemsSource[sourceIndex] = newKey;
-                                key = newKey;
-                                keyChanged = true;
-                            }, false, true, Array.Empty<Attribute>(), targets, richTextTagProvider).result;
-
-                            if (editing != null)
-                            {
-                                element.Clear();
-                                element.Add(editing);
-                            }
-                        }).Every(100);
-                    },
-                });
-
-                listView.columns.Add(new Column
-                {
-                    name = "Values",
-                    // title = "Keys",
-                    stretchable = true,
-                    makeHeader = () =>
-                    {
-                        VisualElement header = new VisualElement();
-                        header.Add(new Label("Values"));
-                        // ToolbarSearchField keySearch = new ToolbarSearchField
-                        // {
-                        //     // isDelayed = true,
-                        //     style =
-                        //     {
-                        //         marginRight = 3,
-                        //         display = saintsDictionaryAttribute?.Searchable ?? true
-                        //             ? DisplayStyle.Flex
-                        //             : DisplayStyle.None,
-                        //         width = Length.Percent(97f),
-                        //     },
-                        // };
-                        // TextField keySearchText = keySearch.Q<TextField>();
-                        // if (keySearchText != null)
-                        // {
-                        //     keySearchText.isDelayed = true;
-                        // }
-                        // header.Add(keySearch);
-                        // keySearch.RegisterValueChangedCallback(evt =>
-                        // {
-                        //     // Debug.Log($"key search {evt.newValue}");
-                        //     if(evt.newValue != preKeySearch)
-                        //     {
-                        //         RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
-                        //     }
-                        // });
-                        return header;
-                    },
-                    makeCell = () => new VisualElement(),
-                    bindCell = (element, elementIndex) =>
-                    {
-                        object key = listView.itemsSource[elementIndex];
-                        object value = payload.GetValue(key);
-
-                        VisualElement valueChild = element.Children().FirstOrDefault();
-
-                        VisualElement editing = UIToolkitEdit.UIToolkitValueEdit(valueChild, "", dictValueType, value, null, newValue =>
-                        {
-                            object refreshedKey = listView.itemsSource[elementIndex];
-                            payload.SetKeyValue(refreshedKey, newValue);
-                        }, false, true, Array.Empty<Attribute>(), targets, richTextTagProvider).result;
-
-                        if (editing != null)
-                        {
-                            element.Clear();
-                            element.Add(editing);
-                        }
-                    },
-                });
-
-                listView.itemsRemoved += ints =>
-                {
-                    int[] toRemoveIndices = ints.ToArray();
-                    // List<object> keepKeys = new List<object>();
-                    List<object> removeKeys = new List<object>();
-                    int index = 0;
-                    foreach (object key in listView.itemsSource)
-                    {
-                        if (Array.IndexOf(toRemoveIndices, index) != -1)
-                        {
-                            removeKeys.Add(key);
-                        }
-                        index++;
-                    }
-
-                    foreach (object key in removeKeys)
-                    {
-                        payload.DeleteKey(key);
-                        // listView.itemsSource.Remove(key);
-                    }
-
-                    // listView.itemsSource = keepKeys;
-                };
-
-                Button listViewAddButton = listView.Q<Button>("unity-list-view__add-button");
-
-                const int pairPanelBorderWidth = 1;
-                Color pairPanelBorderColor = EColor.EditorEmphasized.GetColor();
-                VisualElement addPairPanel = new VisualElement
-                {
-                    style =
-                    {
-                        display = DisplayStyle.None,
-
-                        borderLeftWidth = pairPanelBorderWidth,
-                        borderRightWidth = pairPanelBorderWidth,
-                        borderTopWidth = pairPanelBorderWidth,
-                        borderBottomWidth = pairPanelBorderWidth,
-
-                        borderTopColor = pairPanelBorderColor,
-                        borderBottomColor = pairPanelBorderColor,
-                        borderLeftColor = pairPanelBorderColor,
-                        borderRightColor = pairPanelBorderColor,
-
-                        marginTop = 1,
-                        marginBottom = 1,
-                        marginLeft = 1,
-                        marginRight = 1,
-                    },
-                };
-
-                VisualElement addPairActionContainer = new VisualElement
-                {
-                    style =
-                    {
-                        flexDirection = FlexDirection.Row,
-                        flexGrow = 1,
-                    },
-                };
-
-                Button addPairConfirmButton = new Button
-                {
-                    text = "OK",
-                    style =
-                    {
-                        flexGrow = 1,
-                    },
-                };
-                addPairActionContainer.Add(addPairConfirmButton);
-                Button addPairCancleButton = new Button(() =>
-                {
-                    listViewAddButton.SetEnabled(true);
-                    addPairPanel.style.display = DisplayStyle.None;
-                })
-                {
-                    text = "Cancel",
-                    style =
-                    {
-                        flexGrow = 1,
-                    },
-                };
-                addPairActionContainer.Add(addPairCancleButton);
-
-                VisualElement addPairKeyContainer = new VisualElement();
-                addPairPanel.Add(addPairKeyContainer);
-                object addPairKey = dictKeyType.IsValueType ? Activator.CreateInstance(dictKeyType) : null;
-                bool addPairKeyChange = true;
-                addPairKeyContainer.schedule.Execute(() =>
-                {
-                    if (!addPairKeyChange)
-                    {
-                        return;
-                    }
-
-                    VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
-                        addPairKeyContainer.Children().FirstOrDefault(),
-                        "Key",
-                        dictKeyType,
-                        addPairKey,
-                        null,
-                        newKey =>
-                        {
-                            bool invalidKey = RuntimeUtil.IsNull(newKey);
-                            if (!invalidKey)
-                            {
-                                invalidKey = payload.ContainsKey(newKey);
-                            }
-
-                            addPairConfirmButton.SetEnabled(!invalidKey);
-                            if (!invalidKey)
-                            {
-                                addPairKey = newKey;
-                                addPairKeyChange = true;
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
-                                Debug.Log($"set new pair key {newKey}");
-#endif
-                            }
-                        },
-                        false,
-                        inHorizontalLayout,
-                        Array.Empty<Attribute>(),
-                        targets,
-                        richTextTagProvider
-                    ).result;
-                    // ReSharper disable once InvertIf
-                    if (r != null)
-                    {
-                        addPairKeyContainer.Clear();
-                        addPairKeyContainer.Add(r);
-                    }
-
-                    addPairKeyChange = false;
-                }).Every(100);
-
-                VisualElement addPairValueContainer = new VisualElement();
-                addPairPanel.Add(addPairValueContainer);
-                object addPairValue = dictValueType.IsValueType ? Activator.CreateInstance(dictValueType) : null;
-                bool addPairValueChanged = true;
-                addPairValueContainer.schedule.Execute(() =>
-                {
-                    if (!addPairValueChanged)
-                    {
-                        return;
-                    }
-
-                    VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
-                        addPairValueContainer.Children().FirstOrDefault(),
-                        "Value",
-                        dictValueType,
-                        addPairValue,
-                        null,
-                        newValue =>
-                        {
-                            addPairValue = newValue;
-                            addPairValueChanged = true;
-                        },
-                        false,
-                        inHorizontalLayout,
-                        Array.Empty<Attribute>(),
-                        targets,
-                        richTextTagProvider
-                    ).result;
-                    // ReSharper disable once InvertIf
-                    if (r != null)
-                    {
-                        addPairValueContainer.Clear();
-                        addPairValueContainer.Add(r);
-                    }
-
-                    addPairValueChanged = false;
-                }).Every(100);
-
-                addPairConfirmButton.clicked += () =>
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
-                    Debug.Log($"dictionary set {addPairKey} -> {addPairValue}");
-#endif
-                    payload.SetKeyValue(addPairKey, addPairValue);
-                    addPairPanel.style.display = DisplayStyle.None;
-                    listViewAddButton.SetEnabled(true);
-                    listView.itemsSource = payload.GetKeys().ToList();
-                    // setterOrNull(payload.RawDictValue);
-                    // listView.Rebuild();
-                };
-
-                addPairPanel.Add(addPairActionContainer);
-
-                if (!isReadOnly)
-                {
-                    listViewAddButton.clickable = new Clickable(() =>
-                    {
-                        listViewAddButton.SetEnabled(false);
-                        addPairConfirmButton.SetEnabled(!RuntimeUtil.IsNull(addPairKey) && !payload.ContainsKey(addPairKey));
-                        addPairPanel.style.display = DisplayStyle.Flex;
-                    });
-                }
-
-                foldout.Add(listView);
-                foldout.Add(addPairPanel);
-            }
-
-            DictionaryViewPayload oldPayload = (DictionaryViewPayload)listView.userData;
-            oldPayload.RawDictValue = rawDictValue;
-            if (rawDictValue != null)
-            {
-                // Debug.Log($"Refresh listView");
-                listView.itemsSource = oldPayload.GetKeys().ToList();
-            }
-
-            return useOld? null : foldout;
-        }
+//         private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue,
+//             bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet,
+//             Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
+//         {
+//             // Debug.Log(dictKeyType);
+//             // Debug.Log(dictValueType);
+//
+//             Foldout foldout = oldElement;
+//             if (foldout != null && !foldout.ClassListContains("saintsfield-dictionary"))
+//             {
+//                 foldout = null;
+//             }
+//
+//             bool useOld = foldout != null;
+//
+//             if (foldout == null)
+//             {
+//                 // Debug.Log($"Create new Foldout");
+//                 foldout = new Foldout
+//                 {
+//                     text = label,
+//                 };
+//                 if (labelGrayColor)
+//                 {
+//                     foldout.style.color = EColor.EditorSeparator.GetColor();
+//                 }
+//                 foldout.AddToClassList("saintsfield-dictionary");
+//                 VisualElement foldoutContent = foldout.Q<VisualElement>(className: "unity-foldout__content");
+//                 if (foldoutContent != null)
+//                 {
+//                     foldoutContent.style.marginLeft = 0;
+//                 }
+//
+//                 if(setterOrNull != null)
+//                 {
+//                     // nullable
+//                     foldout.Q<Toggle>().Add(new Button(() =>
+//                     {
+//                         beforeSet?.Invoke(rawDictValue);
+//                         setterOrNull(null);
+//                     })
+//                     {
+//                         // text = "x",
+//                         tooltip = "Set to null",
+//                         style =
+//                         {
+//                             position = Position.Absolute,
+//                             // top = -EditorGUIUtility.singleLineHeight,
+//                             top = 0,
+//                             right = 0,
+//                             width = EditorGUIUtility.singleLineHeight,
+//                             height = EditorGUIUtility.singleLineHeight,
+//
+//                             backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+// #if UNITY_2022_2_OR_NEWER
+//                             backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+//                             backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+//                             backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+//                             backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
+// #else
+//                             unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+// #endif
+//                         },
+//                     });
+//
+//                 }
+//             }
+//
+//             MultiColumnListView listView = foldout.Q<MultiColumnListView>();
+//             if (listView == null)
+//             {
+//                 PropertyInfo keysProperty =  valueType.GetProperty("Keys");
+//                 Debug.Assert(keysProperty != null, $"Failed to get keys from {valueType}");
+//
+//                 PropertyInfo indexerProperty = valueType.GetProperty("Item", new [] { dictKeyType });
+//                 Debug.Assert(keysProperty != null, $"Failed to get key indexer from {valueType}");
+//
+//                 MethodInfo removeMethod = valueType.GetMethod("Remove", new[] { dictKeyType });
+//                 Debug.Assert(keysProperty != null, $"Failed to get `Remove` function from {valueType}");
+//
+//                 MethodInfo containsKeyMethod = valueType.GetMethod("ContainsKey", new[] { dictKeyType });
+//
+//                 Debug.Assert(rawDictValue != null, "Dictionary value should not be null");
+//
+//                 DictionaryViewPayload payload = new DictionaryViewPayload(rawDictValue, keysProperty, indexerProperty, removeMethod, containsKeyMethod);
+//
+//                 listView = new MultiColumnListView
+//                 {
+//                     selectionType = SelectionType.Multiple,
+//                     virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+//                     // showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
+//                     showBoundCollectionSize = false,
+//                     showFoldoutHeader = false,
+//                     // headerTitle = label,
+//                     showAddRemoveFooter = !isReadOnly,
+//                     reorderMode = ListViewReorderMode.Animated,
+//                     reorderable = false,
+//                     style =
+//                     {
+//                         flexGrow = 1,
+//                         position = Position.Relative,
+//                     },
+//                     itemsSource = payload.GetKeys().ToList(),
+//                     userData = payload,
+//                 };
+//
+//                 listView.columns.Add(new Column
+//                 {
+//                     name = "Keys",
+//                     // title = "Keys",
+//                     stretchable = true,
+//                     makeHeader = () =>
+//                     {
+//                         VisualElement header = new VisualElement();
+//                         header.Add(new Label("Keys"));
+//                         // ToolbarSearchField keySearch = new ToolbarSearchField
+//                         // {
+//                         //     // isDelayed = true,
+//                         //     style =
+//                         //     {
+//                         //         marginRight = 3,
+//                         //         display = saintsDictionaryAttribute?.Searchable ?? true
+//                         //             ? DisplayStyle.Flex
+//                         //             : DisplayStyle.None,
+//                         //         width = Length.Percent(97f),
+//                         //     },
+//                         // };
+//                         // TextField keySearchText = keySearch.Q<TextField>();
+//                         // if (keySearchText != null)
+//                         // {
+//                         //     keySearchText.isDelayed = true;
+//                         // }
+//                         // header.Add(keySearch);
+//                         // keySearch.RegisterValueChangedCallback(evt =>
+//                         // {
+//                         //     // Debug.Log($"key search {evt.newValue}");
+//                         //     if(evt.newValue != preKeySearch)
+//                         //     {
+//                         //         RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+//                         //     }
+//                         // });
+//                         return header;
+//                     },
+//                     makeCell = () => new VisualElement(),
+//                     bindCell = (element, elementIndex) =>
+//                     {
+//                         object key = listView.itemsSource[elementIndex];
+//                         object oldValue = payload.GetValue(key);
+//                         bool keyChanged = true;
+//
+//                         VisualElement keyChild = element.Children().FirstOrDefault();
+//
+//                         element.schedule.Execute(() =>
+//                         {
+//                             if (!keyChanged)
+//                             {
+//                                 return;
+//                             }
+//
+//                             keyChanged = false;
+//
+//                             VisualElement editing = UIToolkitValueEdit(keyChild, "", dictKeyType, key, oldKey =>
+//                             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+//                                 Debug.Log($"oldKey={oldKey}");
+// #endif
+//                                 oldValue = payload.GetValue(oldKey);
+//                                 payload.DeleteKey(oldKey);
+//                             }, newKey =>
+//                             {
+//                                 if (RuntimeUtil.IsNull(newKey))
+//                                 {
+//                                     Debug.LogWarning($"Setting key to null is not supported and is ignored");
+//                                     return;
+//                                 }
+//
+//                                 if (payload.ContainsKey(newKey))
+//                                 {
+//                                     Debug.LogWarning($"Setting key {key} to existing key {newKey} is not supported and is ignored");
+//                                     return;
+//                                 }
+//
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+//                                 Debug.Log($"dictionary editing key {key} -> {newKey}");
+// #endif
+//                                 // object oldValue = payload.GetValue(key);
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+//                                 Debug.Log($"set key {key} -> {newKey} with value {oldValue}");
+// #endif
+//                                 payload.DeleteKey(key);
+//                                 payload.SetKeyValue(newKey, oldValue);
+//                                 // int sourceIndex = listView.itemsSource.IndexOf(key);
+//                                 // listView.itemsSource[sourceIndex] = newKey;
+//                                 key = newKey;
+//                                 keyChanged = true;
+//                             }, false, true, Array.Empty<Attribute>(), targets, richTextTagProvider).result;
+//
+//                             if (editing != null)
+//                             {
+//                                 element.Clear();
+//                                 element.Add(editing);
+//                             }
+//                         }).Every(100);
+//                     },
+//                 });
+//
+//                 listView.columns.Add(new Column
+//                 {
+//                     name = "Values",
+//                     // title = "Keys",
+//                     stretchable = true,
+//                     makeHeader = () =>
+//                     {
+//                         VisualElement header = new VisualElement();
+//                         header.Add(new Label("Values"));
+//                         // ToolbarSearchField keySearch = new ToolbarSearchField
+//                         // {
+//                         //     // isDelayed = true,
+//                         //     style =
+//                         //     {
+//                         //         marginRight = 3,
+//                         //         display = saintsDictionaryAttribute?.Searchable ?? true
+//                         //             ? DisplayStyle.Flex
+//                         //             : DisplayStyle.None,
+//                         //         width = Length.Percent(97f),
+//                         //     },
+//                         // };
+//                         // TextField keySearchText = keySearch.Q<TextField>();
+//                         // if (keySearchText != null)
+//                         // {
+//                         //     keySearchText.isDelayed = true;
+//                         // }
+//                         // header.Add(keySearch);
+//                         // keySearch.RegisterValueChangedCallback(evt =>
+//                         // {
+//                         //     // Debug.Log($"key search {evt.newValue}");
+//                         //     if(evt.newValue != preKeySearch)
+//                         //     {
+//                         //         RefreshList(evt.newValue, preValueSearch, prePageIndex, numberOfItemsPerPage.value);
+//                         //     }
+//                         // });
+//                         return header;
+//                     },
+//                     makeCell = () => new VisualElement(),
+//                     bindCell = (element, elementIndex) =>
+//                     {
+//                         object key = listView.itemsSource[elementIndex];
+//                         object value = payload.GetValue(key);
+//
+//                         VisualElement valueChild = element.Children().FirstOrDefault();
+//
+//                         VisualElement editing = UIToolkitEdit.UIToolkitValueEdit(valueChild, "", dictValueType, value, null, newValue =>
+//                         {
+//                             object refreshedKey = listView.itemsSource[elementIndex];
+//                             payload.SetKeyValue(refreshedKey, newValue);
+//                         }, false, true, Array.Empty<Attribute>(), targets, richTextTagProvider).result;
+//
+//                         if (editing != null)
+//                         {
+//                             element.Clear();
+//                             element.Add(editing);
+//                         }
+//                     },
+//                 });
+//
+//                 listView.itemsRemoved += ints =>
+//                 {
+//                     int[] toRemoveIndices = ints.ToArray();
+//                     // List<object> keepKeys = new List<object>();
+//                     List<object> removeKeys = new List<object>();
+//                     int index = 0;
+//                     foreach (object key in listView.itemsSource)
+//                     {
+//                         if (Array.IndexOf(toRemoveIndices, index) != -1)
+//                         {
+//                             removeKeys.Add(key);
+//                         }
+//                         index++;
+//                     }
+//
+//                     foreach (object key in removeKeys)
+//                     {
+//                         payload.DeleteKey(key);
+//                         // listView.itemsSource.Remove(key);
+//                     }
+//
+//                     // listView.itemsSource = keepKeys;
+//                 };
+//
+//                 Button listViewAddButton = listView.Q<Button>("unity-list-view__add-button");
+//
+//                 const int pairPanelBorderWidth = 1;
+//                 Color pairPanelBorderColor = EColor.EditorEmphasized.GetColor();
+//                 VisualElement addPairPanel = new VisualElement
+//                 {
+//                     style =
+//                     {
+//                         display = DisplayStyle.None,
+//
+//                         borderLeftWidth = pairPanelBorderWidth,
+//                         borderRightWidth = pairPanelBorderWidth,
+//                         borderTopWidth = pairPanelBorderWidth,
+//                         borderBottomWidth = pairPanelBorderWidth,
+//
+//                         borderTopColor = pairPanelBorderColor,
+//                         borderBottomColor = pairPanelBorderColor,
+//                         borderLeftColor = pairPanelBorderColor,
+//                         borderRightColor = pairPanelBorderColor,
+//
+//                         marginTop = 1,
+//                         marginBottom = 1,
+//                         marginLeft = 1,
+//                         marginRight = 1,
+//                     },
+//                 };
+//
+//                 VisualElement addPairActionContainer = new VisualElement
+//                 {
+//                     style =
+//                     {
+//                         flexDirection = FlexDirection.Row,
+//                         flexGrow = 1,
+//                     },
+//                 };
+//
+//                 Button addPairConfirmButton = new Button
+//                 {
+//                     text = "OK",
+//                     style =
+//                     {
+//                         flexGrow = 1,
+//                     },
+//                 };
+//                 addPairActionContainer.Add(addPairConfirmButton);
+//                 Button addPairCancleButton = new Button(() =>
+//                 {
+//                     listViewAddButton.SetEnabled(true);
+//                     addPairPanel.style.display = DisplayStyle.None;
+//                 })
+//                 {
+//                     text = "Cancel",
+//                     style =
+//                     {
+//                         flexGrow = 1,
+//                     },
+//                 };
+//                 addPairActionContainer.Add(addPairCancleButton);
+//
+//                 VisualElement addPairKeyContainer = new VisualElement();
+//                 addPairPanel.Add(addPairKeyContainer);
+//                 object addPairKey = dictKeyType.IsValueType ? Activator.CreateInstance(dictKeyType) : null;
+//                 bool addPairKeyChange = true;
+//                 addPairKeyContainer.schedule.Execute(() =>
+//                 {
+//                     if (!addPairKeyChange)
+//                     {
+//                         return;
+//                     }
+//
+//                     VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
+//                         addPairKeyContainer.Children().FirstOrDefault(),
+//                         "Key",
+//                         dictKeyType,
+//                         addPairKey,
+//                         null,
+//                         newKey =>
+//                         {
+//                             bool invalidKey = RuntimeUtil.IsNull(newKey);
+//                             if (!invalidKey)
+//                             {
+//                                 invalidKey = payload.ContainsKey(newKey);
+//                             }
+//
+//                             addPairConfirmButton.SetEnabled(!invalidKey);
+//                             if (!invalidKey)
+//                             {
+//                                 addPairKey = newKey;
+//                                 addPairKeyChange = true;
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+//                                 Debug.Log($"set new pair key {newKey}");
+// #endif
+//                             }
+//                         },
+//                         false,
+//                         inHorizontalLayout,
+//                         Array.Empty<Attribute>(),
+//                         targets,
+//                         richTextTagProvider
+//                     ).result;
+//                     // ReSharper disable once InvertIf
+//                     if (r != null)
+//                     {
+//                         addPairKeyContainer.Clear();
+//                         addPairKeyContainer.Add(r);
+//                     }
+//
+//                     addPairKeyChange = false;
+//                 }).Every(100);
+//
+//                 VisualElement addPairValueContainer = new VisualElement();
+//                 addPairPanel.Add(addPairValueContainer);
+//                 object addPairValue = dictValueType.IsValueType ? Activator.CreateInstance(dictValueType) : null;
+//                 bool addPairValueChanged = true;
+//                 addPairValueContainer.schedule.Execute(() =>
+//                 {
+//                     if (!addPairValueChanged)
+//                     {
+//                         return;
+//                     }
+//
+//                     VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
+//                         addPairValueContainer.Children().FirstOrDefault(),
+//                         "Value",
+//                         dictValueType,
+//                         addPairValue,
+//                         null,
+//                         newValue =>
+//                         {
+//                             addPairValue = newValue;
+//                             addPairValueChanged = true;
+//                         },
+//                         false,
+//                         inHorizontalLayout,
+//                         Array.Empty<Attribute>(),
+//                         targets,
+//                         richTextTagProvider
+//                     ).result;
+//                     // ReSharper disable once InvertIf
+//                     if (r != null)
+//                     {
+//                         addPairValueContainer.Clear();
+//                         addPairValueContainer.Add(r);
+//                     }
+//
+//                     addPairValueChanged = false;
+//                 }).Every(100);
+//
+//                 addPairConfirmButton.clicked += () =>
+//                 {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+//                     Debug.Log($"dictionary set {addPairKey} -> {addPairValue}");
+// #endif
+//                     payload.SetKeyValue(addPairKey, addPairValue);
+//                     addPairPanel.style.display = DisplayStyle.None;
+//                     listViewAddButton.SetEnabled(true);
+//                     listView.itemsSource = payload.GetKeys().ToList();
+//                     // setterOrNull(payload.RawDictValue);
+//                     // listView.Rebuild();
+//                 };
+//
+//                 addPairPanel.Add(addPairActionContainer);
+//
+//                 if (!isReadOnly)
+//                 {
+//                     listViewAddButton.clickable = new Clickable(() =>
+//                     {
+//                         listViewAddButton.SetEnabled(false);
+//                         addPairConfirmButton.SetEnabled(!RuntimeUtil.IsNull(addPairKey) && !payload.ContainsKey(addPairKey));
+//                         addPairPanel.style.display = DisplayStyle.Flex;
+//                     });
+//                 }
+//
+//                 foldout.Add(listView);
+//                 foldout.Add(addPairPanel);
+//             }
+//
+//             DictionaryViewPayload oldPayload = (DictionaryViewPayload)listView.userData;
+//             oldPayload.RawDictValue = rawDictValue;
+//             if (rawDictValue != null)
+//             {
+//                 // Debug.Log($"Refresh listView");
+//                 listView.itemsSource = oldPayload.GetKeys().ToList();
+//             }
+//
+//             return useOld? null : foldout;
+//         }
 
         private static VisualElement WrapVisualElement(VisualElement visualElement)
         {

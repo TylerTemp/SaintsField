@@ -11,6 +11,10 @@ using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if SAINTSFIELD_NEWTONSOFT_JSON
+using Newtonsoft.Json;
+#endif
+
 
 namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 {
@@ -177,6 +181,52 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                     AlwaysCheckUpdate = isNestedField,
                 };
             }
+
+            container.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                (string newValueError, object newValue) = GetValue(FieldWithInfo);
+                if (newValueError != "")
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(newValueError);
+#endif
+                    return;
+                }
+
+                string json = null;
+                if (newValue == null)
+                {
+                    json = "";
+                }
+                else if (newValue is bool boolValue)
+                {
+                    json = boolValue ? "true" : "false";
+                }
+                else if (newValue.GetType().IsPrimitive || newValue is string || newValue.GetType().IsEnum)
+                {
+                    json = newValue.ToString();
+                }
+                else
+                {
+#if SAINTSFIELD_NEWTONSOFT_JSON
+                    try
+                    {
+                        json = JsonConvert.SerializeObject(newValue);
+                    }
+                    catch (Exception e)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(e);
+#endif
+                    }
+#endif
+                }
+
+                if (json != null)
+                {
+                    evt.menu.AppendAction("Copy", _ => GUIUtility.systemCopyBuffer = json);
+                }
+            }));
 
             return (container, true);
 

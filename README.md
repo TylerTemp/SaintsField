@@ -95,10 +95,30 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.9.0**
+**5.10.0**
 
-1.  **Breaking Changes**: Remove `DOTweenPlayStart`/`DOTweenPlayEnd` due to the complexity them introduce.
-2.  Fix: `DOTweenPlay` did not work.
+> [!CAUTION]
+> Contains Breaking Changes
+
+1.  Add: `SaintsDictionary` old version migration [#361](https://github.com/TylerTemp/SaintsField/issues/361)
+2.  Improve: Better look of tree dropdown
+3.  Add: `Copy` right click menu for `ShowInInspector`
+4.  **Breaking Changes**: Make `TreeDropdown` the major dropdown:
+
+Old Name | New Name 
+---------|----------
+`TreeDropdown` | `Dropdown`
+`Dropdown` | `MenuDropdown`
+`OptionsDropdown` | `AdvancedOptionsDropdown`
+`PairsDropdown` | `AdvancedPairsTreeDropdown`
+`OptionsTreeDropdown` | `OptionsDropdown`
+`PairsTreeDropdown` | `PairsDropdown`
+
+Name (Deprecated) | Alias Of
+------------------|--------------
+`TreeDropdown` | `Dropdown`
+`OptionsTreeDropdown` | `OptionsDropdown`
+`PairsTreeDropdown` | `PairsDropdown`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
