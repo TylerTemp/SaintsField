@@ -27,16 +27,16 @@ namespace SaintsField.Samples.Scripts
         {
             AdvancedDropdownList<float> result = new AdvancedDropdownList<float>
             {
-                // { "20%", 0.2f },
-                // { "40%", 0.4f },
-                // { "60%", 0.6f },
+                { "20%", 0.2f },
+                { "40%", 0.4f },
+                { "60%", 0.6f },
             };
             // `Add` is supported
-            // result.Add("80%", 0.8f);
+            result.Add("80%", 0.8f);
             // rich tag is supported
             result.Add($"<color={EColor.GoldenRod}>100%<icon=lightMeter/redLight/>", 1f);
             // disable is supported
-            // result.Add("120%", 1.2f, true);
+            result.Add("120%", 1.2f, true);
             return result;
         }
 
