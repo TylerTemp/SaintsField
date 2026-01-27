@@ -48,7 +48,7 @@ namespace SaintsField.Samples.Scripts.Interface
 #endif
 
 #if UNITY_EDITOR
-        [Dropdown(nameof(Dropdown))]
+        [MenuDropdown(nameof(Dropdown))]
 #endif
         public Interface1 dropdown;
 

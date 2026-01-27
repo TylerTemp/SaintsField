@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class TreeDropdownExample: MonoBehaviour
     {
-        [TreeDropdown(nameof(BookDrop))] public string bookName;
+        [Dropdown(nameof(BookDrop))] public string bookName;
 
         private IEnumerable<string> BookDrop()
         {
@@ -21,7 +21,7 @@ namespace SaintsField.Samples.Scripts
             };
         }
 
-        [TreeDropdown(nameof(QuickDrop))] public float percent;
+        [Dropdown(nameof(QuickDrop))] public float percent;
 
         private AdvancedDropdownList<float> QuickDrop()
         {
@@ -41,7 +41,7 @@ namespace SaintsField.Samples.Scripts
         }
 
         [
-            TreeDropdown(nameof(AdvDropdown)),
+            Dropdown(nameof(AdvDropdown)),
             // PostFieldButton(nameof(Reset), "R"),
         ] public int selectIt;
 
@@ -83,7 +83,7 @@ namespace SaintsField.Samples.Scripts
             [OnValueChanged(nameof(ShowNewValue))]
             [FieldAboveText(nameof(selectIt), true)]
             [FieldLabelText("<icon=star.png /><label />")]
-            [TreeDropdown(nameof(AdvDropdown))] public int selectIt;
+            [Dropdown(nameof(AdvDropdown))] public int selectIt;
 
             public AdvancedDropdownList<int> AdvDropdown()
             {

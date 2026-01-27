@@ -24,7 +24,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [FlagsDropdown]
         public NamedEnums flagsEnums;
 
-        [TreeDropdown]
+        [Dropdown]
         public NamedEnums treeEnums;
 
         [FlagsTreeDropdown]

@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
     {
         private string _selectItem;
 
-        [ShowInInspector, TreeDropdown(nameof(GetItems))]
+        [ShowInInspector, Dropdown(nameof(GetItems))]
         public string SelectedItem
         {
             get => _selectItem;
@@ -15,8 +15,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 
         [ShowInInspector]
         [Button]
-        [TreeDropdown(nameof(GetItems))]  // change the returned value display
-        private string SelectItemWithButton([TreeDropdown(nameof(GetItems))] string item)
+        [Dropdown(nameof(GetItems))]  // change the returned value display
+        private string SelectItemWithButton([Dropdown(nameof(GetItems))] string item)
         {
             return item;
         }

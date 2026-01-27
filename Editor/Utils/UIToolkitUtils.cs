@@ -1426,7 +1426,7 @@ namespace SaintsField.Editor.Utils
                         return null;
                     }
 
-                    TreeDropdownAttribute treeDropdownAttribute = new TreeDropdownAttribute();
+                    DropdownAttribute treeDropdownAttribute = new DropdownAttribute();
                     TreeDropdownAttributeDrawer treeDropdownDrawer = (TreeDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(TreeDropdownAttributeDrawer), fieldInfo, treeDropdownAttribute, label);
                     treeDropdownDrawer.OverridePropertyAttributes = new[] { treeDropdownAttribute };
                     treeDropdownDrawer.InHorizontalLayout = inHorizontalLayout;

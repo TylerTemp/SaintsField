@@ -4180,7 +4180,7 @@ public Vector2Int v2Value;
 
 ### Miscellaneous ###
 
-#### `TreeDropdown` ####
+#### `Dropdown` ####
 
 A tree dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
 
@@ -4200,7 +4200,7 @@ This is the recommended way to make a searchable dropdown.
 First, it can make a quick searchable dropdown:
 
 ```csharp
-[TreeDropdown(nameof(BookDrop))] public string bookName;
+[Dropdown(nameof(BookDrop))] public string bookName;
 
 private IEnumerable<string> BookDrop()
 {
@@ -4219,7 +4219,7 @@ private IEnumerable<string> BookDrop()
 Second, it can set labels for these items with rich text support
 
 ```csharp
-[TreeDropdown(nameof(QuickDrop))] public float percent;
+[Dropdown(nameof(QuickDrop))] public float percent;
 
 private AdvancedDropdownList<float> QuickDrop()
 {
@@ -4246,7 +4246,7 @@ Finally, it support nested items
 ```csharp
 using SaintsField;
 
-[TreeDropdown(nameof(AdvDropdown))] public int drops;
+[Dropdown(nameof(AdvDropdown))] public int drops;
 
 public AdvancedDropdownList<int> AdvDropdown()
 {
@@ -4286,14 +4286,14 @@ Example of up-walk
 [Serializable]
 public struct Down
 {
-    [TreeDropdown("../../" + nameof(options))]  // Up walk 2 levels
+    [Dropdown("../../" + nameof(options))]  // Up walk 2 levels
     public string stringV;
 }
 
 [Serializable]
 public struct MyStruct
 {
-    [TreeDropdown("../" + nameof(options))]  // Up walk 1 level
+    [Dropdown("../" + nameof(options))]  // Up walk 1 level
     public string stringV;
     public Down down;
 }
@@ -4310,7 +4310,7 @@ It can work with `ShowInInspector`
 ```csharp
 using SainsField;
 
-[ShowInInspector, TreeDropdown(nameof(GetItems))]
+[ShowInInspector, Dropdown(nameof(GetItems))]
 public string SelectedItem
 {
     get => _selectItem;
@@ -4327,15 +4327,15 @@ using SainsField;
 using SainsField.Playa;
 
 [ShowInInspector]
-[TreeDropdown(nameof(GetItems))]  // change the returned value display
-private string SelectItemWithButton([TreeDropdown(nameof(GetItems))] string item)
+[Dropdown(nameof(GetItems))]  // change the returned value display
+private string SelectItemWithButton([Dropdown(nameof(GetItems))] string item)
 {
     return item;
 }
 
 [Button]
-[TreeDropdown(nameof(GetItems))]  // change the returned value display
-private string SelectItemWithButton([TreeDropdown(nameof(GetItems))] string item)
+[Dropdown(nameof(GetItems))]  // change the returned value display
+private string SelectItemWithButton([Dropdown(nameof(GetItems))] string item)
 {
     return item;
 }
@@ -4343,9 +4343,9 @@ private string SelectItemWithButton([TreeDropdown(nameof(GetItems))] string item
 
 ![](https://github.com/user-attachments/assets/c2534cdd-a257-4b27-9346-ea439741cdff)
 
-#### `OptionsTreeDropdown` / `PairsTreeDropdown` ####
+#### `OptionsDropdown` / `PairsDropdown` ####
 
-Like `OptionsDropdown` / `PairsDropdown`, but in a tree view
+Like `Dropdown`, but allows you to quickly set some const expression value
 
 > [!WARNING]
 > UI Toolkit only.
@@ -4353,7 +4353,7 @@ Like `OptionsDropdown` / `PairsDropdown`, but in a tree view
 ```csharp
 use SaintsField;
 
-[OptionsTreeDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
+[OptionsDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
 public string[] treeOpt;
 ```
 
@@ -4372,11 +4372,11 @@ public enum Direction
     Center,
 }
 
-[PairsTreeDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
+[PairsDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
 public int treeIntOpt;
 
 // useful if you don't want the entire enum
-[PairsTreeDropdown(EUnique.Disable, "Hor/<-", Direction.Left, "Hor/->", Direction.Right, "Vert/↑", Direction.Up, "Vert/↓", Direction.Down)]
+[PairsDropdown(EUnique.Disable, "Hor/<-", Direction.Left, "Hor/->", Direction.Right, "Vert/↑", Direction.Up, "Vert/↓", Direction.Down)]
 public Direction[] treeDireOpt;
 ```
 
@@ -4595,7 +4595,7 @@ public MyStruct myStruct;
 ![](https://github.com/user-attachments/assets/c9f42bf2-632a-496a-8ffc-74b2abbaceb9)
 
 
-#### `OptionsDropdown` / `PairsDropdown` ####
+#### `AdvancedOptionsDropdown` / `AdvancedPairsDropdown` ####
 
 Like `AdvancedDropdown`, but allows you to quickly set some const expression value
 
@@ -4604,10 +4604,10 @@ Useful when you don't want the entire enum
 ```csharp
 use SaintsField;
 
-[OptionsDropdown(0.5f, 1f, 1.5f, 2f, 2.5f, 3f)]
+[AdvancedOptionsDropdown(0.5f, 1f, 1.5f, 2f, 2.5f, 3f)]
 public float floatOpt;
 
-[OptionsDropdown(EUnique.Disable, "Left", "Right", "Top", "Bottom", "Center")]
+[AdvancedOptionsDropdown(EUnique.Disable, "Left", "Right", "Top", "Bottom", "Center")]
 public string[] stringOpt;
 ```
 
@@ -4616,7 +4616,7 @@ public string[] stringOpt;
 ```csharp
 use SaintsField;
 
-[PairsDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
+[AdvancedPairsDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
 public int intOpt;
 
 public enum Direction
@@ -4630,13 +4630,13 @@ public enum Direction
 }
 
 // useful if you don't want the entire enum
-[PairsDropdown(EUnique.Disable, "<-", Direction.Left, "->", Direction.Right, "↑", Direction.Up, "↓", Direction.Down)]
+[AdvancedPairsDropdown(EUnique.Disable, "<-", Direction.Left, "->", Direction.Right, "↑", Direction.Up, "↓", Direction.Down)]
 public Direction[] direOpt;
 ```
 
 ![](https://github.com/user-attachments/assets/01501513-d00d-4320-94e9-6c76a81a3c2a)
 
-#### `Dropdown` ####
+#### `MenuDropdown` ####
 
 A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
 
@@ -4658,11 +4658,11 @@ If you're using UI Toolkit, the search box can also search the path too (rather 
 ```csharp
 using SaintsField;
 
-[Dropdown(nameof(GetDropdownItems))] public float _float;
+[MenuDropdown(nameof(GetDropdownItems))] public float _float;
 
 public GameObject _go1;
 public GameObject _go2;
-[Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;
+[MenuDropdown(nameof(GetDropdownRefs))] public GameObject _refs;
 
 private DropdownList<float> GetDropdownItems()
 {
@@ -4690,7 +4690,7 @@ To control the separator and disabled item
 ```csharp
 using SaintsField;
 
-[Dropdown(nameof(GetDropdownItems))]
+[MenuDropdown(nameof(GetDropdownItems))]
 public Color color;
 
 private DropdownList<Color> GetDropdownItems()
@@ -4745,7 +4745,7 @@ public enum MyEnum
     ForthOne,
 }
 
-[Dropdown] public MyEnum myEnumDropdown;
+[MenuDropdown] public MyEnum myEnumDropdown;
 ```
 
 ![image](https://github.com/user-attachments/assets/46ddc541-8773-4571-9aeb-f3fe25c5f783)

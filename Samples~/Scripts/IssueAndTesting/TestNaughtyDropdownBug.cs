@@ -21,14 +21,14 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting
     [Serializable]
     public class TestClass
     {
-        [SerializeField, Dropdown(nameof(drop))] private string test;
+        [SerializeField, MenuDropdown(nameof(drop))] private string test;
         public DropdownList<string> drop => TestStatic.TestDropdown;
     }
 
     [Serializable]
     public struct TestStruct
     {
-        [SerializeField, Dropdown(nameof(drop))] private string test;
+        [SerializeField, MenuDropdown(nameof(drop))] private string test;
         public DropdownList<string> drop => TestStatic.TestDropdown;
     }
 }

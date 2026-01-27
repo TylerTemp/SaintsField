@@ -1,34 +1,14 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class PairsTreeDropdown: TreeDropdownAttribute
+    [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property | System.AttributeTargets.Method | System.AttributeTargets.Parameter)]
+    public class PairsTreeDropdown: PairsDropdown
     {
-        public override Mode BehaveMode => Mode.Tuples;
-
-        public PairsTreeDropdown(params object[] tuples)
+        public PairsTreeDropdown(params object[] tuples) : base(tuples)
         {
-            // Tuples = tuples;
-            List<(string, object)> pairs = new List<(string, object)>();
-
-            int startIndex = 0;
-            if (tuples[0].GetType() == typeof(EUnique))
-            {
-                EUnique = (EUnique)tuples[0];
-                startIndex = 1;
-            }
-
-            for (int index = startIndex; index < tuples.Length; index+=2)
-            {
-                string path = (string)tuples[index];
-                object value = tuples[index + 1];
-                pairs.Add((path, value));
-            }
-
-            Tuples = pairs;
         }
     }
 }

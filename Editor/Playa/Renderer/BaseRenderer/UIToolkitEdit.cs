@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             allAttributes,
                             targets), false);
                     }
-                    case TreeDropdownAttribute treeDropdownAttribute:
+                    case DropdownAttribute treeDropdownAttribute:
                     {
                         return (TreeDropdownAttributeDrawer.UIToolkitValueEdit(
                             oldElement,

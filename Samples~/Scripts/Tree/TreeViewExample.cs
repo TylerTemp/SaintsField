@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.Tree
 {
     public class TreeViewExample: MonoBehaviour
     {
-        [TreeDropdown(nameof(Callback)), FieldAboveText("<field />"), BelowButton(nameof(SetValue))]
+        [Dropdown(nameof(Callback)), FieldAboveText("<field />"), BelowButton(nameof(SetValue))]
         public int treeDropdown;
 
         private AdvancedDropdownList<int> Callback()

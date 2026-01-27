@@ -8,16 +8,16 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         [Serializable]
         public struct Down
         {
-            [TreeDropdown("../../" + nameof(options))]
-            public string stringV;
             [Dropdown("../../" + nameof(options))]
+            public string stringV;
+            [MenuDropdown("../../" + nameof(options))]
             public string oldDownV;
         }
 
         [Serializable]
         public struct MyStruct
         {
-            [TreeDropdown("../" + nameof(options))]
+            [Dropdown("../" + nameof(options))]
             public string stringV;
             public Down down;
         }

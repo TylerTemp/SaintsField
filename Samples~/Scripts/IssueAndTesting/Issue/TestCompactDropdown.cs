@@ -5,7 +5,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
     public class TestCompactDropdown : SaintsMonoBehaviour
     {
         [AdvancedDropdown(nameof(Options))] public int d;
-        [TreeDropdown(nameof(Options))] public int t;
+        [Dropdown(nameof(Options))] public int t;
 
         private AdvancedDropdownList<int> Options()
         {

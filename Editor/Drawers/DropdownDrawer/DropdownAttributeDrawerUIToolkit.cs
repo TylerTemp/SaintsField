@@ -1,7 +1,6 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -21,7 +20,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
         {
-            DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
+            MenuDropdownAttribute dropdownAttribute = (MenuDropdownAttribute) saintsAttribute;
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, info, parent);
 
             string buttonLabel = metaInfo.SelectedIndex == -1? "-": metaInfo.DropdownListValue[metaInfo.SelectedIndex].Item1;
@@ -61,7 +60,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            DropdownAttribute dropdownAttribute = (DropdownAttribute)saintsAttribute;
+            MenuDropdownAttribute dropdownAttribute = (MenuDropdownAttribute)saintsAttribute;
 
             UIToolkitUtils.DropdownButtonField dropdownButtonField = container.Q<UIToolkitUtils.DropdownButtonField>(NameDropdownButtonField(property));
 
@@ -110,7 +109,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         private static void ShowDropdown(SerializedProperty property, ISaintsAttribute saintsAttribute,
             VisualElement container, bool slashAsSub, FieldInfo info, object parent, Action<object> onChange)
         {
-            DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
+            MenuDropdownAttribute dropdownAttribute = (MenuDropdownAttribute) saintsAttribute;
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
@@ -175,11 +174,14 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                         });
                     }
                 }
+
+                genericDropdownMenu.DropDown(dropdownButtonField.ButtonElement.worldBound, dropdownButtonField,
 #if UNITY_6000_3_OR_NEWER
-                genericDropdownMenu.DropDown(dropdownButtonField.ButtonElement.worldBound, dropdownButtonField, DropdownMenuSizeMode.Auto);
+                    DropdownMenuSizeMode.Auto
 #else
-                genericDropdownMenu.DropDown(dropdownButtonField.ButtonElement.worldBound, dropdownButtonField, true);
+                    true
 #endif
+                );
             }
         }
     }

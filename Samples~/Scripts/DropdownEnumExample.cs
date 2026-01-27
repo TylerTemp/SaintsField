@@ -20,9 +20,9 @@ namespace SaintsField.Samples.Scripts
             ForthOne,
         }
 
-        [Dropdown] public MyEnum myEnumDropdown;
-        [Dropdown(EUnique.Disable)] public MyEnum[] myEnumDropdownDisable;
-        [Dropdown(EUnique.Remove)] public MyEnum[] myEnumDropdownRemove;
+        [MenuDropdown] public MyEnum myEnumDropdown;
+        [MenuDropdown(EUnique.Disable)] public MyEnum[] myEnumDropdownDisable;
+        [MenuDropdown(EUnique.Remove)] public MyEnum[] myEnumDropdownRemove;
         [AdvancedDropdown] public MyEnum myEnumAdvancedDropdown;
         [AdvancedDropdown(EUnique.Disable)] public MyEnum[] myEnumAdvancedDropdownDisable;
         [AdvancedDropdown(EUnique.Remove)] public MyEnum[] myEnumAdvancedDropdownRemove;

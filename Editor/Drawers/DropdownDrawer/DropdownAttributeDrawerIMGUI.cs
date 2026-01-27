@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 AsyncChangedCache.Remove(key);
             }
 
-            DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
+            MenuDropdownAttribute dropdownAttribute = (MenuDropdownAttribute) saintsAttribute;
             // Object target = property.serializedObject.targetObject;
             // Type parentType = parent.GetType();
             MetaInfo metaInfo = GetMetaInfo(property, dropdownAttribute, info, parent);

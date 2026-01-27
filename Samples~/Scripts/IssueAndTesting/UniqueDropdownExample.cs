@@ -38,8 +38,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting
             };
         }
 
-        [Dropdown(nameof(GetDropdownItems), EUnique.Disable)] public float[] uniqueDisabled;
-        [Dropdown(nameof(GetDropdownItems), EUnique.Remove)] public float[] uniqueRemoved;
+        [MenuDropdown(nameof(GetDropdownItems), EUnique.Disable)] public float[] uniqueDisabled;
+        [MenuDropdown(nameof(GetDropdownItems), EUnique.Remove)] public float[] uniqueRemoved;
 
         private DropdownList<float> GetDropdownItems()
         {

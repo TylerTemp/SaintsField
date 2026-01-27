@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
         public class VideoItem
         {
             // DeEditorUtils.List titles = new();
-            [Dropdown("titles"), FieldBelowText(nameof(value), true)]
+            [MenuDropdown("titles"), FieldBelowText(nameof(value), true)]
             public string value;
 
             public DropdownList<string> titles = new DropdownList<string>

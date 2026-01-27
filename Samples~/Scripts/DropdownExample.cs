@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts
     {
         [SerializeField] private string _label;
 
-        [Dropdown(nameof(GetDropdownItems)), FieldLabelText(nameof(GetLabel), true)]
+        [MenuDropdown(nameof(GetDropdownItems)), FieldLabelText(nameof(GetLabel), true)]
         public float floatV;
 
         private string GetLabel() => string.IsNullOrEmpty(_label) ? null : _label;
@@ -26,7 +26,7 @@ namespace SaintsField.Samples.Scripts
 
         public GameObject go1;
         public GameObject go2;
-        [Dropdown(nameof(GetDropdownRefs))][FieldLabelText("<icon=star.png /><label />")]
+        [MenuDropdown(nameof(GetDropdownRefs))][FieldLabelText("<icon=star.png /><label />")]
         public GameObject refs;
 
         private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
@@ -38,9 +38,9 @@ namespace SaintsField.Samples.Scripts
             {"NULL", null},
         };
 
-        [Dropdown(nameof(GetAdvancedDropdownItems))]
+        [MenuDropdown(nameof(GetAdvancedDropdownItems))]
         public Color color;
-        [Dropdown(nameof(GetAdvancedDropdownItems), false)]
+        [MenuDropdown(nameof(GetAdvancedDropdownItems), false)]
         public Color colorNoSub;
 
         private DropdownList<Color> GetAdvancedDropdownItems()
@@ -59,9 +59,9 @@ namespace SaintsField.Samples.Scripts
             };
         }
 
-        [Dropdown(nameof(GetUniqItems))] public string uniq1;
-        [Dropdown(nameof(GetUniqItems))] public string uniq2;
-        [Dropdown(nameof(GetUniqItems))] public string uniq3;
+        [MenuDropdown(nameof(GetUniqItems))] public string uniq1;
+        [MenuDropdown(nameof(GetUniqItems))] public string uniq2;
+        [MenuDropdown(nameof(GetUniqItems))] public string uniq3;
 
         private DropdownList<string> GetUniqItems() => new DropdownList<string>
         {
@@ -76,7 +76,7 @@ namespace SaintsField.Samples.Scripts
         public int normal;
 
         // [OnValueChanged(nameof(OnChanged))]
-        [Dropdown(nameof(MyStructValues))]
+        [MenuDropdown(nameof(MyStructValues))]
         // [BelowRichLabel(nameof(GetValue), true)]
         public int myInt;
 
@@ -94,7 +94,7 @@ namespace SaintsField.Samples.Scripts
             public int normal;
 
             // [OnValueChanged(nameof(OnChanged))]
-            [Dropdown(nameof(MyStructValues))]
+            [MenuDropdown(nameof(MyStructValues))]
             [FieldBelowText(nameof(myInt), true)]
             public int myInt;
 
@@ -114,7 +114,7 @@ namespace SaintsField.Samples.Scripts
         [SerializeField] private MyData my;
 
         [FieldReadOnly]
-        [Dropdown(nameof(GetDropdownItems))]
+        [MenuDropdown(nameof(GetDropdownItems))]
         public float floatVDisabled;
 
         [Serializable]
@@ -134,7 +134,7 @@ namespace SaintsField.Samples.Scripts
         }
 
         [FieldInfoBox("This works fine, but because we use Equal to compare the struct, it will by default not equal, and does not know when it's actually the same struct")]
-        [Dropdown(nameof(MyStructParentDropdown))]
+        [MenuDropdown(nameof(MyStructParentDropdown))]
         public MyStructParent nestedStruct;
 
         public DropdownList<MyStructParent> MyStructParentDropdown() => new DropdownList<MyStructParent>
@@ -197,7 +197,7 @@ namespace SaintsField.Samples.Scripts
         }
 
 
-        [Dropdown(nameof(ListEnumDropdown))]
+        [MenuDropdown(nameof(ListEnumDropdown))]
         [FieldLabelText("$" + nameof(ListEnumLabel))]
         public ListEnum[] listEnum;
 

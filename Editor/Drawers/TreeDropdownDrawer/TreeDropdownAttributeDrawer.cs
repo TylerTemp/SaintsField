@@ -6,7 +6,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
-    [CustomPropertyDrawer(typeof(TreeDropdownAttribute), true)]
+    [CustomPropertyDrawer(typeof(DropdownAttribute), true)]
     public partial class TreeDropdownAttributeDrawer: SaintsPropertyDrawer
     {
 

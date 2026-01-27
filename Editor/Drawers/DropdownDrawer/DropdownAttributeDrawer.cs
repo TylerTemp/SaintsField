@@ -15,7 +15,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
-    [CustomPropertyDrawer(typeof(DropdownAttribute), true)]
+    [CustomPropertyDrawer(typeof(MenuDropdownAttribute), true)]
     public partial class DropdownAttributeDrawer: SaintsPropertyDrawer
     {
         private string _error = "";
@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             object parentObj)
         {
             Debug.Assert(field != null);
-            DropdownAttribute dropdownAttribute = (DropdownAttribute) saintsAttribute;
+            MenuDropdownAttribute dropdownAttribute = (MenuDropdownAttribute) saintsAttribute;
 
 
             string error;

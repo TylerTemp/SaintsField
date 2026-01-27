@@ -1,5 +1,29 @@
 # Changelog
 
+## 5.10.0 ##
+
+> [!CAUTION]
+> Contains Breaking Changes
+
+1.  Add: `SaintsDictionary` old version migration [#361](https://github.com/TylerTemp/SaintsField/issues/361)
+2.  Improve: Better look of tree dropdown
+3.  **Breaking Changes**: Make `TreeDropdown` the major dropdown:
+
+Old Name | New Name 
+---------|----------
+`TreeDropdown` | `Dropdown`
+`Dropdown` | `MenuDropdown`
+`OptionsDropdown` | `AdvancedOptionsDropdown`
+`PairsDropdown` | `AdvancedPairsTreeDropdown`
+`OptionsTreeDropdown` | `OptionsDropdown`
+`PairsTreeDropdown` | `PairsDropdown`
+
+Name (Deprecated) | Alias Of
+------------------|--------------
+`TreeDropdown` | `Dropdown`
+`OptionsTreeDropdown` | `OptionsDropdown`
+`PairsTreeDropdown` | `PairsDropdown`
+
 ## 5.9.0 ##
 
 1.  **Breaking Changes**: Remove `DOTweenPlayStart`/`DOTweenPlayEnd` due to the complexity them introduce.

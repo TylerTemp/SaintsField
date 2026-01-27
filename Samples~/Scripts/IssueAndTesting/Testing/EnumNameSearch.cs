@@ -13,7 +13,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
             [InspectorName("第三")] Third,
         }
 
-        [TreeDropdown] public MyEnum myEnum;
+        [Dropdown] public MyEnum myEnum;
         public MyEnum myEnumAdv;
     }
 }

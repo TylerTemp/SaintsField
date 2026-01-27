@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 {
     public class Issue92: MonoBehaviour
     {
-        [Dropdown(nameof(LongValues))] public long longValue;
+        [MenuDropdown(nameof(LongValues))] public long longValue;
 
         public DropdownList<long> LongValues() => new DropdownList<long>
         {
@@ -16,7 +16,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             {"min", long.MinValue},
         };
 
-        [Dropdown(nameof(IntValues))]
+        [MenuDropdown(nameof(IntValues))]
         public int intValue;
 
         public DropdownList<int> IntValues() => new DropdownList<int>
@@ -34,7 +34,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             Second,
         }
 
-        [Dropdown(nameof(EnumValueList))]
+        [MenuDropdown(nameof(EnumValueList))]
         public MyEnum enumValue;
 
         public DropdownList<MyEnum> EnumValueList() => new DropdownList<MyEnum>

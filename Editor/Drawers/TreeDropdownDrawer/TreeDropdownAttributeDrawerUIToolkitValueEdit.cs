@@ -17,11 +17,11 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             private IReadOnlyList<object> _targets;
             private readonly UIToolkitUtils.DropdownButtonField _buttonField;
             private readonly Type _type;
-            private readonly TreeDropdownAttribute _attribute;
+            private readonly DropdownAttribute _attribute;
             private readonly IRichTextTagProvider _richTextTagProvider;
             private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
-            public Wrap(string label, TreeDropdownAttribute attribute, Type type, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IRichTextTagProvider richTextTagProvider)
+            public Wrap(string label, DropdownAttribute attribute, Type type, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IRichTextTagProvider richTextTagProvider)
             {
                 _type = type;
                 _attribute = attribute;
@@ -85,7 +85,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             }
         }
 
-        public static VisualElement UIToolkitValueEdit(VisualElement oldElement, TreeDropdownAttribute treeDropdownAttribute, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
+        public static VisualElement UIToolkitValueEdit(VisualElement oldElement, DropdownAttribute treeDropdownAttribute, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
         {
             if (valueType.BaseType == typeof(Enum) || value is Enum)
             {

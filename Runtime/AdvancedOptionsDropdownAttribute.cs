@@ -5,11 +5,11 @@ using System.Linq;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class OptionsTreeDropdownAttribute: TreeDropdownAttribute
+    public class AdvancedOptionsDropdownAttribute: AdvancedDropdownAttribute
     {
         public override Mode BehaveMode => Mode.Options;
 
-        public OptionsTreeDropdownAttribute(params object[] options)
+        public AdvancedOptionsDropdownAttribute(params object[] options)
         {
             if (options[0].GetType() == typeof(EUnique))
             {

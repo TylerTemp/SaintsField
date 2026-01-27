@@ -5,7 +5,8 @@ using System.Linq;
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class OptionsDropdownAttribute: AdvancedDropdownAttribute
+    [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property | System.AttributeTargets.Method | System.AttributeTargets.Parameter)]
+    public class OptionsDropdownAttribute: DropdownAttribute
     {
         public override Mode BehaveMode => Mode.Options;
 
