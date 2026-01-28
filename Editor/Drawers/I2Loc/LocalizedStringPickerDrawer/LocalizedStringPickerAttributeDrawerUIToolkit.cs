@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using I2.Loc;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -126,13 +127,19 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                 ));
             };
 
-            selectorButton.RegisterCallback<AttachToPanelEvent>(_ =>
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(CleanCache);
+            SaintsAssetPostprocessor.OnAnyEvent.AddListener(CleanCache);
+            LocalizationManager.OnLocalizeEvent += CleanCache;
+            // Debug.Log("All listener done.");
+            selectorButton.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
-                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(CleanCache);
-                selectorButton.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CleanCache));
-                return;
-                void CleanCache() => _dropdownListCache = null;
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CleanCache);
+                SaintsAssetPostprocessor.OnAnyEvent.RemoveListener(CleanCache);
+                LocalizationManager.OnLocalizeEvent -= CleanCache;
             });
+            return;
+
+            void CleanCache() => _dropdownListCache = null;
         }
 
         private static void UpdateHelpBox(HelpBox helpBox, string error)

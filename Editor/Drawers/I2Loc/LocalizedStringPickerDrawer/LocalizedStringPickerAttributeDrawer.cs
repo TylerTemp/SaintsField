@@ -59,6 +59,8 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                     AdvancedDropdownList<string>.AddByNames(advancedDropdownList, new Queue<string>(sep), term);
                 }
 
+                advancedDropdownList.SelfCompact();
+
                 _dropdownListCache = advancedDropdownList;
             }
 

@@ -12324,11 +12324,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.I2PickerExample
   ls1:
-    mTerm: 
+    mTerm: SaintsField/Config
     mRTL_IgnoreArabicFix: 0
     mRTL_MaxLineLength: 0
     mRTL_ConvertNumbers: 0
     m_DontLocalizeParameters: 0
+  lang: Chinese
 --- !u!1 &689768759
 GameObject:
   m_ObjectHideFlags: 0

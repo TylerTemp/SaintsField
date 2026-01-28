@@ -3,7 +3,6 @@ using UnityEditor;
 #endif
 
 using System;
-using System.IO;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -15,9 +14,13 @@ namespace SaintsField.Samples.Scripts
 
         [I2Loc.LocalizedStringPicker] public I2.Loc.LocalizedString ls1;
 
-        [PostFieldButton(nameof(SetLang))] public string lang;
+        [OnValueChanged(nameof(SetLang)), OptionsValueButtons("English", "Chinese")] public string lang;
 
-        private void SetLang(string newLang) => I2.Loc.LocalizationManager.CurrentLanguage = newLang;
+        private void SetLang(string newLang)
+        {
+            I2.Loc.LocalizationManager.CurrentLanguage = newLang;
+            // Debug.Log($"set to {I2.Loc.LocalizationManager.CurrentLanguage}");
+        }
 
 #if UNITY_EDITOR
         [InitializeOnLoadMethod]
@@ -46,6 +49,8 @@ namespace SaintsField.Samples.Scripts
                     Debug.Log($"Failed to load {languageSource} into LocalizationManager.Sources, retry later");
                     EditorLoad();
                 }
+
+                // I2.Loc.LocalizationManager.OnLocalizeEvent += () => Debug.Log("OnLocalizeEvent on script");
             };
 
         }
