@@ -162,6 +162,19 @@ namespace SaintsField.Editor.Utils
                 return;
             }
 
+            label.text = "";
+
+            SetLabelChildren(label, chunksOrNull, richTextDrawer);
+        }
+
+        public static void SetLabelChildren(VisualElement label, IEnumerable<RichTextDrawer.RichTextChunk> chunksOrNull,
+            RichTextDrawer richTextDrawer)
+        {
+            if (label == null)
+            {
+                return;
+            }
+
             if (chunksOrNull == null)
             {
                 label.style.display = DisplayStyle.None;
@@ -174,7 +187,6 @@ namespace SaintsField.Editor.Utils
             }
 
             label.Clear();
-            label.text = "";
             label.style.flexDirection = FlexDirection.Row;
             // label.style.alignItems = Align.Center;
             // label.style.height = EditorGUIUtility.singleLineHeight;

@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.EnumFlagsDrawers;
 using SaintsField.Editor.Playa.RendererGroup.TabGroup;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
@@ -158,7 +157,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
             if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
             {
-                Label title = new Label
+                VisualElement title = new VisualElement
                 {
                     style =
                     {
@@ -171,7 +170,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     },
                 };
 
-                UIToolkitUtils.SetLabel(title, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
+                UIToolkitUtils.SetLabelChildren(title, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
 
                 title.RemoveFromClassList("unity-label");
                 if (_eLayout.HasFlagFast(ELayout.TitleOut))
@@ -253,9 +252,9 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     };
                     title.Add(foldoutImage);
 
-                    Label titleLabel = new Label();
+                    VisualElement titleLabel = new VisualElement();
                     title.Add(titleLabel);
-                    UIToolkitUtils.SetLabel(titleLabel, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
+                    UIToolkitUtils.SetLabelChildren(titleLabel, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
 
                     body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
                     title.clicked += () =>

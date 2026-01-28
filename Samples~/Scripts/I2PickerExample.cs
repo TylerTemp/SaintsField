@@ -22,7 +22,7 @@ namespace SaintsField.Samples.Scripts
             // Debug.Log($"set to {I2.Loc.LocalizationManager.CurrentLanguage}");
         }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && SAINTSFIELD_DEBUG
         [InitializeOnLoadMethod]
         private static void EditorLoad()
         {
