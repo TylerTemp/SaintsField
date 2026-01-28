@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -88,12 +89,12 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(objectField.worldBound);
 
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsTreeDropdownUIToolkit(
                     metaInfo,
                     worldBound.width,
                     maxHeight,
                     false,
-                    (_, curItem) =>
+                    (curItem, _) =>
                     {
                         string newValue = (string)curItem;
                         SetValue(property, newValue);
@@ -101,24 +102,25 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                         if(property.propertyType == SerializedPropertyType.String)
                         {
                             onValueChangedCallback.Invoke(newValue);
-                            return;
+                            return null;
                         }
 
                         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                         if (noCacheParent == null)
                         {
                             Debug.LogWarning("Property disposed unexpectedly, skip onChange callback.");
-                            return;
+                            return null;
                         }
 
                         (string error, int _, object reflectedValue) = Util.GetValue(property, info, noCacheParent);
                         if (error != "")
                         {
                             Debug.LogError(error);
-                            return;
+                            return null;
                         }
 
                         onValueChangedCallback.Invoke(reflectedValue);
+                        return null;
                     }
                 ));
             };

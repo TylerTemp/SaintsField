@@ -17,7 +17,8 @@
         "AYellowpaper.SerializeInterfaces",
         "com.inter-illusion.i2",
         "SaintsField.Runtime.TypeReference",
-        "SaintsField.Runtime.Events"
+        "SaintsField.Runtime.Events",
+        "SaintsField.Runtime.I2Loc"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

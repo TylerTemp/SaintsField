@@ -40,7 +40,10 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 
             foreach (string term in terms)
             {
-                advancedDropdownList.Add(term, term);
+                // string displayName = term;
+                string trans = LocalizationManager.GetTranslation(term);
+                string displayName = $"{term} <color=gray>{trans}</color>";
+                advancedDropdownList.Add(displayName, term);
             }
 
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> curStack;
