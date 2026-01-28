@@ -95,31 +95,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.10.0**
+**5.10.1**
 
-> [!CAUTION]
-> Contains Breaking Changes
-
-1.  Add: `SaintsDictionary` old version migration [#361](https://github.com/TylerTemp/SaintsField/issues/361)
-2.  Improve: Better look of tree dropdown
-3.  Add: `Copy` right click menu for `ShowInInspector`
-4.  Fix: `[Searchable]` gave error when click
-5.  **Breaking Changes**: Make `TreeDropdown` the major dropdown:
-
-Old Name | New Name
----------|----------
-`TreeDropdown` | `Dropdown`
-`Dropdown` | `MenuDropdown`
-`OptionsDropdown` | `AdvancedOptionsDropdown`
-`PairsDropdown` | `AdvancedPairsTreeDropdown`
-`OptionsTreeDropdown` | `OptionsDropdown`
-`PairsTreeDropdown` | `PairsDropdown`
-
-Name (Deprecated) | Alias Of
-------------------|--------------
-`TreeDropdown` | `Dropdown`
-`OptionsTreeDropdown` | `OptionsDropdown`
-`PairsTreeDropdown` | `PairsDropdown`
+1.  Fix: Unity below 2023.2 gave warning on serialized field
+2.  Change: `LocalizedStringPicker` now support translated content search, and now uses `TreeDropdown`
+3.  Change: `Dropdown` no longer watch space bar as select, because some IM uses space bar to select the input charactor
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

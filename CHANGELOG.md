@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.10.1 ##
+
+1.  Fix: Unity below 2023.2 gave warning on serialized field
+2.  Change: `LocalizedStringPicker` now support translated content search, and now uses `TreeDropdown`
+3.  Change: `Dropdown` no longer watch space bar as select, because some IM uses space bar to select the input charactor
+
 ## 5.10.0 ##
 
 > [!CAUTION]
