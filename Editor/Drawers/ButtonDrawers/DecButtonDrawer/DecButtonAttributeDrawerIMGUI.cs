@@ -130,7 +130,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             {
                 buttonInfo.ExecError = "";
 
-                foreach ((string error, object result)  in CallButtonFunc(property, decButtonAttribute, info, target))
+                foreach ((string error, object result) in CallButtonFunc(property, decButtonAttribute.FuncName, info, target))
                 {
                     if (error == "")
                     {

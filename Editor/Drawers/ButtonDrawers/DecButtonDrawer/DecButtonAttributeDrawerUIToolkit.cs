@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 // ReSharper disable once PossibleNullReferenceException
                 // ReSharper disable once AccessToModifiedClosure
                 // HashSet<IEnumerator> enumerators = (HashSet<IEnumerator>)buttonElement.userData;
-                foreach ((string eachError, object buttonResult) in CallButtonFunc(property, (DecButtonAttribute) saintsAttribute, info, parent))
+                foreach ((string eachError, object buttonResult) in CallButtonFunc(property, ((DecButtonAttribute)saintsAttribute).FuncName, info, parent))
                 {
                     // Debug.Log($"{eachError}/{buttonResult}");
                     if (eachError == "")

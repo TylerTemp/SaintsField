@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 {
     public abstract partial class DecButtonAttributeDrawer: SaintsPropertyDrawer
     {
-        private static IEnumerable<(string error, object result)> CallButtonFunc(SerializedProperty property, DecButtonAttribute decButtonAttribute, FieldInfo fieldInfo, object target)
+        public static IEnumerable<(string error, object result)> CallButtonFunc(SerializedProperty property, string callback, FieldInfo fieldInfo, object target)
         {
             SaintsContext.SerializedProperty = property;
 
@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                     }
                 }
 
-                yield return Util.GetOf<object>(decButtonAttribute.FuncName, null, property, fieldInfo, useParent, null);
+                yield return Util.GetOf<object>(callback, null, property, fieldInfo, useParent, null);
                 yield break;
             }
 
@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
                     // Debug.Log($"Found property {prop.name} in {t.GetType().Name}");
                     (PropertyAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(prop);
-                    yield return Util.GetOf<object>(decButtonAttribute.FuncName, null, prop, fieldInfo, parent, null);
+                    yield return Util.GetOf<object>(callback, null, prop, fieldInfo, parent, null);
                     // property = prop;
                 }
                 // (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
