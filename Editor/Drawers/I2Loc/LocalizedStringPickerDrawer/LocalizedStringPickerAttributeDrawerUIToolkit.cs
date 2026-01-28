@@ -65,6 +65,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
         }
 
         // private bool _mismatch;
+        // private SaintsTreeDropdownUIToolkit _dropdownUICache;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -127,19 +128,19 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                 ));
             };
 
-            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(CleanCache);
-            SaintsAssetPostprocessor.OnAnyEvent.AddListener(CleanCache);
-            LocalizationManager.OnLocalizeEvent += CleanCache;
-            // Debug.Log("All listener done.");
-            selectorButton.RegisterCallback<DetachFromPanelEvent>(_ =>
-            {
-                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CleanCache);
-                SaintsAssetPostprocessor.OnAnyEvent.RemoveListener(CleanCache);
-                LocalizationManager.OnLocalizeEvent -= CleanCache;
-            });
-            return;
-
-            void CleanCache() => _dropdownListCache = null;
+            // SaintsEditorApplicationChanged.OnAnyEvent.AddListener(CleanCache);
+            // // SaintsAssetPostprocessor.OnAnyEvent.AddListener(CleanCache);
+            // LocalizationManager.OnLocalizeEvent += CleanCache;
+            // // Debug.Log("All listener done.");
+            // selectorButton.RegisterCallback<DetachFromPanelEvent>(_ =>
+            // {
+            //     SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CleanCache);
+            //     // SaintsAssetPostprocessor.OnAnyEvent.RemoveListener(CleanCache);
+            //     LocalizationManager.OnLocalizeEvent -= CleanCache;
+            // });
+            // return;
+            //
+            // void CleanCache() => _dropdownUICache = null;
         }
 
         private static void UpdateHelpBox(HelpBox helpBox, string error)

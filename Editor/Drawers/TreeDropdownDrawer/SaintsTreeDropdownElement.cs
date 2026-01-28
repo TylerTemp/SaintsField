@@ -254,7 +254,11 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
 
                 // ReSharper disable once InvertIf
-                if (e.keyCode is KeyCode.Space or KeyCode.Return or KeyCode.KeypadEnter)
+                if (e.keyCode is
+                    // KeyCode.Space
+                    KeyCode.Return
+                    or KeyCode.KeypadEnter
+                )
                 {
                     switch (CurrentFocus)
                     {
@@ -271,7 +275,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             });
         }
 
-        private bool _hasHorizontalScrollerOnce = false;
+        private bool _hasHorizontalScrollerOnce;
 
         private void OnTreeGeometryChanged(GeometryChangedEvent evt)
         {

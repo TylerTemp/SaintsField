@@ -67,6 +67,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             editorWindow.rootVisualElement.Add(_treeDropdownElement);
         }
 
+        // public void RefreshValues(IReadOnlyList<object> curValues) => _treeDropdownElement.RefreshValues(curValues);
+
         private void OnClicked(object value, bool isOn, bool isPrimary)
         {
             IReadOnlyList<object> r = _setValue(value, isOn);
