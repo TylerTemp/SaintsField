@@ -51,6 +51,16 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 // this.Reset(evt1);
                 evt.StopPropagation();
             }
+#else
+            // [EventInterest(new System.Type[] {typeof (SerializedPropertyBindEvent)})]
+            protected override void ExecuteDefaultActionAtTarget(EventBase evt)
+            {
+                base.ExecuteDefaultActionAtTarget(evt);
+                if (evt.ToString() != "UnityEditor.UIElements.SerializedPropertyBindEvent")
+                    return;
+                // this.Reset(evt1);
+                evt.StopPropagation();
+            }
 #endif
         }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
@@ -124,6 +125,14 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                     }
                 ));
             };
+
+            selectorButton.RegisterCallback<AttachToPanelEvent>(_ =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(CleanCache);
+                selectorButton.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CleanCache));
+                return;
+                void CleanCache() => _dropdownListCache = null;
+            });
         }
 
         private static void UpdateHelpBox(HelpBox helpBox, string error)

@@ -102,7 +102,7 @@ namespace SaintsField
 
         }
 
-        private static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
+        public static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
         {
             string curName = nameQuery.Dequeue();
             if (nameQuery.Count == 0)
