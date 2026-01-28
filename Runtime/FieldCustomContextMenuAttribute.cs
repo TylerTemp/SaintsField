@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 // using SaintsField.Playa;
 using UnityEngine;
 
@@ -15,11 +16,12 @@ namespace SaintsField
 
         public readonly string FuncName;
         public readonly string MenuName;
+        public readonly bool MenuNameIsCallback;
 
         public FieldCustomContextMenuAttribute(string funcName, string menuName = null)
         {
-            FuncName = funcName;
-            MenuName = menuName;
+            FuncName = RuntimeUtil.ParseCallback(funcName).content;
+            (MenuName, MenuNameIsCallback) = RuntimeUtil.ParseCallback(menuName);
         }
     }
 }

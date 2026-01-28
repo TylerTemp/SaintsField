@@ -62,8 +62,8 @@ namespace SaintsField.Editor.Drawers.FieldContextMenuDrawer
             string callback = fieldCustomContextMenuAttribute.FuncName;
             string menuName = string.IsNullOrEmpty(fieldCustomContextMenuAttribute.MenuName) ? ObjectNames.NicifyVariableName(callback) : fieldCustomContextMenuAttribute.MenuName;
 
-            IReadOnlyList<VisualElement> visibilityElements = container.Query<VisualElement>(className: ClassPlaceholder(property)).ToList();
-            VisualElement topElement = visibilityElements[0];
+            IReadOnlyList<VisualElement> placeholderElements = container.Query<VisualElement>(className: ClassPlaceholder(property)).ToList();
+            VisualElement topElement = placeholderElements[0];
             bool isFirst = topElement.name == NamePlaceholder(property, index);
 
             HelpBox helpBox = container.Q<HelpBox>(name: NameHelpBox(property, index));
@@ -76,12 +76,65 @@ namespace SaintsField.Editor.Drawers.FieldContextMenuDrawer
                     return;
                 }
 
+                string useMenuName = menuName;
+                DropdownMenuAction.Status status = DropdownMenuAction.Status.Normal;
+
+                // Debug.Log(fieldCustomContextMenuAttribute.MenuNameIsCallback);
+
+                if (fieldCustomContextMenuAttribute.MenuNameIsCallback)
+                {
+                    object useParent = parent;
+                    if(parent != null && ReflectUtils.TypeIsStruct(parent.GetType()))
+                    {
+                        (SerializedUtils.FieldOrProp _, object refreshedParent) =
+                            SerializedUtils.GetFieldInfoAndDirectParent(property);
+                        if (refreshedParent != null)
+                        {
+                            // Debug.Log($"rewrite parent {refreshedParent}");
+                            useParent = refreshedParent;
+                        }
+                    }
+                    (string error, object result) = Util.GetOf<object>(fieldCustomContextMenuAttribute.MenuName, null, property, fieldInfo, useParent, null);
+                    UIToolkitUtils.SetHelpBox(helpBox, error);
+                    if (error == "")
+                    {
+                        if (result is null or "")  //  don't do menu this time
+                        {
+                            return;
+                        }
+
+                        if (result is ValueTuple<string, EContextMenuStatus> sb)
+                        {
+                            useMenuName = sb.Item1;
+
+                            if (useMenuName is null or "")  //  don't do menu this time
+                            {
+                                return;
+                            }
+
+                            status = sb.Item2 switch
+                            {
+                                EContextMenuStatus.Normal => DropdownMenuAction.Status.Normal,
+                                EContextMenuStatus.Checked => DropdownMenuAction.Status.Checked,
+                                EContextMenuStatus.Disabled => DropdownMenuAction.Status.Disabled,
+                                _ => throw new ArgumentOutOfRangeException(nameof(sb.Item2), sb.Item2, null),
+                            };
+                            // isChecked = sb.Item2;
+                            // isDisabled = sb.Item3;
+                        }
+                        else
+                        {
+                            useMenuName = result.ToString();
+                        }
+                    }
+                }
+
                 if (isFirst)
                 {
                     evt.menu.AppendSeparator();
                 }
 
-                evt.menu.AppendAction(menuName, _ =>
+                evt.menu.AppendAction(useMenuName, _ =>
                 {
                     string buttonError = "";
                     // ReSharper disable once PossibleNullReferenceException
@@ -134,7 +187,7 @@ namespace SaintsField.Editor.Drawers.FieldContextMenuDrawer
                     }
 
                     UIToolkitUtils.SetHelpBox(helpBox, buttonError);
-                });
+                }, status);
             }));
         }
     }
