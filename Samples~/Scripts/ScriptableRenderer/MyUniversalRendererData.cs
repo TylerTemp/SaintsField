@@ -28,7 +28,6 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
 
 #if SAINTSFIELD_DEBUG
         [MenuItem("Assets/Create/Rendering/My URP Universal Renderer")]
-#endif
         private static void CreateUniversalRendererData()
         {
 #if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER
@@ -36,6 +35,8 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateSaintsUniversalRendererAsset >(), "New Custom Universal Renderer Data.asset", icon, null);
 #endif
         }
+#endif
+
 #endif
     }
 }
