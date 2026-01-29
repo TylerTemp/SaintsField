@@ -71,7 +71,7 @@ Unity: 2022.2 or higher
 *   Using a git submodule:
 
     ```bash
-    git submodule add https://github.com/TylerTemp/SaintsField.git Assets/SaintsField
+    git submodule add https://github.com/TylerTemp/SaintsField.git Packages/today.comes.saintsfield
     ```
 
 If you have DOTween installed
