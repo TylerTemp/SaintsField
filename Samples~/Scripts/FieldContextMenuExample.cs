@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class ContextMenuExample : MonoBehaviour
+    public class FieldContextMenuExample : MonoBehaviour
     {
         [FieldCustomContextMenu(nameof(MyCallback))]
         [FieldCustomContextMenu(nameof(Func1), "Custom/Debug")]
@@ -57,5 +58,16 @@ namespace SaintsField.Samples.Scripts
             return ("My Menu", status);
             // return $"Random {Random.Range(0, 9)}";
         }
+
+        [FieldCustomContextMenu(nameof(ClickItemRemover), "$" + nameof(ClickItemRemoverLabel))]
+        public List<string> lis;
+
+        private void ClickItemRemover(object _, int index)
+        {
+            lis.RemoveAt(index);
+        }
+
+        private string ClickItemRemoverLabel(string value, int index) => $"Delete {index}({value})";
+
     }
 }

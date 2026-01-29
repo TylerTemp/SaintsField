@@ -8,7 +8,8 @@ namespace SaintsField.Editor.Playa.Renderer
 {
     public partial class SerializedFieldBareRenderer
     {
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
             {

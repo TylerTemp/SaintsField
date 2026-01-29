@@ -40,7 +40,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
         private Button _buttonElement;
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             container.style.flexGrow = 1;
             MethodInfo methodInfo = FieldWithInfo.MethodInfo;
@@ -194,65 +195,9 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                     object result = methodInfo.Invoke(useTarget, parameterValues);
 
-                    if (isStruct && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
+                    if (isStruct)
                     {
-                        // Debug.Log($"write back {FieldWithInfo.TargetParent}:{FieldWithInfo.TargetMemberInfo.Name}");
-                        switch (FieldWithInfo.TargetMemberInfo)
-                        {
-                            case FieldInfo fieldInfo:
-                            {
-                                if (FieldWithInfo.TargetMemberIndex != -1)
-                                {
-                                    if(rawMemberValue != null)
-                                    {
-                                        Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex,
-                                            useTarget);
-                                    }
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        fieldInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
-                                    }
-                                    catch (Exception e)
-                                    {
-#if SAINTSFIELD_DEBUG
-                                        Debug.LogException(e);
-#endif
-                                    }
-                                }
-                            }
-                                break;
-                            case PropertyInfo propertyInfo:
-                            {
-                                if (propertyInfo.CanWrite)
-                                {
-                                    if (FieldWithInfo.TargetMemberIndex != -1)
-                                    {
-                                        if(rawMemberValue != null)
-                                        {
-                                            Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex,
-                                                useTarget);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        try
-                                        {
-                                            propertyInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
-                                        }
-                                        catch (Exception e)
-                                        {
-#if SAINTSFIELD_DEBUG
-                                            Debug.LogException(e);
-#endif
-                                        }
-                                    }
-                                }
-                            }
-                                break;
-                        }
+                        BackWriteCallback(rawMemberValue, useTarget);
                     }
 
                     return result;

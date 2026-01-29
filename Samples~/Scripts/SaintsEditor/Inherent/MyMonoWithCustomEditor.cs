@@ -66,7 +66,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Inherent
             // IMGUI renderer, if you want IMGUI you can write here
         }
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             VisualElement root = new VisualElement
             {

@@ -22,7 +22,8 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             public RichTextDrawer RichTextDrawer;
         }
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             (VisualElement labelContainer, bool needUpdate) = CreateRichLabelContainer(FieldWithInfo, _playaBelowRichLabelAttribute);
             labelContainer.name = FieldWithInfo.MemberId;

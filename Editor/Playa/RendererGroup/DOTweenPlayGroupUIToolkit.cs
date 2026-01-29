@@ -28,7 +28,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
         }
         // ReSharper enable InconsistentNaming
 
-        public VisualElement CreateVisualElement()
+        public VisualElement CreateVisualElement(VisualElement inspectorRoot)
         {
             VisualElement root = new VisualElement
             {

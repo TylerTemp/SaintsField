@@ -95,11 +95,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.10.1**
+**5.11.0**
 
-1.  Fix: Unity below 2023.2 gave warning on serialized field
-2.  Change: `LocalizedStringPicker` now support translated content search, and now uses `TreeDropdown`
-3.  Change: `Dropdown` no longer watch space bar as select, because some IM uses space bar to select the input charactor
+1.  Add: `CustomContextMenu`, `FieldCustomContextMenu` for right click context menu.
+2.  Improve: `LocalizedStringPicker` no longer render the whole translated text. (You can still do a full text search.)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4385,6 +4384,33 @@ public Direction[] treeDireOpt;
 
 ![](https://github.com/user-attachments/assets/63fb22dd-5aaa-4e7a-9b0b-ac15270316f7)
 
+#### `FlagsDropdown` ####
+
+A searchable dropdown for enum flags (bit mask). Useful when you have a big enum flags type.
+
+```csharp
+using SaintsField;
+
+[Serializable, Flags]
+public enum F
+{
+    [InspectorName("[Null]")]  // InspectorName is optional
+    Zero,
+    [InspectorName("Options/Value1")]
+    One = 1,
+    [InspectorName("Options/Value2")]
+    Two = 1 << 1,
+    [InspectorName("Options/Value3")]
+    Three = 1 << 2,
+    Four = 1 << 3,
+}
+
+[FlagsDropdown]
+public F flags;
+```
+
+![image](https://github.com/user-attachments/assets/3080d503-3bd5-4624-936a-dc5e150e0e43)
+
 #### `AdvancedDropdown` ####
 
 A dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
@@ -4595,7 +4621,6 @@ public MyStruct myStruct;
 
 ![](https://github.com/user-attachments/assets/c9f42bf2-632a-496a-8ffc-74b2abbaceb9)
 
-
 #### `AdvancedOptionsDropdown` / `AdvancedPairsDropdown` ####
 
 Like `AdvancedDropdown`, but allows you to quickly set some const expression value
@@ -4750,6 +4775,206 @@ public enum MyEnum
 ```
 
 ![image](https://github.com/user-attachments/assets/46ddc541-8773-4571-9aeb-f3fe25c5f783)
+
+#### `CustomContextMenu` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+Add a context menu (right click) item for a target
+
+**Parameters**:
+*   `string funcName null`: which function should it call when selected. If `null`, add an seperator instead.
+*   `string menuName = null`: menu item name.
+
+    If `null`, use "funcName" as name.
+
+    If starts with `$`, use a callback instead. Callback can must be one of:
+    
+    ```csharp
+    string MyMenuName(MyFieldType fieldValue);
+    string MyMenuName();
+    (string menuName, EContextMenuStatus menuStatus)  MyMenuName(MyFieldType fieldValue);
+    (string menuName, EContextMenuStatus menuStatus)  MyMenuName();
+    ```
+
+`EContextMenuStatus` can be:
+
+*   `Normal`
+*   `Checked`
+*   `Disabled`
+
+Allow Multiple: Yes
+
+Simple Example:
+
+```csharp
+using SaintsField;
+
+[CustomContextMenu(nameof(MyCallback))]  // use default name
+[CustomContextMenu(nameof(Func1), "Custom/Debug")]  // use sub item
+[CustomContextMenu(nameof(Func2), "Custom/Set")]  // use sub item
+public string content;
+
+private void MyCallback()
+{
+    Debug.Log("clicked on MyCallback");
+}
+private void Func1(string c)  // you can accept the current field's value
+{
+    Debug.Log(c);
+}
+private void Func2()
+{
+    content = "Hi There";
+}
+```
+
+![](https://github.com/user-attachments/assets/fc1e5a0d-0848-4007-930c-ed09f3e07981)
+
+Dynamic item control:
+
+```csharp
+using SaintsField;
+
+[CustomContextMenu(":Debug.Log", "$" + nameof(DynamicMenuCallback))]  // use `:` for static method calling
+[CustomContextMenu(nameof(DynamicMenuInfoClick), "$" + nameof(DynamicMenuInfo))]
+public string content;
+
+public string DynamicMenuCallback()  // dynamic control the item name;
+{
+    return $"Random {Random.Range(0, 9)}";
+}
+
+public bool hasContextMenu;
+public bool isChecked;
+public bool isDisabled;
+
+private void DynamicMenuInfoClick()
+{
+    isChecked = !isChecked;
+}
+
+public (string menuName, EContextMenuStatus menuStatus) DynamicMenuInfo()  // control it's label & status
+{
+    if (!hasContextMenu)
+    {
+        return (null, default);
+    }
+    EContextMenuStatus status = EContextMenuStatus.Normal;
+    if (isChecked)
+    {
+        status = EContextMenuStatus.Checked;
+    }
+    else if (isDisabled)
+    {
+        status = EContextMenuStatus.Disabled;
+    }
+    return ($"My Menu {status}", status);
+}
+```
+
+[![video](https://github.com/user-attachments/assets/90b771b9-2656-45aa-af77-ebd0e5a82ad8)](https://github.com/user-attachments/assets/78ad620f-9bf9-4096-b866-9241f535ac9f)
+
+`IEnumerator` callback is supported:
+
+```csharp
+using SaintsField;
+
+[CustomContextMenu(nameof(MyGenerator))] // use default name
+public int myInt;
+
+private IEnumerator MyGenerator()
+{
+    for (int i = 0; i < 100; i++)
+    {
+        Debug.Log(i);
+        myInt = i;
+        yield return null;
+    }
+}
+```
+
+[![video](https://github.com/user-attachments/assets/2a7e998c-9734-4025-94c5-38bc64cd89f4)](https://github.com/user-attachments/assets/0ad83278-3069-45ea-af32-102d7f34c463)
+
+This attribute works with `ShowInInspector`
+
+```csharp
+using SaintsField;
+
+[CustomContextMenu("$" + nameof(ResetIntV))]
+[ShowInInspector] private int _intV;
+
+private void ResetIntV()
+{
+    _intV = 0;
+}
+```
+
+![](https://github.com/user-attachments/assets/c7dedce1-c5aa-4467-ad81-a730c1028bd4)
+
+Using on a function, it'll add context to the whole component target inspector
+
+```csharp
+using SaintsField;
+
+[CustomContextMenu]  // The whole component will have this context menu
+private void Wizard()
+{
+}
+```
+
+![](https://github.com/user-attachments/assets/01472cef-3abf-4af0-8cb6-764a792fcc1b)
+
+Using on a function of a general struct/class, it'll add context to the drawer of this struct/class
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public struct MyStruct
+{
+    public string myString;
+
+    [CustomContextMenu("Set My String")]  // The whole `MyStruct` type will have this context menu
+    public void SetString()
+    {
+        myString = "My Struct Value";
+    }
+}
+
+public MyStruct myStructWithContextMenu;
+```
+
+![](https://github.com/user-attachments/assets/625841b8-c5ff-4eeb-b135-0453eee2a326)
+
+### `FieldCustomContextMenu` ###
+
+Add a context menu (right click) item for a target. Same as `CustomContextMenu` except:
+
+1.  When used on an array/list, it will work on every element of the array/list, instead of the array/list itself
+2.  When used on an array/list, the callback can optionaly addionally receive a index parameter
+3.  Does not require `SaintsEditor`
+4.  Only works on serializable field
+
+```csharp
+using SaintsField;
+
+[FieldCustomContextMenu(nameof(Func1), "Custom/Debug")]  // use like a CustomContextMenu
+public int myInt;
+    
+[FieldCustomContextMenu(nameof(ClickItemRemover), "$" + nameof(ClickItemRemoverLabel))]
+public List<string> lis;
+
+private void ClickItemRemover(object _, int index)
+{
+    lis.RemoveAt(index);
+}
+
+private string ClickItemRemoverLabel(string value, int index) => $"Delete {index}({value})";
+```
+
+![](https://github.com/user-attachments/assets/3e1bfa96-c3ad-4daa-9903-49f10d1e427e)
 
 #### `ValueButtons` ####
 
@@ -5009,33 +5234,6 @@ public BitMask myMask;
 ```
 
 ![image](https://github.com/user-attachments/assets/a61d9613-8c18-456f-9f27-e25193722dfb)
-
-#### `FlagsDropdown` ####
-
-A searchable dropdown for enum flags (bit mask). Useful when you have a big enum flags type.
-
-```csharp
-using SaintsField;
-
-[Serializable, Flags]
-public enum F
-{
-    [InspectorName("[Null]")]  // InspectorName is optional
-    Zero,
-    [InspectorName("Options/Value1")]
-    One = 1,
-    [InspectorName("Options/Value2")]
-    Two = 1 << 1,
-    [InspectorName("Options/Value3")]
-    Three = 1 << 2,
-    Four = 1 << 3,
-}
-
-[FlagsDropdown]
-public F flags;
-```
-
-![image](https://github.com/user-attachments/assets/3080d503-3bd5-4624-936a-dc5e150e0e43)
 
 #### `ResizableTextArea` ####
 

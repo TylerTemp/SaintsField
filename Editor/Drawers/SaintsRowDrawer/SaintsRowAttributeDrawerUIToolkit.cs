@@ -296,7 +296,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             {
                 saintsRenderer.InAnyHorizontalLayout = inHorizontalLayout;
                 saintsRenderer.SetSerializedProperty(property);
-                VisualElement rendererElement = saintsRenderer.CreateVisualElement();
+                VisualElement rendererElement = saintsRenderer.CreateVisualElement(root);
                 if (rendererElement != null)
                 {
                     // Debug.Log($"add: {saintsRenderer}");

@@ -64,7 +64,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #endif
         }
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             UserDataPayload userDataPayload = new UserDataPayload
             {

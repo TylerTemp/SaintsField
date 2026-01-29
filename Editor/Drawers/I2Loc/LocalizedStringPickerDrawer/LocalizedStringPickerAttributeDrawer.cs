@@ -48,20 +48,40 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
             foreach (string term in terms)
             {
                 string trans = LocalizationManager.GetTranslation(term) ?? "";
-                string noBrTrans = trans.Replace("\r\n", "↵").Replace("\n", "↵").Replace("<br>", "↵");
-                string pureResult = SizeReg.Replace(
-                    noBrTrans,
-                    string.Empty
-                );
+                bool hasExtra;
+                string extraDisplay;
+                ICollection<string> extraSearches;
+                if (string.IsNullOrWhiteSpace(trans))
+                {
+                    hasExtra = false;
+                    extraDisplay = "";
+                    extraSearches = null;
+                }
+                else
+                {
+                    string noBrTrans = trans.Replace("\r\n", "↵").Replace("\n", "↵").Replace("<br>", "↵");
+                    string pureResult = SizeReg.Replace(
+                        noBrTrans,
+                        string.Empty
+                    );
+
+                    hasExtra = true;
+                    int pureLength = pureResult.Length;
+                    extraDisplay = pureLength > 15 ? pureResult[..15] + "..." : pureResult;
+                    extraSearches = new[] { pureResult };
+                }
                 // string trans = "";
 
                 List<string> sep = RuntimeUtil.SeparatePath(term).ToList();
-                string last = sep[^1];
-                sep[^1] = $"{last} <color=gray>{pureResult}</color>";
+                if(hasExtra)
+                {
+                    string last = sep[^1];
+                    sep[^1] = $"{last} <color=gray>{extraDisplay}</color>";
+                }
 
                 // string displayName = $"{term} <color=gray>{noBrTrans}</color>";
                 // advancedDropdownList.Add(displayName, term);
-                AdvancedDropdownList<string>.AddByNames(advancedDropdownList, new Queue<string>(sep), term);
+                AdvancedDropdownList<string>.AddByNames(advancedDropdownList, new Queue<string>(sep), term, extraSearches: extraSearches);
             }
 
             advancedDropdownList.SelfCompact();

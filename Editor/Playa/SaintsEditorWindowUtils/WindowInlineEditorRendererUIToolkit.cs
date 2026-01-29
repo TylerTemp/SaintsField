@@ -12,7 +12,8 @@ namespace SaintsField.Editor.Playa.SaintsEditorWindowUtils
         private VisualElement _container;
         private Object _value;
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             // _value = GetValue();
 

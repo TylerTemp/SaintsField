@@ -80,7 +80,8 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             return result;
         }
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container1)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container1)
         {
             // _lastValueChangedTime = EditorApplication.timeSinceStartup;
             if (!RenderField)

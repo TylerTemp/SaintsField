@@ -14,7 +14,8 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer
         private string _richXml;
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             (VisualElement target, VisualElement title) result =
                 SeparatorAttributeDrawer.CreateSeparatorUIToolkit(_playaSeparatorAttribute, "playa-separator-text");

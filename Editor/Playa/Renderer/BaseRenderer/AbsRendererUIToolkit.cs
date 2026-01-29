@@ -1,11 +1,16 @@
 ﻿#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.FieldContextMenuDrawer;
+using SaintsField.Editor.Linq;
 #if UNITY_2021_2_OR_NEWER
 #endif
 using SaintsField.Editor.Utils;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -20,7 +25,57 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private VisualElement _rootElement;
 
-        public virtual VisualElement CreateVisualElement()
+        private class ManipulatorHandler : CustomContextMenuUtils.IManipulatorHandler
+        {
+            private readonly AbsRenderer _absRenderer;
+            private readonly HelpBox _helpBox;
+            private readonly List<IEnumerator> _enumerators = new List<IEnumerator>();
+            private IVisualElementScheduledItem _buttonTask;
+
+            public ManipulatorHandler(AbsRenderer absRenderer, HelpBox helpBox)
+            {
+                _absRenderer = absRenderer;
+                _helpBox = helpBox;
+            }
+
+            public void SetHelpBox(string error)
+            {
+                UIToolkitUtils.SetHelpBox(_helpBox, error);
+            }
+
+            public void SetIEnumerators(IReadOnlyCollection<IEnumerator> enumerators)
+            {
+                _buttonTask?.Pause();
+                _enumerators.Clear();
+                _enumerators.AddRange(enumerators);
+
+                if (_enumerators.Count > 0)
+                {
+                    _buttonTask = _helpBox.schedule.Execute(() =>
+                    {
+                        HashSet<IEnumerator> completedEnumerators = new HashSet<IEnumerator>();
+
+                        // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                        foreach (IEnumerator enumerator in _enumerators)
+                        {
+                            if (!enumerator.MoveNext())
+                            {
+                                completedEnumerators.Add(enumerator);
+                            }
+                        }
+
+                        _enumerators.RemoveAll(each  => completedEnumerators.Contains(each));
+                    }).Every(1);
+                }
+            }
+
+            public object GetParent()
+            {
+                return GetRefreshedTarget(_absRenderer.FieldWithInfo, _absRenderer.FieldWithInfo.Targets[0]).useTarget;
+            }
+        }
+
+        public virtual VisualElement CreateVisualElement(VisualElement inspectorRoot)
         {
             int flexGrow;
             // if (InDirectHorizontalLayout)
@@ -57,7 +112,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             root.AddToClassList(ClassSaintsFieldPlaya);
             bool hasAnyChildren = false;
 
-            (VisualElement target, bool targetNeedUpdate) = CreateTargetUIToolkit(root);
+            (VisualElement target, bool targetNeedUpdate) = CreateTargetUIToolkit(inspectorRoot, root);
             if (target != null)
             {
                 VisualElement targetContainer = new VisualElement
@@ -112,13 +167,43 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         display = DisplayStyle.None,
                     },
                 });
+
+                #region ContextMenu
+
+                CustomContextMenuAttribute[] customContextMenuAttributes =
+                    (FieldWithInfo.PlayaAttributes ?? Array.Empty<IPlayaAttribute>())
+                    .OfType<CustomContextMenuAttribute>()
+                    .ToArray();
+
+                // ReSharper disable once InvertIf
+                if (customContextMenuAttributes.Length > 0)
+                {
+                    foreach ((CustomContextMenuAttribute customContextMenuAttribute, int index)  in customContextMenuAttributes.WithIndex())
+                    {
+                        HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)
+                        {
+                            style =
+                            {
+                                flexGrow = 1,
+                                flexShrink = 1,
+                                display = DisplayStyle.None,
+                            },
+                        };
+                        root.Add(helpBox);
+                        CustomContextMenuUtils.AddManipulator(root, customContextMenuAttribute.FuncName, customContextMenuAttribute.MenuName, customContextMenuAttribute.MenuNameIsCallback, index == 0, FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, new ManipulatorHandler(this, helpBox));
+                    }
+                }
+
+                #endregion
+
                 return _rootElement = root;
             }
 
             return null;
         }
 
-        protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container);
+        protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container);
 
 
         protected virtual PreCheckResult OnUpdateUIToolKit(VisualElement root)
@@ -192,7 +277,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 : $"{type.Name}: <color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>{type.Namespace}</color>";
         }
 
-        protected static (object rawMemberValue, object useTarget) GetRefreshedTarget(SaintsFieldWithInfo fieldWithInfo, object eachTarget)
+        public static (object rawMemberValue, object useTarget) GetRefreshedTarget(SaintsFieldWithInfo fieldWithInfo, object eachTarget)
         {
             bool isStruct = ReflectUtils.TypeIsStruct(eachTarget.GetType());
             object useTarget = eachTarget;
@@ -384,6 +469,70 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     return "";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
+        }
+
+        protected void BackWriteCallback(object rawMemberValue, object useTarget)
+        {
+            bool isStruct = ReflectUtils.TypeIsStruct(FieldWithInfo.Targets[0].GetType());
+            if (isStruct && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
+            {
+                // Debug.Log($"write back {FieldWithInfo.TargetParent}:{FieldWithInfo.TargetMemberInfo.Name}");
+                switch (FieldWithInfo.TargetMemberInfo)
+                {
+                    case FieldInfo fieldInfo:
+                    {
+                        if (FieldWithInfo.TargetMemberIndex != -1)
+                        {
+                            if(rawMemberValue != null)
+                            {
+                                Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex, useTarget);
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                fieldInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                            }
+                            catch (Exception e)
+                            {
+#if SAINTSFIELD_DEBUG
+                                Debug.LogException(e);
+#endif
+                            }
+                        }
+                    }
+                        break;
+                    case PropertyInfo propertyInfo:
+                    {
+                        if (propertyInfo.CanWrite)
+                        {
+                            if (FieldWithInfo.TargetMemberIndex != -1)
+                            {
+                                if(rawMemberValue != null)
+                                {
+                                    Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex,
+                                        useTarget);
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    propertyInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                }
+                                catch (Exception e)
+                                {
+#if SAINTSFIELD_DEBUG
+                                    Debug.LogException(e);
+#endif
+                                }
+                            }
+                        }
+                    }
+                        break;
+                }
             }
         }
     }

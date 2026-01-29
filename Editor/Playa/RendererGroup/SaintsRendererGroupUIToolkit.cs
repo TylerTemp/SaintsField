@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
         private RichTextDrawer _richTextDrawer;
 
-        public VisualElement CreateVisualElement()
+        public VisualElement CreateVisualElement(VisualElement inspectorRoot)
         {
             _richTextDrawer ??= new RichTextDrawer();
 
@@ -342,7 +342,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 renderer.InAnyHorizontalLayout = InAnyHorizontalLayout || inHorizontal;
                 renderer.InDirectHorizontalLayout = inHorizontal;
 
-                VisualElement fieldElement = renderer.CreateVisualElement();
+                VisualElement fieldElement = renderer.CreateVisualElement(inspectorRoot);
                 // ReSharper disable once InvertIf
                 if(fieldElement != null)
                 {

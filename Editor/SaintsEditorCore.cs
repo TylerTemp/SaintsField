@@ -13,6 +13,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor
 {
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class SaintsEditorCore: IDOTweenPlayRecorder, IMakeRenderer
     {
         private readonly UnityEditor.Editor _editor;
@@ -128,7 +129,7 @@ namespace SaintsField.Editor
             foreach (ISaintsRenderer saintsRenderer in AllRenderersUIToolkit)
             {
                 // Debug.Log($"renderer={saintsRenderer}");
-                VisualElement ve = saintsRenderer.CreateVisualElement();
+                VisualElement ve = saintsRenderer.CreateVisualElement(root);
                 if(ve != null)
                 {
                     usedRenderers.Add(saintsRenderer);

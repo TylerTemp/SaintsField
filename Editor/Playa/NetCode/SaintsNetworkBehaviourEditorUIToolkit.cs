@@ -90,7 +90,7 @@ namespace SaintsField.Editor.Playa.NetCode
             foreach (ISaintsRenderer saintsRenderer in _renderers)
             {
                 // Debug.Log($"renderer={saintsRenderer}");
-                VisualElement ve = saintsRenderer.CreateVisualElement();
+                VisualElement ve = saintsRenderer.CreateVisualElement(root);
                 if(ve != null)
                 {
                     root.Add(ve);

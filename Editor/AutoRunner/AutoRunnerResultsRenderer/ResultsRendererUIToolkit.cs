@@ -17,7 +17,8 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
         private VisualElement _root;
         private IReadOnlyList<AutoRunnerResult> _results = new List<AutoRunnerResult>();
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             _root = new VisualElement();
             // Debug.Log(AutoRunner);

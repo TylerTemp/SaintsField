@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.11.0 ##
+
+1.  Add: `CustomContextMenu`, `FieldCustomContextMenu` for right click context menu.
+2.  Improve: `LocalizedStringPicker` no longer render the whole translated text. (You can still do a full text search.)
+
 ## 5.10.1 ##
 
 1.  Fix: Unity below 2023.2 gave warning on serialized field

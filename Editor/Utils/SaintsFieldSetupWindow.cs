@@ -134,7 +134,7 @@ namespace SaintsField.Editor.Utils
 #endif
         + " in this project", 5, 5)]
 
-        [InfoBox("Loading, please wait...", show: nameof(_loadingSaintsEditor))]
+        [InfoBox("Loading, please wait...\nPlease use ctrl(command)+R to see the result", show: nameof(_loadingSaintsEditor))]
 
         [LayoutStart("./SaintsEditor Buttons", ELayout.Horizontal)]
 #if SAINTSFIELD_SAINTS_EDITOR_APPLY

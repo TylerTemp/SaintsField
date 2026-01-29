@@ -47,7 +47,8 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
         private int _curLength;
         private HelpBox _helpBox;
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             // Debug.Log(FieldWithInfo.SerializedProperty.propertyPath);
             SerializedProperty prop = FieldWithInfo.SerializedProperty;

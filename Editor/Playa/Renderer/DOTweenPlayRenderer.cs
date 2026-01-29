@@ -35,7 +35,8 @@ namespace SaintsField.Editor.Playa.Renderer
         {
         }
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             return (null, false);
         }

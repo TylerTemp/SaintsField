@@ -368,7 +368,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                             {
                                                 renderer.NoLabel = noLabel;
                                                 renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
-                                                VisualElement fieldElement = renderer.CreateVisualElement();
+                                                VisualElement fieldElement = renderer.CreateVisualElement(element);
                                                 if (fieldElement != null)
                                                 {
                                                     element.Add(fieldElement);
@@ -525,7 +525,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                                         {
                                             renderer.NoLabel = noLabel;
                                             renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
-                                            VisualElement fieldElement = renderer.CreateVisualElement();
+                                            VisualElement fieldElement = renderer.CreateVisualElement(element);
                                             if (fieldElement != null)
                                             {
                                                 element.Add(fieldElement);

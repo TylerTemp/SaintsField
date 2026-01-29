@@ -8,6 +8,7 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.Renderer.ButtonCustomContextMenuFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
@@ -1237,6 +1238,11 @@ namespace SaintsField.Editor
                             //     new RealTimeCalculatorRenderer(serializedObject, fieldWithInfo), fieldWithInfo,
                             //     serializedObject);
                             // baseRenderers.Add(new RealTimeCalculatorRenderer(serializedObject, fieldWithInfo));
+                        }
+
+                        if (playaAttribute is CustomContextMenuAttribute customContextMenuAttribute)
+                        {
+                            baseRenderers.Add(new ButtonCustomContextMenuRenderer(customContextMenuAttribute, serializedObject, fieldWithInfo));
                         }
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
                         if (playaAttribute is DOTweenPlayAttribute)

@@ -20,7 +20,8 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             public RichTextDrawer RichTextDrawer;
         }
 
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             (HelpBox helpBox, bool needUpdate) = CreateInfoBox(FieldWithInfo, _playaInfoBoxAttribute, this);
             helpBox.name = FieldWithInfo.MemberId;

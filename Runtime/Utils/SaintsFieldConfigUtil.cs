@@ -44,7 +44,7 @@ namespace SaintsField.Utils
         public const string EditorResourcePath = "SaintsField/SaintsFieldConfig.asset";
 
         public static SaintsFieldConfig Config;
-        public static string ConfigAssetPath = "";
+        private static string _configAssetPath = "";
         public static bool IsConfigLoaded;
 
         public static readonly UnityEvent<SaintsFieldConfig> OnConfigLoaded = new UnityEvent<SaintsFieldConfig>();
@@ -90,29 +90,34 @@ namespace SaintsField.Utils
             {
                 if (!Directory.Exists("Assets/Editor Default Resources"))
                 {
-                    Debug.Log($"Create folder: Assets/Editor Default Resources");
+                    Debug.Log("Create folder: Assets/Editor Default Resources");
                     AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
                 }
 
                 if (!Directory.Exists("Assets/Editor Default Resources/SaintsField"))
                 {
-                    Debug.Log($"Create folder: Assets/Editor Default Resources/SaintsField");
+                    Debug.Log("Create folder: Assets/Editor Default Resources/SaintsField");
                     AssetDatabase.CreateFolder("Assets/Editor Default Resources", "SaintsField");
                 }
 
+                string fullPath = $"Assets/Editor Default Resources/{EditorResourcePath}";
+                if (File.Exists(fullPath))
+                {
+                    Debug.LogWarning($"File exists but failed to load as SaintsConfig: {fullPath}");
+                    return;
+                }
+
                 Config = ScriptableObject.CreateInstance<SaintsFieldConfig>();
-                Debug.Log(
-                    $"Create saintsFieldConfig: Assets/Editor Default Resources/{EditorResourcePath}");
-                AssetDatabase.CreateAsset(Config,
-                    $"Assets/Editor Default Resources/{EditorResourcePath}");
+                Debug.Log($"Create saintsFieldConfig: {fullPath}");
+                AssetDatabase.CreateAsset(Config, fullPath);
                 AssetDatabase.SaveAssets();
                 IsConfigLoaded = true;
             }
 
-            ConfigAssetPath = AssetDatabase.GetAssetPath(Config);
+            _configAssetPath = AssetDatabase.GetAssetPath(Config);
             OnConfigLoaded.Invoke(Config);
 #if SAINTSFIELD_DEBUG
-            Debug.Log($"SaintsField config load: {IsConfigLoaded}, {ConfigAssetPath}");
+            Debug.Log($"SaintsField config load: {IsConfigLoaded}, {_configAssetPath}");
 #endif
         }
 #endif

@@ -6,7 +6,8 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 {
     public partial class MethodBindRenderer
     {
-        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container)
+        protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
+            VisualElement container)
         {
             CheckMethodBind(_methodBindAttribute, FieldWithInfo);
 
