@@ -9,7 +9,11 @@ namespace SaintsField
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
     public class ValueAttributeAttribute: InjectAttributeBase
     {
-        public ValueAttributeAttribute(Type decorator, params object[] parameters) : base(decorator, parameters)
+        public ValueAttributeAttribute(Type decorator, params object[] parameters) : base(1, decorator, parameters)
+        {
+        }
+
+        public ValueAttributeAttribute(int depth, Type decorator, params object[] parameters) : base(depth, decorator, parameters)
         {
         }
     }
