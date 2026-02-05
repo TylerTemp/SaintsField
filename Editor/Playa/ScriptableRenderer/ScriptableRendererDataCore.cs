@@ -154,9 +154,9 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             {
                 // Debug.Log(_editor.target.GetType());
                 // Debug.Log("==============");
-                var types = TypeCache.GetTypesDerivedFrom<ScriptableRendererFeature>();
+                TypeCache.TypeCollection types = TypeCache.GetTypesDerivedFrom<ScriptableRendererFeature>();
                 // var data = _editor.target as ScriptableRendererData;
-                var dropdown = new AdvancedDropdownList<Type>();
+                AdvancedDropdownList<Type> dropdown = new AdvancedDropdownList<Type>();
                 foreach (Type t in types)
                 {
                     // Debug.Log(t);
@@ -170,7 +170,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                         continue;
                     }
 
-                    var path = GetMenuNameFromType(t);
+                    string path = GetMenuNameFromType(t);
                     // _editor.AddComponent(t);
                     // Debug.Log(path);
                     dropdown.Add(path, t);
@@ -277,7 +277,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
 
         internal bool DuplicateFeatureCheck(Type type)
         {
-            var data = _editor.target as ScriptableRendererData;
+            ScriptableRendererData data = _editor.target as ScriptableRendererData;
 
             Attribute isSingleFeature = type.GetCustomAttribute(typeof(DisallowMultipleRendererFeature));
             if (isSingleFeature == null)
@@ -299,7 +299,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             if (data == null || RendererFeaturesField == null)
                 return false;
 
-            var m_RendererFeatures = RendererFeaturesField.GetValue(data) as List<ScriptableRendererFeature>;
+            List<ScriptableRendererFeature> m_RendererFeatures = RendererFeaturesField.GetValue(data) as List<ScriptableRendererFeature>;
             if (m_RendererFeatures == null)
                 return false;
             for (int i = 0; i < m_RendererFeatures.Count; i++)
@@ -544,17 +544,45 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 renderFeatureProperty.objectReferenceValue.name = evt.changedProperty.stringValue;
             });
 
-            titleElement.Add(new InspectorElement(rendererFeatureEditor)
+            if(IsUIToolkit(rendererFeatureEditor))
             {
-                style =
+                titleElement.Add(new InspectorElement(rendererFeatureEditor)
                 {
-                    marginLeft = -7,
-                },
-            });
+                    style =
+                    {
+                        marginLeft = -7,
+                    },
+                });
+            }
+            else
+            {
+                titleElement.Add(new IMGUIContainer(() =>
+                {
+                    rendererFeatureEditor.serializedObject.Update();
+                    rendererFeatureEditor.OnInspectorGUI();
+                    rendererFeatureEditor.serializedObject.ApplyModifiedProperties();
+                }));
+            }
 
             root.Bind(serializedRendererFeaturesEditor);
 
             return root;
+        }
+
+        bool IsUIToolkit(UnityEditor.Editor rendererFeatureEditor)
+        {
+            var type = rendererFeatureEditor.GetType();
+
+            var method = type.GetMethod(
+                "CreateInspectorGUI",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+            );
+
+            if (method == null)
+                return false;
+
+            // If this method is overridden, DeclaringType will differ
+            return method.DeclaringType != method.GetBaseDefinition().DeclaringType;
         }
 
         private static class ScriptableRendererDataReflection
