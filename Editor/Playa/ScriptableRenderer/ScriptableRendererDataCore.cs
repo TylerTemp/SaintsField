@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
+using SaintsField.ScriptableRenderer;
 using UnityEditor;
 using UnityEditor.Rendering;
 using UnityEditor.Rendering.Universal;
@@ -134,30 +137,83 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             root.Add(addBtn);
 
             // static readonly Assembly UrpEditorAssembly = typeof(UniversalRenderPipelineEditor).Assembly;
-            Type providerType = typeof(ScriptableRendererDataEditor).Assembly
-                .GetType("UnityEditor.Rendering.Universal.ScriptableRendererFeatureProvider");
+            // Type providerType = typeof(ScriptableRendererDataEditor).Assembly
+            //     .GetType("UnityEditor.Rendering.Universal.ScriptableRendererFeatureProvider");
             // Type t = typeof(ScriptableRendererFeatureProvider);
             // Debug.Log(providerType);
-            ConstructorInfo ctor =
-                providerType?.GetConstructor(
-                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
-                    null,
-                    new[] { typeof(ScriptableRendererDataEditor) },
-                    null
-                );
+            // ConstructorInfo ctor =
+            //     providerType?.GetConstructor(
+            //         BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+            //         null,
+            //         new[] { typeof(ScriptableRendererDataEditor) },
+            //         null
+            //     );
             // Debug.Log(ctor);
 
             addBtn.clicked += () =>
             {
-                Rect r = addBtn.worldBound;
-                Vector2 pos = new Vector2(r.x + r.width / 2f, r.yMax + 18f);
-                if (ctor == null)
+                // Debug.Log(_editor.target.GetType());
+                // Debug.Log("==============");
+                var types = TypeCache.GetTypesDerivedFrom<ScriptableRendererFeature>();
+                // var data = _editor.target as ScriptableRendererData;
+                var dropdown = new AdvancedDropdownList<Type>();
+                foreach (Type t in types)
                 {
-                    throw new MissingMemberException(
-                        "ScriptableRendererFeatureProvider ctor not found (URP API changed). Please report this issue to SaintsField."
-                    );
+                    // Debug.Log(t);
+                    // Debug.Log(RendererFeatureSupported(t));
+                    if (!RendererFeatureSupported(t))
+                    {
+                        continue;
+                    }
+                    if (DuplicateFeatureCheck(t))
+                    {
+                        continue;
+                    }
+
+                    var path = GetMenuNameFromType(t);
+                    // _editor.AddComponent(t);
+                    // Debug.Log(path);
+                    dropdown.Add(path, t);
                 }
-                FilterWindow.Show(pos, (FilterWindow.IProvider)ctor.Invoke(new object[] { _editor }));
+
+
+                AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+                {
+                    CurDisplay = "",
+                    CurValues = Array.Empty<object>(),
+                    DropdownListValue = dropdown,
+                    SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                };
+
+                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+                SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
+                    metaInfo,
+                    root.worldBound.width,
+                    maxHeight,
+                    false,
+                    (curItem, _) =>
+                    {
+                        // _editor.AddComponent((Type)curItem);
+                        AddComponentMethod.Invoke(_editor, new object[] { (Type)curItem });
+                        return null;
+                    }
+                );
+
+                // DebugPopupExample.SaintsAdvancedDropdownUIToolkit = sa;
+                // var editorWindow = EditorWindow.GetWindow<DebugPopupExample>();
+                // editorWindow.Show();
+
+                UnityEditor.PopupWindow.Show(worldBound, sa);
+                // Rect r = addBtn.worldBound;
+                // Vector2 pos = new Vector2(r.x + r.width / 2f, r.yMax + 18f);
+                // if (ctor == null)
+                // {
+                //     throw new MissingMemberException(
+                //         "ScriptableRendererFeatureProvider ctor not found (URP API changed). Please report this issue to SaintsField."
+                //     );
+                // }
+                // FilterWindow.Show(pos, (FilterWindow.IProvider)ctor.Invoke(new object[] { _editor }));
             };
 
             root.schedule.Execute(OnUpdateUIToolkit).Every(150);
@@ -167,6 +223,137 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
 
             return root;
         }
+
+        #region FilterWindow.IProvider
+        static readonly MethodInfo AddComponentMethod =
+            typeof(ScriptableRendererDataEditor).GetMethod(
+                "AddComponent",
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                null,
+                new[] { typeof(Type) },
+                null
+            );
+
+
+        internal bool RendererFeatureSupported(Type rendererFeatureType)
+        {
+            // UnityEngine.Rendering.Universal.DecalRendererFeature
+            Type urd = typeof(UniversalRendererData);
+            Type rendererType = _editor.target.GetType();
+
+            SupportedOnRendererAttribute rendererFilterAttribute = Attribute.GetCustomAttribute(rendererFeatureType, typeof(SupportedOnRendererAttribute)) as SupportedOnRendererAttribute;
+            if (rendererFilterAttribute != null)
+            {
+                bool foundEditor = false;
+                for (int i = 0; i < rendererFilterAttribute.rendererTypes.Length && !foundEditor; i++)
+                {
+                    // Debug.Log($"{rendererFilterAttribute.rendererTypes[i]}/{rendererType}");
+                    foundEditor = rendererFilterAttribute.rendererTypes[i] == rendererType;
+                    if (!foundEditor)
+                    {
+                        if (rendererFilterAttribute.rendererTypes[i] == urd)
+                        {
+                            // If it's used on UniversalRendererData, then it should be allowed to used on SaintsUniversalRendererData
+                            // including its children
+                            if (_editor.target is SaintsUniversalRendererData)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return foundEditor;
+            }
+
+            return true;
+        }
+
+        static readonly FieldInfo RendererFeaturesField =
+            typeof(ScriptableRendererData).GetField(
+                "m_RendererFeatures",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+        internal bool DuplicateFeatureCheck(Type type)
+        {
+            var data = _editor.target as ScriptableRendererData;
+
+            Attribute isSingleFeature = type.GetCustomAttribute(typeof(DisallowMultipleRendererFeature));
+            if (isSingleFeature == null)
+                return false;
+
+            // if (data.m_RendererFeatures == null)
+            //     return false;
+            //
+            // for (int i = 0; i < m_RendererFeatures.Count; i++)
+            // {
+            //     ScriptableRendererFeature feature = m_RendererFeatures[i];
+            //     if (feature == null)
+            //         continue;
+            //
+            //     if (feature.GetType() == type)
+            //         return true;
+            // }
+
+            if (data == null || RendererFeaturesField == null)
+                return false;
+
+            var m_RendererFeatures = RendererFeaturesField.GetValue(data) as List<ScriptableRendererFeature>;
+            if (m_RendererFeatures == null)
+                return false;
+            for (int i = 0; i < m_RendererFeatures.Count; i++)
+            {
+                ScriptableRendererFeature feature = m_RendererFeatures[i];
+                if (feature == null)
+                    continue;
+
+                if (feature.GetType() == type)
+                    return true;
+            }
+            return false;
+        }
+
+        static readonly MethodInfo GetCustomTitleMethod =
+            typeof(ScriptableRendererDataEditor).GetMethod(
+                "GetCustomTitle",
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                null,
+                new[] { typeof(Type), typeof(string).MakeByRefType() },
+                null
+            );
+
+        string GetMenuNameFromType(Type type)
+        {
+            // string path;
+            // if (!_editor.GetCustomTitle(type, out path))
+            // {
+            //     path = ObjectNames.NicifyVariableName(type.Name);
+            // }
+            string path = null;
+
+            bool hasCustomTitle = false;
+
+            if (_editor != null && GetCustomTitleMethod != null)
+            {
+                object[] args = { type, null };
+                hasCustomTitle = (bool)GetCustomTitleMethod.Invoke(_editor, args);
+                path = args[1] as string;
+            }
+            if (!hasCustomTitle)
+            {
+                path = ObjectNames.NicifyVariableName(type.Name);
+            }
+
+            if (type.Namespace != null)
+            {
+                if (type.Namespace.Contains("Experimental"))
+                    path += " (Experimental)";
+            }
+
+            return path;
+        }
+        #endregion
 
 
         // private int _rendererFeaturesCount = 0;
