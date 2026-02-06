@@ -7,7 +7,7 @@
                 <ui:VisualElement name="foldoutIcon" class="saints-right-foldout-rotate foldoutIcon" style="rotate: 90deg;"/>
             </ui:VisualElement>
             <ui:Toggle name="toggleActive" class="toggleActive"/>
-            <ui:Label text="Label" name="titleLabel" style="color: rgb(128, 128, 128);"/>
+            <ui:Label text="Label" name="titleLabel" class="titleLabel"/>
         </ui:VisualElement>
         <ui:VisualElement name="right" class="right">
             <ui:Button name="helpButton" class="iconButton helpButton" style="display: none;"/>

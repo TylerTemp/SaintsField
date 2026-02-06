@@ -17,7 +17,10 @@
         "AYellowpaper.SerializeInterfaces",
         "com.inter-illusion.i2",
         "SaintsField.Runtime.TypeReference",
-        "SaintsField.Samples"
+        "SaintsField.Samples",
+        "SaintsField.Editor.ScriptableRenderer",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.Editor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -68,9 +71,9 @@
             "define": "SAINTSFIELD_NEWTONSOFT_JSON"
         },
         {
-            "name": "com.unity.nuget.newtonsoft-json",
+            "name": "com.unity.render-pipelines.universal",
             "expression": "",
-            "define": "SAINTSFIELD_NEWTONSOFT_JSON"
+            "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL"
         }
     ],
     "noEngineReferences": false

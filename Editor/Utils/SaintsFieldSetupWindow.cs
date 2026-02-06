@@ -134,7 +134,12 @@ namespace SaintsField.Editor.Utils
 #endif
         + " in this project", 5, 5)]
 
-        [InfoBox("Loading, please wait...\nPlease use ctrl(command)+R to see the result", show: nameof(_loadingSaintsEditor))]
+#if UNITY_6000_0_OR_NEWER && !SAINTSFIELD_SAINTS_EDITOR_APPLY
+        [Separator(5)]
+        [InfoBox("<size+1>If you're using <b>custom \"Build Profile\"</b> with custom \"Player Settings\", please add `SAINTSFIELD_SAINTS_EDITOR_APPLY` in \"Scripting Define Symbols\" manually", EMessageType.Warning)]
+#endif
+
+        [InfoBox("Loading, please wait...", show: nameof(_loadingSaintsEditor))]
 
         [LayoutStart("./SaintsEditor Buttons", ELayout.Horizontal)]
 #if SAINTSFIELD_SAINTS_EDITOR_APPLY

@@ -304,19 +304,19 @@ namespace SaintsField.Editor.Utils
 
         #endregion
 
-        #region Code Analysis
-
-        // ReSharper disable once InconsistentNaming
-        public const string SAINTSFIELD_CODE_ANALYSIS = "SAINTSFIELD_CODE_ANALYSIS";
-
-        [MenuItem(MenuRoot + "Code Analysis...")]
-        public static void EnableCodeAnalysis()
-        {
-            SaintsFieldSetupWindow.Open();
-        }
-
-
-        #endregion
+        // #region Code Analysis
+        //
+        // // ReSharper disable once InconsistentNaming
+        // public const string SAINTSFIELD_CODE_ANALYSIS = "SAINTSFIELD_CODE_ANALYSIS";
+        //
+        // [MenuItem(MenuRoot + "Code Analysis...")]
+        // public static void EnableCodeAnalysis()
+        // {
+        //     SaintsFieldSetupWindow.Open();
+        // }
+        //
+        //
+        // #endregion
 
 #if SAINTSFIELD_DEBUG
         [MenuItem(MenuRoot + "IMGUI Debugger" )]

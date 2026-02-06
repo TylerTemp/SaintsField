@@ -9,7 +9,7 @@ namespace SaintsField
     [AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property, AllowMultiple = true)]
     public class KeyAttributeAttribute: InjectAttributeBase
     {
-        public KeyAttributeAttribute(Type decorator, params object[] parameters) : base(decorator, parameters)
+        public KeyAttributeAttribute(Type decorator, params object[] parameters) : base(1, decorator, parameters)
         {
         }
     }
