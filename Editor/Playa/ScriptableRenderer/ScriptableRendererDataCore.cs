@@ -238,6 +238,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
 
         private bool RendererFeatureSupported(Type rendererFeatureType)
         {
+#if SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL_17_1_0_OR_NEWER
             // UnityEngine.Rendering.Universal.DecalRendererFeature
             Type urd = typeof(UniversalRendererData);
             Type rendererType = _editor.target.GetType();
@@ -269,8 +270,9 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
 
                 return foundEditor;
             }
-
+#endif
             return true;
+
         }
 
         private static readonly FieldInfo RendererFeaturesField =
