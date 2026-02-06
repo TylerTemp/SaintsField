@@ -170,7 +170,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     },
                 };
 
-                UIToolkitUtils.SetLabelChildren(title, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
+                // work around UI Toolkit CJK issue
+                UIToolkitUtils.SetLabelChildren(title, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last() + "  ", new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
 
                 title.RemoveFromClassList("unity-label");
                 if (_eLayout.HasFlagFast(ELayout.TitleOut))
@@ -254,7 +255,8 @@ namespace SaintsField.Editor.Playa.RendererGroup
 
                     VisualElement titleLabel = new VisualElement();
                     title.Add(titleLabel);
-                    UIToolkitUtils.SetLabelChildren(titleLabel, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last(), new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
+                    // work around UI Toolkit CJK issue
+                    UIToolkitUtils.SetLabelChildren(titleLabel, RichTextDrawer.ParseRichXmlWithProvider(_groupPath.Last() + "  ", new RichTextDrawer.EmptyRichTextTagProvider()), _richTextDrawer);
 
                     body.style.display = _foldout? DisplayStyle.Flex : DisplayStyle.None;
                     title.clicked += () =>

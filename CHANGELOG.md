@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.11.1 ##
+
+1.  Fix: dropdown button for URP editor now can detect `SupportedOnRendererAttribute` and allows for inherented from `SaintsScriptableRendererData`. Fix URP editor title text overflow when it's too long. Fix IMGUI based editor can not be saved under URP editor. [#363](https://github.com/TylerTemp/SaintsField/issues/363) 
+2.  Add a warning for Unity 6000+ about building support [#362](https://github.com/TylerTemp/SaintsField/issues/362)
+
 ## 5.11.0 ##
 
 1.  Add: `CustomContextMenu`, `FieldCustomContextMenu` for right click context menu.

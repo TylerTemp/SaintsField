@@ -95,10 +95,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.11.0**
+**5.11.1**
 
-1.  Add: `CustomContextMenu`, `FieldCustomContextMenu` for right click context menu.
-2.  Improve: `LocalizedStringPicker` no longer render the whole translated text. (You can still do a full text search.)
+1.  Fix: dropdown button for URP editor now can detect `SupportedOnRendererAttribute` and allows for inherented from `SaintsScriptableRendererData`. Fix URP editor title text overflow when it's too long. Fix IMGUI based editor can not be saved under URP editor. [#363](https://github.com/TylerTemp/SaintsField/issues/363)
+2.  Add a warning for Unity 6000+ about building support [#362](https://github.com/TylerTemp/SaintsField/issues/362)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
