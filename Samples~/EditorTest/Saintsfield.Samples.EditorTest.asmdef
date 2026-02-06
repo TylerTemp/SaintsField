@@ -71,9 +71,9 @@
             "define": "SAINTSFIELD_NEWTONSOFT_JSON"
         },
         {
-            "name": "com.unity.nuget.newtonsoft-json",
+            "name": "com.unity.render-pipelines.universal",
             "expression": "",
-            "define": "SAINTSFIELD_NEWTONSOFT_JSON"
+            "define": "SAINTSFIELD_RENDER_PIPELINE_UNIVERSAL"
         }
     ],
     "noEngineReferences": false
