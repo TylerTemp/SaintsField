@@ -19,6 +19,7 @@
 .foldoutContainer {
     width: 12px;
     height: 12px;
+    flex-shrink: 0;
 }
 
 .foldoutIcon {
@@ -30,6 +31,7 @@
 
 .toggleActive {
     margin: 1 4 1 2;
+    flex-shrink: 0;
 }
 
 .iconButton {
@@ -60,6 +62,7 @@
 
 .right {
     flex-direction: row;
+    flex-shrink: 0;
 }
 
 .footer {
@@ -69,6 +72,11 @@
     padding-top: 5px;
 }
 
-/*.addRendererFeatureButton {*/
-/*    height: 20px;*/
-/*}*/
+.titleLabel {
+    overflow: hidden;
+    flex-shrink: 1;
+    flex-grow: 1;
+    color: rgb(128, 128, 128);
+    text-overflow: ellipsis;
+    -unity-text-align: middle-left;
+}

@@ -185,11 +185,11 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                     SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
                 };
 
-                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+                (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(addBtn.worldBound);
 
                 SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
                     metaInfo,
-                    root.worldBound.width,
+                    addBtn.worldBound.width,
                     maxHeight,
                     false,
                     (curItem, _) =>
@@ -225,7 +225,8 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
         }
 
         #region FilterWindow.IProvider
-        static readonly MethodInfo AddComponentMethod =
+
+        private static readonly MethodInfo AddComponentMethod =
             typeof(ScriptableRendererDataEditor).GetMethod(
                 "AddComponent",
                 BindingFlags.Instance | BindingFlags.NonPublic,
@@ -235,13 +236,14 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             );
 
 
-        internal bool RendererFeatureSupported(Type rendererFeatureType)
+        private bool RendererFeatureSupported(Type rendererFeatureType)
         {
             // UnityEngine.Rendering.Universal.DecalRendererFeature
             Type urd = typeof(UniversalRendererData);
             Type rendererType = _editor.target.GetType();
 
             SupportedOnRendererAttribute rendererFilterAttribute = Attribute.GetCustomAttribute(rendererFeatureType, typeof(SupportedOnRendererAttribute)) as SupportedOnRendererAttribute;
+            // ReSharper disable once InvertIf
             if (rendererFilterAttribute != null)
             {
                 bool foundEditor = false;
@@ -249,13 +251,15 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 {
                     // Debug.Log($"{rendererFilterAttribute.rendererTypes[i]}/{rendererType}");
                     foundEditor = rendererFilterAttribute.rendererTypes[i] == rendererType;
+                    // ReSharper disable once InvertIf
                     if (!foundEditor)
                     {
+                        // ReSharper disable once InvertIf
                         if (rendererFilterAttribute.rendererTypes[i] == urd)
                         {
-                            // If it's used on UniversalRendererData, then it should be allowed to used on SaintsUniversalRendererData
-                            // including its children
-                            if (_editor.target is SaintsUniversalRendererData)
+                            // If it's used on UniversalRendererData, then it should be allowed to used on SaintsUniversalRendererData's direct children
+                            // sub children is not allowed because SupportedOnRendererAttribute itself does not work on child object
+                            if (_editor.target is SaintsUniversalRendererData && _editor.target.GetType().BaseType == typeof(SaintsUniversalRendererData))
                             {
                                 return true;
                             }
@@ -269,7 +273,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             return true;
         }
 
-        static readonly FieldInfo RendererFeaturesField =
+        private static readonly FieldInfo RendererFeaturesField =
             typeof(ScriptableRendererData).GetField(
                 "m_RendererFeatures",
                 BindingFlags.Instance | BindingFlags.NonPublic
@@ -299,9 +303,13 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             if (data == null || RendererFeaturesField == null)
                 return false;
 
+            // ReSharper disable once UseNegatedPatternMatching
+            // ReSharper disable once InconsistentNaming
             List<ScriptableRendererFeature> m_RendererFeatures = RendererFeaturesField.GetValue(data) as List<ScriptableRendererFeature>;
             if (m_RendererFeatures == null)
                 return false;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            // ReSharper disable once LoopCanBeConvertedToQuery
             for (int i = 0; i < m_RendererFeatures.Count; i++)
             {
                 ScriptableRendererFeature feature = m_RendererFeatures[i];
@@ -314,7 +322,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             return false;
         }
 
-        static readonly MethodInfo GetCustomTitleMethod =
+        private static readonly MethodInfo GetCustomTitleMethod =
             typeof(ScriptableRendererDataEditor).GetMethod(
                 "GetCustomTitle",
                 BindingFlags.Instance | BindingFlags.NonPublic,
@@ -323,7 +331,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 null
             );
 
-        string GetMenuNameFromType(Type type)
+        private string GetMenuNameFromType(Type type)
         {
             // string path;
             // if (!_editor.GetCustomTitle(type, out path))
@@ -569,7 +577,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             return root;
         }
 
-        bool IsUIToolkit(UnityEditor.Editor rendererFeatureEditor)
+        private bool IsUIToolkit(UnityEditor.Editor rendererFeatureEditor)
         {
             var type = rendererFeatureEditor.GetType();
 
