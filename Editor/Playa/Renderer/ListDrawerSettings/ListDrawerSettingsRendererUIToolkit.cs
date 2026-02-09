@@ -495,8 +495,6 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                             property.DeleteArrayElementAtIndex(propIndex);
                             property.serializedObject.ApplyModifiedProperties();
                         });
-
-                        evt.menu.AppendSeparator();
                     }));
                 }
             }
