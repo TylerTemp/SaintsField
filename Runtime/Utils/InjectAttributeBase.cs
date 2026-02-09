@@ -4,7 +4,7 @@ using UnityEngine;
 // ReSharper disable once CheckNamespace
 namespace SaintsField.Utils
 {
-    public abstract class InjectAttributeBase: PropertyAttribute
+    public abstract class InjectAttributeBase: Attribute
     {
         public readonly Type Decorator;
         public readonly object[] Parameters;
