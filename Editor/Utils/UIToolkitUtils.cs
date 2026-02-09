@@ -884,6 +884,13 @@ namespace SaintsField.Editor.Utils
                             }).Every(100);
 
                             AddContextualMenuReset(listViewToggle, property, fieldInfo, parent);
+
+#if !UNITY_6000_0_OR_NEWER
+                            {
+                                Toggle toggle = listView.Q<Toggle>(className: "unity-toggle");
+                                AddContextualMenuManipulator(toggle, property, () => { });
+                            }
+#endif
                         }
 
                         listView.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
