@@ -8,6 +8,9 @@ using System.Text;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEngine;
+#if SAINTSFIELD_DEBUG
+using Unity.Profiling;
+#endif
 
 namespace SaintsField.Editor
 {
@@ -50,6 +53,9 @@ namespace SaintsField.Editor
 
         public static MemberInfoComparerPreParsed GetComparer(Type systemType)
         {
+#if SAINTSFIELD_DEBUG
+            using var AutoScope = new ProfilerMarker("MemberInfoComparerPreParsed.GetComparer").Auto();
+#endif
             if (TypeToPreParsedComparer.TryGetValue(systemType, out MemberInfoComparerPreParsed cache))
             {
 #if SAINTSFIELD_DEBUG
@@ -166,6 +172,7 @@ namespace SaintsField.Editor
             _memberContainers = memberContainers;
         }
 
+        // TODO: Refactor the extremely heavy comparison logic
         public int Compare(MemberInfo x, MemberInfo y)
         {
             Debug.Assert(x != null);
@@ -211,7 +218,7 @@ namespace SaintsField.Editor
             {
                 MemberContainer memberContainer = codeAnalysisMembers[index];
 
-                if (memberContainer.Name != memberInfo.Name && RuntimeUtil.GetAutoPropertyName(memberContainer.Name) != memberInfo.Name)
+                if (memberContainer.Name != memberInfo.Name && !RuntimeUtil.IsAutoPropertyNoAlloc(memberContainer.Name, memberInfo.Name))
                 {
                     // Debug.Log($"{memberInfo.Name} not found, continue");
                     continue;
