@@ -172,6 +172,7 @@ namespace SaintsField.Editor
             _memberContainers = memberContainers;
         }
 
+        // TODO: Refactor the extremely heavy comparison logic
         public int Compare(MemberInfo x, MemberInfo y)
         {
             Debug.Assert(x != null);

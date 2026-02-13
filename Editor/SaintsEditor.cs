@@ -229,7 +229,7 @@ namespace SaintsField.Editor
                     List<SaintsFieldWithInfo> thisDepthInfos = new List<SaintsFieldWithInfo>();
                     List<string> memberDepthIds = new List<string>();
 
-                    // MemberInfoComparerPreParsed comparison complexity is of complexity O(YES) and urgently needs refactoring
+                    // MemberInfoComparerPreParsed comparison is of complexity O(YES) and urgently needs refactoring
                     IComparer<MemberInfo> memberOrderComparer = MemberInfoComparerPreParsed.GetComparer(systemType);
 
 #if SAINTSFIELD_CODE_ANALYSIS
