@@ -599,6 +599,26 @@ namespace SaintsField.Utils
         {
             return $"<{propName}>k__BackingField";
         }
+        
+        /// <summary>
+        /// Checks if the <paramref name="memberName"/> value is equal to the automatically generated C# backing field name for the given <paramref name="basePropName"/> without gc allocation.
+        /// </summary>
+        /// <param name="basePropName">Original C# property name</param>
+        /// <param name="memberName">Auto generated backing field name candidate to check</param>
+        /// <returns>True if <paramref name="memberName"/> is equal to the auto generated backing field name for <paramref name="basePropName"/></returns>
+        public static bool IsAutoPropertyNoAlloc(string basePropName, string memberName)
+        {
+            const string InitialPart   = "<";                // Length: 1
+            const string FinalPartPart = ">k__BackingField"; // Lenght: 16
+            if (1 + 16 + basePropName.Length != memberName.Length)
+            {
+                return false;
+            }
+            
+            return string.Compare(memberName, 0, InitialPart, 0, 1) == 0
+                && string.Compare(memberName, memberName.Length - FinalPartPart.Length, FinalPartPart, 0, FinalPartPart.Length) == 0
+                && string.Compare(basePropName, 0, memberName, 1, basePropName.Length) == 0;
+        }
 
         public static ResponsiveLength ParseResponsiveLength(string content)
         {
