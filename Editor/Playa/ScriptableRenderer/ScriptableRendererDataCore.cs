@@ -24,6 +24,11 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
         private List<UnityEditor.Editor> _editors;
         private ListView _listView;
 
+        /// <summary>
+        /// Editors used to fix base imgui urp editors that rely on <see cref="UniversalDataEditor"/>
+        /// </summary>
+        private List<RendererFeatureImguiEditorWrapper> _imguiWrapperEditors;
+
         private readonly ScriptableRendererDataEditor _editor;
         private readonly SerializedObject _serializedObject;
         private readonly UnityEngine.Object _target;
@@ -94,6 +99,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             {
                 updateEditorListMethod.Invoke(_target, null);
             }
+            _updateImguiWrapperEditors();
 
             _serializedObject.Update();
 
@@ -433,6 +439,12 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                     {
                         renderFeatureProperty = _mRendererFeatures.GetArrayElementAtIndex(index);
                         editor = _editors[index];
+
+                        // If IMGUI editro, we wrap it with similar functionality to UniversalRendererDataEditor
+                        if (!IsUIToolkit(editor))
+                        {
+                            editor = _imguiWrapperEditors[index];
+                        }
                     }
                     catch (Exception e)
                     {
@@ -554,25 +566,13 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 renderFeatureProperty.objectReferenceValue.name = evt.changedProperty.stringValue;
             });
 
-            if(IsUIToolkit(rendererFeatureEditor))
+            titleElement.Add(new InspectorElement(rendererFeatureEditor)
             {
-                titleElement.Add(new InspectorElement(rendererFeatureEditor)
+                style =
                 {
-                    style =
-                    {
-                        marginLeft = -7,
-                    },
-                });
-            }
-            else
-            {
-                titleElement.Add(new IMGUIContainer(() =>
-                {
-                    rendererFeatureEditor.serializedObject.Update();
-                    rendererFeatureEditor.OnInspectorGUI();
-                    rendererFeatureEditor.serializedObject.ApplyModifiedProperties();
-                }));
-            }
+                    marginLeft = -7,
+                },
+            });
 
             root.Bind(serializedRendererFeaturesEditor);
 
@@ -593,6 +593,32 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
 
             // If this method is overridden, DeclaringType will differ
             return method.DeclaringType != method.GetBaseDefinition().DeclaringType;
+        }
+
+        /// <summary>
+        /// Update <see cref="_imguiWrapperEditors"/> to reflect the m_Editors field of <see cref="ScriptableRendererDataEditor."/>
+        /// </summary>
+        private void _updateImguiWrapperEditors()
+        {
+            _imguiWrapperEditors ??= new List<RendererFeatureImguiEditorWrapper>(_editors.Count);
+
+            // Clear old editors if sizes don't match
+            if (_editors.Count != _imguiWrapperEditors.Count)
+            {
+                _imguiWrapperEditors.Clear();
+            }
+
+            for (int Index = 0; Index < _editors.Count; Index++)
+            {
+                if (Index >= _imguiWrapperEditors.Count)
+                {
+                    _imguiWrapperEditors.Add(RendererFeatureImguiEditorWrapper.CreateEditor(_editors[Index]));
+                }
+                else
+                {
+                    _imguiWrapperEditors[Index] = RendererFeatureImguiEditorWrapper.CreateCachedEditor(_imguiWrapperEditors[Index], _editors[Index]);
+                }
+            }
         }
 
         private static class ScriptableRendererDataReflection
@@ -620,6 +646,68 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             {
                 RemoveMissingRendererFeaturesMethod.Invoke(data, null);
             }
+        }
+
+        private class RendererFeatureImguiEditorWrapper : UnityEditor.Editor
+        {
+            public override void OnInspectorGUI()
+            {
+                EditorGUI.BeginChangeCheck();
+
+                _baseEditor.OnInspectorGUI();
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
+            }
+
+            /// <summary>
+            /// Create a new <see cref="RendererFeatureImguiEditorWrapper"/>
+            /// </summary>
+            /// <param name="baseEditor">Base editor that the wrapper is supposed to wrap</param>
+            /// <returns></returns>
+            /// <exception cref="ArgumentNullException">Throws if <paramref name="baseEditor"/> is null</exception>
+            public static RendererFeatureImguiEditorWrapper CreateEditor(UnityEditor.Editor baseEditor)
+            {
+                if (baseEditor == null)
+                {
+                    throw new ArgumentNullException(nameof(baseEditor));
+                }
+
+                var newEditor = (RendererFeatureImguiEditorWrapper)CreateEditor(baseEditor.targets, typeof(RendererFeatureImguiEditorWrapper));
+                newEditor._baseEditor = baseEditor;
+
+                return newEditor;
+            }
+
+            /// <summary>
+            /// Create a new editor if <paramref name="cachedValue"/> is no longer valid or <paramref name="cachedValue"/> otherwise.
+            /// </summary>
+            /// <param name="cachedValue">Cached instance of the editor</param>
+            /// <param name="baseEditor">Base editor that the wrapper is supposed to wrap</param>
+            /// <returns></returns>
+            /// <exception cref="ArgumentNullException">Throws if <paramref name="baseEditor"/> is null</exception>
+            public static RendererFeatureImguiEditorWrapper CreateCachedEditor(RendererFeatureImguiEditorWrapper cachedValue, UnityEditor.Editor baseEditor)
+            {
+                if (baseEditor == null)
+                {
+                    throw new ArgumentNullException(nameof(baseEditor));
+                }
+
+                if (cachedValue == null || cachedValue._baseEditor != baseEditor)
+                {
+
+                    var newEditor = (RendererFeatureImguiEditorWrapper)CreateEditor(baseEditor.targets, typeof(RendererFeatureImguiEditorWrapper));
+                    newEditor._baseEditor = baseEditor;
+
+                    return newEditor;
+                }
+
+                return cachedValue;
+            }
+
+            private UnityEditor.Editor _baseEditor;
         }
 
     }
