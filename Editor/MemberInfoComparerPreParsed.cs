@@ -19,7 +19,7 @@ namespace SaintsField.Editor
         private static readonly Dictionary<Type, MemberInfoComparerPreParsed> TypeToPreParsedComparer =
             new Dictionary<Type, MemberInfoComparerPreParsed>();
 
-        public enum MemberType
+        private enum MemberType
         {
             Field,
             Property,
@@ -54,7 +54,7 @@ namespace SaintsField.Editor
         public static MemberInfoComparerPreParsed GetComparer(Type systemType)
         {
 #if SAINTSFIELD_DEBUG
-            using var AutoScope = new ProfilerMarker("MemberInfoComparerPreParsed.GetComparer").Auto();
+            using ProfilerMarker.AutoScope autoScope = new ProfilerMarker("MemberInfoComparerPreParsed.GetComparer").Auto();
 #endif
             if (TypeToPreParsedComparer.TryGetValue(systemType, out MemberInfoComparerPreParsed cache))
             {

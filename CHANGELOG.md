@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.11.4 ##
+
+1.  Fix: Prefab view dropdown(advanceddropdwn/treedropdown) in inspector failed on second selection [#367](https://github.com/TylerTemp/SaintsField/issues/367)
+2.  Fix: `SaintsEditor` might get incorrect field order since version 5.11.3
+
 ## 5.11.3 ##
 
 1.  Fix: Fixed extremely high GC alloc. Parallelized heavy sorting. [#365](https://github.com/TylerTemp/SaintsField/pull/365) by [@ZeroIQGames](https://github.com/ZeroIQGames)

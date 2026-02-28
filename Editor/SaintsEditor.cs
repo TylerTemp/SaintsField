@@ -166,7 +166,7 @@ namespace SaintsField.Editor
 
 
             // Dictionary<string, SerializedProperty> pendingSerializedProperties = new Dictionary<string, SerializedProperty>(serializedPropertyDict);
-            
+
             Dictionary<string, SerializedProperty> pendingSerializedProperties = serializedPropertyDict.ToDictionary(each => each.Key, each => each.Value);
             pendingSerializedProperties.Remove("m_Script");
 
@@ -232,9 +232,9 @@ namespace SaintsField.Editor
                     // MemberInfoComparerPreParsed comparison is of complexity O(YES) and urgently needs refactoring
                     IComparer<MemberInfo> memberOrderComparer = MemberInfoComparerPreParsed.GetComparer(systemType);
 
-#if SAINTSFIELD_CODE_ANALYSIS
-                    memberOrderComparer ??= MemberInfoComparerCodeAnalysis.GetComparer(systemType);
-#endif
+// #if SAINTSFIELD_CODE_ANALYSIS
+//                     memberOrderComparer ??= MemberInfoComparerCodeAnalysis.GetComparer(systemType);
+// #endif
 
                     memberOrderComparer ??= new MemberInfoComparerReflection();
 
@@ -254,22 +254,25 @@ namespace SaintsField.Editor
 // #endif
 //                         .ToList();
 
-                    List<MemberInfo> memberLis;
-                    if (members.Length > 100) // Parallelize on large types
-                    {
-                        // 100 elements might sound too small for just 100 elements, but each comparison is so heavy that makes it worthwhile
-                        memberLis = members.AsParallel().OrderBy(static memberInfo => memberInfo, memberOrderComparer).ToList();
-                    }
-                    else
-                    {
-                        memberLis = members.ToList();
-                        memberLis.Sort(memberOrderComparer); // In-place no-alloc sort instead of using linq
-                    }
-                    
+                    // List<MemberInfo> memberLis;
+                    // if (members.Length > 100) // Parallelize on large types
+                    // {
+                    //     // 100 elements might sound too small for just 100 elements, but each comparison is so heavy that makes it worthwhile
+                    //     memberLis = members.AsParallel().OrderBy(static memberInfo => memberInfo, memberOrderComparer).ToList();
+                    // }
+                    // else
+                    // {
+                    //     memberLis = members.ToList();
+                    //     memberLis.Sort(memberOrderComparer); // In-place no-alloc sort instead of using linq
+                    // }
+
+                    // List.Sort is unstable sort. So use linq's version anyway.
+                    List<MemberInfo> memberLis = members.AsParallel().OrderBy(static memberInfo => memberInfo, memberOrderComparer).ToList();
+
 // #if SAINTSFIELD_CODE_ANALYSIS
                     // memberLis.Sort((a, b) => MemberLisCompare(a, b, codeAnalysisMembers));
 // #endif
-                    
+
                     //
                     Dictionary<MemberInfo, IPlayaAttribute[]> memberInfoToPlaya =
                         CollectionPool<Dictionary<MemberInfo, IPlayaAttribute[]>, KeyValuePair<MemberInfo, IPlayaAttribute[]>>.Get();
