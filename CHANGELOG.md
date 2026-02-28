@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.11.3 ##
+
+1.  Fix: Fixed extremely high GC alloc. Parallelized heavy sorting. [#365](https://github.com/TylerTemp/SaintsField/pull/365) by [@ZeroIQGames](https://github.com/ZeroIQGames)
+2.  Fix: `AboveImage`/`BelowImage` can correctly display a multiple sprite.
+3.  Fix: URP editor now display the correct order after draging the rendering list.
+
 ## 5.11.2 ##
 
 1.  Fix: dropdown button for URP editor now can detect `SupportedOnRendererAttribute` and allows for inherented from `SaintsScriptableRendererData`. Fix URP editor title text overflow when it's too long. Fix IMGUI based editor can not be saved under URP editor. [#363](https://github.com/TylerTemp/SaintsField/issues/363) 

@@ -8,7 +8,6 @@ using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.ScriptableRenderer;
 using UnityEditor;
-using UnityEditor.Rendering;
 using UnityEditor.Rendering.Universal;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -247,6 +246,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             Type urd = typeof(UniversalRendererData);
             Type rendererType = _editor.target.GetType();
 
+            // ReSharper disable once UsePatternMatching
             SupportedOnRendererAttribute rendererFilterAttribute = Attribute.GetCustomAttribute(rendererFeatureType, typeof(SupportedOnRendererAttribute)) as SupportedOnRendererAttribute;
             // ReSharper disable once InvertIf
             if (rendererFilterAttribute != null)
@@ -285,7 +285,7 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
 
-        internal bool DuplicateFeatureCheck(Type type)
+        private bool DuplicateFeatureCheck(Type type)
         {
             ScriptableRendererData data = _editor.target as ScriptableRendererData;
 
@@ -436,7 +436,9 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                     try
                     {
                         renderFeatureProperty = _mRendererFeatures.GetArrayElementAtIndex(index);
-                        editor = _editors[index];
+                        // editor = _editors[index];
+                        editor = _editors.First(each =>
+                            each.serializedObject.targetObject == renderFeatureProperty.objectReferenceValue);
                     }
                     catch (Exception e)
                     {
