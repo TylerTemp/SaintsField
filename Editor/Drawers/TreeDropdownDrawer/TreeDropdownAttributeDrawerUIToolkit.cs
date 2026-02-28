@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
@@ -11,6 +12,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 {
@@ -62,6 +64,10 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         {
             UIToolkitUtils.DropdownButtonField dropdownButtonField = container.Q<UIToolkitUtils.DropdownButtonField>(NameButton(property));
             VisualElement root = container.Q<VisualElement>(NameLabelFieldUIToolkit(property));
+            // var serObj = property.serializedObject;
+            Object[] targetObjects = property.serializedObject.targetObjects;
+            string propPath = property.propertyPath;
+
             dropdownButtonField.ButtonElement.clicked += () =>
             {
                 AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(property, (PathedDropdownAttribute)saintsAttribute, info, parent, false);
@@ -75,11 +81,32 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     false,
                     (curItem, _) =>
                     {
+                        SerializedObject serObj = null;
+                        if (!SerializedUtils.IsOk(property))
+                        {
+                            // https://github.com/TylerTemp/SaintsField/issues/367
+                            // Only happens in prefab
+                            Object[] inspecting = targetObjects
+                                .Where(each => each != null).ToArray();
+                            if (inspecting.Length == 0)
+                            {
+#if SAINTSFIELD_DEBUG
+                                Debug.Log("No inspecting");
+#endif
+                                return null;
+                            }
+
+                            serObj = new SerializedObject(inspecting);
+                            property = serObj.FindProperty(propPath);
+                            // Debug.Log(property.propertyPath);
+                            // return null;
+                        }
                         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
                             parent, curItem);
                         Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
                         onValueChangedCallback(curItem);
+                        serObj?.Dispose();
                         return null;
                     }
                 );

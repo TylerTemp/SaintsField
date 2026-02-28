@@ -959,6 +959,13 @@ namespace SaintsField.Editor.Core
             Action<object> onValueChangedCallback = null;
             onValueChangedCallback = obj =>
             {
+                if (!SerializedUtils.IsOk(property))
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning("Property disposed");
+#endif
+                    return;
+                }
                 object newFetchParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                 if (newFetchParent == null)
                 {
