@@ -17,5 +17,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
         }
 
         public MyStruct myStruct;
+
+        public Sprite multi1;
+        public Sprite multi2;
+
+        [AboveImage(nameof(multi1)), AboveImage(nameof(multi2))] public string multi;
     }
 }

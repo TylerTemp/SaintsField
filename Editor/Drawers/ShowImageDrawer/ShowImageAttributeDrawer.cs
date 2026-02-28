@@ -18,16 +18,18 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
     [CustomPropertyDrawer(typeof(ShowImageAttribute), true)]
     [CustomPropertyDrawer(typeof(AboveImageAttribute), true)]
     [CustomPropertyDrawer(typeof(BelowImageAttribute), true)]
-    public partial class ShowImageAttributeDrawer: SaintsPropertyDrawer
+    public partial class ShowImageAttributeDrawer : SaintsPropertyDrawer
     {
-        private static (string error, Texture2D image) GetImage(SerializedProperty property, string name, FieldInfo info, object target)
+        private (string error, Texture2D image) GetImage(SerializedProperty property, string name, FieldInfo info,
+            object target)
         {
             if (string.IsNullOrEmpty(name))
             {
                 // ReSharper disable once ConvertIfStatementToReturnStatement
                 if (property.propertyType == SerializedPropertyType.Generic)
                 {
-                    (string _, object propValue) = Util.GetOf<object>(property.name, null, property, info, target, null);
+                    (string _, object propValue) =
+                        Util.GetOf<object>(property.name, null, property, info, target, null);
                     if (propValue is IWrapProp wrapProp)
                     {
                         object actualValue = Util.GetWrapValue(wrapProp);
@@ -43,7 +45,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                     return ($"property {property.propertyPath} is not supported.", null);
                 }
 
-                if(property.propertyType != SerializedPropertyType.ObjectReference)
+                if (property.propertyType != SerializedPropertyType.ObjectReference)
                 {
                     return ($"Expect ObjectReference for `{property.propertyPath}`, get {property.propertyType}", null);
                 }
@@ -57,9 +59,9 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             {
                 GameObject startingGo;
                 string hierarchyPath;
-                if (useFieldHierarchy)  // get field
+                if (useFieldHierarchy) // get field
                 {
-                    (string curError, int _, object curValue)  = Util.GetValue(property, info, target);
+                    (string curError, int _, object curValue) = Util.GetValue(property, info, target);
                     if (curError != "")
                     {
                         return ($"Fail to get value of `{property.propertyPath}`: {curError}", null);
@@ -85,7 +87,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                     // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     hierarchyPath = name.Substring(2);
                 }
-                else  // using current object
+                else // using current object
                 {
                     switch (target)
                     {
@@ -109,12 +111,13 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 {
                     return ($"Fail to find child `{hierarchyPath}` under `{startingGo.name}`", null);
                 }
+
                 return GetImageFromTarget(findChild.gameObject);
             }
 
             // search parent first
             (string reflectError, object fieldValue) = Util.GetOf<object>(name, null, property, info, target, null);
-            if(reflectError == "")
+            if (reflectError == "")
             {
                 if (fieldValue is IWrapProp wrapProp)
                 {
@@ -167,7 +170,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             return null;
         }
 
-        private static (string error, Texture2D image) GetImageFromTarget(object result)
+        private (string error, Texture2D image) GetImageFromTarget(object result)
         {
             if (RuntimeUtil.IsNull(result))
             {
@@ -178,7 +181,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             switch (result)
             {
                 case Sprite sprite:
-                    return ("", sprite.texture);
+                    return ("", GetSpriteTexture(sprite));
                 case Texture2D texture2D:
                     return ("", texture2D);
                 // case Texture texture:
@@ -213,15 +216,61 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 }
                 default:
                     return (
-                        $"Unable to find image on {(result == null ? "null" : result.GetType().ToString())}",
+                        $"Unable to find image on {result.GetType()}",
                         null);
             }
         }
 
-#if UNITY_2021_3_OR_NEWER
+        private readonly Dictionary<Sprite, Texture2D> _cachedSpriteToTexture2D = new Dictionary<Sprite, Texture2D>();
+        private Texture2D GetSpriteTexture(Sprite sprite)
+        {
+            if (_cachedSpriteToTexture2D.TryGetValue(sprite, out Texture2D cachedImage) && cachedImage != null)
+            {
+                return cachedImage;
+            }
 
-        // ReSharper disable once SuggestBaseTypeForParameter
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (IsPartOfMultipleSprite(sprite))
+            {
+                return _cachedSpriteToTexture2D[sprite] = GetPartOfTheSprite(sprite);
+            }
 
-#endif
+            return _cachedSpriteToTexture2D[sprite] = sprite.texture;
+        }
+
+        private static bool IsPartOfMultipleSprite(Sprite sprite)
+        {
+            string path = AssetDatabase.GetAssetPath(sprite.texture);
+
+            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+
+            if (importer != null)
+            {
+                // Check if the sprite mode is set to Multiple
+                return importer.spriteImportMode == SpriteImportMode.Multiple;
+            }
+
+            return false;
+        }
+
+        private static Texture2D GetPartOfTheSprite(Sprite sprite)
+        {
+            Texture2D originalTexture = sprite.texture;
+            Texture2D readWriteTexture = Tex.ConvertToCompatibleFormat(originalTexture);
+
+            Texture2D croppedTexture = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height);
+
+            Color[] pixels = readWriteTexture.GetPixels(
+                (int)sprite.textureRect.x,
+                (int)sprite.textureRect.y,
+                (int)sprite.textureRect.width,
+                (int)sprite.textureRect.height
+            );
+
+            croppedTexture.SetPixels(pixels);
+            croppedTexture.Apply();
+
+            return croppedTexture;
+        }
     }
 }

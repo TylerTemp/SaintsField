@@ -8,5 +8,8 @@ namespace SaintsField.Samples.Scripts
         [AssetPreview(20, 100)] public Texture2D drawTexture2D;
         [AssetPreview(above: true, align: EAlign.Center)] public Sprite sprite;
         [AssetPreview(above: true)] public Sprite[] sprites;
+
+        [AssetPreview] public Sprite multi1;
+        [AssetPreview] public Sprite multi2;
     }
 }

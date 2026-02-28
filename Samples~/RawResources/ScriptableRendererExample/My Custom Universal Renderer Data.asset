@@ -1,19 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-4776153865837005266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e32e72b6a3f58a24c9033e2b9275eea0, type: 3}
-  m_Name: ScreenSpaceShadows
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.ScreenSpaceShadows
-  m_Active: 1
-  m_Shader: {fileID: 0}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39,11 +25,9 @@ MonoBehaviour:
     probeSamplingDebugTexture: {fileID: 0}
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
-  - {fileID: 7883369030880482892}
-  - {fileID: -4776153865837005266}
-  - {fileID: 5933222224020228573}
   - {fileID: 2381348526136899176}
-  m_RendererFeatureMap: 4c56f29e5d5a676d2e362d3a5db1b7bdddc92d5c2d0a57526836ca1ade3f0c21
+  - {fileID: 2575624296576687229}
+  m_RendererFeatureMap: 6836ca1ade3f0c217d9c51c8a674be23
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 0}
@@ -98,13 +82,13 @@ MonoBehaviour:
     Source: 1
     NormalSamples: 1
     Intensity: 3
-    DirectLightingStrength: 0.25
+    DirectLightingStrength: 0.406
     Radius: 0.035
     Samples: 1
     BlurQuality: 0
     Falloff: 100
     SampleCount: -1
---- !u!114 &5933222224020228573
+--- !u!114 &2575624296576687229
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,41 +108,3 @@ MonoBehaviour:
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
---- !u!114 &7883369030880482892
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a735372e943b084b8bdcafe7bdd91c3, type: 3}
-  m_Name: I'll follow you into the dark
-  m_EditorClassIdentifier: SaintsField.Samples.ScriptableRenderer::SaintsField.Samples.Scripts.ScriptableRenderer.MyRendererFeature
-  m_Active: 1
-  curve1:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  content: 
