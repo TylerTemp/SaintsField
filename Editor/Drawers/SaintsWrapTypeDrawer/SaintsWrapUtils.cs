@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             {
                 if (underType.IsArray)
                 {
-                    Debug.Log($"is array because array underhood needUseRef=true");
+                    // Debug.Log($"is array because array underhood needUseRef=true");
                     return WrapType.Array;
                 }
 

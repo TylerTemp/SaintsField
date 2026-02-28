@@ -16114,7 +16114,33 @@ MonoBehaviour:
     _wrapType: 4
   gameObjects4: []
   _arrSize:
-    _saintsList: []
+    _saintsList:
+    - value: 0
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    - value: 0
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
     _saintsSerializedVersion: 2
     _wrapType: 4
   pagging:
@@ -16123,7 +16149,9 @@ MonoBehaviour:
     _wrapType: 4
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &965251183
 GameObject:
   m_ObjectHideFlags: 0
