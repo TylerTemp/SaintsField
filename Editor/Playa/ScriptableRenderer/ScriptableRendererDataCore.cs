@@ -159,6 +159,10 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
                 AdvancedDropdownList<Type> dropdown = new AdvancedDropdownList<Type>();
                 foreach (Type t in types)
                 {
+                    if (t.IsAbstract)
+                    {
+                        continue;
+                    }
                     // Debug.Log(t);
                     // Debug.Log(RendererFeatureSupported(t));
                     if (!RendererFeatureSupported(t))
@@ -568,9 +572,32 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
             {
                 titleElement.Add(new IMGUIContainer(() =>
                 {
-                    rendererFeatureEditor.serializedObject.Update();
-                    rendererFeatureEditor.OnInspectorGUI();
-                    rendererFeatureEditor.serializedObject.ApplyModifiedProperties();
+                    // WTF Unity
+                    using (new DisableUnityLogScoop())
+                    {
+                        rendererFeatureEditor.serializedObject.Update();
+                    }
+
+                    try
+                    {
+                        rendererFeatureEditor.OnInspectorGUI();
+                    }
+                    catch (NullReferenceException e)
+                    {
+                        // ... No words...
+                        if (e.Message.Contains("SerializedProperty has been Disposed"))
+                        {
+                            return;
+                        }
+
+                        throw;
+                    }
+
+                    // WTF Unity
+                    using (new DisableUnityLogScoop())
+                    {
+                        rendererFeatureEditor.serializedObject.ApplyModifiedProperties();
+                    }
                 }));
             }
 
