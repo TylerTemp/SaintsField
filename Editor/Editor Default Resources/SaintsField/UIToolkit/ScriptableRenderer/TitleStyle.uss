@@ -5,7 +5,7 @@
 
 .titleButton {
     flex-direction: row;
-    padding: 1 0 1 0;
+    padding: 1px 0 1px 0;
     margin: 0;
     border-width: 0;
     background-color: rgb(50, 50, 50);
@@ -30,14 +30,14 @@
 }
 
 .toggleActive {
-    margin: 1 4 1 2;
+    margin: 1px 4px 1px 2px;
     flex-shrink: 0;
 }
 
 .iconButton {
     width: 12px;
     height: 12px;
-    margin: 0 0 0 1;
+    margin: 0 0 0 1px;
     padding: 0;
     border-width: 0;
     -unity-background-scale-mode: scale-to-fit;
