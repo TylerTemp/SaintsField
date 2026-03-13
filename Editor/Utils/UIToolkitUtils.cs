@@ -2,6 +2,7 @@
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.Renderer.SaintsCell;
 using SaintsField.Interfaces;
 #if UNITY_2021_3_OR_NEWER
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
@@ -15,7 +16,10 @@ using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsTreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
+using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
 using SaintsField.Editor.Playa;
+using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 #endif
@@ -450,7 +454,7 @@ namespace SaintsField.Editor.Utils
 
         public static VisualElement CreateOrUpdateFieldProperty(
             SerializedProperty property,
-            IReadOnlyList<PropertyAttribute> allAttributes,
+            IReadOnlyList<Attribute> allAttributes,
             Type rawType,
             string label,
             FieldInfo fieldInfo,
@@ -484,7 +488,7 @@ namespace SaintsField.Editor.Utils
                            && property.isArray;
 
             // bool useFallbackSaintsRow = false;
-            // Debug.Log($"rendering {property.propertyPath}/{property.propertyType}/isArray={isArray}/hor={inHorizontalLayout}");
+            // Debug.Log($"rendering {property.propertyPath}/{property.propertyType}/isArray={isArray}/hor={inHorizontalLayout}/allAttributes={string.Join(",", allAttributes)}");
             if(!isArray)
             {
                 ISaintsAttribute saintsAttr = allAttributes
@@ -558,7 +562,7 @@ namespace SaintsField.Editor.Utils
 
             if (useDrawerType == null)
             {
-                // Debug.Log($"fallback {property.propertyPath}/hor={inHorizontalLayout};prop={string.Join(",", allAttributes)}; label={label}");
+                Debug.Log($"fallback CreateOrUpdateFieldRawFallback {property.propertyPath}/hor={inHorizontalLayout};prop={string.Join(",", allAttributes)}; label={label}; allAttributes={string.Join(", ", allAttributes)}");
                 VisualElement r = CreateOrUpdateFieldRawFallback(
                     property,
                     allAttributes,
@@ -576,7 +580,7 @@ namespace SaintsField.Editor.Utils
                     return null;
                 }
 
-                return mergeDec? UIToolkitCache.MergeWithDec(r, allAttributes): r;
+                return mergeDec? UIToolkitCache.MergeWithDec(r, allAttributes.OfType<PropertyAttribute>().ToArray()): r;
             }
 
             // Nah... This didn't handle for mis-ordered case
@@ -613,18 +617,19 @@ namespace SaintsField.Editor.Utils
 
             if (!useImGui)
             {
-                // Debug.Log($"CreatePropertyGUI for {property.propertyPath} with {propertyDrawer}");
+                Debug.Log($"CreatePropertyGUI for {property.propertyPath} with {propertyDrawer}");
                 VisualElement r = propertyDrawer.CreatePropertyGUI(property);
                 if (r != null)
                 {
                     r.Bind(property.serializedObject);
                     // PropertyDrawerElementDirtyFix(property, propertyDrawer, r);
-                    return mergeDec? UIToolkitCache.MergeWithDec(r, allAttributes): r;
+                    return mergeDec? UIToolkitCache.MergeWithDec(r, allAttributes.OfType<PropertyAttribute>().ToArray()): r;
                 }
             }
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.
             // We don't need to handle decorators either
+            Debug.Log($"PropertyField for {property.propertyPath}");
             PropertyField result = new PropertyField(property, string.IsNullOrEmpty(label) ? "": label)
             {
                 style =
@@ -735,7 +740,7 @@ namespace SaintsField.Editor.Utils
         // Note: do NOT pass SerializedPropertyType.Generic type: process it externally.
         public static VisualElement CreateOrUpdateFieldRawFallback(
           SerializedProperty property,
-          IReadOnlyList<PropertyAttribute> allAttributes,
+          IReadOnlyList<Attribute> allAttributes,
           Type rawType,
           string label,
           FieldInfo fieldInfo,
@@ -746,6 +751,7 @@ namespace SaintsField.Editor.Utils
           object parent)
         {
             SerializedPropertyType propertyType = property.propertyType;
+            Debug.Log($"CreateOrUpdateFieldRawFallback {property.propertyPath} allAttributes={string.Join(", ", allAttributes)} propertyType={propertyType} property.isArray={property.isArray}");
             int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             bool canAddContextReset = propIndex == -1;
             // Debug.Log($"CreateOrUpdateFieldRawFallback process {property.propertyPath}/{property.propertyType}/{property.isArray}/hor={inHorizontalLayout}");
@@ -754,13 +760,42 @@ namespace SaintsField.Editor.Utils
                 case SerializedPropertyType.Generic:
                 case SerializedPropertyType.ManagedReference:
                 {
-                    // Debug.Log($"generic/managed process {property.propertyPath}/{property.isArray}");
+                    // Debug.Log($"generic/managed process {property.propertyPath}/{property.isArray} allAttributes={string.Join(", ", allAttributes)}");
                     if (property.isArray)
                     {
+                        Debug.Log($"array process {property.propertyPath} allAttributes={string.Join(", ", allAttributes)}");
+
                         ListView listView = originalField as ListView;
                         bool listViewNotExist = listView == null;
                         if (listViewNotExist)
                         {
+                            List<Attribute> injectedAllAttributes = new List<Attribute>();
+                            List<IPlayaAttribute> injectedIPlayaAttributes = new List<IPlayaAttribute>();
+                            // List<InjectAttributeBase> nestedInjectAttributes = new List<InjectAttributeBase>();
+                            foreach (Attribute attr in allAttributes)
+                            {
+                                // ReSharper disable once MergeIntoPattern
+                                if(attr is InjectAttributeBase injectAttributeBase && injectAttributeBase.Depth <= 1)
+                                {
+                                    Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttributeBase);
+                                    injectedAllAttributes.Add(injectedAttribute);
+                                    if(injectedAttribute is IPlayaAttribute ip)
+                                    {
+                                        injectedIPlayaAttributes.Add(ip);
+                                        // injectedAllAttributes.Add(injectedAttribute);
+                                    }
+                                }
+                                else
+                                {
+                                    injectedAllAttributes.Add(attr);
+                                    if(attr is IPlayaAttribute ip)
+                                    {
+                                        injectedIPlayaAttributes.Add(ip);
+                                    }
+                                    // injectedAllAttributes.Add(attr);
+                                }
+                            }
+
                             // Debug.Log($"listView {property.propertyPath}");
                             listView = new ListView
                             {
@@ -789,20 +824,49 @@ namespace SaintsField.Editor.Utils
                                     }
                                     element.Clear();
 
-                                    // Debug.Log($"draw item {itemProp.propertyPath}/rawType={rawType}/itemType={ReflectUtils.GetElementType(rawType)}");
+                                    Debug.Log($"draw item {itemProp.propertyPath}/rawType={rawType}/itemType={ReflectUtils.GetElementType(rawType)}; allAttributes={string.Join(",", allAttributes)}");
 
                                     string defaultName = itemProp.displayName;
 
                                     VisualElement result = CreateOrUpdateFieldProperty(
                                         itemProp,
-                                        allAttributes,
+                                        allAttributes.Where(each => (each is InjectAttributeBase) || each is not IPlayaAttribute).ToArray(),
                                         ReflectUtils.GetElementType(rawType),
                                         itemProp.displayName,
                                         fieldInfo, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, null, false, parent);
                                     // Debug.Log($"done rendering {index}/{itemProp.propertyPath}/{result == null}/{property.arraySize}");
                                     if (result != null)
                                     {
-                                        element.Add(result);
+                                        // injectedIPlayaAttributes = allAttributes.OfType<IPlayaAttribute>().ToList();
+                                        Debug.Log($"list item process {itemProp.propertyPath} injectedIPlayaAttributes={string.Join(", ", injectedIPlayaAttributes)}");
+                                        if (injectedIPlayaAttributes.Count > 0)
+                                        {
+                                            SaintsCellRenderer cellRenderer = new SaintsCellRenderer(
+                                                itemProp.serializedObject,
+                                                new SaintsFieldWithInfo
+                                                {
+                                                    ClassStructType = null,
+                                                    PlayaAttributes = injectedIPlayaAttributes,
+                                                    // PlayaAttributes = Array.Empty<IPlayaAttribute>(),
+                                                    TargetParent = null,
+                                                    TargetMemberInfo = null,
+                                                    TargetMemberIndex = 0,
+                                                    Targets = new[]{parent},
+
+                                                    RenderType = SaintsRenderType.SerializedField,
+                                                    SerializedProperty = itemProp,
+                                                    MemberId = itemProp.propertyPath,
+                                                    FieldInfo = fieldInfo,
+                                                    InherentDepth = 0,
+                                                }
+                                            );
+                                            element.Add(cellRenderer.GetElementAndInit(result));
+                                        }
+                                        else
+                                        {
+                                            element.Add(result);
+                                        }
+
                                         if(itemProp.propertyType == SerializedPropertyType.Generic || itemProp.propertyType == SerializedPropertyType.ManagedReference)
                                         {
                                             result.schedule.Execute(() =>
@@ -921,6 +985,7 @@ namespace SaintsField.Editor.Utils
                         listView.BindProperty(property);
                         listView.RegisterCallback<DetachFromPanelEvent>(_ => Unbind(listView));
 
+                        // Debug.Log($"array created {property.propertyPath} allAttributes={string.Join(", ", allAttributes)}");
                         return listViewNotExist ? listView : null;
 
                     }
@@ -1309,6 +1374,8 @@ namespace SaintsField.Editor.Utils
                       textField.SetValueWithoutNotify(property.stringValue);
                       return null;
                     }
+
+                    Debug.Log($"rendering string field {property.propertyPath}");
 
                     textField = new TextField(label)
                     {

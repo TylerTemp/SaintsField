@@ -391,14 +391,34 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             (FieldInfo keysField, object keysParent) = GetTargetInfo(propKeysNameCompact, rawType, fieldValue);
             Debug.Assert(keysField != null, $"Failed to get keys field {propKeysNameCompact} from {property.propertyPath}");
             Type keyType = ReflectUtils.GetElementType(keysField.FieldType);
-            IReadOnlyList<Attribute> injectedKeyAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(KeyAttributeAttribute));
-            WrapType keyWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeKey"), keysField, injectedKeyAttributes);
+            List<InjectAttributeBase> keyInjectAttributes = new List<InjectAttributeBase>();
+            bool keyHasSerializeReference = false;
+            foreach (KeyAttributeAttribute injectAttribute in ReflectCache.GetCustomAttributes<KeyAttributeAttribute>(info))
+            {
+                if (injectAttribute.Decorator == typeof(SerializeReference))
+                {
+                    keyHasSerializeReference = true;
+                    continue;
+                }
+                keyInjectAttributes.Add(new ValueAttributeAttribute(injectAttribute.Depth, injectAttribute.Decorator, injectAttribute.Parameters));
+            }
+            WrapType keyWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeKey"), keysField, keyHasSerializeReference);
 
             (FieldInfo valuesField, object valuesParent) = GetTargetInfo(propValuesNameCompact, rawType, fieldValue);
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
             Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);
-            IReadOnlyList<Attribute> injectedValueAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
-            WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeValue"), valuesField, injectedValueAttributes);
+            List<InjectAttributeBase> valueInjectAttributes = new List<InjectAttributeBase>();
+            bool valueHasSerializeReference = false;
+            foreach (KeyAttributeAttribute injectAttribute in ReflectCache.GetCustomAttributes<KeyAttributeAttribute>(info))
+            {
+                if (injectAttribute.Decorator == typeof(SerializeReference))
+                {
+                    valueHasSerializeReference = true;
+                    continue;
+                }
+                valueInjectAttributes.Add(new ValueAttributeAttribute(injectAttribute.Depth, injectAttribute.Decorator, injectAttribute.Parameters));
+            }
+            WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeValue"), valuesField, valueHasSerializeReference);
             // Debug.Log($"decide valueWrapType={valueWrapType} for {valuesField.Name}/{valueType}");
 
             IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
@@ -693,7 +713,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     };
                     element.Add(keyContainer);
 
-                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(keyWrapType, keysField, keyType, elementProp, injectedKeyAttributes, this, this, keysParent);
+                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(keyWrapType, keysField, keyType, elementProp, keyInjectAttributes, keyHasSerializeReference, this, this, keysParent);
                     keyContainer.Add(resultElement);
 
                     keyContainer.TrackPropertyValue(keysProp, _ =>
@@ -832,7 +852,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                     // Debug.Log($"elementProp={elementProp.propertyPath}, valueWrapType={valueWrapType}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
 
-                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valueWrapType, valuesField, valueType, elementProp, injectedValueAttributes, this, this, valuesParent);
+                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valueWrapType, valuesField, valueType, elementProp, valueInjectAttributes, valueHasSerializeReference, this, this, valuesParent);
 
                     element.Add(resultElement);
 

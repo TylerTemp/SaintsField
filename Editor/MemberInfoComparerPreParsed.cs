@@ -172,15 +172,34 @@ namespace SaintsField.Editor
             _memberContainers = memberContainers;
         }
 
-        // TODO: Refactor the extremely heavy comparison logic
+        private readonly Dictionary<MemberInfo, int> _cachedMemberInfoToIndex = new Dictionary<MemberInfo, int>();
+
         public int Compare(MemberInfo x, MemberInfo y)
         {
             Debug.Assert(x != null);
             Debug.Assert(y != null);
 
-            int aIndex = FindMemberIndex(x, _memberContainers);
+            int aIndex;
+            if (_cachedMemberInfoToIndex.TryGetValue(x, out int xIndex))
+            {
+                aIndex = xIndex;
+            }
+            else
+            {
+                aIndex = FindMemberIndex(x, _memberContainers);
+                _cachedMemberInfoToIndex[x] = aIndex;
+            }
             // Debug.Log($"MemberOrderComparer {a.Name} index {aIndex}");
-            int bIndex = FindMemberIndex(y, _memberContainers);
+            int bIndex;
+            if (_cachedMemberInfoToIndex.TryGetValue(y, out int yIndex))
+            {
+                bIndex = yIndex;
+            }
+            else
+            {
+                bIndex = FindMemberIndex(y, _memberContainers);
+                _cachedMemberInfoToIndex[y] = bIndex;
+            }
             // Debug.Log($"MemberOrderComparer {b.Name} index {bIndex}");
 
             // if (aIndex == -1 || bIndex == -1)

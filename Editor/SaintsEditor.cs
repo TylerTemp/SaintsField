@@ -160,7 +160,7 @@ namespace SaintsField.Editor
             IReadOnlyList<object> targets)
         {
 #if SAINTSFIELD_DEBUG
-            using var AutoMarker = new ProfilerMarker("HelperGetSaintsFieldWithInfo").Auto();
+            using ProfilerMarker.AutoScope autoMarker = new ProfilerMarker("HelperGetSaintsFieldWithInfo").Auto();
 #endif
             List<SaintsFieldWithInfo> fieldWithInfos = new List<SaintsFieldWithInfo>();
 
@@ -201,7 +201,7 @@ namespace SaintsField.Editor
                     // {
                     //     continue;
                     // }
-                    IPlayaClassAttribute[] playaClassAttributes = (IPlayaClassAttribute[])systemType.GetCustomAttributes(typeof(IPlayaClassAttribute), inherit: false);
+                    IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetTypeCustomAttributes<IPlayaClassAttribute>(systemType, false);
 
                     IPlayaClassAttribute[] startClassAttributes = playaClassAttributes.Where(each => !each.EndDecorator).ToArray();
                     if (startClassAttributes.Length > 0)
@@ -267,7 +267,9 @@ namespace SaintsField.Editor
                     // }
 
                     // List.Sort is unstable sort. So use linq's version anyway.
-                    List<MemberInfo> memberLis = members.AsParallel().OrderBy(static memberInfo => memberInfo, memberOrderComparer).ToList();
+                    // List<MemberInfo> memberLis = members.AsParallel().OrderBy(static memberInfo => memberInfo, memberOrderComparer).ToList();
+                    // AsParallel will disable the cache function :( use the old OrderBy one
+                    List<MemberInfo> memberLis = members.OrderBy(static memberInfo => memberInfo, memberOrderComparer).ToList();
 
 // #if SAINTSFIELD_CODE_ANALYSIS
                     // memberLis.Sort((a, b) => MemberLisCompare(a, b, codeAnalysisMembers));
@@ -321,7 +323,7 @@ namespace SaintsField.Editor
                             {
                                 case FieldInfo fieldInfo:
                                 {
-                                #region SerializedField
+                                    #region SerializedField
 
                                     if (serializedPropertyDict.ContainsKey(fieldInfo.Name))
                                     {
@@ -361,7 +363,7 @@ namespace SaintsField.Editor
                                         pendingSerializedProperties.Remove(fieldInfo.Name);
                                     }
 
-                                #endregion
+                                    #endregion
 
                                 #region nonSerFieldInfo
 
@@ -824,7 +826,7 @@ namespace SaintsField.Editor
             return r;
         }
 
-        private static ISaintsRenderer MakeRendererForGroupIfNeed(RendererGroupInfo rendererGroupInfo)
+        public static ISaintsRenderer MakeRendererForGroupIfNeed(RendererGroupInfo rendererGroupInfo)
         {
             if (rendererGroupInfo.Renderer != null)
             {
@@ -854,7 +856,7 @@ namespace SaintsField.Editor
             return group;
         }
 
-        private class RendererGroupInfo {
+        public class RendererGroupInfo {
             public string AbsGroupBy;  // ""=normal fields, other=grouped fields
             public List<RendererGroupInfo> Children;
             public SaintsRendererGroup.Config Config;
@@ -862,7 +864,7 @@ namespace SaintsField.Editor
             public object Target;
         }
 
-        private static IReadOnlyList<RendererGroupInfo> ChainSaintsFieldWithInfo(IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted, SerializedObject serializedObject, IMakeRenderer makeRenderer)
+        public static IReadOnlyList<RendererGroupInfo> ChainSaintsFieldWithInfo(IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted, SerializedObject serializedObject, IMakeRenderer makeRenderer)
         {
             List<RendererGroupInfo> rendererGroupInfos = new List<RendererGroupInfo>();
             Dictionary<string, RendererGroupInfo> rootToRendererGroupInfo =

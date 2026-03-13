@@ -1,4 +1,5 @@
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
@@ -40,7 +41,7 @@ namespace SaintsField.Editor.Playa.Renderer
             }
             VisualElement r = UIToolkitUtils.CreateOrUpdateFieldProperty(
                 FieldWithInfo.SerializedProperty,
-                ReflectCache.GetCustomAttributes<PropertyAttribute>(FieldWithInfo.FieldInfo),
+                ReflectCache.GetCustomAttributes<Attribute>(FieldWithInfo.FieldInfo),
                 FieldWithInfo.FieldInfo.FieldType,
                 label,
                 FieldWithInfo.FieldInfo,

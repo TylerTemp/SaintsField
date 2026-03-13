@@ -649,11 +649,19 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             listView.makeItem = () => new VisualElement();
 
             bool needUseRef = typeof(ReferenceHashSet<>).IsAssignableFrom(rawType.GetGenericTypeDefinition());
-            IReadOnlyList<Attribute> injectedKeyAttributes = needUseRef
-                ? new[]{new SerializeReference()}
-                : Array.Empty<Attribute>();
+            List<InjectAttributeBase> injectAttributes = new List<InjectAttributeBase>();
+            bool hasSerializeReference = needUseRef;
+            foreach (InjectAttributeBase injectAttribute in ReflectCache.GetCustomAttributes<InjectAttributeBase>(info))
+            {
+                if (injectAttribute.Decorator == typeof(SerializeReference))
+                {
+                    hasSerializeReference = true;
+                    continue;
+                }
+                injectAttributes.Add(new ValueAttributeAttribute(injectAttribute.Depth, injectAttribute.Decorator, injectAttribute.Parameters));
+            }
 
-            WrapType keyWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapType"), wrapField, injectedKeyAttributes);
+            WrapType keyWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapType"), wrapField, hasSerializeReference);
 
             listView.bindItem = (element, elementIndex) =>
             {
@@ -677,7 +685,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                         keyWrapType,
                         wrapField,
                         wrapType,
-                        elementProp, injectedKeyAttributes, this, this, wrapParent
+                        elementProp, injectAttributes, hasSerializeReference, this, this, wrapParent
                     );
                 ElementField elementField = new ElementField($"Element {propIndex}", resultElement);
                 element.Add(elementField);

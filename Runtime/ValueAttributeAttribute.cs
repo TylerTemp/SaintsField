@@ -16,5 +16,10 @@ namespace SaintsField
         public ValueAttributeAttribute(int depth, Type decorator, params object[] parameters) : base(depth, decorator, parameters)
         {
         }
+
+        public override string ToString()
+        {
+            return $"<ValueAttribute depth={Depth} decorator={Decorator} params={string.Join(",", Parameters)}>";
+        }
     }
 }

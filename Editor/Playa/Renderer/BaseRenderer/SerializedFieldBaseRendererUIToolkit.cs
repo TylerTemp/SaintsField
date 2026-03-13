@@ -162,7 +162,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
-        // private void UIToolkitCheckUpdate(VisualElement result, bool ifCondition, bool arraySizeCondition, bool richLabelCondition, FieldInfo info, object parent)
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
             if (_container == null)

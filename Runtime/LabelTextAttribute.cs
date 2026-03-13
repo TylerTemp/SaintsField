@@ -15,11 +15,21 @@ namespace SaintsField
         public readonly bool IsCallback;
         // ReSharper enable InconsistentNaming
 
-        public LabelTextAttribute(string richTextXml, bool isCallback=false)
+        // ReSharper disable once IntroduceOptionalParameters.Global
+        public LabelTextAttribute(string richTextXml): this(richTextXml, false)
+        {
+        }
+
+        public LabelTextAttribute(string richTextXml, bool isCallback)
         {
             (string parsedContent, bool parsedIsCallback) = RuntimeUtil.ParseCallback(richTextXml, isCallback);
             RichTextXml = parsedContent;
             IsCallback = parsedIsCallback;
+        }
+
+        public override string ToString()
+        {
+            return $"<LabelText callback={IsCallback} xml={RichTextXml} />";
         }
     }
 }

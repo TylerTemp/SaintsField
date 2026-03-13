@@ -208,7 +208,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         protected virtual PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
-            return UpdatePreCheckUIToolkitInternal(FieldWithInfo, _rootElement);
+            return UpdatePreCheckUIToolkitInternal(FieldWithInfo, root);
         }
 
         // protected PreCheckResult HelperOnUpdateUIToolKitRawBase()
@@ -227,7 +227,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         protected PreCheckResult UpdatePreCheckUIToolkitInternal(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(fieldWithInfo, false);
-            // Debug.Log($"{preCheckResult.HasGuiColor}/{preCheckResult.GuiColor}");
             if(result.enabledSelf != !preCheckResult.IsDisabled)
             {
                 result.SetEnabled(!preCheckResult.IsDisabled);

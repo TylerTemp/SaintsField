@@ -13,26 +13,36 @@ namespace SaintsField.Editor.Utils
         private readonly struct AttributesKey : IEquatable<AttributesKey>
         {
             private readonly MemberInfo _memberInfo;
+            private readonly Type _classType;
             private readonly bool _inherit;
             private readonly Type _type;
 
             public AttributesKey(MemberInfo memberInfo, bool inherit, Type type = null)
             {
                 _memberInfo = memberInfo;
+                _classType = null;
+                _inherit = inherit;
+                _type = type;
+            }
+
+            public AttributesKey(Type classType, bool inherit, Type type = null)
+            {
+                _memberInfo = null;
+                _classType = classType;
                 _inherit = inherit;
                 _type = type;
             }
 
             public bool Equals(AttributesKey other) =>
-                Equals(_memberInfo, other._memberInfo) && _inherit == other._inherit && _type == other._type;
+                Equals(_memberInfo, other._memberInfo) && _classType == other._classType && _inherit == other._inherit && _type == other._type;
 
             public override bool Equals(object obj) => obj is AttributesKey other && Equals(other);
 
-            public override int GetHashCode() => Util.CombineHashCode(_memberInfo, _inherit, _type);
+            public override int GetHashCode() => Util.CombineHashCode(_memberInfo, _classType, _inherit, _type);
 
             public override string ToString()
             {
-                return $"<Attribute member={_memberInfo.Name}-{_memberInfo.MemberType} type={_type} inherit={_inherit}/>";
+                return $"<Attribute {(_classType != null? "class=" + _classType: $"member={_memberInfo.Name}-{_memberInfo.MemberType}")} type={_type} inherit={_inherit}/>";
             }
         }
 
@@ -63,6 +73,22 @@ namespace SaintsField.Editor.Utils
 
             // Debug.Log($"refresh fetch for {key}");
             attributes = memberInfo.GetCustomAttributes().ToArray();
+            CustomAttributes[key] = attributes;
+            return attributes.OfType<T>().ToArray();
+        }
+
+        public static T[] GetTypeCustomAttributes<T>(Type attributeType, bool inherit)
+        {
+            AttributesKey key = new AttributesKey(attributeType, inherit, typeof(T));
+            if (CustomAttributes.TryGetValue(key, out Attribute[] attributes))
+            {
+                // return (T[])attributes;
+                // Debug.Log($"cached fetch for {key} = {string.Join<Attribute>(", ", attributes)}");
+                return attributes.OfType<T>().ToArray();
+            }
+
+            // Debug.Log($"refresh fetch for {key}");
+            attributes = attributeType.GetCustomAttributes(inherit: inherit).Cast<Attribute>().ToArray();
             CustomAttributes[key] = attributes;
             return attributes.OfType<T>().ToArray();
         }

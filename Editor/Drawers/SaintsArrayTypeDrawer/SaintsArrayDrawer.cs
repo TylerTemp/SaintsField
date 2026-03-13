@@ -6,9 +6,12 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsWrapTypeDrawer;
+using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.SaintsCell;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -33,7 +36,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
         protected override bool UseCreateFieldUIToolKit => true;
 
-        private class ElementField : BaseField<Object>
+        public class ElementField : BaseField<Object>
         {
             public ElementField(string label, VisualElement visualInput) : base(label, visualInput)
             {
@@ -460,15 +463,79 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
 
             // TODO: reference type
             // bool needUseRef = typeof(ReferenceHashSet<>).IsAssignableFrom(rawType.GetGenericTypeDefinition());
-            IReadOnlyList<Attribute> r = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
-            SerializeReference serRef = r.OfType<SerializeReference>().FirstOrDefault();
-            IReadOnlyList<Attribute> injectedKeyAttributes = serRef == null
-                ? Array.Empty<Attribute>()
-                : new[]{serRef};
+            // IReadOnlyList<Attribute> r = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
+            // Debug.Log($"sa info = {info.Name}");
+            bool hasSerializeReference = false;
+            // List<InjectAttributeBase> injectAttributes1 = new List<InjectAttributeBase>();
+            List<Attribute> injectCreatedAttributes1 = new List<Attribute>();
+
+            List<InjectAttributeBase> injectAttributes2 = new List<InjectAttributeBase>();
+            // List<Attribute> injectCreatedAttributes2 = new List<Attribute>();
+            // int injectDelta = insideArray ? 2 : 1;
+            InjectAttributeBase[] refreshedAllAttributes = ReflectCache.GetCustomAttributes<InjectAttributeBase>(info);
+            Debug.Log($"SaintsArray {property.propertyPath} injected={string.Join<InjectAttributeBase>(", ", refreshedAllAttributes)}, insideArray={insideArray}");
+
+            int insideArrayOffset = insideArray ? 1 : 0;
+
+            foreach (InjectAttributeBase injectAttribute in refreshedAllAttributes)
+            {
+                if (injectAttribute.Decorator == typeof(SerializeReference))
+                {
+                    hasSerializeReference = true;
+                    continue;
+                }
+
+                ValueAttributeAttribute less1DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 1 - insideArrayOffset, injectAttribute.Decorator,
+                    injectAttribute.Parameters);
+                // if(less1DepthInject.Depth > 0)
+                // {
+                //     injectAttributes1.Add(less1DepthInject);
+                // }
+                ValueAttributeAttribute less2DepthInject = new ValueAttributeAttribute(injectAttribute.Depth - 2 - insideArrayOffset, injectAttribute.Decorator,
+                    injectAttribute.Parameters);
+                if (less2DepthInject.Depth > 0)
+                {
+                    Debug.Log($"SaintsArray {property.propertyPath} injectAttributes2.Add={less2DepthInject}");
+                    injectAttributes2.Add(less2DepthInject);
+                }
+
+                if (less1DepthInject.Depth == 0)
+                {
+                    Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttribute);
+                    if(injectedAttribute != null)
+                    {
+                        Debug.Log($"SaintsArray {property.propertyPath} injectCreatedAttributes1.Add={injectedAttribute}");
+                        injectCreatedAttributes1.Add(injectedAttribute);
+                    }
+                }
+                else if (less1DepthInject.Depth > 0)
+                {
+                    Debug.Log($"SaintsArray {property.propertyPath} injectCreatedAttributes1.Add={less1DepthInject}");
+                    injectCreatedAttributes1.Add(less1DepthInject);
+                }
+
+                // if (injectAttribute.Depth == 2)
+                // {
+                //     Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttribute);
+                //     if(injectedAttribute != null)
+                //     {
+                //         injectCreatedAttributes2.Add(injectedAttribute);
+                //     }
+                // }
+                // else
+                // {
+                //     injectCreatedAttributes2.Add(less2DepthInject);
+                // }
+            }
+
+            // SerializeReference serRef = r.OfType<SerializeReference>().FirstOrDefault();
+            // IReadOnlyList<Attribute> injectedKeyAttributes = serRef == null
+            //     ? Array.Empty<Attribute>()
+            //     : new[]{serRef};
             // IReadOnlyList<Attribute> injectedKeyAttributes = new List<Attribute>();
 
             WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(
-                property.FindPropertyRelative("_wrapType"), wrapField, injectedKeyAttributes);
+                property.FindPropertyRelative("_wrapType"), wrapField, hasSerializeReference);
 
             listView.bindItem = (element, elementIndex) =>
             {
@@ -478,24 +545,82 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 elementProp.isExpanded = true;
                 element.Clear();
 
-                VisualElement resultElement =
+                // (FieldInfo actualInfo, SerializedProperty actualProp) = SaintsWrapUtils.GetCellInfo(
+                //     valueWrapType,
+                //     wrapField,
+                //     wrapType,
+                //     elementProp,
+                //     hasSerializeReference
+                // );
+                //
+                // Debug.Log($"SaintsArray rendering {elementProp.propertyPath}({elementProp.displayName}) injectAttributes={string.Join(",", injectCreatedAttributes)}");
+                //
+                SaintsFieldWithInfo saintsContainerInfo = new SaintsFieldWithInfo
+                {
+                    ClassStructType = null,
+                    PlayaAttributes = injectCreatedAttributes1.OfType<IPlayaAttribute>().ToArray(),
+                    // PlayaAttributes = Array.Empty<IPlayaAttribute>(),
+                    TargetParent = null,
+                    TargetMemberInfo = null,
+                    TargetMemberIndex = 0,
+                    Targets = new[]{fieldValue},
+
+                    RenderType = SaintsRenderType.SerializedField,
+                    SerializedProperty = elementProp,
+                    MemberId = info.Name,
+                    FieldInfo = info,
+                    InherentDepth = 0,
+                    // Order = order,
+                    // serializable = true,
+                };
+                //
+                // IReadOnlyList<SaintsEditor.RendererGroupInfo> chainedGroups = SaintsEditor.ChainSaintsFieldWithInfo(
+                //     new[]{saintsInfo}, elementProp.serializedObject, this);
+                //
+                // IEnumerable<ISaintsRenderer> saintsRenderers = chainedGroups
+                //     .Select(SaintsEditor.MakeRendererForGroupIfNeed);
+                //
+                // foreach (ISaintsRenderer saintsRenderer in saintsRenderers)
+                // {
+                //     // Debug.Log($"renderer={saintsRenderer}");
+                //     VisualElement ve = saintsRenderer.CreateVisualElement(root);
+                //     if(ve != null)
+                //     {
+                //         element.Add(ve);
+                //     }
+                // }
+
+                // element.Add(wrapContainer);
+
+                // wrapContainer.Add(resultElement);
+
+                Debug.Log($"create SaintsCellRenderer {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType}) injectCreatedAttributes1={string.Join(", ", injectCreatedAttributes1)}");
+                SaintsCellRenderer renderer = new SaintsCellRenderer(
+                    elementProp.serializedObject,
+                    saintsContainerInfo
+                );
+
+                Debug.Log($"create CreateCellElement {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType}) injectAttributes={string.Join(", ", injectAttributes2)}");
+                VisualElement resultElementNoLabel =
                     SaintsWrapUtils.CreateCellElement(
                         valueWrapType,
                         wrapField,
                         wrapType,
-                        elementProp, injectedKeyAttributes, this, this, wrapParent
+                        elementProp,
+                        injectAttributes2,
+                        hasSerializeReference,
+                        this,
+                        this,
+                        wrapParent
                     );
 
-                ElementField wrapContainer = new ElementField($"Element {propIndex}", resultElement)
-                {
-                    // style =
-                    // {
-                    //     marginRight = 3,
-                    // },
-                };
-                element.Add(wrapContainer);
+                Debug.Log($"create ElementField {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType})");
+                ElementField wrapContainer = new ElementField($"Element {propIndex}", resultElementNoLabel);
+                wrapContainer.labelElement.AddToClassList(ClassLabelFieldUIToolkit);
 
-                // wrapContainer.Add(resultElement);
+                element.Add(renderer.GetElementAndInit(wrapContainer));
+
+
             };
 
             pagePreButton.clicked += () =>
