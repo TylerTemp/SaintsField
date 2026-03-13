@@ -7249,22 +7249,6 @@ MonoBehaviour:
     _saintsList:
     - value:
       - 
-      - 
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value:
-      - 
-      - 
       valueField:
         propertyType: 0
         longValue: 0
@@ -7280,6 +7264,23 @@ MonoBehaviour:
     _saintsSerializedVersion: 2
     _wrapType: 4
   saOutArr:
+  - _saintsList:
+    - value: 
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _saintsSerializedVersion: 0
+    _wrapType: 4
+  saOutArrLabelDirect:
   - _saintsList:
     - value: 
       valueField:

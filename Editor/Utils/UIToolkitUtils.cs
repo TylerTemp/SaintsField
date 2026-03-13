@@ -769,7 +769,7 @@ namespace SaintsField.Editor.Utils
                         bool listViewNotExist = listView == null;
                         if (listViewNotExist)
                         {
-                            List<Attribute> injectedAllAttributes = new List<Attribute>();
+                            // List<Attribute> injectedAllAttributes = new List<Attribute>();
                             List<IPlayaAttribute> injectedIPlayaAttributes = new List<IPlayaAttribute>();
                             // List<InjectAttributeBase> nestedInjectAttributes = new List<InjectAttributeBase>();
                             foreach (Attribute attr in allAttributes)
@@ -778,22 +778,22 @@ namespace SaintsField.Editor.Utils
                                 if(attr is InjectAttributeBase injectAttributeBase && injectAttributeBase.Depth <= 1)
                                 {
                                     Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttributeBase);
-                                    injectedAllAttributes.Add(injectedAttribute);
+                                    // injectedAllAttributes.Add(injectedAttribute);
                                     if(injectedAttribute is IPlayaAttribute ip)
                                     {
                                         injectedIPlayaAttributes.Add(ip);
                                         // injectedAllAttributes.Add(injectedAttribute);
                                     }
                                 }
-                                else
-                                {
-                                    injectedAllAttributes.Add(attr);
-                                    if(attr is IPlayaAttribute ip)
-                                    {
-                                        injectedIPlayaAttributes.Add(ip);
-                                    }
-                                    // injectedAllAttributes.Add(attr);
-                                }
+                                // else
+                                // {
+                                //     // injectedAllAttributes.Add(attr);
+                                //     if(attr is IPlayaAttribute ip)
+                                //     {
+                                //         injectedIPlayaAttributes.Add(ip);
+                                //     }
+                                //     // injectedAllAttributes.Add(attr);
+                                // }
                             }
 
                             // Debug.Log($"listView {property.propertyPath}");

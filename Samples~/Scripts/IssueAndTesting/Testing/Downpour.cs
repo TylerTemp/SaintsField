@@ -8,5 +8,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
         [ValueAttribute(1, typeof(LabelTextAttribute), "Pool <index />")] public SaintsArray<string[]> sa;
         [ValueAttribute(1, typeof(LabelTextAttribute), "Pool <index />")]
         public SaintsArray<string>[] saOutArr;
+
+        [LabelText("OutLabelText")]
+        public SaintsArray<string>[] saOutArrLabelDirect;
     }
 }
