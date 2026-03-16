@@ -95,10 +95,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.11.4**
+**5.12.0-preview.0**
 
-1.  Fix: Prefab view dropdown(advanceddropdwn/treedropdown) in inspector failed on second selection [#367](https://github.com/TylerTemp/SaintsField/issues/367)
-2.  Fix: `SaintsEditor` might get incorrect field order since version 5.11.3
+1.  Fix: USS warning [#369](https://github.com/TylerTemp/SaintsField/issues/369)
+2.  Fix: URP IMGUI editor rendering flicking on slider [#364](https://github.com/TylerTemp/SaintsField/pull/364)
+3.  Improve: Cache SaintsEditor field order result for a bit better performance
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
