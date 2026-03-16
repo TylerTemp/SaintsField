@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             return wrapType;
         }
 
-        public static VisualElement CreateCellElement(WrapType saintsWrapType, FieldInfo info, Type rawType, SerializedProperty serializedProperty, IReadOnlyList<InjectAttributeBase> injectedAttributes, bool hasSerializeReference, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
+        public static VisualElement CreateCellElement(WrapType saintsWrapType, FieldInfo info, Type rawType, SerializedProperty serializedProperty, IReadOnlyList<Attribute> allCustomAttributes, IReadOnlyList<InjectAttributeBase> injectedAttributes, bool hasSerializeReference, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
             SerializedProperty wrapTypeProp = serializedProperty.FindPropertyRelative("wrapType");
             Debug.Assert(wrapTypeProp != null);
@@ -99,8 +99,10 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 serializedProperty.serializedObject.ApplyModifiedProperties();
             }
 
-            Attribute[] allCustomAttributes = ReflectCache.GetCustomAttributes<Attribute>(info);
+            // Attribute[] allCustomAttributes = ReflectCache.GetCustomAttributes<Attribute>(info);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
             Debug.Log($"CreateCellElement {serializedProperty.propertyPath} info={info.Name} allCustomAttributes={string.Join<Attribute>(", ", allCustomAttributes)}/injectedAttributes={string.Join(", ", injectedAttributes)}");
+#endif
             List<Attribute> allAttributes = allCustomAttributes.Concat(injectedAttributes).ToList();
             // List<Attribute> allAttributes = new List<Attribute>(allCustomAttributes);
             // List<InjectAttributeBase> nestedInjectAttributes = new List<InjectAttributeBase>();
@@ -120,8 +122,9 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             //         allAttributes.Add(new ValueAttributeAttribute(injectAttributeBase.Depth - 1, injectAttributeBase.Decorator, injectAttributeBase.Parameters));
             //     }
             // }
-
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
             Debug.Log($"CreateCellElement {serializedProperty.propertyPath} allAttributes={string.Join(", ", allAttributes)}");
+#endif
             PropertyAttribute[] allPropertyAttributes = allAttributes
                 .OfType<PropertyAttribute>()
                 .ToArray();
@@ -260,7 +263,9 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 
             if (useDrawerType == null)
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                 Debug.Log($"CreateCellElement rendering {serializedProperty.propertyPath}->{serializedBaseProperty.propertyPath} using CreateOrUpdateFieldRawFallback, allAttributes={string.Join(", ", allAttributes)}");
+#endif
                 VisualElement r = UIToolkitUtils.CreateOrUpdateFieldRawFallback(
                     serializedBaseProperty,
                     allAttributes,
@@ -317,7 +322,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 
             if (!useImGui)
             {
-                Debug.Log($"CreateCellElement rendering {serializedProperty.propertyPath} using {propertyDrawer}");
+                // Debug.Log($"CreateCellElement rendering {serializedProperty.propertyPath} using {propertyDrawer}");
                 // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}(BaseWrapDrawer={propertyDrawer is BaseWrapDrawer})");
                 VisualElement r = propertyDrawer.CreatePropertyGUI(propertyDrawer is BaseWrapDrawer? serializedProperty: serializedBaseProperty);
                 VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
@@ -329,7 +334,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             // We don't need to handle decorators either
             // Debug.Log(serializedProperty.propertyPath);
             // Debug.Log(info.FieldType);
-            Debug.Log($"CreateCellElement rendering {serializedProperty.propertyPath} using PropertyField");
+            // Debug.Log($"CreateCellElement rendering {serializedProperty.propertyPath} using PropertyField");
             PropertyField result = new PropertyField(serializedBaseProperty, string.Empty)
             {
                 style =

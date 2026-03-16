@@ -1,5 +1,19 @@
 # Changelog
 
+## 5.12.0-preview.0 ##
+
+1.  Fix: USS warning [#369](https://github.com/TylerTemp/SaintsField/issues/369)
+2.  Fix: URP IMGUI editor rendering flicking on slider [#364](https://github.com/TylerTemp/SaintsField/pull/364)
+3.  Improve: Cache SaintsEditor field order result for a bit better performance
+
+About this preview:
+
+This preview contains a new system called "downpour", with `ValueAttribute` which allows inject attribute for nested types like `SaintsArray`.
+
+This feature is still experimental and will not be documented ATM.
+
+As this release contains core code changes for rendering, it might break the rendering flow. Upgrade with cation.
+
 ## 5.11.4 ##
 
 1.  Fix: Prefab view dropdown(advanceddropdwn/treedropdown) in inspector failed on second selection [#367](https://github.com/TylerTemp/SaintsField/issues/367)

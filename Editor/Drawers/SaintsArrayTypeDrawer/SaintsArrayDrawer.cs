@@ -473,8 +473,10 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             // List<Attribute> injectCreatedAttributes2 = new List<Attribute>();
             // int injectDelta = insideArray ? 2 : 1;
             InjectAttributeBase[] refreshedAllAttributes = ReflectCache.GetCustomAttributes<InjectAttributeBase>(info);
-            Debug.Log($"SaintsArray {property.propertyPath} injected={string.Join<InjectAttributeBase>(", ", refreshedAllAttributes)}, insideArray={insideArray}");
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
+            Debug.Log($"SaintsArray {property.propertyPath} injected={string.Join<InjectAttributeBase>(", ", refreshedAllAttributes)}, insideArray={insideArray}");
+#endif
             int insideArrayOffset = insideArray ? 1 : 0;
 
             foreach (InjectAttributeBase injectAttribute in refreshedAllAttributes)
@@ -495,7 +497,9 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                     injectAttribute.Parameters);
                 if (less2DepthInject.Depth > 0)
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                     Debug.Log($"SaintsArray {property.propertyPath} injectAttributes2.Add={less2DepthInject}");
+#endif
                     injectAttributes2.Add(less2DepthInject);
                 }
 
@@ -504,13 +508,17 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                     Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(injectAttribute);
                     if(injectedAttribute != null)
                     {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                         Debug.Log($"SaintsArray {property.propertyPath} injectCreatedAttributes1.Add={injectedAttribute}");
+#endif
                         injectCreatedAttributes1.Add(injectedAttribute);
                     }
                 }
                 else if (less1DepthInject.Depth > 0)
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                     Debug.Log($"SaintsArray {property.propertyPath} injectCreatedAttributes1.Add={less1DepthInject}");
+#endif
                     injectCreatedAttributes1.Add(less1DepthInject);
                 }
 
@@ -593,28 +601,33 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 // element.Add(wrapContainer);
 
                 // wrapContainer.Add(resultElement);
-
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                 Debug.Log($"create SaintsCellRenderer {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType}) injectCreatedAttributes1={string.Join(", ", injectCreatedAttributes1)}");
+#endif
                 SaintsCellRenderer renderer = new SaintsCellRenderer(
                     elementProp.serializedObject,
                     saintsContainerInfo
                 );
-
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                 Debug.Log($"create CreateCellElement {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType}) injectAttributes={string.Join(", ", injectAttributes2)}");
+#endif
                 VisualElement resultElementNoLabel =
                     SaintsWrapUtils.CreateCellElement(
                         valueWrapType,
                         wrapField,
                         wrapType,
                         elementProp,
+                        ReflectCache.GetCustomAttributes<Attribute>(info).Where(each => each is not InjectAttributeBase).ToArray(),
                         injectAttributes2,
                         hasSerializeReference,
                         this,
                         this,
                         wrapParent
                     );
-
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
                 Debug.Log($"create ElementField {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType})");
+#endif
+
                 ElementField wrapContainer = new ElementField($"Element {propIndex}", resultElementNoLabel);
                 wrapContainer.labelElement.AddToClassList(ClassLabelFieldUIToolkit);
 

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {
@@ -11,5 +10,14 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
         [LabelText("OutLabelText")]
         public SaintsArray<string>[] saOutArrLabelDirect;
+
+        // Dont break the old behaviors
+        public ReferenceHashSet<IDummy> refHashSet;
+
+        [KeyAttribute(typeof(ExpandableAttribute))]
+        [ValueAttribute(typeof(ExpandableAttribute))]
+        public SaintsDictionary<MonoBehaviour, MonoBehaviour> injectDict;
+
+        public SaintsDictionary<IDummy, IDummy> refInterfaceDict;
     }
 }

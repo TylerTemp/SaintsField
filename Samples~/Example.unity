@@ -7295,24 +7295,11 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
     _saintsSerializedVersion: 0
     _wrapType: 4
-  - _saintsList:
-    - value: 
-      valueField:
+  refHashSet:
+    _saintsList:
+    - valueField:
         propertyType: 0
         longValue: 0
         uLongValue: 0
@@ -7323,22 +7310,85 @@ MonoBehaviour:
         IsVRef: 0
       valueArray: []
       valueList: []
-      wrapType: 4
-    - value: 
-      valueField:
+      wrapType: 1
+    - valueField:
         propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
-        V: {fileID: 0}
+        V: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
         VRef:
           rid: -2
         IsVRef: 0
       valueArray: []
       valueList: []
-      wrapType: 4
-    _saintsSerializedVersion: 0
+      wrapType: 1
+    _saintsSerializedVersion: 2
     _wrapType: 4
+  injectDict:
+    _saintsKeys:
+    - value: {fileID: 380193379}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value: {fileID: 1792998046}
+      valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
+    _keys: []
+    _values: []
+  refInterfaceDict:
+    _saintsKeys:
+    - valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 1
+    _wrapTypeKey: 1
+    _saintsValues:
+    - valueField:
+        propertyType: 0
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 1
+    _wrapTypeValue: 1
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:

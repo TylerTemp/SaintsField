@@ -685,7 +685,10 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                         keyWrapType,
                         wrapField,
                         wrapType,
-                        elementProp, injectAttributes, hasSerializeReference, this, this, wrapParent
+                        elementProp,
+                        ReflectCache.GetCustomAttributes<Attribute>(info),
+                        injectAttributes,
+                        hasSerializeReference, this, this, wrapParent
                     );
                 ElementField elementField = new ElementField($"Element {propIndex}", resultElement);
                 element.Add(elementField);
