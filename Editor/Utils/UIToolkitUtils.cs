@@ -2559,7 +2559,7 @@ namespace SaintsField.Editor.Utils
                             Debug.LogError(e);
                         }
 
-                        // UnityEngine.Object.DestroyImmediate(go);
+                        UnityEngine.Object.DestroyImmediate(go);
                     });
 
                 }));
