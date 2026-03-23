@@ -631,9 +631,9 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 ElementField wrapContainer = new ElementField($"Element {propIndex}", resultElementNoLabel);
                 wrapContainer.labelElement.AddToClassList(ClassLabelFieldUIToolkit);
 
-                element.Add(renderer.GetElementAndInit(wrapContainer));
-
-
+                VisualElement elementFinal = renderer.GetElementAndInit(wrapContainer);
+                UIToolkitUtils.AddContextualMenuManipulator(elementFinal, elementProp, () => { });
+                element.Add(elementFinal);
             };
 
             pagePreButton.clicked += () =>
