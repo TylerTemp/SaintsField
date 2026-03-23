@@ -7248,7 +7248,7 @@ MonoBehaviour:
   sa:
     _saintsList:
     - value:
-      - 
+      - e1321
       valueField:
         propertyType: 0
         longValue: 0
@@ -7324,7 +7324,7 @@ MonoBehaviour:
       valueList: []
       wrapType: 1
     _saintsSerializedVersion: 2
-    _wrapType: 4
+    _wrapType: 1
   injectDict:
     _saintsKeys:
     - value: {fileID: 380193379}

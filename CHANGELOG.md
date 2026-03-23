@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.12.1 ##
+
+1.  Fix: context menu for old unity, context menu for SaintsArray/SaintsList
+2.  Fix: new gameobjects being spawned whenever a property is reset [@peterdwdawe](https://github.com/peterdwdawe), [PR#371](https://github.com/TylerTemp/SaintsField/pull/371)
+3.  Add: `ResizableTextArea` support `ShowInInspector` and `Button`
+
 ## 5.12.0-preview.0 ##
 
 1.  Fix: USS warning [#369](https://github.com/TylerTemp/SaintsField/issues/369)

@@ -5242,7 +5242,7 @@ This `TextArea` will always grow its height to fit the content. (minimal height 
 
 Note: Unlike NaughtyAttributes, this does not have a text-wrap issue.
 
-*   AllowMultiple: No
+*   Allow Multiple: No
 
 ```csharp
 using SaintsField;
@@ -5266,6 +5266,37 @@ public string RawTa
 ```
 
 ![](https://github.com/user-attachments/assets/3d7ab248-b705-48d1-b324-0d8e77b85bc5)
+
+It can work with `ShowInInspector`
+
+```csharp
+[ShowInInspector, ResizableTextArea]
+private string TextArea
+{
+    get => _textArea;
+    set => _textArea = value;
+}
+```
+
+![](https://github.com/user-attachments/assets/e5796fbb-8e58-49e2-9142-d22291b1c3d1)
+
+It can work with `ShowInInspector`/`Button` parameters and return value
+
+```csharp
+[Button, ResizableTextArea]
+private string TestTextAreaBtn([ResizableTextArea] string text)
+{
+    return "Button: " + text;
+}
+
+[ShowInInspector, ResizableTextArea]
+private string TestTextAreaShowInInspector([ResizableTextArea] string text)
+{
+    return "ShowInInspector: " + text;
+}
+```
+
+![](https://github.com/user-attachments/assets/36b8312e-de32-4964-acda-3a027c80c086)
 
 #### `LeftToggle` ####
 
