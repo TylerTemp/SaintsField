@@ -637,6 +637,9 @@ namespace SaintsField.Editor.Core
             Debug.Log($"Done property gui {property.propertyPath}/{this}");
 #endif
 
+#if !UNITY_6000_3_OR_NEWER  // when < 6k, default context menu will be lost if we add menu here...
+            UIToolkitUtils.AddContextualMenuManipulator(rootElement, property, () => { });
+#endif
             UIToolkitUtils.AddContextualMenuReset(rootElement, property, fieldInfo, parent);
 
             return rootElement;
