@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.SaintsCell;
@@ -328,12 +327,12 @@ namespace SaintsField.Editor.Utils
 
         private class ButtonColorWrapper
         {
-            private readonly Button button;
+            private readonly Button _button;
             private bool _init;
 
             public ButtonColorWrapper(Button button)
             {
-                this.button = button;
+                _button = button;
             }
 
             private Color _hoverColor;
@@ -348,7 +347,7 @@ namespace SaintsField.Editor.Utils
                 _hoverColor = newColor / 2;
 
                 EnsureBindColorEvent();
-                button.style.backgroundColor = _normalColor;
+                _button.style.backgroundColor = _normalColor;
             }
 
             private void EnsureBindColorEvent()
@@ -359,16 +358,16 @@ namespace SaintsField.Editor.Utils
                 }
 
                 _init = true;
-                button.RegisterCallback<PointerEnterEvent>(_ => button.style.backgroundColor = _hoverColor);
-                button.RegisterCallback<PointerLeaveEvent>(_ => button.style.backgroundColor = _normalColor);
+                _button.RegisterCallback<PointerEnterEvent>(_ => _button.style.backgroundColor = _hoverColor);
+                _button.RegisterCallback<PointerLeaveEvent>(_ => _button.style.backgroundColor = _normalColor);
 
-                button.RegisterCallback<PointerDownEvent>(_ => button.style.backgroundColor = _pressedColor,
+                _button.RegisterCallback<PointerDownEvent>(_ => _button.style.backgroundColor = _pressedColor,
                 TrickleDown.TrickleDown);
-                button.RegisterCallback<PointerUpEvent>(evt =>
+                _button.RegisterCallback<PointerUpEvent>(evt =>
                 {
                     // if pointer still over button, return hover color; otherwise normal color
-                    bool inside = button.worldBound.Contains(evt.position);
-                    button.style.backgroundColor = inside ? _hoverColor : _normalColor;
+                    bool inside = _button.worldBound.Contains(evt.position);
+                    _button.style.backgroundColor = inside ? _hoverColor : _normalColor;
                     // button.style.backgroundColor = _hoverColor;
                 },
                 TrickleDown.TrickleDown);
@@ -2518,6 +2517,21 @@ namespace SaintsField.Editor.Utils
             }));
         }
 
+        private readonly struct TemporaryGameObject : IDisposable
+        {
+            private readonly GameObject _gameObject;
+
+            public TemporaryGameObject(GameObject go)
+            {
+                _gameObject = go;
+            }
+
+            public void Dispose()
+            {
+                UnityEngine.Object.DestroyImmediate(_gameObject);
+            }
+        }
+
         public static void AddContextualMenuReset(VisualElement element, SerializedProperty property, FieldInfo fieldInfo, object parent)
         {
             int propIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
@@ -2542,24 +2556,26 @@ namespace SaintsField.Editor.Utils
                     evt.menu.AppendAction(label, _ =>
                     {
                         GameObject go = new GameObject();
-                        Component result = go.AddComponent(type);
-                        if (SerializedUtils.IsOk(property))
+                        using(new TemporaryGameObject(go))
                         {
-                            Undo.RecordObject(property.serializedObject.targetObject, $"SaintsField Reset {fieldInfo.Name}");
-                        }
+                            Component result = go.AddComponent(type);
+                            if (SerializedUtils.IsOk(property))
+                            {
+                                Undo.RecordObject(property.serializedObject.targetObject,
+                                    $"SaintsField Reset {fieldInfo.Name}");
+                            }
 
-                        try
-                        {
-                            object defaultValue = fieldInfo.GetValue(result);
+                            try
+                            {
+                                object defaultValue = fieldInfo.GetValue(result);
 
-                            fieldInfo.SetValue(parent, defaultValue);
+                                fieldInfo.SetValue(parent, defaultValue);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.LogError(e);
+                            }
                         }
-                        catch (Exception e)
-                        {
-                            Debug.LogError(e);
-                        }
-
-                        UnityEngine.Object.DestroyImmediate(go);
                     });
 
                 }));
