@@ -5,7 +5,7 @@
 1.  Fix: context menu in old unity did not show correctly, context menu for SaintsArray/SaintsList did not show
 2.  Fix: new gameobjects being spawned whenever a property is reset [@peterdwdawe](https://github.com/peterdwdawe), [PR#371](https://github.com/TylerTemp/SaintsField/pull/371)
 3.  Add: `ResizableTextArea` support `ShowInInspector` and `Button`
-4.  Fix: reset context menu shows uppercase if a variable name starts with `_`
+4.  Fix: reset context menu shows uppercase if a variable name starts with `_`, remove the `k__BackingField` information.
 
 About this version:
 
@@ -38,7 +38,7 @@ As this release contains core code changes for rendering, it might break the ren
 
 ## 5.11.2 ##
 
-1.  Fix: dropdown button for URP editor now can detect `SupportedOnRendererAttribute` and allows for inherented from `SaintsScriptableRendererData`. Fix URP editor title text overflow when it's too long. Fix IMGUI based editor can not be saved under URP editor. [#363](https://github.com/TylerTemp/SaintsField/issues/363) 
+1.  Fix: dropdown button for URP editor now can detect `SupportedOnRendererAttribute` and allows for inherented from `SaintsScriptableRendererData`. Fix URP editor title text overflow when it's too long. Fix IMGUI based editor can not be saved under URP editor. [#363](https://github.com/TylerTemp/SaintsField/issues/363)
 2.  Add a warning for Unity 6000+ about building support [#362](https://github.com/TylerTemp/SaintsField/issues/362)
 
 ## 5.11.0 ##

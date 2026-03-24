@@ -2547,6 +2547,11 @@ namespace SaintsField.Editor.Utils
             }
 
             string noEscapeName = fieldInfo.Name;
+            const string bfn = ">k__BackingField";
+            if (noEscapeName.EndsWith(bfn))
+            {
+                noEscapeName = noEscapeName[1..^bfn.Length];
+            }
 #if UNITY_EDITOR_WIN
             if (noEscapeName.StartsWith("_"))
             {
@@ -2559,7 +2564,7 @@ namespace SaintsField.Editor.Utils
             {
                 element.AddManipulator(new ContextualMenuManipulator(evt =>
                 {
-                    evt.menu.AppendSeparator();
+                    // evt.menu.AppendSeparator();
                     evt.menu.AppendAction(label, _ =>
                     {
                         GameObject go = new GameObject();
@@ -2594,7 +2599,7 @@ namespace SaintsField.Editor.Utils
             {
                 element.AddManipulator(new ContextualMenuManipulator(evt =>
                 {
-                    evt.menu.AppendSeparator();
+                    // evt.menu.AppendSeparator();
                     evt.menu.AppendAction(label, _ =>
                     {
                         ScriptableObject result = ScriptableObject.CreateInstance(type);
@@ -2623,7 +2628,7 @@ namespace SaintsField.Editor.Utils
 
             element.AddManipulator(new ContextualMenuManipulator(evt =>
             {
-                evt.menu.AppendSeparator();
+                // evt.menu.AppendSeparator();
                 evt.menu.AppendAction(label, _ =>
                 {
                     if (SerializedUtils.IsOk(property))

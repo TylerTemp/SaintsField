@@ -100,7 +100,7 @@ namespace: `SaintsField`
 1.  Fix: context menu in old unity did not show correctly, context menu for SaintsArray/SaintsList did not show
 2.  Fix: new gameobjects being spawned whenever a property is reset [@peterdwdawe](https://github.com/peterdwdawe), [PR#371](https://github.com/TylerTemp/SaintsField/pull/371)
 3.  Add: `ResizableTextArea` support `ShowInInspector` and `Button`
-4.  Fix: reset context menu shows uppercase if a variable name starts with `_`
+4.  Fix: reset context menu shows uppercase if a variable name starts with `_`, remove the `k__BackingField` information.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4792,7 +4792,7 @@ Add a context menu (right click) item for a target
     If `null`, use "funcName" as name.
 
     If starts with `$`, use a callback instead. Callback can must be one of:
-    
+
     ```csharp
     string MyMenuName(MyFieldType fieldValue);
     string MyMenuName();
@@ -4964,7 +4964,7 @@ using SaintsField;
 
 [FieldCustomContextMenu(nameof(Func1), "Custom/Debug")]  // use like a CustomContextMenu
 public int myInt;
-    
+
 [FieldCustomContextMenu(nameof(ClickItemRemover), "$" + nameof(ClickItemRemoverLabel))]
 public List<string> lis;
 
