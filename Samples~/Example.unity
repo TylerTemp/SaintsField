@@ -5393,6 +5393,69 @@ MonoBehaviour:
           - 
         - name: 
           conditions: []
+--- !u!1 &528893599
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 528893600}
+  - component: {fileID: 528893601}
+  - component: {fileID: 528893602}
+  m_Layer: 0
+  m_Name: Issue373ExpandableDefaultExpand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &528893600
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528893599}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &528893601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528893599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec708c01b3c56044b7d54a700e4ad73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue373.Issue373ExpandableDefaultExpand
+  e: {fileID: 528893600}
+  eArr:
+  - {fileID: 528893600}
+--- !u!114 &528893602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528893599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c84ba86ef100b634e9fabff132f9de4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue373.Issue373ExpandableDefaultExpandSaints
+  e: {fileID: 528893600}
+  eArr:
+  - {fileID: 528893600}
 --- !u!1 &529722622
 GameObject:
   m_ObjectHideFlags: 0
@@ -23314,6 +23377,7 @@ Transform:
   - {fileID: 1759777062}
   - {fileID: 1954615237}
   - {fileID: 666176604}
+  - {fileID: 528893600}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1487457131

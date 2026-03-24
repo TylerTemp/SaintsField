@@ -37,6 +37,19 @@ namespace SaintsField.Editor.Utils
                 Debug.Log($"Init for Config.SaintsFieldSourceParser.additionalfile");
                 File.WriteAllText(roslynConfigFile, "debug = 0\ndisabled = 0\n");
             }
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (string configLine in File.ReadAllLines(roslynConfigFile))
+            {
+                string[] split = configLine.Split('=');
+                // ReSharper disable once InvertIf
+                if (split.Length == 2 && split[0].Trim() == "disabled" && split[1].Trim() != "0")
+                {
+                    Debug.LogWarning("Roslyn is disabled for SaintsField. Your field order might not be correct if you have SaintsEditor enabled");
+                    return;
+                }
+            }
+
             const string roslynTempFileName = "Temp.SaintsFieldSourceParser.additionalfile";
             const string roslynTempFile = saintsFieldFolder + "/" + roslynTempFileName;
             string writeTempContent = $"path = {projectRootPath.Replace("\\", "/")}/{preParserRelativeFolder}\n";

@@ -2,9 +2,14 @@
 
 ## 5.12.1 ##
 
-1.  Fix: context menu for old unity, context menu for SaintsArray/SaintsList
+1.  Fix: context menu in old unity did not show correctly, context menu for SaintsArray/SaintsList did not show
 2.  Fix: new gameobjects being spawned whenever a property is reset [@peterdwdawe](https://github.com/peterdwdawe), [PR#371](https://github.com/TylerTemp/SaintsField/pull/371)
 3.  Add: `ResizableTextArea` support `ShowInInspector` and `Button`
+4.  Fix: reset context menu shows uppercase if a variable name starts with `_`
+
+About this version:
+
+The "Downpour" system is still WIP. My personal test seems the change does not affect other functions so I'm removing the "preview" tag.
 
 ## 5.12.0-preview.0 ##
 

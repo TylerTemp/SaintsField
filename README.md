@@ -95,11 +95,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.12.0-preview.0**
+**5.12.1**
 
-1.  Fix: USS warning [#369](https://github.com/TylerTemp/SaintsField/issues/369)
-2.  Fix: URP IMGUI editor rendering flicking on slider [#364](https://github.com/TylerTemp/SaintsField/pull/364)
-3.  Improve: Cache SaintsEditor field order result for a bit better performance
+1.  Fix: context menu in old unity did not show correctly, context menu for SaintsArray/SaintsList did not show
+2.  Fix: new gameobjects being spawned whenever a property is reset [@peterdwdawe](https://github.com/peterdwdawe), [PR#371](https://github.com/TylerTemp/SaintsField/pull/371)
+3.  Add: `ResizableTextArea` support `ShowInInspector` and `Button`
+4.  Fix: reset context menu shows uppercase if a variable name starts with `_`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
