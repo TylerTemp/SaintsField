@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             public Object Object;
             public Texture2D Icon;
             // public bool HasInstanceId;
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
             public EntityId InstanceID;
 #else
             public int InstanceID;
@@ -71,7 +71,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
         private static readonly ItemInfo NullItemInfo = new ItemInfo
         {
             Icon = null,
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
             InstanceID = EntityId.None,
 #else
             InstanceID = int.MinValue,

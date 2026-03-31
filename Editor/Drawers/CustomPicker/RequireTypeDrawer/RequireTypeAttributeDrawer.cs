@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                 Object itemObject = itemInfo.Object;
                 Debug.Assert(itemObject, itemObject);
 
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
                 EntityId targetInstanceId = target.GetEntityId();
 #else
                 int targetInstanceId = target.GetInstanceID();
@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                 Object itemToOriginTypeValue = Util.GetTypeFromObj(itemObject, _fieldType);
 
                 // Debug.Log($"{itemObject} ?= {target} => {itemToOriginTypeValue.GetInstanceID() == targetInstanceId}");
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
                 return itemToOriginTypeValue.GetEntityId() == targetInstanceId;
 #else
                 return itemToOriginTypeValue.GetInstanceID() == targetInstanceId;

@@ -123,7 +123,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 return false;
             }
 
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
             HashSet<EntityId> instanceIds = new HashSet<EntityId>();
 #else
             HashSet<int> instanceIds = new HashSet<int>();
@@ -132,7 +132,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             {
                 if(target)
                 {
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
                     instanceIds.Add(target.GetEntityId());
 #else
                     instanceIds.Add(target.GetInstanceID());
@@ -140,7 +140,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 }
             }
 
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
             HashSet<EntityId> instanceIds2 = new HashSet<EntityId>();
 #else
             HashSet<int> instanceIds2 = new HashSet<int>();
@@ -150,7 +150,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 // ReSharper disable once InvertIf
                 if(target)
                 {
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
                     EntityId id = target.GetEntityId();
 #else
                     int id = target.GetInstanceID();

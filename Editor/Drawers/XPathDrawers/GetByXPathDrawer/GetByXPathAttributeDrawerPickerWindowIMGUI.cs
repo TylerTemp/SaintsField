@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     Object = each,
                     Label = each.name,
                     // Icon = property.icon,
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
                     InstanceID = each.GetEntityId(),
 #else
                     InstanceID = each.GetInstanceID(),
@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     Object = each,
                     Label = each.name,
                     // Icon = property.icon,
-#if UNITY_6000_5_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
                     InstanceID = each.GetEntityId(),
 #else
                     InstanceID = each.GetInstanceID(),
