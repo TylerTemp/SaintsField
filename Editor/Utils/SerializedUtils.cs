@@ -243,7 +243,11 @@ namespace SaintsField.Editor.Utils
             string[] paths = property.propertyPath.Split(DotSplitSeparator);
 
             (bool _, string[] propPathSegments) = TrimEndArray(paths);
+#if UNITY_6000_5_OR_NEWER
+            return $"{EntityId.ToULong(property.serializedObject.targetObject.GetEntityId())}_{string.Join(".", propPathSegments)}";
+#else
             return $"{property.serializedObject.targetObject.GetInstanceID()}_{string.Join(".", propPathSegments)}";
+#endif
         }
 
         public static (string error, SerializedProperty property) GetArrayProperty(SerializedProperty property)
@@ -384,14 +388,22 @@ namespace SaintsField.Editor.Utils
 
         public static string GetUniqueId(SerializedProperty property)
         {
+#if UNITY_6000_5_OR_NEWER
+            return $"{EntityId.ToULong(property.serializedObject.targetObject.GetEntityId())}_{property.propertyPath}";
+#else
             return $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+#endif
         }
 
         public static bool IsOk(SerializedProperty property)
         {
             try
             {
+#if UNITY_6000_5_OR_NEWER
+                EntityId _ = property.serializedObject.targetObject.GetEntityId();
+#else
                 int _ = property.serializedObject.targetObject.GetInstanceID();
+#endif
                 string __ = property.propertyPath;
                 string ___ = property.displayName;
             }

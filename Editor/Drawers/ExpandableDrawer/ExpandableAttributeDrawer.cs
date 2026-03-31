@@ -123,22 +123,38 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 return false;
             }
 
+#if UNITY_6000_5_OR_NEWER
+            HashSet<EntityId> instanceIds = new HashSet<EntityId>();
+#else
             HashSet<int> instanceIds = new HashSet<int>();
+#endif
             foreach (Object target in serObj1.targetObjects)
             {
                 if(target)
                 {
+#if UNITY_6000_5_OR_NEWER
+                    instanceIds.Add(target.GetEntityId());
+#else
                     instanceIds.Add(target.GetInstanceID());
+#endif
                 }
             }
 
+#if UNITY_6000_5_OR_NEWER
+            HashSet<EntityId> instanceIds2 = new HashSet<EntityId>();
+#else
             HashSet<int> instanceIds2 = new HashSet<int>();
+#endif
             foreach (Object target in serObj2.targetObjects)
             {
                 // ReSharper disable once InvertIf
                 if(target)
                 {
+#if UNITY_6000_5_OR_NEWER
+                    EntityId id = target.GetEntityId();
+#else
                     int id = target.GetInstanceID();
+#endif
                     if (!instanceIds.Contains(id))
                     {
                         return false;
