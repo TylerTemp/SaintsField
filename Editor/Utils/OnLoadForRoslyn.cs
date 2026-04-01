@@ -10,7 +10,7 @@ namespace SaintsField.Editor.Utils
         [InitializeOnLoadMethod]
         private static void OnLoad()
         {
-            const string preParserRelativeFolder = SaintsFieldConfig.PreParserRelativeFolder;
+            string preParserRelativeFolder = SaintsFieldConfig.PreParserRelativeFolder;
             if (!Directory.Exists(preParserRelativeFolder))
             {
                 Debug.Log($"Create folder: {preParserRelativeFolder}");

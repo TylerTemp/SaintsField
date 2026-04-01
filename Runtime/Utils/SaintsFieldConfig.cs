@@ -13,8 +13,8 @@ namespace SaintsField.Utils
 #endif
     public class SaintsFieldConfig : ScriptableObject
     {
-        public const int PreParserVersion = 0;
-        public const string PreParserRelativeFolder = "Library/SaintsFieldTemp";
+        public const int PreParserVersion = 1;
+        public static readonly string PreParserRelativeFolder = "Library/SaintsFieldTempV" + PreParserVersion;
 
         public const int UpdateLoopDefaultMs = 100;
 
