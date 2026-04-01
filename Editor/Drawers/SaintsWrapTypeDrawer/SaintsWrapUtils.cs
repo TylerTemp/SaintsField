@@ -5,8 +5,10 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.Playa.Renderer.SaintsCell;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -259,7 +261,40 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 useDrawerType = typeof(BaseWrapDrawer);
             }
 
-            // Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath}/{useDrawerType}");
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
+//             Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath}/{useDrawerType}");
+// #endif
+
+            SaintsCellRenderer renderer = null;
+            IPlayaAttribute[] playaAttributes = allCustomAttributes.OfType<IPlayaAttribute>().ToArray();
+            if (playaAttributes.Length > 0)
+            {
+                SaintsFieldWithInfo saintsContainerInfo = new SaintsFieldWithInfo
+                {
+                    ClassStructType = null,
+                    PlayaAttributes = allCustomAttributes.OfType<IPlayaAttribute>().ToArray(),
+                    // PlayaAttributes = Array.Empty<IPlayaAttribute>(),
+                    TargetParent = null,
+                    TargetMemberInfo = null,
+                    TargetMemberIndex = 0,
+                    Targets = new[]{parent},
+
+                    RenderType = SaintsRenderType.SerializedField,
+                    SerializedProperty = serializedProperty,
+                    MemberId = info.Name,
+                    FieldInfo = info,
+                    InherentDepth = 0,
+                    // Order = order,
+                    // serializable = true,
+                };
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
+                Debug.Log($"CreateCellElement wrap {serializedProperty.propertyPath}->{serializedBaseProperty.propertyPath} for playa {string.Join<IPlayaAttribute>(", ", playaAttributes)}");
+#endif
+                renderer = new SaintsCellRenderer(
+                    serializedProperty.serializedObject,
+                    saintsContainerInfo
+                );
+            }
 
             if (useDrawerType == null)
             {
@@ -306,7 +341,7 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             if (propertyDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
             {
                 saintsPropertyDrawer.InHorizontalLayout = true;
-                saintsPropertyDrawer.AppendPropertyAttributes = allPropertyAttributes;
+                saintsPropertyDrawer.OverrideAttributes = allAttributes;
                 // Debug.Log($"{needUseRef}{saintsPropertyDrawer is BaseWrapDrawer}/{saintsPropertyDrawer}");
                 // Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath} -> {string.Join(", ", saintsPropertyDrawer.AppendPropertyAttributes)}");
             }
@@ -324,10 +359,15 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             {
                 // Debug.Log($"CreateCellElement rendering {serializedProperty.propertyPath} using {propertyDrawer}");
                 // Debug.Log($"{propertyDrawer} draw {serializedProperty.propertyPath}(BaseWrapDrawer={propertyDrawer is BaseWrapDrawer})");
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
+                Debug.Log($"CreateCellElement rendering with {propertyDrawer} {serializedProperty.propertyPath}->{serializedBaseProperty.propertyPath}, allAttributes={string.Join(", ", allAttributes)}");
+#endif
                 VisualElement r = propertyDrawer.CreatePropertyGUI(propertyDrawer is BaseWrapDrawer? serializedProperty: serializedBaseProperty);
                 VisualElement merged = UIToolkitCache.MergeWithDec(r, allPropertyAttributes);
                 UIToolkitUtils.CheckOutOfScoopFoldout(merged, new HashSet<Toggle>());
-                return merged;
+                VisualElement mergedFinal = renderer == null ? merged : renderer.GetElementAndInit(merged);
+                return mergedFinal;
             }
 
             // SaintsPropertyDrawer won't have pure IMGUI one. Let Unity handle it.

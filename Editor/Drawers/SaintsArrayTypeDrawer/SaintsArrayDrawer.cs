@@ -76,9 +76,18 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             VisualElement header = new VisualElement();
             root.Add(header);
 
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
+//             Debug.Log($"property {property.propertyPath} label={GetPreferredLabel(property)}");
+// #endif
+            string thisPreferredLabel = GetPreferredLabel(property);
+            if (string.IsNullOrEmpty(thisPreferredLabel))
+            {
+                thisPreferredLabel = "Value";
+            }
+
             Foldout foldout = new Foldout
             {
-                text = GetPreferredLabel(property),
+                text = thisPreferredLabel,
                 // value = property.isExpanded,
                 name = NameFoldout(property),
                 viewDataKey = property.propertyPath,
@@ -470,7 +479,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
             List<Attribute> injectCreatedAttributes1 = new List<Attribute>();
 
             List<InjectAttributeBase> injectAttributes2 = new List<InjectAttributeBase>();
-            // List<Attribute> injectCreatedAttributes2 = new List<Attribute>();
+            List<Attribute> injectCreatedAttributes2 = new List<Attribute>();
             // int injectDelta = insideArray ? 2 : 1;
             InjectAttributeBase[] refreshedAllAttributes = ReflectCache.GetCustomAttributes<InjectAttributeBase>(info);
 
@@ -501,6 +510,18 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                     Debug.Log($"SaintsArray {property.propertyPath} injectAttributes2.Add={less2DepthInject}");
 #endif
                     injectAttributes2.Add(less2DepthInject);
+                }
+                else
+                {
+                    Attribute injectedAttribute = SaintsWrapUtils.CreateInjectedAttribute(less2DepthInject);
+                    if(injectedAttribute != null)
+                    {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
+                        Debug.Log(
+                            $"SaintsArray {property.propertyPath} injectCreatedAttributes2.Create={injectedAttribute}");
+#endif
+                        injectCreatedAttributes2.Add(injectedAttribute);
+                    }
                 }
 
                 if (less1DepthInject.Depth == 0)
@@ -609,7 +630,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                     saintsContainerInfo
                 );
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                Debug.Log($"create CreateCellElement {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType}) injectAttributes={string.Join(", ", injectAttributes2)}");
+                Debug.Log($"create CreateCellElement {saintsContainerInfo.SerializedProperty.propertyPath}({saintsContainerInfo.SerializedProperty.propertyType}) injectCreatedAttributes={string.Join(", ", injectCreatedAttributes2)}, injectAttributes={string.Join(", ", injectAttributes2)}");
 #endif
                 VisualElement resultElementNoLabel =
                     SaintsWrapUtils.CreateCellElement(
@@ -617,7 +638,10 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                         wrapField,
                         wrapType,
                         elementProp,
-                        ReflectCache.GetCustomAttributes<Attribute>(info).Where(each => each is not InjectAttributeBase).ToArray(),
+                        ReflectCache.GetCustomAttributes<Attribute>(info)
+                            .Where(each => each is not InjectAttributeBase)
+                            .Concat(injectCreatedAttributes2)
+                            .ToArray(),
                         injectAttributes2,
                         hasSerializeReference,
                         this,

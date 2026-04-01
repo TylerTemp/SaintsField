@@ -24,21 +24,22 @@ namespace SaintsField.Editor.Core
 {
     public partial class SaintsPropertyDrawer: IDOTweenPlayRecorder
     {
+        // ReSharper disable once VirtualMemberNeverOverridden.Global
         protected virtual void OnDisposeUIToolkit()
         {
 
         }
 
         protected static string NameLabelFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-label-field";
-        public static string ClassLabelFieldUIToolkit = "saints-field--label-field";
+        public const string ClassLabelFieldUIToolkit = "saints-field--label-field";
 
-        public static string ClassNoRichLabelUpdate = "saints-field-no-rich-label-update";
-        private static string NameSaintsPropertyDrawerOverrideLabel = "saints-property-drawer-override-label";
+        public const string ClassNoRichLabelUpdate = "saints-field-no-rich-label-update";
+        private const string NameSaintsPropertyDrawerOverrideLabel = "saints-property-drawer-override-label";
 
         protected static string ClassFieldUIToolkit(SerializedProperty property) => $"{property.propertyPath}__saints-field-field";
 
         public const string ClassAllowDisable = "saints-field-allow-disable";
-        public static string UIToolkitFallbackName(SerializedProperty property) => $"saints-field--fallback-{property.propertyPath}";
+        protected static string UIToolkitFallbackName(SerializedProperty property) => $"saints-field--fallback-{property.propertyPath}";
         private static string UIToolkitOnChangedTrackerName(SerializedProperty property) =>
             $"saints-field-tracker--{property.propertyPath}";
 
@@ -49,13 +50,11 @@ namespace SaintsField.Editor.Core
             $"{SerializedUtils.GetUniqueId(property)}--saints-field--container";
 
         protected virtual bool UseCreateFieldUIToolKit => false;
-        public bool SaintsSubRenderer = false;
-
-        // public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
-        public IReadOnlyList<PropertyAttribute> AppendPropertyAttributes = null;
-        public IReadOnlyList<PropertyAttribute> OverridePropertyAttributes = null;
+        private bool _saintsSubRenderer;
 
         protected List<SaintsPropertyInfo> SaintsPropertyDrawers;
+
+        public IReadOnlyList<Attribute> OverrideAttributes;
 
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
@@ -88,14 +87,14 @@ namespace SaintsField.Editor.Core
                 name = NameSaintsPropertyDrawerContainer(property),
             };
 
-            (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+            (Attribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<Attribute>(property);
             _thisPropertyType = parent.GetType();
             // Debug.Log($"getting {property.propertyPath}: {string.Join<PropertyAttribute>(", ", allAttributesRaw)}");
             IReadOnlyList<PropertyAttribute> allAttributes;
-            if (SaintsSubRenderer)
+            if (_saintsSubRenderer)
             {
                 // Debug.Log($"SaintsSubRenderer={attribute}");
-                List<PropertyAttribute> attrs = allAttributesRaw.Where(each => each is not ISaintsAttribute).ToList();
+                List<PropertyAttribute> attrs = (OverrideAttributes ?? allAttributesRaw).Where(each => each is not ISaintsAttribute).OfType<PropertyAttribute>().ToList();
                 if (attribute != null && !attrs.Contains(attribute))
                 {
                     attrs.Add(attribute);
@@ -104,18 +103,7 @@ namespace SaintsField.Editor.Core
             }
             else
             {
-                if (OverridePropertyAttributes != null)
-                {
-                    // Debug.Log($"OverridePropertyAttributes={OverridePropertyAttributes}");
-                    allAttributes = OverridePropertyAttributes.ToArray();
-                }
-                else
-                {
-                    // Debug.Log($"AppendPropertyAttributes={AppendPropertyAttributes}");
-                    allAttributes = AppendPropertyAttributes == null
-                        ? allAttributesRaw
-                        : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
-                }
+                allAttributes = (OverrideAttributes ?? allAttributesRaw).OfType<PropertyAttribute>().ToList();
             }
 
             // Debug.Log(string.Join<PropertyAttribute>(", ", allAttributes));
@@ -130,7 +118,7 @@ namespace SaintsField.Editor.Core
             //         Index = index,
             //     })
             //     .ToArray();
-            string preferredLabel = GetPreferredLabel(property);
+            string saintsPreferredLabel = GetPreferredLabel(property);
 
             List<SaintsPropertyInfo> saintsPropertyDrawers = new List<SaintsPropertyInfo>();
             bool alreadyHasFieldDrawer = false;
@@ -146,7 +134,7 @@ namespace SaintsField.Editor.Core
                 }
                 saintsPropertyDrawers.Add(new SaintsPropertyInfo
                 {
-                    Drawer = GetOrCreateSaintsDrawerByAttr(property, value, preferredLabel),
+                    Drawer = GetOrCreateSaintsDrawerByAttr(property, value, saintsPreferredLabel),
                     Attribute = value,
                     Index = index,
                 });
@@ -155,7 +143,7 @@ namespace SaintsField.Editor.Core
             SaintsPropertyDrawers = saintsPropertyDrawers;
 
             // PropertyField with empty label. This value will not be updated by Unity even call PropertyField.label = something, which has no actual effect in unity's drawer either
-            if (string.IsNullOrEmpty(preferredLabel))
+            if (string.IsNullOrEmpty(saintsPreferredLabel))
             {
                 SaintsPropertyDrawers.RemoveAll(each => each.Attribute is FieldLabelTextAttribute rl && string.IsNullOrEmpty(rl.RichTextXml));
 
@@ -171,7 +159,7 @@ namespace SaintsField.Editor.Core
                         found = true;
                         SaintsPropertyDrawers[richLabelIndex] = new SaintsPropertyInfo
                         {
-                            Drawer = GetOrCreateSaintsDrawerByAttr(property, noLabelAttribute, preferredLabel),
+                            Drawer = GetOrCreateSaintsDrawerByAttr(property, noLabelAttribute, saintsPreferredLabel),
                             Attribute = noLabelAttribute,
                             Index = richLabelIndex,
                         };
@@ -183,7 +171,7 @@ namespace SaintsField.Editor.Core
                 {
                     SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
-                        Drawer = GetOrCreateSaintsDrawerByAttr(property, noLabelAttribute, preferredLabel),
+                        Drawer = GetOrCreateSaintsDrawerByAttr(property, noLabelAttribute, saintsPreferredLabel),
                         Attribute = noLabelAttribute,
                         Index = SaintsPropertyDrawers.Count,
                     });
@@ -216,7 +204,7 @@ namespace SaintsField.Editor.Core
 
                     LeftToggleAttributeDrawer leftToggleAttributeDrawer =
                         (LeftToggleAttributeDrawer)
-                        GetOrCreateSaintsDrawerByAttr(property, leftToggleAttribute, preferredLabel);
+                        GetOrCreateSaintsDrawerByAttr(property, leftToggleAttribute, saintsPreferredLabel);
                     // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
                     SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
@@ -249,7 +237,7 @@ namespace SaintsField.Editor.Core
 
                             FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
                                 (FullWidthRichLabelAttributeDrawer)
-                                GetOrCreateSaintsDrawerByAttr(property, aboveRichLabelAttribute, preferredLabel);
+                                GetOrCreateSaintsDrawerByAttr(property, aboveRichLabelAttribute, saintsPreferredLabel);
                             // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
                             SaintsPropertyDrawers[index] = new SaintsPropertyInfo
                             {
@@ -268,7 +256,7 @@ namespace SaintsField.Editor.Core
                     NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
                     SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
-                        Drawer = GetOrCreateSaintsDrawerByAttr(property, noLabelAttribute, preferredLabel),
+                        Drawer = GetOrCreateSaintsDrawerByAttr(property, noLabelAttribute, saintsPreferredLabel),
                         Attribute = noLabelAttribute,
                         Index = SaintsPropertyDrawers.Count,
                     });
@@ -282,7 +270,7 @@ namespace SaintsField.Editor.Core
 
                     FullWidthRichLabelAttributeDrawer fullWidthRichLabelAttributeDrawer =
                         (FullWidthRichLabelAttributeDrawer)
-                        GetOrCreateSaintsDrawerByAttr(property, aboveRichLabelAttribute, preferredLabel);
+                        GetOrCreateSaintsDrawerByAttr(property, aboveRichLabelAttribute, saintsPreferredLabel);
                     // fullWidthRichLabelAttributeDrawer.IsSaintsPropertyDrawerOverrideLabel = true;
                     SaintsPropertyDrawers.Add(new SaintsPropertyInfo
                     {
@@ -419,18 +407,6 @@ namespace SaintsField.Editor.Core
                 },
                 pickingMode = PickingMode.Ignore,
             };
-            // #region label info
-            //
-            // // if (labelAttributeWithIndex.SaintsAttribute != null)
-            // // {
-            // //     _saintsLabelDrawer = GetOrCreateSaintsDrawer(labelAttributeWithIndex);
-            // // }
-            // // else
-            // // {
-            // //     _saintsLabelDrawer = null;
-            // // }
-            //
-            // #endregion
 
             #region label/field
             VisualElement fieldContainer = new VisualElement
@@ -697,7 +673,7 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"{GetType().Name}: fall to SaintsPropertyDrawer={spd}; allAttribute={string.Join(", ", allAttributes)}");
                 spd.InHorizontalLayout = InHorizontalLayout;
-                spd.SaintsSubRenderer = true;
+                spd._saintsSubRenderer = true;
             }
 
             VisualElement element = DrawUsingDrawerInstance(passedPreferredLabel, drawerType, typeDrawer, property, info,
@@ -710,7 +686,13 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private static VisualElement DrawUsingDrawerInstance(string passedLabel, Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
+        private static VisualElement DrawUsingDrawerInstance(string passedLabel, Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property,
+            // ReSharper disable once UnusedParameter.Local
+            FieldInfo info,
+            // ReSharper disable once UnusedParameter.Local
+            IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers,
+            // ReSharper disable once UnusedParameter.Local
+            VisualElement containerElement)
         {
             Debug.Assert(drawerType != null);
             if (drawerInstance == null)
@@ -1316,7 +1298,7 @@ namespace SaintsField.Editor.Core
 
         }
 
-        public static void TrackPropertyManagedUIToolkit(Action<object> onValueChangedCallback, SerializedProperty watchSubProperty, int propertyIndex, MemberInfo memberInfo, VisualElement tracker, object newFetchParent)
+        protected static void TrackPropertyManagedUIToolkit(Action<object> onValueChangedCallback, SerializedProperty watchSubProperty, int propertyIndex, MemberInfo memberInfo, VisualElement tracker, object newFetchParent)
         {
 #if UNITY_2021_3_OR_NEWER
             foreach ((string _, SerializedProperty subProperty) in SaintsRowAttributeDrawer.GetSerializableFieldInfo(watchSubProperty))
@@ -1601,16 +1583,11 @@ namespace SaintsField.Editor.Core
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Please override this for your Saints Property Drawer!");
         }
 
         protected virtual VisualElement CreateAboveUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
-        {
-            return null;
-        }
-
-        protected virtual VisualElement DrawPreLabelUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute)
         {
             return null;
         }

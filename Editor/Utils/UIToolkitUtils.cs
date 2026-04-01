@@ -1003,7 +1003,7 @@ namespace SaintsField.Editor.Utils
                     {
                         ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
                         ReferencePickerAttributeDrawer referencePickerAttributeDrawer = (ReferencePickerAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(ReferencePickerAttributeDrawer), fieldInfo, referencePickerAttribute, label);
-                        referencePickerAttributeDrawer.OverridePropertyAttributes = new PropertyAttribute[]
+                        referencePickerAttributeDrawer.OverrideAttributes = new PropertyAttribute[]
                         {
                             referencePickerAttribute,
                             new SaintsRowAttribute(),
@@ -1506,7 +1506,7 @@ namespace SaintsField.Editor.Utils
 
                         FlagsTreeDropdownAttribute flagsDropdownAttribute = new FlagsTreeDropdownAttribute();
                         FlagsTreeDropdownAttributeDrawer flagsDropdownDrawer = (FlagsTreeDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(FlagsTreeDropdownAttributeDrawer), fieldInfo, flagsDropdownAttribute, label);
-                        flagsDropdownDrawer.OverridePropertyAttributes = new[] { flagsDropdownAttribute };
+                        flagsDropdownDrawer.OverrideAttributes = new[] { flagsDropdownAttribute };
                         flagsDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
                         return flagsDropdownDrawer.CreatePropertyGUI(property);
                     }
@@ -1518,7 +1518,7 @@ namespace SaintsField.Editor.Utils
 
                     DropdownAttribute treeDropdownAttribute = new DropdownAttribute();
                     TreeDropdownAttributeDrawer treeDropdownDrawer = (TreeDropdownAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(TreeDropdownAttributeDrawer), fieldInfo, treeDropdownAttribute, label);
-                    treeDropdownDrawer.OverridePropertyAttributes = new[] { treeDropdownAttribute };
+                    treeDropdownDrawer.OverrideAttributes = new[] { treeDropdownAttribute };
                     treeDropdownDrawer.InHorizontalLayout = inHorizontalLayout;
                     return treeDropdownDrawer.CreatePropertyGUI(property);
                 }
