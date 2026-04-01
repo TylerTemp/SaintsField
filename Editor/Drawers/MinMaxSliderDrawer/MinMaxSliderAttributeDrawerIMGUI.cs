@@ -12,8 +12,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
         private static readonly Dictionary<string, Vector2> IdToMinMaxRange = new Dictionary<string, Vector2>();
 
-        private static string GetKey(SerializedProperty property) =>
-            $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+        private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
 
         private string _error = "";
         private string _cacheKey = "";

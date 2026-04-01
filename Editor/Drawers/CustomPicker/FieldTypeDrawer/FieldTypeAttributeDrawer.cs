@@ -55,7 +55,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                     return false;
                 }
 
+#if UNITY_6000_4_OR_NEWER
+                EntityId targetInstanceId = target.GetEntityId();
+#else
                 int targetInstanceId = target.GetInstanceID();
+#endif
                 if (itemInfo.InstanceID == targetInstanceId)
                 {
                     return true;
@@ -80,7 +84,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                 }
 
                 // Debug.Log($"{itemObject} ?= {target} => {itemToOriginTypeValue.GetInstanceID() == targetInstanceId}");
+#if UNITY_6000_4_OR_NEWER
+                return itemToOriginTypeValue.GetEntityId() == targetInstanceId;
+#else
                 return itemToOriginTypeValue.GetInstanceID() == targetInstanceId;
+#endif
             }
 
             protected override void OnSelect(ItemInfo itemInfo)

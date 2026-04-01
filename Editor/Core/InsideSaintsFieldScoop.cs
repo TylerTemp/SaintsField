@@ -10,12 +10,24 @@ namespace SaintsField.Editor.Core
     {
         public readonly struct PropertyKey : IEquatable<PropertyKey>
         {
+#if UNITY_6000_4_OR_NEWER
+            public readonly ulong ObjectHash;
+#else
             public readonly int ObjectHash;
+#endif
             public readonly string PropertyPath;
 
+#if UNITY_6000_4_OR_NEWER
+            public PropertyKey(EntityId entityId, string propertyPath)
+#else
             public PropertyKey(int objectHash, string propertyPath)
+#endif
             {
+#if UNITY_6000_4_OR_NEWER
+                ObjectHash = EntityId.ToULong(entityId);
+#else
                 ObjectHash = objectHash;
+#endif
                 PropertyPath = propertyPath;
             }
 
@@ -43,7 +55,11 @@ namespace SaintsField.Editor.Core
         private readonly PropertyKey _property;
 
         public static PropertyKey MakeKey(SerializedProperty property) => new PropertyKey(
+#if UNITY_6000_4_OR_NEWER
+            property.serializedObject.targetObject.GetEntityId(),
+#else
             property.serializedObject.targetObject.GetInstanceID(),
+#endif
             property.propertyPath
         );
 

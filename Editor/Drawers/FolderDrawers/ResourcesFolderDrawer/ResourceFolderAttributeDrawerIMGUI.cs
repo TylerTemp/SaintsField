@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
     {
         private static Texture2D _folderIcon;
 
-        private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+        private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
 
         private class CacheInfo
         {

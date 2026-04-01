@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace SaintsField.Editor.Drawers.GUIColor
     {
         private static readonly Dictionary<string, Color> _idToOriginalColor = new Dictionary<string, Color>();
 
-        private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+        private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {

@@ -110,7 +110,11 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                                     failedCount = itemInfo.failedCount,
                                     GuiLabel = itemInfo.GuiLabel,
                                     Icon = itemInfo.Icon,
+#if UNITY_6000_4_OR_NEWER
+                                    InstanceID = component.GetEntityId(),
+#else
                                     InstanceID = component.GetInstanceID(),
+#endif
                                     Label = components.Count == 1 ? component.name : $"{component.name} [{index}]",
                                     Object = component,
                                     preview = itemInfo.preview,
