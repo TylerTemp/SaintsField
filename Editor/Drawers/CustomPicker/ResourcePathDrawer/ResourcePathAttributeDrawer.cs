@@ -49,7 +49,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
                 Object itemObject = itemInfo.Object;
                 Debug.Assert(itemObject, itemObject);
 
+#if UNITY_6000_4_OR_NEWER
+                EntityId targetInstanceId = target.GetEntityId();
+#else
                 int targetInstanceId = target.GetInstanceID();
+#endif
                 if (itemInfo.InstanceID == targetInstanceId)
                 {
                     return true;

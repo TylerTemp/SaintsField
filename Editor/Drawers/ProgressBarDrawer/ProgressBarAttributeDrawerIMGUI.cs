@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ExpandableDrawer;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
@@ -29,7 +30,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             FieldInfo info,
             object parent)
         {
-            string arrayKey = $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+            string arrayKey = SerializedUtils.GetUniqueIdArray(property);
             // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
             if (!_inArrayMousePressed.ContainsKey(arrayKey))
             {
