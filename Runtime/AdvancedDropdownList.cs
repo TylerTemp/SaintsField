@@ -102,7 +102,8 @@ namespace SaintsField
 
         }
 
-        private static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
         {
             if (nameQuery.Count == 0)
             {
