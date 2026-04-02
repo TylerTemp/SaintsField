@@ -5,6 +5,7 @@
 1.  Fix: `AdvancedDropdownList.AddByNames` got `InvalidOperationException` [#375](https://github.com/TylerTemp/SaintsField/issues/375)
 2.  Improve: Cache SaintsEditor field order result with corssing domain reload for a bit better performance
 3.  Add: Support [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) information for auto restored assets.
+4.  Change: Move menu from `Window/Saints` to `Tools/SaintsField`
 
 ## 5.12.1 ##
 

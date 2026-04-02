@@ -68,7 +68,7 @@ namespace SaintsField.Editor
                         // ReSharper disable once InvertIf
                         if (backupInfo.assetPath == assetPath)
                         {
-                            content.enabledSelf = false;
+                            content.SetEnabled(false);
                             VisualElement disabler = new VisualElement();
                             HelpBox helpBox =
                                 new HelpBox(
@@ -113,7 +113,7 @@ namespace SaintsField.Editor
                                     }
                                 }
 
-                                content.enabledSelf = true;
+                                content.SetEnabled(true);
                                 if (!found)
                                 {
                                     helpBox.text = "Asset not found in SaintsBuild list";

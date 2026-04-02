@@ -19,9 +19,9 @@ namespace SaintsField.Editor.Utils
     {
         private const string MenuRoot =
 #if SAINTSFIELD_DEBUG
-            "Saints/"
+            "SaintsField/"
 #else
-            "Window/Saints/"
+            "Tools/SaintsField/"
 #endif
         ;
 

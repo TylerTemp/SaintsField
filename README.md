@@ -76,10 +76,10 @@ Unity: 2022.2 or higher
 
 If you have DOTween installed
 *   Please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
-*   Or disable related functions with `Window` - `Saints` - `Disable DOTween Support`
+*   Or disable related functions with `Tools` - `SaintsField` - `Disable DOTween Support`
 *   If you can not find this menu, please read the "Add a Macro" section about how to manually disable DOTween support in SaintsField.
 
-[**Optional**] To use the full functions of this project, please also do: `Window` - `Saints` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
+[**Optional**] To use the full functions of this project, please also do: `Tools` - `SaintsField` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
 
 If you're using `unitypackage` or git submodule, but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
 
@@ -89,7 +89,7 @@ If you're using `unitypackage` or git submodule, but you put this project under 
 
 **Troubleshoot**
 
-After installation, you can use `Window` - `Saints` - `Troubleshoot` to check if some attributes do not work.
+After installation, you can use `Tools` - `SaintsField` - `Troubleshoot` to check if some attributes do not work.
 
 namespace: `SaintsField`
 
@@ -100,6 +100,7 @@ namespace: `SaintsField`
 1.  Fix: `AdvancedDropdownList.AddByNames` got `InvalidOperationException` [#375](https://github.com/TylerTemp/SaintsField/issues/375)
 2.  Improve: Cache SaintsEditor field order result with corssing domain reload for a bit better performance
 3.  Add: Support [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) information for auto restored assets.
+4.  Change: Move menu from `Window/Saints` to `Tools/SaintsField`
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -144,7 +145,7 @@ Parameters:
 
     You can also use Unity Editor's built-in icons. See [UnityEditorIcons](https://github.com/nukadelic/UnityEditorIcons). e.g. `<icon=d_AudioListener Icon/>`
 
-    for `color`, you can use `Window` - `Saints` - `EColor Preview` to view all the pre-set colors. It supports:
+    for `color`, you can use `Tools` - `SaintsField` - `EColor Preview` to view all the pre-set colors. It supports:
 
     *   Standard [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) colors:
 
@@ -1529,7 +1530,7 @@ Known issues:
 1.  the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside the rect will make the target non-interactable.
     But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect on top leve, but not on array/list level... so you may see different outcomes on different Unity version.
 
-    If you see unexpected space or overlap between foldout and label, use `Window` - `Saints` - `Create or Edit SaintsField Config` to change the config.
+    If you see unexpected space or overlap between foldout and label, use `Tools` - `SaintsField` - `Create or Edit SaintsField Config` to change the config.
 
 2.  `ReadOnly` (and `DisableIf`, `EnableIf`) can NOT disable the expanded fields. This is because `InspectorElement` does not work with `SetEnable(false)`, neither with `pickingMode=Ignore`. This can not be fixed unless Unity fixes it.
 
@@ -5761,7 +5762,7 @@ public class CustomEventExample : MonoBehaviour
 
 A simple color palette tool to select a color from a list of colors.
 
-Use `Window` - `Saints` - `Color Palette` to manage the color palette.
+Use `Tools` - `SaintsField` - `Color Palette` to manage the color palette.
 
 **Parameters**:
 
@@ -5775,7 +5776,7 @@ Use `Window` - `Saints` - `Color Palette` to manage the color palette.
 
 [![video](https://github.com/user-attachments/assets/7cec6366-e731-4cd1-9d13-a6b0f0f2fa1c)](https://github.com/user-attachments/assets/e5b93ec2-ab77-47d9-9e3b-15f87fd5cecd)
 
-`Window` - `Saints` - `Color Palette`:
+`Tools` - `SaintsField` - `Color Palette`:
 
 [![video](https://github.com/user-attachments/assets/526bb4e9-990b-4d7a-8bba-6293e880ee78)](https://github.com/user-attachments/assets/bb76243f-96cd-4452-b1c7-ae6886d08c25)
 
@@ -6973,7 +6974,7 @@ Component Header allows you to draw extra stuffs on a component like this:
 
 If you have `SaintsEditor` enabled, this works by default.
 
-(If you can not enable `SaintsEditor`, it can work as stand-alone, go `window` - `Saints` - `Enable Stand-Alone Header GUI Support`)
+(If you can not enable `SaintsEditor`, it can work as stand-alone, go `Tools` - `SaintsField` - `Enable Stand-Alone Header GUI Support`)
 
 ### `HeaderButton` / `HeaderLeftButton` ###
 
@@ -8377,7 +8378,7 @@ public Event stopEvents;
 
 ## I2 Localization ##
 
-Tools for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Window` - `Saints` - `Enable I2 Localization Support`
+Tools for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Tools` - `SaintsField` - `Enable I2 Localization Support`
 
 NameSpace: `SaintsField.I2Loc`
 
@@ -9520,7 +9521,7 @@ Pick a way that is most convenient for you:
 
 **Using Saints Menu**
 
-Go to `Window` - `Saints` to enable/disable functions you want
+Go to `Tools` - `SaintsField` to enable/disable functions you want
 
 ![Saints Menu](https://github.com/TylerTemp/SaintsField/assets/6391063/272e72c3-656c-47e4-adc6-75ba62f7f432)
 
@@ -9554,7 +9555,7 @@ Note: `csc.rsp` can override settings by Saints Menu.
 
 ### Auto Validator ###
 
-UI Toolkit: A simple validation tool under `Window` - `Saints` - `Auto Validator`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
+UI Toolkit: A simple validation tool under `Tools` - `SaintsField` - `Auto Validator`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
 
 This tool allows you to check if some target has `Required` but not filled, or an auto getter (e.g. `GetComponentInChildren`) but not filled or mismatched. Auto getters error will give you a button to fix it there. Note the fix function might be broken if the target is inside a prefab.
 
