@@ -6,6 +6,7 @@
 2.  Improve: Cache SaintsEditor field order result with corssing domain reload for a bit better performance
 3.  Add: Support [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) information for auto restored assets.
 4.  Change: Move menu from `Window/Saints` to `Tools/SaintsField`
+5.  Fix: Unity 6.5 API changes by [@nnra6864](https://github.com/nnra6864) in [#374](https://github.com/TylerTemp/SaintsField/pull/374)
 
 ## 5.12.1 ##
 
