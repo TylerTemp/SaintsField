@@ -105,17 +105,17 @@ namespace SaintsField
         // ReSharper disable once MemberCanBePrivate.Global
         public static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
         {
-            if (nameQuery.Count == 0)
+            int curCount = nameQuery.Count;
+            string curName = curCount == 0 ? "": nameQuery.Dequeue();
+            int leftCount = nameQuery.Count;
+            if (leftCount == 0)
             {
-                // container.Add(curName == ""? Separator(): new AdvancedDropdownList<T>(curName, value, disabled, icon)
-                // {
-                //     ExtraSearches = extraSearches ?? new HashSet<string>(),
-                // });
-                container.Add(Separator());
+                container.Add(curName == ""? Separator(): new AdvancedDropdownList<T>(curName, value, disabled, icon)
+                {
+                    ExtraSearches = extraSearches ?? new HashSet<string>(),
+                });
                 return;
             }
-
-            string curName = nameQuery.Dequeue();
 
             IAdvancedDropdownList matchedChild = container.children.FirstOrDefault(each => each.displayName == curName);
             AdvancedDropdownList<T> targetChild;
