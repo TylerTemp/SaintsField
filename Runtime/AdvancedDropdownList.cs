@@ -102,17 +102,20 @@ namespace SaintsField
 
         }
 
-        public static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
+        private static void AddByNames(AdvancedDropdownList<T> container, Queue<string> nameQuery, T value, bool disabled = false, string icon = null, ICollection<string> extraSearches=null)
         {
-            string curName = nameQuery.Dequeue();
             if (nameQuery.Count == 0)
             {
-                container.Add(curName == ""? Separator(): new AdvancedDropdownList<T>(curName, value, disabled, icon)
-                {
-                    ExtraSearches = extraSearches ?? new HashSet<string>(),
-                });
+                // container.Add(curName == ""? Separator(): new AdvancedDropdownList<T>(curName, value, disabled, icon)
+                // {
+                //     ExtraSearches = extraSearches ?? new HashSet<string>(),
+                // });
+                container.Add(Separator());
                 return;
             }
+
+            string curName = nameQuery.Dequeue();
+
             IAdvancedDropdownList matchedChild = container.children.FirstOrDefault(each => each.displayName == curName);
             AdvancedDropdownList<T> targetChild;
             if (matchedChild != null)
