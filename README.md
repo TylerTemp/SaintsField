@@ -95,12 +95,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.12.1**
+**5.12.2**
 
-1.  Fix: context menu in old unity did not show correctly, context menu for SaintsArray/SaintsList did not show
-2.  Fix: new gameobjects being spawned whenever a property is reset [@peterdwdawe](https://github.com/peterdwdawe), [PR#371](https://github.com/TylerTemp/SaintsField/pull/371)
-3.  Add: `ResizableTextArea` support `ShowInInspector` and `Button`
-4.  Fix: reset context menu shows uppercase if a variable name starts with `_`, remove the `k__BackingField` information.
+1.  Fix: `AdvancedDropdownList.AddByNames` got `InvalidOperationException` [#375](https://github.com/TylerTemp/SaintsField/issues/375)
+2.  Improve: Cache SaintsEditor field order result with corssing domain reload for a bit better performance
+3.  Add: Support [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) information for auto restored assets.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -8703,6 +8702,12 @@ public class MyRendererFeature: SaintsScriptableRendererFeature
     // ...
 }
 ```
+
+### SaintsBuild Support ##
+
+If you have [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) support, the auto-restored asset will have a notice with all field disabled. It also allows you to one-click remove the auto-restore function and modify the asset within play mode.
+
+![SaintsBuild Toggle](https://github.com/user-attachments/assets/3a718584-ac0c-4f4e-a5f4-61afa100daac)
 
 ## Extended Serialization ##
 

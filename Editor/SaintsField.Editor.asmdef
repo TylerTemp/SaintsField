@@ -16,7 +16,8 @@
         "SaintsField.Runtime.TypeReference",
         "SaintsField.Runtime.Events",
         "Unity.Collections",
-        "Unity.Serialization"
+        "Unity.Serialization",
+        "SaintsBuild.Editor"
     ],
     "includePlatforms": [
         "Editor"
@@ -84,6 +85,11 @@
             "name": "microsoft.codeanalysis.csharp",
             "expression": "",
             "define": "SAINTSFIELD_CODE_ANALYSIS"
+        },
+        {
+          "name": "today.comes.saintsbuild",
+          "expression": "2.0.0",
+          "define": "SAINTSBUILD"
         }
     ],
     "noEngineReferences": false

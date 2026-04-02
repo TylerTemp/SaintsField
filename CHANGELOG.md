@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.12.2 ##
+
+1.  Fix: `AdvancedDropdownList.AddByNames` got `InvalidOperationException` [#375](https://github.com/TylerTemp/SaintsField/issues/375)
+2.  Improve: Cache SaintsEditor field order result with corssing domain reload for a bit better performance
+3.  Add: Support [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) information for auto restored assets.
+
 ## 5.12.1 ##
 
 1.  Fix: context menu in old unity did not show correctly, context menu for SaintsArray/SaintsList did not show

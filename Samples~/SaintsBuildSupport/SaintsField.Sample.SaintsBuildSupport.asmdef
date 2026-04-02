@@ -1,0 +1,26 @@
+{
+    "name": "SaintsField.Sample.SaintsBuildSupport",
+    "rootNamespace": "SaintsField",
+    "references": [
+        "SaintsField.Runtime",
+        "SaintsBuild.Editor",
+        "SaintsBuild.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSBUILD"
+    ],
+    "versionDefines": [
+        {
+            "name": "today.comes.saintsbuild",
+            "expression": "2.0.0",
+            "define": "SAINTSBUILD"
+        }
+    ],
+    "noEngineReferences": false
+}
