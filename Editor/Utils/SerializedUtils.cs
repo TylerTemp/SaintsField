@@ -25,6 +25,30 @@ namespace SaintsField.Editor.Utils
             return property.FindPropertyRelative(RuntimeUtil.GetAutoPropertyName(propName));
         }
 
+        public static string TrimKBackingField(string oriName)
+        {
+            const string suffix = ">k__BackingField";  // 16 chars
+            const int suffixLength = 16;
+
+            const int minLength = 1 + suffixLength;
+
+            int originalLength = oriName.Length;
+            if (originalLength <= minLength)
+            {
+                return oriName;
+            }
+
+            ReadOnlySpan<char> span = oriName.AsSpan();
+
+            if (span[0] != '<' || !span.EndsWith(suffix))
+            {
+                return oriName;
+            }
+
+            ReadOnlySpan<char> sliced = span.Slice(1, originalLength - minLength);
+            return new string(sliced);
+        }
+
         public static bool IsArrayOrDirectlyInsideArray(SerializedProperty property)
         {
             bool extractFromArrayType = property.propertyType == SerializedPropertyType.Generic && property.isArray;

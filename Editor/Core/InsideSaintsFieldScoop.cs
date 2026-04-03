@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Core
 {
@@ -10,35 +9,44 @@ namespace SaintsField.Editor.Core
     {
         public readonly struct PropertyKey : IEquatable<PropertyKey>
         {
+            private readonly
 #if UNITY_6000_4_OR_NEWER
-            public readonly ulong ObjectHash;
+                ulong
 #else
-            public readonly int ObjectHash;
+                int
 #endif
-            public readonly string PropertyPath;
+                _objectHash;
 
+            private readonly string _propertyPath;
+
+
+            public PropertyKey(
 #if UNITY_6000_4_OR_NEWER
-            public PropertyKey(EntityId entityId, string propertyPath)
+                EntityId entityId,
 #else
-            public PropertyKey(int objectHash, string propertyPath)
+                int objectHash,
 #endif
+                string propertyPath)
             {
+                _objectHash =
 #if UNITY_6000_4_OR_NEWER
-                ObjectHash = EntityId.ToULong(entityId);
+                    EntityId.ToULong(entityId)
 #else
-                ObjectHash = objectHash;
+                    objectHash
 #endif
-                PropertyPath = propertyPath;
+                ;
+
+                _propertyPath = propertyPath;
             }
 
             public override string ToString()
             {
-                return $"{ObjectHash}.{PropertyPath}";
+                return $"{_objectHash}.{_propertyPath}";
             }
 
             public bool Equals(PropertyKey other)
             {
-                return ObjectHash == other.ObjectHash && PropertyPath == other.PropertyPath;
+                return _objectHash == other._objectHash && _propertyPath == other._propertyPath;
             }
 
             public override bool Equals(object obj)
@@ -48,44 +56,49 @@ namespace SaintsField.Editor.Core
 
             public override int GetHashCode()
             {
-                return Util.CombineHashCode(ObjectHash, PropertyPath);
+                return Util.CombineHashCode(_objectHash, _propertyPath);
             }
         }
 
         private readonly PropertyKey _property;
 
         public static PropertyKey MakeKey(SerializedProperty property) => new PropertyKey(
+            property.serializedObject.targetObject.
 #if UNITY_6000_4_OR_NEWER
-            property.serializedObject.targetObject.GetEntityId(),
+                GetEntityId
 #else
-            property.serializedObject.targetObject.GetInstanceID(),
+
+                GetInstanceID
 #endif
+            (),
+
             property.propertyPath
         );
 
-        private readonly Dictionary<InsideSaintsFieldScoop.PropertyKey, int> Counter;
+        private readonly Dictionary<PropertyKey, int> _counter;
 
-        public InsideSaintsFieldScoop(Dictionary<InsideSaintsFieldScoop.PropertyKey, int> counter, PropertyKey key)
+        public InsideSaintsFieldScoop(Dictionary<PropertyKey, int> counter, PropertyKey key)
         {
-            Counter = counter;
+            _counter = counter;
             _property = key;
 
-            if (!Counter.TryGetValue(key, out int count))
+            // ReSharper disable once CanSimplifyDictionaryTryGetValueWithGetValueOrDefault
+            if (!_counter.TryGetValue(key, out int count))
             {
                 count = 0;
             }
 
             // Debug.Log($"subCount {key} {count}+1");
-            Counter[key] = count + 1;
+            _counter[key] = count + 1;
         }
 
         public void Dispose()
         {
             // SaintsPropertyDrawer.IsSubDrawer = false;
-            if (Counter.TryGetValue(_property, out int count))
+            if (_counter.TryGetValue(_property, out int count))
             {
                 // Debug.Log($"subCount {_property} {count}-1");
-                Counter[_property] = count - 1;
+                _counter[_property] = count - 1;
             }
         }
     }

@@ -232,27 +232,38 @@ namespace SaintsField.Editor
         private int GetMemberInfoIndex(MemberInfo x)
         {
             string aId = MemberInfoPreParsedCache.GetMemberInfoEssentialId(x);
-            if (_memberIdToOrderCache != null && _memberIdToOrderCache.TryGetValue(aId, out int aValue))
+            if (_memberIdToOrderCache != null)
             {
 // #if SAINTSFIELD_DEBUG
 //                 Debug.Log($"Use cached field order for {aId}");
 // #endif
-                return aValue;
+                lock(MemberInfoPreParsedCache.instance)
+                {
+                    if (_memberIdToOrderCache.TryGetValue(aId, out int aValue))
+                    {
+                        return aValue;
+                    }
+                }
             }
 
             int aIndex = FindMemberIndex(x, _memberContainers);
-            if (_memberIdToOrderCache == null)
+            lock(MemberInfoPreParsedCache.instance)
             {
-                _memberIdToOrderCache = MemberInfoPreParsedCache.instance.nameToMemberIdToOrder[_nameBase] =
-                    new SaintsDictionary<string, int>
-                    {
-                        {aId, aIndex},
-                    };
+                if (_memberIdToOrderCache == null)
+                {
+                    _memberIdToOrderCache = MemberInfoPreParsedCache.instance.nameToMemberIdToOrder[_nameBase] =
+                        new SaintsDictionary<string, int>
+                        {
+                            { aId, aIndex },
+                        };
+
+                }
+                else
+                {
+                    _memberIdToOrderCache[aId] = aIndex;
+                }
             }
-            else
-            {
-                _memberIdToOrderCache[aId] = aIndex;
-            }
+
 #if SAINTSFIELD_DEBUG
             Debug.Log($"Use new field order for {aId}");
 #endif

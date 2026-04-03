@@ -2546,17 +2546,9 @@ namespace SaintsField.Editor.Utils
                 return;
             }
 
-            string noEscapeName = fieldInfo.Name;
-            const string bfn = ">k__BackingField";
-            if (noEscapeName.EndsWith(bfn))
-            {
-                noEscapeName = noEscapeName[1..^bfn.Length];
-            }
+            string noEscapeName = SerializedUtils.TrimKBackingField(fieldInfo.Name);
 #if UNITY_EDITOR_WIN
-            if (noEscapeName.StartsWith("_"))
-            {
-                noEscapeName = noEscapeName.TrimStart('_');
-            }
+            noEscapeName = noEscapeName.TrimStart('_');
 #endif
             string label = $"Reset {noEscapeName}";
 
