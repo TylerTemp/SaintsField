@@ -137,7 +137,7 @@ namespace SaintsField.Utils
             get
             {
                 string projectRootPath = Directory.GetCurrentDirectory();
-                return $"{projectRootPath.Replace("\\", "/")}/{PreParserRelativeFolder}\n";
+                return $"{projectRootPath.Replace("\\", "/")}/{PreParserRelativeFolder}";
             }
         }
 

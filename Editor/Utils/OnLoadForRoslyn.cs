@@ -95,8 +95,7 @@ namespace SaintsField.Editor.Utils
             if (writeTempContent != null)
             {
                 Debug.Log($"Set generate parse path into {roslynTempFile} with {writeTempContent}");
-                // TODO: undo this!
-                // File.WriteAllText(roslynTempFile, writeTempContent);
+                File.WriteAllText(roslynTempFile, writeTempContent);
             }
 
             if (checkIgnore)
