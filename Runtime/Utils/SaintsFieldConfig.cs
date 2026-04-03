@@ -1,3 +1,4 @@
+using System.IO;
 using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,9 +12,9 @@ namespace SaintsField.Utils
 #if SAINTSFIELD_DEBUG
     [CreateAssetMenu(fileName = "SaintsFieldConfig", menuName = "ScriptableObject/SaintsFieldConfig", order = 20)]
 #endif
-    public class SaintsFieldConfig : ScriptableObject
+    public class SaintsFieldConfig : ScriptableSingleton<SaintsFieldConfig>
     {
-        public const int PreParserVersion = 1;
+        private const int PreParserVersion = 1;
         public static readonly string PreParserRelativeFolder = "Library/SaintsFieldTempV" + PreParserVersion;
 
         public const int UpdateLoopDefaultMs = 100;
@@ -123,6 +124,30 @@ namespace SaintsField.Utils
 
         [LayoutStart("Hidden Configs", ELayout.Collapse)]
         public bool setupWindowPopOnce;
+
+        [LayoutStart("./Code Parser", ELayout.TitleBox)]
+        [AboveText("Custom Code Parser Save Path")]
+        [LayoutStart("./Configs", ELayout.Horizontal)]
+        [FieldLabelText("Override Save")] public bool overrideCodeParserFolder;
+        [ShowIf(nameof(overrideCodeParserFolder)), NoLabel, ResizableTextArea] public string codeParserFolder = "";
+
+        [ShowInInspector, HideIf(nameof(overrideCodeParserFolder)), LabelText(null), ResizableTextArea]
+        public static string CodeParserDefaultFolder
+        {
+            get
+            {
+                string projectRootPath = Directory.GetCurrentDirectory();
+                return $"{projectRootPath.Replace("\\", "/")}/{PreParserRelativeFolder}\n";
+            }
+        }
+
+        [LayoutEnd(".")]
+        [Button]
+        private void ApplyOverridePath()
+        {
+
+        }
+
         public bool GetSetupWindowPopOnce()
         {
 #if SAINTSFIELD_SAINTS_EDITOR_APPLY

@@ -29,46 +29,46 @@ namespace SaintsField.Editor.Utils
 
         #region Config
 
-        [MenuItem(MenuRoot + "Create or Edit SaintsField Config")]
+        [MenuItem(MenuRoot + "Edit SaintsField Config")]
         private static void CreateOrEditSaintsFieldConfig()
         {
-            Selection.activeObject = EnsureCreateSaintsFieldConfig();
+            Selection.activeObject = SaintsFieldConfig.instance;
         }
 
-        public static SaintsFieldConfig EnsureCreateSaintsFieldConfig()
-        {
-            SaintsFieldConfig saintsFieldConfig;
-            if (SaintsFieldConfigUtil.ReloadConfig())
-            {
-                saintsFieldConfig = SaintsFieldConfigUtil.Config;
-            }
-            else
-            {
-                if (!Directory.Exists("Assets/Editor Default Resources"))
-                {
-                    Debug.Log($"Create folder: Assets/Editor Default Resources");
-                    AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
-                }
-
-                if (!Directory.Exists("Assets/Editor Default Resources/SaintsField"))
-                {
-                    Debug.Log($"Create folder: Assets/Editor Default Resources/SaintsField");
-                    AssetDatabase.CreateFolder("Assets/Editor Default Resources", "SaintsField");
-                }
-
-                saintsFieldConfig = ScriptableObject.CreateInstance<SaintsFieldConfig>();
-                Debug.Log(
-                    $"Create saintsFieldConfig: Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
-                AssetDatabase.CreateAsset(saintsFieldConfig,
-                    $"Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
-                AssetDatabase.SaveAssets();
-
-                SaintsFieldConfigUtil.ReloadConfig();
-                saintsFieldConfig = SaintsFieldConfigUtil.Config;
-            }
-
-            return saintsFieldConfig;
-        }
+        // public static SaintsFieldConfig EnsureCreateSaintsFieldConfig()
+        // {
+        //     SaintsFieldConfig saintsFieldConfig;
+        //     if (SaintsFieldConfigUtil.ReloadConfig())
+        //     {
+        //         saintsFieldConfig = SaintsFieldConfigUtil.Config;
+        //     }
+        //     else
+        //     {
+        //         if (!Directory.Exists("Assets/Editor Default Resources"))
+        //         {
+        //             Debug.Log($"Create folder: Assets/Editor Default Resources");
+        //             AssetDatabase.CreateFolder("Assets", "Editor Default Resources");
+        //         }
+        //
+        //         if (!Directory.Exists("Assets/Editor Default Resources/SaintsField"))
+        //         {
+        //             Debug.Log($"Create folder: Assets/Editor Default Resources/SaintsField");
+        //             AssetDatabase.CreateFolder("Assets/Editor Default Resources", "SaintsField");
+        //         }
+        //
+        //         saintsFieldConfig = ScriptableObject.CreateInstance<SaintsFieldConfig>();
+        //         Debug.Log(
+        //             $"Create saintsFieldConfig: Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
+        //         AssetDatabase.CreateAsset(saintsFieldConfig,
+        //             $"Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}");
+        //         AssetDatabase.SaveAssets();
+        //
+        //         SaintsFieldConfigUtil.ReloadConfig();
+        //         saintsFieldConfig = SaintsFieldConfigUtil.Config;
+        //     }
+        //
+        //     return saintsFieldConfig;
+        // }
 
         #endregion
 

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -10,6 +12,11 @@ namespace SaintsField.Editor.Utils
         [InitializeOnLoadMethod]
         private static void OnLoad()
         {
+            if (!File.Exists(SaintsFieldConfigUtil.AssetPath))
+            {
+                return;
+            }
+
             string preParserRelativeFolder = SaintsFieldConfig.PreParserRelativeFolder;
             if (!Directory.Exists(preParserRelativeFolder))
             {
@@ -52,7 +59,22 @@ namespace SaintsField.Editor.Utils
 
             const string roslynTempFileName = "Temp.SaintsFieldSourceParser.additionalfile";
             const string roslynTempFile = saintsFieldFolder + "/" + roslynTempFileName;
-            string writeTempContent = $"path = {projectRootPath.Replace("\\", "/")}/{preParserRelativeFolder}\n";
+            string saveToPath;
+            if (SaintsFieldConfig.instance.overrideCodeParserFolder)
+            {
+                string tempPath = Path.GetTempPath().Replace("\\", "/").TrimEnd('/');
+                saveToPath = StringFormatByName(SaintsFieldConfig.instance.codeParserFolder,
+                    new Dictionary<string, string>
+                    {
+                        { "TEMP", tempPath},
+                        { "PROJECT", projectRootPath },
+                    }).Replace("\\", "/").Trim();
+            }
+            else
+            {
+                saveToPath = SaintsFieldConfig.CodeParserDefaultFolder;
+            }
+            string writeTempContent = $"path = {saveToPath}\n";
             bool checkIgnore = true;
             if (File.Exists(roslynTempFile))
             {
@@ -63,13 +85,18 @@ namespace SaintsField.Editor.Utils
                 {
                     writeTempContent = null;
                 }
+                else
+                {
+                    Debug.Log($"Generate config to {writeTempContent} from {oldContent}");
+                }
                 // Debug.Log($"Init for Temp.SaintsFieldSourceParser.temporaryfile");
             }
 
             if (writeTempContent != null)
             {
-                Debug.Log($"Set generate parse path into {roslynTempFile}");
-                File.WriteAllText(roslynTempFile, writeTempContent);
+                Debug.Log($"Set generate parse path into {roslynTempFile} with {writeTempContent}");
+                // TODO: undo this!
+                // File.WriteAllText(roslynTempFile, writeTempContent);
             }
 
             if (checkIgnore)
@@ -78,6 +105,15 @@ namespace SaintsField.Editor.Utils
                 Debug.Log($"Write ignore file: {ignoreFile}");
                 File.WriteAllText(ignoreFile, $"{roslynTempFileName}\n{roslynTempFileName}.meta\n");
             }
+        }
+
+        private static string StringFormatByName(string template, Dictionary<string, string> values)
+        {
+            // Dictionary<string, string> values = new Dictionary<string, string> { { "Name", "Alice" }, { "Age", "30" } };
+            // string template = "Hello {Name}, you are {Age}.";
+
+            return values.Aggregate(template, (current, value) =>
+                current.Replace("{" + value.Key + "}", value.Value));
         }
     }
 }
