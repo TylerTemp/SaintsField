@@ -43,12 +43,12 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaMaskDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            if (property.propertyType == SerializedPropertyType.String)
+            if (property.propertyType == SerializedPropertyType.Integer)
             {
                 return null;
             }
 
-            return new HelpBox($"Type {property.propertyType} is not int or string.", HelpBoxMessageType.Error)
+            return new HelpBox($"Type {property.propertyType} is not int.", HelpBoxMessageType.Error)
             {
                 style =
                 {
