@@ -95,13 +95,13 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.12.4**
+**5.12.5**
 
-1.  Fix: `AdvancedDropdownList.AddByNames` got `InvalidOperationException` [#375](https://github.com/TylerTemp/SaintsField/issues/375)
-2.  Improve: Cache SaintsEditor field order result with corssing domain reload for a bit better performance
-3.  Add: Support [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) information for auto restored assets.
-4.  Change: Move menu from `Window/Saints` to `Tools/SaintsField`
-5.  Fix: Unity 6.5 API changes by [@nnra6864](https://github.com/nnra6864) in [#374](https://github.com/TylerTemp/SaintsField/pull/374)
+1.  Fix: `SaintsRow` did not work with `OnValueChanged`
+2.  Fix: `SaintsEditor` field order cache didn't get updated when the target script changed
+3.  Fix: `InfoBox` `<field/>` tag not get updated, and did not work with non serialized fields/properties
+4.  Add: You can now set code parser's save folder in `SaintsConfig`, fix [#372](https://github.com/TylerTemp/SaintsField/issues/372)
+5.  Fix: `NavMeshAreaMask` gave an error on integer type [#376](https://github.com/TylerTemp/SaintsField/issues/376)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

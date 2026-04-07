@@ -6,6 +6,7 @@
 2.  Fix: `SaintsEditor` field order cache didn't get updated when the target script changed
 3.  Fix: `InfoBox` `<field/>` tag not get updated, and did not work with non serialized fields/properties
 4.  Add: You can now set code parser's save folder in `SaintsConfig`, fix [#372](https://github.com/TylerTemp/SaintsField/issues/372)
+5.  Fix: `NavMeshAreaMask` gave an error on integer type [#376](https://github.com/TylerTemp/SaintsField/issues/376)
 
 ## 5.12.4 ##
 
