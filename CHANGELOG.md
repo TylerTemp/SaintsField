@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.12.5 ##
+
+1.  Fix: `SaintsRow` did not work with `OnValueChanged`
+2.  Fix: `SaintsEditor` field order cache didn't get updated when the target script changed
+3.  Fix: `InfoBox` `<field/>` tag not get updated, and did not work with non serialized fields/properties
+4.  Add: You can now set code parser's save folder in `SaintsConfig`, fix [#372](https://github.com/TylerTemp/SaintsField/issues/372)
+
 ## 5.12.4 ##
 
 1.  Fix: `AdvancedDropdownList.AddByNames` got `InvalidOperationException` [#375](https://github.com/TylerTemp/SaintsField/issues/375)

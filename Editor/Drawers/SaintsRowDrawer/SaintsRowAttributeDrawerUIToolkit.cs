@@ -167,6 +167,8 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             return ele;
         }
 
+        protected override bool CreateFieldUIToolKitOnChangeManuallyWatch() => true;
+
         // private static Type GetMemberType(MemberInfo member)
         // {
         //     return member.MemberType == MemberTypes.Property

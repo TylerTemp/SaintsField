@@ -440,6 +440,7 @@ namespace SaintsField.Editor.Core
             #endregion
 
             bool fieldIsFallback = fieldAttributeWithIndex.Attribute == null;
+            // Debug.Log($"fieldIsFallback={fieldIsFallback}/{property.propertyPath}");
             bool onChangeManuallyWatch;
 
             if (fieldIsFallback)
@@ -483,7 +484,7 @@ namespace SaintsField.Editor.Core
                 fieldContainer.Add(fieldElement);
                 fieldContainer.userData = fieldAttributeWithIndex;
 
-                onChangeManuallyWatch = false;
+                onChangeManuallyWatch = fieldAttributeWithIndex.Drawer.CreateFieldUIToolKitOnChangeManuallyWatch();
             }
 
             containerElement.Add(fieldContainer);
@@ -974,6 +975,9 @@ namespace SaintsField.Editor.Core
             PropertyField fallbackField = containerElement.Q<PropertyField>(name: UIToolkitFallbackName(property));
             // Debug.Log($"check has fallback {property.propertyPath}: {fallbackField}");
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
+            Debug.Log($"manuallyWatch={manuallyWatch} for {property.propertyPath}");
+#endif
             if (manuallyWatch)
             {
                                 // ReSharper disable once ConvertToConstant.Local
@@ -1306,7 +1310,7 @@ namespace SaintsField.Editor.Core
                 // int propertyIndex = SerializedUtils.PropertyPathIndex(getValueProperty.propertyPath);
                 VisualElement subTracker = tracker.Q<VisualElement>(name: UIToolkitOnChangedTrackerName(subProperty));
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ON_VALUE_CHANGED
-                Debug.Log($"Try add sub track: {subProperty.propertyPath}; real value prop = {getValueProperty.propertyPath}, index={propertyIndex}/{subTracker}");
+                Debug.Log($"Try add sub track: {subProperty.propertyPath}; watchSubProperty = {watchSubProperty.propertyPath}, index={propertyIndex}/{subTracker}");
 #endif
                 if (subTracker != null)
                 {
@@ -1585,6 +1589,8 @@ namespace SaintsField.Editor.Core
         {
             throw new NotImplementedException("Please override this for your Saints Property Drawer!");
         }
+
+        protected virtual bool CreateFieldUIToolKitOnChangeManuallyWatch() => false;
 
         protected virtual VisualElement CreateAboveUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, VisualElement container, FieldInfo info, object parent)
