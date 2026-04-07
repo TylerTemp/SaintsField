@@ -23,7 +23,7 @@ namespace SaintsField.Editor.Utils
         [InitializeOnLoadMethod]
         private static void WatchConfigLoad()
         {
-            if (File.Exists(SaintsFieldConfigUtil.AssetPath))
+            if (File.Exists(SaintsFieldConfigUtil.AssetPath) && EditorUtility.IsPersistent(SaintsFieldConfig.instance))
             {
                 CheckConfigOpen(SaintsFieldConfig.instance);
             }

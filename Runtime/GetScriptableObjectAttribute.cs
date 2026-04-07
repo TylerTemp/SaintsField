@@ -23,8 +23,9 @@ namespace SaintsField
         public GetScriptableObjectAttribute(string pathSuffix=null, string groupBy="")
         {
             PathSuffix = string.IsNullOrEmpty(pathSuffix)? null: pathSuffix + ".asset";
-
+#if UNITY_EDITOR
             ParseOptions(SaintsFieldConfigUtil.GetScriptableObjectExp(DefaultEXP));
+#endif
             ParseXPath(pathSuffix);
             GroupBy = groupBy;
 

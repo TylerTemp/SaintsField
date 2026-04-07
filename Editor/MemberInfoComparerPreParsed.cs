@@ -171,6 +171,7 @@ namespace SaintsField.Editor
                 }
             }
             MemberInfoPreParsedCache.instance.nameToFileInfo[nameBase] = new MemberInfoPreParsedCache.FileInfo(lastWriteTime, memberContainers.ToArray());
+            MemberInfoPreParsedCache.instance.nameToMemberIdToOrder.Remove(nameBase);
 
 #if SAINTSFIELD_DEBUG
             Debug.Log($"Use new preParse for {nameBase}");
@@ -265,7 +266,7 @@ namespace SaintsField.Editor
             }
 
 #if SAINTSFIELD_DEBUG
-            Debug.Log($"Use new field order for {aId}");
+            Debug.Log($"Use new field order for {aId}@{aIndex}");
 #endif
             return aIndex;
         }

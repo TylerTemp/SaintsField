@@ -21,7 +21,9 @@ namespace SaintsField
 
         public GetComponentInParentAttribute(Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
+#if UNITY_EDITOR
             ParseOptions(SaintsFieldConfigUtil.GetComponentInParentExp(DefaultEXP));
+#endif
             ParseArguments(compType, excludeSelf);
             GroupBy = groupBy;
 

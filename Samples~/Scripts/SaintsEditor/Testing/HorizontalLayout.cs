@@ -60,18 +60,19 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [LayoutStart("Horizontal", ELayout.TitleBox | ELayout.Horizontal)]
         [Expandable] public Scriptable so;
         [AnimatorState] public AnimatorStateBase animBase;
-        // [LayoutStart("Tab", ELayout.TitleBox)]
-        // // public string tab;
-        //
-        // // [LayoutStart("./1", ELayout.TitleBox)]
-        // // public string tab1Sub1;
-        // public string tab1Sub2;
-        // [LayoutTerminateHere]
-        // public string tab1Sub3;
-        //
-        // [Button]
-        // public void AFunction() {}
-        // [Button]
-        // public void BFunction() {}
+
+        [LayoutStart("Tab", ELayout.TitleBox)]
+        // public string tab;
+
+        // [LayoutStart("./1", ELayout.TitleBox)]
+        // public string tab1Sub1;
+        public string tab1Sub2;
+        [LayoutTerminateHere]
+        public string tab1Sub3;
+
+        [Button]
+        public void AFunction() {}
+        [Button]
+        public void BFunction() {}
     }
 }

@@ -28,7 +28,9 @@ namespace SaintsField
 
         public FindObjectsByTypeAttribute(EXP exp, Type type = null, bool findObjectsInactive = false, string groupBy = "")
         {
+#if UNITY_EDITOR
             ParseOptions(SaintsFieldConfigUtil.GetComponentInSceneExp(exp));
+#endif
             ParseArguments(type, findObjectsInactive);
             GroupBy = groupBy;
 

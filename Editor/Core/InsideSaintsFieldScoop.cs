@@ -22,7 +22,7 @@ namespace SaintsField.Editor.Core
 
             public PropertyKey(
 #if UNITY_6000_4_OR_NEWER
-                EntityId entityId,
+                UnityEngine.EntityId entityId,
 #else
                 int objectHash,
 #endif
@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Core
             {
                 _objectHash =
 #if UNITY_6000_4_OR_NEWER
-                    EntityId.ToULong(entityId)
+                    UnityEngine.EntityId.ToULong(entityId)
 #else
                     objectHash
 #endif

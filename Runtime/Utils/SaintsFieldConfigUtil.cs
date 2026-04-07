@@ -1,11 +1,11 @@
+#if UNITY_EDITOR
 
-using System;
 using UnityEditor;
 using UnityEngine.Events;
-#if UNITY_EDITOR
+
 using System.IO;
 using UnityEngine;
-#endif
+
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField.Utils
@@ -67,7 +67,9 @@ namespace SaintsField.Utils
         public static EXP GetPrefabWithComponentExp(EXP defaultValue) => SaintsFieldConfig.instance.getPrefabWithComponentExpOverride? SaintsFieldConfig.instance.getPrefabWithComponentExp: defaultValue;
         public static EXP GetScriptableObjectExp(EXP defaultValue) => SaintsFieldConfig.instance.getScriptableObjectExpOverride? SaintsFieldConfig.instance.getScriptableObjectExp: defaultValue;
         public static EXP GetByXPathExp(EXP defaultValue) => SaintsFieldConfig.instance.getByXPathExpOverride? SaintsFieldConfig.instance.getByXPathExp: defaultValue;
+        // ReSharper disable once UnusedParameter.Global
         public static EXP GetComponentByPathExp(EXP defaultValue) => SaintsFieldConfig.instance.getComponentByPathExp;
+        // ReSharper disable once UnusedParameter.Global
         public static EXP FindComponentExp(EXP defaultValue) => SaintsFieldConfig.instance.findComponentExp;
 
         public static int ResizableTextAreaMinRow() => SaintsFieldConfig.instance.resizableTextAreaMinRowOverride? SaintsFieldConfig.instance.resizableTextAreaMinRow: SaintsFieldConfig.ResizableTextAreaMinRowDefault;
@@ -93,3 +95,4 @@ namespace SaintsField.Utils
         }
     }
 }
+#endif

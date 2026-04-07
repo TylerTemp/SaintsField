@@ -21,7 +21,9 @@ namespace SaintsField
 
         public GetPrefabWithComponentAttribute(Type compType = null, string groupBy = "")
         {
+#if UNITY_EDITOR
             ParseOptions(SaintsFieldConfigUtil.GetPrefabWithComponentExp(DefaultEXP));
+#endif
             ParseXPath(compType);
             GroupBy = groupBy;
 

@@ -4,6 +4,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
@@ -63,7 +64,11 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 
             UpdateInfoBox(helpBox, provider);
 
-            return (helpBox, !string.IsNullOrEmpty(infoBoxAttribute.ShowCallback) || infoBoxAttribute.IsCallback);
+            bool needUpdate = !string.IsNullOrEmpty(infoBoxAttribute.ShowCallback)  // need callback to control the visibility
+                              || infoBoxAttribute.IsCallback  // dynamic content
+                              || (!string.IsNullOrEmpty(infoBoxAttribute.Content) && infoBoxAttribute.Content.Contains("<field"))  // contains <field/>
+                              ;
+            return (helpBox, needUpdate);
         }
 
         private static void UpdateInfoBox(HelpBox helpBox, IRichTextTagProvider provider)
@@ -155,7 +160,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             }
 
             // Debug.Log($"{infoBoxUserData.XmlContent} == {xmlContent}: {infoBoxUserData.XmlContent == xmlContent}");
-            if (infoBoxUserData.XmlContent == xmlContent)
+            if (infoBoxUserData.XmlContent == xmlContent && !xmlContent.Contains("<field"))
             {
                 return;
             }
@@ -180,18 +185,15 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             label.text = "";
             label.style.flexDirection = FlexDirection.Row;
 
-            string useLabel;
-            MemberInfo member;
-            if (infoBoxUserData.FieldWithInfo.RenderType == SaintsRenderType.ClassStruct)
-            {
-                member = null;
-                useLabel = ObjectNames.NicifyVariableName(infoBoxUserData.FieldWithInfo.Targets[0].GetType().Name);
-            }
-            else
-            {
-                member = GetMemberInfo(infoBoxUserData.FieldWithInfo);
-                useLabel = ObjectNames.NicifyVariableName(member.Name);
-            }
+            // if (infoBoxUserData.FieldWithInfo.RenderType == SaintsRenderType.ClassStruct)
+            // {
+            //     ObjectNames.NicifyVariableName(infoBoxUserData.FieldWithInfo.Targets[0].GetType().Name);
+            // }
+            // else
+            // {
+            //     MemberInfo member = GetMemberInfo(infoBoxUserData.FieldWithInfo);
+            //     ObjectNames.NicifyVariableName(member.Name);
+            // }
 
             label.Clear();
             foreach (VisualElement richTextElement in infoBoxUserData.RichTextDrawer.DrawChunksUIToolKit(

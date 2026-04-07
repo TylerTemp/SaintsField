@@ -24,7 +24,9 @@ namespace SaintsField
 
         public GetComponentInParentsAttribute(bool includeInactive = false, Type compType = null, bool excludeSelf = false, string groupBy = "")
         {
+#if UNITY_EDITOR
             ParseOptions(SaintsFieldConfigUtil.GetComponentInParentsExp(DefaultEXP));
+#endif
             ParseArguments(includeInactive, compType, excludeSelf);
             GroupBy = groupBy;
 

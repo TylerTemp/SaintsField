@@ -12,12 +12,19 @@ namespace SaintsField
     {
         public readonly string[] Paths;
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public FindComponentAttribute(EXP config, string path, params string[] paths): base(config, paths.Prepend(path).ToArray())
         {
             Paths = new[]{path}.Concat(paths).ToArray();
         }
 
-        public FindComponentAttribute(string path, params string[] paths): this(SaintsFieldConfigUtil.FindComponentExp(EXP.NoPicker | EXP.NoAutoResignToNull), path, paths)
+        public FindComponentAttribute(string path, params string[] paths): this(
+#if UNITY_EDITOR
+            SaintsFieldConfigUtil.FindComponentExp(EXP.NoPicker | EXP.NoAutoResignToNull)
+#else
+            EXP.NoPicker | EXP.NoAutoResignToNull
+#endif
+            , path, paths)
         {
             Paths = new[]{path}.Concat(paths).ToArray();
         }

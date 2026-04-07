@@ -443,8 +443,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 FieldWithInfo.SerializedProperty,
                                 FieldWithInfo.FieldInfo, result.value, null);
 
-                            // hasError = getOfValue.error != "";
-                            // error = getOfValue.error;
                             result = (getOfValue.error, result.index, getOfValue.result);
                         }
                     }
@@ -461,8 +459,84 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     return RichTextDrawer.TagStringFormatter(result.value, tagValue);
                 }
                 case SaintsRenderType.NonSerializedField:
-                case SaintsRenderType.Method:
+                {
+                    FieldInfo memberInfo = FieldWithInfo.FieldInfo;
+                    object value;
+                    try
+                    {
+                        value = memberInfo.GetValue(FieldWithInfo.Targets[0]);
+                    }
+                    catch (Exception e)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(e);
+#endif
+                        return "";
+                    }
+
+                    if (tagName == "field")
+                    {
+                    }
+                    else
+                    {
+                        string revName = tagName["field.".Length..];
+
+                        (string error, object result) getOfValue = Util.GetOf<object>(revName, null,
+                            null,
+                            memberInfo, value, null);
+                        if (!string.IsNullOrEmpty(getOfValue.error))
+                        {
+#if SAINTSFIELD_DEBUG
+                            Debug.LogWarning(getOfValue.error);
+#endif
+                            return "";
+                        }
+
+                        value = getOfValue.result;
+                    }
+
+                    return RichTextDrawer.TagStringFormatter(value, tagValue);
+                }
                 case SaintsRenderType.NativeProperty:
+                {
+                    PropertyInfo memberInfo = FieldWithInfo.PropertyInfo;
+                    object value;
+                    try
+                    {
+                        value = memberInfo.GetValue(FieldWithInfo.Targets[0]);
+                    }
+                    catch (Exception e)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(e);
+#endif
+                        return "";
+                    }
+
+                    if (tagName == "field")
+                    {
+                    }
+                    else
+                    {
+                        string revName = tagName["field.".Length..];
+
+                        (string error, object result) getOfValue = Util.GetOf<object>(revName, null,
+                            null,
+                            memberInfo, value, null);
+                        if (!string.IsNullOrEmpty(getOfValue.error))
+                        {
+#if SAINTSFIELD_DEBUG
+                            Debug.LogWarning(getOfValue.error);
+#endif
+                            return "";
+                        }
+
+                        value = getOfValue.result;
+                    }
+
+                    return RichTextDrawer.TagStringFormatter(value, tagValue);
+                }
+                case SaintsRenderType.Method:
                 case SaintsRenderType.ClassStruct:
                 case SaintsRenderType.Other:
                     return "";

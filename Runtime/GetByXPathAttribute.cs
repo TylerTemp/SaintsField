@@ -117,7 +117,14 @@ namespace SaintsField
             XPathInfoAndList = new[] { xPathInfoOrList };
         }
 
-        public GetByXPathAttribute(params string[] ePaths) : this(SaintsFieldConfigUtil.GetByXPathExp(DefaultEXP), ePaths)
+        public GetByXPathAttribute(params string[] ePaths) : this(
+#if UNITY_EDITOR
+
+            SaintsFieldConfigUtil.GetByXPathExp(DefaultEXP)
+#else
+            EXP.None
+#endif
+            , ePaths)
         {
         }
 

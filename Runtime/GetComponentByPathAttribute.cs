@@ -77,8 +77,9 @@ namespace SaintsField
                     return result;
                 })
                 .ToArray();
-
+#if UNITY_EDITOR
             ParseOptions(SaintsFieldConfigUtil.GetComponentByPathExp(EXP.NoAutoResignToValue | EXP.NoAutoResignToNull | EXP.NoPicker));
+#endif
             ParseXPaths(paths.Prepend(path).Select(TranslatePath).ToArray());
         }
 

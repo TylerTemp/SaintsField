@@ -1,10 +1,12 @@
+#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SaintsField.Playa;
 using UnityEngine;
-using UnityEngine.Events;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
+
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField.Utils
@@ -12,8 +14,15 @@ namespace SaintsField.Utils
 #if SAINTSFIELD_DEBUG
     [CreateAssetMenu(fileName = "SaintsFieldConfig", menuName = "ScriptableObject/SaintsFieldConfig", order = 20)]
 #endif
+    [FilePath("Assets/Editor Default Resources/SaintsField/SaintsFieldConfig.asset", FilePathAttribute.Location.ProjectFolder)]
     public class SaintsFieldConfig : ScriptableSingleton<SaintsFieldConfig>
     {
+        private void OnEnable()
+        {
+            hideFlags &= ~HideFlags.NotEditable;
+            _codeParserFolderResult = null;
+        }
+
         private const int PreParserVersion = 1;
         public static readonly string PreParserRelativeFolder = "Library/SaintsFieldTempV" + PreParserVersion;
 
@@ -115,6 +124,7 @@ namespace SaintsField.Utils
         [FieldInfoBox("Deprecated", EMessageType.Warning)]
         [FieldInfoBox("IMGUI: Space for foldout. If you see overlap in expandable, set this value to 13, otherwise 0")]
         [MinValue(0)] public int foldoutSpaceImGui = FoldoutSpaceImGuiDefault;
+        // ReSharper disable once MemberCanBePrivate.Global
         public const int FoldoutSpaceImGuiDefault = 13;
 
         [FieldInfoBox("Deprecated", EMessageType.Warning)]
@@ -126,10 +136,20 @@ namespace SaintsField.Utils
         public bool setupWindowPopOnce;
 
         [LayoutStart("./Code Parser", ELayout.TitleBox)]
-        [AboveText("Custom Code Parser Save Path")]
+        [AboveText("Custom Code Parser Save Path, variables:\n"
+                   + "- {TEMP}: Temp Folder Path\n"
+                   + "- {PROJECT}: Project Root Path\n"
+                   + "- {PROJECT_DIR_NAME}: Project Directory Name\n"
+                   + "- {PRODUCT_NAME}: Application.productName"
+        )]
+
+        [InfoBox("Parser result will be saved in: <field />", show: nameof(_codeParserFolderResult))]
+        private string _codeParserFolderResult;
+
         [LayoutStart("./Configs", ELayout.Horizontal)]
         [FieldLabelText("Override Save")] public bool overrideCodeParserFolder;
-        [ShowIf(nameof(overrideCodeParserFolder)), NoLabel, ResizableTextArea] public string codeParserFolder = "";
+        [ShowIf(nameof(overrideCodeParserFolder)), NoLabel, ResizableTextArea, Required, FieldInfoBox("$" + nameof(GetCustomSavePath), EMessageType.None), BelowButton(nameof(UpdateRoslyn))]
+        public string codeParserFolder = "";
 
         [ShowInInspector, HideIf(nameof(overrideCodeParserFolder)), LabelText(null), ResizableTextArea]
         public static string CodeParserDefaultFolder
@@ -141,13 +161,49 @@ namespace SaintsField.Utils
             }
         }
 
-        [LayoutEnd(".")]
-        [Button]
-        private void ApplyOverridePath()
+        private void UpdateRoslyn()
         {
+            (string error, string result) = RoslynUtil.CheckChange(this);
 
+            if (string.IsNullOrEmpty(error))
+            {
+                Debug.Log($"Set parsed folder to {result}");
+                _codeParserFolderResult = result;
+            }
+            else
+            {
+                _codeParserFolderResult = null;
+                Debug.LogError(error);
+                throw new Exception(error);
+            }
         }
 
+        public static string GetCustomSavePath(string parserFolder)
+        {
+            string projectRootPath = Directory.GetCurrentDirectory();
+            string tempPath = Path.GetTempPath().Replace("\\", "/").TrimEnd('/');
+            string projectDirName = Path.GetFileName(projectRootPath);
+            // Debug.Log(parserFolder);
+            return StringFormatByName(parserFolder,
+                new Dictionary<string, string>
+                {
+                    { "TEMP", tempPath},
+                    { "PROJECT", projectRootPath },
+                    { "PROJECT_DIR_NAME", projectDirName },
+                    { "PRODUCT_NAME", Application.productName },
+                }).Replace("\\", "/").Trim();
+        }
+
+        private static string StringFormatByName(string template, Dictionary<string, string> values)
+        {
+            // Dictionary<string, string> values = new Dictionary<string, string> { { "Name", "Alice" }, { "Age", "30" } };
+            // string template = "Hello {Name}, you are {Age}.";
+
+            return values.Aggregate(template, (current, value) =>
+                current.Replace("{" + value.Key + "}", value.Value));
+        }
+
+        // ReSharper disable once MemberCanBeMadeStatic.Global
         public bool GetSetupWindowPopOnce()
         {
 #if SAINTSFIELD_SAINTS_EDITOR_APPLY
@@ -171,3 +227,4 @@ namespace SaintsField.Utils
 // #endif
     }
 }
+#endif
