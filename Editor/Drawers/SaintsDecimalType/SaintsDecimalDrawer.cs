@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -24,7 +26,9 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
         {
             SaintsDecimalField field = new SaintsDecimalField(GetPreferredLabel(property));
             field.DecimalTextField.AddToClassList(DecimalTextField.alignedFieldUssClassName);
-            return field;
+            EmptyPrefabOverrideElement emptyPrefabOverrideElement = new EmptyPrefabOverrideElement(property);
+            emptyPrefabOverrideElement.Add(field);
+            return emptyPrefabOverrideElement;
             // SaintsDecimalElement element = new SaintsDecimalElement();
             // SaintsDecimalField field = new SaintsDecimalField(GetPreferredLabel(property), element);
             // field.AddToClassList(SaintsDecimalField.alignedFieldUssClassName);
@@ -57,6 +61,25 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
                     cacheField!.SetValue(thisData, true);
                 }
             });
+
+            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => {});
+
+            field.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                evt.menu.AppendAction($"Copy \"{field.value}\"", _ =>
+                {
+                    EditorGUIUtility.systemCopyBuffer = $"{field.value}";
+                });
+
+                string clipboardText = EditorGUIUtility.systemCopyBuffer;
+                if (decimal.TryParse(clipboardText, out decimal value))
+                {
+                    evt.menu.AppendAction($"Paste \"{clipboardText}\"", _ =>
+                    {
+                        field.value = value;
+                    });
+                }
+            }));
         }
     }
 }
