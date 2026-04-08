@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,11 +11,7 @@ namespace SaintsField.Editor.AutoRunner
 {
     public class AutoRunnerMenu: SaintsEditorWindow
     {
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Auto Validator...")]
-#else
-        [MenuItem("Window/Saints/Validator...")]
-#endif
+        [MenuItem(RuntimeUtil.MenuRoot + "Auto Validator...")]
         public static void OpenWindow()
         {
             EditorWindow window = GetWindow<AutoRunnerMenu>(false, "SaintsField Auto Runner");

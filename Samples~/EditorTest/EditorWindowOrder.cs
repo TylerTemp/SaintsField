@@ -2,6 +2,7 @@
 using System.Collections;
 using SaintsField.Editor;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 
 namespace SaintsField.Samples.EditorTest
@@ -17,7 +18,7 @@ namespace SaintsField.Samples.EditorTest
         private int _maxCount = 100;
 
 #if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/EditorWindowOrder")]
+        [MenuItem(RuntimeUtil.MenuRoot + "EditorWindowOrder")]
 #endif
         public static void ShowWindow()
         {

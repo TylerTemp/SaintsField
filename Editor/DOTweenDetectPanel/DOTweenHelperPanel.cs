@@ -15,7 +15,6 @@ namespace SaintsField.Editor.DOTweenDetectPanel
         private static DOTweenHelperPanel _doTweenHelperPanel;
 
         [InitializeOnLoadMethod]
-        // [MenuItem("Window/Saints/Help Panel")]
         public static void ShowHelpPanel()
         {
             if (DoTweenAllGood())

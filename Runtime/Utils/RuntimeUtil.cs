@@ -13,6 +13,15 @@ namespace SaintsField.Utils
 {
     public static class RuntimeUtil
     {
+        public const string MenuRoot =
+#if SAINTSFIELD_DEBUG
+                "SaintsField/"
+#else
+                "Tools/SaintsField/"
+#endif
+            ;
+
+
         public static (string content, bool isCallback) ParseCallback(string content, bool isCallback=false)
         {
             if (isCallback || content is null)

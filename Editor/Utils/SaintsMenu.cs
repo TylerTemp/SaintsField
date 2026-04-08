@@ -17,19 +17,9 @@ namespace SaintsField.Editor.Utils
 {
     public static class SaintsMenu
     {
-        private const string MenuRoot =
-#if SAINTSFIELD_DEBUG
-            "SaintsField/"
-#else
-            "Tools/SaintsField/"
-#endif
-        ;
-
-
-
         #region Config
 
-        [MenuItem(MenuRoot + "Edit SaintsField Config")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Edit SaintsField Config")]
         private static void CreateOrEditSaintsFieldConfig()
         {
             Selection.activeObject = SaintsFieldConfig.instance;
@@ -75,20 +65,20 @@ namespace SaintsField.Editor.Utils
 
         #region UI Toolkit
 // #if SAINTSFIELD_UI_TOOLKIT_DISABLE
-//         [MenuItem("Window/Saints/Enable UI Toolkit Support")]
+//         [MenuItem(RuntimeUtil.MenuRoot + "Enable UI Toolkit Support")]
 //         public static void UIToolkit() => RemoveCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
 // #else
-//         [MenuItem("Window/Saints/Disable UI Toolkit Support")]
+//         [MenuItem(RuntimeUtil.MenuRoot + "Disable UI Toolkit Support")]
 //         public static void UIToolkit() => AddCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
 // #endif
 
         #region IMGUI decorators
 
 #if SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
-        [MenuItem("Window/Saints/Disable IMGUI duplicated decorator fix")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Disable IMGUI duplicated decorator fix")]
         public static void ImGuiDuplicateDecoratorFix() => RemoveCompileDefine("SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX");
 #else
-        [MenuItem("Window/Saints/Enable IMGUI duplicated decorator fix")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Enable IMGUI duplicated decorator fix")]
         public static void ImGuiDuplicateDecoratorFix() => AddCompileDefine("SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX");
 #endif
 
@@ -96,10 +86,10 @@ namespace SaintsField.Editor.Utils
 //         #region Label Fix (UI Toolkit)
 // #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 // #if !SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE
-//         [MenuItem("Window/Saints/Disable UI Toolkit Label Fix")]
+//         [MenuItem(RuntimeUtil.MenuRoot + "Disable UI Toolkit Label Fix")]
 //         public static void UIToolkitLabelFix() => AddCompileDefine("SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE");
 // #else
-//         [MenuItem("Window/Saints/Enable UI Toolkit Label Fix")]
+//         [MenuItem(RuntimeUtil.MenuRoot + "Enable UI Toolkit Label Fix")]
 //         public static void UIToolkitLabelFix() => RemoveCompileDefine("SAINTSFIELD_UI_TOOLKIT_LABEL_FIX_DISABLE");
 // #endif
 // #endif
@@ -126,7 +116,7 @@ namespace SaintsField.Editor.Utils
 // #endif
 //         #endregion
 // #else
-        [MenuItem(MenuRoot + "SaintsEditor...")]
+        [MenuItem(RuntimeUtil.MenuRoot + "SaintsEditor...")]
         public static void ApplySaintsEditor()
         {
             SaintsFieldSetupWindow.Open();
@@ -141,17 +131,17 @@ namespace SaintsField.Editor.Utils
 #if DOTWEEN
 
 #if SAINTSFIELD_DOTWEEN_DISABLED
-        [MenuItem("Window/Saints/Enable DOTween Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Enable DOTween Support")]
         public static void DOTween() => RemoveCompileDefine("SAINTSFIELD_DOTWEEN_DISABLED");
 #else
-        [MenuItem("Window/Saints/Disable DOTween Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Disable DOTween Support")]
         public static void DOTween() => AddCompileDefine("SAINTSFIELD_DOTWEEN_DISABLED");
 #endif  // SAINTSFIELD_DOTWEEN_DISABLED
 
 #else
-        [MenuItem("Window/Saints/DOTween Not Installed")]
+        [MenuItem(RuntimeUtil.MenuRoot + "DOTween Not Installed")]
         public static void DOTweenNotInstalled() { }
-        [MenuItem("Window/Saints/DOTween Not Installed", true)]
+        [MenuItem(RuntimeUtil.MenuRoot + "DOTween Not Installed", true)]
         public static bool DOTweenNotInstalledEnabled() => false;
 #endif  // DOTWEEN
 
@@ -161,19 +151,19 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_ADDRESSABLE
 
 #if !SAINTSFIELD_ADDRESSABLE_DISABLE
-        [MenuItem("Window/Saints/Disable Addressable Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Disable Addressable Support")]
         public static void Addressable() => AddCompileDefine("SAINTSFIELD_ADDRESSABLE_DISABLE");
 #endif
 
 #if SAINTSFIELD_ADDRESSABLE_DISABLE
-        [MenuItem("Window/Saints/Enable Addressable Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Enable Addressable Support")]
         public static void Addressable() => RemoveCompileDefine("SAINTSFIELD_ADDRESSABLE_DISABLE");
 #endif
 
 #else
-        [MenuItem("Window/Saints/Addressable Not Installed")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Addressable Not Installed")]
         public static void AddressableNotInstalled() { }
-        [MenuItem("Window/Saints/Addressable Not Installed", true)]
+        [MenuItem(RuntimeUtil.MenuRoot + "Addressable Not Installed", true)]
         public static bool AddressableNotInstalledEnabled() => false;
 #endif
         #endregion
@@ -184,19 +174,19 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_AI_NAVIGATION
 
 #if !SAINTSFIELD_AI_NAVIGATION_DISABLED
-        [MenuItem("Window/Saints/Disable AI Navigation Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Disable AI Navigation Support")]
         public static void AiNavigation() => AddCompileDefine("SAINTSFIELD_AI_NAVIGATION_DISABLED");
 #endif  // !SAINTSFIELD_AI_NAVIGATION_DISABLED
 
 #if SAINTSFIELD_AI_NAVIGATION_DISABLED
-        [MenuItem("Window/Saints/Enable AI Navigation Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Enable AI Navigation Support")]
         public static void AiNavigation() => RemoveCompileDefine("SAINTSFIELD_AI_NAVIGATION_DISABLED");
 #endif  // SAINTSFIELD_AI_NAVIGATION_DISABLED
 
 #else   // SAINTSFIELD_AI_NAVIGATION
-        [MenuItem("Window/Saints/AI Navigation Not Installed")]
+        [MenuItem(RuntimeUtil.MenuRoot + "AI Navigation Not Installed")]
         public static void AiNavigationNotInstalled() { }
-        [MenuItem("Window/Saints/AI Navigation Not Installed", true)]
+        [MenuItem(RuntimeUtil.MenuRoot + "AI Navigation Not Installed", true)]
         public static bool AiNavigationNotInstalledEnabled() => false;
 #endif  // SAINTSFIELD_AI_NAVIGATION
 
@@ -205,10 +195,10 @@ namespace SaintsField.Editor.Utils
         #region I2Loc
 
 #if SAINTSFIELD_I2_LOC
-        [MenuItem("Window/Saints/Disable I2 Localization Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Disable I2 Localization Support")]
         public static void I2Localization() => RemoveCompileDefine("SAINTSFIELD_I2_LOC");
 #else
-        [MenuItem("Window/Saints/Enable I2 Localization Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Enable I2 Localization Support")]
         public static void I2Localization() => I2SetupWindow.OpenWindow();
 #endif
 
@@ -217,10 +207,10 @@ namespace SaintsField.Editor.Utils
         #region Header GUI
 
 #if SAINTSFIELD_HEADER_GUI
-        [MenuItem("Window/Saints/Disable Stand-Alone Header GUI Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Disable Stand-Alone Header GUI Support")]
         public static void HeaderGUI() => RemoveCompileDefine("SAINTSFIELD_HEADER_GUI");
 #else
-        [MenuItem("Window/Saints/Enable Stand-Alone Header GUI Support")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Enable Stand-Alone Header GUI Support")]
         public static void HeaderGUI() => AddCompileDefine("SAINTSFIELD_HEADER_GUI");
 #endif
 
@@ -229,11 +219,7 @@ namespace SaintsField.Editor.Utils
 
         #region Color Palette
 
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Color Palette...")]
-#else
-        [MenuItem("Window/Saints/Color Palette...")]
-#endif
+        [MenuItem(RuntimeUtil.MenuRoot + "Color Palette...")]
         public static void ColorPaletteMenu()
         {
             string[] guids = AssetDatabase.FindAssets("t:" + typeof(ColorPaletteArray).FullName);
@@ -319,14 +305,14 @@ namespace SaintsField.Editor.Utils
         // #endregion
 
 #if SAINTSFIELD_DEBUG
-        [MenuItem(MenuRoot + "IMGUI Debugger" )]
+        [MenuItem(RuntimeUtil.MenuRoot + "IMGUI Debugger" )]
         public static void OpenIMGUIDebugger()
         {
             EditorWindow.GetWindow(Type.GetType("UnityEditor.GUIViewDebuggerWindow,UnityEditor")).Show();
         }
 #endif
 
-        [MenuItem(MenuRoot + "EColor Preview")]
+        [MenuItem(RuntimeUtil.MenuRoot + "EColor Preview")]
         public static void OpenEColorPreview()
         {
             EColorPreviewWindow.Open();

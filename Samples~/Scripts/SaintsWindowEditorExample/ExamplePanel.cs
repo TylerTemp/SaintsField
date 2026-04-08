@@ -2,6 +2,7 @@
 using System.Collections;
 using SaintsField.Editor;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,11 +11,7 @@ namespace SaintsField.Samples.Scripts.SaintsWindowEditorExample
     public class ExamplePanel: SaintsEditorWindow
     {
 
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Example/SaintsEditor")]
-#else
-        [MenuItem("Window/Saints/Example/SaintsEditor")]
-#endif
+        [MenuItem(RuntimeUtil.MenuRoot + "Example/SaintsEditor")]
         public static void TestOpenWindow()
         {
             EditorWindow window = GetWindow<ExamplePanel>(false, "My Panel");

@@ -8,6 +8,7 @@ using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -18,11 +19,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 {
     public class TroubleshootEditorWindow: SaintsEditorWindow
     {
-#if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/Troubleshoot")]
-#else
-        [MenuItem("Window/Saints/Troubleshoot")]
-#endif
+        [MenuItem(RuntimeUtil.MenuRoot + "Troubleshoot")]
         public static void TestOpenWindow()
         {
             EditorWindow window = GetWindow<TroubleshootEditorWindow>(false, "SaintsField Troubleshoot");

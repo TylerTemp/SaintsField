@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Utils
     public class SaintsFieldSetupWindow: SaintsEditorWindow
     {
 #if SAINTSFIELD_DEBUG
-        [MenuItem("Saints/SaintsField Setup")]
+        [MenuItem(RuntimeUtil.MenuRoot + "/SaintsField Setup")]
 #endif
         public static void Open()
         {
