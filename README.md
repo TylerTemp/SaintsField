@@ -95,13 +95,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.12.5**
+**5.13.0**
 
-1.  Fix: `SaintsRow` did not work with `OnValueChanged`
-2.  Fix: `SaintsEditor` field order cache didn't get updated when the target script changed
-3.  Fix: `InfoBox` `<field/>` tag not get updated, and did not work with non serialized fields/properties
-4.  Add: You can now set code parser's save folder in `SaintsConfig`, fix [#372](https://github.com/TylerTemp/SaintsField/issues/372)
-5.  Fix: `NavMeshAreaMask` gave an error on integer type [#376](https://github.com/TylerTemp/SaintsField/issues/376)
+1.  Fix: Code parser custom path was not used by field comparer.
+2.  Add: `SaintsDecimal` type for `decimal` serialization.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
