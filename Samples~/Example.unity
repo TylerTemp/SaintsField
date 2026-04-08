@@ -5556,6 +5556,55 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 141663151621510311, guid: 777d4bb73446cf4419ae56a8aa47d64a, type: 3}
   prefabOnlyUnderEntity: {fileID: 0}
+--- !u!1 &537131353
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 537131355}
+  - component: {fileID: 537131354}
+  m_Layer: 0
+  m_Name: SaintsDecimal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &537131354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 537131353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79939b5548c80ac419914f7ec86e8a9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsDecimalExample.SaintsDecimalField
+  saintsDecimal:
+    flags: 0
+    hi: 0
+    lo: 1
+    mid: 0
+--- !u!4 &537131355
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 537131353}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &539722464
 GameObject:
   m_ObjectHideFlags: 0
@@ -7308,155 +7357,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0f6c4f4f3e5df546be82f6f39117cbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Downpour
-  sa:
-    _saintsList:
-    - value:
-      - e1321
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
+  saNest1:
+    _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
-  saOutArr:
-  - _saintsList:
-    - value: 
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _saintsSerializedVersion: 0
-    _wrapType: 4
-  saOutArrLabelDirect:
-  - _saintsList:
-    - value: 
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _saintsSerializedVersion: 0
-    _wrapType: 4
-  refHashSet:
-    _saintsList:
-    - valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    - valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 1637141728839897546, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    _saintsSerializedVersion: 2
-    _wrapType: 1
-  injectDict:
-    _saintsKeys:
-    - value: {fileID: 380193379}
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _wrapTypeKey: 4
-    _saintsValues:
-    - value: {fileID: 1792998046}
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _wrapTypeValue: 4
-    saintsSerializedVersion: 2
-    _keys: []
-    _values: []
-  refInterfaceDict:
-    _saintsKeys:
-    - valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    _wrapTypeKey: 1
-    _saintsValues:
-    - valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 1
-    _wrapTypeValue: 1
-    saintsSerializedVersion: 2
   references:
     version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    RefIds: []
 --- !u!1 &669193995
 GameObject:
   m_ObjectHideFlags: 0
@@ -26108,6 +26015,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -35329,7 +35237,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SceneReferenceExample
   sceneRef:
     guid: 1326ba3bbd4558245a4850948bd03f1a
-    index: 1
+    index: 2
     path: Packages/today.comes.saintsfield/Samples/Example
 --- !u!4 &2002997102 stripped
 Transform:
@@ -37113,7 +37021,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2134144047}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
@@ -37165,7 +37073,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
@@ -40600,3 +40508,4 @@ SceneRoots:
   - {fileID: 1242835955}
   - {fileID: 688533479}
   - {fileID: 386699477}
+  - {fileID: 537131355}

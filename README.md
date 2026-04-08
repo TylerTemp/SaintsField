@@ -7693,6 +7693,20 @@ public ReferenceHashSet<Sub1> polymorphism;
 
 ![](https://github.com/user-attachments/assets/46ec96a6-bd11-447e-bb16-85f1b99deec8)
 
+### `SaintsDecimal` ###
+
+A serializable `decimal` type
+
+```csharp
+public SaintsDecimal saintsDecimal;
+
+// implicit converting supported
+decimal convertToDecimal = saintsDecimal;
+decimal add = decimal.One + saintsDecimal;
+```
+
+![](https://github.com/user-attachments/assets/ffa7dd1a-e048-446f-b079-7f01b42c7aae)
+
 ### `TypeReference` ###
 
 Serialize a `System.Type`

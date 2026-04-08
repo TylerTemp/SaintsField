@@ -69,7 +69,7 @@ namespace SaintsField.Editor
             // SaintsField.Samples.Scripts.SaintsEditor.NewParserTest+Part1`2+TestNestedStructForParse[System.Int32,System.Int32]: SaintsField.Samples, SaintsField.Samples.Scripts.SaintsEditor
 
             // Debug.Log($"{systemType}: {ass.GetName().Name}, {nameSpace}");
-            string baseFolder = $"{SaintsFieldConfig.PreParserRelativeFolder}/{ass.GetName().Name}";
+            string baseFolder = $"{SaintsFieldConfig.instance.GetParserSavePath()}/{ass.GetName().Name}";
             if (!Directory.Exists(baseFolder))
             {
 // #if SAINTSFIELD_DEBUG

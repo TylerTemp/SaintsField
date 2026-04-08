@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.13.0 ## 
+
+1.  Fix: Code parser custom path was not used by field comparer.
+2.  Add: `SaintsDecimal` type for `decimal` serialization.
+
 ## 5.12.5 ##
 
 1.  Fix: `SaintsRow` did not work with `OnValueChanged`

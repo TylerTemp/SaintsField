@@ -24,7 +24,7 @@ namespace SaintsField.Utils
         }
 
         private const int PreParserVersion = 1;
-        public static readonly string PreParserRelativeFolder = "Library/SaintsFieldTempV" + PreParserVersion;
+        private static readonly string PreParserRelativeFolder = "Library/SaintsFieldTempV" + PreParserVersion;
 
         public const int UpdateLoopDefaultMs = 100;
 
@@ -192,6 +192,17 @@ namespace SaintsField.Utils
                     { "PROJECT_DIR_NAME", projectDirName },
                     { "PRODUCT_NAME", Application.productName },
                 }).Replace("\\", "/").Trim();
+        }
+
+        public string GetParserSavePath()
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (overrideCodeParserFolder)
+            {
+                return GetCustomSavePath(codeParserFolder);
+            }
+
+            return CodeParserDefaultFolder;
         }
 
         private static string StringFormatByName(string template, Dictionary<string, string> values)

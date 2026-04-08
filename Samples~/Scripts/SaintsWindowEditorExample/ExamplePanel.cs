@@ -11,7 +11,7 @@ namespace SaintsField.Samples.Scripts.SaintsWindowEditorExample
     public class ExamplePanel: SaintsEditorWindow
     {
 
-        [MenuItem(RuntimeUtil.MenuRoot + "Example/SaintsEditor")]
+        [MenuItem(RuntimeUtil.MenuRoot + "Example/SaintsEditorWindow")]
         public static void TestOpenWindow()
         {
             EditorWindow window = GetWindow<ExamplePanel>(false, "My Panel");

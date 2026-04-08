@@ -14,21 +14,21 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         /// USS class name of elements of this type.
         /// </para>
         ///      </summary>
-        public new static readonly string ussClassName = "unity-long-field";
+        public new static readonly string ussClassName = "saintsfield-ulong-field";
         /// <summary>
         ///        <para>
         /// USS class name of labels in elements of this type.
         /// </para>
         ///      </summary>
-        public new static readonly string labelUssClassName = LongField.ussClassName + "__label";
+        public new static readonly string labelUssClassName = ussClassName + "__label";
         /// <summary>
         ///        <para>
         /// USS class name of input elements in elements of this type.
         /// </para>
         ///      </summary>
-        public new static readonly string inputUssClassName = LongField.ussClassName + "__input";
+        public new static readonly string inputUssClassName = ussClassName + "__input";
 
-        private ULongField.ULongInput longInput => (ULongField.ULongInput) this.textInputBase;
+        private ULongInput longInput => (ULongInput) textInputBase;
 
         /// <summary>
         ///        <para>
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         /// </returns>
         protected override string ValueToString(ulong v)
         {
-            return v.ToString(this.formatString, (IFormatProvider) CultureInfo.InvariantCulture.NumberFormat);
+            return v.ToString(formatString, (IFormatProvider) CultureInfo.InvariantCulture.NumberFormat);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return v;
             }
 
-            return this.rawValue;
+            return rawValue;
             // long num;
             // ExpressionEvaluator.Expression expression;
             // bool flag = UINumericFieldsUtils.TryConvertStringToLong(str, this.textInputBase.originalText, out num, out expression);
@@ -99,14 +99,14 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         /// <param name="maxLength">Maximum number of characters the field can take.</param>
         /// <param name="label"></param>
         public ULongField(string label, int maxLength = 1000)
-            : base(label, maxLength, (TextValueField<ulong>.TextValueInput) new ULongField.ULongInput())
+            : base(label, maxLength, (TextValueInput) new ULongInput())
         {
-            this.AddToClassList(LongField.ussClassName);
-            this.labelElement.AddToClassList(LongField.labelUssClassName);
+            AddToClassList(ussClassName);
+            labelElement.AddToClassList(labelUssClassName);
             // TODO
             // this.visualInput.AddToClassList(LongField.inputUssClassName);
 
-            this.AddLabelDragger<ulong>();
+            AddLabelDragger<ulong>();
         }
 
         // TODO
@@ -123,7 +123,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         /// <param name="startValue">The start value.</param>
         public override void ApplyInputDeviceDelta(Vector3 delta, DeltaSpeed speed, ulong startValue)
         {
-            this.longInput.ApplyInputDeviceDelta(delta, speed, startValue);
+            longInput.ApplyInputDeviceDelta(delta, speed, startValue);
         }
 
         // [ExcludeFromDocs]
@@ -156,12 +156,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
         // {
         // }
 
-        private class ULongInput : TextValueField<ulong>.TextValueInput
+        private class ULongInput : TextValueInput
         {
-            private ULongField parentULongField => (ULongField) this.parent;
+            private ULongField parentULongField => (ULongField) parent;
 
             // internal ULongInput() => this.formatString = UINumericFieldsUtils.k_IntFieldFormatString;
-            internal ULongInput() => this.formatString = "#######0";
+            internal ULongInput() => formatString = "#######0";
 
             // protected override string allowedCharacters => UINumericFieldsUtils.k_AllowedCharactersForInt;
             protected override string allowedCharacters => "0123456789-*/+%^()cosintaqrtelfundxvRL,=pPI#";
@@ -170,12 +170,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             {
                 double intDragSensitivity = (double) CalculateIntDragSensitivity(startValue);
                 float acceleration = Acceleration(speed == DeltaSpeed.Fast, speed == DeltaSpeed.Slow);
-                ulong num1 = this.StringToValue(this.text);
-                ulong num2 = this.ClampMinMaxLongValue((long) Math.Round((double) NiceDelta((Vector2) delta, acceleration) * intDragSensitivity), num1);
-                if (this.parentULongField.isDelayed)
-                    this.text = this.ValueToString(num2);
+                ulong num1 = StringToValue(text);
+                ulong num2 = ClampMinMaxLongValue((long) Math.Round((double) NiceDelta((Vector2) delta, acceleration) * intDragSensitivity), num1);
+                if (parentULongField.isDelayed)
+                    text = ValueToString(num2);
                 else
-                    this.parentULongField.value = num2;
+                    parentULongField.value = num2;
             }
 
             public static double CalculateIntDragSensitivity(double value)
@@ -219,9 +219,9 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 return ulongDelta + value;
             }
 
-            protected override string ValueToString(ulong v) => v.ToString(this.formatString);
+            protected override string ValueToString(ulong v) => v.ToString(formatString);
 
-            protected override ulong StringToValue(string str) => this.parentULongField.StringToValue(str);
+            protected override ulong StringToValue(string str) => parentULongField.StringToValue(str);
         }
     }
 }

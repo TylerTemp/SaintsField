@@ -14,11 +14,12 @@ namespace SaintsField.Utils
                 return ("Config not created", string.Empty);
             }
 
-            string preParserRelativeFolder = SaintsFieldConfig.PreParserRelativeFolder;
-            if (!Directory.Exists(preParserRelativeFolder))
+            string saveToPath = instance.GetParserSavePath();
+            // string preParserRelativeFolder = SaintsFieldConfig.instance.GetParserSavePath();
+            if (!Directory.Exists(saveToPath))
             {
-                Debug.Log($"#Roslyn# Create folder: {preParserRelativeFolder}");
-                Directory.CreateDirectory(preParserRelativeFolder);
+                Debug.Log($"#Roslyn# Create folder: {saveToPath}");
+                Directory.CreateDirectory(saveToPath);
             }
 
             // string projectRootPath = Directory.GetCurrentDirectory();
@@ -56,18 +57,10 @@ namespace SaintsField.Utils
 
             const string roslynTempFileName = "Temp.SaintsFieldSourceParser.additionalfile";
             const string roslynTempFile = saintsFieldFolder + "/" + roslynTempFileName;
-            string saveToPath;
+
             // Debug.Log(SaintsFieldConfig.instance.overrideCodeParserFolder);
             // Debug.Log(SaintsFieldConfig.instance.codeParserFolder);
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (instance.overrideCodeParserFolder)
-            {
-                saveToPath = SaintsFieldConfig.GetCustomSavePath(instance.codeParserFolder);
-            }
-            else
-            {
-                saveToPath = SaintsFieldConfig.CodeParserDefaultFolder;
-            }
             string writeTempContent = $"path = {saveToPath}\n";
             bool checkIgnore = true;
             if (File.Exists(roslynTempFile))
