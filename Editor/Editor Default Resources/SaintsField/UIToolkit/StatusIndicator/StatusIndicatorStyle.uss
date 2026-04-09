@@ -1,17 +1,16 @@
 :root {
-    width: 16px;
-    height: 16px;
     position: relative;
+    flex-grow: 1;
 }
 
 .container {
     -unity-background-scale-mode: scale-to-fit;
-    width: 100%;
-    height: 100%;
+    width: 16px;
+    height: 16px;
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
+    top: 1px;
+    bottom: 1px;
+    left: 1px;
     right: 0;
 }
 
@@ -61,4 +60,21 @@
 }
 
 .toggleImageRoot {
+}
+
+.progressBarContainer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.progressBar {
+    background-color: rgb(0, 182, 255);
+    height: 2px;
+    opacity: 0.75;
+    width: 0;
 }

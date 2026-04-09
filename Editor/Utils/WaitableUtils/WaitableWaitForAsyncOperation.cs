@@ -11,6 +11,8 @@ namespace SaintsField.Editor.Utils.WaitableUtils
         }
 
         public bool Done => _asyncOperation.isDone;
+        public float Progress => -1f;
+
         public void Update()
         {
         }

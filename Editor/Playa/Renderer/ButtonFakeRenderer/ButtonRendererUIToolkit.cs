@@ -173,10 +173,13 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 style =
                 {
                     position = Position.Absolute,
-                    width = 16,
-                    height = 16,
-                    left = 1,
+                    // width = 16,
+                    // height = 16,
+                    // left = 1,
                     top = 1,
+                    left = 0,
+                    right = 0,
+                    bottom = 0,
                     // display = DisplayStyle.None,
                 },
             };
@@ -277,6 +280,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         List<Waiter> finishedEnumerators = new List<Waiter>();
                         int oldCounter = buttonUserData.Enumerators.Count;
                         Exception movingError = null;
+                        float progress = -1f;
                         // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
                         foreach (Waiter waiter in buttonUserData.Enumerators)
                         {
@@ -284,6 +288,11 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                             if (!waiter.Done())
                             {
+                                if (waiter.Waitable != null)
+                                {
+                                    float curProcess = waiter.Waitable.Progress;
+                                    progress = Mathf.Max(progress, curProcess);
+                                }
                                 continue;
                             }
 
@@ -327,7 +336,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         }
 
                         bool stillHaveRunner = buttonUserData.Enumerators.Count > 0;
-                        statusIndicatorElement.EnsureLoading(stillHaveRunner);
+                        statusIndicatorElement.EnsureLoading(stillHaveRunner, progress);
 
                         if(!stillHaveRunner)
                         {

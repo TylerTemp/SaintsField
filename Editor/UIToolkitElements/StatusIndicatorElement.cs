@@ -11,6 +11,8 @@ namespace SaintsField.Editor.UIToolkitElements
         private readonly VisualElement _loading;
         private readonly VisualElement _ok;
         private readonly VisualElement _error;
+        private readonly VisualElement _progressBar;
+
         public StatusIndicatorElement()
         {
             _treeRowTemplate = Util.LoadResource<VisualTreeAsset>("UIToolkit/StatusIndicator/StatusIndicator.uxml");
@@ -18,6 +20,7 @@ namespace SaintsField.Editor.UIToolkitElements
             _loading = root.Q<VisualElement>("Loading");
             _ok = root.Q<VisualElement>("OK");
             _error = root.Q<VisualElement>("Error");
+            _progressBar = root.Q<VisualElement>("ProgressBar");
 
             _pendingTasks[_loading] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_ok] = new List<IVisualElementScheduledItem>();
@@ -38,10 +41,19 @@ namespace SaintsField.Editor.UIToolkitElements
 
         // private bool _isLoading;
 
-        public void EnsureLoading(bool needLoading)
+        public void EnsureLoading(bool needLoading, float progress)
         {
             if (_displayStatus[_loading] == needLoading)
             {
+                if (needLoading && progress >= 0)
+                {
+                    _progressBar.style.width = Length.Percent(progress * 100);
+                }
+                else
+                {
+                    _progressBar.style.width = 0;
+                }
+
                 return;
             }
 
@@ -52,10 +64,15 @@ namespace SaintsField.Editor.UIToolkitElements
                 EnsureHide(_ok);
                 EnsureHide(_error);
                 PlayShow(_loading);
+                if (progress >= 0)
+                {
+                    _progressBar.style.width = Length.Percent(progress * 100);
+                }
             }
             else
             {
                 EnsureHide(_loading);
+                _progressBar.style.width = 0;
             }
         }
 

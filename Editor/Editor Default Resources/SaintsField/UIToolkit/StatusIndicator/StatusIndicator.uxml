@@ -4,4 +4,7 @@
     <ui:VisualElement name="Loading" class="saints-rotate loading container toggleImageRoot"/>
     <ui:VisualElement name="OK" class="container ok toggleRoot"/>
     <ui:VisualElement name="Error" class="container toggleRoot error"/>
+    <ui:VisualElement name="ProgresssBarContainer" class="progressBarContainer">
+        <ui:VisualElement name="ProgressBar" picking-mode="Ignore" class="progressBar"/>
+    </ui:VisualElement>
 </ui:UXML>

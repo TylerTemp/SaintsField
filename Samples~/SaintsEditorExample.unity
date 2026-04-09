@@ -4936,6 +4936,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cda65753ca60bf84fa63fb7e2d001e32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ButtonResultIcon
+  res: Packages/today.comes.saintsbuild/Samples/RawResources/Text (TMP)
 --- !u!1 &1150580243
 GameObject:
   m_ObjectHideFlags: 0
@@ -9077,7 +9078,6 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0

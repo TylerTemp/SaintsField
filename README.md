@@ -95,10 +95,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.13.0**
+**5.13.1**
 
-1.  Fix: Code parser custom path was not used by field comparer.
-2.  Add: `SaintsDecimal` type for `decimal` serialization.
+1.  Improve: `Button` now display a success or failed icon depending on the result of the calling function
+2.  Improve: `Button` now support `WaitForSeconds`, `WaitUtil` etc. and `AsyncOperation`, and will give a progress bar when possible
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -902,10 +902,6 @@ Draw a button for a function. If the method have arguments (required or optional
     Rich text is supported.
 *   `bool hideReturnValue = false` do not display the returned value.
 
-**Known Issue**: Using dynamic label in `SaintsRow`, the label will not update in real time. This is because a `Serializable` class/struc
-field value will be cached by Unity, and reflection can not get an updated value. This issue can not be solved unless
-there is a way to reflect the actual value from a cached container.
-
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
@@ -970,6 +966,66 @@ private int ReturnIgnored() => Random.Range(0, 100);
 ```
 
 [![video](https://github.com/user-attachments/assets/8632fa84-2e69-46c2-aa1a-8cb247b3888f)](https://github.com/user-attachments/assets/b56f05a2-590f-4683-8b81-2ff4998c4578)
+
+You can use `IEnumerator` for async calling. 
+
+If the yield type is `WaitForSeconds`/`AsyncOperation`, a countdown progress bar will display.
+
+If the yield type is `AsyncOperation`, a progress bar will display.
+
+
+```csharp
+[Button]
+private void NormalFunc()
+{
+
+}
+[Button]
+private void ErrorFunc()
+{
+    throw new Exception("Stop There!");
+}
+
+[Button]
+private IEnumerator IEFunc()
+{
+    yield return new WaitForSeconds(4);  // Note: Pausing the editor will NOT pause this enumerator
+}
+
+[Button]
+private IEnumerator IEFuncError()
+{
+    yield return new WaitForSecondsRealtime(2);  // same as WaitForSeconds
+    throw new Exception("Stop There!");
+}
+
+[ShowInInspector] private bool _waitUntilMe;
+
+[Button]
+private IEnumerator WaitUntilChecked()
+{
+    yield return new WaitUntil(() => _waitUntilMe);
+}
+
+[ShowInInspector] private bool _waitWhileMe = true;
+
+[Button]
+private IEnumerator WaitWhileChecked()
+{
+    yield return new WaitWhile(() => _waitWhileMe);
+}
+
+[ResourcePath(EStr.Resource, typeof(GameObject))]
+public string res;
+
+[Button]  // Loader using `AsyncOperation` is supported
+private IEnumerator AsyncOp()
+{
+    AsyncOperation op = Resources.LoadAsync(res);
+    yield return op;
+    Debug.Log("DONE");
+}
+```
 
 #### `AboveButton`/`BelowButton`/`PostFieldButton` ####
 

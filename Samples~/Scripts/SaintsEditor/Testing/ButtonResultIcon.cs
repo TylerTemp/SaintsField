@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Linq;
 using SaintsField.Playa;
 using UnityEngine;
 
@@ -22,40 +21,36 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [Button]
         private IEnumerator IEFunc()
         {
-            foreach (int i in Enumerable.Range(0, 3))
-            {
-                Debug.Log(i);
-                yield return new WaitForSeconds(1);
-            }
+            yield return new WaitForSeconds(4);  // Note: Pausing the editor will NOT pause this enumerator
         }
 
         [Button]
         private IEnumerator IEFuncError()
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSecondsRealtime(2);  // same as WaitForSeconds
             throw new Exception("Stop There!");
         }
 
-        public bool waitUntilMe;
+        [ShowInInspector] private bool _waitUntilMe;
 
         [Button]
         private IEnumerator WaitUntilChecked()
         {
-            yield return new WaitUntil(() => waitUntilMe);
+            yield return new WaitUntil(() => _waitUntilMe);
         }
 
-        public bool waitWhileMe = true;
+        [ShowInInspector] private bool _waitWhileMe = true;
 
         [Button]
         private IEnumerator WaitWhileChecked()
         {
-            yield return new WaitWhile(() => waitWhileMe);
+            yield return new WaitWhile(() => _waitWhileMe);
         }
 
         [ResourcePath(EStr.Resource, typeof(GameObject))]
         public string res;
 
-        [Button]
+        [Button]  // Loader using `AsyncOperation` is supported
         private IEnumerator AsyncOp()
         {
             AsyncOperation op = Resources.LoadAsync(res);

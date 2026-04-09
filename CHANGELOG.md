@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.13.1 ##
+
+1.  Improve: `Button` now display a success or failed icon depending on the result of the calling function
+2.  Improve: `Button` now support `WaitForSeconds`, `WaitUtil` etc. and `AsyncOperation`, and will give a progress bar when possible
+
 ## 5.13.0 ## 
 
 1.  Fix: Code parser custom path was not used by field comparer.

@@ -36,6 +36,8 @@ namespace SaintsField.Editor.Utils.WaitableUtils
         }
 
         public bool Done { get; private set; }
+        public float Progress => -1f;
+
         public void Update()
         {
             if (!Done)
