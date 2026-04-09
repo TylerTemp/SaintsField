@@ -35,7 +35,7 @@ namespace SaintsField.Editor.UIToolkitElements
             ToolbarSearchField.style.width = StyleKeyword.Auto;
             LoadingImage = SearchContainer.Q<VisualElement>(name: "LoadingIcon");
             LoadingImage.style.visibility = Visibility.Hidden;
-            UIToolkitUtils.KeepRotate(LoadingImage);
+            UIToolkitUtils.SetKeepRotate(LoadingImage);
             RegisterCallback<AttachToPanelEvent>(_ =>
             {
                 schedule.Execute(() => UIToolkitUtils.TriggerRotate(LoadingImage));

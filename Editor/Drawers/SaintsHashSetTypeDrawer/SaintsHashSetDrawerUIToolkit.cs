@@ -615,7 +615,7 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 searchTextField.style.position = Position.Relative;
 
                 searchTextField.Add(loadingImage);
-                UIToolkitUtils.KeepRotate(loadingImage);
+                UIToolkitUtils.SetKeepRotate(loadingImage);
                 loadingImage.RegisterCallback<AttachToPanelEvent>(_ => loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage)));
                 // _asyncSearchItems.LoadingImage = loadingImage;
 

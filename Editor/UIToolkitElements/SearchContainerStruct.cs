@@ -30,7 +30,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
             VisualElement loadingImage = root.Q<VisualElement>(name: "LoadingIcon");
             loadingImage.style.visibility = Visibility.Hidden;
-            UIToolkitUtils.KeepRotate(loadingImage);
+            UIToolkitUtils.SetKeepRotate(loadingImage);
             loadingImage.RegisterCallback<AttachToPanelEvent>(_ =>
             {
                 loadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(loadingImage));

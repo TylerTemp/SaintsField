@@ -1,0 +1,64 @@
+:root {
+    width: 16px;
+    height: 16px;
+    position: relative;
+}
+
+.container {
+    -unity-background-scale-mode: scale-to-fit;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.loading {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/refresh.png?fileID=2800000&guid=bfdf848cb00f1544db8f6a367acd4d8e&type=3#refresh");
+    -unity-background-image-tint-color: rgb(100, 232, 255);
+}
+
+.ok {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/check.png?fileID=2800000&guid=ed18320f902c7d847bc9df6a063170d0&type=3#check");
+    -unity-background-image-tint-color: rgb(73, 255, 123);
+}
+
+.error {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/close.png?fileID=2800000&guid=f2d0b83660a56994fa039297f84cbf05&type=3#close");
+    -unity-background-image-tint-color: rgb(255, 45, 23);
+}
+
+.toggleRoot {
+    transform-origin: center;
+    scale: 0 0;
+    rotate: -60deg;
+    opacity: 0;
+    transition-property: scale, rotate, opacity;
+    transition-duration: 0.2s, 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out, ease-out;
+}
+
+.toggleRoot.show {
+    scale: 1 1;
+    rotate: 0;
+    opacity: 1;
+}
+
+.toggleImageRoot {
+    transform-origin: center;
+    scale: 0 0;
+    opacity: 0;
+    transition-property: scale, opacity;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+}
+
+.toggleImageRoot.show {
+    scale: 1 1;
+    opacity: 1;
+}
+
+.toggleImageRoot {
+}

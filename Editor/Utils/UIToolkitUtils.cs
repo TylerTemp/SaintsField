@@ -47,10 +47,17 @@ namespace SaintsField.Editor.Utils
             label.RegisterCallback<GeometryChangedEvent>(evt => FixLabelWidthUIToolkit((Label)evt.target));
         }
 
-        public static void KeepRotate(VisualElement element)
+        // will add uss for you
+        public static void SetKeepRotate(VisualElement element)
         {
             StyleSheet rotateUss = Util.LoadResource<StyleSheet>("UIToolkit/SaintsRotate.uss");
             element.styleSheets.Add(rotateUss);
+            HelpKeepRotate(element);
+        }
+
+        // already set up uss, just init the rotate processor
+        public static void HelpKeepRotate(VisualElement element)
+        {
             element.AddToClassList("saints-rotate");
             element.RegisterCallback<TransitionEndEvent>(_ =>
             {
@@ -74,16 +81,7 @@ namespace SaintsField.Editor.Utils
                         // Debug.Log($"restart to {buttonRotator.style.rotate}");
                     });
                 });
-
-                // Debug.Log(e);
             });
-
-            // element.schedule.Execute(() =>
-            // {
-            //     StyleRotate rotate = element.style.rotate;
-            //     rotate.value = new Rotate(360);
-            //     element.style.rotate = rotate;
-            // });
         }
 
         public static void TriggerRotate(VisualElement element)

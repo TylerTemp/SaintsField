@@ -137,7 +137,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
         {
             Image buttonRotator = container.Q<Image>(name: NameButtonRotator(property, index));
             // UIToolkitUtils.TriggerRotate(buttonRotator);
-            UIToolkitUtils.KeepRotate(buttonRotator);
+            UIToolkitUtils.SetKeepRotate(buttonRotator);
             buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator));
             // Debug.Log("TriggerRotate");
         }

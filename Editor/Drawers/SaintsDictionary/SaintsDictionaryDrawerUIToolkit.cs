@@ -701,7 +701,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     searchTextField.style.position = Position.Relative;
 
                     searchTextField.Add(keyLoadingImage);
-                    UIToolkitUtils.KeepRotate(keyLoadingImage);
+                    UIToolkitUtils.SetKeepRotate(keyLoadingImage);
                     keyLoadingImage.RegisterCallback<AttachToPanelEvent>(_ => keyLoadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(keyLoadingImage)));
 
                     header.Add(keySearch);
@@ -839,7 +839,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     searchTextField.style.position = Position.Relative;
 
                     searchTextField.Add(valueLoadingImage);
-                    UIToolkitUtils.KeepRotate(valueLoadingImage);
+                    UIToolkitUtils.SetKeepRotate(valueLoadingImage);
                     valueLoadingImage.RegisterCallback<AttachToPanelEvent>(_ => valueLoadingImage.schedule.Execute(() => UIToolkitUtils.TriggerRotate(valueLoadingImage)));
 
                     header.Add(valueSearch);
