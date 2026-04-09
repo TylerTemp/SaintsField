@@ -17,11 +17,15 @@ namespace SaintsField.Editor.Utils.WaitableUtils
             _mPredicate = (Func<bool>)_fieldWaitUntilMPredicate.GetValue(waitUntil);
 
             _fieldWaitUntilMTimeoutCallback ??= typeof(WaitUntil).GetField("m_TimeoutCallback", BindingFlags.Instance | BindingFlags.NonPublic);
-            Debug.Assert(_fieldWaitUntilMTimeoutCallback != null);
-            object mTimeoutCallback = _fieldWaitUntilMTimeoutCallback.GetValue(waitUntil);
-            if (mTimeoutCallback != null)
+
+            // ReSharper disable once InvertIf
+            if(_fieldWaitUntilMTimeoutCallback != null)
             {
-                throw new Exception("Timeout is not supported in editor button");
+                object mTimeoutCallback = _fieldWaitUntilMTimeoutCallback.GetValue(waitUntil);
+                if (mTimeoutCallback != null)
+                {
+                    throw new Exception("Timeout is not supported in editor button");
+                }
             }
         }
 
