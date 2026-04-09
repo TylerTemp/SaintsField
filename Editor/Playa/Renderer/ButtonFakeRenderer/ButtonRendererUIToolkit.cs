@@ -9,6 +9,7 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.WaitableUtils;
 using SaintsField.Playa;
 using UnityEditor;
 // ReSharper disable once RedundantUsingDirective
@@ -33,7 +34,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             public bool UpdateOneMoreTime;
             public RichTextDrawer RichTextDrawer;
 
-            public List<IEnumerator> Enumerators = new List<IEnumerator>();
+            public List<Waiter> Enumerators = new List<Waiter>();
         }
 
         private VisualElement _returnValueContainer;
@@ -163,7 +164,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 Xml = buttonText,
                 Callback = _buttonAttribute.IsCallback ? _buttonAttribute.Label : "",
                 UpdateOneMoreTime = true,
-                Enumerators = new List<IEnumerator>(),
+                Enumerators = new List<Waiter>(),
             };
 
             // IVisualElementScheduledItem buttonTask = null;
@@ -252,7 +253,12 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 }
 
                 buttonUserData.Enumerators.Clear();
-                buttonUserData.Enumerators.AddRange(returnValues.OfType<IEnumerator>());
+                foreach (IEnumerator enumerator in returnValues.OfType<IEnumerator>())
+                {
+                    Waiter waiter = new Waiter(enumerator);
+                    buttonUserData.Enumerators.Add(waiter);
+                }
+
                 if (buttonUserData.Enumerators.Count == 0)
                 {
                     statusIndicatorElement.PlayOk();
@@ -268,30 +274,50 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     // ButtonUserData buttonUserData = (ButtonUserData) buttonElement.userData;
                     buttonTask = _buttonElement.schedule.Execute(() =>
                     {
-                        List<IEnumerator> finishedEnumerators = new List<IEnumerator>();
+                        List<Waiter> finishedEnumerators = new List<Waiter>();
                         int oldCounter = buttonUserData.Enumerators.Count;
-                        Exception error = null;
+                        Exception movingError = null;
                         // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-                        foreach (IEnumerator bindEnumerator in buttonUserData.Enumerators)
+                        foreach (Waiter waiter in buttonUserData.Enumerators)
                         {
+                            waiter.Update();
+
+                            if (!waiter.Done())
+                            {
+                                continue;
+                            }
+
                             bool moveNext;
+                            bool thisHasMoveError = false;
                             try
                             {
-                                moveNext = bindEnumerator.MoveNext();
+                                moveNext = waiter.Enumerator.MoveNext();
                             }
                             catch (Exception e)
                             {
                                 Debug.LogException(e);
-                                error = e;
+                                movingError = e;
                                 moveNext = false;
+                                thisHasMoveError = true;
                             }
+
+                            if (thisHasMoveError)
+                            {
+                                waiter.Waitable = null;
+                            }
+                            else
+                            {
+                                waiter.CheckCurrent();
+                            }
+
+                            // Debug.Log(bindEnumerator.Current);
                             if (!moveNext)
                             {
-                                finishedEnumerators.Add(bindEnumerator);
+                                finishedEnumerators.Add(waiter);
                             }
                         }
 
-                        if(error == null)
+                        if(movingError == null)
                         {
                             buttonUserData.Enumerators.RemoveAll(each => finishedEnumerators.Contains(each));
                         }
@@ -311,7 +337,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                             if (oldCounter > 0)
                             {
-                                if(error == null)
+                                if(movingError == null)
                                 {
                                     statusIndicatorElement.PlayOk();
                                 }
