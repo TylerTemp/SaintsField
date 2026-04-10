@@ -14,6 +14,8 @@ namespace SaintsField.SaintsSerialization
         public ulong uLongValue;
         public string stringValue;
 
+        public int[] intValues;
+
         #region General Serialization
         // ReSharper disable once InconsistentNaming
         public UnityEngine.Object V;

@@ -81,7 +81,7 @@ If you have DOTween installed
 
 [**Optional**] To use the full functions of this project, please also do: `Tools` - `SaintsField` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
 
-If you're using `unitypackage` or git submodule, but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
+If you need to put this project under another folder rather than `Packages/today.comes.saintsfield`, please also do the following:
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
 *   Copy files from the project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
@@ -95,10 +95,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.13.1**
+**5.13.2**
 
-1.  Improve: `Button` now display a success or failed icon depending on the result of the calling function
-2.  Improve: `Button` now support `WaitForSeconds`, `WaitUtil` etc. and `AsyncOperation`, and will give a progress bar when possible
+1.  Fix: `ResourcePath` now has the correct right click context menu
+2.  Fix: `ResourceFolder`/`AssetFolder` now support draging folder directly on the field
+3.  Fix: `ResourceFolder`/`AssetFolder` now gives an error if the resource path does not exists
+4.  Add: `ResourceFolder`/`AssetFolder` now is supported in "Auto Validator"
+5.  Add: Support `decimal` type in "Extended Serialization", you can now directly serialize a deciaml type with `SaintsSerialized`
+6.  Add: `ShowInInspector` now can display/edit `decimal` type
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

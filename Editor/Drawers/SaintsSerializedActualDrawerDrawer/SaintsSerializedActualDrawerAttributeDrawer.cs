@@ -8,6 +8,7 @@ using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
+using SaintsField.Editor.Drawers.SaintsDecimalType;
 using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -146,6 +147,11 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
                     VisualElement element = GuidAttributeDrawer.RenderSerializedActual(label, property, inHorizontalLayout);
                     return (element, element == null? null: (GuidAttributeDrawer)MakePropertyDrawer(typeof(GuidAttributeDrawer), serInfo, null, label));
                     // return GuidAttributeDrawer.RenderSerializedActual(label, property, inHorizontalLayout);
+                }
+                case SaintsPropertyType.Decimal:
+                {
+                    VisualElement element = SaintsDecimalDrawer.RenderSerializedActual(label, property, inHorizontalLayout);
+                    return (element, element == null? null: (SaintsDecimalDrawer)MakePropertyDrawer(typeof(SaintsDecimalDrawer), serInfo, null, label));
                 }
                 // case SaintsPropertyType.Undefined:
                 // case SaintsPropertyType.ClassOrStruct:

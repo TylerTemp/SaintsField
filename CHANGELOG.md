@@ -2,10 +2,12 @@
 
 ## 5.13.2 ##
 
-1.  Fix: `ResourcePath` now has the correct right click context menu.
-1.  Fix: `ResourceFolder`/`AssetFolder` now support draging folders directly on the field.
-1.  Fix: `ResourceFolder`/`AssetFolder` now gives an error if the resource path does not exists.
-1.  Add: `ResourceFolder`/`AssetFolder` now is supported in "Auto Validator".
+1.  Fix: `ResourcePath` now has the correct right click context menu
+2.  Fix: `ResourceFolder`/`AssetFolder` now support draging folder directly on the field
+3.  Fix: `ResourceFolder`/`AssetFolder` now gives an error if the resource path does not exists
+4.  Add: `ResourceFolder`/`AssetFolder` now is supported in "Auto Validator"
+5.  Add: Support `decimal` type in "Extended Serialization", you can now directly serialize a deciaml type with `SaintsSerialized`
+6.  Add: `ShowInInspector` now can display/edit `decimal` type
 
 ## 5.13.1 ##
 
