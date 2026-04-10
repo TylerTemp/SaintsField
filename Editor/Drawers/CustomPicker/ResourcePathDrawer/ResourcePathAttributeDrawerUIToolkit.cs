@@ -71,7 +71,9 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
         {
             ResourcePathAttribute resourcePathAttribute = (ResourcePathAttribute)saintsAttribute;
             IReadOnlyList<Type> requiredTypes = resourcePathAttribute.RequiredTypes;
-            ObjectField objectField = container.Q<ObjectField>(NameObjectField(property));
+            EmptyPrefabOverrideElement wrapper = container.Q<EmptyPrefabOverrideElement>();
+            UIToolkitUtils.AddContextualMenuManipulator(wrapper, property, () => {});
+            ObjectField objectField = wrapper.Q<ObjectField>(NameObjectField(property));
 
             if (resourcePathAttribute.CustomPicker)
             {

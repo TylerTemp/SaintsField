@@ -8,7 +8,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
     [CustomPropertyDrawer(typeof(AssetFolderAttribute), true)]
     public partial class AssetFolderAttributeDrawer: FolderDrawerBase
     {
-        protected override (string error, string actualFolder) ValidateFolder(string folderValue)
+        protected override (string error, string actualFolder) ValidateFullFolder(string folderValue)
         {
             return GetAssetsPath(folderValue);
         }

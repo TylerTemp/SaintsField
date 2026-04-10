@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
     [CustomPropertyDrawer(typeof(ResourceFolderAttribute), true)]
     public partial class ResourceFolderAttributeDrawer: FolderDrawerBase
     {
-        protected override (string error, string actualFolder) ValidateFolder(string folderValue)
+        protected override (string error, string actualFolder) ValidateFullFolder(string folderValue)
         {
             (string error, string assetsFolder) = GetAssetsPath(folderValue);
             if (error != "")
@@ -19,6 +19,11 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
                 return (error, assetsFolder);
             }
 
+            return ValidateAssetFolder(assetsFolder);
+        }
+
+        private static (string error, string actualFolder) ValidateAssetFolder(string assetsFolder)
+        {
             List<string> resourcePaths = new List<string>();
             bool found = false;
             foreach (string part in assetsFolder.Split('/'))
