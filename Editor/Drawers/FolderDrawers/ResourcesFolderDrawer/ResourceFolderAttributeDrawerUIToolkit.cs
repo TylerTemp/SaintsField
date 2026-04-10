@@ -1,11 +1,13 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -38,6 +40,8 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 #endif
                     paddingLeft = 8,
                     paddingRight = 8,
+                    borderTopLeftRadius = 0,
+                    borderBottomLeftRadius = 0,
                 },
                 name = ButtonName(property),
             };
@@ -125,8 +129,15 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
                 property.stringValue = fineFolder;
                 property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(fineFolder);
             });
             #endregion
+
+            CheckHelpBox(property.stringValue, helpBox);
+            helpBox.TrackPropertyValue(property, p =>
+            {
+                CheckHelpBox(p.stringValue, helpBox);
+            });
         }
 
         private static IEnumerable<string> CanDrop(IEnumerable<Object> objRefs)
@@ -134,24 +145,21 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
             foreach (Object objRef in objRefs)
             {
                 string path = AssetDatabase.GetAssetPath(objRef);
+                if (!Directory.Exists(path))
+                {
+                    continue;
+                }
                 (string error, string actualFolder) = ValidateAssetFolder(path);
                 if (error == "")
                 {
                     yield return actualFolder;
                 }
-                Debug.Log(error);
             }
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
+        private static void CheckHelpBox(string value, HelpBox helpBox)
         {
-            HelpBox helpBox = container.Q<HelpBox>(name: HelpBoxName(property));
-
-            if (helpBox.style.display != DisplayStyle.None)
-            {
-                helpBox.style.display = DisplayStyle.None;
-            }
+            UIToolkitUtils.SetHelpBox(helpBox, CheckFolder(value));
         }
     }
 }

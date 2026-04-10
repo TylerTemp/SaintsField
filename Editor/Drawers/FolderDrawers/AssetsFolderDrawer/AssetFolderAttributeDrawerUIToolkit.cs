@@ -1,12 +1,16 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 
 namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
@@ -36,6 +40,8 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
 #endif
                     paddingLeft = 8,
                     paddingRight = 8,
+                    borderTopLeftRadius = 0,
+                    borderBottomLeftRadius = 0,
                 },
                 name = ButtonName(property),
             };
@@ -93,17 +99,57 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
                     helpBox.style.display = DisplayStyle.Flex;
                 }
             };
+
+            #region Drag
+            VisualElement fieldContainer = container.Q<VisualElement>(name: NameLabelFieldUIToolkit(property));
+            fieldContainer.RegisterCallback<DragEnterEvent>(_ =>
+            {
+                DragAndDrop.visualMode = CanDrop(DragAndDrop.objectReferences).Any()
+                    ? DragAndDropVisualMode.Copy
+                    : DragAndDropVisualMode.Rejected;
+            });
+            fieldContainer.RegisterCallback<DragLeaveEvent>(_ =>
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.None;
+            });
+            fieldContainer.RegisterCallback<DragUpdatedEvent>(_ =>
+            {
+                // Debug.Log($"Drag Update {string.Join<Object>(",", DragAndDrop.objectReferences)}");
+                DragAndDrop.visualMode = CanDrop(DragAndDrop.objectReferences).Any()
+                    ? DragAndDropVisualMode.Copy
+                    : DragAndDropVisualMode.Rejected;
+            });
+            fieldContainer.RegisterCallback<DragPerformEvent>(_ =>
+            {
+                string fineFolder = CanDrop(DragAndDrop.objectReferences).FirstOrDefault();
+                if (string.IsNullOrEmpty(fineFolder))
+                {
+                    return;
+                }
+
+                property.stringValue = fineFolder;
+                property.serializedObject.ApplyModifiedProperties();
+                onValueChangedCallback.Invoke(fineFolder);
+            });
+            #endregion
+
+            CheckHelpBox(property.stringValue, helpBox);
+            helpBox.TrackPropertyValue(property, p =>
+            {
+                CheckHelpBox(p.stringValue, helpBox);
+            });
         }
 
-        protected override void OnValueChanged(SerializedProperty property, ISaintsAttribute saintsAttribute, int index, VisualElement container,
-            FieldInfo info, object parent, Action<object> onValueChangedCallback, object newValue)
+        private static IEnumerable<string> CanDrop(IEnumerable<Object> objRefs)
         {
-            HelpBox helpBox = container.Q<HelpBox>(name: HelpBoxName(property));
+            return objRefs
+                .Select(AssetDatabase.GetAssetPath)
+                .Where(Directory.Exists);
+        }
 
-            if (helpBox.style.display != DisplayStyle.None)
-            {
-                helpBox.style.display = DisplayStyle.None;
-            }
+        private static void CheckHelpBox(string value, HelpBox helpBox)
+        {
+            UIToolkitUtils.SetHelpBox(helpBox, Directory.Exists(value)? "": $"Folder \"{value}\" does not exists");
         }
     }
 }

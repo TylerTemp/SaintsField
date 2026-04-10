@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.13.2 ##
+
+1.  Fix: `ResourcePath` now has the correct right click context menu.
+1.  Fix: `ResourceFolder`/`AssetFolder` now support draging folders directly on the field.
+1.  Fix: `ResourceFolder`/`AssetFolder` now gives an error if the resource path does not exists.
+1.  Add: `ResourceFolder`/`AssetFolder` now is supported in "Auto Validator".
+
 ## 5.13.1 ##
 
 1.  Improve: `Button` now display a success or failed icon depending on the result of the calling function

@@ -4555,8 +4555,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   assetsFolder: Assets/SaintsField/Runtime
   assetsFolders:
-  - 
-  - 
+  - Packages/today.comes.saintsfield/Samples/Script
+  - Packages/today.comes.saintsfield/Samples/EditorTest
 --- !u!1 &435171140
 GameObject:
   m_ObjectHideFlags: 0
@@ -4746,10 +4746,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a48af1b5f53e6844199170ff15c80d7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourcesFolder: SubInResources
+  resourcesFolder: ResNewFolder
   resourcesFolders:
   - SubInResources
-  - 
+  - ResNewFolder
 --- !u!4 &446354017
 Transform:
   m_ObjectHideFlags: 0
@@ -25966,7 +25966,6 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -36972,7 +36971,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2134144047}
   m_Enabled: 1
-  serializedVersion: 13
+  serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
@@ -37024,7 +37023,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShapeRadius: 0
+  m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
