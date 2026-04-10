@@ -6,7 +6,6 @@ using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,7 +15,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.ValuePriority)]
 #endif
     [CustomPropertyDrawer(typeof(SaintsDecimal), true)]
-    public class SaintsDecimalDrawer: SaintsPropertyDrawer
+    public partial class SaintsDecimalDrawer: SaintsPropertyDrawer
     {
         protected override bool UseCreateFieldUIToolKit => true;
 
@@ -29,10 +28,6 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
             EmptyPrefabOverrideElement emptyPrefabOverrideElement = new EmptyPrefabOverrideElement(property);
             emptyPrefabOverrideElement.Add(field);
             return emptyPrefabOverrideElement;
-            // SaintsDecimalElement element = new SaintsDecimalElement();
-            // SaintsDecimalField field = new SaintsDecimalField(GetPreferredLabel(property), element);
-            // field.AddToClassList(SaintsDecimalField.alignedFieldUssClassName);
-            // return field;
         }
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
@@ -61,6 +56,12 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
                     cacheField!.SetValue(thisData, true);
                 }
             });
+
+            AddContextualMenuManipulator(field, property);
+        }
+
+        private static void AddContextualMenuManipulator(SaintsDecimalFieldAbs field, SerializedProperty property)
+        {
 
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => {});
 

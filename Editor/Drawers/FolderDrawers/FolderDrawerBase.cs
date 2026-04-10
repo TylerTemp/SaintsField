@@ -44,10 +44,10 @@ namespace SaintsField.Editor.Drawers.FolderDrawers
                 // Debug.Log(d.FullName);
                 // Debug.Log(Path.GetFullPath(path));
                 // return ValidateFolder(d.FullName.Replace("\\", "/"));
-                : ValidateFolder(path.Replace("\\", "/"));
+                : ValidateFullFolder(path.Replace("\\", "/"));
         }
 
-        protected abstract (string error, string actualFolder) ValidateFolder(string folderValue);
+        protected abstract (string error, string actualFolder) ValidateFullFolder(string folderValue);
 
         protected abstract string WrapFolderToOpen(string folder);
     }

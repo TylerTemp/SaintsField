@@ -16,5 +16,6 @@ namespace SaintsField.SaintsSerialization
         DateTime = 5,
         TimeSpan = 6,
         Guid = 7,
+        Decimal = 8,
     }
 }

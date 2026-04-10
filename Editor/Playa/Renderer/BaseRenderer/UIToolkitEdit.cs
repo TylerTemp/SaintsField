@@ -19,6 +19,7 @@ using SaintsField.Editor.Drawers.PropRangeDrawer;
 using SaintsField.Editor.Drawers.RateDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
 using SaintsField.Editor.Drawers.ResizableTextAreaDrawer;
+using SaintsField.Editor.Drawers.SaintsDecimalType;
 using SaintsField.Editor.Drawers.SaintsDictionary;
 using SaintsField.Editor.Drawers.SceneDrawer;
 using SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer;
@@ -2091,6 +2092,23 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             #endregion
+
+            #region decimal
+            if (value is decimal decimalValue)
+            {
+                return (SaintsDecimalDrawer.UIToolkitValueEdit(
+                    oldElement,
+                    label,
+                    valueType,
+                    decimalValue,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes), false);
+            }
+            #endregion
+
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
 

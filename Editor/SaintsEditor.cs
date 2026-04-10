@@ -424,9 +424,9 @@ namespace SaintsField.Editor
                                             //     .Prepend(ReflectCache.GetCustomAttributes<SaintsSerializedActualAttribute>(serInfo).First())
                                             //     .ToArray();
 
-                                        #if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_SERIALIZED_DEBUG
                                             Debug.Log($"wrap {fieldInfo.Name} to {serInfo.Name}");
-                                        #endif
+#endif
 
                                             // Debug.Log($"keys={string.Join(",", serializedPropertyDict.Keys)}");
 

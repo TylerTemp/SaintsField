@@ -81,7 +81,7 @@ If you have DOTween installed
 
 [**Optional**] To use the full functions of this project, please also do: `Tools` - `SaintsField` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
 
-If you're using `unitypackage` or git submodule, but you put this project under another folder rather than `Assets/SaintsField`, please also do the following:
+If you need to put this project under another folder rather than `Packages/today.comes.saintsfield`, please also do the following:
 
 *   Create `Assets/Editor Default Resources/SaintsField`.
 *   Copy files from the project's `Editor/Editor Default Resources/SaintsField` into your project's `Assets/Editor Default Resources/SaintsField`.
@@ -95,10 +95,14 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.13.1**
+**5.13.2**
 
-1.  Improve: `Button` now display a success or failed icon depending on the result of the calling function
-2.  Improve: `Button` now support `WaitForSeconds`, `WaitUtil` etc. and `AsyncOperation`, and will give a progress bar when possible
+1.  Fix: `ResourcePath` now has the correct right-click context menu
+2.  Fix: `ResourceFolder`/`AssetFolder` now supports dragging a folder directly on the field
+3.  Fix: `ResourceFolder`/`AssetFolder` now gives an error if the resource path does not exist
+4.  Add: `ResourceFolder`/`AssetFolder` is now supported in "Auto Validator"
+5.  Add: Support `decimal` type in "Extended Serialization", you can now directly serialize a decimal type with `SaintsSerialized`
+6.  Add: `ShowInInspector` now can display/edit `decimal` type
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -9039,6 +9043,42 @@ public partial class SerGuidExample : MonoBehaviour
 ```
 
 ![](https://github.com/user-attachments/assets/770ffe85-91cf-4d01-94a0-28a059610d49)
+
+### `decimal` ###
+
+Serialize a `decimal` type.
+
+**IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set all parent class/struct to `partial`
+
+```csharp
+using SaintsField;
+
+// note the partial
+public partial class SerDecimalExample : MonoBehaviour
+{
+    [SaintsSerialized]
+    private decimal _dec;
+
+    [SaintsSerialized]
+    private List<decimal> _decList;
+}
+
+// use in a normal class/struct, set parents partial recursively
+public partial class SerDecimalExample : MonoBehaviour
+{
+    [Serializable]
+    public partial class MyClass
+    {
+        [SaintsSerialized]
+        private decimal[] _decArray;
+    }
+
+    // No SaintsSerialized here
+    public MyClass myClass;
+}
+```
+
+![](https://github.com/user-attachments/assets/0f8d6994-5149-441e-b3b0-20a93aa9a421)
 
 ## `SaintsEditorWindow` ##
 

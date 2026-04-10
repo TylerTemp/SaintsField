@@ -112,6 +112,15 @@ namespace SaintsField.Utils
                 });
             }
 
+            if (obj is decimal numDecimal)
+            {
+                return (true, new SaintsSerializedProperty
+                {
+                    propertyType = SaintsPropertyType.Decimal,
+                    intValues = decimal.GetBits(numDecimal),
+                });
+            }
+
             return (false, default);
         }
 
@@ -619,6 +628,19 @@ namespace SaintsField.Utils
                     }
 
                     return (false, default);
+                }
+                case SaintsPropertyType.Decimal:
+                {
+                    int[] bites = saintsSerializedProperty.intValues;
+                    try
+                    {
+                        return (true, (T)(object)new decimal(bites));
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                        return (false, default);
+                    }
                 }
                 case SaintsPropertyType.Undefined:
                 default:
