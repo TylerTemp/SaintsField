@@ -9044,6 +9044,42 @@ public partial class SerGuidExample : MonoBehaviour
 
 ![](https://github.com/user-attachments/assets/770ffe85-91cf-4d01-94a0-28a059610d49)
 
+### `decimal` ###
+
+Serialize a `decimal` type.
+
+**IMPORTANT**: Set your `MonoBehaviour`/`ScriptableObject` to `partial` if the field is declaration inside. If it's inside a normal class/struct, you need to set all parent class/struct to `partial`
+
+```csharp
+using SaintsField;
+
+// note the partial
+public partial class SerDecimalExample : MonoBehaviour
+{
+    [SaintsSerialized]
+    private decimal _dec;
+
+    [SaintsSerialized]
+    private List<decimal> _decList;
+}
+
+// use in a normal class/struct, set parents partial recursively
+public partial class SerDecimalExample : MonoBehaviour
+{
+    [Serializable]
+    public partial class MyClass
+    {
+        [SaintsSerialized]
+        private decimal[] _decArray;
+    }
+
+    // No SaintsSerialized here
+    public MyClass myClass;
+}
+```
+
+![](https://github.com/user-attachments/assets/0f8d6994-5149-441e-b3b0-20a93aa9a421)
+
 ## `SaintsEditorWindow` ##
 
 An `EditorWindow` class to easily create an editor (a bit like Odin's `OdinEditorWindow`), with support of `StartEditorCoroutine`

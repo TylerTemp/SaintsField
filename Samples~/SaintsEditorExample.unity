@@ -9742,7 +9742,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1615369249453982582, guid: 17ba6a24586274b438a070f05f7f0293, type: 3}
       propertyPath: '_d__SaintsSerialized__.intValues.Array.data[0]'
-      value: 1538
+      value: 1410064661
+      objectReference: {fileID: 0}
+    - target: {fileID: 1615369249453982582, guid: 17ba6a24586274b438a070f05f7f0293, type: 3}
+      propertyPath: '_d__SaintsSerialized__.intValues.Array.data[1]'
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2156901078156341612, guid: 17ba6a24586274b438a070f05f7f0293, type: 3}
       propertyPath: m_Name
