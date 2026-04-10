@@ -126,7 +126,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
             };
             if (_eLayout.HasFlagFast(ELayout.Background))
             {
-                body.style.paddingRight = 4;
+                body.style.paddingLeft = body.style.paddingRight = 4;
                 body.style.paddingTop = 1;
                 body.style.paddingBottom = 3;
             }
@@ -219,6 +219,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                             marginTop = 0,
                             marginLeft = 0,
                             marginRight = 0,
+                            marginBottom = 0,
                             unityTextAlign = TextAnchor.MiddleLeft,
                             paddingLeft = imageSize,
                             paddingTop = 2,
@@ -377,7 +378,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                 root.style.borderRightColor = FancyBorderColor;
                 root.style.borderTopColor = FancyBorderColor;
                 root.style.borderBottomColor = FancyBorderColor;
-                root.style.paddingRight = 2;
+                // root.style.paddingRight = 2;
             }
 
             root.Add(titleRow);
