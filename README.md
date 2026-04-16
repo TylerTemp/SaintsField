@@ -97,7 +97,7 @@ namespace: `SaintsField`
 
 **5.13.3**
 
-1.  Reversed: Move type of `SaintsFieldConfig` from `` back to `ScriptableObject` as in some cases Unity will try to create `Attribute` on load time when `ScriptableSingleton` can not be deserialized at all, and crashes the editor. [#222](https://github.com/TylerTemp/SaintsField/issues/222)
+1.  Reversed: Move type of `SaintsFieldConfig` from `ScriptableSingleton` back to `ScriptableObject` as in some cases Unity will try to create `Attribute` on load time when `ScriptableSingleton` can not be deserialized at all, and crashes the editor. [#222](https://github.com/TylerTemp/SaintsField/issues/222)
 2.  Fix: `Table` foldout did not have a context menu
 3.  Improve: Better box margin for `LayoutSystem` [#366](https://github.com/TylerTemp/SaintsField/issues/366)
 
@@ -968,7 +968,7 @@ private int ReturnIgnored() => Random.Range(0, 100);
 
 [![video](https://github.com/user-attachments/assets/8632fa84-2e69-46c2-aa1a-8cb247b3888f)](https://github.com/user-attachments/assets/b56f05a2-590f-4683-8b81-2ff4998c4578)
 
-You can use `IEnumerator` for async calling. 
+You can use `IEnumerator` for async calling.
 
 If the yield type is `WaitForSeconds`/`AsyncOperation`, a countdown progress bar will display.
 

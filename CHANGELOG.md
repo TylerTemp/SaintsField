@@ -2,7 +2,7 @@
 
 ## 5.13.3 ##
 
-1.  Reversed: Move type of `SaintsFieldConfig` from `` back to `ScriptableObject` as in some cases Unity will try to create `Attribute` on load time when `ScriptableSingleton` can not be deserialized at all, and crashes the editor. [#222](https://github.com/TylerTemp/SaintsField/issues/222)
+1.  Reversed: Move type of `SaintsFieldConfig` from `ScriptableSingleton` back to `ScriptableObject` as in some cases Unity will try to create `Attribute` on load time when `ScriptableSingleton` can not be deserialized at all, and crashes the editor. [#222](https://github.com/TylerTemp/SaintsField/issues/222)
 2.  Fix: `Table` foldout did not have a context menu
 3.  Improve: Better box margin for `LayoutSystem` [#366](https://github.com/TylerTemp/SaintsField/issues/366)
 
@@ -20,7 +20,7 @@
 1.  Improve: `Button` now display a success or failed icon depending on the result of the calling function
 2.  Improve: `Button` now support `WaitForSeconds`, `WaitUtil` etc. and `AsyncOperation`, and will give a progress bar when possible
 
-## 5.13.0 ## 
+## 5.13.0 ##
 
 1.  Fix: Code parser custom path was not used by field comparer.
 2.  Add: `SaintsDecimal` type for `decimal` serialization.
