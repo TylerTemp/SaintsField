@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.13.3 ##
+
+1.  Reversed: Move type of `SaintsFieldConfig` from `` back to `ScriptableObject` as in some cases Unity will try to create `Attribute` on load time when `ScriptableSingleton` can not be deserialized at all, and crashes the editor. [#222](https://github.com/TylerTemp/SaintsField/issues/222)
+2.  Fix: `Table` foldout did not have a context menu
+3.  Improve: Better box margin for `LayoutSystem` [#366](https://github.com/TylerTemp/SaintsField/issues/366)
+
 ## 5.13.2 ##
 
 1.  Fix: `ResourcePath` now has the correct right-click context menu

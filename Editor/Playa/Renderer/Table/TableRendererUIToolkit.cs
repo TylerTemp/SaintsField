@@ -78,6 +78,8 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                     // marginRight = 54,
                 },
             };
+
+            UIToolkitUtils.AddContextualMenuManipulator(foldout, arrayProp, () => {});
             root.Add(foldout);
 
             IntegerField arraySizeField = new IntegerField

@@ -95,14 +95,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.13.2**
+**5.13.3**
 
-1.  Fix: `ResourcePath` now has the correct right-click context menu
-2.  Fix: `ResourceFolder`/`AssetFolder` now supports dragging a folder directly on the field
-3.  Fix: `ResourceFolder`/`AssetFolder` now gives an error if the resource path does not exist
-4.  Add: `ResourceFolder`/`AssetFolder` is now supported in "Auto Validator"
-5.  Add: Support `decimal` type in "Extended Serialization", you can now directly serialize a decimal type with `SaintsSerialized`
-6.  Add: `ShowInInspector` now can display/edit `decimal` type
+1.  Reversed: Move type of `SaintsFieldConfig` from `` back to `ScriptableObject` as in some cases Unity will try to create `Attribute` on load time when `ScriptableSingleton` can not be deserialized at all, and crashes the editor. [#222](https://github.com/TylerTemp/SaintsField/issues/222)
+2.  Fix: `Table` foldout did not have a context menu
+3.  Improve: Better box margin for `LayoutSystem` [#366](https://github.com/TylerTemp/SaintsField/issues/366)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
