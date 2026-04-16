@@ -9,7 +9,7 @@ namespace SaintsField.Utils
     {
         public static (string error, string result) CheckChange(SaintsFieldConfig instance)
         {
-            if (!File.Exists(SaintsFieldConfigUtil.AssetPath))
+            if (!File.Exists($"Assets/Editor Default Resources/{SaintsFieldConfigUtil.EditorResourcePath}"))
             {
                 return ("Config not created", string.Empty);
             }

@@ -51,39 +51,46 @@ namespace SaintsField.Editor.Utils
                 {
                     ScrollView scroller = new ScrollView();
                     root.Add(scroller);
-                    AddConfigInspector(scroller);
+
+                    Button createConfigButton = new Button
+                    {
+                        text = "Create Config",
+                        style =
+                        {
+                            display = SaintsFieldConfigUtil.IsConfigLoaded? DisplayStyle.None: DisplayStyle.Flex,
+                        },
+                    };
+                    scroller.Add(createConfigButton);
+
+                    VisualElement configContainer = new VisualElement();
+                    scroller.Add(configContainer);
+
+                    createConfigButton.clicked += () =>
+                    {
+                        AddConfigInspector(configContainer);//.OnDeleteConfig.AddListener(OnDeleteConfig);
+                        createConfigButton.style.display = DisplayStyle.None;
+                    };
+
+                    if (SaintsFieldConfigUtil.IsConfigLoaded)
+                    {
+                        AddConfigInspector(configContainer); //.OnDeleteConfig.AddListener(OnDeleteConfig);
+                    }
+
+                    // return;
                     //
-                    // Button createConfigButton = new Button
+                    // void OnDeleteConfig()
                     // {
-                    //     text = "Create Config",
-                    //     style =
-                    //     {
-                    //         display = SaintsFieldConfigUtil.IsConfigLoaded? DisplayStyle.None: DisplayStyle.Flex,
-                    //     },
-                    // };
-                    // scroller.Add(createConfigButton);
-                    //
-                    // VisualElement configContainer = new VisualElement();
-                    // scroller.Add(configContainer);
-                    //
-                    // createConfigButton.clicked += () =>
-                    // {
-                    //     AddConfigInspector(configContainer);//.OnDeleteConfig.AddListener(OnDeleteConfig);
-                    //     createConfigButton.style.display = DisplayStyle.None;
-                    // };
-                    //
-                    // if (SaintsFieldConfigUtil.IsConfigLoaded)
-                    // {
-                    //     AddConfigInspector(configContainer); //.OnDeleteConfig.AddListener(OnDeleteConfig);
+                    //     configContainer.Clear();
+                    //     createConfigButton.style.display = DisplayStyle.Flex;
                     // }
                 },
                 keywords = new System.Collections.Generic.HashSet<string>(new[] { "SaintsField" }),
             };
         }
 
-        private static void AddConfigInspector(VisualElement root)
+        private static SaintsFieldConfig AddConfigInspector(VisualElement root)
         {
-            SaintsFieldConfig config = SaintsFieldConfig.instance;
+            SaintsFieldConfig config = SaintsMenu.EnsureCreateSaintsFieldConfig();
             // SerializedObject serializedObject = new SerializedObject(config);
 
             SaintsEditor editor = (SaintsEditor)UnityEditor.Editor.CreateEditor(config, typeof(SaintsEditor));
@@ -93,7 +100,7 @@ namespace SaintsField.Editor.Utils
             root.Add(ins);
 
             // root.Bind(serializedObject);
-            // return config;
+            return config;
         }
 
         [SettingsProvider]

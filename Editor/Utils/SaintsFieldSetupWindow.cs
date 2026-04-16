@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.IO;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
@@ -23,9 +22,10 @@ namespace SaintsField.Editor.Utils
         [InitializeOnLoadMethod]
         private static void WatchConfigLoad()
         {
-            if (File.Exists(SaintsFieldConfigUtil.AssetPath) && EditorUtility.IsPersistent(SaintsFieldConfig.instance))
+
+            if (SaintsFieldConfigUtil.Config != null)
             {
-                CheckConfigOpen(SaintsFieldConfig.instance);
+                CheckConfigOpen(SaintsFieldConfigUtil.Config);
             }
             else
             {
@@ -109,8 +109,8 @@ namespace SaintsField.Editor.Utils
 
         public override void OnEditorDestroy()
         {
-            SaintsFieldConfig config = SaintsFieldConfig.instance;
-            if(!config.setupWindowPopOnce)
+            SaintsFieldConfig config = SaintsFieldConfigUtil.Config;
+            if(config != null && !config.setupWindowPopOnce)
             {
                 EditorUtility.SetDirty(config);
                 config.setupWindowPopOnce = true;

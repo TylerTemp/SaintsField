@@ -14,17 +14,10 @@ namespace SaintsField.Utils
 #if SAINTSFIELD_DEBUG
     [CreateAssetMenu(fileName = "SaintsFieldConfig", menuName = "ScriptableObject/SaintsFieldConfig", order = 20)]
 #endif
-    [FilePath("Assets/Editor Default Resources/SaintsField/SaintsFieldConfig.asset", FilePathAttribute.Location.ProjectFolder)]
-    public class SaintsFieldConfig : ScriptableSingleton<SaintsFieldConfig>
+    public class SaintsFieldConfig : ScriptableObject
     {
-        private void OnEnable()
-        {
-            hideFlags &= ~HideFlags.NotEditable;
-            _codeParserFolderResult = null;
-        }
-
-        private const int PreParserVersion = 1;
-        private static readonly string PreParserRelativeFolder = "Library/SaintsFieldTempV" + PreParserVersion;
+        public const int PreParserVersion = 1;
+        public static readonly string PreParserRelativeFolder = "Library/SaintsFieldTempV" + PreParserVersion;
 
         public const int UpdateLoopDefaultMs = 100;
 
