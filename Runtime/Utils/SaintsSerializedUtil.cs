@@ -656,9 +656,11 @@ namespace SaintsField.Utils
             {
                 case null:
                 {
-                    // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
+                    // Debug.Log($"OnAfterDeserializeDictionary to new dictionary, saintsSerializedProperty={saintsSerializedProperty.Count}");
                     // return (false, null);
-                    return (true, new Dictionary<TKey, TValue>());
+                    Dictionary<TKey, TValue> result = OnAfterDeserializeDictionary(new Dictionary<TKey, TValue>(), saintsSerializedProperty)
+                        .result;
+                    return (true, result);
                 }
                 case Dictionary<TKey, TValue> originDictionary:
                 {
@@ -690,7 +692,7 @@ namespace SaintsField.Utils
                         }
                         else
                         {
-                            // Debug.Log($"add {keyV}={valueV}");
+                            // Debug.Log($"add kv");
                             originDictionary[keyV] = valueV;
                         }
 
@@ -699,12 +701,12 @@ namespace SaintsField.Utils
 
                     foreach (TKey removeKey in originDictionary.Keys.Except(keys).ToArray())
                     {
-                        // Debug.Log($"remove {removeKey}");
+                        // Debug.Log($"remove key");
                         originDictionary.Remove(removeKey);
                     }
 
-                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}/{saintsSerializedProperty._saintsKeys.Count}={saintsSerializedProperty._saintsValues.Count}");
-                    return (true, originDictionary);
+                    // Debug.Log($"OnAfterDeserializeDictionary inplace {originDictionary.Count} with {saintsSerializedProperty.Count}");
+                    return (false, originDictionary);
                 }
                 default:
                     // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
@@ -719,7 +721,7 @@ namespace SaintsField.Utils
                 case null:
                 {
                     // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
-                    return (true, new HashSet<T>());
+                    return (true, OnAfterDeserializeHashSet(new HashSet<T>(), saintsSerializedProperty).result);
                 }
                 case HashSet<T> originalHashSet:
                 {
@@ -738,7 +740,7 @@ namespace SaintsField.Utils
                     }
 
                     // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}");
-                    return (true, originalHashSet);
+                    return (false, originalHashSet);
                 }
                 default:
                     // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
@@ -752,7 +754,7 @@ namespace SaintsField.Utils
                 case null:
                 {
                     // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
-                    return (true, new HashSet<T>());
+                    return (true, OnAfterDeserializeReferenceHashSet(new HashSet<T>(), saintsSerializedProperty).result);
                 }
                 case HashSet<T> originalHashSet:
                 {
@@ -767,7 +769,7 @@ namespace SaintsField.Utils
                     }
 
                     // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}");
-                    return (true, originalHashSet);
+                    return (false, originalHashSet);
                 }
                 default:
                     // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");

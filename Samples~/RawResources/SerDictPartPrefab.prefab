@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2370357191292358950
+--- !u!1 &7511402810886713192
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,22 +8,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 173335424543569994}
-  - component: {fileID: 9160051824825826174}
+  - component: {fileID: 2300438399459853620}
+  - component: {fileID: 1396233614596044362}
   m_Layer: 0
-  m_Name: SerDictionary
+  m_Name: SerDictPartPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &173335424543569994
+--- !u!4 &2300438399459853620
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2370357191292358950}
+  m_GameObject: {fileID: 7511402810886713192}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -32,45 +32,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9160051824825826174
+--- !u!114 &1396233614596044362
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2370357191292358950}
+  m_GameObject: {fileID: 7511402810886713192}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b2d895589422354390a67373901f986, type: 3}
+  m_Script: {fileID: 11500000, guid: 23d56da2cdfa08646b300d0cfd9a11bb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.SaintsEditor.SerDictionaryExample
-  simpleDict__SaintsSerialized__:
-    _saintsKeys: []
-    _wrapTypeKey: 4
-    _saintsValues: []
-    _wrapTypeValue: 4
-    saintsSerializedVersion: 2
-    _keys: 
-    _values: []
-  dictIntToStruct__SaintsSerialized__:
-    _saintsKeys: []
-    _wrapTypeKey: 4
-    _saintsValues: []
-    _wrapTypeValue: 4
-    saintsSerializedVersion: 2
-    _keys: 
-    _values: []
-  _dictInterface__SaintsSerialized__:
-    _saintsKeys: []
-    _wrapTypeKey: 4
-    _saintsValues: []
-    _wrapTypeValue: 1
-    saintsSerializedVersion: 2
-    _keys: 
-  _dictInterfaceArr__SaintsSerialized__:
-  - _saintsKeys:
-    - valueField:
-        propertyType: 4
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.SerDictPartPrefab
+  _levelToFanParticle__SaintsSerialized__:
+    _saintsKeys:
+    - value: 2
+      valueField:
+        propertyType: 0
         longValue: 0
         uLongValue: 0
         stringValue: 
@@ -78,13 +56,13 @@ MonoBehaviour:
         V: {fileID: 0}
         VRef:
           rid: -2
-        IsVRef: 1
+        IsVRef: 0
       valueArray: []
       valueList: []
-      wrapType: 1
-    _wrapTypeKey: 1
+      wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
-    - value: 11
+    - value: {fileID: 0}
       valueField:
         propertyType: 0
         longValue: 0
@@ -100,8 +78,8 @@ MonoBehaviour:
       wrapType: 4
     _wrapTypeValue: 4
     saintsSerializedVersion: 2
-    _values: 
-  _dictInterfaceLis__SaintsSerialized__: []
+    _keys: 
+    _values: []
   references:
     version: 2
     RefIds:

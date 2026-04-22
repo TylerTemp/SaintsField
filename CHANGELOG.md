@@ -1,10 +1,11 @@
 # Changelog
 
-## 5.13.4 ##
+## 5.13.5 ##
 
 1.  Fix: Code parser custom path was not used correctly on load.
 2.  Add: `Button` now can display the error message if any error happens. This works for both normal method and `IEnumerator` method.
 3.  Add: `Button` with `IEnumerator` now can be manually terminated when it's finished yet.
+4.  Fix: `SaintsSerialized` might failed to deserialize the collection type data and resulted in empty data.
 
 ## 5.13.3 ##
 
