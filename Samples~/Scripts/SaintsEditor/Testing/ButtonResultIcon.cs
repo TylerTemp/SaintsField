@@ -7,6 +7,26 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class ButtonResultIcon : SaintsMonoBehaviour
     {
+        public string s1;
+        [Button]
+        private int ButtonParamsReturn(int p)
+        {
+            return p;
+        }
+
+        [Button]
+        private void ButtonParams(int p)
+        {
+
+        }
+
+        [Button]
+        private int ButtonReturn()
+        {
+            return 1;
+        }
+        public string s2;
+
         [Button]
         private void NormalFunc()
         {
@@ -17,7 +37,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         {
             throw new Exception("Stop There!");
         }
-
         [Button]
         private IEnumerator IEFunc()
         {
@@ -27,8 +46,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [Button]
         private IEnumerator IEFuncError()
         {
-            yield return new WaitForSecondsRealtime(2);  // same as WaitForSeconds
-            throw new Exception("Stop There!");
+            float waitTime = UnityEngine.Random.Range(0.5f, 2f);
+            yield return new WaitForSecondsRealtime(waitTime);  // same as WaitForSeconds
+            throw new Exception($"Expected error happend after {waitTime}s");
         }
 
         [ShowInInspector] private bool _waitUntilMe;

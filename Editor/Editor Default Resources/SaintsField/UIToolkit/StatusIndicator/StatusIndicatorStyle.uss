@@ -29,6 +29,11 @@
     -unity-background-image-tint-color: rgb(255, 45, 23);
 }
 
+.pause {
+    background-image: resource("d_PauseButton");
+    -unity-background-image-tint-color: rgb(151, 23, 255);
+}
+
 .toggleRoot {
     transform-origin: center;
     scale: 0 0;

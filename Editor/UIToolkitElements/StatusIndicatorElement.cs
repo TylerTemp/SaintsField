@@ -5,26 +5,38 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
-    public class StatusIndicatorElement: VisualElement
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    public partial class StatusIndicatorElement: VisualElement
     {
+#if !UNITY_6000_0_OR_NEWER
+        public new class UxmlFactory : UxmlFactory<StatusIndicatorElement, UxmlTraits> { }
+#endif
+
         private static VisualTreeAsset _treeRowTemplate;
         private readonly VisualElement _loading;
         private readonly VisualElement _ok;
         private readonly VisualElement _error;
+        private readonly VisualElement _pause;
         private readonly VisualElement _progressBar;
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public StatusIndicatorElement()
         {
-            _treeRowTemplate = Util.LoadResource<VisualTreeAsset>("UIToolkit/StatusIndicator/StatusIndicator.uxml");
+            _treeRowTemplate ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/StatusIndicator/StatusIndicator.uxml");
             TemplateContainer root = _treeRowTemplate.CloneTree();
+            root.pickingMode = PickingMode.Ignore;
             _loading = root.Q<VisualElement>("Loading");
             _ok = root.Q<VisualElement>("OK");
             _error = root.Q<VisualElement>("Error");
+            _pause = root.Q<VisualElement>("Pause");
             _progressBar = root.Q<VisualElement>("ProgressBar");
 
             _pendingTasks[_loading] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_ok] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_error] = new List<IVisualElementScheduledItem>();
+            _pendingTasks[_pause] = new List<IVisualElementScheduledItem>();
             _displayStatus[_loading] = false;
             _displayStatus[_ok] = false;
             _displayStatus[_error] = false;
@@ -63,6 +75,7 @@ namespace SaintsField.Editor.UIToolkitElements
             {
                 EnsureHide(_ok);
                 EnsureHide(_error);
+                EnsureHide(_pause);
                 PlayShow(_loading);
                 if (progress >= 0)
                 {
@@ -82,6 +95,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
             EnsureHide(_ok);
             EnsureHide(_error);
+            EnsureHide(_pause);
 
             if(curDisplaying)
             {
@@ -102,6 +116,8 @@ namespace SaintsField.Editor.UIToolkitElements
         {
             EnsureHide(_loading);
             EnsureHide(_error);
+            EnsureHide(_pause);
+
             if (_displayStatus[_ok])
             {
                 EnsureHide(_ok);
@@ -123,6 +139,8 @@ namespace SaintsField.Editor.UIToolkitElements
         {
             EnsureHide(_loading);
             EnsureHide(_ok);
+            EnsureHide(_pause);
+
             if (_displayStatus[_error])
             {
                 EnsureHide(_error);
@@ -140,25 +158,33 @@ namespace SaintsField.Editor.UIToolkitElements
             _displayStatus[_error] = true;
         }
 
-        // public void DoPlay()
-        // {
-        //     Play(_loading);
-        // }
+        public void PlayPause()
+        {
+            EnsureHide(_loading);
+            EnsureHide(_ok);
+            EnsureHide(_error);
 
-        // private readonly List<IVisualElementScheduledItem> _pendingTasks = new List<IVisualElementScheduledItem>();
+            if (_displayStatus[_pause])
+            {
+                EnsureHide(_pause);
+                _pendingTasks[_pause].Add(schedule.Execute(() =>
+                {
+                    PlayShow(_pause);
+                    TimeoutHide(_pause);
+                }).StartingIn(100));
+            }
+            else
+            {
+                PlayShow(_pause);
+                TimeoutHide(_pause);
+            }
+            _displayStatus[_pause] = true;
+        }
+
         private readonly Dictionary<VisualElement, List<IVisualElementScheduledItem>> _pendingTasks =
             new Dictionary<VisualElement, List<IVisualElementScheduledItem>>();
         private readonly Dictionary<VisualElement, bool> _displayStatus =
             new Dictionary<VisualElement, bool>();
-
-        // private void CleanTasks()
-        // {
-        //     foreach (IVisualElementScheduledItem pt in _pendingTasks)
-        //     {
-        //         pt.Pause();
-        //     }
-        //     _pendingTasks.Clear();
-        // }
 
 
         private void CleanTasks(VisualElement el)

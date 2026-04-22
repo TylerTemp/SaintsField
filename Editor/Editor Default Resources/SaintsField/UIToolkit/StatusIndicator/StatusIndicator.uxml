@@ -1,10 +1,11 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/StatusIndicator/StatusIndicatorStyle.uss?fileID=7433441132597879392&amp;guid=635d456b0d057bf41906c5802fd1e5c4&amp;type=3#StatusIndicatorStyle"/>
     <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/SaintsRotate.uss?fileID=7433441132597879392&amp;guid=2ab8c04876944150b2df065c28e1dd66&amp;type=3#SaintsRotate"/>
-    <ui:VisualElement name="Loading" class="saints-rotate loading container toggleImageRoot"/>
-    <ui:VisualElement name="OK" class="container ok toggleRoot"/>
-    <ui:VisualElement name="Error" class="container toggleRoot error"/>
-    <ui:VisualElement name="ProgresssBarContainer" class="progressBarContainer">
+    <ui:VisualElement name="Loading" picking-mode="Ignore" class="saints-rotate loading container toggleImageRoot"/>
+    <ui:VisualElement name="OK" picking-mode="Ignore" class="container ok toggleRoot"/>
+    <ui:VisualElement name="Error" picking-mode="Ignore" class="container toggleRoot error"/>
+    <ui:VisualElement name="Pause" picking-mode="Ignore" class="container toggleRoot pause"/>
+    <ui:VisualElement name="ProgresssBarContainer" picking-mode="Ignore" class="progressBarContainer">
         <ui:VisualElement name="ProgressBar" picking-mode="Ignore" class="progressBar"/>
     </ui:VisualElement>
 </ui:UXML>

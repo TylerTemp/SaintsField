@@ -1,0 +1,87 @@
+:root {
+    /*margin: 0 4px;*/
+}
+
+.parameters {
+    flex-grow: 1;
+    padding-right: 4px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(41, 41, 41);
+    border-right-color: rgb(41, 41, 41);
+    border-top-color: rgb(41, 41, 41);
+    border-radius: 3px 3px 0 0;
+}
+
+.buttonArea {
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+.mainButton {
+    flex-shrink: 1;
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+
+
+.mainButtonWithClose {
+    border-right-width: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.closeButton {
+    -unity-background-scale-mode: scale-to-fit;
+    background-image: resource("d_Close");
+    min-width: 18px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.buttonWithParams {
+    border-top-width: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+
+.buttonWithResult {
+    border-bottom-width: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+
+.ghostButton {
+    margin: 0;
+}
+
+.mainLabel {
+    align-content: center;
+    flex-grow: 1;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.statusIndicatorElement {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 2px;
+    right: 2px;
+}
+
+.result {
+    flex-grow: 1;
+    padding-right: 4px;
+    border-bottom-width: 1px;
+    border-right-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(41, 41, 41);
+    border-right-color: rgb(41, 41, 41);
+    border-bottom-color: rgb(41, 41, 41);
+    border-radius: 0 0 3px 3px;
+}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.13.4 ##
+
+1.  Fix: Code parser custom path was not used correctly on load.
+2.  Add: `Button` now can display the error message if any error happens. This works for both normal method and `IEnumerator` method.
+3.  Add: `Button` with `IEnumerator` now can be manually terminated when it's finished yet.
+
 ## 5.13.3 ##
 
 1.  Reversed: Move type of `SaintsFieldConfig` from `ScriptableSingleton` back to `ScriptableObject` as in some cases Unity will try to create `Attribute` on load time when `ScriptableSingleton` can not be deserialized at all, and crashes the editor. [#222](https://github.com/TylerTemp/SaintsField/issues/222)

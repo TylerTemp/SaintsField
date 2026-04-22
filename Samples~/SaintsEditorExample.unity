@@ -2191,6 +2191,53 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+--- !u!1 &494659098
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 494659099}
+  - component: {fileID: 494659100}
+  m_Layer: 0
+  m_Name: ButtonResultIcon (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &494659099
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494659098}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &494659100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494659098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda65753ca60bf84fa63fb7e2d001e32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ButtonResultIcon
+  s1: 
+  s2: 
+  res: Packages/today.comes.saintsbuild/Samples/RawResources/Text (TMP)
 --- !u!1 &504820853
 GameObject:
   m_ObjectHideFlags: 0
@@ -4944,6 +4991,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cda65753ca60bf84fa63fb7e2d001e32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ButtonResultIcon
+  s1: 
+  s2: 
   res: Packages/today.comes.saintsbuild/Samples/RawResources/Text (TMP)
 --- !u!1 &1150580243
 GameObject:
@@ -5135,6 +5184,7 @@ Transform:
   - {fileID: 1903957528}
   - {fileID: 1779724378}
   - {fileID: 1137110948}
+  - {fileID: 494659099}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1196999815
@@ -8402,7 +8452,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   s: []
-  dynamicContent: <color=brown>dynamic!
+  dynamicContent: 
 --- !u!1 &1872824170
 GameObject:
   m_ObjectHideFlags: 0
@@ -9678,15 +9728,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 2103412845}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee885033ee8c21d46b6abd36d50519f6, type: 3}
+  m_Script: {fileID: 11500000, guid: dbc192b90ead410a8d627321544b56dd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue366NestedFoldoutBox
-  various: 
-  isActive: 0
-  isFriendly: 0
-  spawnByTime:
-    time: 0
-  hasTakenDamage: 0
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue366.Issue366Mono
+  swarmSpawner:
+    isActive: 0
+    isFriendly: 0
+    spawnByTime:
+      s: 
+    hasTakenDamage: 0
+    spawnByTime_WhenTookOneDamage:
+      s: 
+    spawnOnDamage: 0
+    spawnOnDamage_EntitiesToSpawn:
+      s: 
+    spawnOnDamage_CooldownSeconds: 0
+    spawnOnDamage_RemainingCooldown: 0
+    spawnOnDamage_damageCounter: 0
+    spawnOnDamage_BurstCount: {x: 0, y: 0}
+    spawnOnDamage_RestCount: {x: 0, y: 0}
+    spawnOnDamage_CurrentBurstRemaining: 0
+    spawnOnDamage_CurrentRestRemaining: 0
+    spawnOnDamage_ChainReactionRadius: 0
+    unitSpawnPositions: []
+    unitSpawnPositions_ConvertedToVector3: []
 --- !u!1 &2117085778
 GameObject:
   m_ObjectHideFlags: 0
