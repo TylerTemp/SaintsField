@@ -1,5 +1,4 @@
 :root {
-    /*margin: 0 4px;*/
 }
 
 .parameters {
@@ -25,8 +24,6 @@
     flex-direction: row;
 }
 
-
-
 .mainButtonWithClose {
     border-right-width: 0;
     border-top-right-radius: 0;
@@ -35,7 +32,7 @@
 
 .closeButton {
     -unity-background-scale-mode: scale-to-fit;
-    background-image: resource("d_Close");
+    background-image: url('project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/close-padding.png?fileID=2800000&guid=36dd69db1bf18b64eb0aa0ef5d34280b&type=3#close-padding');
     min-width: 18px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -47,13 +44,11 @@
     border-top-right-radius: 0;
 }
 
-
 .buttonWithResult {
     border-bottom-width: 0;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
-
 
 .ghostButton {
     margin: 0;
