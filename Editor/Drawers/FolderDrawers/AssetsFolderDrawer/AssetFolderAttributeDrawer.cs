@@ -36,10 +36,17 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
                     Callback = null,
                 };
             }
-            string err = Directory.Exists(property.stringValue)? "": $"Folder \"{property.stringValue}\" does not exists";
+            string value = property.stringValue;
+
+            string error = "";
+            if (!string.IsNullOrEmpty(value) && !Directory.Exists(value))
+            {
+                error = $"Folder \"{value}\" does not exists";
+            }
+
             return new AutoRunnerFixerResult
             {
-                Error = err,
+                Error = error,
                 ExecError = "",
                 CanFix = false,
                 Callback = null,

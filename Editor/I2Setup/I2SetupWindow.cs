@@ -14,9 +14,12 @@ namespace SaintsField.Editor.I2Setup
             window.Show();
         }
 
+        private const string DefaultI2InstallFolder = "Assets/I2";
+
         [FieldInfoBox("Please select the root folder of your I2 Localization plugin.")]
+        // [ValidateInput(nameof(FolderExists))]
         [Required]
-        [AssetFolder("Assets/I2", "Choose your I2 Localization folder")]
+        [AssetFolder(DefaultI2InstallFolder, "Choose your I2 Localization folder")]
         public string i2LocFolder;
 
         [FieldInfoBox("asmdef file name, must endswith .asmdef")]
@@ -47,12 +50,19 @@ namespace SaintsField.Editor.I2Setup
             File.Copy(i2LocAsmdefPath, $"{i2LocFolder}/{i2LocAsdmefName}", true);
             File.Copy(i2LocAsmdefMetaPath, $"{i2LocFolder}/{i2LocAsdmefName}.meta", true);
             AssetDatabase.Refresh();
-            SaintsMenu.AddCompileDefine("SAINTSFIELD_I2_LOC");
+            SaintsMenu.AddCompileDefine(SaintsMenu.EnableI2LocalizationSupportMarco);
             Close();
         }
 
+        // private bool FolderExists(string folder) => Directory.Exists(folder);
+
         public override void OnEditorEnable()
         {
+            if (Directory.Exists(DefaultI2InstallFolder))
+            {
+                i2LocFolder = DefaultI2InstallFolder;
+            }
+
             i2LocAsmdefPath = i2LocAsmdefMetaPath = "";
             foreach (string folder in Util.ResourceSearchFolder)
             {

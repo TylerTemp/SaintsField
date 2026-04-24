@@ -44,4 +44,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90aa17b125d44e1aa40a2101379471a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vector2Step03: {x: 0, y: 0}
+  vector2Step03Adapt: {x: 0, y: 0}
   vector2IntStep3: {x: 0, y: 18}
+  vector2IntStep3Adapt: {x: 0, y: 0}
+  vector2IntFree: {x: 0, y: 0}
+  <OuterRange>k__BackingField: {x: 0, y: 0}
+  _innerRange: {x: 0, y: 0}
+  <DynamicMin>k__BackingField: 0
+  <DynamicMax>k__BackingField: 0
+  _propRange: {x: 0, y: 0}
+  _propLeftRange: {x: 0, y: 0}
+  _propRightRange: {x: 0, y: 0}
+  vector2Step03Disabled: {x: 0, y: 0}
+  incorrectType: 0

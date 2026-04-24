@@ -17,9 +17,9 @@ namespace SaintsField.Samples.EditorTest
 
         private int _maxCount = 100;
 
-#if SAINTSFIELD_DEBUG
-        [MenuItem(RuntimeUtil.MenuRoot + "EditorWindowOrder")]
-#endif
+// #if SAINTSFIELD_DEBUG
+//         [MenuItem(RuntimeUtil.MenuRoot + "EditorWindowOrder")]
+// #endif
         public static void ShowWindow()
         {
             GetWindow<EditorWindowOrder>();

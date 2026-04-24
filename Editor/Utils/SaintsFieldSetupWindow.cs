@@ -11,9 +11,9 @@ namespace SaintsField.Editor.Utils
 {
     public class SaintsFieldSetupWindow: SaintsEditorWindow
     {
-#if SAINTSFIELD_DEBUG
-        [MenuItem(RuntimeUtil.MenuRoot + "/SaintsField Setup")]
-#endif
+// #if SAINTSFIELD_DEBUG
+//         [MenuItem(RuntimeUtil.MenuRoot + "/SaintsField Setup")]
+// #endif
         public static void Open()
         {
             GetWindow<SaintsFieldSetupWindow>("SaintsField Setup").Show();

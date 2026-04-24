@@ -149,7 +149,13 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
 
         private static void CheckHelpBox(string value, HelpBox helpBox)
         {
-            UIToolkitUtils.SetHelpBox(helpBox, Directory.Exists(value)? "": $"Folder \"{value}\" does not exists");
+            string error = "";
+            if (!string.IsNullOrEmpty(value) && !Directory.Exists(value))
+            {
+                error = $"Folder \"{value}\" does not exists";
+            }
+
+            UIToolkitUtils.SetHelpBox(helpBox, error);
         }
     }
 }

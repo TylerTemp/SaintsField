@@ -19,8 +19,7 @@ namespace SaintsField.Editor.TroubleshootEditor
 {
     public class TroubleshootEditorWindow: SaintsEditorWindow
     {
-        [MenuItem(RuntimeUtil.MenuRoot + "Troubleshoot")]
-        public static void TestOpenWindow()
+        public static void Open()
         {
             EditorWindow window = GetWindow<TroubleshootEditorWindow>(false, "SaintsField Troubleshoot");
             window.Show();
