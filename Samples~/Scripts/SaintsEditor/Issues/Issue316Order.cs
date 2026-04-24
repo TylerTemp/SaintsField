@@ -8,7 +8,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues
 // #endif
     public class Issue316Order : SaintsScriptableObject
     {
+#pragma warning disable CS0108, CS0114
         public string name;
+#pragma warning restore CS0108, CS0114
         public Sprite unitSprite;
         public string description;
         public int unitType;
