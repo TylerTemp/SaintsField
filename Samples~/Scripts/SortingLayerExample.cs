@@ -20,11 +20,23 @@ namespace SaintsField.Samples.Scripts
 
         private void OnValueChanged(string s) => Debug.Log(_sortingLayerString);
 
-        [ShowInInspector, SortingLayer]
-        private int SortingLayerInt
+        [ShowInInspector]  // can be used as params
+        private int CalcParamSortingLayerInt([SortingLayer] int sceneI)
         {
-            get => _sortingLayerInt;
-            set => _sortingLayerInt = value;
+            return sceneI;
+        }
+
+        [ShowInInspector]
+        [SortingLayer]  // can be used as return value
+        private string CalcParamSortingLayerStr([SortingLayer] string sceneS)
+        {
+            return sceneS;
+        }
+
+        [Button]  // Works on Button too
+        private (int i, string s) ButtonParam([SortingLayer] int sceneI, [SortingLayer] string sceneS)
+        {
+            return (sceneI, sceneS);
         }
     }
 }
