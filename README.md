@@ -1252,25 +1252,32 @@ It can work with `ShowInInspector`
 }
 ```
 
-![](https://github.com/user-attachments/assets/d733da4a-aa83-4f6c-a974-a8c966f237c5)
+![](https://github.com/user-attachments/assets/8ca9f2aa-5f27-42cb-9c03-d51a94776342)
 
 It can work with `ShowInInspector`/`Button` parameters and return value
 
 ```csharp
-[ShowInInspector]
-private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sceneS)
+[ShowInInspector]  // can be used as params
+private int CalcParamSortingLayerInt([SortingLayer] int sceneI)
 {
-    return (sceneI, sceneS);
+    return sceneI;
 }
 
-[Button]
-private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sceneS)
+[ShowInInspector]
+[SortingLayer]  // can be used as return value
+private string CalcParamSortingLayerStr([SortingLayer] string sceneS)
+{
+    return sceneS;
+}
+
+[Button]  // Works on Button too
+private (int i, string s) ButtonParam([SortingLayer] int sceneI, [SortingLayer] string sceneS)
 {
     return (sceneI, sceneS);
 }
 ```
 
-![](https://github.com/user-attachments/assets/a3862780-3f81-4ba1-a64a-ef51ef55e0c3)
+![](https://github.com/user-attachments/assets/a9f1cf8a-6c42-4aa2-be1a-3623ae73f5d2)
 
 #### `Tag` ####
 
