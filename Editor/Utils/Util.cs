@@ -145,7 +145,7 @@ namespace SaintsField.Editor.Utils
             }
             else if (value is Enum)
             {
-                numericValue = Convert.ToInt64(value);;
+                numericValue = Convert.ToInt64(value);
             }
             else
             {
@@ -784,7 +784,7 @@ namespace SaintsField.Editor.Utils
         //         : ("", ReflectUtils.Truly(value));
         // }
 
-        public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
+        public static (string error, MemberInfo memberInfo, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
         {
             if (by.StartsWith(":"))
             {
@@ -794,7 +794,7 @@ namespace SaintsField.Editor.Utils
 
             if (target == null)
             {
-                return ("Target is null", defaultValue);
+                return ("Target is null", null, defaultValue);
             }
 
             return by.Contains(".")
@@ -802,7 +802,7 @@ namespace SaintsField.Editor.Utils
                 : FlatGetOf(by, defaultValue, property, memberInfo, target, overrideParams);
         }
 
-        private static (string error, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
+        private static (string error, MemberInfo memberInfo, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
             object parent, IReadOnlyList<object> overrideParams)
         {
             string accBy = by;
@@ -814,7 +814,7 @@ namespace SaintsField.Editor.Utils
                 (error, accBy, accParent) = UpwardWalk(by, property, parent);
                 if (error != "")
                 {
-                    return (error, defaultValue);
+                    return (error, null, defaultValue);
                 }
             }
 
@@ -827,7 +827,7 @@ namespace SaintsField.Editor.Utils
             // Debug.Log($"looking for {accBy} in {accParent}");
 
             // MemberInfo accMemberInfo = memberInfo;
-            (string error, T result) thisResult = ("No Attributes", defaultValue);
+            (string error, MemberInfo memberInfo, T result) thisResult = ("No Attributes", null, defaultValue);
 
             foreach (string attrName in accBy.Split(SerializedUtils.DotSplitSeparator))
             {
@@ -858,7 +858,7 @@ namespace SaintsField.Editor.Utils
 
         }
 
-        public static (string error, T result) FlatGetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
+        public static (string error, MemberInfo memberInfo, T result) FlatGetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
         {
             if (by.StartsWith(":"))
             {
@@ -868,13 +868,13 @@ namespace SaintsField.Editor.Utils
 
             if (target == null)
             {
-                return ("Target is null", defaultValue);
+                return ("Target is null", null, defaultValue);
             }
 
             foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(target))
             {
                 ReflectUtils.GetPropType getPropType;
-                object fieldOrMethodInfo;
+                MemberInfo fieldOrMethodInfo;
                 try
                 {
                     (getPropType, fieldOrMethodInfo) = ReflectUtils.GetProp(type, by);
@@ -890,11 +890,15 @@ namespace SaintsField.Editor.Utils
                             (string methodError, object methodReturnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
                             if (methodError == "")
                             {
-                                return ConvertTo(methodReturnValue, defaultValue);
+                                (string error, T result) methodConvert = ConvertTo(methodReturnValue, defaultValue);
+                                return (methodConvert.error, methodInfo, methodConvert.result);
                             }
                         }
                     }
-                    return ($"All method failed to match the signature: {string.Join("; ", methodInfos.Select(eachMethod => $"({string.Join(", ", eachMethod.GetParameters().Select(each => $"{each.ParameterType} {each.Name}{(each.HasDefaultValue? $"={each.DefaultValue}": "")}"))}) => {eachMethod.ReturnParameter}"))}", defaultValue);
+                    return (
+                        $"All method failed to match the signature: {string.Join("; ", methodInfos.Select(eachMethod => $"({string.Join(", ", eachMethod.GetParameters().Select(each => $"{each.ParameterType} {each.Name}{(each.HasDefaultValue? $"={each.DefaultValue}": "")}"))}) => {eachMethod.ReturnParameter}"))}",
+                        null,
+                        defaultValue);
                 }
 
                 object genResult;
@@ -920,7 +924,7 @@ namespace SaintsField.Editor.Utils
                         (string methodError, object methodReturnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
                         if (methodError != "")
                         {
-                            return (methodError, defaultValue);
+                            return (methodError, methodInfo, defaultValue);
                         }
 
                         genResult = methodReturnValue;
@@ -932,13 +936,15 @@ namespace SaintsField.Editor.Utils
                 }
 
                 // Debug.Log($"GetOf {genResult}/{genResult?.GetType()}/{genResult==null}");
-                return ConvertTo(genResult, defaultValue);
+                var r = ConvertTo(genResult, defaultValue);
+                return (r.error, fieldOrMethodInfo, r.result);
             }
 
-            return ($"No field or method named `{by}` found on `{target}`", defaultValue);
+            return ($"No field or method named `{by}` found on `{target}`", null, defaultValue);
         }
 
         // this can not walk out of the
+        // ReSharper disable once UnusedParameter.Local
         private static (string error, string by, object parent) UpwardWalk(string by, SerializedProperty property, object parent)
         {
             Debug.Assert(by.StartsWith("../"));
@@ -1217,13 +1223,13 @@ namespace SaintsField.Editor.Utils
                 : assembly.GetTypes().FirstOrDefault(t => t.Name == split[0]);
         }
 
-        private static (string error, T result) GetOfStatic<T>(string nameSpaceAndName, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
+        private static (string error, MemberInfo memberInfo, T result) GetOfStatic<T>(string nameSpaceAndName, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target, IReadOnlyList<object> overrideParams)
         {
             List<string> split = new List<string>(nameSpaceAndName.Split('.'));
             int totalLength = split.Count;
             if (totalLength == 0)
             {
-                return ($"Static/Const callback must be in form of `Namespace.ClassName.FieldNameOrMethodName` or `ClassName.FieldNameOrMethodName`, get {nameSpaceAndName}", defaultValue);
+                return ($"Static/Const callback must be in form of `Namespace.ClassName.FieldNameOrMethodName` or `ClassName.FieldNameOrMethodName`, get {nameSpaceAndName}", null, defaultValue);
             }
 
             bool fullSearch = totalLength > 1;
@@ -1255,7 +1261,7 @@ namespace SaintsField.Editor.Utils
             }
             if (type == null)
             {
-                return ($"type name `{string.Join(".", split)}` not found", defaultValue);
+                return ($"type name `{string.Join(".", split)}` not found", null, defaultValue);
             }
 
             const BindingFlags bindAttr = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public |
@@ -1275,10 +1281,11 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e);
 #endif
-                    return (e.Message, defaultValue);
+                    return (e.Message, null, defaultValue);
                 }
 
-                return ConvertTo(genResult, defaultValue);
+                (string error, T result) r = ConvertTo(genResult, defaultValue);
+                return (r.error, fieldInfo, r.result);
             }
 
             PropertyInfo propertyInfo = type.GetProperty(fieldOrMethod, bindAttr);
@@ -1294,10 +1301,11 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e);
 #endif
-                    return (e.Message, defaultValue);
+                    return (e.Message, null, defaultValue);
                 }
 
-                return ConvertTo(genResult, defaultValue);
+                (string error, T result) r = ConvertTo(genResult, defaultValue);
+                return (r.error, propertyInfo, r.result);
             }
 
             MethodInfo[] methodInfos = type.GetMethods(bindAttr);
@@ -1306,10 +1314,11 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG
                 Debug.LogWarning($"No field, property or method found for {nameSpaceAndName}");
 #endif
-                return ($"No field, property or method found for {nameSpaceAndName}", defaultValue);
+                return ($"No field, property or method found for {nameSpaceAndName}", null, defaultValue);
             }
 
             List<string> errors = new List<string>();
+            MethodInfo foundMethodInfo = null;
             foreach (MethodInfo methodInfo in methodInfos)
             {
                 if(methodInfo.Name == fieldOrMethod)
@@ -1318,9 +1327,11 @@ namespace SaintsField.Editor.Utils
                         InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target, overrideParams);
                     if (error == "")
                     {
-                        return ConvertTo(returnValue, defaultValue);
+                        (string error, T result) r = ConvertTo(returnValue, defaultValue);
+                        return (r.error, memberInfo, r.result);
                     }
 
+                    foundMethodInfo = methodInfo;
                     errors.Add(error);
                 }
             }
@@ -1357,10 +1368,11 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG
                                 Debug.LogException(e);
 #endif
-                                return (e.Message, defaultValue);
+                                return (e.Message, null, defaultValue);
                             }
 
-                            return ConvertTo(genResult, defaultValue);
+                            var r = ConvertTo(genResult, defaultValue);
+                            return (r.error, foundMethodInfo, r.result);
                         }
                     }
 
@@ -1368,7 +1380,7 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG
                 Debug.LogWarning($"No method/field/property {fieldOrMethod} found for {string.Join(".", split)}");
 #endif
-                return ($"No method/field/property {fieldOrMethod} found for {string.Join(".", split)}", defaultValue);
+                return ($"No method/field/property {fieldOrMethod} found for {string.Join(".", split)}", null, defaultValue);
             }
 
             string finalError = string.Join("\n", errors);
@@ -1377,7 +1389,7 @@ namespace SaintsField.Editor.Utils
             Debug.LogWarning(finalError);
 #endif
 
-            return (finalError, defaultValue);
+            return (finalError, null, defaultValue);
         }
 
         // public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
@@ -1944,7 +1956,7 @@ namespace SaintsField.Editor.Utils
 
                 if(!foundResult)
                 {
-                    (string error, object getResult) = GetOf<object>(conditionStringTarget, null, property, info, target, null);
+                    (string error, MemberInfo _, object getResult) = GetOf<object>(conditionStringTarget, null, property, info, target, null);
 
                     if (error != "")
                     {
@@ -1967,7 +1979,7 @@ namespace SaintsField.Editor.Utils
                     }
                     else
                     {
-                        (string errorValue, object callbackResult) =
+                        (string errorValue, MemberInfo _, object callbackResult) =
                             GetOf<object>((string)value, null, property, info, target, null);
                         if (errorValue != "")
                         {
@@ -2558,7 +2570,7 @@ namespace SaintsField.Editor.Utils
                 };
             }
 
-            (string callbackError, object value) = GetOf<object>(space, null, property, info, parent, null);
+            (string callbackError, MemberInfo _, object value) = GetOf<object>(space, null, property, info, parent, null);
             if (callbackError != "")
             {
                 return new TargetWorldPosInfo

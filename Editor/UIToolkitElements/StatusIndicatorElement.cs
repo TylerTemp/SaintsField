@@ -225,7 +225,7 @@ namespace SaintsField.Editor.UIToolkitElements
             _pendingTasks[el].Add(hideTask);
         }
 
-        public void EnsureHide(VisualElement el)
+        private void EnsureHide(VisualElement el)
         {
             _displayStatus[el] = false;
             CleanTasks(el);

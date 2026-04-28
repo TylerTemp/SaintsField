@@ -73,7 +73,7 @@ namespace SaintsField.Editor.Drawers
                 //     return SignObject(targetProperty.objectReferenceValue);
                 // }
 
-                (string error, object foundObj) =
+                (string error, MemberInfo _, object foundObj) =
                     Util.GetOf<object>(imageCompName, null, property, info, parent, null);
 
                 if (error != "")

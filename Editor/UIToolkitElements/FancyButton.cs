@@ -95,6 +95,11 @@ namespace SaintsField.Editor.UIToolkitElements
             _result.Clear();
         }
 
+        public bool HasResult()
+        {
+            return _result.childCount > 0;
+        }
+
 
     }
 }

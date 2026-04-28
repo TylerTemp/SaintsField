@@ -8,6 +8,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 
@@ -130,7 +131,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             {
                 buttonInfo.ExecError = "";
 
-                foreach ((string error, object result) in CallButtonFunc(property, decButtonAttribute.FuncName, info, target))
+                foreach ((string error, MemberInfo _, object result) in CallButtonFunc(property, decButtonAttribute.FuncName, info, target))
                 {
                     if (error == "")
                     {

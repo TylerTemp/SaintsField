@@ -109,7 +109,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             }
             else
             {
-                (string getError, object getValue) =
+                (string getError, MemberInfo _, object getValue) =
                     Util.GetOf<object>(progressBarAttribute.MinCallback, 0, property, info, parent, null);
                 if (getError != "")
                 {
@@ -127,7 +127,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             }
             else
             {
-                (string getError, object getValue) =
+                (string getError, MemberInfo _, object getValue) =
                     Util.GetOf<object>(progressBarAttribute.MaxCallback, 0f, property, info, parent, null);
                 if (getError != "")
                 {

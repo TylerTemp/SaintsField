@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Reflection;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -39,7 +40,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonCustomContextMenuFakeRenderer
                 DropdownMenuAction.Status status = DropdownMenuAction.Status.Normal;
                 if (_customContextMenuAttribute.MenuNameIsCallback)
                 {
-                    (string error, object result) = Util.GetOf<object>(
+                    (string error, MemberInfo _, object result) = Util.GetOf<object>(
                         _customContextMenuAttribute.FuncName ?? _customContextMenuAttribute.MenuName,
                         null, FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, GetRefreshedTarget(FieldWithInfo, FieldWithInfo.Targets[0]).useTarget, null);
                     if (error != "")

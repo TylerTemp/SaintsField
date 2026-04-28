@@ -47,7 +47,7 @@ namespace SaintsField.Editor.Utils
         public const BindingFlags FindTargetBindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                       BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
 
-        public static (GetPropType getPropType, object fieldOrMethodInfo) GetProp(Type targetType, string fieldName)
+        public static (GetPropType getPropType, MemberInfo fieldOrMethodInfo) GetProp(Type targetType, string fieldName)
         {
             FieldInfo fieldInfo = targetType.GetField(fieldName, FindTargetBindAttr);
             // Debug.Log($"init get fieldInfo {fieldInfo}");

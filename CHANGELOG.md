@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.13.6 ##
+
+1.  Add: `AboveButton`/`BelowButton`/`PostFieldButton` now can show return result, has loading indicator just like `Button`
+2.  Fix: `GetByXPath` now search possible types for `GetComponent`, support sub-types, interfaces [#385](https://github.com/TylerTemp/SaintsField/issues/385)
+3.  Fix: `SortingLayer` now work with `ShowInInspector` and `Button`-s
+
 ## 5.13.5 ##
 
 1.  Fix: Code parser custom path was not used correctly on load.

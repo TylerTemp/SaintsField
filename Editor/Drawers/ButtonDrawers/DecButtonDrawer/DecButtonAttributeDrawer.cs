@@ -9,7 +9,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 {
     public abstract partial class DecButtonAttributeDrawer: SaintsPropertyDrawer
     {
-        public static IEnumerable<(string error, object result)> CallButtonFunc(SerializedProperty property, string callback, FieldInfo fieldInfo, object target)
+        public static IEnumerable<(string error, MemberInfo memberInfo, object result)> CallButtonFunc(SerializedProperty property, string callback, FieldInfo fieldInfo, object target)
         {
             SaintsContext.SerializedProperty = property;
 

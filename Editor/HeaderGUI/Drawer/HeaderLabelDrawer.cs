@@ -130,7 +130,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
             }
             else if(headerLabelAttribute.IsCallback)
             {
-                (string error, object result) = Util.GetOf<object>(headerLabelAttribute.Label, null, null, renderTargetInfo.MemberInfo, target, null);
+                (string error, MemberInfo _, object result) = Util.GetOf<object>(headerLabelAttribute.Label, null, null, renderTargetInfo.MemberInfo, target, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG

@@ -92,12 +92,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.13.5**
+**5.13.6**
 
-1.  Fix: Code parser custom path was not used correctly on load.
-2.  Add: `Button` now can display the error message if any error happens. This works for both normal method and `IEnumerator` method.
-3.  Add: `Button` with `IEnumerator` now can be manually terminated when it's finished yet.
-4.  Fix: `SaintsSerialized` might failed to deserialize the collection type data and resulted in empty data.
+1.  Add: `AboveButton`/`BelowButton`/`PostFieldButton` now can show return result, has loading indicator just like `Button`
+2.  Fix: `GetByXPath` now search possible types for `GetComponent`, support sub-types, interfaces [#385](https://github.com/TylerTemp/SaintsField/issues/385)
+3.  Fix: `SortingLayer` now work with `ShowInInspector` and `Button`-s
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 

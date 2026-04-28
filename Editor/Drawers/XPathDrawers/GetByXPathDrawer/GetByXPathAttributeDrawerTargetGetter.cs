@@ -114,7 +114,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     IEnumerable<XPathStep> xPathSteps;
                     if (xPathInfo.IsCallback)
                     {
-                        (string error, string xPathString) = Util.GetOf(xPathInfo.Callback, "", property, info, parent, null);
+                        (string error, MemberInfo _, string xPathString) = Util.GetOf(xPathInfo.Callback, "", property, info, parent, null);
 
                         if (error != "")
                         {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
@@ -9,20 +10,22 @@ namespace SaintsField.Samples.Scripts
 
         [field: SerializeField] private string _labelByField;
 
-        [AboveButton(nameof(ClickErrorButton), "$" + nameof(_labelByField))]
-        [AboveButton(nameof(ClickErrorButton), "Click <color=green><icon='eye.png' /></color>!")]
-        [AboveButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
-        [AboveButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
+        [AboveButton(nameof(ClickLogButton), "$" + nameof(_labelByField))]
+        [AboveButton(nameof(ClickWithReturn), "Click <color=green><icon='eye.png' /></color>!")]
+        [AboveButton(nameof(ClickCanErrorButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
+        [AboveButton(nameof(ClickIe), "$" + nameof(GetButtonLabel), groupBy: "OK")]
 
         [PostFieldButton(nameof(ToggleAndError), "$" + nameof(GetButtonLabelIcon))]
         [PostFieldButton(nameof(ToggleAndError), "$" + nameof(GetButtonLabelIcon))]
 
-        [BelowButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
-        [BelowButton(nameof(ClickButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
-        [BelowButton(nameof(ClickErrorButton), "Below <color=green><icon='eye.png' /></color>!")]
+        [BelowButton(nameof(ClickCanErrorButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
+        [BelowButton(nameof(ClickCanErrorButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
+        [BelowButton(nameof(ClickLogButton), "Below <color=green><icon='eye.png' /></color>!")]
         public int _someInt;
 
-        private void ClickErrorButton() => Debug.Log("<color=GrEeN>CLICKED!</color>");
+        private void ClickLogButton() => Debug.Log("<color=GrEeN>CLICKED!</color>");
+
+        private int ClickWithReturn(int rawValue) => rawValue;
 
         private string GetButtonLabel() =>
             _errorOut
@@ -33,9 +36,18 @@ namespace SaintsField.Samples.Scripts
             ? "<color=red><icon='eye.png' /></color>"
             : "<color=green><icon='eye.png' /></color>";
 
-        private void ClickButton()
+        private void ClickCanErrorButton()
         {
             Debug.Log("CLICKED 2!");
+            if(_errorOut)
+            {
+                throw new Exception("Expected exception!");
+            }
+        }
+
+        private IEnumerator ClickIe()
+        {
+            yield return new WaitForSeconds(2);
             if(_errorOut)
             {
                 throw new Exception("Expected exception!");
@@ -45,21 +57,21 @@ namespace SaintsField.Samples.Scripts
         private void ToggleAndError()
         {
             Toggle();
-            ClickButton();
+            ClickCanErrorButton();
         }
 
         private void Toggle() => _errorOut = !_errorOut;
 
-        [Space]
-        [AboveButton(nameof(ClickButton))]
-        [BelowButton(nameof(ClickButton))]
-        [PostFieldButton(nameof(ClickButton))]
-        public int testNoLabel;
-
-        [FieldReadOnly]
-        [AboveButton(nameof(ClickButton))]
-        [BelowButton(nameof(ClickButton))]
-        [PostFieldButton(nameof(ClickButton))]
-        public int testDisable;
+        // [Space]
+        // [AboveButton(nameof(ClickButton))]
+        // [BelowButton(nameof(ClickButton))]
+        // [PostFieldButton(nameof(ClickButton))]
+        // public int testNoLabel;
+        //
+        // [FieldReadOnly]
+        // [AboveButton(nameof(ClickButton))]
+        // [BelowButton(nameof(ClickButton))]
+        // [PostFieldButton(nameof(ClickButton))]
+        // public int testDisable;
     }
 }

@@ -37,7 +37,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             if (animatorName != null)
             {
                 // search parent first
-                (string error, object result) = Util.GetOf<object>(animatorName, null, property, info, parent, null);
+                (string error, MemberInfo _, object result) = Util.GetOf<object>(animatorName, null, property, info, parent, null);
                 if (error != "")
                 {
                     return (error, null);

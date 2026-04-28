@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
         private static StyleSheet _ussClassSaintsFieldEditingDisabledHide;
 
-        private class ButtonUserData
+        public class ButtonUserData
         {
             public string Xml;
             public string Callback;
@@ -35,13 +35,14 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             public RichTextDrawer RichTextDrawer;
 
             public List<Waiter> Enumerators = new List<Waiter>();
+            public IVisualElementScheduledItem ButtonTask;
         }
 
         // private VisualElement _returnValueContainer;
         // private VisualElement _returnContainer;
 
         // private Button _buttonElement;
-        private IVisualElementScheduledItem _buttonTask;
+
 
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
@@ -50,13 +51,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             {
                 name = ButtonName(FieldWithInfo),
             };
-            // fancyButton.MainLabel.Add(new Label(FieldWithInfo.MethodInfo.Name));
-            // fancyButton.StatusIndicator.EnsureLoading(true, 0.7f);
-            //
-            // fancyButton.MainButton.clicked += () =>
-            // {
-            //     fancyButton.ShowCloseButton(fancyButton.CloseButton.style.display != DisplayStyle.Flex);
-            // };
 
             // return (fancyButton, true);
             container.style.flexGrow = 1;
@@ -155,7 +149,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
             fancyButton.CloseButton.clicked += () =>
             {
-                _buttonTask?.Pause();
+                buttonUserData.ButtonTask?.Pause();
 
                 fancyButton.StatusIndicator.EnsureLoading(false, 0);
                 if (buttonUserData.Enumerators.Count > 0)
@@ -265,16 +259,15 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     fancyButton.ShowCloseButton(true);
                 }
 
-                _buttonTask?.Pause();
+                buttonUserData.ButtonTask?.Pause();
 
                 if (buttonUserData.Enumerators.Count > 0)
                 {
                     // ButtonUserData buttonUserData = (ButtonUserData) buttonElement.userData;
-                    _buttonTask = fancyButton.schedule.Execute(() =>
+                    buttonUserData.ButtonTask = fancyButton.schedule.Execute(() =>
                     {
                         List<Waiter> finishedEnumerators = new List<Waiter>();
                         int oldCounter = buttonUserData.Enumerators.Count;
-                        Exception movingError = null;
                         float progress = -1f;
                         // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
                         foreach (Waiter waiter in buttonUserData.Enumerators)
@@ -301,7 +294,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             catch (Exception e)
                             {
                                 Debug.LogException(e);
-                                movingError = e;
                                 moveNext = false;
                                 thisHasMoveError = true;
 
@@ -332,7 +324,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
                         if (!stillHaveRunner)
                         {
-                            _buttonTask?.Pause();
+                            buttonUserData.ButtonTask?.Pause();
 
                             if (oldCounter > 0)
                             {
@@ -443,7 +435,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             // ReSharper disable once InvertIf
             if(!string.IsNullOrEmpty(labelCallback))
             {
-                (string error, string result) = Util.GetOf<string>(labelCallback, null,
+                (string error, MemberInfo _, string result) = Util.GetOf<string>(labelCallback, null,
                     FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0], null);
                 // Debug.Log($"{error}/{result}");
                 if (error != "")

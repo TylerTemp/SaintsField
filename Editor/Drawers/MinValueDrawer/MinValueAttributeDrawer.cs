@@ -16,9 +16,13 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
     {
         private static (string error, float valueLimit) GetLimitFloat(SerializedProperty property, MinValueAttribute minValueAttribute, MemberInfo info, object parentTarget)
         {
-            return string.IsNullOrEmpty(minValueAttribute.ValueCallback)
-                ? ("", minValueAttribute.Value)
-                : Util.GetOf(minValueAttribute.ValueCallback, 0f, property, info, parentTarget, null);
+            if (string.IsNullOrEmpty(minValueAttribute.ValueCallback))
+                return ("", minValueAttribute.Value);
+            else
+            {
+                var r = Util.GetOf(minValueAttribute.ValueCallback, 0f, property, info, parentTarget, null);
+                return (r.error, r.result);
+            }
         }
 
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,

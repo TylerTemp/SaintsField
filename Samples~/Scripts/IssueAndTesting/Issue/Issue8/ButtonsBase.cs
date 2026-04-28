@@ -12,7 +12,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8
 
         [PostFieldButton(nameof(ToggleAndError), nameof(GetButtonLabelIcon), true)]
 
-        [BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, "OK")]
+        [BelowButton(nameof(ClickButton), nameof(GetButtonLabel), true, groupBy: "OK")]
         public int someInt;
 
         private string GetButtonLabel() =>

@@ -142,7 +142,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
             else
             {
-                (string getError, object getValue) =
+                (string getError, MemberInfo _, object getValue) =
                     Util.GetOf<object>(propRangeAttribute.MinCallback, 0, property, info, parentTarget, null);
                 if (getError != "")
                 {
@@ -158,7 +158,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
             else
             {
-                (string getError, object getValue) =
+                (string getError, MemberInfo _, object getValue) =
                     Util.GetOf<object>(propRangeAttribute.MaxCallback, 0f, property, info, parentTarget, null);
                 if (getError != "")
                 {

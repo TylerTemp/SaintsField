@@ -6,7 +6,7 @@ namespace SaintsField
     [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
     public class BelowButtonAttribute : DecButtonAttribute
     {
-        public BelowButtonAttribute(string funcName, string buttonLabel=null, bool isCallback = false, string groupBy = "") : base(funcName, buttonLabel, isCallback, groupBy)
+        public BelowButtonAttribute(string funcName, string buttonLabel=null, bool isCallback = false, bool hideReturnValue=false, string groupBy = "") : base(funcName, buttonLabel, isCallback, hideReturnValue, groupBy)
         {
         }
     }

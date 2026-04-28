@@ -439,7 +439,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             string revName = tagName["field.".Length..];
 
-                            (string error, object result) getOfValue = Util.GetOf<object>(revName, null,
+                            (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName, null,
                                 FieldWithInfo.SerializedProperty,
                                 FieldWithInfo.FieldInfo, result.value, null);
 
@@ -481,7 +481,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         string revName = tagName["field.".Length..];
 
-                        (string error, object result) getOfValue = Util.GetOf<object>(revName, null,
+                        (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName, null,
                             null,
                             memberInfo, value, null);
                         if (!string.IsNullOrEmpty(getOfValue.error))
@@ -520,7 +520,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         string revName = tagName["field.".Length..];
 
-                        (string error, object result) getOfValue = Util.GetOf<object>(revName, null,
+                        (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName, null,
                             null,
                             memberInfo, value, null);
                         if (!string.IsNullOrEmpty(getOfValue.error))

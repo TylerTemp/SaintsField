@@ -385,10 +385,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
-            (string error, object result) result = Util.GetOf<object>(by, null, fieldWithInfo.SerializedProperty,
+            (string error, MemberInfo _, object result) result = Util.GetOf<object>(by, null, fieldWithInfo.SerializedProperty,
                 (MemberInfo)fieldWithInfo.FieldInfo ?? fieldWithInfo.PropertyInfo, target, null);
             // Debug.Log(r);
-            return result;
+            return (result.error, result.result);
         }
 
         public abstract void OnDestroy();

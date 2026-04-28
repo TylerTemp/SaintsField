@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
             else
             {
-                (string getError, float getValue) =
+                (string getError, MemberInfo _, float getValue) =
                     Util.GetOf(propRangeAttribute.MinCallback, 0f, property, info, parentTarget, null);
                 error = getError;
                 minValue = getValue;
@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
             else
             {
-                (string getError, float getValue) =
+                (string getError, MemberInfo _, float getValue) =
                     Util.GetOf(propRangeAttribute.MaxCallback, 0f, property, info, parentTarget, null);
                 error = getError;
                 maxValue = getValue;

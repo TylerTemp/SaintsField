@@ -61,7 +61,7 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
 
             // Debug.Log(useParent);
 
-            (string error, object _) = Util.GetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, useParent, overrideParams);
+            (string error, MemberInfo _, object _) = Util.GetOf<object>(((OnValueChangedAttribute)saintsAttribute).Callback, null, property, info, useParent, overrideParams);
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
             UIToolkitUtils.SetHelpBox(helpBox, error);
         }

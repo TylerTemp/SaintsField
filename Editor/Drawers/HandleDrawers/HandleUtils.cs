@@ -25,7 +25,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
             }
             else
             {
-                (string error, Object result) = Util.GetOf<Object>(parentSpace, null,
+                (string error, MemberInfo _, Object result) = Util.GetOf<Object>(parentSpace, null,
                     serializedProperty, memberInfo, parent, null);
                 if (error != "")
                 {

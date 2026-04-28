@@ -115,7 +115,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             }
             else if(!string.IsNullOrEmpty(sphereInfo.SphereHandleCapAttribute.RadiusCallback))
             {
-                (string error, float result) = Util.GetOf(sphereInfo.SphereHandleCapAttribute.RadiusCallback, sphereInfo.SphereHandleCapAttribute.Radius, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent, null);
+                (string error, MemberInfo _, float result) = Util.GetOf(sphereInfo.SphereHandleCapAttribute.RadiusCallback, sphereInfo.SphereHandleCapAttribute.Radius, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -130,7 +130,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 
             if (!string.IsNullOrEmpty(sphereInfo.SphereHandleCapAttribute.ColorCallback))
             {
-                (string error, Color result) = Util.GetOf(sphereInfo.SphereHandleCapAttribute.ColorCallback, sphereInfo.SphereHandleCapAttribute.Color, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent, null);
+                (string error, MemberInfo _, Color result) = Util.GetOf(sphereInfo.SphereHandleCapAttribute.ColorCallback, sphereInfo.SphereHandleCapAttribute.Color, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -190,7 +190,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
             Vector3 positionOffset = sphereInfo.SphereHandleCapAttribute.PosOffset;
             if (!string.IsNullOrEmpty(sphereInfo.SphereHandleCapAttribute.PosOffsetCallback))
             {
-                (string error, Vector3 result) = Util.GetOf(sphereInfo.SphereHandleCapAttribute.PosOffsetCallback, positionOffset, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent, null);
+                (string error, MemberInfo _, Vector3 result) = Util.GetOf(sphereInfo.SphereHandleCapAttribute.PosOffsetCallback, positionOffset, sphereInfo.SerializedProperty, sphereInfo.MemberInfo, sphereInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG

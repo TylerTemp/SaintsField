@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.FieldContextMenuDrawer
                 DropdownMenuAction.Status status = DropdownMenuAction.Status.Normal;
                 if (menuNameIsCallback)
                 {
-                    (string error, object result) = Util.GetOf<object>(menuName, null, property, info, manipulatorHandler.GetParent(), null);
+                    (string error, MemberInfo _, object result) = Util.GetOf<object>(menuName, null, property, info, manipulatorHandler.GetParent(), null);
                     // UIToolkitUtils.SetHelpBox(helpBox, error);
                     if (error != "")
                     {
@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.FieldContextMenuDrawer
                     // ReSharper disable once PossibleNullReferenceException
                     // ReSharper disable once AccessToModifiedClosure
                     // HashSet<IEnumerator> enumerators = (HashSet<IEnumerator>)buttonElement.userData;
-                    foreach ((string eachError, object buttonResult) in DecButtonAttributeDrawer.CallButtonFunc(property, funcName, info, manipulatorHandler.GetParent()))
+                    foreach ((string eachError, MemberInfo _, object buttonResult) in DecButtonAttributeDrawer.CallButtonFunc(property, funcName, info, manipulatorHandler.GetParent()))
                     {
                         // Debug.Log($"{eachError}/{buttonResult}");
                         if (eachError == "")

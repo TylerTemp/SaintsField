@@ -103,7 +103,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             }
             else if(!string.IsNullOrEmpty(wireDiscInfo.DrawWireDiscAttribute.RadiusCallback))
             {
-                (string error, float result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.RadiusCallback, wireDiscInfo.DrawWireDiscAttribute.Radius, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
+                (string error, MemberInfo _, float result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.RadiusCallback, wireDiscInfo.DrawWireDiscAttribute.Radius, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -118,7 +118,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 
             if (!string.IsNullOrEmpty(wireDiscInfo.DrawWireDiscAttribute.ColorCallback))
             {
-                (string error, Color result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.ColorCallback, wireDiscInfo.DrawWireDiscAttribute.Color, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
+                (string error, MemberInfo _, Color result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.ColorCallback, wireDiscInfo.DrawWireDiscAttribute.Color, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -178,7 +178,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             Vector3 positionOffset = wireDiscInfo.DrawWireDiscAttribute.PosOffset;
             if (!string.IsNullOrEmpty(wireDiscInfo.DrawWireDiscAttribute.PosOffsetCallback))
             {
-                (string error, Vector3 result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.PosOffsetCallback, positionOffset, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
+                (string error, MemberInfo _, Vector3 result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.PosOffsetCallback, positionOffset, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -218,7 +218,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             Vector3 normal = wireDiscInfo.DrawWireDiscAttribute.Normal;
             if (!string.IsNullOrEmpty(wireDiscInfo.DrawWireDiscAttribute.NormalCallback))
             {
-                (string error, Vector3 result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.NormalCallback, wireDiscInfo.DrawWireDiscAttribute.Normal, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
+                (string error, MemberInfo _, Vector3 result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.NormalCallback, wireDiscInfo.DrawWireDiscAttribute.Normal, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG
@@ -234,7 +234,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             Quaternion rotate = wireDiscInfo.DrawWireDiscAttribute.Rot;
             if(!string.IsNullOrEmpty(wireDiscInfo.DrawWireDiscAttribute.RotCallback))
             {
-                (string error, Quaternion result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.RotCallback, wireDiscInfo.DrawWireDiscAttribute.Rot, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
+                (string error, MemberInfo _, Quaternion result) = Util.GetOf(wireDiscInfo.DrawWireDiscAttribute.RotCallback, wireDiscInfo.DrawWireDiscAttribute.Rot, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo, wireDiscInfo.Parent, null);
                 if (error != "")
                 {
 #if SAINTSFIELD_DEBUG

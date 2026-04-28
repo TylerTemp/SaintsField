@@ -141,7 +141,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                 if (colorPaletteSource.IsCallback)
                 {
                     string callback = colorPaletteSource.Name;
-                    (string error, object result) =
+                    (string error, MemberInfo _, object result) =
                         Util.GetOf<object>(callback, null, property, info, parent, null);
                     if (error != "")
                     {

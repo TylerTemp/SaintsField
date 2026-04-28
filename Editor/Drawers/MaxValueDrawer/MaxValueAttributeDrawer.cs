@@ -15,9 +15,13 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
     {
         private static (string error, float valueLimit) GetLimitFloat(SerializedProperty property, MaxValueAttribute maxValueAttribute, MemberInfo info, object parentTarget)
         {
-            return maxValueAttribute.ValueCallback == null
-                ? ("", maxValueAttribute.Value)
-                : Util.GetOf(maxValueAttribute.ValueCallback, 0f, property, info, parentTarget, null);
+            if (maxValueAttribute.ValueCallback == null)
+            {
+                return ("", maxValueAttribute.Value);
+            }
+
+            (string error, MemberInfo memberInfo, float result) r = Util.GetOf(maxValueAttribute.ValueCallback, 0f, property, info, parentTarget, null);
+            return (r.error, r.result);
         }
 
         public AutoRunnerFixerResult AutoRunFix(UnityEngine.PropertyAttribute propertyAttribute, IReadOnlyList<UnityEngine.PropertyAttribute> allAttributes,

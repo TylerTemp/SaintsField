@@ -111,7 +111,7 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
                 for (int index = oldLength; index < newLength; index++)
                 {
                     // object addValue = curValueList[index];
-                    (string addError, object _) = Util.GetOf<object>(_onValueChangedAttribute.Callback, null, prop.GetArrayElementAtIndex(index), memberInfo, parent, null);
+                    (string addError, MemberInfo _, object _) = Util.GetOf<object>(_onValueChangedAttribute.Callback, null, prop.GetArrayElementAtIndex(index), memberInfo, parent, null);
                     if (addError != "")
                     {
                         errors.Add(addError);
@@ -123,7 +123,7 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
                 return baseResult;
             }
             // remove some
-            (string error, object _) = Util.GetOf<object>(_onValueChangedAttribute.Callback, null, prop, memberInfo, parent, new[]{curValue, diffCount});
+            (string error, MemberInfo _, object _) = Util.GetOf<object>(_onValueChangedAttribute.Callback, null, prop, memberInfo, parent, new[]{curValue, diffCount});
             UIToolkitUtils.SetHelpBox(_helpBox, error);
             return baseResult;
         }

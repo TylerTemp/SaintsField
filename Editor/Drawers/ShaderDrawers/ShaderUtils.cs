@@ -32,7 +32,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers
                 return GetShaderFromRenderer(directRenderer, index);
             }
 
-            (string error, Object uObj) = Util.GetOf<Object>(callback, null, property, info, parent, null);
+            (string error, MemberInfo _, Object uObj) = Util.GetOf<Object>(callback, null, property, info, parent, null);
             if (error != "")
             {
 #if SAINTSFIELD_DEBUG

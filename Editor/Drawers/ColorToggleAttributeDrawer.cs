@@ -88,7 +88,7 @@ namespace SaintsField.Editor.Drawers
                     }
                     if(targetProperty.propertyType == SerializedPropertyType.Generic)
                     {
-                        (string _, IWrapProp getResult) = Util.GetOf<IWrapProp>(compName, null, property, info, parent, null);
+                        (string _, MemberInfo _, IWrapProp getResult) = Util.GetOf<IWrapProp>(compName, null, property, info, parent, null);
                         // Debug.Log(getResult);
                         if (getResult != null)
                         {
@@ -100,7 +100,7 @@ namespace SaintsField.Editor.Drawers
                     // return SignObject(targetProperty.objectReferenceValue);
                 }
 
-                (string error, object foundObj) =
+                (string error, MemberInfo _, object foundObj) =
                     Util.GetOf<object>(compName, null, property, info, parent, null);
 
                 if (error != "")

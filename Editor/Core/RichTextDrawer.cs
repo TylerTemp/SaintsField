@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Core
                 return ("", richTextXml);
             }
 
-            (string error, string result) = Util.GetOf(richTextXml, "", property, fieldInfo, target, null);
+            (string error, MemberInfo _, string result) = Util.GetOf(richTextXml, "", property, fieldInfo, target, null);
             if (error != "")
             {
                 string originalName;

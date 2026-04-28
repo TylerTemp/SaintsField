@@ -96,7 +96,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                     if (!string.IsNullOrEmpty(callback))
                     {
                         (object _, object useTarget) = GetRefreshedTarget(fieldWithInfo, fieldWithInfo.Targets[0]);
-                        (string error, object _) = Util.GetOf<object>(callback, null, fieldWithInfo.SerializedProperty,
+                        (string error, MemberInfo _, object _) = Util.GetOf<object>(callback, null, fieldWithInfo.SerializedProperty,
                             (MemberInfo)fieldWithInfo.FieldInfo ?? fieldWithInfo.PropertyInfo, useTarget, new[]{value});
                         if (error != "")
                         {
@@ -116,7 +116,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                     if (!string.IsNullOrEmpty(callback))
                     {
                         (object _, object useTarget) = GetRefreshedTarget(fieldWithInfo, fieldWithInfo.Targets[0]);
-                        (string error, object _) = Util.GetOf<object>(callback, null, fieldWithInfo.SerializedProperty,
+                        (string error, MemberInfo _, object _) = Util.GetOf<object>(callback, null, fieldWithInfo.SerializedProperty,
                             (MemberInfo)fieldWithInfo.FieldInfo ?? fieldWithInfo.PropertyInfo, useTarget,
                             new[] { value });
                         if (error != "")
