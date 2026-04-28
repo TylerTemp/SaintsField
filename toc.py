@@ -37,7 +37,7 @@ class TitleAndContent:
     sub_content: list[TitleAndContent]
 
 
-readme_path = os.path.join(os.path.dirname(__file__), 'SaintsField', 'Docs~', 'README.md')
+readme_path = os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'Docs~', 'README.md')
 
 root_title: TitleAndContent | None = None
 title_chain: list[TitleAndContent] = []
@@ -192,11 +192,11 @@ def get_first_change_log(changelog):
             yield line
 
 with open(readme_path, 'r', encoding='utf-8') as source_readme:
-    with open(os.path.join(os.path.dirname(__file__), 'SaintsField', 'README.md'), 'w', encoding='utf-8') as main_readme:
+    with open(os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'README.md'), 'w', encoding='utf-8') as main_readme:
 
         for line in source_readme:
             if line.startswith('## Getting Started ##'):
-                with open(os.path.join(os.path.dirname(__file__), 'SaintsField', 'Docs~', 'ReadMeMainFragment.md'), 'r', encoding='utf-8') as fragment:
+                with open(os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'Docs~', 'ReadMeMainFragment.md'), 'r', encoding='utf-8') as fragment:
                     main_readme.write(fragment.read())
                     main_readme.write('\n')
 
@@ -204,7 +204,7 @@ with open(readme_path, 'r', encoding='utf-8') as source_readme:
 
                 main_readme.write(line)
 
-                with open(os.path.join(os.path.dirname(__file__), 'SaintsField', 'CHANGELOG.md'), 'r',
+                with open(os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'CHANGELOG.md'), 'r',
                           encoding='utf-8') as changelog:
                     main_readme.writelines(get_first_change_log(changelog))
                 break

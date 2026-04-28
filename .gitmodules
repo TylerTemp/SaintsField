@@ -1,4 +1,4 @@
-[submodule "SaintsField"]
-	path = SaintsField
+[submodule "Packages/today.comes.saintsfield"]
+	path = Packages/today.comes.saintsfield
 	url = git@github.com:TylerTemp/SaintsField.git
 	branch = wip
