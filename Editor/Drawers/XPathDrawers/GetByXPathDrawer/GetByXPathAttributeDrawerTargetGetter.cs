@@ -1299,23 +1299,109 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
         private static IEnumerable<Component> FilterComponentsByTypeName(Component[] components, string executeFragmentExecuteString)
         {
-            // a simple implement. Inheritance/Interface/Generic type not considered
+            // a simple implement. Generic type not considered
+
+            IReadOnlyList<Type> possibleTypes = FindAllPossibleTypes(executeFragmentExecuteString);
+
             foreach (Component eachComp in components)
             {
-                Type type = eachComp.GetType();
-                string fullNamePrefixDot = $".{type.FullName}";
-                string checkNamePrefixDot = $".{executeFragmentExecuteString}";
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                Debug.Log($"type name check: {checkNamePrefixDot} <- {fullNamePrefixDot} with component {eachComp}");
-#endif
-                if (fullNamePrefixDot.EndsWith(checkNamePrefixDot))
+                foreach (Type possibleType in possibleTypes)
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
-                    Debug.Log($"type name check passed: {checkNamePrefixDot} <- {fullNamePrefixDot}, return {eachComp}");
-#endif
-                    yield return eachComp;
+                    if (possibleType.IsInstanceOfType(eachComp))
+                    {
+                        yield return eachComp;
+                    }
+                }
+
+//                 Type type = eachComp.GetType();
+//                 string fullNamePrefixDot = $".{type.FullName}";
+//                 string checkNamePrefixDot = $".{executeFragmentExecuteString}";
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+//                 Debug.Log($"type name check: {checkNamePrefixDot} <- {fullNamePrefixDot} with component {eachComp}");
+// #endif
+//                 if (fullNamePrefixDot.EndsWith(checkNamePrefixDot))
+//                 {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_PATH
+//                     Debug.Log($"type name check passed: {checkNamePrefixDot} <- {fullNamePrefixDot}, return {eachComp}");
+// #endif
+//                     yield return eachComp;
+//                 }
+            }
+        }
+
+        private static Dictionary<Assembly, Type[]> _cachedAssemblyTypes = null;
+        private static readonly Dictionary<string, IReadOnlyList<Type>> _cachedNameToType = new Dictionary<string, IReadOnlyList<Type>>();
+
+        public static IReadOnlyList<Type> FindAllPossibleTypes(string shortOrQualifiedName)
+        {
+            if (_cachedNameToType.TryGetValue(shortOrQualifiedName, out IReadOnlyList<Type> cachedTypes))
+            {
+                return cachedTypes;
+            }
+
+            bool containDot = shortOrQualifiedName.Contains(".");
+            string shortName = containDot
+                ? shortOrQualifiedName.Split('.').Last()
+                : shortOrQualifiedName;
+
+            _cachedAssemblyTypes ??= AppDomain.CurrentDomain.GetAssemblies()
+                .ToDictionary(assembly => assembly, assembly =>
+                {
+                    try
+                    {
+                        return assembly.GetTypes();
+                    }
+                    catch
+                    {
+                        return Array.Empty<Type>();
+                    }
+                });
+
+            List<Type> exactlyFullMatchedTypes = new List<Type>();
+            List<Type> unityEngineTypes = new List<Type>();
+            List<Type> unityTypes = new List<Type>();
+            List<Type> otherTypes = new List<Type>();
+            foreach (KeyValuePair<Assembly, Type[]> kv in _cachedAssemblyTypes)
+            {
+                foreach (Type t in kv.Value)
+                {
+                    string fullNameT = t.FullName;
+                    if (containDot && fullNameT == shortOrQualifiedName)
+                    {
+                        exactlyFullMatchedTypes.Add(t);
+                    }
+                    else if(t.Name == shortName
+                            || fullNameT == shortOrQualifiedName
+                            || fullNameT?.EndsWith("." + shortName, StringComparison.Ordinal) == true)
+                    {
+                        if (!string.IsNullOrEmpty(fullNameT))
+                        {
+                            if (fullNameT.StartsWith("UnityEngine."))
+                            {
+                                unityEngineTypes.Add(t);
+                            }
+                            else if (fullNameT.StartsWith("Unity."))
+                            {
+                                unityTypes.Add(t);
+                            }
+                            else
+                            {
+                                otherTypes.Add(t);
+                            }
+                        }
+                        else
+                        {
+                            otherTypes.Add(t);
+                        }
+                    }
                 }
             }
+
+            exactlyFullMatchedTypes.AddRange(unityEngineTypes);
+            exactlyFullMatchedTypes.AddRange(unityTypes);
+            exactlyFullMatchedTypes.AddRange(otherTypes);
+
+            return _cachedNameToType[shortOrQualifiedName] = exactlyFullMatchedTypes;
         }
 
         private static (string resourceFolder, string subFolder) SplitResources(string resourcePath)
