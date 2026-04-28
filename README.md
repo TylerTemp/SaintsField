@@ -113,7 +113,7 @@ namespace: `SaintsField`
 
 ## Usage ##
 
-*   <a href="https://saintsfield.comes.today/general-attributes" target="_blank">General Attributes</a>
+*   General Attributes
     *   Label & Text
         *   <a href="https://saintsfield.comes.today/general-attributes/label--text/labeltext" target="_blank">`LabelText`</a>
         *   <a href="https://saintsfield.comes.today/general-attributes/label--text/fieldlabeltext" target="_blank">`FieldLabelText`</a>
@@ -217,7 +217,7 @@ namespace: `SaintsField`
         *   <a href="https://saintsfield.comes.today/general-attributes/miscellaneous/datetime" target="_blank">`DateTime`</a>
         *   <a href="https://saintsfield.comes.today/general-attributes/miscellaneous/timespan" target="_blank">`TimeSpan`</a>
         *   <a href="https://saintsfield.comes.today/general-attributes/miscellaneous/guid" target="_blank">`Guid`</a>
-*   <a href="https://saintsfield.comes.today/layout-system" target="_blank">Layout System</a>
+*   Layout System
     *   <a href="https://saintsfield.comes.today/layout-system/overview" target="_blank">Overview</a>
     *   <a href="https://saintsfield.comes.today/layout-system/layout" target="_blank">`Layout`</a>
     *   <a href="https://saintsfield.comes.today/layout-system/layoutstart--layoutend" target="_blank">`LayoutStart` / `LayoutEnd`</a>
@@ -238,7 +238,7 @@ namespace: `SaintsField`
     *   <a href="https://saintsfield.comes.today/component-header/headerghostbutton--headerghostleftbutton" target="_blank">`HeaderGhostButton` / `HeaderGhostLeftButton`</a>
     *   <a href="https://saintsfield.comes.today/component-header/headerlabel--headerleftlabel" target="_blank">`HeaderLabel` / `HeaderLeftLabel`</a>
     *   <a href="https://saintsfield.comes.today/component-header/headerdraw--headerleftdraw" target="_blank">`HeaderDraw` / `HeaderLeftDraw`</a>
-*   <a href="https://saintsfield.comes.today/data-types" target="_blank">Data Types</a>
+*   Data Types
     *   <a href="https://saintsfield.comes.today/data-types/saintsarraysaintslist" target="_blank">`SaintsArray`/`SaintsList`</a>
     *   <a href="https://saintsfield.comes.today/data-types/saintsdictionary" target="_blank">`SaintsDictionary<,>`</a>
     *   <a href="https://saintsfield.comes.today/data-types/saintsinterface" target="_blank">`SaintsInterface<>`</a>
@@ -266,7 +266,7 @@ namespace: `SaintsField`
     *   <a href="https://saintsfield.comes.today/spine/spineikconstraintpicker" target="_blank">`SpineIkConstraintPicker`</a>
     *   <a href="https://saintsfield.comes.today/spine/spinepathconstraintpicker" target="_blank">`SpinePathConstraintPicker`</a>
     *   <a href="https://saintsfield.comes.today/spine/spinetransformconstraintpicker" target="_blank">`SpineTransformConstraintPicker`</a>
-*   <a href="https://saintsfield.comes.today/dotween" target="_blank">DOTween</a>
+*   DOTween
     *   <a href="https://saintsfield.comes.today/dotween/dotweenplay" target="_blank">`DOTweenPlay`</a>
 *   <a href="https://saintsfield.comes.today/wwise" target="_blank">Wwise</a>
     *   <a href="https://saintsfield.comes.today/wwise/getwwise" target="_blank">`GetWwise`</a>
@@ -293,7 +293,7 @@ namespace: `SaintsField`
     *   <a href="https://saintsfield.comes.today/saintseditorwindow/usage--example" target="_blank">Usage & Example</a>
     *   <a href="https://saintsfield.comes.today/saintseditorwindow/life-cycle--functions" target="_blank">Life Cycle & Functions</a>
     *   <a href="https://saintsfield.comes.today/saintseditorwindow/windowinlineeditor" target="_blank">`WindowInlineEditor`</a>
-*   <a href="https://saintsfield.comes.today/misc" target="_blank">Misc</a>
+*   Misc
     *   <a href="https://saintsfield.comes.today/misc/about-groupby" target="_blank">About GroupBy</a>
     *   <a href="https://saintsfield.comes.today/misc/emode" target="_blank">`EMode`</a>
     *   <a href="https://saintsfield.comes.today/misc/callback" target="_blank">Callback</a>
