@@ -37,7 +37,7 @@ class TitleAndContent:
     sub_content: list[TitleAndContent]
 
 
-readme_path = os.path.join(os.path.dirname(__file__), 'SaintsField', '~docs', 'README.md')
+readme_path = os.path.join(os.path.dirname(__file__), 'SaintsField', 'Docs~', 'README.md')
 
 root_title: TitleAndContent | None = None
 title_chain: list[TitleAndContent] = []
@@ -143,14 +143,14 @@ def make_linked_list(list_compact: list[TitleAndContentCompact], root: str, proj
 # print(json.dumps(linked_lis, cls=EnhancedJSONEncoder, indent=2))
 
 def make_target_link(content: str, url: str) -> str:
-    return f'<a href="{url}">{content}</a>'
+    return f'<a href="{url}" target="_blank">{content}</a>'
 
 def gen_sub_links(root: str, indent: int, sub_contents: list[TitleAndContentCompact]):
     for item in sub_contents:
         if item.Content == '' or item.Content is None:
             yield f'{" " * (indent * 4)}*   {item.Title}'
         else:
-            yield f'{" " * (indent * 4)}*   {make_target_link(item.Title, f"https://saintsfield.comes.today/{root}/{item.TitleId}")}'
+            yield f'{" " * (indent * 4)}*   ' + make_target_link(item.Title, f"https://saintsfield.comes.today/{root}/{item.TitleId}")
         if len(item.SubContents) > 0:
             for sub in gen_sub_links(f'{root}/{item.TitleId}', indent + 1, item.SubContents):
                 yield sub
@@ -163,7 +163,13 @@ def gen_links(linked_list: list[TitleAndContentCompact]):
 
         title_str: str = item.Title
         logger.debug(f'Title id: {title_id} ({title_str})')
-        yield f'*   ' + make_target_link(title_str, 'https://saintsfield.comes.today/getting-started')
+        # yield f'*   ' + make_target_link(title_str, f'https://saintsfield.comes.today/{title_id}')
+
+        if item.Content == '' or item.Content is None:
+            yield f'*   {item.Title}'
+        else:
+            yield f'*   ' + make_target_link(item.Title, f"https://saintsfield.comes.today/{item.TitleId}")
+
         for title_md in gen_sub_links(title_id, 1, item.SubContents):
             yield title_md
 
@@ -190,7 +196,7 @@ with open(readme_path, 'r', encoding='utf-8') as source_readme:
 
         for line in source_readme:
             if line.startswith('## Getting Started ##'):
-                with open(os.path.join(os.path.dirname(__file__), 'SaintsField', '~docs', 'ReadMeMainFragment.md'), 'r', encoding='utf-8') as fragment:
+                with open(os.path.join(os.path.dirname(__file__), 'SaintsField', 'Docs~', 'ReadMeMainFragment.md'), 'r', encoding='utf-8') as fragment:
                     main_readme.write(fragment.read())
                     main_readme.write('\n')
 
