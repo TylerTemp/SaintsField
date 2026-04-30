@@ -18,9 +18,9 @@ namespace SaintsField.Samples.Scripts
         [PostFieldButton(nameof(ToggleAndError), "$" + nameof(GetButtonLabelIcon))]
         [PostFieldButton(nameof(ToggleAndError), "$" + nameof(GetButtonLabelIcon))]
 
+        [BelowButton(nameof(ClickWithReturn), "Click <color=green><icon='eye.png' /></color>!")]
         [BelowButton(nameof(ClickCanErrorButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
-        [BelowButton(nameof(ClickCanErrorButton), "$" + nameof(GetButtonLabel), groupBy: "OK")]
-        [BelowButton(nameof(ClickLogButton), "Below <color=green><icon='eye.png' /></color>!")]
+        [BelowButton(nameof(ClickIe), "$" + nameof(GetButtonLabel), groupBy: "OK")]
         public int _someInt;
 
         private void ClickLogButton() => Debug.Log("<color=GrEeN>CLICKED!</color>");
