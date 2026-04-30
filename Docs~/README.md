@@ -73,10 +73,10 @@ Unity: 2022.2 or higher
 
 If you have DOTween installed
 *   Please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
-*   Or disable related functions with `Tools` - `SaintsField` - `Disable DOTween Support`
+*   Or disable related functions with `Tools` - `Saints Field` - `Disable DOTween Support`
 *   If you can not find this menu, please read the "Add a Macro" section about how to manually disable DOTween support in SaintsField.
 
-[**Optional**] To use the full functions of this project, please also do: `Tools` - `SaintsField` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
+[**Optional**] To use the full functions of this project, please also do: `Tools` - `Saints Field` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
 
 If you need to put this project under another folder rather than `Packages/today.comes.saintsfield`, please also do the following:
 
@@ -86,17 +86,17 @@ If you need to put this project under another folder rather than `Packages/today
 
 **Troubleshoot**
 
-After installation, you can use `Tools` - `SaintsField` - `Troubleshoot` to check if some attributes do not work.
+After installation, you can use `Tools` - `Saints Field` - `Troubleshoot` to check if some attributes do not work.
 
 namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.13.6**
+**5.13.7**
 
-1.  Add: `AboveButton`/`BelowButton`/`PostFieldButton` now can show return result, has loading indicator just like `Button`
-2.  Fix: `GetByXPath` now search possible types for `GetComponent`, support sub-types, interfaces [#385](https://github.com/TylerTemp/SaintsField/issues/385)
-3.  Fix: `SortingLayer` now work with `ShowInInspector` and `Button`-s
+1.  Fix: Enum selector didn't refresh the target and got wrong displayed label in EditorWindow case [#379](https://github.com/TylerTemp/SaintsField/issues/379)
+2.  Improve: Better menu order, and change `SaintsField` to `Saints Field` in menu
+3.  Oh, by the way, "Component Header" is supported by [SaintsHierarchy](https://github.com/TylerTemp/SaintsHierarchy). You can use both/either `HierarchyDraw`/`HierarchyLeftDraw` and `HeaderDraw`/`HeaderLeftDraw` with either type (type from SaintsField or SaintsHierarchy), and it will appear on the target places.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -141,7 +141,7 @@ Parameters:
 
     You can also use Unity Editor's built-in icons. See [UnityEditorIcons](https://github.com/nukadelic/UnityEditorIcons). e.g. `<icon=d_AudioListener Icon/>`
 
-    for `color`, you can use `Tools` - `SaintsField` - `EColor Preview` to view all the pre-set colors. It supports:
+    for `color`, you can use `Tools` - `Saints Field` - `EColor Preview` to view all the pre-set colors. It supports:
 
     *   Standard [Unity Rich Label](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html#ColorNames) colors:
 
@@ -1592,7 +1592,7 @@ Known issues:
 1.  the `Foldout` will NOT be placed at the left space like a Unity's default foldout component, because Unity limited the `PropertyDrawer` to be drawn inside the rect Unity gives. Trying outside the rect will make the target non-interactable.
     But in early Unity (like 2019.1), Unity will force `Foldout` to be out of rect on top leve, but not on array/list level... so you may see different outcomes on different Unity version.
 
-    If you see unexpected space or overlap between foldout and label, use `Tools` - `SaintsField` - `Create or Edit SaintsField Config` to change the config.
+    If you see unexpected space or overlap between foldout and label, use `Tools` - `Saints Field` - `Create or Edit SaintsField Config` to change the config.
 
 2.  `ReadOnly` (and `DisableIf`, `EnableIf`) can NOT disable the expanded fields. This is because `InspectorElement` does not work with `SetEnable(false)`, neither with `pickingMode=Ignore`. This can not be fixed unless Unity fixes it.
 
@@ -5824,7 +5824,7 @@ public class CustomEventExample : MonoBehaviour
 
 A simple color palette tool to select a color from a list of colors.
 
-Use `Tools` - `SaintsField` - `Color Palette` to manage the color palette.
+Use `Tools` - `Saints Field` - `Color Palette` to manage the color palette.
 
 **Parameters**:
 
@@ -5838,7 +5838,7 @@ Use `Tools` - `SaintsField` - `Color Palette` to manage the color palette.
 
 [![video](https://github.com/user-attachments/assets/7cec6366-e731-4cd1-9d13-a6b0f0f2fa1c)](https://github.com/user-attachments/assets/e5b93ec2-ab77-47d9-9e3b-15f87fd5cecd)
 
-`Tools` - `SaintsField` - `Color Palette`:
+`Tools` - `Saints Field` - `Color Palette`:
 
 [![video](https://github.com/user-attachments/assets/526bb4e9-990b-4d7a-8bba-6293e880ee78)](https://github.com/user-attachments/assets/bb76243f-96cd-4452-b1c7-ae6886d08c25)
 
@@ -7036,7 +7036,7 @@ Component Header allows you to draw extra stuffs on a component like this:
 
 If you have `SaintsEditor` enabled, this works by default.
 
-(If you can not enable `SaintsEditor`, it can work as stand-alone, go `Tools` - `SaintsField` - `Enable Stand-Alone Header GUI Support`)
+(If you can not enable `SaintsEditor`, it can work as stand-alone, go `Tools` - `Saints Field` - `Enable Stand-Alone Header GUI Support`)
 
 ### `HeaderButton` / `HeaderLeftButton` ###
 
@@ -8454,7 +8454,7 @@ public Event stopEvents;
 
 ## I2 Localization ##
 
-Tools for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Tools` - `SaintsField` - `Enable I2 Localization Support`
+Tools for [I2 Localization](https://inter-illusion.com/tools/i2-localization). Enable it in `Tools` - `Saints Field` - `Enable I2 Localization Support`
 
 NameSpace: `SaintsField.I2Loc`
 
@@ -9633,7 +9633,7 @@ Pick a way that is most convenient for you:
 
 **Using Saints Menu**
 
-Go to `Tools` - `SaintsField` to enable/disable functions you want
+Go to `Tools` - `Saints Field` to enable/disable functions you want
 
 ![Saints Menu](https://github.com/TylerTemp/SaintsField/assets/6391063/272e72c3-656c-47e4-adc6-75ba62f7f432)
 
@@ -9667,7 +9667,7 @@ Note: `csc.rsp` can override settings by Saints Menu.
 
 ### Auto Validator ###
 
-UI Toolkit: A simple validation tool under `Tools` - `SaintsField` - `Auto Validator`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
+UI Toolkit: A simple validation tool under `Tools` - `Saints Field` - `Auto Validator`, related to [#115](https://github.com/TylerTemp/SaintsField/discussions/115)
 
 This tool allows you to check if some target has `Required` but not filled, or an auto getter (e.g. `GetComponentInChildren`) but not filled or mismatched. Auto getters error will give you a button to fix it there. Note the fix function might be broken if the target is inside a prefab.
 

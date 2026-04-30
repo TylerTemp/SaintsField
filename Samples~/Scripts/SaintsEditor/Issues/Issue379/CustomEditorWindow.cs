@@ -10,7 +10,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
 {
     public class CustomEditorWindow: SaintsEditorWindow
     {
-        // [MenuItem("Saints Field/DebugIssue379")]
+        [MenuItem("Saints Field/DebugIssue379")]
         private static void OpenWindow()
         {
             EditorWindow window = GetWindow<CustomEditorWindow>(false, "Debug Issue 379");

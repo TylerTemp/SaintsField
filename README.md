@@ -87,10 +87,10 @@ Unity: 2022.2 or higher
 
 If you have DOTween installed
 *   Please also ensure you do: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
-*   Or disable related functions with `Tools` - `SaintsField` - `Disable DOTween Support`
+*   Or disable related functions with `Tools` - `Saints Field` - `Disable DOTween Support`
 *   If you can not find this menu, please read the "Add a Macro" section about how to manually disable DOTween support in SaintsField.
 
-[**Optional**] To use the full functions of this project, please also do: `Tools` - `SaintsField` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
+[**Optional**] To use the full functions of this project, please also do: `Tools` - `Saints Field` - `Enable SaintsEditor`. Note this will break your existing Editor plugin like `OdinInspector`, `NaughtyAttributes`, `MyToolbox`, `Tri-Inspector`.
 
 If you need to put this project under another folder rather than `Packages/today.comes.saintsfield`, please also do the following:
 
@@ -100,15 +100,15 @@ If you need to put this project under another folder rather than `Packages/today
 
 **Troubleshoot**
 
-After installation, you can use `Tools` - `SaintsField` - `Troubleshoot` to check if some attributes do not work.
+After installation, you can use `Tools` - `Saints Field` - `Troubleshoot` to check if some attributes do not work.
 
 namespace: `SaintsField`
 
 ### Change Log ###
 
-1.  Add: `AboveButton`/`BelowButton`/`PostFieldButton` now can show return result, has loading indicator just like `Button`
-2.  Fix: `GetByXPath` now search possible types for `GetComponent`, support sub-types, interfaces [#385](https://github.com/TylerTemp/SaintsField/issues/385)
-3.  Fix: `SortingLayer` now work with `ShowInInspector` and `Button`-s
+1.  Fix: Enum selector didn't refresh the target and got wrong displayed label in EditorWindow case [#379](https://github.com/TylerTemp/SaintsField/issues/379)
+2.  Improve: Better menu order, and change `SaintsField` to `Saints Field` in menu
+3.  Oh, by the way, "Component Header" is supported by [SaintsHierarchy](https://github.com/TylerTemp/SaintsHierarchy). You can use both/either `HierarchyDraw`/`HierarchyLeftDraw` and `HeaderDraw`/`HeaderLeftDraw` with either type (type from SaintsField or SaintsHierarchy), and it will appear on the target places.
 
 ## Usage ##
 

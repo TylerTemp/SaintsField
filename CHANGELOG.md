@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.13.7 ##
+
+1.  Fix: Enum selector didn't refresh the target and got wrong displayed label in EditorWindow case [#379](https://github.com/TylerTemp/SaintsField/issues/379)
+2.  Improve: Better menu order, and change `SaintsField` to `Saints Field` in menu
+3.  Oh, by the way, "Component Header" is supported by [SaintsHierarchy](https://github.com/TylerTemp/SaintsHierarchy). You can use both/either `HierarchyDraw`/`HierarchyLeftDraw` and `HeaderDraw`/`HeaderLeftDraw` with either type (type from SaintsField or SaintsHierarchy), and it will appear on the target places.
+
 ## 5.13.6 ##
 
 1.  Add: `AboveButton`/`BelowButton`/`PostFieldButton` now can show return result, has loading indicator just like `Button`
