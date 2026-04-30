@@ -133,8 +133,20 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             void UpdateButtonLabel(SerializedProperty p)
             {
-                string display =
-                    AdvancedDropdownAttributeDrawer.GetMetaStackDisplay(AdvancedDropdownAttributeDrawer.GetMetaInfo(p, (PathedDropdownAttribute)saintsAttribute, info, parent, false));
+                // Issue 379
+                // see Samples/Scripts/SaintsEditor/Issues/Issue379/CustomEditorWindow.cs
+                object useParent = parent;
+                (SerializedUtils.FieldOrProp _, object refreshedParent) =
+                    SerializedUtils.GetFieldInfoAndDirectParent(property);
+                if (refreshedParent != null)
+                {
+                    // Debug.Log($"rewrite parent {refreshedParent}");
+                    useParent = refreshedParent;
+                }
+
+                AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(p, (PathedDropdownAttribute)saintsAttribute,
+                    info, useParent, false);
+                string display = AdvancedDropdownAttributeDrawer.GetMetaStackDisplay(metaInfo);
                 if((string)dropdownButtonField.ButtonLabelElement.userData != display)
                 {
                     dropdownButtonField.ButtonLabelElement.userData = display;

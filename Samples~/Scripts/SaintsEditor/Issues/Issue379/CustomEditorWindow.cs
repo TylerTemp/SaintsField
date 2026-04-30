@@ -10,23 +10,11 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
 {
     public class CustomEditorWindow: SaintsEditorWindow
     {
-        // [MenuItem("SaintsField/DebugIssue379")]
+        // [MenuItem("Saints Field/DebugIssue379")]
         private static void OpenWindow()
         {
             EditorWindow window = GetWindow<CustomEditorWindow>(false, "Debug Issue 379");
             window.Show();
-        }
-
-        [Serializable]
-        public class BVC
-        {
-            public string myBvc;
-
-            [Serializable]
-            public class SimData
-            {
-                public string mySimData;
-            }
         }
 
         [SaintsRow(true)] public BVC bvc;
