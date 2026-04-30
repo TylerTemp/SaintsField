@@ -7,5 +7,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
     {
         Gold,
         Stone,
+        Gem,
+        Cloth,
     }
 }
