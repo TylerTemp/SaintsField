@@ -15,9 +15,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
         ]
 
 #pragma warning disable 0262
+#pragma warning disable 0414
         // ReSharper disable once NotAccessedField.Local
         // ReSharper disable once InconsistentNaming
         private Canvas naCenterMessageCanvas = null;
+#pragma warning restore 0414
 #pragma warning restore 0262
 
         // nah, SaintsField always render the error message below the field so...

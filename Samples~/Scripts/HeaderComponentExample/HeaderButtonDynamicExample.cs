@@ -9,8 +9,10 @@ namespace SaintsField.Samples.Scripts.HeaderComponentExample
 {
     public class HeaderButtonDynamicExample: SaintsMonoBehaviour
     {
+#pragma warning disable 0414
         private string _editButtonIcon = "<icon=pencil.png/>";
         private bool _editing;
+#pragma warning restore 0414
 
         [HeaderGhostButton("$" + nameof(_editButtonIcon), "Edit")]
         private void StartEdit()
@@ -42,7 +44,9 @@ namespace SaintsField.Samples.Scripts.HeaderComponentExample
             _editButtonIcon = "<icon=pencil.png/>";
         }
 
+#pragma warning disable 0414
         private string _saveLabel = "";
+#pragma warning restore 0414
 
         [FieldEnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public string nickName;
         [FieldEnableIf(nameof(_editing)), OnValueChanged(nameof(OnChanged))] public string password;

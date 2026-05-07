@@ -15,7 +15,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [SerializeField]
         [ShowInInspector]
         [GUIColor("#00FF00")]
+#pragma warning disable 0414
         private int _greenInt = 42;
+#pragma warning restore 0414
 
         [ShowInInspector]
         [GUIColor(EColor.Burlywood)]

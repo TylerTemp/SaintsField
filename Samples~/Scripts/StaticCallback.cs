@@ -1,3 +1,5 @@
+#pragma warning disable 0414
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -31,7 +33,9 @@ namespace SaintsField.Samples.Scripts
 #endif
         public string imgName;
 
+#pragma warning disable 0414
         [ShowInInspector] private static bool _disableMe = true;
+#pragma warning restore 0414
 
 #if UNITY_EDITOR
         [FieldDisableIf("$:" + nameof(_disableMe))]

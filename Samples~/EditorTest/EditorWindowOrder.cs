@@ -1,3 +1,5 @@
+#pragma warning disable 0414
+
 #if UNITY_EDITOR
 using System.Collections;
 using SaintsField.Editor;

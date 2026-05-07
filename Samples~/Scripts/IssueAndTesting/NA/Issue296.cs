@@ -1,3 +1,4 @@
+#pragma warning disable 0414
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
@@ -26,8 +27,10 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
         ]
         // ReSharper disable once NotAccessedField.Local
 #pragma warning disable 0296
+#pragma warning disable 0414
         // ReSharper disable once InconsistentNaming
-        private Sprite naLabel = null;
+        private Sprite naLabel;
+#pragma warning restore 0414
 #pragma warning restore 0296
 
         private bool RequiredIfReloadable(Object o) => o != null;
