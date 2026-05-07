@@ -28,6 +28,8 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
             style.borderTopColor = style.borderLeftColor = style.borderRightColor = borderColor;
             style.borderBottomWidth = 0;
             style.borderLeftWidth = 1;
+            style.marginTop = 0;
+            style.marginBottom = 0;
         }
 
         protected override void SetOffStyle(bool isFirst, bool isLast)

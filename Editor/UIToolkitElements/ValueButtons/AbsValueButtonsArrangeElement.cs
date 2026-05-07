@@ -243,9 +243,8 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
 
             // Debug.Log("Start range");
 
-            int rowIndex = 0;
-            float accWidth = _selfWidth;
-            List<List<ValueButtonRawInfo>> splitRowInfos = new List<List<ValueButtonRawInfo>>();
+            List<ValueButtonRawInfo> buttonInfos = new List<ValueButtonRawInfo>(_results.Count);
+            List<float> buttonWidths = new List<float>(_results.Count);
 
             for (int index = 0; index < _results.Count; index++)
             {
@@ -256,43 +255,11 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
                     return;  // mismatch, must be changed during rendering. Wait next call
                 }
 
-                // is it a new row?
-                if (splitRowInfos.Count <= rowIndex)
-                {
-                    List<ValueButtonRawInfo> newRow = new List<ValueButtonRawInfo>
-                    {
-                        valueButtonRawInfo,
-                    };
-                    splitRowInfos.Add(newRow);
-                    accWidth = (index == 0? _selfWidth: _subWidth) - resultWidth;
-                    // Debug.Log($"On {rowIndex} add new row with {resultWidth}, left width = {accWidth}");
-                    if (accWidth < 0)
-                    {
-                        // Debug.Log($"On {rowIndex} pump to next row");
-                        rowIndex += 1;
-                    }
-                }
-                else  // old row
-                {
-                    if (accWidth < resultWidth)  // no enough space, move to next row
-                    {
-                        List<ValueButtonRawInfo> newRow = new List<ValueButtonRawInfo>
-                        {
-                            valueButtonRawInfo,
-                        };
-                        splitRowInfos.Add(newRow);
-                        accWidth = _subWidth - resultWidth;
-                        // Debug.Log($"On {rowIndex} pump to new row with {resultWidth}, left width = {accWidth}");
-                        rowIndex += 1;
-                    }
-                    else  // add item to current row
-                    {
-                        splitRowInfos[rowIndex].Add(valueButtonRawInfo);
-                        accWidth -= resultWidth;
-                        // Debug.Log($"On {rowIndex} now count={splitRowInfos[rowIndex].Count} reduce {resultWidth}, left width {accWidth}");
-                    }
-                }
+                buttonInfos.Add(valueButtonRawInfo);
+                buttonWidths.Add(resultWidth);
             }
+
+            List<List<ValueButtonRawInfo>> splitRowInfos = SplitRowsBalanced(buttonInfos, buttonWidths);
 
             int processedIndex = 0;
             // bool hasSubRows = false;
@@ -349,6 +316,149 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             //         _subRows.RemoveAt(toRemoveIndex);
             //     }
             // }
+        }
+
+        private List<List<ValueButtonRawInfo>> SplitRowsBalanced(
+            IReadOnlyList<ValueButtonRawInfo> buttonInfos,
+            IReadOnlyList<float> buttonWidths)
+        {
+            List<List<ValueButtonRawInfo>> greedyRows = SplitRowsGreedy(buttonInfos, buttonWidths);
+            int rowCount = greedyRows.Count;
+            int buttonCount = buttonInfos.Count;
+            if (rowCount <= 1 || buttonCount <= 2)
+            {
+                return greedyRows;
+            }
+
+            float[] prefixWidths = new float[buttonCount + 1];
+            for (int index = 0; index < buttonCount; index++)
+            {
+                prefixWidths[index + 1] = prefixWidths[index] + buttonWidths[index];
+            }
+
+            float[,] costs = new float[rowCount + 1, buttonCount + 1];
+            int[,] previousBreaks = new int[rowCount + 1, buttonCount + 1];
+            for (int rowIndex = 0; rowIndex <= rowCount; rowIndex++)
+            {
+                for (int buttonIndex = 0; buttonIndex <= buttonCount; buttonIndex++)
+                {
+                    costs[rowIndex, buttonIndex] = float.PositiveInfinity;
+                    previousBreaks[rowIndex, buttonIndex] = -1;
+                }
+            }
+
+            costs[0, 0] = 0;
+            for (int rowIndex = 1; rowIndex <= rowCount; rowIndex++)
+            {
+                float rowWidth = rowIndex == 1 ? _selfWidth : _subWidth;
+                for (int buttonIndex = rowIndex; buttonIndex <= buttonCount; buttonIndex++)
+                {
+                    for (int previousBreak = rowIndex - 1; previousBreak < buttonIndex; previousBreak++)
+                    {
+                        if (float.IsPositiveInfinity(costs[rowIndex - 1, previousBreak]))
+                        {
+                            continue;
+                        }
+
+                        float segmentWidth = prefixWidths[buttonIndex] - prefixWidths[previousBreak];
+                        bool isSingleOversizedButton = buttonIndex - previousBreak == 1 && segmentWidth > rowWidth;
+                        if (segmentWidth > rowWidth && !isSingleOversizedButton)
+                        {
+                            continue;
+                        }
+
+                        float unusedWidth = Mathf.Max(0, rowWidth - segmentWidth);
+                        float candidateCost = costs[rowIndex - 1, previousBreak] + unusedWidth * unusedWidth;
+                        if (candidateCost >= costs[rowIndex, buttonIndex])
+                        {
+                            continue;
+                        }
+
+                        costs[rowIndex, buttonIndex] = candidateCost;
+                        previousBreaks[rowIndex, buttonIndex] = previousBreak;
+                    }
+                }
+            }
+
+            if (previousBreaks[rowCount, buttonCount] < 0)
+            {
+                return greedyRows;
+            }
+
+            int[] breaks = new int[rowCount + 1];
+            breaks[rowCount] = buttonCount;
+            for (int rowIndex = rowCount; rowIndex > 0; rowIndex--)
+            {
+                breaks[rowIndex - 1] = previousBreaks[rowIndex, breaks[rowIndex]];
+            }
+
+            List<List<ValueButtonRawInfo>> balancedRows = new List<List<ValueButtonRawInfo>>(rowCount);
+            for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+            {
+                List<ValueButtonRawInfo> rowInfos = new List<ValueButtonRawInfo>(breaks[rowIndex + 1] - breaks[rowIndex]);
+                for (int buttonIndex = breaks[rowIndex]; buttonIndex < breaks[rowIndex + 1]; buttonIndex++)
+                {
+                    rowInfos.Add(buttonInfos[buttonIndex]);
+                }
+
+                balancedRows.Add(rowInfos);
+            }
+
+            return balancedRows;
+        }
+
+        private List<List<ValueButtonRawInfo>> SplitRowsGreedy(
+            IReadOnlyList<ValueButtonRawInfo> buttonInfos,
+            IReadOnlyList<float> buttonWidths)
+        {
+            int rowIndex = 0;
+            float accWidth = _selfWidth;
+            List<List<ValueButtonRawInfo>> splitRowInfos = new List<List<ValueButtonRawInfo>>();
+
+            for (int index = 0; index < buttonInfos.Count; index++)
+            {
+                ValueButtonRawInfo valueButtonRawInfo = buttonInfos[index];
+                float resultWidth = buttonWidths[index];
+
+                // is it a new row?
+                if (splitRowInfos.Count <= rowIndex)
+                {
+                    List<ValueButtonRawInfo> newRow = new List<ValueButtonRawInfo>
+                    {
+                        valueButtonRawInfo,
+                    };
+                    splitRowInfos.Add(newRow);
+                    accWidth = (index == 0? _selfWidth: _subWidth) - resultWidth;
+                    // Debug.Log($"On {rowIndex} add new row with {resultWidth}, left width = {accWidth}");
+                    if (accWidth < 0)
+                    {
+                        // Debug.Log($"On {rowIndex} pump to next row");
+                        rowIndex += 1;
+                    }
+                }
+                else  // old row
+                {
+                    if (accWidth < resultWidth)  // no enough space, move to next row
+                    {
+                        List<ValueButtonRawInfo> newRow = new List<ValueButtonRawInfo>
+                        {
+                            valueButtonRawInfo,
+                        };
+                        splitRowInfos.Add(newRow);
+                        accWidth = _subWidth - resultWidth;
+                        // Debug.Log($"On {rowIndex} pump to new row with {resultWidth}, left width = {accWidth}");
+                        rowIndex += 1;
+                    }
+                    else  // add item to current row
+                    {
+                        splitRowInfos[rowIndex].Add(valueButtonRawInfo);
+                        accWidth -= resultWidth;
+                        // Debug.Log($"On {rowIndex} now count={splitRowInfos[rowIndex].Count} reduce {resultWidth}, left width {accWidth}");
+                    }
+                }
+            }
+
+            return splitRowInfos;
         }
 
         public void RefreshCurValue(object curValue)

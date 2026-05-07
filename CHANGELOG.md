@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.13.8 ##
+
+1.  Fix: inline buttons gave error when no label is passed [#386](https://github.com/TylerTemp/SaintsField/issues/386)
+2.  Improve: multiline tabs/buttons can not arrange the space better
+
 ## 5.13.7 ##
 
 1.  Fix: Enum selector didn't refresh the target and got wrong displayed label in EditorWindow case [#379](https://github.com/TylerTemp/SaintsField/issues/379)
