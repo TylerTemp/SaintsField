@@ -92,11 +92,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.13.7**
+**5.13.8**
 
-1.  Fix: Enum selector didn't refresh the target and got wrong displayed label in EditorWindow case [#379](https://github.com/TylerTemp/SaintsField/issues/379)
-2.  Improve: Better menu order, and change `SaintsField` to `Saints Field` in menu
-3.  Oh, by the way, "Component Header" is supported by [SaintsHierarchy](https://github.com/TylerTemp/SaintsHierarchy). You can use both/either `HierarchyDraw`/`HierarchyLeftDraw` and `HeaderDraw`/`HeaderLeftDraw` with either type (type from SaintsField or SaintsHierarchy), and it will appear on the target places.
+1.  Fix: inline buttons gave error when no label is passed [#386](https://github.com/TylerTemp/SaintsField/issues/386)
+2.  Improve: multiline tabs/buttons can not arrange the space better
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
