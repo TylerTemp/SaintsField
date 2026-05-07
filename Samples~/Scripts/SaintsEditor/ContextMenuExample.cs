@@ -74,7 +74,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         }
 
         [CustomContextMenu("$" + nameof(ResetIntV))]
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         [ShowInInspector] private int _intV;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
 
         private void ResetIntV()
         {

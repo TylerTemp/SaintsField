@@ -689,7 +689,9 @@ namespace SaintsField.Editor.Utils
                 {
                     equalCalledResult = itemValue == curValue;
                 }
+#pragma warning disable CS0168 // Variable is declared but never used
                 catch (Exception e2)
+#pragma warning restore CS0168 // Variable is declared but never used
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(e2);
@@ -1137,11 +1139,13 @@ namespace SaintsField.Editor.Utils
                                         {
                                             targetFieldOrProp.FieldInfo.SetValue(targetParent, target);
                                         }
+#pragma warning disable CS0168 // Variable is declared but never used
                                         catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                                         {
-    #if SAINTSFIELD_DEBUG
+#if SAINTSFIELD_DEBUG
                                             Debug.LogException(e);
-    #endif
+#endif
                                         }
                                     }
                                 }
@@ -1159,11 +1163,14 @@ namespace SaintsField.Editor.Utils
                                         {
                                             targetFieldOrProp.PropertyInfo.SetValue(targetParent, target);
                                         }
+#pragma warning disable CS0168 // Variable is declared but never used
                                         catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                                         {
-    #if SAINTSFIELD_DEBUG
+                                            // ignored
+#if SAINTSFIELD_DEBUG
                                             Debug.LogException(e);
-    #endif
+#endif
                                         }
                                     }
                                 }
@@ -1186,8 +1193,11 @@ namespace SaintsField.Editor.Utils
                     {
                         arr.SetValue(target, insideArrayIndex);
                     }
+#pragma warning disable CS0168 // Variable is declared but never used
                     catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                     {
+                        // ignored
 #if SAINTSFIELD_DEBUG
                         Debug.LogException(e);
 #endif
@@ -1200,8 +1210,11 @@ namespace SaintsField.Editor.Utils
                     {
                         lis[insideArrayIndex] = target;
                     }
+#pragma warning disable CS0168 // Variable is declared but never used
                     catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                     {
+                        // ignored
 #if SAINTSFIELD_DEBUG
                         Debug.LogException(e);
 #endif
@@ -2849,7 +2862,9 @@ namespace SaintsField.Editor.Utils
                 {
                     fieldValue = fieldInfo.GetValue(childObject);
                 }
+#pragma warning disable CS0168 // Variable is declared but never used
                 catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogWarning(e);
@@ -2875,7 +2890,9 @@ namespace SaintsField.Editor.Utils
                 {
                     propertyValue = propertyInfo.GetValue(childObject);
                 }
+#pragma warning disable CS0168 // Variable is declared but never used
                 catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogWarning(e);

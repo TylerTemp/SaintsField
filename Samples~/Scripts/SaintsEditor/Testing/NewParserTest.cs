@@ -6,10 +6,18 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 {
     public class NewParserTest : SaintsMonoBehaviour
     {
+#pragma warning disable CS0067 // Event is never used
+        // ReSharper disable once InconsistentNaming
         public event Action myEventField;
+#pragma warning restore CS0067 // Event is never used
 
         [Serializable]
-        public class Part1<U, V>
+        // ReSharper disable once InconsistentNaming
+        // ReSharper disable once UnusedTypeParameter
+        public class Part1<U,
+            // ReSharper disable once InconsistentNaming
+            // ReSharper disable once UnusedTypeParameter
+            V>
         {
 
             [Serializable]

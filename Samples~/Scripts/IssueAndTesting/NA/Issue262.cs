@@ -16,7 +16,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
 
 #pragma warning disable 0262
         // ReSharper disable once NotAccessedField.Local
-        private Canvas naCenterMessageCanvas = default;
+        // ReSharper disable once InconsistentNaming
+        private Canvas naCenterMessageCanvas = null;
 #pragma warning restore 0262
 
         // nah, SaintsField always render the error message below the field so...
@@ -26,6 +27,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             Required,
         ]
         // ReSharper disable once NotAccessedField.Local
-        private Canvas centerMessageCanvas = default;
+        // ReSharper disable once InconsistentNaming
+        private Canvas centerMessageCanvas;
     }
 }

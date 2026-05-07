@@ -12,6 +12,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         [Button]
         private void ButtonGold(){}
 
+        [SerializeField]
         [ShowInInspector]
         [GUIColor("#00FF00")]
         private int _greenInt = 42;

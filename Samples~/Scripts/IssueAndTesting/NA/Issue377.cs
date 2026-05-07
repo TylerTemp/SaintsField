@@ -32,7 +32,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
         {
 
 #pragma warning disable 0169
-            string name = "";
+#pragma warning disable CS0414 // Field is assigned but its value is never used
+            // ReSharper disable once InconsistentNaming
+            // ReSharper disable once MemberInitializerValueIgnored
+            private string name = "";
+#pragma warning restore CS0414 // Field is assigned but its value is never used
 #pragma warning restore 0169
             public TimelineItem()
             {
@@ -41,6 +45,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             }
             public bool label;
             [FieldShowIf("label")]
+            // ReSharper disable once InconsistentNaming
             public string LabelText = "Round 1";
             [SaintsRow]
             public List<VideoItem> videos = new List<VideoItem>();

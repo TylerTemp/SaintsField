@@ -16,7 +16,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         }
 
         [OnValueChanged(nameof(ValueChanged))]
-        [OnArraySizeChanged(nameof(SizeChanged))]
         public MyClass[] myClasses;
 
         public void ValueChanged(MyClass myClass, int index)

@@ -25,28 +25,28 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue238
         [Button]
         private void SearchPrefabInterface()
         {
-            HierarchyProperty property = new HierarchyProperty(HierarchyType.Assets, false);
-
-            TypeCache.TypeCollection derivedTypes = TypeCache.GetTypesDerivedFrom(typeof(IIssue238));
-            Debug.Log($"found types = {string.Join(" ", derivedTypes)}");
-            StringBuilder sb = new StringBuilder();
-            Type fieldType = typeof(UnityEngine.Object);
-            foreach (Type type in derivedTypes)
-            {
-                if (fieldType.IsAssignableFrom(type))
-                    sb.Append("t:" + type.FullName + " ");
-            }
-            // this makes sure we don't find anything if there's no type supplied
-            if (sb.Length == 0)
-                sb.Append("t:");
-
-            string searchFilter = sb.ToString();
-            Debug.Log($"search filter: {searchFilter}");
-            property.SetSearchFilter(searchFilter, 0);
-            while (property.Next(null))
-            {
-                Debug.Log(property.pptrValue);
-            }
+            // HierarchyProperty property = new HierarchyProperty(HierarchyType.Assets, false);
+            //
+            // TypeCache.TypeCollection derivedTypes = TypeCache.GetTypesDerivedFrom(typeof(IIssue238));
+            // Debug.Log($"found types = {string.Join(" ", derivedTypes)}");
+            // StringBuilder sb = new StringBuilder();
+            // Type fieldType = typeof(UnityEngine.Object);
+            // foreach (Type type in derivedTypes)
+            // {
+            //     if (fieldType.IsAssignableFrom(type))
+            //         sb.Append("t:" + type.FullName + " ");
+            // }
+            // // this makes sure we don't find anything if there's no type supplied
+            // if (sb.Length == 0)
+            //     sb.Append("t:");
+            //
+            // string searchFilter = sb.ToString();
+            // Debug.Log($"search filter: {searchFilter}");
+            // property.SetSearchFilter(searchFilter, 0);
+            // while (property.Next(null))
+            // {
+            //     Debug.Log(property.pptrValue);
+            // }
         }
 #endif
 

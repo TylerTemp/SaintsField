@@ -49,6 +49,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [ShowInInspector] private bool _boolV;
         [ShowInInspector] private byte _byteV;
         [ShowInInspector] private sbyte _sbyteV;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         [ShowInInspector] private short _shortV = -5;
         [ShowInInspector] private ushort _ushortV = 0;
         [ShowInInspector] private long _longV = long.MaxValue;
@@ -57,6 +58,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         [ShowInInspector] private double _doubleV = 0.1234d;
         [ShowInInspector] private string _stringV = "Hi";
         [ShowInInspector] private char _charV = 'c';
+#pragma warning restore CS0414 // Field is assigned but its value is never used
         [ShowInInspector] private Vector2 _vector2V = Vector2.one;
         [ShowInInspector] private Vector3 _vector3V = Vector3.one;
         [ShowInInspector] private Vector4 _vector4V = Vector4.one;

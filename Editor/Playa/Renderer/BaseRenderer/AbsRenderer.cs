@@ -352,8 +352,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                     fieldWithInfo.TargetMemberIndex);
                             }
                         }
+#pragma warning disable CS0168 // Variable is declared but never used
                         catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                         {
+                            // ignored
 #if SAINTSFIELD_DEBUG
                             Debug.LogException(e);
 #endif
@@ -373,8 +376,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                         fieldWithInfo.TargetMemberIndex);
                                 }
                             }
+#pragma warning disable CS0168 // Variable is declared but never used
                             catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                             {
+                                // ignored
 #if SAINTSFIELD_DEBUG
                                 Debug.LogException(e);
 #endif

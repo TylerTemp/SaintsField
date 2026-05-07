@@ -296,8 +296,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             }
                             // Debug.Log($"useTarget={useTarget}");
                         }
+#pragma warning disable CS0168 // Variable is declared but never used
                         catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                         {
+                            // ignored
 #if SAINTSFIELD_DEBUG
                             Debug.LogException(e);
 #endif
@@ -316,8 +319,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                     useTarget = GetCollectionIndex(useTarget, fieldWithInfo.TargetMemberIndex);
                                 }
                             }
+#pragma warning disable CS0168 // Variable is declared but never used
                             catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                             {
+                                // ignored
 #if SAINTSFIELD_DEBUG
                                 Debug.LogException(e);
 #endif
@@ -466,7 +472,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         value = memberInfo.GetValue(FieldWithInfo.Targets[0]);
                     }
+#pragma warning disable CS0168 // Variable is declared but never used
                     catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                     {
 #if SAINTSFIELD_DEBUG
                         Debug.LogWarning(e);
@@ -505,7 +513,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         value = memberInfo.GetValue(FieldWithInfo.Targets[0]);
                     }
+#pragma warning disable CS0168 // Variable is declared but never used
                     catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                     {
 #if SAINTSFIELD_DEBUG
                         Debug.LogWarning(e);
@@ -568,8 +578,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             {
                                 fieldInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
                             }
+#pragma warning disable CS0168 // Variable is declared but never used
                             catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                             {
+                                // ignored
 #if SAINTSFIELD_DEBUG
                                 Debug.LogException(e);
 #endif
@@ -595,8 +608,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 {
                                     propertyInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
                                 }
+#pragma warning disable CS0168 // Variable is declared but never used
                                 catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                                 {
+                                    // ignored
 #if SAINTSFIELD_DEBUG
                                     Debug.LogException(e);
 #endif

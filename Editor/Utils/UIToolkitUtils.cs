@@ -2477,8 +2477,11 @@ namespace SaintsField.Editor.Utils
                         PopulateContextMenuUsingFillPropertyContextMenu(evt, ele, property);
                         return;
                     }
+#pragma warning disable CS0168 // Variable is declared but never used
                     catch (Exception ex)
+#pragma warning restore CS0168 // Variable is declared but never used
                     {
+                        // ignored
 #if SAINTSFIELD_DEBUG
                         Debug.LogException(ex);
 #endif
@@ -2727,8 +2730,11 @@ namespace SaintsField.Editor.Utils
 
                         menu = fillPropertyContextMenu.Invoke(property, root);
                     }
+#pragma warning disable CS0168 // Variable is declared but never used
                     catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                     {
+                        // ignored
 #if SAINTSFIELD_DEBUG
                         Debug.LogError(e);
 #endif
@@ -2750,7 +2756,9 @@ namespace SaintsField.Editor.Utils
                     // Convert legacy menu to new UI Toolkit dropdown menu
                     converted = GenericMenuDynamicConverter.ConvertGenericMenuToDropdownMenu(menu, evt.menu);
                 }
+#pragma warning disable CS0168 // Variable is declared but never used
                 catch (Exception ex)
+#pragma warning restore CS0168 // Variable is declared but never used
                 {
 #if SAINTSFIELD_DEBUG
                     Debug.LogException(ex);

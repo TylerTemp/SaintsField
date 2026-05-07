@@ -18,15 +18,9 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 {
     public partial class DecButtonAttributeDrawer
     {
-
-
-        // private static string ClassButton(SerializedProperty property) => $"{property.propertyPath}__Button";
-        private static string ClassLabelContainer(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__LabelContainer";
         private static string ClassLabelError(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__LabelError";
         private static string ClassExecError(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__ExecError";
-        private static string NameButtonRotator(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__ButtonRatator";
         protected static string NameButton(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__Button";
-        protected static string NameButtonInvokeResult(SerializedProperty property, int index) => $"{property.propertyPath}__{index}__ButtonResult";
 
         protected abstract void CleanResult(VisualElement container, SerializedProperty property, int index);
         protected abstract void AppendErrorResult(VisualElement container, SerializedProperty property, int index, string error);
@@ -39,7 +33,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
             ButtonRenderer.ButtonUserData buttonUserData = new ButtonRenderer.ButtonUserData
             {
-                Xml = decButtonAttribute.ButtonLabel,
+                Xml = decButtonAttribute.ButtonLabel ?? ObjectNames.NicifyVariableName(decButtonAttribute.FuncName),
                 Callback = decButtonAttribute.IsCallback? decButtonAttribute.ButtonLabel: "",
                 UpdateOneMoreTime = true,
                 Enumerators = new List<Waiter>(),
@@ -52,109 +46,6 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
             fancyButton.MainLabel.Add(new Label(buttonUserData.Xml));
             fancyButton.AddToClassList(ClassAllowDisable);
 
-            // Button buttonElement = null;
-            // IVisualElementScheduledItem buttonTask = null;
-            // HashSet<IEnumerator> enumerators = new HashSet<IEnumerator>();
-            // Image buttonRotator = new Image
-            // {
-            //     image = Util.LoadResource<Texture2D>("refresh.png"),
-            //     style =
-            //     {
-            //         position = Position.Absolute,
-            //         width = EditorGUIUtility.singleLineHeight - 2,
-            //         height = EditorGUIUtility.singleLineHeight - 2,
-            //         left = 1,
-            //         top = 1,
-            //         opacity = 0.5f,
-            //         display = DisplayStyle.None,
-            //     },
-            //     tintColor = EColor.Lime.GetColor(),
-            //     name = NameButtonRotator(property, index),
-            // };
-            // Button buttonElement = new Button(() =>
-            // {
-            //     HelpBox helpBox = container.Query<HelpBox>(className: ClassExecError(property, index)).First();
-            //     string buttonError = "";
-            //     // ReSharper disable once PossibleNullReferenceException
-            //     // ReSharper disable once AccessToModifiedClosure
-            //     // HashSet<IEnumerator> enumerators = (HashSet<IEnumerator>)buttonElement.userData;
-            //     foreach ((string eachError, object buttonResult) in CallButtonFunc(property, ((DecButtonAttribute)saintsAttribute).FuncName, info, parent))
-            //     {
-            //         // Debug.Log($"{eachError}/{buttonResult}");
-            //         if (eachError == "")
-            //         {
-            //             // Debug.Log(buttonResult is IEnumerator);
-            //             if (buttonResult is IEnumerator enumerator)
-            //             {
-            //                 enumerators.Add(enumerator);
-            //             }
-            //         }
-            //         else
-            //         {
-            //             buttonError += eachError;
-            //         }
-            //     }
-            //
-            //     buttonTask?.Pause();
-            //
-            //     if (enumerators.Count > 0)
-            //     {
-            //         // ReSharper disable once PossibleNullReferenceException
-            //         // ReSharper disable once AccessToModifiedClosure
-            //         buttonTask = container.schedule.Execute(() =>
-            //         {
-            //             HashSet<IEnumerator> completedEnumerators = new HashSet<IEnumerator>();
-            //
-            //             foreach (IEnumerator enumerator in enumerators)
-            //             {
-            //                 if (!enumerator.MoveNext())
-            //                 {
-            //                     completedEnumerators.Add(enumerator);
-            //                 }
-            //             }
-            //
-            //             enumerators.ExceptWith(completedEnumerators);
-            //             bool show = enumerators.Count > 0;
-            //
-            //             DisplayStyle style = show? DisplayStyle.Flex : DisplayStyle.None;
-            //             if(buttonRotator.style.display != style)
-            //             {
-            //                 buttonRotator.style.display = style;
-            //             }
-            //         }).Every(1);
-            //     }
-            //
-            //     helpBox.style.display = buttonError == ""? DisplayStyle.None: DisplayStyle.Flex;
-            //     helpBox.text = buttonError;
-            // })
-            // {
-            //     style =
-            //     {
-            //         height = EditorGUIUtility.singleLineHeight,
-            //         flexGrow = 1,
-            //     },
-            //     userData = new HashSet<IEnumerator>(),
-            // };
-            //
-            // buttonElement.Add(buttonRotator);
-            //
-            // VisualElement labelContainer = new VisualElement
-            // {
-            //     style =
-            //     {
-            //         flexDirection = FlexDirection.Row,
-            //         // flexGrow = 1,
-            //         justifyContent = Justify.Center,  // horizontal
-            //         alignItems = Align.Center,  // vertical
-            //     },
-            //     userData = "",
-            // };
-            // labelContainer.AddToClassList(ClassLabelContainer(property, index));
-            // // labelContainer.Add(new Label("test label"));
-            //
-            // buttonElement.Add(labelContainer);
-            // // button.AddToClassList();
-            // buttonElement.AddToClassList(ClassAllowDisable);
             return fancyButton;
         }
 

@@ -9,6 +9,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
             AssetPreview,
             ValidateInput(nameof(RequiredIfReloadable)),
             // ReSharper disable once NotAccessedField.Local
+            // ReSharper disable once InconsistentNaming
         ] private Sprite ammoIcon = null;
 
         [
@@ -25,6 +26,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
         ]
         // ReSharper disable once NotAccessedField.Local
 #pragma warning disable 0296
+        // ReSharper disable once InconsistentNaming
         private Sprite naLabel = null;
 #pragma warning restore 0296
 
