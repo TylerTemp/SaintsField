@@ -2,6 +2,7 @@
 using System;
 using SaintsField.Editor;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -10,7 +11,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
 {
     public class CustomEditorWindow: SaintsEditorWindow
     {
-        // [MenuItem("Saints Field/DebugIssue379")]
+#if SAINTSFIELD_DEBUG
+        [MenuItem(RuntimeUtil.MenuRoot + "DebugIssue379")]
+#endif
         private static void OpenWindow()
         {
             EditorWindow window = GetWindow<CustomEditorWindow>(false, "Debug Issue 379");
@@ -21,7 +24,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
 
         [HideIf(true)]
         public BVC.SimData simData;
-
 
         protected override void EditorRelinkRootUIToolkit()
         {

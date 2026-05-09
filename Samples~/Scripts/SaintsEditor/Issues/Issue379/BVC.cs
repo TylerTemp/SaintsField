@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
 {
@@ -84,6 +85,20 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
         {
             public int InputRangeMin = 0;
             public int InputRangeMax = 100;
+
+            [SerializeReference, ReferencePicker]
+            public IAnyInterfece upgradeCostStackAsInput2;
+
+            public bool ShouldShowUpgradeCostBalanceAsInput2()
+            {
+                var data = upgradeCostStackAsInput2 == null;
+                Debug.Log(upgradeCostStackAsInput2);
+                return data;
+            }
+
+            [ShowIf(nameof(ShouldShowUpgradeCostBalanceAsInput2))]
+            public bool test;
+
         }
     }
 }
