@@ -773,7 +773,7 @@ namespace SaintsField.Editor.Utils
                     return (true, property.boundsIntValue);
 #if UNITY_2019_3_OR_NEWER
                 case SerializedPropertyType.ManagedReference:
-                    return (false, null);
+                    return (true, property.managedReferenceValue);
 #endif
                 case SerializedPropertyType.Generic:
                 {

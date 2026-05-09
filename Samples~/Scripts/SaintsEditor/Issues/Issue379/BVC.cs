@@ -60,7 +60,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
 
         public float basePercentage;
         public float startValue;
-        [HideIf] public SimData simData;
+        public SimData simData;
 
         [Serializable]
         public class Rule
@@ -83,22 +83,29 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
         [Serializable]
         public class SimData
         {
+            public string displayName;
             public int InputRangeMin = 0;
             public int InputRangeMax = 100;
 
-            [SerializeReference, ReferencePicker]
+            [SerializeReference, ReferencePicker, FieldBelowText("$" + nameof(upgradeCostStackAsInput2))]
             public IAnyInterfece upgradeCostStackAsInput2;
 
             public bool ShouldShowUpgradeCostBalanceAsInput2()
             {
                 var data = upgradeCostStackAsInput2 == null;
-                Debug.Log(upgradeCostStackAsInput2);
+                Debug.Log($"callback upgradeCostStackAsInput2 = {upgradeCostStackAsInput2} (is null: {data})");
                 return data;
             }
 
             [ShowIf(nameof(ShouldShowUpgradeCostBalanceAsInput2))]
+            // [ShowIf(nameof(upgradeCostStackAsInput2))]
             public bool test;
 
+
+            public override string ToString()
+            {
+                return $"<SimData={displayName}/>";
+            }
         }
     }
 }

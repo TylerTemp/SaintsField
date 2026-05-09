@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.13.9 ##
+
+Fix: The callback might get an old (not up to date) value when manually assign a serializable class value [#387](https://github.com/TylerTemp/SaintsField/issues/387)
+
 ## 5.13.8 ##
 
 1.  Fix: inline buttons gave error when no label is passed [#386](https://github.com/TylerTemp/SaintsField/issues/386)

@@ -22,8 +22,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
 
         [SaintsRow(true)] public BVC bvc;
 
-        [HideIf(true)]
-        public BVC.SimData simData;
+        // [HideIf(true)]
+        // public BVC.SimData simData;
 
         protected override void EditorRelinkRootUIToolkit()
         {
@@ -51,7 +51,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
         {
             using (SerializedObject serObj = new SerializedObject(GetTarget()))
             {
-                var property = serObj.FindProperty(nameof(simData));
+                // var property = serObj.FindProperty(nameof(simData));
 
                 // EditorGUILayout.PropertyField(property, true);
 
@@ -60,7 +60,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
                     // This is where you draw the charts. PropertyField won't work here because `HideIf`
                     // Change it to your own drawing logic
                     GuiCharts();
-                    EditorGUILayout.PropertyField(property, true);
+                    // EditorGUILayout.PropertyField(property, true);
                     if (changed.changed)
                     {
                         serObj.ApplyModifiedProperties();

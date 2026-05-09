@@ -8,6 +8,7 @@ using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -148,6 +149,24 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         // Debug.Log(property.managedReferenceId);
                     })
                     .Every(100);
+            }
+            else if (property.propertyType == SerializedPropertyType.Generic)
+            {
+                root.TrackPropertyValue(property, p =>
+                {
+                    root.Clear();
+
+                    object useParent = parent;
+                    (SerializedUtils.FieldOrProp _, object refreshedParent) =
+                        SerializedUtils.GetFieldInfoAndDirectParent(p);
+                    if (refreshedParent != null)
+                    {
+                        // Debug.Log($"rewrite parent {refreshedParent}");
+                        useParent = refreshedParent;
+                    }
+
+                    FillElement(root, label, p, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, useParent, richTextTagProvider);
+                });
             }
             return root;
         }

@@ -28,6 +28,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
             // Debug.Log(data.resourceType);
             window.bvc = data;
             window.simData_Internal = data.simData;
+            window.simData_Internal.displayName = "Editor Panel!";
+            // window.EditorRefreshTarget();
             window.Show();
 
             return window;

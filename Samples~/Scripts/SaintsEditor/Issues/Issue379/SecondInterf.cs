@@ -1,7 +1,8 @@
-using UnityEngine;
+using System;
 
-namespace SaintsField
+namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
 {
+    [Serializable]
     public class SecondInterf: IAnyInterfece
     {
 
