@@ -19,6 +19,10 @@ namespace SaintsField.Editor.Playa.RendererGroup
     public partial class DOTweenPlayGroup: ISaintsRendererGroup
     {
         public bool InDirectHorizontalLayout { get; set; }
+        public void RefreshTargets(object[] targets)
+        {
+        }
+
         public bool InAnyHorizontalLayout { get; set; }
         // public bool NoLabel { get; set; }
 

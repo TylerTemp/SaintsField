@@ -11,9 +11,9 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
 {
     public class CustomEditorWindow: SaintsEditorWindow
     {
-#if SAINTSFIELD_DEBUG
-        [MenuItem(RuntimeUtil.MenuRoot + "DebugIssue379")]
-#endif
+// #if SAINTSFIELD_DEBUG
+//         [MenuItem(RuntimeUtil.MenuRoot + "DebugIssue379")]
+// #endif
         private static void OpenWindow()
         {
             EditorWindow window = GetWindow<CustomEditorWindow>(false, "Debug Issue 379");
