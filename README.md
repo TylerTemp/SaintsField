@@ -106,8 +106,7 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-1.  Fix: inline buttons gave error when no label is passed [#386](https://github.com/TylerTemp/SaintsField/issues/386)
-2.  Improve: multiline tabs/buttons can not arrange the space better
+Fix: The callback might get an old (not up to date) value when manually assign a serializable class value [#387](https://github.com/TylerTemp/SaintsField/issues/387)
 
 ## Usage ##
 
