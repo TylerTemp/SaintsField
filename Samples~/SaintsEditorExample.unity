@@ -2191,6 +2191,61 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+--- !u!1 &483085976
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 483085977}
+  - component: {fileID: 483085978}
+  m_Layer: 0
+  m_Name: CopyFrom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &483085977
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 483085976}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1740530759}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &483085978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 483085976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2f7a13f08ece014bac11a5583ee79c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue387.Issue387CopyFrom
+  simData:
+    displayName: 
+    upgradeCostStackAsInput2:
+      rid: 8269941736313454706
+    test: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 8269941736313454706
+      type: {class: SomeInter, ns: SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue387, asm: SaintsField.Samples}
+      data: 
 --- !u!1 &494659098
 GameObject:
   m_ObjectHideFlags: 0
@@ -3035,6 +3090,7 @@ Transform:
   - {fileID: 936838944}
   - {fileID: 2103412846}
   - {fileID: 1393990603}
+  - {fileID: 1740530759}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &786619284
@@ -4354,7 +4410,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!4 &975163648
 Transform:
@@ -5018,6 +5074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2caad9d3c6b8a0d43943bb5d07dcd2d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.EditorGUIColor
+  _greenInt: 42
 --- !u!1 &1135433103
 GameObject:
   m_ObjectHideFlags: 0
@@ -8426,6 +8483,62 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1740530758
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1740530759}
+  - component: {fileID: 1740530760}
+  m_Layer: 0
+  m_Name: Issue387
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1740530759
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1740530758}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 483085977}
+  m_Father: {fileID: 785898368}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1740530760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1740530758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d566d428ed4e12f47b228911d39d9e40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue387.Issue387Main
+  editingSimData:
+    displayName: 
+    upgradeCostStackAsInput2:
+      rid: 8269941736313454705
+    test: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 8269941736313454705
+      type: {class: SomeInter, ns: SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue387, asm: SaintsField.Samples}
+      data: 
 --- !u!1 &1757007196
 GameObject:
   m_ObjectHideFlags: 0

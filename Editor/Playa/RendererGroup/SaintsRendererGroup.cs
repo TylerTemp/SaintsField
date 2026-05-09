@@ -157,6 +157,14 @@ namespace SaintsField.Editor.Playa.RendererGroup
             }
         }
 
+        public void RefreshTargets(object[] targets)
+        {
+            foreach ((string _, ISaintsRenderer renderer) in _renderers)
+            {
+                renderer.RefreshTargets(targets);
+            }
+        }
+
         public override string ToString() => $"<Group path={string.Join('/', _groupPath)} layout={_eLayout}/>";
 
         private static bool IsFancyBox(ELayout eLayout) => eLayout.HasFlagFast(ELayout.Background) || eLayout.HasFlagFast(ELayout.Tab);

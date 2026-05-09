@@ -99,7 +99,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             root.AddToClassList(SaintsRowClass);
             root.AddToClassList(ClassAllowDisable);
 
-            FillElement(root, label, property, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, parent, richTextTagProvider);
+            (object thisValue, IReadOnlyList<ISaintsRenderer> renderers) = FillElement(root, label, property, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, parent, richTextTagProvider);
 
             // ReSharper disable once InvertIf
             if (property.propertyType == SerializedPropertyType.ManagedReference)
@@ -144,7 +144,16 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
                             SerializedProperty newProp = property.serializedObject.FindProperty(propPath);
 
-                            FillElement(root, label, newProp, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, parent, richTextTagProvider);
+                            object useParent = parent;
+                            (SerializedUtils.FieldOrProp _, object refreshedParent) =
+                                SerializedUtils.GetFieldInfoAndDirectParent(property);
+                            if (refreshedParent != null)
+                            {
+                                // Debug.Log($"rewrite parent {refreshedParent}");
+                                useParent = refreshedParent;
+                            }
+
+                            FillElement(root, label, newProp, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, useParent, richTextTagProvider);
                         }
                         // Debug.Log(property.managedReferenceId);
                     })
@@ -152,20 +161,30 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             }
             else if (property.propertyType == SerializedPropertyType.Generic)
             {
+
+                // Debug.Log($"tracking: {property.propertyPath})");
                 root.TrackPropertyValue(property, p =>
                 {
-                    root.Clear();
 
-                    object useParent = parent;
-                    (SerializedUtils.FieldOrProp _, object refreshedParent) =
-                        SerializedUtils.GetFieldInfoAndDirectParent(p);
-                    if (refreshedParent != null)
+                    // Debug.Log($"changed: {p.propertyPath}/{p.serializedObject.targetObject}");
+                    // root.Clear();
+                    //
+
+                    (string error, int index, object value) refreshed = Util.GetValue(property, info, parent);
+                    // (SerializedUtils.FieldOrProp _, object refreshedParent) =
+                    //     SerializedUtils.GetFieldInfoAndDirectParent(p);
+                    // Debug.Log($"refreshedParent: {refreshedParent}");
+                    if (refreshed.value != null && refreshed.value != thisValue)
                     {
-                        // Debug.Log($"rewrite parent {refreshedParent}");
-                        useParent = refreshedParent;
+                        // Debug.Log($"rewrite parent {refreshed.value}");
+                        // useParent = refreshedParent;
+                        foreach (ISaintsRenderer saintsRenderer in renderers)
+                        {
+                            saintsRenderer.RefreshTargets(new[]{refreshed.value});
+                        }
                     }
-
-                    FillElement(root, label, p, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, useParent, richTextTagProvider);
+                    //
+                    // FillElement(root, label, p, info, inHorizontalLayout, makeRenderer, doTweenPlayRecorder, useParent, richTextTagProvider);
                 });
             }
             return root;
@@ -195,7 +214,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         //         : ((FieldInfo) member).FieldType;
         // }
 
-        private static void FillElement(VisualElement root, string label, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent, IRichTextTagProvider richTextTagProvider)
+        private static (object value, IReadOnlyList<ISaintsRenderer> renderers) FillElement(VisualElement root, string label, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent, IRichTextTagProvider richTextTagProvider)
         {
             // Debug.Log(info.Name);
             // Debug.Log(info.DeclaringType);
@@ -222,7 +241,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 value = property.managedReferenceValue;
                 if (value == null)
                 {
-                    return;
+                    return (null, Array.Empty<ISaintsRenderer>());
                 }
             }
             else
@@ -251,14 +270,14 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                 if (error != "")
                 {
                     root.Add(new HelpBox(error, HelpBoxMessageType.Error));
-                    return;
+                    return (value, Array.Empty<ISaintsRenderer>());
                 }
 
                 if (value == null)
                 {
                     // https://github.com/TylerTemp/SaintsField/issues/200
                     // Unity will re-render this whole, for no reason...
-                    var errorHelpBox = new HelpBox($"Failed to get value from {property.propertyPath}",
+                    HelpBox errorHelpBox = new HelpBox($"Failed to get value from {property.propertyPath}",
                         HelpBoxMessageType.Error);
                     root.Add(errorHelpBox);
                     try
@@ -271,7 +290,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     }
                     catch (Exception)
                     {
-                        return;
+                        return (null, Array.Empty<ISaintsRenderer>());
                     }
                     errorHelpBox.schedule.Execute(() =>
                     {
@@ -296,7 +315,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         Debug.Log("Patched up #200");
 #endif
                     }).StartingIn(150);
-                    return;
+                    return (null, Array.Empty<ISaintsRenderer>());
                 }
 
                 // Debug.Assert(value != null);
@@ -332,6 +351,8 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(doTweenPlayRecorder));
             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));
 #endif
+
+            return (value, renderer);
         }
     }
 }
