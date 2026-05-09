@@ -87,13 +87,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
             public int InputRangeMin = 0;
             public int InputRangeMax = 100;
 
-            [SerializeReference, ReferencePicker, FieldBelowText("$" + nameof(upgradeCostStackAsInput2))]
+            [SerializeReference, ReferencePicker]
             public IAnyInterfece upgradeCostStackAsInput2;
 
             public bool ShouldShowUpgradeCostBalanceAsInput2()
             {
                 var data = upgradeCostStackAsInput2 == null;
-                Debug.Log($"callback upgradeCostStackAsInput2 = {upgradeCostStackAsInput2} (is null: {data})");
+                // Debug.Log($"callback upgradeCostStackAsInput2 = {upgradeCostStackAsInput2} (is null: {data})");
                 return data;
             }
 

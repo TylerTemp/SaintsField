@@ -1969,7 +1969,19 @@ namespace SaintsField.Editor.Utils
 
                 if(!foundResult)
                 {
+                    // object useParent = parent;
+                    // (SerializedUtils.FieldOrProp _, object refreshedParent) =
+                    //     SerializedUtils.GetFieldInfoAndDirectParent(property);
+                    // target = refreshedParent;
+                    // if (refreshedParent != null)
+                    // {
+                    //     // Debug.Log($"rewrite parent {refreshedParent}");
+                    //     useParent = refreshedParent;
+                    // }
                     (string error, MemberInfo _, object getResult) = GetOf<object>(conditionStringTarget, null, property, info, target, null);
+
+                    // Debug.Log(
+                    //     $"getting {conditionStringTarget} of target {conditionInfo.Target} on parent {target} on ser {property.serializedObject.targetObject} = {getResult}, error={error}");
 
                     if (error != "")
                     {

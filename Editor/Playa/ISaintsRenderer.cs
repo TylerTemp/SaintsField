@@ -25,5 +25,7 @@ namespace SaintsField.Editor.Playa
         void OnSearchField(string searchString);
 
         void SetSerializedProperty(SerializedProperty property);
+
+        void RefreshTargets(object[] targets);
     }
 }

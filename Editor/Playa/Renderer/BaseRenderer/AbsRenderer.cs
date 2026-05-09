@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         protected abstract bool AllowGuiColor { get; }
 
         // ReSharper disable InconsistentNaming
-        public readonly SaintsFieldWithInfo FieldWithInfo;
+        public SaintsFieldWithInfo FieldWithInfo { get; private set; }
         // protected readonly SerializedObject SerializedObject;
         // ReSharper enable InconsistentNaming
 
@@ -114,8 +114,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             List<ToggleCheckInfo> preCheckInternalInfos = new List<ToggleCheckInfo>(fieldWithInfo.PlayaAttributes.Count);
             (int, int) arraySize = (-1, -1);
+
+            object parent = fieldWithInfo.Targets[0];
+            // object parent = GetRefreshedTarget(FieldWithInfo, FieldWithInfo.Targets[0]).useTarget;
+
             foreach (IPlayaAttribute playaAttribute in fieldWithInfo.PlayaAttributes)
             {
+                // Debug.Log($"parent={parent} for {fieldWithInfo.SerializedProperty.propertyPath}({fieldWithInfo.SerializedProperty.serializedObject.targetObject})");
                 switch (playaAttribute)
                 {
                     case IVisibilityAttribute visibilityAttribute:
@@ -123,7 +128,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         (
                             visibilityAttribute.IsShow? ToggleType.Show: ToggleType.Hide,
                             visibilityAttribute.ConditionInfos,
-                            fieldWithInfo.Targets[0]
+                            parent
                         ));
                         break;
                     case EnableIfAttribute enableIfAttribute:
@@ -131,7 +136,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         (
                             ToggleType.Enable,
                             enableIfAttribute.ConditionInfos,
-                            fieldWithInfo.Targets[0]
+                            parent
                         ));
                         break;
                     case DisableIfAttribute disableIfAttribute:
@@ -139,7 +144,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         (
                             ToggleType.Disable,
                             disableIfAttribute.ConditionInfos,
-                            fieldWithInfo.Targets[0]
+                            parent
                         ));
                         break;
                     case IPlayaArraySizeAttribute arraySizeAttribute:
@@ -149,7 +154,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             arraySize = (fieldWithInfo.SerializedProperty.propertyType == SerializedPropertyType.Generic
                                          && fieldWithInfo.SerializedProperty.isArray)
                                 ? GetArraySize(arraySizeAttribute, fieldWithInfo.SerializedProperty,
-                                    fieldWithInfo.FieldInfo, fieldWithInfo.Targets[0], isImGui)
+                                    fieldWithInfo.FieldInfo, parent, isImGui)
                                 : (-1, -1);
                         }
                         break;
@@ -405,6 +410,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         public void SetSerializedProperty(SerializedProperty property)
         {
             _serializedProperty = property;
+        }
+
+        public void RefreshTargets(object[] targets)
+        {
+            FieldWithInfo = FieldWithInfo.RefreshTargets(targets);
         }
 
         public static string GetFriendlyName(SaintsFieldWithInfo fieldWithInfo)

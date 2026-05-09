@@ -278,10 +278,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         public static (object rawMemberValue, object useTarget) GetRefreshedTarget(SaintsFieldWithInfo fieldWithInfo, object eachTarget)
         {
-            bool isStruct = ReflectUtils.TypeIsStruct(eachTarget.GetType());
+            // bool isStruct = ReflectUtils.TypeIsStruct(eachTarget.GetType());
             object useTarget = eachTarget;
             object rawMemberValue = eachTarget;
-            if (isStruct && fieldWithInfo.TargetParent != null && fieldWithInfo.TargetMemberInfo != null)
+            if (fieldWithInfo.TargetParent != null && fieldWithInfo.TargetMemberInfo != null)
             {
                 switch (fieldWithInfo.TargetMemberInfo)
                 {

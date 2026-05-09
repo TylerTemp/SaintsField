@@ -35,5 +35,25 @@ namespace SaintsField.Editor.Playa
         {
             return $"<SaintsFieldWithInfo {RenderType} {FieldInfo?.Name} {PropertyInfo?.Name} {MethodInfo?.Name} {SerializedProperty?.propertyPath}/>";
         }
+
+        public SaintsFieldWithInfo RefreshTargets(object[] targets)
+        {
+            return new SaintsFieldWithInfo
+            {
+                InherentDepth = InherentDepth,
+                PlayaAttributes = PlayaAttributes,
+                TargetParent = TargetParent,
+                TargetMemberInfo = TargetMemberInfo,
+                TargetMemberIndex = TargetMemberIndex,
+                Targets = targets,
+                RenderType = RenderType,
+                SerializedProperty = SerializedProperty,
+                MemberId = MemberId,
+                FieldInfo = FieldInfo,
+                MethodInfo = MethodInfo,
+                PropertyInfo = PropertyInfo,
+                ClassStructType = ClassStructType,
+            };
+        }
     }
 }
