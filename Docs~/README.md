@@ -92,9 +92,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.13.9**
+**5.13.10**
 
-Fix: The callback might get an old (not up to date) value when manually assign a serializable class value [#387](https://github.com/TylerTemp/SaintsField/issues/387)
+1.  Fix: `SortingLayer` for integer should use id instead of value.
+2.  Add: `SortingLayer` now support auto validator.
+3.  Add: New parameter `bool noFold=false` for `EnumToggleButtons` and `ValueButtons` so they will always expaned
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1048,6 +1050,10 @@ All of them have the same arguments:
 *   `bool isCallback = false`
 
     a callback or property name for button's label, same as `RichLabel`
+
+*   `bool hideReturnValue=false`
+
+    When `true`, if the function has return value, the returned value will not be displayed
 
 *   `string groupBy = ""`
 
@@ -5053,6 +5059,7 @@ Parameters:
     When omitted, it will try to find all the static values from the field type.
 
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
+*   `bool noFold=false`: when `True`, always expand the buttons
 *   Allow Multiple: No
 
 Use property/field/function as options
@@ -5221,6 +5228,10 @@ This field has compact mode and expanded mode.
 Note: Use `DefaultExpand` if you want it to be expanded by default.
 
 (Old Name: `EnumFlags`)
+
+**Parameters**:
+
+*   `bool noFold=false`: when `True`, always expand the buttons
 
 ```csharp
 using SaintsField;
