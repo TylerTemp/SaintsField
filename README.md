@@ -106,7 +106,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-Fix: The callback might get an old (not up to date) value when manually assign a serializable class value [#387](https://github.com/TylerTemp/SaintsField/issues/387)
+1.  Fix: `SortingLayer` for integer should use id instead of value.
+2.  Add: `SortingLayer` now support auto validator.
+3.  Add: New parameter `bool noFold=false` for `EnumToggleButtons` and `ValueButtons` so they will always expaned
 
 ## Usage ##
 
