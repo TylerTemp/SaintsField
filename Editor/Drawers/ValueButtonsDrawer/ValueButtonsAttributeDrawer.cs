@@ -131,11 +131,14 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
-            Action<object> onValueChangedCallback, FieldInfo info, object parent) =>
-            UtilOnAwakeUIToolkit(this, property, saintsAttribute, container, onValueChangedCallback,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        {
+            bool noFold = ((ValueButtonsAttribute)saintsAttribute).NoFold;
+            UtilOnAwakeUIToolkit(noFold, this, property, saintsAttribute, container, onValueChangedCallback,
                 info, parent);
+        }
 
-        public static void UtilOnAwakeUIToolkit(IRichTextTagProvider richTextTagProvider, SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement container, Action<object> onValueChangedCallback, MemberInfo info, object parent)
+        public static void UtilOnAwakeUIToolkit(bool noFold, IRichTextTagProvider richTextTagProvider, SerializedProperty property, ISaintsAttribute saintsAttribute, VisualElement container, Action<object> onValueChangedCallback, MemberInfo info, object parent)
         {
             EmptyPrefabOverrideField field = container.Q<EmptyPrefabOverrideField>(NameField(property));
             UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
@@ -159,15 +162,28 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             }
             valueButtonsArrangeElement.TrackPropertyValue(property, _ => RefreshCurValue());
 
+            bool autoFold = !noFold;
+            if (noFold)
+            {
+                subPanel.style.display = DisplayStyle.Flex;
+                leftExpandButton.style.display = DisplayStyle.None;
+            }
+
             valueButtonsArrangeElement.schedule.Execute(() =>
             {
-                leftExpandButton.RegisterValueChangedCallback(evt =>
-                    subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
-
-                valueButtonsArrangeElement.OnCalcArrangeDoneAddListener(b =>
+                if(autoFold)
                 {
-                    subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
-                    OnCalcArrangeDone(b);
+                    leftExpandButton.RegisterValueChangedCallback(evt =>
+                        subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                }
+
+                valueButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>
+                {
+                    if(autoFold)
+                    {
+                        subPanel.style.display = leftExpandButton.value ? DisplayStyle.Flex : DisplayStyle.None;
+                    }
+                    OnCalcArrangeDone(hasSubRow);
                 });
                 valueButtonsArrangeElement.OnButtonClicked.AddListener(value =>
                 {
@@ -185,10 +201,9 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             void OnCalcArrangeDone(bool hasSubRow)
             {
-                DisplayStyle display = hasSubRow ? DisplayStyle.Flex : DisplayStyle.None;
-                if (leftExpandButton.style.display != display)
+                if(autoFold)
                 {
-                    leftExpandButton.style.display = display;
+                    UIToolkitUtils.SetDisplayStyle(leftExpandButton, hasSubRow ? DisplayStyle.Flex : DisplayStyle.None);
                 }
                 RefreshCurValue();
             }

@@ -17114,14 +17114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myMask: 14
-  myMask2: 10
-  myStruct:
-    myMask: 0
-  myMaskDisabled: 0
-  myMaskDisabledLabel: 0
-  enumNormal: 1
-  enumExpand: 4
-  labelField: 2
+  myMaskNoFold: 0
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0
@@ -22284,6 +22277,12 @@ MonoBehaviour:
   - Are
   - The <color=red>Wild Roses
   - <icon="lightMeter/redLight"/>Grow
+  transOpts:
+  - {fileID: 1451422003}
+  - {fileID: 259742171}
+  - {fileID: 597926529}
+  - {fileID: 1314259150}
+  transformSelect: {fileID: 0}
 --- !u!4 &1451422003
 Transform:
   m_ObjectHideFlags: 0

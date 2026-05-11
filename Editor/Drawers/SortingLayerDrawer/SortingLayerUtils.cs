@@ -1,9 +1,6 @@
 using System;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Drawers.SceneDrawer;
-using SaintsField.Editor.Utils;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 

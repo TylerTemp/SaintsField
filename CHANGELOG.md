@@ -4,6 +4,7 @@
 
 1.  Fix: `SortingLayer` for integer should use id instead of value.
 2.  Add: `SortingLayer` now support auto validator.
+3.  Add: New parameter `bool noFold=false` for `EnumToggleButtons` and `ValueButtons` so they will always expaned
 
 ## 5.13.9 ##
 
