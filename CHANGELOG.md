@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.13.10 ##
+
+1.  Fix: `SortingLayer` for integer should use id instead of value.
+2.  Add: `SortingLayer` now support auto validator.
+
 ## 5.13.9 ##
 
 Fix: The callback might get an old (not up to date) value when manually assign a serializable class value [#387](https://github.com/TylerTemp/SaintsField/issues/387)

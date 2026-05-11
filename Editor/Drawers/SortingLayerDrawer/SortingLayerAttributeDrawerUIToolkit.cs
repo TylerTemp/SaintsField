@@ -1,11 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Drawers.SceneDrawer;
-using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -150,14 +146,14 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                     {
                         // ReSharper disable once InvertIf
                         if (sortingLayer.name == clipboardText
-                            || canBeInt && sortingLayer.value == clipboardInt)
+                            || canBeInt && sortingLayer.id == clipboardInt)
                         {
-                            evt.menu.AppendAction($"Paste \"{sortingLayer.name}\"({sortingLayer.value})", _ =>
+                            evt.menu.AppendAction($"Paste \"{sortingLayer.name}\"({sortingLayer.id})", _ =>
                             {
-                                property.intValue = sortingLayer.value;
-                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, sortingLayer.value);
+                                property.intValue = sortingLayer.id;
+                                ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, sortingLayer.id);
                                 property.serializedObject.ApplyModifiedProperties();
-                                onValueChangedCallback.Invoke(sortingLayer.value);
+                                onValueChangedCallback.Invoke(sortingLayer.id);
                             });
                             return;
                         }
