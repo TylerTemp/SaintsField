@@ -1,5 +1,4 @@
 #if UNITY_2021_3_OR_NEWER
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -23,11 +22,12 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
         {
             CachedValue = newValue;
 
-            foreach ((SortingLayer layer, int index) in SortingLayer.layers.WithIndex())
+            // foreach ((SortingLayer layer, int index) in SortingLayer.layers.WithIndex())
+            foreach (SortingLayer layer in SortingLayer.layers)
             {
-                if (layer.value == newValue)
+                if (layer.id == newValue)
                 {
-                    Label.text = $"{layer.name} <color=#808080>({index})</color>";
+                    Label.text = $"{layer.name} <color=#808080>({layer.id})</color>";
                     return;
                 }
             }

@@ -23,12 +23,12 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
         {
             CachedValue = newValue;
 
-            foreach ((SortingLayer layer, int index) in SortingLayer.layers.WithIndex())
+            foreach (SortingLayer layer in SortingLayer.layers)
             {
                 // ReSharper disable once InvertIf
                 if (layer.name == newValue)
                 {
-                    SetLabelString($"{layer.name} <color=#808080>({index})</color>");
+                    SetLabelString($"{layer.name} <color=#808080>({layer.id})</color>");
                     return;
                 }
             }
