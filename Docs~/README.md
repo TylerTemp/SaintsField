@@ -1224,7 +1224,7 @@ private (int i, string s) ButtonParamScene([Scene] int sceneI, [Scene] string sc
 #### `SortingLayer` ####
 
 
-A dropdown selector for sorting layer, plus an "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
+A dropdown selector for sorting layer (name or id), with an "Edit Sorting Layers..." option to directly open "Sorting Layers" tab from "Tags & Layers" inspector where you can change sorting layers.
 
 *   Allow Multiple: No
 
