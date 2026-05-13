@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.ComponentHeader;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.HeaderGUI.Drawer;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.RuntimeSave;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -262,6 +263,8 @@ namespace SaintsField.Editor.HeaderGUI
             }
         }
 
+        private static Texture2D _saveIconTexture;
+
         private static bool DrawMethod(Rect rectangle, Object[] targets)
         {
             if (rectangle.x < 0)
@@ -302,16 +305,9 @@ namespace SaintsField.Editor.HeaderGUI
                 }
 
                 Rect useRect = new Rect(rectangle);
+                // EditorGUI.DrawRect(useRect, Color.red);
                 rectangle.x -= rectangle.height;
-                rectangle.xMax -= rectangle.height;
-
-                // Rect actualRect = new Rect(useRect)
-                // {
-                //     x = useRect.x + 1,
-                //     width = useRect.width - 2,
-                //     y = useRect.y + 1,
-                //     height = useRect.height - 2,
-                // };
+                // rectangle.xMax -= rectangle.height;
 
                 GUIContent content = new GUIContent(EditorGUIUtility.IconContent("d_Search Icon"))
                 {
@@ -336,6 +332,44 @@ namespace SaintsField.Editor.HeaderGUI
                 SearchableSaintsEditors.Remove(toRemove);
             }
             // SearchableSaintsEditors.Remove(removeSaintsEditor);
+
+            bool runtimeSaveIcon = SaintsFieldConfigUtil.GetMonoBehaviorRuntimeSave();
+            if(runtimeSaveIcon)
+            {
+                Rect useRect = new Rect(rectangle);
+                // Debug.Log(useRect);
+                // EditorGUI.DrawRect(useRect, Color.green);
+                rectangle.x -= rectangle.height;
+                // rectangle.width -= rectangle.height;
+                // Debug.Log(rectangle);
+
+                _saveIconTexture ??= Util.LoadResource<Texture2D>("save.png");
+
+                GUIContent content = new GUIContent(_saveIconTexture)
+                {
+                    tooltip = "Save",
+                };
+
+                using EditorGUI.ChangeCheckScope change = new EditorGUI.ChangeCheckScope();
+                GUI.Toggle(
+                    useRect,
+                    false,
+                    content,
+                    CacheAndUtil.GetIconButtonStyle()
+                );
+                if (change.changed)
+                {
+                    foreach (Object target in targets)
+                    {
+                        if (target is Component component)
+                        {
+                            RuntimeSaverUtil.SaveComponent(component);
+                        }
+                    }
+                }
+
+                // DrawRuntimeSaveIcon(rectangle, targets);
+            }
 
             if (renderTargetInfos.Count == 0)
             {

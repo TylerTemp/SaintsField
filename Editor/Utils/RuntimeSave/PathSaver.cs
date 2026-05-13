@@ -1,0 +1,56 @@
+using System;
+using UnityEngine;
+
+namespace SaintsField.Editor.Utils.RuntimeSave
+{
+    [Serializable]
+    public struct PathSaver
+    {
+        // Direct reference to the component. Unity remaps the InstanceID across
+        // play-mode exit, so this is far more reliable than a GlobalObjectId
+        // captured during play mode (which has identifierType=2 and becomes
+        // unresolvable in edit mode).
+        public UnityEngine.Object targetObject;
+        public int targetInstanceId;
+
+        // public UnityEngine.Object propertyObject;
+        public string globalObjectIdString;
+
+        public string propertyPath;
+        public SaverPropertyType propertyType;
+
+        public int intValue;
+        public uint uintValue;
+        public long longValue;
+        public ulong ulongValue;
+        public bool boolValue;
+        public float floatValue;
+        public double doubleValue;
+        public string stringValue;
+        public object boxedValue;
+        public Color colorValue;
+        public UnityEngine.Object objectReferenceValue;
+        public int objectReferenceInstanceIDValue;
+        public int enumValueIndex;
+        public int enumValueFlag;
+        public Vector2 vector2Value;
+        public Vector3 vector3Value;
+        public Vector4 vector4Value;
+        public Rect rectValue;
+        // public int arraySize;
+        public AnimationCurve animationCurveValue;
+        public Bounds boundsValue;
+        public Gradient gradientValue;
+        public Quaternion quaternionValue;
+        public UnityEngine.Object exposedReferenceValue;
+        public Vector2Int vector2IntValue;
+        public Vector3Int vector3IntValue;
+        public RectInt rectIntValue;
+        public BoundsInt boundsIntValue;
+        // public long managedReferenceId;
+        // public string managedReferenceFullTypename;
+        // public string managedReferenceFieldTypename;
+        // public object managedReferenceValue;
+        public Hash128 hash128Value;
+    }
+}

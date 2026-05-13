@@ -1,0 +1,35 @@
+namespace SaintsField.Editor.Utils.RuntimeSave
+{
+    public enum SaverPropertyType
+    {
+        Generic,
+        Integer,
+        UInteger,
+        Long,
+        ULong,
+        Boolean,
+        Float,
+        Double,
+        String,
+        Color,
+        ObjectReference,
+        Enum,
+        Vector2,
+        Vector3,
+        Vector4,
+        Rect,
+        ArraySize,
+        AnimationCurve,
+        Bounds,
+        Gradient,
+        Quaternion,
+        ExposedReference,
+        Vector2Int,
+        Vector3Int,
+        RectInt,
+        BoundsInt,
+        // ManagedReferenceId,
+        ManagedReferenceFullTypename,
+        Hash128,
+    }
+}

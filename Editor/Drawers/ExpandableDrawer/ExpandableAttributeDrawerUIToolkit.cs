@@ -98,6 +98,11 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
             void UpdateDisplay()
             {
+                if (!SerializedUtils.IsOk(property))
+                {
+                    return;
+                }
+
                 object refreshParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                 if (refreshParent == null)
                 {

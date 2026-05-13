@@ -21,12 +21,22 @@ namespace SaintsField.Utils
 
         public const int UpdateLoopDefaultMs = 100;
 
-        [LayoutStart("MonoBehavior Default Searchable", ELayout.TitleOut)]
+        [LayoutStart("Component Header", ELayout.FoldoutBox)]
+
+        [LayoutStart("./MonoBehavior Default Searchable", ELayout.TitleOut)]
         [AboveText("This will add [Searchable] to all MonoBehavior")]
         [LayoutStart("./Configs", ELayout.Horizontal)]
         [FieldLabelText("Override Searchable")] public bool monoBehaviorSearchableOverride;
         [ShowIf(nameof(monoBehaviorSearchableOverride)), FieldLabelText("Always Searchable")] public bool monoBehaviorSearchable = MonoBehaviorSearchableDefault;
         [ShowInInspector, HideIf(nameof(monoBehaviorSearchableOverride)), LabelText("Always Searchable")] public const bool MonoBehaviorSearchableDefault = true;
+
+        [LayoutStart("../MonoBehavior Runtime Save", ELayout.TitleOut)]
+        [AboveText("Show the runtime save icon on component header")]
+        [LayoutStart("./Configs", ELayout.Horizontal)]
+        [FieldLabelText("Override Runtime Save")] public bool monoBehaviorRuntimeSaveOverride;
+        [ShowIf(nameof(monoBehaviorRuntimeSaveOverride)), FieldLabelText("Show Save")] public bool monoBehaviorRuntimeSave = MonoBehaviorRuntimeSaveDefault;
+        [ShowInInspector, HideIf(nameof(monoBehaviorRuntimeSaveOverride)), LabelText("Show Save")] public const bool MonoBehaviorRuntimeSaveDefault = true;
+
         [LayoutEnd]
 
         // [FieldInfoBox("The minimum row of resizable text area", EMessageType.None)]

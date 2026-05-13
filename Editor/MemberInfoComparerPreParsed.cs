@@ -173,7 +173,7 @@ namespace SaintsField.Editor
             MemberInfoPreParsedCache.instance.nameToFileInfo[nameBase] = new MemberInfoPreParsedCache.FileInfo(lastWriteTime, memberContainers.ToArray());
             MemberInfoPreParsedCache.instance.nameToMemberIdToOrder.Remove(nameBase);
 
-#if SAINTSFIELD_DEBUG
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MEMBER_ORDER
             Debug.Log($"Use new preParse for {nameBase}");
 #endif
             return TypeToPreParsedComparer[systemType] = new MemberInfoComparerPreParsed(nameBase, memberContainers);
@@ -265,7 +265,7 @@ namespace SaintsField.Editor
                 }
             }
 
-#if SAINTSFIELD_DEBUG
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MEMBER_ORDER
             Debug.Log($"Use new field order for {aId}@{aIndex}");
 #endif
             return aIndex;
