@@ -106,9 +106,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-1.  Fix: `SortingLayer` for integer should use id instead of value.
-2.  Add: `SortingLayer` now support auto validator.
-3.  Add: New parameter `bool noFold=false` for `EnumToggleButtons` and `ValueButtons` so they will always expaned
+Add: You can now save component's value when play. after click the "save" icon, the data will be saved to object once you exit the play mode.
+
+Note: This feature might have issues. Please report if you face any.
 
 ## Usage ##
 

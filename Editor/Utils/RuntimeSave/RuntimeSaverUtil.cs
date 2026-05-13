@@ -146,8 +146,12 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 case SerializedPropertyType.Character:
                 case SerializedPropertyType.LayerMask:
                 case SerializedPropertyType.ArraySize:
+#if UNITY_6000_0_OR_NEWER
                 case SerializedPropertyType.RenderingLayerMask:
+#endif
+#if UNITY_6000_2_OR_NEWER
                 case SerializedPropertyType.EntityId:
+#endif
                     pathSaver = SaveNumericValues(property, pathSaver);
                     break;
                 case SerializedPropertyType.Boolean:
@@ -233,7 +237,9 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Integer:
+#if UNITY_6000_2_OR_NEWER
                 case SerializedPropertyType.EntityId:
+#endif
                     return GetNumericSaverPropertyType(property);
                 case SerializedPropertyType.Boolean:
                     return SaverPropertyType.Boolean;
@@ -285,8 +291,10 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 //     return SaverPropertyType.ManagedReference;
                 case SerializedPropertyType.Hash128:
                     return SaverPropertyType.Hash128;
+#if UNITY_6000_0_OR_NEWER
                 case SerializedPropertyType.RenderingLayerMask:
                     return SaverPropertyType.UInteger;
+#endif
                 case SerializedPropertyType.Generic:
                 default:
                     return SaverPropertyType.Generic;
@@ -324,9 +332,11 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 case SerializedPropertyType.LayerMask:
                     pathSaver.intValue = property.intValue;
                     return pathSaver;
+#if UNITY_6000_0_OR_NEWER
                 case SerializedPropertyType.RenderingLayerMask:
                     pathSaver.uintValue = property.uintValue;
                     return pathSaver;
+#endif
                 case SerializedPropertyType.Character:
                     pathSaver.uintValue = property.uintValue;
                     return pathSaver;
@@ -471,9 +481,19 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                     property.colorValue = pathSaver.colorValue;
                     break;
                 case SaverPropertyType.ObjectReference:
-                    property.objectReferenceValue = pathSaver.objectReferenceValue != null
-                        ? pathSaver.objectReferenceValue
-                        : EditorUtility.EntityIdToObject((EntityId)pathSaver.objectReferenceInstanceIDValue);
+                    if (pathSaver.objectReferenceValue != null)
+                    {
+                        property.objectReferenceValue = pathSaver.objectReferenceValue;
+                    }
+                    else
+                    {
+#if UNITY_6000_3_OR_NEWER
+                        property.objectReferenceValue =
+                            EditorUtility.EntityIdToObject((EntityId)pathSaver.objectReferenceInstanceIDValue);
+#else
+                        return;
+#endif
+                    }
                     break;
                 case SaverPropertyType.Enum:
                     property.enumValueIndex = pathSaver.enumValueIndex;

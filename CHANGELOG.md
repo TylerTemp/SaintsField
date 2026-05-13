@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.14.0 ##
+
+Add: You can now save component's value when play. after click the "save" icon, the data will be saved to object once you exit the play mode.
+
+Note: This feature might have issues. Please report if you face any.
+
 ## 5.13.10 ##
 
 1.  Fix: `SortingLayer` for integer should use id instead of value.
