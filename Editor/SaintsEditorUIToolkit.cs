@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Editor.Playa;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
@@ -136,6 +137,11 @@ namespace SaintsField.Editor
             root.RegisterCallback<AttachToPanelEvent>(_ => AddInstance(this));
             root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance(this));
 #endif
+            UIToolkitUtils.OnAttachToPanelOnce(root, _ =>
+            {
+                root.schedule.Execute(() => HeaderGUI.DrawHeaderGUI.EnsureInitLoad()).StartingIn(500);
+            });
+
             return root;
         }
 
