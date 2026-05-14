@@ -42,13 +42,28 @@ namespace SaintsField.Editor.HeaderGUI
         }
 
         private static double _initStartTime;
-// #if SAINTSFIELD_DEBUG
-//         [MenuItem(RuntimeUtil.MenuRoot + "/DEBUG Header Init")]
-// #endif
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_COMPONENT_HEADER
+        [MenuItem(RuntimeUtil.MenuRoot + "/DEBUG Header Init")]
+#endif
         private static void DelayCallEnsureInitLoad()
         {
             _initStartTime = EditorApplication.timeSinceStartup;
             LoopEnsureInitLoadUntilTimeout();
+
+            EditorApplication.playModeStateChanged += PlayModeStateChangedEnsureInitLoad;
+        }
+
+        private static void PlayModeStateChangedEnsureInitLoad(PlayModeStateChange state)
+        {
+            if(state is PlayModeStateChange.EnteredPlayMode or PlayModeStateChange.EnteredEditMode)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_COMPONENT_HEADER
+                Debug.Log($"play mode changed ensure init {state}");
+#endif
+
+                _initStartTime = EditorApplication.timeSinceStartup;
+                LoopEnsureInitLoadUntilTimeout();
+            }
         }
 
         private static void LoopEnsureInitLoadUntilTimeout()
@@ -58,8 +73,12 @@ namespace SaintsField.Editor.HeaderGUI
                 return;
             }
 
+            // ReSharper disable once InvertIf
             if (EditorApplication.timeSinceStartup - _initStartTime < 1)
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_COMPONENT_HEADER
+                Debug.Log("failed to init component header, retry later");
+#endif
                 EditorApplication.delayCall += LoopEnsureInitLoadUntilTimeout;
             }
         }
@@ -76,6 +95,7 @@ namespace SaintsField.Editor.HeaderGUI
             return InitLoad();
         }
 
+
         private static bool InitLoad()
         {
             const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Static;
@@ -89,7 +109,9 @@ namespace SaintsField.Editor.HeaderGUI
             }
 
             IList value = (IList)_sEditorHeaderItemsMethods.GetValue(null);
-            // Debug.Log($"value={value}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_COMPONENT_HEADER
+            Debug.Log($"component header value={value}");
+#endif
             if (value == null)
             {
                 return false;
