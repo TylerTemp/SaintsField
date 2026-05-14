@@ -115,9 +115,9 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                         catch (Exception e)
 #pragma warning restore CS0168 // Variable is declared but never used
                         {
-    #if SAINTSFIELD_DEBUG
+#if SAINTSFIELD_DEBUG
                             Debug.LogException(e.InnerException ?? e);
-    #endif
+#endif
                             return (false, default);
                         }
 

@@ -9,6 +9,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.RuntimeSave;
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -21,7 +22,7 @@ namespace SaintsField.Editor.HeaderGUI
 #endif
         public static void DelayInit()
         {
-            EditorApplication.delayCall += () => EnsureInitLoad();
+            EditorApplication.delayCall += DelayCallEnsureInitLoad;
             EditorApplication.delayCall += LoadTypeToRenderTargetInfo;
             EditorApplication.delayCall += ManuallyUpdate;
         }
@@ -33,6 +34,35 @@ namespace SaintsField.Editor.HeaderGUI
         }
 
         private static FieldInfo _sEditorHeaderItemsMethods;
+
+        [InitializeOnLoadMethod]
+        public static void InitOnLoad()
+        {
+            EditorApplication.delayCall += DelayCallEnsureInitLoad;
+        }
+
+        private static double _initStartTime;
+// #if SAINTSFIELD_DEBUG
+//         [MenuItem(RuntimeUtil.MenuRoot + "/DEBUG Header Init")]
+// #endif
+        private static void DelayCallEnsureInitLoad()
+        {
+            _initStartTime = EditorApplication.timeSinceStartup;
+            LoopEnsureInitLoadUntilTimeout();
+        }
+
+        private static void LoopEnsureInitLoadUntilTimeout()
+        {
+            if (EnsureInitLoad())
+            {
+                return;
+            }
+
+            if (EditorApplication.timeSinceStartup - _initStartTime < 1)
+            {
+                EditorApplication.delayCall += LoopEnsureInitLoadUntilTimeout;
+            }
+        }
 
         private static bool _initLoad;
 
@@ -62,7 +92,6 @@ namespace SaintsField.Editor.HeaderGUI
             // Debug.Log($"value={value}");
             if (value == null)
             {
-                // EditorApplication.delayCall += InitLoad;
                 return false;
             }
 
@@ -77,6 +106,13 @@ namespace SaintsField.Editor.HeaderGUI
             // ReSharper disable once AssignNullToNotNullAttribute
             value.Add(Delegate.CreateDelegate(delegateType, methodInfo));
             _initLoad = true;
+
+            if (EditorWindow.focusedWindow != null)
+            {
+                EditorWindow.focusedWindow.Repaint();
+            }
+            InternalEditorUtility.RepaintAllViews();
+
             return true;
         }
 
@@ -264,6 +300,11 @@ namespace SaintsField.Editor.HeaderGUI
         }
 
         private static Texture2D _saveIconTexture;
+        private static Texture2D _checkIconTexture;
+
+        // Per-target check animation state
+        private const double CheckAnimDuration = 1.0; // seconds total before reverting to save icon
+        private static readonly Dictionary<int, double> SaveCheckAnimEndTime = new Dictionary<int, double>();
 
         private static bool DrawMethod(Rect rectangle, Object[] targets)
         {
@@ -271,6 +312,8 @@ namespace SaintsField.Editor.HeaderGUI
             {
                 return false;
             }
+
+            // Debug.Log($"DrawMethod {string.Join<Object>(",", targets)}");
 
             // EditorGUI.DrawRect(rectangle, Color.blue);
 
@@ -334,6 +377,7 @@ namespace SaintsField.Editor.HeaderGUI
             // SearchableSaintsEditors.Remove(removeSaintsEditor);
 
             bool runtimeSaveIcon = SaintsFieldConfigUtil.GetMonoBehaviorRuntimeSave();
+            _checkIconTexture ??= Util.LoadResource<Texture2D>("check.png");
             if(runtimeSaveIcon)
             {
                 Rect useRect = new Rect(rectangle);
@@ -345,26 +389,90 @@ namespace SaintsField.Editor.HeaderGUI
 
                 _saveIconTexture ??= Util.LoadResource<Texture2D>("save.png");
 
-                GUIContent content = new GUIContent(_saveIconTexture)
-                {
-                    tooltip = "Save",
-                };
+                // Determine if we are currently in the "saved/check" animation phase for this target
+                int targetKey = firstTarget.GetInstanceID();
+                double now = EditorApplication.timeSinceStartup;
+                bool isAnimating = SaveCheckAnimEndTime.TryGetValue(targetKey, out double animEnd) && now < animEnd;
 
-                using EditorGUI.ChangeCheckScope change = new EditorGUI.ChangeCheckScope();
-                GUI.Toggle(
-                    useRect,
-                    false,
-                    content,
-                    CacheAndUtil.GetIconButtonStyle()
-                );
-                if (change.changed)
+                if (isAnimating)
                 {
-                    foreach (Object target in targets)
+                    // Draw a green background circle/box, then the white check icon on top
+                    // Fade the green by remaining time so it eases out as it returns to default.
+                    float remaining = (float)(animEnd - now);
+                    float t = Mathf.Clamp01(remaining / (float)CheckAnimDuration);
+                    // Pop scale: quick scale-up then settle to 1
+                    float pop = 1f + 0.5f * Mathf.Sin(Mathf.Clamp01((1f - t) * 3f) * Mathf.PI);
+                    Rect bgRect = useRect;
+                    bgRect.width *= pop;
+                    bgRect.height *= pop;
+                    bgRect.x = useRect.x + (useRect.width - bgRect.width) * 0.5f;
+                    bgRect.y = useRect.y + (useRect.height - bgRect.height) * 0.5f;
+
+                    Rect iconRect = bgRect;
+                    float pad = bgRect.height * 0.15f;
+                    iconRect.x += pad;
+                    iconRect.y += pad;
+                    iconRect.width -= pad * 2;
+                    iconRect.height -= pad * 2;
+                    using(new GUIColorScoop(Color.green))
                     {
-                        if (target is Component component)
+                        GUI.DrawTexture(iconRect, _checkIconTexture, ScaleMode.ScaleToFit, true);
+                    }
+                    // GUI.color = prevColor;
+
+                    if (GUI.Button(useRect, GUIContent.none, GUIStyle.none))
+                    {
+                        foreach (Object target in targets)
                         {
-                            RuntimeSaverUtil.SaveComponent(component);
+                            if (target is Component component)
+                            {
+                                RuntimeSaverUtil.SaveComponent(component);
+                            }
                         }
+                        SaveCheckAnimEndTime[targetKey] = EditorApplication.timeSinceStartup + CheckAnimDuration;
+                    }
+
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        EditorApplication.delayCall += () =>
+                        {
+                            if (EditorWindow.focusedWindow != null)
+                            {
+                                EditorWindow.focusedWindow.Repaint();
+                            }
+                            InternalEditorUtility.RepaintAllViews();
+                        };
+                    }
+                }
+                else
+                {
+                    SaveCheckAnimEndTime.Remove(targetKey);
+
+                    GUIContent content = new GUIContent(_saveIconTexture)
+                    {
+                        tooltip = "Save",
+                    };
+
+                    using EditorGUI.ChangeCheckScope change = new EditorGUI.ChangeCheckScope();
+                    GUI.Toggle(
+                        useRect,
+                        false,
+                        content,
+                        CacheAndUtil.GetIconButtonStyle()
+                    );
+                    if (change.changed)
+                    {
+                        foreach (Object target in targets)
+                        {
+                            if (target is Component component)
+                            {
+                                RuntimeSaverUtil.SaveComponent(component);
+                            }
+                        }
+
+                        // Trigger animation: show green check for CheckAnimDuration, then revert to save icon
+                        SaveCheckAnimEndTime[targetKey] = EditorApplication.timeSinceStartup + CheckAnimDuration;
+                        InternalEditorUtility.RepaintAllViews();
                     }
                 }
 
