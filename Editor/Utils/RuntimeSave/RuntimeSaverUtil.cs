@@ -503,26 +503,17 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                     property.colorValue = pathSaver.colorValue;
                     break;
                 case SaverPropertyType.ObjectReference:
-<<<<<<< HEAD
+                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                     if (pathSaver.objectReferenceValue != null)
                     {
                         property.objectReferenceValue = pathSaver.objectReferenceValue;
                     }
                     else
                     {
-#if UNITY_6000_3_OR_NEWER
                         property.objectReferenceValue =
+                            // ReSharper disable once RedundantCast
                             EditorUtility.EntityIdToObject((EntityId)pathSaver.objectReferenceInstanceIDValue);
-#else
-                        return;
-#endif
                     }
-=======
-                    property.objectReferenceValue = pathSaver.objectReferenceValue != null
-                        ? pathSaver.objectReferenceValue
-                        // ReSharper disable once RedundantCast
-                        : EditorUtility.EntityIdToObject((EntityId)pathSaver.objectReferenceInstanceIDValue);
->>>>>>> wip
                     break;
                 case SaverPropertyType.Enum:
                     property.enumValueIndex = pathSaver.enumValueIndex;

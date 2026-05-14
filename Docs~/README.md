@@ -92,11 +92,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.14.0**
+**5.14.1**
 
-Add: You can now save component's value when play. after click the "save" icon, the data will be saved to object once you exit the play mode.
-
-Note: This feature might have issues. Please report if you face any.
+1.  Runtime Saver no longer requires SaintsEditor
+2.  Fix: Component Header failed to display icon on first domain reload
+3.  Runtime Saver icon now have a feedback after click
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -7046,6 +7046,19 @@ Component Header allows you to draw extra stuffs on a component like this:
 If you have `SaintsEditor` enabled, this works by default.
 
 (If you can not enable `SaintsEditor`, it can work as stand-alone, go `Tools` - `Saints Field` - `Enable Stand-Alone Header GUI Support`)
+
+### Runtime Saver ###
+
+> [!NOTE]
+> This feature is enabled by default and no `SaintsEditor` required
+
+When in play mode, an save icon will display on the component. If saved, the saved value will be write back to component once you exit play mode.
+
+Note: this will not work for prefabs, because prefabs will always get `Instantiate`-d in play mode. Please directly edit the prefab file instead.
+
+(Disable this function in `Tools` - `Saints Field` - `Edit Config...` - `Component Runtime Save`)
+
+[![video](https://github.com/user-attachments/assets/2b445a4d-e650-44ed-a7f3-2e5224e806cf)](https://github.com/user-attachments/assets/1fa4a1d6-e2c6-4cb1-8c86-24aae447d8c4)
 
 ### `HeaderButton` / `HeaderLeftButton` ###
 

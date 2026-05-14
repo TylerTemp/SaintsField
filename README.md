@@ -106,9 +106,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-Add: You can now save component's value when play. after click the "save" icon, the data will be saved to object once you exit the play mode.
-
-Note: This feature might have issues. Please report if you face any.
+1.  Runtime Saver no longer requires SaintsEditor
+2.  Fix: Component Header failed to display icon on first domain reload
+3.  Runtime Saver icon now has feedback after clicking
 
 ## Usage ##
 
@@ -233,6 +233,7 @@ Note: This feature might have issues. Please report if you face any.
     *   <a href="https://saintsfield.comes.today/handles/drawwiredisc" target="_blank">`DrawWireDisc`</a>
     *   <a href="https://saintsfield.comes.today/handles/spherehandlecap" target="_blank">`SphereHandleCap`</a>
 *   <a href="https://saintsfield.comes.today/component-header" target="_blank">Component Header</a>
+    *   <a href="https://saintsfield.comes.today/component-header/runtime-saver" target="_blank">Runtime Saver</a>
     *   <a href="https://saintsfield.comes.today/component-header/headerbutton--headerleftbutton" target="_blank">`HeaderButton` / `HeaderLeftButton`</a>
     *   <a href="https://saintsfield.comes.today/component-header/headerghostbutton--headerghostleftbutton" target="_blank">`HeaderGhostButton` / `HeaderGhostLeftButton`</a>
     *   <a href="https://saintsfield.comes.today/component-header/headerlabel--headerleftlabel" target="_blank">`HeaderLabel` / `HeaderLeftLabel`</a>

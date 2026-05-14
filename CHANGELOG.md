@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.14.1 ##
+
+1.  Runtime Saver no longer requires SaintsEditor
+2.  Fix: Component Header failed to display icon on first domain reload
+3.  Runtime Saver icon now has feedback after clicking
+
 ## 5.14.0 ##
 
 Add: You can now save component's value when play. after click the "save" icon, the data will be saved to object once you exit the play mode.

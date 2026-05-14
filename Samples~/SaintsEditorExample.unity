@@ -665,6 +665,7 @@ MonoBehaviour:
     rid: -2
   myClass:
     myClass: 
+  lis: []
   references:
     version: 2
     RefIds:
@@ -5572,6 +5573,7 @@ MonoBehaviour:
     rid: 8269941826369880134
   myClass:
     myClass: over!
+  lis: []
   references:
     version: 2
     RefIds:
@@ -6837,19 +6839,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1872314224
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 0
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &1500346665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6862,19 +6851,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c12153bf83683e54884fabf6011eeea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  normalIntArrays: 
-  normalString: 
-  content: 
-  testVar:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  TestList:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
 --- !u!4 &1500346666
 Transform:
   m_ObjectHideFlags: 0
@@ -6902,19 +6878,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 686656c53f7998841aecdf3d0da41a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  normalIntArrays: 
-  normalString: 
-  content: 
-  testVar:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  TestList:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
 --- !u!1 &1511218292
 GameObject:
   m_ObjectHideFlags: 0

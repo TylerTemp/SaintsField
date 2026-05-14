@@ -26,5 +26,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
         public IMyInterface myInterface;
 
         public MyClass myClass;
+
+        public string[] lis;
     }
 }

@@ -30,7 +30,7 @@ namespace SaintsField.Utils
         [ShowIf(nameof(monoBehaviorSearchableOverride)), FieldLabelText("Always Searchable")] public bool monoBehaviorSearchable = MonoBehaviorSearchableDefault;
         [ShowInInspector, HideIf(nameof(monoBehaviorSearchableOverride)), LabelText("Always Searchable")] public const bool MonoBehaviorSearchableDefault = true;
 
-        [LayoutStart("../MonoBehavior Runtime Save", ELayout.TitleOut)]
+        [LayoutStart("../Component Runtime Save", ELayout.TitleOut)]
         [AboveText("Show the runtime save icon on component header")]
         [LayoutStart("./Configs", ELayout.Horizontal)]
         [FieldLabelText("Override Runtime Save")] public bool monoBehaviorRuntimeSaveOverride;
