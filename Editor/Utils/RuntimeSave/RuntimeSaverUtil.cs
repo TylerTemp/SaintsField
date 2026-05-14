@@ -517,13 +517,16 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                         }
                         else
                         {
+
+                            property.objectReferenceValue = EditorUtility.
 #if UNITY_6000_3_OR_NEWER
-                            property.objectReferenceValue =
-                                // ReSharper disable once RedundantCast
-                                EditorUtility.EntityIdToObject((EntityId)pathSaver.objectReferenceInstanceIDValue);
+                                    // ReSharper disable once RedundantCast
+                                    EntityIdToObject((EntityId)
 #else
-                            return;
+                                    InstanceIDToObject(
 #endif
+                                        pathSaver.objectReferenceInstanceIDValue)
+                                ;
                         }
                     }
                     break;
