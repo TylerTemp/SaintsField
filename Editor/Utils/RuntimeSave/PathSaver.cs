@@ -36,6 +36,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
         // public object boxedValue;
         public Color colorValue;
         public UnityEngine.Object objectReferenceValue;
+        public bool objectReferenceValueIsNull;
         public int objectReferenceInstanceIDValue;
         public int enumValueIndex;
         public int enumValueFlag;

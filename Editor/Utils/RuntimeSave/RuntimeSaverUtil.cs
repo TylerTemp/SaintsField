@@ -193,6 +193,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                     break;
                 case SerializedPropertyType.ObjectReference:
                     pathSaver.objectReferenceValue = property.objectReferenceValue;
+                    pathSaver.objectReferenceValueIsNull = property.objectReferenceValue == null;
                     pathSaver.objectReferenceInstanceIDValue = property.objectReferenceInstanceIDValue;
                     break;
                 case SerializedPropertyType.Enum:
@@ -503,16 +504,27 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                     property.colorValue = pathSaver.colorValue;
                     break;
                 case SaverPropertyType.ObjectReference:
-                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                    if (pathSaver.objectReferenceValue != null)
+                    if (pathSaver.objectReferenceValueIsNull)
                     {
-                        property.objectReferenceValue = pathSaver.objectReferenceValue;
+                        property.objectReferenceValue = null;
                     }
                     else
                     {
-                        property.objectReferenceValue =
-                            // ReSharper disable once RedundantCast
-                            EditorUtility.EntityIdToObject((EntityId)pathSaver.objectReferenceInstanceIDValue);
+                        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                        if (pathSaver.objectReferenceValue != null)
+                        {
+                            property.objectReferenceValue = pathSaver.objectReferenceValue;
+                        }
+                        else
+                        {
+#if UNITY_6000_3_OR_NEWER
+                            property.objectReferenceValue =
+                                // ReSharper disable once RedundantCast
+                                EditorUtility.EntityIdToObject((EntityId)pathSaver.objectReferenceInstanceIDValue);
+#else
+                            return;
+#endif
+                        }
                     }
                     break;
                 case SaverPropertyType.Enum:
