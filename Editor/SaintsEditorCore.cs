@@ -58,7 +58,7 @@ namespace SaintsField.Editor
             // }
 
             MonoScript monoScript = SaintsEditor.GetMonoScript(Target);
-            if(monoScript)
+            if(monoScript && _editorShowMonoScript)
             {
                 ObjectField objectField = new ObjectField("Script")
                 {
@@ -70,10 +70,10 @@ namespace SaintsField.Editor
                 objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
                 objectField.Bind(SerializedObject);
                 objectField.SetEnabled(false);
-                if(!_editorShowMonoScript)
-                {
-                    objectField.style.display = DisplayStyle.None;
-                }
+                objectField.AddManipulator(new ContextualMenuManipulator(evt =>
+                        evt.menu.AppendAction("Edit Script", _ => AssetDatabase.OpenAsset(monoScript))
+                    ));
+
                 root.Add(objectField);
             }
 

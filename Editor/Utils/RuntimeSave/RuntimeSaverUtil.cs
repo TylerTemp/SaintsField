@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEditor;
 using Object = UnityEngine.Object;
@@ -23,20 +21,23 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 
             RuntimeSaver saver = RuntimeSaver.instance;
 
-            SerializedObject serializedObject = new SerializedObject(component);
+            saver.pathSavers.RemoveAll(each => ReferenceEquals(each.targetObject, component));
+
             List<PathSaver> pathSavers = new List<PathSaver>();
-            foreach (SerializedProperty serializedProperty in SerializedUtils.GetAllField(serializedObject))
+            using(SerializedObject serializedObject = new SerializedObject(component))
             {
-                IEnumerable<PathSaver> results = ToPathSaver(component, serializedProperty);
-                foreach (PathSaver pathSaver in results)
+
+                foreach (SerializedProperty serializedProperty in SerializedUtils.GetAllField(serializedObject))
                 {
+                    IEnumerable<PathSaver> results = ToPathSaver(component, serializedProperty);
+                    foreach (PathSaver pathSaver in results)
+                    {
 #if SAINTSFIELD_DEBUG
-                    Debug.Log($"save {component.GetType().Name}.{pathSaver.propertyPath}={pathSaver.propertyType}");
+                        Debug.Log($"save {component.GetType().Name}.{pathSaver.propertyPath}={pathSaver.propertyType}");
 #endif
-                    pathSavers.Add(pathSaver);
+                        pathSavers.Add(pathSaver);
+                    }
                 }
-
-
             }
 
             if (pathSavers.Count == 0)
@@ -62,7 +63,15 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                     yield return new PathSaver
                     {
                         targetObject = component,
-                        targetInstanceId = component.GetInstanceID(),
+                        targetInstanceId = component.
+#if UNITY_6000_4_OR_NEWER
+                            GetEntityId
+#else
+
+                            GetInstanceID
+#endif
+
+                                (),
                         globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
                         propertyPath = property.propertyPath,
                         propertyType = SaverPropertyType.ArraySize,
@@ -107,7 +116,15 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 yield return new PathSaver
                 {
                     targetObject = component,
-                    targetInstanceId = component.GetInstanceID(),
+                    targetInstanceId = component.
+#if UNITY_6000_4_OR_NEWER
+                            GetEntityId
+#else
+
+                        GetInstanceID
+#endif
+
+                            (),
                     propertyPath = property.propertyPath,
                     propertyType = SaverPropertyType.ManagedReferenceFullTypename,
                     stringValue =  property.managedReferenceFullTypename,
@@ -134,7 +151,15 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             PathSaver pathSaver = new PathSaver
             {
                 targetObject = component,
-                targetInstanceId = component.GetInstanceID(),
+                targetInstanceId = component.
+#if UNITY_6000_4_OR_NEWER
+                            GetEntityId
+#else
+
+                    GetInstanceID
+#endif
+
+                        (),
                 globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
                 propertyPath = property.propertyPath,
                 propertyType = GetSaverPropertyType(property),
@@ -334,8 +359,6 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                     return pathSaver;
 #if UNITY_6000_0_OR_NEWER
                 case SerializedPropertyType.RenderingLayerMask:
-                    pathSaver.uintValue = property.uintValue;
-                    return pathSaver;
 #endif
                 case SerializedPropertyType.Character:
                     pathSaver.uintValue = property.uintValue;
@@ -385,23 +408,22 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 
         public static void RestoreComponent(PathSaver pathSaver)
         {
-            // Try the direct Unity Object reference first. Unity remaps the
-            // InstanceID across play-mode exit, so a serialized Object field on
-            // a ScriptableSingleton survives play mode the same way
-            // VInspectorClipboard's `sourceComponent` does.
-            //
-            // Fall back to InstanceID -> Object lookup, then finally the
-            // GlobalObjectId saved at SaveComponent time. The GlobalObjectId
-            // fallback only works reliably if the id was captured *outside*
-            // play mode (identifierType == 1); ids captured during play mode
-            // (identifierType == 2) are session-scoped and become unresolvable
-            // once Edit mode is re-entered, which is why relying solely on
-            // GlobalObjectId silently failed before.
             Object target = pathSaver.targetObject;
 
             if (target == null && pathSaver.targetInstanceId != 0)
             {
-                target = EditorUtility.InstanceIDToObject(pathSaver.targetInstanceId);
+
+#pragma warning disable CS0618 // Type or member is obsolete
+                target = EditorUtility.
+#if UNITY_6000_4_OR_NEWER
+                    EntityIdToObject
+#else
+                    InstanceIDToObject
+#endif
+
+                        (pathSaver.targetInstanceId);
+#pragma warning restore CS0618 // Type or member is obsolete
+
             }
 
             if (target == null)
@@ -429,7 +451,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 return;
             }
 
-            SerializedObject serializedObject = new SerializedObject(target);
+            using SerializedObject serializedObject = new SerializedObject(target);
             serializedObject.Update();
 
             SerializedProperty property = serializedObject.FindProperty(pathSaver.propertyPath);
@@ -448,11 +470,11 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             switch (pathSaver.propertyType)
             {
                 case SaverPropertyType.Generic:
-                    if (!property.isArray)
-                    {
-                        property.boxedValue = pathSaver.boxedValue;
-                    }
-                    break;
+                    // if (!property.isArray)
+                    // {
+                    //     property.boxedValue = pathSaver.boxedValue;
+                    // }
+                    return;
                 case SaverPropertyType.Integer:
                     property.intValue = pathSaver.intValue;
                     break;
@@ -481,6 +503,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                     property.colorValue = pathSaver.colorValue;
                     break;
                 case SaverPropertyType.ObjectReference:
+<<<<<<< HEAD
                     if (pathSaver.objectReferenceValue != null)
                     {
                         property.objectReferenceValue = pathSaver.objectReferenceValue;
@@ -494,6 +517,12 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                         return;
 #endif
                     }
+=======
+                    property.objectReferenceValue = pathSaver.objectReferenceValue != null
+                        ? pathSaver.objectReferenceValue
+                        // ReSharper disable once RedundantCast
+                        : EditorUtility.EntityIdToObject((EntityId)pathSaver.objectReferenceInstanceIDValue);
+>>>>>>> wip
                     break;
                 case SaverPropertyType.Enum:
                     property.enumValueIndex = pathSaver.enumValueIndex;

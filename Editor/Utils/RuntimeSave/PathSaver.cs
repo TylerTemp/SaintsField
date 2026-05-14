@@ -11,7 +11,13 @@ namespace SaintsField.Editor.Utils.RuntimeSave
         // captured during play mode (which has identifierType=2 and becomes
         // unresolvable in edit mode).
         public UnityEngine.Object targetObject;
-        public int targetInstanceId;
+        public
+#if UNITY_6000_4_OR_NEWER
+            EntityId
+#else
+            int
+#endif
+            targetInstanceId;
 
         // public UnityEngine.Object propertyObject;
         public string globalObjectIdString;
@@ -27,7 +33,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
         public float floatValue;
         public double doubleValue;
         public string stringValue;
-        public object boxedValue;
+        // public object boxedValue;
         public Color colorValue;
         public UnityEngine.Object objectReferenceValue;
         public int objectReferenceInstanceIDValue;
