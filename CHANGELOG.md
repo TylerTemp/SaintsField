@@ -1,9 +1,10 @@
 # Changelog
 
-## WIP ##
+## 5.14.2 ##
 
 1.  Fix: `ParticlePlay` now plays correctly with "Auto Random Seed"
 2.  Add: `ParticlePlay` in play mode now can correctly reflect it's runtime playing status
+3.  Fix: `InfoBox`-`show` callback now support upwalk/downwalk
 
 ## 5.14.1 ##
 
