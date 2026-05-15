@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/ParticlePlay/ParticlePlayButtonsStyle.uss?fileID=7433441132597879392&amp;guid=f2a553536eb6408439ebfdaf05058859&amp;type=3#ParticlePlayButtonsStyle"/>
+    <ui:Button name="playButton" class="iconButton"/>
+    <ui:Button name="stopButton" class="iconButton leftButton"/>
+    <ui:Button name="pauseButton" class="iconButton rightButton"/>
+    <ui:Button name="resumeButton" class="iconButton rightButton"/>
+</ui:UXML>

@@ -8,6 +8,6 @@ namespace SaintsField.Samples.Scripts
         // It also works if the field target has a particleSystem component
         [ParticlePlay, FieldType(typeof(ParticleSystem), false)] public GameObject particle2;
 
-        [ParticlePlay] public ParticleSystem[] particles;
+        // [ParticlePlay] public ParticleSystem[] particles;
     }
 }

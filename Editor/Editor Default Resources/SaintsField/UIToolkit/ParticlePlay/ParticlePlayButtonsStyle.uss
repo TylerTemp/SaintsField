@@ -1,0 +1,37 @@
+:root {
+    flex-direction: row;
+}
+
+.iconButton {
+    width: 20px;
+    height: 20px;
+    -unity-background-scale-mode: scale-to-fit;
+    margin: 0;
+}
+
+#stopButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/stop.png?fileID=2800000&guid=7e2fb24895f24b445a4430ed75c89feb&type=3#stop");
+}
+
+#playButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/play.png?fileID=2800000&guid=0d8f6056b9be054428bc5851846b31ba&type=3#play");
+}
+
+#pauseButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/pause.png?fileID=2800000&guid=a220d245105a9b447b5a5f737576d0cd&type=3#pause");
+}
+
+#resumeButton {
+    background-image: url("project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/resume.png?fileID=2800000&guid=b66404d4cda9808458d44dc72661c0bf&type=3#resume");
+}
+
+.leftButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 0;
+}
+
+.rightButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}

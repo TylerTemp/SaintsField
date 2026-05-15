@@ -2301,8 +2301,20 @@ namespace SaintsField.Editor.Utils
             {
                 rawValue = ((PropertyInfo)fieldInfo).GetValue(parent);
             }
+            else if (fieldInfo.MemberType == MemberTypes.Method)
+            {
+                try
+                {
+                    rawValue = ((MethodInfo)fieldInfo).Invoke(parent, null);
+                }
+                catch (Exception e)
+                {
+                    return (e.InnerException?.Message ?? e.Message, -1, null);
+                }
+            }
             else
             {
+                Debug.LogError($"MemberInfo is of type {fieldInfo.MemberType}");
                 return ($"Unable to get value from {fieldInfo} ({fieldInfo.MemberType})", -1, null);
             }
 

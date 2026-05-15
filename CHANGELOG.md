@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: `ParticlePlay` now plays correctly with "Auto Random Seed"
+2.  Add: `ParticlePlay` in play mode now can correctly reflect it's runtime playing status
+
 ## 5.14.1 ##
 
 1.  Runtime Saver no longer requires SaintsEditor
