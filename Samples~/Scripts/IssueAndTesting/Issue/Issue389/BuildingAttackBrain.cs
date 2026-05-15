@@ -12,9 +12,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue389
         [InfoBox("Only available in BuildObject type", show: nameof(ShowMessage))]
         public int damage;
 
-        private bool ShowMessage() => !EnableIfDamage();
+        private static bool ShowMessage() => !EnableIfDamage();
 
-        private bool EnableIfDamage()
+        private static bool EnableIfDamage()
         {
 #if UNITY_EDITOR
             // ReSharper disable once InvertIf
@@ -29,6 +29,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue389
                 }
             }
             return false;
+#else
+            return true;
 #endif
         }
     }

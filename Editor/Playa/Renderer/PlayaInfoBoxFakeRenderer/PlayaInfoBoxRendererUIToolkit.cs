@@ -3,8 +3,6 @@ using System;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
-using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
@@ -92,8 +90,13 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         private static (string error, bool show) UpdateInfoBoxShow(HelpBox helpBox,
             InfoBoxUserData infoBoxUserData)
         {
-            (string showError, object showResult) = Util.GetOfNoParams<object>(infoBoxUserData.FieldWithInfo.Targets[0],
-                infoBoxUserData.InfoBoxAttribute.ShowCallback, null);
+            (string showError, MemberInfo _, object showResult) = Util.GetOf<object>(
+                infoBoxUserData.InfoBoxAttribute.ShowCallback,
+                true,
+                infoBoxUserData.FieldWithInfo.SerializedProperty,
+                infoBoxUserData.FieldWithInfo.FieldInfo ?? (MemberInfo)infoBoxUserData.FieldWithInfo.PropertyInfo ?? infoBoxUserData.FieldWithInfo.MethodInfo,
+                infoBoxUserData.FieldWithInfo.Targets[0],
+                Array.Empty<object>());
             if (showError != "")
             {
                 infoBoxUserData.XmlContent = showError;
