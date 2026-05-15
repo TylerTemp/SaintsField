@@ -2456,7 +2456,7 @@ private int ProgressBar([ProgressBar(0, 10)] int hp) => hp;
 
 ### Animation ###
 
-#### `AnimatorParam` ###
+#### `AnimatorParam` ####
 
 A dropdown selector for an animator parameter.
 
@@ -2508,7 +2508,7 @@ private int ShowAnimatorParam([AnimatorParam] string animName) => Animator.Strin
 
 ![](https://github.com/user-attachments/assets/8ca9967d-71d2-4b2f-8ab5-20110853550f)
 
-#### `AnimatorState` ###
+#### `AnimatorState` ####
 
 A dropdown selector for animator state.
 
@@ -5338,7 +5338,7 @@ public string myInterface;
 
 ![resource_path](https://github.com/TylerTemp/SaintsField/assets/6391063/35d683bf-7d19-4854-bdf6-ee63532fed80)
 
-#### `ResourceFolder` ###
+#### `ResourceFolder` ####
 
 A folder picker to pick a resource folder under any `Resources`. It'll give error if the selected folder is not a resource.
 
@@ -9242,7 +9242,7 @@ You can skip the `namespace` part. And if you also skip the `type` part, we'll t
 
 Note: decorators like `OnEvent`, `OnButtonClick` does not support this `$:` yet. I'm still working on making all APIs consistent.
 
-### Syntax for Show/Hide/Enable/Disable/Required-If ##
+### Syntax for Show/Hide/Enable/Disable/Required-If ###
 
 This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `RequiredIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
 
@@ -9545,7 +9545,7 @@ And some shortcut:
 *   `JustPicker` = `NoInitSign | NoAutoResignToValue | NoAutoResignToNull | NoResignButton | NoMessage`. Do nothing but just give you a picker with matched targets.
 *   `Message` = `NoAutoResignToValue | NoAutoResignToNull | NoResignButton`. Just give an error message if target is mismatched.
 
-### Add a Macro ##
+### Add a Macro ###
 
 Pick a way that is most convenient for you:
 
