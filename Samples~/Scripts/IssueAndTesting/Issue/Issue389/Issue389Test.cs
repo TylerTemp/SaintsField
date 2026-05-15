@@ -6,7 +6,5 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue389
         public NotMatchedContainer notMatched;
         [DefaultExpand]
         public BuildObject matched;
-
-        [DefaultExpand] public NoSuchFunction noSuchFunction;
     }
 }

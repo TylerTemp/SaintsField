@@ -8,6 +8,11 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue389
         [DefaultExpand]
         public BuildingAttackBrain buildingAttackBrain;
 
-        private bool InMatchedType => true;
+        // private bool InMatchedType => true;
+
+        public override string ToString()
+        {
+            return $"<BuildObject {buildingAttackBrain} />";
+        }
     }
 }

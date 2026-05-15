@@ -7,7 +7,5 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue389
     {
         [DefaultExpand]
         public BuildingAttackBrain buildingAttackBrain;
-
-        private bool InMatchedType => false;
     }
 }

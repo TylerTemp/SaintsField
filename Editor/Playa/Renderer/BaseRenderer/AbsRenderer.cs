@@ -161,6 +161,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
             }
 
+            SaintsContext.SerializedProperty = fieldWithInfo.SerializedProperty;
+
             for (int i = 0; i < preCheckInternalInfos.Count; i++)
             {
                 preCheckInternalInfos[i] = SaintsEditorUtils.FillResult(preCheckInternalInfos[i], fieldWithInfo.SerializedProperty);

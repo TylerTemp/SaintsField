@@ -1,4 +1,7 @@
+
+using System.Linq;
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using SaintsField.Utils;
 using UnityEditor;
 #endif
@@ -13,16 +16,38 @@ namespace SaintsField
         public static SerializedProperty FindPropertyRelateTo(string propertyName)
         {
             string curPath = SerializedProperty.propertyPath;
-            int lastDot = curPath.LastIndexOf('.');
 
-            SerializedProperty result = SerializedProperty.serializedObject.FindProperty(MergePath(curPath, lastDot, propertyName));
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-            if (result == null)
+            foreach (string eachPart in propertyName.Split('/'))
             {
-                result = SerializedProperty.serializedObject.FindProperty(MergePath(curPath, lastDot, RuntimeUtil.GetAutoPropertyName(propertyName)));
+                int lastDot = curPath.LastIndexOf('.');
+                if (eachPart == "..")
+                {
+                    string upPath = curPath[..lastDot];
+                    if (upPath.EndsWith(']'))  // .Array.data[Number]
+                    {
+                        upPath = string.Join('.', upPath.Split('.').SkipLast(2));
+                    }
+
+                    curPath = upPath;
+                }
+                else
+                {
+                    curPath = curPath[..(lastDot + 1)] + eachPart;
+                }
             }
 
-            return result;
+            return SerializedProperty.serializedObject.FindProperty(curPath);
+
+            // int lastDot = curPath.LastIndexOf('.');
+            //
+            // SerializedProperty result = SerializedProperty.serializedObject.FindProperty(MergePath(curPath, lastDot, propertyName));
+            // // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
+            // if (result == null)
+            // {
+            //     result = SerializedProperty.serializedObject.FindProperty(MergePath(curPath, lastDot, RuntimeUtil.GetAutoPropertyName(propertyName)));
+            // }
+            //
+            // return result;
         }
 
         private static string MergePath(string curPath, int lastDot, string propertyName)
@@ -32,8 +57,12 @@ namespace SaintsField
                 return propertyName;
             }
 
-            // ReSharper disable once ReplaceSubstringWithRangeIndexer
-            string parentPath = curPath.Substring(0, lastDot + 1);
+            if (propertyName == "..")
+            {
+                return curPath[..lastDot];
+            }
+
+            string parentPath = curPath[..(lastDot + 1)];
             return parentPath + propertyName;
 
         }
