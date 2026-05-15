@@ -37,34 +37,49 @@ class TitleAndContent:
     sub_content: list[TitleAndContent]
 
 
+readme_home_path = os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'Docs~', 'ReadMeHome.md')
+readme_main_fragment_path = os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'Docs~', 'ReadMeMainFragment.md')
+readme_pre_path = os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'Docs~', 'ReadMePreBlock.md')
 readme_path = os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'Docs~', 'README.md')
+readme_post_block_path = os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'Docs~', 'ReadMePostBlock.md')
 
-root_title: TitleAndContent | None = None
-title_chain: list[TitleAndContent] = []
+def is_markdown_header(line: str) -> bool:
+    return line.startswith('#') and not line.startswith('#if ') and not line.startswith('#endif')
 
-with open(readme_path, 'r', encoding='utf-8') as f:
-    for line in f:
-        if line.startswith('#') and not line.startswith('#if ') and not line.startswith('#endif'):
-            split_header_md = line.split()
-            split_header_md.pop(len(split_header_md) - 1)
-            title_start = split_header_md.pop(0)
-            title_level = len(title_start)
-            title = ' '.join(split_header_md)
-            title_id: str = re.sub(r'[^a-zA-Z\s\-]', '', title).replace(' ', '-').lower()
 
-            if title_level == 1:
-                root_title = TitleAndContent(title, title_id, title_level, [], [])
-                title_chain.append(root_title)
-            else:
-                last_title = title_chain[-1]
-                if last_title.title_level >= title_level:
-                    while title_chain[-1].title_level >= title_level:
-                        title_chain.pop()
+def parse_markdown_header(line: str) -> tuple[int, str, str]:
+    header = line.strip()
+    title_start, title = header.split(maxsplit=1)
+    title_level = len(title_start)
+    title = title.strip()
+
+    closing_header = '#' * title_level
+    if title.endswith(closing_header):
+        title = title[:-title_level].strip()
+
+    title_id: str = re.sub(r'[^a-zA-Z\s\-]', '', title).replace(' ', '-').lower()
+    return title_level, title, title_id
+
+
+def parse_readme(path: str) -> TitleAndContent:
+    root = TitleAndContent('', '', 0, [], [])
+    title_chain: list[TitleAndContent] = [root]
+
+    with open(path, 'r', encoding='utf-8') as f:
+        for line in f:
+            if is_markdown_header(line):
+                title_level, title, title_id = parse_markdown_header(line)
+
+                while title_chain[-1].title_level >= title_level:
+                    title_chain.pop()
+
                 new_title = TitleAndContent(title, title_id, title_level, [], [])
                 title_chain[-1].sub_content.append(new_title)
                 title_chain.append(new_title)
-        else:
-            title_chain[-1].content.append(line)
+            else:
+                title_chain[-1].content.append(line)
+
+    return root
 
 # print(json.dumps(root_title, cls=EnhancedJSONEncoder, indent=4))
 @dataclass()
@@ -85,19 +100,8 @@ def compact_title_and_content(title_and_content: TitleAndContent) -> TitleAndCon
         SubContents=[compact_title_and_content(sub) for sub in title_and_content.sub_content]
     )
 
-root_compact = compact_title_and_content(root_title)
-
-list_compact: list[TitleAndContentCompact] = []
-root_node = root_compact
-root_node.TitleId = ""
-sub_list = list(root_compact.SubContents)
-root_compact.SubContents.clear()
-
-list_compact.append(root_node)
-list_compact.extend(sub_list)
-
-if list_compact[0].Title == 'SaintsField':
-    list_compact[0].Title = ''
+root_compact = compact_title_and_content(parse_readme(readme_path))
+list_compact: list[TitleAndContentCompact] = list(root_compact.SubContents)
 
 # markdown_link_pattern = re.compile(r'\[([^\]]+)\]\(([^)]+)\)')
 markdown_image_pattern = re.compile(r'!\[([^\]]*)\]\(([^)]+)\)')
@@ -143,7 +147,8 @@ def make_linked_list(list_compact: list[TitleAndContentCompact], root: str, proj
 # print(json.dumps(linked_lis, cls=EnhancedJSONEncoder, indent=2))
 
 def make_target_link(content: str, url: str) -> str:
-    return f'<a href="{url}" target="_blank">{content}</a>'
+    # return f'<a href="{url}" target="_blank">{content}</a>'
+    return f'[{content}]({url})'
 
 def gen_sub_links(root: str, indent: int, sub_contents: list[TitleAndContentCompact]):
     for item in sub_contents:
@@ -184,31 +189,38 @@ def get_first_change_log(changelog):
     for line in changelog:
         if line.startswith('## '):
             second_level_counter += 1
+
             if second_level_counter >= 2:
                 return
+
+            version_number = line.replace('#', '').strip()
+            yield f'\n**{version_number}**\n'
+
             continue
 
         if second_level_counter == 1:
             yield line
 
-with open(readme_path, 'r', encoding='utf-8') as source_readme:
-    with open(os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'README.md'), 'w', encoding='utf-8') as main_readme:
+with open(os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'README.md'), 'w', encoding='utf-8') as main_readme:
 
-        for line in source_readme:
-            if line.startswith('## Getting Started ##'):
-                with open(os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'Docs~', 'ReadMeMainFragment.md'), 'r', encoding='utf-8') as fragment:
-                    main_readme.write(fragment.read())
-                    main_readme.write('\n')
+    with open(readme_home_path, 'r', encoding='utf-8') as home:
+        main_readme.write(home.read())
+        main_readme.write('\n')
 
-            if line.startswith('### Change Log ###'):
+    with open(readme_main_fragment_path, 'r', encoding='utf-8') as fragment:
+        main_readme.write(fragment.read())
+        main_readme.write('\n')
 
-                main_readme.write(line)
+    with open(readme_pre_path, 'r', encoding='utf-8') as pre_readme:
+        main_readme.write(pre_readme.read())
+        main_readme.write('\n')
 
-                with open(os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'CHANGELOG.md'), 'r',
-                          encoding='utf-8') as changelog:
-                    main_readme.writelines(get_first_change_log(changelog))
-                break
-            main_readme.write(line)
+    main_readme.write('## Change Log ##\n')
+    with open(os.path.join(os.path.dirname(__file__), 'Packages', 'today.comes.saintsfield', 'CHANGELOG.md'), 'r',
+                encoding='utf-8') as changelog:
+        main_readme.writelines(get_first_change_log(changelog))
+
+    with open(readme_path, 'r', encoding='utf-8') as source_readme:
 
         main_readme.write('## Usage ##\n\n')
         for link in gen_links(linked_lis):
@@ -216,9 +228,5 @@ with open(readme_path, 'r', encoding='utf-8') as source_readme:
             main_readme.write('\n')
         main_readme.write('\n')
 
-        found_left: bool = False
-        for line in source_readme:
-            if line.startswith('## Donation ##'):
-                found_left = True
-            if found_left:
-                main_readme.write(line)
+    with open(readme_post_block_path, 'r', encoding='utf-8') as post_block:
+        main_readme.write(post_block.read())
