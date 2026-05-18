@@ -308,6 +308,7 @@ Parameters:
 
 *   `bool isCallback=false` if true, the `richTextXml` will be interpreted as a property/callback function, and the string value / the returned string value (tag supported) will be used as the label content
 *   `float padding=5f` padding between the field and the label.
+*   `string show=null` control the visibility. Show by default. Supports upwalk/downwalk
 *   `string GroupBy=""` this is only for the error message box.
 *   AllowMultiple: Yes
 
