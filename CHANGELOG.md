@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP ##
+
+1.  Add: `EndText` add `show` parameters to controll it's shown or not
+2.  Fix: `Button` did not hide the termination button when all `ienumerator`-s finished
+
 ## 5.14.2 ##
 
 1.  Fix: `ParticlePlay` now plays correctly with "Auto Random Seed"

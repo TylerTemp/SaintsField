@@ -329,6 +329,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             if (oldCounter > 0)
                             {
                                 statusIndicatorElement.PlayOk();
+                                fancyButton.ShowResult(false);
                             }
                         }
                     }).Every(1);

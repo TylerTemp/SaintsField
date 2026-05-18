@@ -1,0 +1,27 @@
+{
+    "name": "UnityMath",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d8b63aba1907145bea998dd612889d6b",
+        "GUID:9b261077c7a2ac34886513ec1345f8e0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [
+        "Editor"
+    ],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_UNITY_MATHEMATICS"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.mathematics",
+            "expression": "",
+            "define": "SAINTSFIELD_UNITY_MATHEMATICS"
+        }
+    ],
+    "noEngineReferences": false
+}

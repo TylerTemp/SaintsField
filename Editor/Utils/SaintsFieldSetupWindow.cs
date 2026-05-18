@@ -264,5 +264,40 @@ namespace SaintsField.Editor.Utils
         }
 
         #endregion
+
+        #region Debug
+
+        #if SAINTSFIELD_DEBUG
+
+        [LayoutStart("Debug", ELayout.FoldoutBox)]
+        [Button("com.unity.mathematics")]
+        private IEnumerator InstallComUnityMathematics()
+        {
+            return DebugInstall("com.unity.mathematics");
+        }
+
+        private static IEnumerator DebugInstall(string packageName)
+        {
+            AddRequest removeRequest = Client.Add(packageName);
+            while (true)
+            {
+                switch (removeRequest.Status)
+                {
+                    case StatusCode.InProgress:
+                        yield return null;
+                        break;
+                    case StatusCode.Success:
+                        yield break;
+                    case StatusCode.Failure:
+                        throw new Exception(removeRequest.Error.message);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        #endif
+
+        #endregion
     }
 }
