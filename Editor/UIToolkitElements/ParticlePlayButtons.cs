@@ -9,6 +9,7 @@ namespace SaintsField.Editor.UIToolkitElements
 #if UNITY_6000_0_OR_NEWER
     [UxmlElement]
 #endif
+    // ReSharper disable once PartialTypeWithSinglePart
     public partial class ParticlePlayButtons: VisualElement
     {
 #if !UNITY_6000_0_OR_NEWER
@@ -122,7 +123,9 @@ namespace SaintsField.Editor.UIToolkitElements
 
         private void CheckParticleSystem()
         {
-            SetEnabled(_particleSystem != null);
+            bool enabled = _particleSystem != null
+                           && _particleSystem.gameObject.activeSelf;
+            SetEnabled(enabled);
         }
 
         public void SetParticleSystem(ParticleSystem particleSystem)
