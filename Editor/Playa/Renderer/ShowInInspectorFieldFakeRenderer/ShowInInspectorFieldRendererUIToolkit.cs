@@ -32,10 +32,8 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
             public void SetErrorMessage(string error)
             {
-                if (_helpBox.text != error)
-                {
-                    _helpBox.text = error;
-                }
+                UIToolkitUtils.SetHelpBox(_helpBox, error);
+                UIToolkitUtils.SetDisplayStyle(this, string.IsNullOrEmpty(error)? DisplayStyle.None: DisplayStyle.Flex);
             }
         }
 
@@ -76,6 +74,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             }
 
             result.labelElement.style.color = EColor.EditorSeparator.GetColor();
+            result.SetErrorMessage(error);
 
             return result;
         }
@@ -109,6 +108,15 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 },
                 name = NameContainer(),
             };
+
+            VisualElement resultElement = new VisualElement
+            {
+                name = NameResult(),
+            };
+            container.Add(resultElement);
+            NativeFieldPropertyRendererErrorField errorElement = MakeNativeFieldPropertyRendererErrorField("");
+            container.Add(errorElement);
+
             // Debug.Log(NameContainer());
             Action<object> setter = GetSetterOrNull(FieldWithInfo);
 
@@ -117,7 +125,8 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 #if SAINTSFIELD_DEBUG
                 Debug.LogWarning(error);
 #endif
-                container.Add(MakeNativeFieldPropertyRendererErrorField(error));
+                // container.Add(MakeNativeFieldPropertyRendererErrorField(error));
+                errorElement.SetErrorMessage(error);
                 container.userData = new DataPayload
                 {
                     HasDrawer = false,
@@ -172,8 +181,9 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                     oldCollection = Array.Empty<object>();
                 }
 
-                result.name = NameResult();
-                container.Add(result);
+                // result.name = NameResult();
+                // container.Add(result);
+                resultElement.Add(result);
                 container.userData = new DataPayload
                 {
                     HasDrawer = true,
@@ -350,24 +360,12 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             (string error, object value) = GetValue(FieldWithInfo);
             // Debug.Log($"error={error}, value={value}");
 
-            string nameErrorBox = NameErrorBox();
-            // Debug.Log(container);
-            NativeFieldPropertyRendererErrorField errorHelpBox = container.Q<NativeFieldPropertyRendererErrorField>(nameErrorBox);
-            if (error == "")
-            {
-                errorHelpBox?.RemoveFromHierarchy();
-            }
-            else
-            {
-                if (errorHelpBox == null)
-                {
-                    container.Add(MakeNativeFieldPropertyRendererErrorField(error));
-                }
-                else
-                {
-                    errorHelpBox.SetErrorMessage(error);
-                }
+            NativeFieldPropertyRendererErrorField errorContainer = container.Q<NativeFieldPropertyRendererErrorField>(NameErrorBox());
 
+            errorContainer.SetErrorMessage(error);
+
+            if (error != "")
+            {
                 return preCheckResult;
             }
 
@@ -405,7 +403,9 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 }
             }
             // bool isEqual = userData.HasDrawer && (userData.Value == value || ReferenceEquals(userData.Value, value));
-            VisualElement fieldElementOrNull = container.Q<VisualElement>(NameResult());
+            VisualElement resultContainer = container.Q<VisualElement>(NameResult());
+
+            VisualElement fieldElementOrNull = resultContainer.Children().FirstOrDefault();
 
             // Debug.Log($"isEqual={isEqual}");
 
@@ -449,10 +449,10 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {
-                    result.name = NameResult();
-                    container.Clear();
+                    resultContainer.Clear();
                     container.Add(result);
                     userData.HasDrawer = true;
+                    errorContainer.SetErrorMessage("");
                 }
                 else if(fieldElementOrNull == null)
                 {

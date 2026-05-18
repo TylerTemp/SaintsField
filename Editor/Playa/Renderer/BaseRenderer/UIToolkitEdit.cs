@@ -31,6 +31,7 @@ using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
@@ -2346,6 +2347,32 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     return (WrapVisualElement(textField), true);
                 }
             }
+
+            // ReSharper disable once InvertIf
+            if (oldElement is GeneralTypeEdit gte && gte.ClassListContains(foldoutViewKey))
+            {
+                gte.CheckRefresh(label, valueType, value, beforeSet, setterOrNull, targets);
+                return (null, true);
+            }
+
+            // Debug.Log($"recreated! {oldElement}{oldElement?.name}(name={foldoutViewKey})");
+
+            GeneralTypeEdit newCreated = new GeneralTypeEdit(
+                label,
+                valueType,
+                value,
+                beforeSet,
+                setterOrNull,
+                labelGrayColor,
+                inHorizontalLayout,
+                allAttributes,
+                targets,
+                richTextTagProvider,
+                foldoutViewKey);
+            newCreated.AddToClassList(foldoutViewKey);
+
+            return (newCreated,
+                true);
 
             const string objFieldName = "saintsfield-objectfield";
 
