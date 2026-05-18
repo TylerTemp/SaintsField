@@ -12,10 +12,13 @@ namespace SaintsField
 
         public readonly float Padding;
 
-        public EndTextAttribute(string richTextXml, bool isCallback=false, float padding=5f, string groupBy=""): base(richTextXml, isCallback)
+        public readonly string ShowCallback;
+
+        public EndTextAttribute(string richTextXml, bool isCallback=false, float padding=5f, string show=null, string groupBy=""): base(richTextXml, isCallback)
         {
             Padding = padding;
             GroupBy = groupBy;
+            ShowCallback = show;
         }
     }
 }

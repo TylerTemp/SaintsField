@@ -17,11 +17,13 @@ namespace SaintsField.Samples.Scripts
 
         public string TakeAGuess()
         {
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if(guess > 20)
             {
                 return "<color=red>too high";
             }
 
+            // ReSharper disable once ConvertIfStatementToReturnStatement
             if (guess < 10)
             {
                 return "<color=blue>too low";
@@ -29,5 +31,9 @@ namespace SaintsField.Samples.Scripts
 
             return "<color=green>acceptable!";
         }
+
+        public bool show;
+
+        [EndText("<color=gray>Dynamic", show: nameof(show))] public int num;
     }
 }

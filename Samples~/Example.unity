@@ -6739,7 +6739,7 @@ GameObject:
   - component: {fileID: 622173743}
   - component: {fileID: 622173742}
   m_Layer: 0
-  m_Name: PostFieldRichLabel
+  m_Name: EndText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34550,9 +34550,6 @@ MonoBehaviour:
     buildingAttackBrain:
       damage: 0
   matched:
-    buildingAttackBrain:
-      damage: 0
-  noSuchFunction:
     buildingAttackBrain:
       damage: 0
 --- !u!1 &1951413950

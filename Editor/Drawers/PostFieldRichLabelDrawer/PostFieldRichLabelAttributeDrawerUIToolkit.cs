@@ -77,21 +77,36 @@ namespace SaintsField.Editor.Drawers.PostFieldRichLabelDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info)
         {
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-
             EndTextAttribute targetAttribute = (EndTextAttribute)saintsAttribute;
-            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml,
-                targetAttribute.IsCallback, info, parent);
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
+            VisualElement richLabel = container.Q<VisualElement>(NameRichLabel(property, index));
+
+            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+
+            (string willDrawError, bool willDraw) = WillDraw(targetAttribute.ShowCallback, property, info, parent);
+            if (willDrawError != "")
+            {
+                UIToolkitUtils.SetHelpBox(helpBox, willDrawError);
+                UIToolkitUtils.SetDisplayStyle(richLabel, DisplayStyle.None);
+                return;
+            }
+
+            if (!willDraw)
+            {
+                UIToolkitUtils.SetHelpBox(helpBox, string.Empty);
+                UIToolkitUtils.SetDisplayStyle(richLabel, DisplayStyle.None);
+                return;
+            }
+
+            (string error, string xml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml,
+                targetAttribute.IsCallback, info, parent);
             string curError = (string)helpBox.userData;
             if (curError != error)
             {
                 helpBox.text = error;
                 helpBox.style.display = error == "" ? DisplayStyle.None : DisplayStyle.Flex;
             }
-
-            VisualElement richLabel = container.Q<VisualElement>(NameRichLabel(property, index));
             string curXml = (string)richLabel.userData;
             // ReSharper disable once InvertIf
             if (curXml != xml)
@@ -109,6 +124,28 @@ namespace SaintsField.Editor.Drawers.PostFieldRichLabelDrawer
                     }
                 }
             }
+
+            UIToolkitUtils.SetDisplayStyle(richLabel, DisplayStyle.Flex);
+        }
+
+        private static (string error, bool willDraw) WillDraw(string callback, SerializedProperty property, FieldInfo info, object target)
+        {
+            if (string.IsNullOrEmpty(callback))
+            {
+                return (string.Empty, true);
+            }
+
+            (string error, MemberInfo _, object result) = Util.GetOf<object>(
+                callback,
+                null,
+                property,
+                info,
+                target,
+                null);
+
+            return error != ""
+                ? (error, false)
+                : ("", ReflectUtils.Truly(result));
         }
 
     }
