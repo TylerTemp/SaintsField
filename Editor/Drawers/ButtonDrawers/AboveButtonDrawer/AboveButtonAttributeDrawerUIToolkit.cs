@@ -52,7 +52,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.AboveButtonDrawer
                 InHorizontalLayout,
                 ReflectCache.GetCustomAttributes(methodInfo),
                 new[]{parent},
-                this
+                this,
+                SerializedUtils.GetUniqueId(property)
             ).result;
             if (r != null)
             {

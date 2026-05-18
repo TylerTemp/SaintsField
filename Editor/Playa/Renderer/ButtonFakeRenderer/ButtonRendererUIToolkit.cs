@@ -70,6 +70,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 && methodInfo.ReturnType != typeof(void)
                 && !typeof(IEnumerator).IsAssignableFrom(methodInfo.ReturnType);
 
+            string buttonId = $"{FieldWithInfo.Targets[0].GetHashCode()}.{methodInfo.Name}";
+
             if (hasParameters || hasReturnValue)
             {
                 VisualElement parametersContainer = fancyButton.HasParameters();
@@ -124,7 +126,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             InAnyHorizontalLayout,
                             attributes,
                             FieldWithInfo.Targets,
-                            this
+                            this,
+                            $"{buttonId}.{parameterInfo.Name}"
                         ).result;
                         // ReSharper disable once InvertIf
                         if (r != null)
@@ -222,7 +225,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         InAnyHorizontalLayout,
                         ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo),
                         FieldWithInfo.Targets,
-                        this
+                        this,
+                        $"{buttonId}.[return]"
                     ).result;
                     if (r != null)
                     {
@@ -329,6 +333,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             if (oldCounter > 0)
                             {
                                 statusIndicatorElement.PlayOk();
+                                fancyButton.ShowResult(false);
                             }
                         }
                     }).Every(1);

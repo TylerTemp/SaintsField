@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.14.3 ##
+
+1.  Add: `EndText` add `show` parameters to controll it's shown or not [#390](https://github.com/TylerTemp/SaintsField/issues/390)
+2.  Fix: `Button` did not hide the termination button when all `ienumerator`-s finished
+3.  Fix: `ShowInInspector` could not expand a self-referenced (loop-referenced) data
+
 ## 5.14.2 ##
 
 1.  Fix: `ParticlePlay` now plays correctly with "Auto Random Seed"

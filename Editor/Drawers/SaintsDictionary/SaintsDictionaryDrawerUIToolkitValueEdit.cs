@@ -55,9 +55,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             // true: add; false: cancel
             // key
             // value
-            public UnityEvent<bool, object, object> OnFinished = new UnityEvent<bool, object, object>();
+            public readonly UnityEvent<bool, object, object> OnFinished = new UnityEvent<bool, object, object>();
 
-            public PairPanel(Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
+            public PairPanel(Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider, string foldoutViewKey)
             {
                 const int pairPanelBorderWidth = 1;
                 Color pairPanelBorderColor = EColor.EditorEmphasized.GetColor();
@@ -149,7 +149,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         inHorizontalLayout,
                         Array.Empty<Attribute>(),
                         targets,
-                        richTextTagProvider
+                        richTextTagProvider,
+                        $"{foldoutViewKey}.[panel.add.key]"
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -187,7 +188,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         inHorizontalLayout,
                         Array.Empty<Attribute>(),
                         targets,
-                        richTextTagProvider
+                        richTextTagProvider,
+                        $"{foldoutViewKey}.[panel.add.value]"
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -226,7 +228,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             public readonly ListViewPagerFooterStruct FooterStruct;
             public readonly PairPanel PairPanel;
 
-            public SaintsDictionaryWrapper(string label, bool nullable, MultiColumnListView listView, Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
+            public SaintsDictionaryWrapper(string label, bool nullable, MultiColumnListView listView, Type dictKeyType, Type dictValueType, DictionaryViewPayload payload, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider, string foldoutViewKey)
             {
                 VisualElement header = new VisualElement();
                 Add(header);
@@ -301,7 +303,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 Add(FooterStruct.Root);
 
                 // panel for adding
-                Add(PairPanel = new PairPanel(dictKeyType, dictValueType, payload, inHorizontalLayout, targets, richTextTagProvider));
+                Add(PairPanel = new PairPanel(dictKeyType, dictValueType, payload, inHorizontalLayout, targets, richTextTagProvider, $"{foldoutViewKey}.[add.panel]"));
 
                 FooterStruct.AddButton.clicked += () =>
                 {
@@ -328,7 +330,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
         public static VisualElement UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object rawDictValue,
             bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet,
-            Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
+            Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout,
+            IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider,
+            string foldoutViewKey)
         {
 
             if (oldElement is SaintsDictionaryWrapper dictField)
@@ -402,7 +406,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 },
                 itemsSource = payload.GetKeys().ToList(),
                 userData = payload,
-            }, dictKeyType, dictValueType, payload, inHorizontalLayout, targets, richTextTagProvider);
+            }, dictKeyType, dictValueType, payload, inHorizontalLayout, targets, richTextTagProvider, $"{foldoutViewKey}.[dict]");
 
             // Size
             if (isReadOnly)
@@ -516,15 +520,21 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                         keyChanged = false;
 
-                        VisualElement editing = UIToolkitEdit.UIToolkitValueEdit(keyChild, "", dictKeyType, key, oldKey =>
-                        {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
-                            Debug.Log($"oldKey={oldKey}");
-#endif
-                            oldValue = payload.GetValue(oldKey);
-                            payload.DeleteKey(oldKey);
-                        }, newKey =>
-                        {
+                        VisualElement editing = UIToolkitEdit.UIToolkitValueEdit(
+                                keyChild,
+                                "",
+                                dictKeyType,
+                                key,
+                                oldKey =>
+                                {
+        #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_DICTIONARY
+                                    Debug.Log($"oldKey={oldKey}");
+        #endif
+                                    oldValue = payload.GetValue(oldKey);
+                                    payload.DeleteKey(oldKey);
+                                },
+                                newKey =>
+                                {
                             if (RuntimeUtil.IsNull(newKey))
                             {
                                 Debug.LogWarning($"Setting key to null is not supported and is ignored");
@@ -550,7 +560,14 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                             // listView.itemsSource[sourceIndex] = newKey;
                             key = newKey;
                             keyChanged = true;
-                        }, false, true, Array.Empty<Attribute>(), targets, richTextTagProvider).result;
+                        },
+                                false,
+                                true,
+                                Array.Empty<Attribute>(),
+                                targets,
+                                richTextTagProvider,
+                                $"{foldoutViewKey}.[key].[{elementIndex}]"
+                            ).result;
 
                         if (editing != null)
                         {
@@ -619,11 +636,24 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                     VisualElement valueChild = element.Children().FirstOrDefault();
 
-                    VisualElement editing = UIToolkitEdit.UIToolkitValueEdit(valueChild, "", dictValueType, value, null, newValue =>
-                    {
-                        object refreshedKey = dictField.ListView.itemsSource[elementIndex];
-                        payload.SetKeyValue(refreshedKey, newValue);
-                    }, false, true, Array.Empty<Attribute>(), targets, richTextTagProvider).result;
+                    VisualElement editing = UIToolkitEdit.UIToolkitValueEdit(
+                        valueChild,
+                        "",
+                        dictValueType,
+                        value,
+                        null,
+                        newValue =>
+                        {
+                            object refreshedKey = dictField.ListView.itemsSource[elementIndex];
+                            payload.SetKeyValue(refreshedKey, newValue);
+                        },
+                        false,
+                        true,
+                        Array.Empty<Attribute>(),
+                        targets,
+                        richTextTagProvider,
+                        $"{foldoutViewKey}.[value].[{elementIndex}]"
+                    ).result;
 
                     if (editing != null)
                     {

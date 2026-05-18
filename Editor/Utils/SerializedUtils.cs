@@ -267,11 +267,21 @@ namespace SaintsField.Editor.Utils
             string[] paths = property.propertyPath.Split(DotSplitSeparator);
 
             (bool _, string[] propPathSegments) = TrimEndArray(paths);
+
 #if UNITY_6000_4_OR_NEWER
-            return $"{EntityId.ToULong(property.serializedObject.targetObject.GetEntityId())}_{string.Join(".", propPathSegments)}";
+            EntityId
 #else
-            return $"{property.serializedObject.targetObject.GetInstanceID()}_{string.Join(".", propPathSegments)}";
+            int
 #endif
+                objectId = property.serializedObject.targetObject.
+#if UNITY_6000_4_OR_NEWER
+                    GetEntityId
+#else
+                    GetInstanceID
+#endif
+                        ();
+
+            return $"{objectId}_{string.Join(".", propPathSegments)}";
         }
 
         public static (string error, SerializedProperty property) GetArrayProperty(SerializedProperty property)
@@ -413,23 +423,27 @@ namespace SaintsField.Editor.Utils
         public static string GetUniqueId(SerializedProperty property)
         {
 #if UNITY_6000_4_OR_NEWER
-            return $"{EntityId.ToULong(property.serializedObject.targetObject.GetEntityId())}_{property.propertyPath}";
+            EntityId
 #else
-            return $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
+            int
 #endif
+                objectId = property.serializedObject.targetObject.
+#if UNITY_6000_4_OR_NEWER
+                GetEntityId
+#else
+                GetInstanceID
+#endif
+                ();
+
+            return $"{objectId}_{property.propertyPath}";
         }
 
         public static bool IsOk(SerializedProperty property)
         {
             try
             {
-#if UNITY_6000_4_OR_NEWER
-                EntityId _ = property.serializedObject.targetObject.GetEntityId();
-#else
-                int _ = property.serializedObject.targetObject.GetInstanceID();
-#endif
-                string __ = property.propertyPath;
-                string ___ = property.displayName;
+                string _ = GetUniqueId(property);
+                string __ = property.displayName;
             }
             catch (NullReferenceException)
             {
