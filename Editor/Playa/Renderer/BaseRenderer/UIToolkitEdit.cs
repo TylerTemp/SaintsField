@@ -45,7 +45,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
     {
         public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement,
             string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull,
-            bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
+            bool labelGrayColor, bool inHorizontalLayout,
+            IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider,
+            string foldoutViewKey)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render start {label}/{valueType}/{value}");
@@ -2160,7 +2162,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return (SaintsDictionaryDrawer.UIToolkitValueEdit(
                     oldElement as Foldout, label, valueType, value, isReadOnly,
                     dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
-                    inHorizontalLayout, allAttributes, targets, richTextTagProvider), false);
+                    inHorizontalLayout, allAttributes, targets, richTextTagProvider, foldoutViewKey), false);
 
 // #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
 //                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
@@ -2264,9 +2266,21 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (value is IEnumerable enumerableValue)
             {
                 // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
-                return (ListDrawerSettingsRenderer.UIToolkitValueEdit(oldElement, label, valueType, enumerableValue,
-                    enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor,
-                    inHorizontalLayout, allAttributes, targets, richTextTagProvider), false);
+                return (ListDrawerSettingsRenderer.UIToolkitValueEdit(
+                        oldElement,
+                        label,
+                        valueType,
+                        enumerableValue,
+                        enumerableValue.Cast<object>().ToArray(),
+                        beforeSet,
+                        setterOrNull,
+                        labelGrayColor,
+                        inHorizontalLayout,
+                        allAttributes,
+                        targets,
+                        richTextTagProvider,
+                        foldoutViewKey
+                    ), false);
             }
             #endregion
 
@@ -2362,10 +2376,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if (!useOld)
             {
-                // Debug.Log($"Create foldout for value {value}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT_GENERAL
+                Debug.Log($"Create foldout for value {value}({foldoutViewKey})");
+#endif
                 genFoldout = new Foldout
                 {
-                    value = ExpandedValue.Contains(value),
+                    value = ExpandedValue.Contains(foldoutViewKey),
                     text = label,
                     style =
                     {
@@ -2501,7 +2517,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // Debug.Log($"Expand value {value} -> {evt.newValue}");
                     bool expanded = evt.newValue;
                     payload.IsFullFilled = true;
-                    FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, targets, richTextTagProvider);
+                    FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, targets, richTextTagProvider, foldoutViewKey);
                 });
 
                 // if (ExpandedValue.Contains(value))
@@ -2549,7 +2565,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (genFoldout.value)  // if expanded, we always call FillExpandIfNeeded because we need to update value (as it might have changed)
             {
                 payload.IsFullFilled = true;
-                FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, targets, richTextTagProvider);
+                FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, targets, richTextTagProvider, foldoutViewKey);
             }
 
             bool enabled = setterOrNull != null;
@@ -3116,7 +3132,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public bool IsFullFilled;
         }
 
-        public static readonly HashSet<object> ExpandedValue = new HashSet<object>();
+        public static readonly HashSet<string> ExpandedValue = new HashSet<string>();
 
         private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType,
             object currentValue, Action<Type> setType)
@@ -3197,31 +3213,31 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return dropdownButton;
         }
 
-        private class DictionaryViewPayload
-        {
-            public object RawDictValue;
-            private readonly PropertyInfo _keysProperty;
-            private readonly PropertyInfo _indexerProperty;
-            private readonly MethodInfo _removeMethod;
-            private readonly MethodInfo _containersKeyMethod;
-
-            public DictionaryViewPayload(object rawDictValue, PropertyInfo keysProperty, PropertyInfo indexerProperty,
-                MethodInfo removeMethod, MethodInfo containsKeyMethod)
-            {
-                RawDictValue = rawDictValue;
-                _keysProperty = keysProperty;
-                _indexerProperty = indexerProperty;
-                _removeMethod = removeMethod;
-                _containersKeyMethod = containsKeyMethod;
-            }
-
-            public IEnumerable<object> GetKeys() => ((IEnumerable)_keysProperty.GetValue(RawDictValue)).Cast<object>();
-
-            public object GetValue(object key) => _indexerProperty.GetValue(RawDictValue, new[] { key });
-            public void DeleteKey(object key) => _removeMethod.Invoke(RawDictValue, new[] { key });
-            public void SetKeyValue(object key, object value) => _indexerProperty.SetValue(RawDictValue, value, new[] { key });
-            public bool ContainsKey(object key) => (bool)_containersKeyMethod.Invoke(RawDictValue, new[] { key });
-        }
+        // private class DictionaryViewPayload
+        // {
+        //     public object RawDictValue;
+        //     private readonly PropertyInfo _keysProperty;
+        //     private readonly PropertyInfo _indexerProperty;
+        //     private readonly MethodInfo _removeMethod;
+        //     private readonly MethodInfo _containersKeyMethod;
+        //
+        //     public DictionaryViewPayload(object rawDictValue, PropertyInfo keysProperty, PropertyInfo indexerProperty,
+        //         MethodInfo removeMethod, MethodInfo containsKeyMethod)
+        //     {
+        //         RawDictValue = rawDictValue;
+        //         _keysProperty = keysProperty;
+        //         _indexerProperty = indexerProperty;
+        //         _removeMethod = removeMethod;
+        //         _containersKeyMethod = containsKeyMethod;
+        //     }
+        //
+        //     public IEnumerable<object> GetKeys() => ((IEnumerable)_keysProperty.GetValue(RawDictValue)).Cast<object>();
+        //
+        //     public object GetValue(object key) => _indexerProperty.GetValue(RawDictValue, new[] { key });
+        //     public void DeleteKey(object key) => _removeMethod.Invoke(RawDictValue, new[] { key });
+        //     public void SetKeyValue(object key, object value) => _indexerProperty.SetValue(RawDictValue, value, new[] { key });
+        //     public bool ContainsKey(object key) => (bool)_containersKeyMethod.Invoke(RawDictValue, new[] { key });
+        // }
 
 //         private static void MoveArrayElement(IList list, int fromIndex, int toIndex)
 //         {
@@ -3291,7 +3307,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static void FillExpandIfNeeded(bool expanded, object value, Foldout genFoldout,
             VisualElement oldElement,
-            Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
+            Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout,
+            IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider,
+            string foldoutViewKey)
         {
             const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
 
@@ -3303,11 +3321,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             if (expanded)
             {
-                UIToolkitEdit.ExpandedValue.Add(value);
+                ExpandedValue.Add(foldoutViewKey);
             }
             else
             {
-                UIToolkitEdit.ExpandedValue.Remove(value);
+                ExpandedValue.Remove(foldoutViewKey);
             }
 
             if (!expanded)
@@ -3343,7 +3361,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // Debug.Log("Init generic type");
             foreach (FieldInfo fieldInfo in fieldTargets)
             {
-                string name = fieldInfo.Name;
+                // string name = fieldInfo.Name;
+                string subId = $"{foldoutViewKey}.{fieldInfo.Name}";
 
                 if (AbsRenderer.SkipTypeDrawing(fieldInfo.FieldType))
                 {
@@ -3353,8 +3372,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
                 Debug.Log($"render general field {name}/{fieldInfo.FieldType}/{fieldInfo.FieldType.Namespace}/{fieldInfo.FieldType.Name}");
 #endif
-                VisualElement oldItemElement = oldElement?.Q<VisualElement>(name: name);
-                string thisLabel = ObjectNames.NicifyVariableName(name);
+                VisualElement oldItemElement = oldElement?.Q<VisualElement>(name: subId);
+                string thisLabel = ObjectNames.NicifyVariableName(fieldInfo.Name);
                 VisualElement result = null;
 
                 object fieldValue = null;
@@ -3366,7 +3385,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 catch (Exception e)
                 {
 #if SAINTSFIELD_DEBUG
-                    Debug.LogWarning($"field {name}/{fieldInfo.FieldType} inside {value} gives error: {e}");
+                    Debug.LogWarning($"field {subId}/{fieldInfo.FieldType} inside {value} gives error: {e}");
 #endif
                     getValueSucceed = false;
                     string msg = e.InnerException?.Message ?? e.Message;
@@ -3408,7 +3427,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         oldItemElement.RemoveFromHierarchy();
                         oldItemElement = null;
                     }
-                    result = UIToolkitEdit.UIToolkitValueEdit(
+                    result = UIToolkitValueEdit(
                         oldItemElement,
                         thisLabel,
                         fieldInfo.FieldType,
@@ -3427,13 +3446,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         labelGrayColor,
                         inHorizontalLayout,
                         ReflectCache.GetCustomAttributes(fieldInfo),
-                        targets, richTextTagProvider).result;
+                        targets, richTextTagProvider,
+                        subId).result;
                 }
                 // Debug.Log($"{name}: {result}: {fieldInfo.FieldType}");
                 // ReSharper disable once InvertIf
                 if(result != null)
                 {
-                    result.name = name;
+                    result.name = subId;
                     fieldsBody.Add(result);
                 }
             }
@@ -3445,17 +3465,23 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     continue;
                 }
 
+                if (propertyInfo.GetIndexParameters().Length != 0)
+                {
+                    continue;
+                }
+
                 if (AbsRenderer.SkipTypeDrawing(propertyInfo.PropertyType))
                 {
                     continue;
                 }
 
-                string name = propertyInfo.Name;
-                VisualElement oldItemElement = oldElement?.Q<VisualElement>(name: name);
-                string thisLabel = ObjectNames.NicifyVariableName(name);
+                // string name = propertyInfo.Name;
+                string subId = $"{foldoutViewKey}.{propertyInfo.Name}";
+                VisualElement oldItemElement = oldElement?.Q<VisualElement>(name: subId);
+                string thisLabel = ObjectNames.NicifyVariableName(propertyInfo.Name);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
                 Debug.Log(
-                    $"render general property {name}/{propertyInfo.PropertyType} inside {value}");
+                    $"render general property {propertyInfo.Name}/{propertyInfo.PropertyType} inside {value}");
 #endif
                 VisualElement result = null;
                 object propertyValue = null;
@@ -3468,7 +3494,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     getValueSucceed = false;
 #if SAINTSFIELD_DEBUG
-                    Debug.LogWarning($"property {name}/{propertyInfo.PropertyType} inside {value} gives error: {e}");
+                    Debug.LogWarning($"property {subId}/{propertyInfo.PropertyType} inside {value} gives error: {e}");
                     Debug.LogWarning(e.InnerException ?? e);
 #endif
                     string msg = e.InnerException?.Message ?? e.Message;
@@ -3508,7 +3534,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         oldItemElement.RemoveFromHierarchy();
                         oldItemElement = null;
                     }
-                    result = UIToolkitEdit.UIToolkitValueEdit(
+                    result = UIToolkitValueEdit(
                         oldItemElement,
                         thisLabel,
                         propertyInfo.PropertyType,
@@ -3525,13 +3551,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         inHorizontalLayout,
                         ReflectCache.GetCustomAttributes(propertyInfo),
                         targets,
-                        richTextTagProvider).result;
+                        richTextTagProvider,
+                        subId).result;
                 }
 
                 // ReSharper disable once InvertIf
                 if(result != null)
                 {
-                    result.name = name;
+                    result.name = subId;
                     fieldsBody.Add(result);
                 }
             }

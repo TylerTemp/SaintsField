@@ -134,8 +134,22 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
             Type fieldType = GetFieldType(FieldWithInfo);
             string labelName = NoLabel ? null : GetNiceName(FieldWithInfo);
+            MemberInfo memberInfo = (MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo;
             // FieldWithInfo.Targets;
-            (VisualElement result, bool isNestedField) = UIToolkitEdit.UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets, this);
+            (VisualElement result, bool isNestedField) = UIToolkitEdit.UIToolkitValueEdit(
+                null,
+                labelName,
+                fieldType,
+                value,
+                null,
+                setter,
+                !isSaintsSerialized,
+                InAnyHorizontalLayout,
+                ReflectCache.GetCustomAttributes(memberInfo),
+                FieldWithInfo.Targets,
+                this,
+                $"{FieldWithInfo.Targets[0].GetHashCode()}.{memberInfo.Name}"
+            );
 
             _onSearchFieldUIToolkit.AddListener(Search);
             container.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
@@ -417,7 +431,21 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 
                 bool isSaintsSerialized = FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute);
 
-                (VisualElement result, bool _) = UIToolkitEdit.UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets, this);
+                MemberInfo memberInfo = (MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo;
+
+                (VisualElement result, bool _) = UIToolkitEdit.UIToolkitValueEdit(
+                    fieldElementOrNull,
+                    NoLabel? null: GetNiceName(FieldWithInfo),
+                    GetFieldType(FieldWithInfo),
+                    value,
+                    null,
+                    userData.Setter,
+                    !isSaintsSerialized,
+                    InAnyHorizontalLayout,
+                    ReflectCache.GetCustomAttributes(memberInfo),
+                    FieldWithInfo.Targets,
+                    this,
+                    $"{FieldWithInfo.Targets[0].GetHashCode()}.{memberInfo.Name}");
                 // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {

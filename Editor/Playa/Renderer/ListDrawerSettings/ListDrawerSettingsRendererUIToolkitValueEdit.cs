@@ -115,7 +115,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
         public static ListViewWrapper UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object rawListValue,
             object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor,
-            bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider)
+            bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider,
+            string foldoutViewKey)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render list start {listValue.Length}/{label}/{valueType}");
@@ -609,7 +610,9 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     inHorizontalLayout,
                     allAttributes,
                     targets,
-                    richTextTagProvider).result;
+                    richTextTagProvider,
+                    $"{foldoutViewKey}.[${actualIndex}]"
+                    ).result;
                 if (item != null)
                 {
                     visualElement.Clear();

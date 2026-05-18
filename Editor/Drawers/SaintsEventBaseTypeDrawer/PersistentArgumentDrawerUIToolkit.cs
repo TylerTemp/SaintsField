@@ -509,7 +509,13 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                         // Debug.Log($"re-render SerializedValueEditorRepaint");
                         SerializedValueEditorRepaint();
 
-                    }, false, true, ReflectCache.GetCustomAttributes(info), property.serializedObject.targetObjects, new RichTextDrawer.EmptyRichTextTagProvider());
+                    },
+                    false,
+                    true,
+                    ReflectCache.GetCustomAttributes(info),
+                    property.serializedObject.targetObjects,
+                    new RichTextDrawer.EmptyRichTextTagProvider(),
+                    SerializedUtils.GetUniqueId(property));
 
                 if (result != null)
                 {

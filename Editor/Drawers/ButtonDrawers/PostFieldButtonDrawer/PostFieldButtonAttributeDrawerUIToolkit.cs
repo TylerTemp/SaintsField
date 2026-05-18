@@ -62,6 +62,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
             fancyButton.ShowCloseButton(true);
         }
 
+
+
         protected override void AppendInvokeResult(VisualElement container, SerializedProperty property, int index, MethodInfo methodInfo,
             object parent, object result)
         {
@@ -79,7 +81,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
                 InHorizontalLayout,
                 ReflectCache.GetCustomAttributes(methodInfo),
                 new[]{parent},
-                this
+                this,
+                SerializedUtils.GetUniqueId(property)
             ).result;
             if (r != null)
             {
