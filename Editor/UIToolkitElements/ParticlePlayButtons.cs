@@ -60,7 +60,11 @@ namespace SaintsField.Editor.UIToolkitElements
              CheckParticleSystem();
 
              CheckPlayModeWatcher();
-             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+
+             RegisterCallback<AttachToPanelEvent>(_ =>
+                 EditorApplication.playModeStateChanged += OnPlayModeStateChanged);
+             RegisterCallback<DetachFromPanelEvent>(_ =>
+                 EditorApplication.playModeStateChanged -= OnPlayModeStateChanged);
         }
 
         private IVisualElementScheduledItem _playModeWatcher;

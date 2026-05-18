@@ -12,7 +12,6 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
 {
     public partial class InfoBoxAttributeDrawer
     {
-        #region UIToolkit
 
         private static string NameInfoBox(SerializedProperty property, int index) =>
             $"{property.propertyPath}_{index}__InfoBox";
@@ -126,8 +125,6 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
                 infoBox.userData = metaInfo;
             }
         }
-
-        #endregion
     }
 }
 #endif
