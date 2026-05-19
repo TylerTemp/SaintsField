@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.ReferencePicker
 {
@@ -50,14 +51,103 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 return newObj;
             }
             // MyObject copyObject = ...
-            Type type = oldObj.GetType();
-            while (type != null)
+
+            (IReadOnlyList<FieldInfo> sourceFields, IReadOnlyList<PropertyInfo> sourceProperties) = GetFieldProperties(oldObj.GetType());
+            (IReadOnlyList<FieldInfo> targetFields, IReadOnlyList<PropertyInfo> targetProperties) = GetFieldProperties(newObj.GetType());
+            Dictionary<string, FieldInfo> targetNameToField = targetFields.ToDictionary(fieldInfo => fieldInfo.Name);
+            Dictionary<string, PropertyInfo> targetNameToProperty = targetProperties.ToDictionary(propertyInfo => propertyInfo.Name);
+            foreach (FieldInfo sourceField in sourceFields)
             {
-                UpdateForType(type, oldObj, newObj);
-                type = type.BaseType;
+                if (!targetNameToField.TryGetValue(sourceField.Name, out FieldInfo targetField))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    object sourceValue = sourceField.GetValue(oldObj);
+                    targetField.SetValue(newObj, sourceValue);
+                }
+#pragma warning disable CS0168 // Variable is declared but never used
+                catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(e);
+#endif
+                    // ignore
+                }
             }
 
+            foreach (PropertyInfo sourceProperty in sourceProperties)
+            {
+                if (!targetNameToProperty.TryGetValue(sourceProperty.Name, out PropertyInfo targetProperty))
+                {
+                    continue;
+                }
+
+                if (!sourceProperty.CanRead || !targetProperty.CanRead)
+                {
+                    continue;
+                }
+
+                if (!targetProperty.CanWrite)
+                {
+                    continue;
+                }
+
+                if (sourceProperty.GetIndexParameters().Length != 0 || targetProperty.GetIndexParameters().Length != 0)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    object sourceValue = sourceProperty.GetValue(oldObj);
+                    targetProperty.SetValue(newObj, sourceValue);
+                }
+#pragma warning disable CS0168 // Variable is declared but never used
+                catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(e);
+#endif
+                    // ignore
+                }
+            }
+
+
+            // Type type = oldObj.GetType();
+            // while (type != null)
+            // {
+            //     UpdateForType(type, oldObj, newObj);
+            //     type = type.BaseType;
+            // }
+
             return newObj;
+        }
+
+        private static (IReadOnlyList<FieldInfo> fieldInfos, IReadOnlyList<PropertyInfo> propertyInfos)
+            GetFieldProperties(Type type)
+        {
+            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+            List<FieldInfo> fieldTargets = type.GetFields(bindAttrNormal).ToList();
+            Dictionary<string, FieldInfo> backingToFieldInfo = fieldTargets
+                .Where(each => each.Name.StartsWith("<") && each.Name.EndsWith(">k__BackingField"))
+                .ToDictionary(each => each.Name);
+            PropertyInfo[] propertyTargets = type.GetProperties(bindAttrNormal);
+            foreach (PropertyInfo propertyInfo in propertyTargets)
+            {
+                string propName = propertyInfo.Name;
+                string backingName = $"<{propName}>k__BackingField";
+                if (backingToFieldInfo.TryGetValue(backingName, out FieldInfo dupInfo))
+                {
+                    fieldTargets.Remove(dupInfo);
+                }
+            }
+
+            return (fieldTargets, propertyTargets);
         }
 
         private static void UpdateForType(Type type, object source, object destination)
@@ -67,12 +157,20 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
 
             foreach (FieldInfo fi in myObjectFields)
             {
+                // Debug.Log($"copy {fi.Name}");
                 try
                 {
-                    fi.SetValue(destination, fi.GetValue(source));
+                    object originalValue = fi.GetValue(source);
+                    fi.SetValue(destination, originalValue);
+                    // Debug.Log($"set {fi.Name}={originalValue}");
                 }
-                catch (Exception)
+#pragma warning disable CS0168 // Variable is declared but never used
+                catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
                 {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError(e);
+#endif
                     // do nothing
                     // Debug.LogException(e);
                 }

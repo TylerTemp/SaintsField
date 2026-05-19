@@ -4764,6 +4764,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1030246767
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1030246768}
+  - component: {fileID: 1030246769}
+  m_Layer: 0
+  m_Name: IObj1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1030246768
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030246767}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1507236747}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1030246769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030246767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7dfce29c6682f44cae70fc2b4250b1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ShowInInspectorGenImprove.InterObj1
 --- !u!1 &1035620224
 GameObject:
   m_ObjectHideFlags: 0
@@ -5555,6 +5599,7 @@ Transform:
   - {fileID: 494659099}
   - {fileID: 1679673133}
   - {fileID: 95150788}
+  - {fileID: 1507236747}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1175289512
@@ -6878,6 +6923,124 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 686656c53f7998841aecdf3d0da41a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1501571746
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1501571747}
+  - component: {fileID: 1501571748}
+  - component: {fileID: 1501571749}
+  m_Layer: 0
+  m_Name: IObj12
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1501571747
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501571746}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1507236747}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1501571748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501571746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7dfce29c6682f44cae70fc2b4250b1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ShowInInspectorGenImprove.InterObj1
+--- !u!114 &1501571749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501571746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7763cb0d1bfa18449bdff18489cd8340, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ShowInInspectorGenImprove.InterObj2
+--- !u!1 &1507236746
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1507236747}
+  - component: {fileID: 1507236748}
+  - component: {fileID: 1507236749}
+  m_Layer: 0
+  m_Name: ShowInInspectorGenImprove
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1507236747
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1507236746}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2142474027}
+  - {fileID: 2020960575}
+  - {fileID: 1030246768}
+  - {fileID: 1501571747}
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1507236748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1507236746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f504ae0a2170ef04f97ca5d712d76b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ShowInInspectorGenImprove.ShowInInspectorAbsUnity
+--- !u!114 &1507236749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1507236746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 429b5b34aedc7404b8ef08047fb28afa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ShowInInspectorGenImprove.ShowInInspectorInterfaceUnity
 --- !u!1 &1511218292
 GameObject:
   m_ObjectHideFlags: 0
@@ -9771,6 +9934,63 @@ MonoBehaviour:
   o1: 
   o2: 
   o3: 
+--- !u!1 &2020960574
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2020960575}
+  - component: {fileID: 2020960577}
+  - component: {fileID: 2020960576}
+  m_Layer: 0
+  m_Name: AbsU12
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2020960575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020960574}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1507236747}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2020960576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020960574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 747b6bdd3a752334593c6b9a4ff688c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ShowInInspectorGenImprove.AbsU2
+--- !u!114 &2020960577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020960574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 775054b50f5033e428801fdc17f99569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ShowInInspectorGenImprove.AbsU1
 --- !u!1 &2031599730
 GameObject:
   m_ObjectHideFlags: 0
@@ -10267,6 +10487,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   testBg: 
+--- !u!1 &2142474026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2142474027}
+  - component: {fileID: 2142474028}
+  m_Layer: 0
+  m_Name: AbsU1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2142474027
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142474026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1507236747}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2142474028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142474026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 775054b50f5033e428801fdc17f99569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.ShowInInspectorGenImprove.AbsU1
 --- !u!1001 &1136147603275953067
 PrefabInstance:
   m_ObjectHideFlags: 0

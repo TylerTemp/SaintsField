@@ -11,8 +11,10 @@ using SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
@@ -25,43 +27,38 @@ namespace SaintsField.Editor.UIToolkitElements
         public new class UxmlFactory : UxmlFactory<GeneralTypeEdit, UxmlTraits> { }
 #endif
 
-        private enum UIToolkitValueEditPayloadState
-        {
-            None,
-            FieldObject,
-            GenericType,
-        }
 
-        private Type UnityObjectOverrideType;
-        private UIToolkitValueEditPayloadState State;
-        private bool IsFullFilled;
+        private Type _unityObjectOverrideType;
+        private bool _isFullFilled;
 
-        private readonly RichTextDrawer _richTextDrawer;
         private readonly UIToolkitUtils.DropdownButtonField _dropdownBtn;
+        private readonly ObjectField _unityObjectField;
         private readonly VisualElement _checkMark;
         private readonly bool _labelGrayColor;
         private readonly bool _inHorizontalLayout;
-        private readonly IReadOnlyList<Attribute> _allAttributes;
         private readonly IRichTextTagProvider _richTextTagProvider;
         private readonly string _foldoutViewKey;
 
+        // private readonly bool _isUnityObjectOnly;
+        private readonly IReadOnlyList<Type> _canHaveUnityTypes;
+
+        // ReSharper disable once MemberCanBePrivate.Global
         public GeneralTypeEdit()
         {
         }
 
         public GeneralTypeEdit(string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull,
-            bool labelGrayColor, bool inHorizontalLayout,
-            IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider,
+            bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider,
             string foldoutViewKey)
         {
             this.value = false;
 
-            _richTextDrawer = new RichTextDrawer();
             _labelGrayColor = labelGrayColor;
             _inHorizontalLayout = inHorizontalLayout;
-            _allAttributes = allAttributes;
             _richTextTagProvider = richTextTagProvider;
             _foldoutViewKey = foldoutViewKey;
+
+            // _isUnityObjectOnly = valueType == typeof(Object) || valueType.IsSubclassOf(typeof(Object));
 
             Toggle toggle = this.Q<Toggle>();
             _checkMark = toggle.Q<VisualElement>("unity-checkmark");
@@ -75,12 +72,22 @@ namespace SaintsField.Editor.UIToolkitElements
             _dropdownBtn.style.marginLeft = 0;
             _dropdownBtn.labelElement.style.marginLeft = 0;
 
-            Type newType = value?.GetType();
-            UnityObjectOverrideType = newType;
-
             if (labelGrayColor)
             {
                 _dropdownBtn.labelElement.style.color = AbsRenderer.ReColor;
+            }
+
+            _canHaveUnityTypes = TypeCache.GetTypesDerivedFrom(valueType)
+                .Prepend(valueType)
+                .Where(each => !each.IsAbstract) // abstract classes
+                .Where(each => !each.ContainsGenericParameters) // generic classes
+                .Where(each => typeof(Object).IsAssignableFrom(each))
+                .ToArray();
+
+            Type newType = value?.GetType();
+            if(_canHaveUnityTypes.Contains(newType))
+            {
+                _unityObjectOverrideType = newType;
             }
 
             CheckRefresh(label, valueType, value, beforeSet, setterOrNull, targets);
@@ -90,7 +97,8 @@ namespace SaintsField.Editor.UIToolkitElements
 
             this.RegisterValueChangedCallback(evt =>
             {
-                if (evt.newValue && !IsFullFilled)
+                // Debug.Log($"evt.newValue={evt.newValue}, _isFullFilled={_isFullFilled}, curValue={_curValue}");
+                if (evt.newValue && !_isFullFilled)
                 {
                     FillOrUpdateExpand(
                         _curValue, contentContainer, _beforeSet, _setterOrNull,
@@ -99,6 +107,16 @@ namespace SaintsField.Editor.UIToolkitElements
                         richTextTagProvider, foldoutViewKey);
                 }
             });
+
+            // if (initValue)
+            // {
+            //     this.value = true;
+            //     schedule.Execute(() => FillOrUpdateExpand(
+            //         _curValue, contentContainer, _beforeSet, _setterOrNull,
+            //         labelGrayColor, inHorizontalLayout,
+            //         _targets,
+            //         richTextTagProvider, foldoutViewKey));
+            // }
         }
 
         private readonly bool _init;
@@ -117,6 +135,22 @@ namespace SaintsField.Editor.UIToolkitElements
             _setterOrNull = setterOrNull;
             _targets = targets;
 
+            // if (_isUnityObjectOnly)
+            // {
+            //     if (_unityObjectOnly.label != label)
+            //     {
+            //         _unityObjectOnly.label = label;
+            //     }
+            //
+            //     if (!ReferenceEquals(_unityObjectOnly.value, value))
+            //     {
+            //         _unityObjectOnly.SetValueWithoutNotify((Object)value);
+            //     }
+            //
+            //     _curValue = value;
+            //     return;
+            // }
+
             if (_dropdownBtn.label != label)
             {
                 _dropdownBtn.label = label;
@@ -124,20 +158,66 @@ namespace SaintsField.Editor.UIToolkitElements
 
             bool nullValue = value == null;
             // UIToolkitUtils.SetDisplayStyle(_checkMark, nullValue? DisplayStyle.None: DisplayStyle.Flex);
-            Visibility checkMarkVisibility = nullValue ? Visibility.Hidden : Visibility.Visible;
+            Visibility checkMarkVisibility;
+            if (nullValue && !_canHaveUnityTypes.Contains(_unityObjectOverrideType))
+            {
+                checkMarkVisibility = Visibility.Hidden;
+            }
+            else
+            {
+                checkMarkVisibility = Visibility.Visible;
+            }
+
             if (_checkMark.style.visibility != checkMarkVisibility)
             {
                 _checkMark.style.visibility = checkMarkVisibility;
             }
 
-            if (nullValue && this.value)
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            // if (nullValue && this.value && _canHaveUnityTypes.Count == 0)
+            // {
+            //     this.value = false;
+            // }
+
+            if (!nullValue && _canHaveUnityTypes.Contains(value.GetType()))
             {
-                this.value = false;
+                _unityObjectOverrideType = value.GetType();
             }
+
+            bool onUnityType = _canHaveUnityTypes.Contains(_unityObjectOverrideType);
 
             Type instanceFieldType = RuntimeUtil.IsNull(value)
                 ? null
                 : value!.GetType();
+
+            if (!_init || _curType != instanceFieldType || onUnityType)
+            {
+                string newDropdownButtonLabel;
+                if (value == null)
+                {
+                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                    if (onUnityType)
+                    {
+                        newDropdownButtonLabel =
+                            $"{_unityObjectOverrideType.Name} <color=grey>({_unityObjectOverrideType.Namespace})</color>";
+                    }
+                    else
+                    {
+                        newDropdownButtonLabel = "Null";
+                    }
+                }
+                else
+                {
+                    newDropdownButtonLabel =
+                        $"{instanceFieldType!.Name} <color=grey>({instanceFieldType.Namespace})</color>";
+                }
+
+                if (_dropdownBtn.ButtonLabelElement.text != newDropdownButtonLabel)
+                {
+                    _dropdownBtn.ButtonLabelElement.text = newDropdownButtonLabel;
+                }
+            }
+
             // Debug.Log($"{_curType?.Name}/{fieldType.Name}");
 
             if (!_init || _curType != instanceFieldType)
@@ -148,8 +228,6 @@ namespace SaintsField.Editor.UIToolkitElements
                 Type[] optionTypes = ReferencePickerAttributeDrawer
                     .GetTypesDerivedFrom(fieldType)
                     .ToArray();
-
-                _dropdownBtn.ButtonLabelElement.text = value == null? "Null": $"{instanceFieldType!.Name} <color=grey>({instanceFieldType.Namespace})</color>";
 
                 AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>();
                 bool canBeNull = !fieldType.IsValueType;
@@ -200,7 +278,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 _curValue = value;
                 if (this.value)  // expanded
                 {
-                    IsFullFilled = true;
+                    _isFullFilled = true;
                     FillOrUpdateExpand(
                         value,
                         contentContainer,
@@ -215,7 +293,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 }
                 else
                 {
-                    IsFullFilled = false;
+                    _isFullFilled = false;
                 }
             }
 
@@ -225,9 +303,14 @@ namespace SaintsField.Editor.UIToolkitElements
 
         private void OnDropdown()
         {
+            Type selectedType = _curType;
+            if (_curValue == null && _canHaveUnityTypes.Contains(_unityObjectOverrideType))
+            {
+                selectedType = _unityObjectOverrideType;
+            }
             AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
             {
-                CurValues = new []{_curType},
+                CurValues = new []{selectedType},
                 DropdownListValue = _cachedDropdownList,
                 SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
             };
@@ -243,9 +326,19 @@ namespace SaintsField.Editor.UIToolkitElements
                     Type newType = (Type)curItem;
                     _beforeSet?.Invoke(_curValue);
 
-                    if (newType == null)
+                    bool isUnityObjectType = _canHaveUnityTypes.Contains(newType);
+                    if (isUnityObjectType)
+                    {
+                        _unityObjectOverrideType = newType;
+                    }
+
+                    if (newType == null || isUnityObjectType)
                     {
                         _setterOrNull?.Invoke(null);
+                        if (value)
+                        {
+                            UpdateOrAddUnityObjectField(contentContainer, null);
+                        }
                         return null;
                     }
 
@@ -272,7 +365,8 @@ namespace SaintsField.Editor.UIToolkitElements
             ));
         }
 
-        private static void FillOrUpdateExpand(object value,
+        // ReSharper disable once ParameterHidesMember
+        private void FillOrUpdateExpand(object value,
             VisualElement fieldsBody,
             Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout,
             IReadOnlyList<object> targets, IRichTextTagProvider richTextTagProvider,
@@ -283,7 +377,20 @@ namespace SaintsField.Editor.UIToolkitElements
             bool valueIsNull = RuntimeUtil.IsNull(value);
             if (valueIsNull)
             {
-                fieldsBody.Clear();
+                if (_canHaveUnityTypes.Count > 0 && _unityObjectOverrideType != null)
+                {
+                    UpdateOrAddUnityObjectField(fieldsBody, null);
+                }
+                else
+                {
+                    fieldsBody.Clear();
+                }
+                return;
+            }
+
+            if (_canHaveUnityTypes.Contains(value.GetType()))
+            {
+                UpdateOrAddUnityObjectField(fieldsBody, (Object) value);
                 return;
             }
 
@@ -519,6 +626,44 @@ namespace SaintsField.Editor.UIToolkitElements
             foreach (VisualElement noLongNeedChildren in children)
             {
                 noLongNeedChildren.RemoveFromHierarchy();
+            }
+        }
+
+        private void UpdateOrAddUnityObjectField(VisualElement fieldsBody, Object uObj)
+        {
+            string className = $"{_foldoutViewKey}[object]";
+            ObjectField field = fieldsBody.Q<ObjectField>(className: className);
+            if (field == null)
+            {
+                // Debug.Log($"not found {className} for Unity object {UnityObjectOverrideType?.Name}, create");
+                ObjectField newCreated = new ObjectField
+                {
+                    objectType = _unityObjectOverrideType,
+                    allowSceneObjects = true,
+                };
+                newCreated.AddToClassList(className);
+                fieldsBody.Add(newCreated);
+
+                newCreated.RegisterValueChangedCallback(evt =>
+                {
+                    Object newValue = evt.newValue;
+                    _beforeSet?.Invoke(_curValue);
+                    _setterOrNull?.Invoke(newValue);
+                });
+                field = newCreated;
+            }
+            else
+            {
+                if (field.objectType != _unityObjectOverrideType)
+                {
+                    // Debug.Log($"update unityType from {field.objectType} to {UnityObjectOverrideType}");
+                    field.objectType = _unityObjectOverrideType;
+                }
+            }
+
+            if (!ReferenceEquals(field.value, uObj))
+            {
+                field.SetValueWithoutNotify(uObj);
             }
         }
     }

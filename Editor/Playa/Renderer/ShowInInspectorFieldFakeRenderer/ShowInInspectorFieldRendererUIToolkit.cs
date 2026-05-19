@@ -450,7 +450,7 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 if(result != null)
                 {
                     resultContainer.Clear();
-                    container.Add(result);
+                    resultContainer.Add(result);
                     userData.HasDrawer = true;
                     errorContainer.SetErrorMessage("");
                 }

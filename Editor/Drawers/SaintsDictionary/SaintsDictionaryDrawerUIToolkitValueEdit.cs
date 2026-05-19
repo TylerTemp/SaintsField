@@ -407,6 +407,10 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 itemsSource = payload.GetKeys().ToList(),
                 userData = payload,
             }, dictKeyType, dictValueType, payload, inHorizontalLayout, targets, richTextTagProvider, $"{foldoutViewKey}.[dict]");
+            if (labelGrayColor)
+            {
+                dictField.Q<Label>().style.color = AbsRenderer.ReColor;
+            }
 
             // Size
             if (isReadOnly)

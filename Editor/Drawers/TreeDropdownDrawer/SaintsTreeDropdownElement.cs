@@ -97,7 +97,14 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
 
             Add(treeContainer);
             _scrollView = treeContainer;
-            treeContainer.RegisterCallback<GeometryChangedEvent>(OnTreeGeometryChanged);
+            // treeContainer.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedReCalcScroll);
+            _scrollView.contentContainer.RegisterCallback<GeometryChangedEvent>(OnGeometryChangedReCalcScroll);
+            RegisterCallback<AttachToPanelEvent>(AttachToPanelEventReCalcScroll);
+
+            // treeContainer.RegisterCallback<AttachToPanelEvent>(_ =>
+            // {
+            //
+            // });
 
 #if UNITY_6000_0_OR_NEWER
             _toolbarSearchField.placeholderText = "Search";
@@ -275,9 +282,13 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             });
         }
 
+        private void AttachToPanelEventReCalcScroll(AttachToPanelEvent evt) => ReCalcScroll();
+
         private bool _hasHorizontalScrollerOnce;
 
-        private void OnTreeGeometryChanged(GeometryChangedEvent evt)
+        private void OnGeometryChangedReCalcScroll(GeometryChangedEvent evt) => ReCalcScroll();
+
+        private void ReCalcScroll()
         {
             // Debug.Log(_scrollView.horizontalScroller);
             float width = _scrollView.horizontalScroller.resolvedStyle.width;

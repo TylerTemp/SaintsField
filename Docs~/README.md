@@ -9173,7 +9173,7 @@ See the example above.
 
 ## Misc ##
 
-### About GroupBy ##
+### About GroupBy ###
 
 group with any decorator that has the same `groupBy` for this field. The same group will share even the width of the view width between them.
 
@@ -9400,7 +9400,7 @@ public EnumF enumF;
 [EnableIf(nameof(enumF), EnumF.A | EnumF.B), LabelText("hasFlag(A | B)")] public string enumFEnableAB;
 ```
 
-### Saints XPath-like Syntax ##
+### Saints XPath-like Syntax ###
 
 #### XPath ####
 

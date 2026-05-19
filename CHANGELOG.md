@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.14.4 ##
+
+1.  Improve: `ShowInInspector` better UI for general class/struct
+2.  Improve: `ReferencePicker` now can handle more cases when copying data from one type to another
+
 ## 5.14.3 ##
 
 1.  Add: `EndText` add `show` parameters to controll it's shown or not [#390](https://github.com/TylerTemp/SaintsField/issues/390)

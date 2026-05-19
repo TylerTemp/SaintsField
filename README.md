@@ -296,13 +296,13 @@ namespace: `SaintsField`
     *   [Life Cycle & Functions](https://saintsfield.comes.today/saintseditorwindow/life-cycle--functions)
     *   [`WindowInlineEditor`](https://saintsfield.comes.today/saintseditorwindow/windowinlineeditor)
 *   Misc
-    *   [About GroupBy ##](https://saintsfield.comes.today/misc/about-groupby-)
+    *   [About GroupBy](https://saintsfield.comes.today/misc/about-groupby)
     *   [`EMode`](https://saintsfield.comes.today/misc/emode)
     *   [Callback](https://saintsfield.comes.today/misc/callback)
     *   [Syntax for Show/Hide/Enable/Disable/Required-If](https://saintsfield.comes.today/misc/syntax-for-showhideenabledisablerequired-if)
-    *   Saints XPath-like Syntax ##
-        *   [XPath](https://saintsfield.comes.today/misc/saints-xpath-like-syntax-/xpath)
-        *   [`EXP`](https://saintsfield.comes.today/misc/saints-xpath-like-syntax-/exp)
+    *   Saints XPath-like Syntax
+        *   [XPath](https://saintsfield.comes.today/misc/saints-xpath-like-syntax/xpath)
+        *   [`EXP`](https://saintsfield.comes.today/misc/saints-xpath-like-syntax/exp)
     *   [Add a Macro](https://saintsfield.comes.today/misc/add-a-macro)
     *   [Auto Validator](https://saintsfield.comes.today/misc/auto-validator)
     *   [Use With Other Drawers](https://saintsfield.comes.today/misc/use-with-other-drawers)
