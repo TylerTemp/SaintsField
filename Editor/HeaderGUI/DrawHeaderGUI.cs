@@ -38,7 +38,29 @@ namespace SaintsField.Editor.HeaderGUI
         [InitializeOnLoadMethod]
         public static void InitOnLoad()
         {
-            EditorApplication.delayCall += DelayCallEnsureInitLoad;
+            // EditorApplication.delayCall += DelayCallEnsureInitLoad;
+            UnityEditor.Editor.finishedDefaultHeaderGUI -= OnFinishedHeaderGUI;
+            UnityEditor.Editor.finishedDefaultHeaderGUI += OnFinishedHeaderGUI;
+        }
+
+        private static readonly HashSet<Object> CheckedTargets = new HashSet<Object>();
+
+        private static void OnFinishedHeaderGUI(UnityEditor.Editor editor)
+        {
+            // Debug.Log(editor.target);
+            if (_initLoad)
+            {
+                return;
+            }
+
+            Object target = editor.target;
+            // ReSharper disable once InvertIf
+            if(CheckedTargets.Add(target))
+            {
+                // InitLoad();
+                _initStartTime = EditorApplication.timeSinceStartup;
+                EditorApplication.delayCall += LoopEnsureInitLoadUntilTimeout;
+            }
         }
 
         private static double _initStartTime;
@@ -50,21 +72,21 @@ namespace SaintsField.Editor.HeaderGUI
             _initStartTime = EditorApplication.timeSinceStartup;
             LoopEnsureInitLoadUntilTimeout();
 
-            EditorApplication.playModeStateChanged += PlayModeStateChangedEnsureInitLoad;
+            // EditorApplication.playModeStateChanged += PlayModeStateChangedEnsureInitLoad;
         }
 
-        private static void PlayModeStateChangedEnsureInitLoad(PlayModeStateChange state)
-        {
-            if(state is PlayModeStateChange.EnteredPlayMode or PlayModeStateChange.EnteredEditMode)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_COMPONENT_HEADER
-                Debug.Log($"play mode changed ensure init {state}");
-#endif
-
-                _initStartTime = EditorApplication.timeSinceStartup;
-                LoopEnsureInitLoadUntilTimeout();
-            }
-        }
+//         private static void PlayModeStateChangedEnsureInitLoad(PlayModeStateChange state)
+//         {
+//             if(state is PlayModeStateChange.EnteredPlayMode or PlayModeStateChange.EnteredEditMode)
+//             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_COMPONENT_HEADER
+//                 Debug.Log($"play mode changed ensure init {state}");
+// #endif
+//
+//                 _initStartTime = EditorApplication.timeSinceStartup;
+//                 LoopEnsureInitLoadUntilTimeout();
+//             }
+//         }
 
         private static void LoopEnsureInitLoadUntilTimeout()
         {

@@ -5544,7 +5544,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1175289511}
-  - component: {fileID: 1175289512}
   m_Layer: 0
   m_Name: Testing
   m_TagString: Untagged
@@ -5602,30 +5601,6 @@ Transform:
   - {fileID: 1507236747}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1175289512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1175289510}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce44f8b8b06b86e4c9cbf3c807834fc9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.SaveRestoreTest
-  myInterface:
-    rid: 8269941826369880134
-  myClass:
-    myClass: over!
-  lis: []
-  references:
-    version: 2
-    RefIds:
-    - rid: 8269941826369880134
-      type: {class: SaveRestoreTest/MyClass, ns: SaintsField.Samples.Scripts.SaintsEditor.Testing, asm: SaintsField.Samples}
-      data:
-        myClass: fff
 --- !u!1 &1196999815
 GameObject:
   m_ObjectHideFlags: 0
