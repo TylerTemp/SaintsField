@@ -198,8 +198,9 @@ namespace SaintsField.Editor.UIToolkitElements
                     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                     if (onUnityType)
                     {
+                        // Don't use color=gray or Color=grey, and fuck Unity
                         newDropdownButtonLabel =
-                            $"{_unityObjectOverrideType.Name} <color=grey>({_unityObjectOverrideType.Namespace})</color>";
+                            $"{_unityObjectOverrideType.Name} <color=#808080ff>({_unityObjectOverrideType.Namespace})</color>";
                     }
                     else
                     {
@@ -209,7 +210,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 else
                 {
                     newDropdownButtonLabel =
-                        $"{instanceFieldType!.Name} <color=grey>({instanceFieldType.Namespace})</color>";
+                        $"{instanceFieldType!.Name} <color=#808080ff>({instanceFieldType.Namespace})</color>";
                 }
 
                 if (_dropdownBtn.ButtonLabelElement.text != newDropdownButtonLabel)
