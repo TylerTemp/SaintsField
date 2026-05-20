@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
             {
                 value = value,
             };
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)

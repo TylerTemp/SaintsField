@@ -107,16 +107,6 @@ namespace SaintsField.Editor.UIToolkitElements
                         richTextTagProvider, foldoutViewKey);
                 }
             });
-
-            // if (initValue)
-            // {
-            //     this.value = true;
-            //     schedule.Execute(() => FillOrUpdateExpand(
-            //         _curValue, contentContainer, _beforeSet, _setterOrNull,
-            //         labelGrayColor, inHorizontalLayout,
-            //         _targets,
-            //         richTextTagProvider, foldoutViewKey));
-            // }
         }
 
         private readonly bool _init;
@@ -134,22 +124,6 @@ namespace SaintsField.Editor.UIToolkitElements
             _beforeSet = beforeSet;
             _setterOrNull = setterOrNull;
             _targets = targets;
-
-            // if (_isUnityObjectOnly)
-            // {
-            //     if (_unityObjectOnly.label != label)
-            //     {
-            //         _unityObjectOnly.label = label;
-            //     }
-            //
-            //     if (!ReferenceEquals(_unityObjectOnly.value, value))
-            //     {
-            //         _unityObjectOnly.SetValueWithoutNotify((Object)value);
-            //     }
-            //
-            //     _curValue = value;
-            //     return;
-            // }
 
             if (_dropdownBtn.label != label)
             {
@@ -240,6 +214,13 @@ namespace SaintsField.Editor.UIToolkitElements
                         dropdownList.AddSeparator();
                     }
                 }
+
+                DisplayStyle dropdownBtnDisplay = DisplayStyle.Flex;
+                if (optionTypes.Length <= 1 && !canBeNull)
+                {
+                    dropdownBtnDisplay =  DisplayStyle.None;
+                }
+                UIToolkitUtils.SetDisplayStyle(_dropdownBtn.ButtonElement, dropdownBtnDisplay);
 
                 Dictionary<string, List<Type>> nameSpaceToTypes = new Dictionary<string, List<Type>>();
                 foreach (Type type in optionTypes)

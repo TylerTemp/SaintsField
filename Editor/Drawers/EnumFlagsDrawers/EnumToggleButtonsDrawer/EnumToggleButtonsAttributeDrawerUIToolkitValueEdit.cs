@@ -72,7 +72,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
                 UIToolkitFieldWrapper uiToolkitFieldWrapper = new UIToolkitFieldWrapper(label, visualInput);
                 Add(uiToolkitFieldWrapper);
-                UIToolkitUtils.UIToolkitValueEditAfterProcess(uiToolkitFieldWrapper, setterOrNull,
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(uiToolkitFieldWrapper, setterOrNull != null,
                     labelGrayColor, inHorizontalLayout);
 
                 SubPanel = new VisualElement

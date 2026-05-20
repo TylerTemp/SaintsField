@@ -162,22 +162,72 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94dfbbbe1c384cf40adfde05dfeed3a1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: NewAssembly::Samples.Scripts.UnityMath.SerMath
-  f2:
+  m_EditorClassIdentifier: UnityMath::Samples.Scripts.UnityMath.SerMath
+  b2:
     x: 0
     y: 0
-  f3:
+  b3:
     x: 0
     y: 0
     z: 0
-  f2x2:
+  b4:
+    x: 1
+    y: 1
+    z: 1
+    w: 1
+  b2x2:
     c0:
-      x: 0
+      x: 1
       y: 0
     c1:
       x: 0
+      y: 1
+  b2x3:
+    c0:
+      x: 1
+      y: 1
+    c1:
+      x: 1
       y: 0
-  f3x4:
+    c2:
+      x: 1
+      y: 1
+  b2x4:
+    c0:
+      x: 1
+      y: 0
+    c1:
+      x: 0
+      y: 1
+    c2:
+      x: 1
+      y: 0
+    c3:
+      x: 0
+      y: 1
+  b3x2:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+  b3x3:
+    c0:
+      x: 1
+      y: 0
+      z: 1
+    c1:
+      x: 0
+      y: 1
+      z: 0
+    c2:
+      x: 1
+      y: 0
+      z: 1
+  b3x4:
     c0:
       x: 0
       y: 0
@@ -194,6 +244,291 @@ MonoBehaviour:
       x: 0
       y: 0
       z: 0
+  b4x2:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+  b4x3:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c2:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+  b4x4:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c2:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c3:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+  d2:
+    x: 1.13
+    y: 0.22
+  d3:
+    x: 0
+    y: 0
+    z: 0
+  d4:
+    x: -0.21
+    y: 0.85
+    z: -0.3
+    w: 0.12
+  d2x2:
+    c0:
+      x: 2
+      y: 0
+    c1:
+      x: 0
+      y: 3
+  d2x3:
+    c0:
+      x: 0
+      y: 0
+    c1:
+      x: 0
+      y: 0
+    c2:
+      x: 0
+      y: 0
+  d2x4:
+    c0:
+      x: 0
+      y: 0
+    c1:
+      x: 0
+      y: 0
+    c2:
+      x: 0
+      y: 0
+    c3:
+      x: 0
+      y: 0
+  d3x2:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+  d3x3:
+    c0:
+      x: 1
+      y: 0
+      z: 6
+    c1:
+      x: 0
+      y: 2
+      z: 0
+    c2:
+      x: 4
+      y: 0
+      z: 3
+  d3x4:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+    c2:
+      x: 0
+      y: 0
+      z: 0
+    c3:
+      x: 0
+      y: 0
+      z: 0
+  d4x2:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+  d4x3:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c2:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+  d4x4:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c2:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c3:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+  f2:
+    x: 0
+    y: 0
+  f3:
+    x: 0
+    y: 0
+    z: 0
+  f4:
+    x: 0
+    y: 0
+    z: 0
+    w: 0
+  f2x2:
+    c0:
+      x: 0
+      y: 0
+    c1:
+      x: 0
+      y: 0
+  f2x3:
+    c0:
+      x: 8
+      y: 4
+    c1:
+      x: 7
+      y: 3
+    c2:
+      x: 6
+      y: 2
+  f2x4:
+    c0:
+      x: 9
+      y: 5
+    c1:
+      x: 2
+      y: 6
+    c2:
+      x: 3
+      y: 0
+    c3:
+      x: 4
+      y: 8
+  f3x2:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+  f3x3:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+    c2:
+      x: 0
+      y: 0
+      z: 0
+  f3x4:
+    c0:
+      x: 2
+      y: 1
+      z: 0
+    c1:
+      x: 3
+      y: 2
+      z: 0
+    c2:
+      x: 4
+      y: 3
+      z: 0
+    c3:
+      x: 5
+      y: 4
+      z: 0
+  f4x2:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+  f4x3:
+    c0:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c1:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+    c2:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
   f4x4:
     c0:
       x: 0
@@ -211,12 +546,6 @@ MonoBehaviour:
       z: 0
       w: 0
     c3:
-      x: 0
-      y: 0
-      z: 0
-      w: 0
-  quat:
-    value:
       x: 0
       y: 0
       z: 0

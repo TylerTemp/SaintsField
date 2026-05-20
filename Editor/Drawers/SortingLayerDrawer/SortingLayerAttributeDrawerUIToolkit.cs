@@ -181,7 +181,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                     value = value,
                 };
 
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)
@@ -213,7 +213,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                     value = value,
                 };
 
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)

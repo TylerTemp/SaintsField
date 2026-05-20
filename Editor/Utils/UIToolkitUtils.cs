@@ -2904,14 +2904,10 @@ namespace SaintsField.Editor.Utils
 
         public static void UIToolkitValueEditAfterProcess<T>(
             BaseField<T> element,
-            Action<object> setterOrNull,
+            bool hasSetter,
             bool labelGrayColor,
             bool inHorizontalLayout)
         {
-            if (labelGrayColor)
-            {
-                element.labelElement.style.color = AbsRenderer.ReColor;
-            }
             if (inHorizontalLayout)
             {
                 element.style.flexDirection = FlexDirection.Column;
@@ -2920,14 +2916,29 @@ namespace SaintsField.Editor.Utils
             {
                 element.AddToClassList(BaseField<T>.alignedFieldUssClassName);
             }
-            if (setterOrNull == null)
+
+            UIToolkitValueEditAfterProcessBase(element, element.labelElement, hasSetter, labelGrayColor);
+        }
+
+        public static void UIToolkitValueEditAfterProcessBase(
+            VisualElement element,
+            VisualElement labelElement,
+            bool hasSetter,
+            bool labelGrayColor)
+        {
+            if (labelGrayColor)
             {
-                element.SetEnabled(false);
-                element.AddToClassList(AbsRenderer.ClassSaintsFieldEditingDisabled);
+                labelElement.style.color = AbsRenderer.ReColor;
+            }
+
+            if (hasSetter)
+            {
+                element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
             }
             else
             {
-                element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
+                element.SetEnabled(false);
+                element.AddToClassList(AbsRenderer.ClassSaintsFieldEditingDisabled);
             }
         }
 

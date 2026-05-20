@@ -30,7 +30,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 UIToolkitUtils.DropdownButtonField dropdownButtonField = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
                 Add(dropdownButtonField);
                 _buttonField = dropdownButtonField;
-                UIToolkitUtils.UIToolkitValueEditAfterProcess(dropdownButtonField, setterOrNull,
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(dropdownButtonField, setterOrNull != null,
                     labelGrayColor, inHorizontalLayout);
 
                 HelpBox helpBox = new HelpBox("", HelpBoxMessageType.Error)

@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Drawers.RateDrawer
                     value = value,
                 };
 
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)

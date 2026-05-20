@@ -29,6 +29,11 @@ using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.UIToolkitElements;
+using SaintsField.Editor.UIToolkitElements.EditWrapper;
+using SaintsField.Editor.UIToolkitElements.MathematicsHalfUShort;
+using SaintsField.Editor.UIToolkitElements.Vector2DoubleType;
+using SaintsField.Editor.UIToolkitElements.Vector3DoubleType;
+using SaintsField.Editor.UIToolkitElements.Vector4DoubleType;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor.UIElements;
@@ -1819,21 +1824,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                     allAttributes,
                                     targets), false);
                             }
-                            else
-                            {
-                                return (ValueButtonsAttributeDrawer.UIToolkitValueEditEnum(
-                                    oldElement,
-                                    new ValueButtonsAttribute(),
-                                    label,
-                                    value,
-                                    enumType,
-                                    beforeSet,
-                                    setterOrNull,
-                                    labelGrayColor,
-                                    inHorizontalLayout,
-                                    allAttributes,
-                                    targets), false);
-                            }
+
+                            return (ValueButtonsAttributeDrawer.UIToolkitValueEditEnum(
+                                oldElement,
+                                new ValueButtonsAttribute(),
+                                label,
+                                value,
+                                enumType,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                         }
                     }
                 }
@@ -2109,6 +2112,1706 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             #endregion
 
 
+            #region com.unity.mathematics
+
+#if SAINTSFIELD_UNITY_MATHEMATICS && !SAINTSFIELD_UNITY_MATHEMATICS_DISABLE
+
+            #region bool2
+            if (value is Unity.Mathematics.bool2 bool2)
+            {
+                if (oldElement is MultiBooleanField { Count: 2 } multiBooleanField)
+                {
+                    multiBooleanField.SetValueWithoutNotify(new[]{bool2.x, bool2.y});
+                    return (null, false);
+                }
+
+                MultiBooleanField element = MultiBooleanField.Create(2, label, setterOrNull != null, labelGrayColor,
+                    inHorizontalLayout);
+                element.value = new[] { bool2.x, bool2.y };
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.bool2(evt.previousValue[0], evt.previousValue[1]));
+                        setterOrNull(new Unity.Mathematics.bool2(evt.newValue[0], evt.newValue[1]));
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region bool3
+            if (value is Unity.Mathematics.bool3 bool3)
+            {
+                if (oldElement is MultiBooleanField { Count: 3 } multiBooleanField)
+                {
+                    multiBooleanField.SetValueWithoutNotify(new[]{bool3.x, bool3.y, bool3.z});
+                    return (null, false);
+                }
+
+                MultiBooleanField element = MultiBooleanField.Create(3, label, setterOrNull != null, labelGrayColor,
+                    inHorizontalLayout);
+                element.value = new[] { bool3.x, bool3.y, bool3.z };
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.bool3(evt.previousValue[0], evt.previousValue[1], evt.previousValue[2]));
+                        setterOrNull(new Unity.Mathematics.bool3(evt.newValue[0], evt.newValue[1], evt.newValue[2]));
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region bool4
+            if (value is Unity.Mathematics.bool4 bool4)
+            {
+                if (oldElement is MultiBooleanField { Count: 4 } multiBooleanField)
+                {
+                    multiBooleanField.SetValueWithoutNotify(new[]{bool4.x, bool4.y, bool4.z, bool4.w});
+                    return (null, false);
+                }
+
+                MultiBooleanField element = MultiBooleanField.Create(4, label, setterOrNull != null, labelGrayColor,
+                    inHorizontalLayout);
+                element.value = new[] { bool4.x, bool4.y, bool4.z, bool4.w };
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.bool4(evt.previousValue[0], evt.previousValue[1], evt.previousValue[2], evt.previousValue[3]));
+                        setterOrNull(new Unity.Mathematics.bool4(evt.newValue[0], evt.newValue[1], evt.newValue[2], evt.newValue[3]));
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region bool2x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.bool2x2 bool2x2)
+            {
+                bool[][] updateValue = {
+                    new[] { bool2x2.c0.x, bool2x2.c1.x },
+                    new[] { bool2x2.c0.y, bool2x2.c1.y },
+                };
+                if (oldElement is MatrixBooleanField { RowCount: 2, ColumnCount: 2 } oldMatrixBooleanField)
+                {
+                    oldMatrixBooleanField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixBooleanField element = new MatrixBooleanField(label, 2, 2)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        bool[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.bool2x2(
+                            oldValue[0][0], oldValue[0][1],
+                            oldValue[1][0], oldValue[1][1]));
+                        bool[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.bool2x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region bool2x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.bool2x3 bool2x3)
+            {
+                bool[][] updateValue = {
+                    new[] { bool2x3.c0.x, bool2x3.c1.x, bool2x3.c2.x, },
+                    new[] { bool2x3.c0.y, bool2x3.c1.y, bool2x3.c2.y, },
+                };
+                if (oldElement is MatrixBooleanField { RowCount: 2, ColumnCount: 3 } oldMatrixBooleanField)
+                {
+                    oldMatrixBooleanField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixBooleanField element = new MatrixBooleanField(label, 2, 3)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        bool[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.bool2x3(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2]));
+                        bool[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.bool2x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region bool2x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.bool2x4 bool2x4)
+            {
+                bool[][] updateValue = {
+                    new[] { bool2x4.c0.x, bool2x4.c1.x, bool2x4.c2.x, bool2x4.c3.x },
+                    new[] { bool2x4.c0.y, bool2x4.c1.y, bool2x4.c2.y, bool2x4.c3.y },
+                };
+                if (oldElement is MatrixBooleanField { RowCount: 2, ColumnCount: 4 } oldMatrixBooleanField)
+                {
+                    oldMatrixBooleanField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixBooleanField element = new MatrixBooleanField(label, 2, 4)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        bool[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.bool2x4(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2], oldValue[0][3],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2], oldValue[1][3]));
+                        bool[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.bool2x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region bool3x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.bool3x2 bool3x2)
+            {
+                bool[][] updateValue = {
+                    new[] { bool3x2.c0.x, bool3x2.c1.x },
+                    new[] { bool3x2.c0.y, bool3x2.c1.y },
+                    new[] { bool3x2.c0.z, bool3x2.c1.z },
+                };
+                if (oldElement is MatrixBooleanField { RowCount: 3, ColumnCount: 2 } oldMatrixBooleanField)
+                {
+                    oldMatrixBooleanField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixBooleanField element = new MatrixBooleanField(label, 3, 2)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        bool[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.bool3x2(
+                            oldValue[0][0], oldValue[0][1],
+                            oldValue[1][0], oldValue[1][1],
+                            oldValue[2][0], oldValue[2][1]));
+                        bool[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.bool3x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1],
+                            newValue[2][0], newValue[2][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region bool3x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.bool3x3 bool3x3)
+            {
+                bool[][] updateValue = {
+                    new[] { bool3x3.c0.x, bool3x3.c1.x, bool3x3.c2.x },
+                    new[] { bool3x3.c0.y, bool3x3.c1.y, bool3x3.c2.y },
+                    new[] { bool3x3.c0.z, bool3x3.c1.z, bool3x3.c2.z },
+                };
+                if (oldElement is MatrixBooleanField { RowCount: 3, ColumnCount: 3 } oldMatrixBooleanField)
+                {
+                    oldMatrixBooleanField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixBooleanField element = new MatrixBooleanField(label, 3, 3)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        bool[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.bool3x3(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2],
+                            oldValue[2][0], oldValue[2][1], oldValue[2][2]));
+                        bool[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.bool3x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2],
+                            newValue[2][0], newValue[2][1], newValue[2][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region bool3x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.bool3x4 bool3x4)
+            {
+                bool[][] updateValue = {
+                    new[] { bool3x4.c0.x, bool3x4.c1.x, bool3x4.c2.x, bool3x4.c3.x },
+                    new[] { bool3x4.c0.y, bool3x4.c1.y, bool3x4.c2.y, bool3x4.c3.y },
+                    new[] { bool3x4.c0.z, bool3x4.c1.z, bool3x4.c2.z, bool3x4.c3.z },
+                };
+                if (oldElement is MatrixBooleanField { RowCount: 3, ColumnCount: 4 } oldMatrixBooleanField)
+                {
+                    oldMatrixBooleanField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixBooleanField element = new MatrixBooleanField(label, 3, 4)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        bool[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.bool3x4(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2], oldValue[0][3],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2], oldValue[1][3],
+                            oldValue[2][0], oldValue[2][1], oldValue[2][2], oldValue[2][3]));
+                        bool[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.bool3x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3],
+                            newValue[2][0], newValue[2][1], newValue[2][2], newValue[2][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region bool4x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.bool4x2 bool4x2)
+            {
+                bool[][] updateValue = {
+                    new[] { bool4x2.c0.x, bool4x2.c1.x },
+                    new[] { bool4x2.c0.y, bool4x2.c1.y },
+                    new[] { bool4x2.c0.z, bool4x2.c1.z },
+                    new[] { bool4x2.c0.w, bool4x2.c1.w },
+                };
+                if (oldElement is MatrixBooleanField { RowCount: 4, ColumnCount: 2 } oldMatrixBooleanField)
+                {
+                    oldMatrixBooleanField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixBooleanField element = new MatrixBooleanField(label, 4, 2)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        bool[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.bool4x2(
+                            oldValue[0][0], oldValue[0][1],
+                            oldValue[1][0], oldValue[1][1],
+                            oldValue[2][0], oldValue[2][1],
+                            oldValue[3][0], oldValue[3][1]));
+                        bool[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.bool4x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1],
+                            newValue[2][0], newValue[2][1],
+                            newValue[3][0], newValue[3][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region bool4x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.bool4x3 bool4x3)
+            {
+                bool[][] updateValue = {
+                    new[] { bool4x3.c0.x, bool4x3.c1.x, bool4x3.c2.x },
+                    new[] { bool4x3.c0.y, bool4x3.c1.y, bool4x3.c2.y },
+                    new[] { bool4x3.c0.z, bool4x3.c1.z, bool4x3.c2.z },
+                    new[] { bool4x3.c0.w, bool4x3.c1.w, bool4x3.c2.w },
+                };
+                if (oldElement is MatrixBooleanField { RowCount: 4, ColumnCount: 3 } oldMatrixBooleanField)
+                {
+                    oldMatrixBooleanField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixBooleanField element = new MatrixBooleanField(label, 4, 3)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        bool[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.bool4x3(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2],
+                            oldValue[2][0], oldValue[2][1], oldValue[2][2],
+                            oldValue[3][0], oldValue[3][1], oldValue[3][2]));
+                        bool[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.bool4x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2],
+                            newValue[2][0], newValue[2][1], newValue[2][2],
+                            newValue[3][0], newValue[3][1], newValue[3][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region bool4x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.bool4x4 bool4x4)
+            {
+                bool[][] updateValue = {
+                    new[] { bool4x4.c0.x, bool4x4.c1.x, bool4x4.c2.x, bool4x4.c3.x },
+                    new[] { bool4x4.c0.y, bool4x4.c1.y, bool4x4.c2.y, bool4x4.c3.y },
+                    new[] { bool4x4.c0.z, bool4x4.c1.z, bool4x4.c2.z, bool4x4.c3.z },
+                    new[] { bool4x4.c0.w, bool4x4.c1.w, bool4x4.c2.w, bool4x4.c3.w },
+                };
+                if (oldElement is MatrixBooleanField { RowCount: 4, ColumnCount: 4 } oldMatrixBooleanField)
+                {
+                    oldMatrixBooleanField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixBooleanField element = new MatrixBooleanField(label, 4, 4)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        bool[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.bool4x4(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2], oldValue[0][3],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2], oldValue[1][3],
+                            oldValue[2][0], oldValue[2][1], oldValue[2][2], oldValue[2][3],
+                            oldValue[3][0], oldValue[3][1], oldValue[3][2], oldValue[3][3]));
+                        bool[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.bool4x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3],
+                            newValue[2][0], newValue[2][1], newValue[2][2], newValue[2][3],
+                            newValue[3][0], newValue[3][1], newValue[3][2], newValue[3][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region double2
+            if (value is Unity.Mathematics.double2 double2)
+            {
+                Vector2Double updateValue = new Vector2Double(double2.x, double2.y);
+                if (oldElement is Vector2DoubleField oldVector2Field)
+                {
+                    oldVector2Field.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                Vector2DoubleField element = new Vector2DoubleField(label)
+                {
+                    value = updateValue,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.double2(evt.previousValue.x, evt.previousValue.y));
+                        setterOrNull(new Unity.Mathematics.double2(evt.newValue.x, evt.newValue.y));
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region double3
+            if (value is Unity.Mathematics.double3 double3)
+            {
+                Vector3Double updateValue = new Vector3Double(double3.x, double3.y, double3.z);
+                if (oldElement is Vector3DoubleField oldVector3Field)
+                {
+                    oldVector3Field.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                Vector3DoubleField element = new Vector3DoubleField(label)
+                {
+                    value = updateValue,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.double3(evt.previousValue.x, evt.previousValue.y, evt.previousValue.z));
+                        setterOrNull(new Unity.Mathematics.double3(evt.newValue.x, evt.newValue.y, evt.newValue.z));
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region double4
+            if (value is Unity.Mathematics.double4 double4)
+            {
+                Vector4Double updateValue = new Vector4Double(double4.x, double4.y, double4.z, double4.w);
+                if (oldElement is Vector4DoubleField oldVector4Field)
+                {
+                    oldVector4Field.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                Vector4DoubleField element = new Vector4DoubleField(label)
+                {
+                    value = updateValue,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.double4(evt.previousValue.x, evt.previousValue.y, evt.previousValue.z, evt.previousValue.w));
+                        setterOrNull(new Unity.Mathematics.double4(evt.newValue.x, evt.newValue.y, evt.newValue.z, evt.newValue.w));
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region double2x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.double2x2 double2x2)
+            {
+                double[][] updatedValue = {
+                    new[] { double2x2.c0.x, double2x2.c1.x },
+                    new[] { double2x2.c0.y, double2x2.c1.y },
+                };
+
+                if (oldElement is MatrixField<DoubleField, double> { RowCount: 2, ColumnCount: 2 } oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(updatedValue);
+                    return (null, false);
+                }
+
+                MatrixField<DoubleField, double> element = new MatrixField<DoubleField, double>(label, 2, 2)
+                {
+                    value = updatedValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        double[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.double2x2(
+                            oldValue[0][0], oldValue[0][1],
+                            oldValue[1][0], oldValue[1][1]));
+                        double[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.double2x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region double2x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.double2x3 double2x3)
+            {
+                double[][] updatedValue = {
+                    new[] { double2x3.c0.x, double2x3.c1.x, double2x3.c2.x, },
+                    new[] { double2x3.c0.y, double2x3.c1.y, double2x3.c2.y, },
+                };
+
+                if (oldElement is MatrixField<DoubleField, double> { RowCount: 2, ColumnCount: 3 } oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(updatedValue);
+                    return (null, false);
+                }
+
+                MatrixField<DoubleField, double> element = new MatrixField<DoubleField, double>(label, 2, 3)
+                {
+                    value = updatedValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        double[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.double2x3(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2]));
+                        double[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.double2x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region double2x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.double2x4 double2x4)
+            {
+                double[][] updatedValue = {
+                    new[] { double2x4.c0.x, double2x4.c1.x, double2x4.c2.x, double2x4.c3.x },
+                    new[] { double2x4.c0.y, double2x4.c1.y, double2x4.c2.y, double2x4.c3.y },
+                };
+
+                if (oldElement is MatrixField<DoubleField, double> { RowCount: 2, ColumnCount: 4 } oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(updatedValue);
+                    return (null, false);
+                }
+
+                MatrixField<DoubleField, double> element = new MatrixField<DoubleField, double>(label, 2, 4)
+                {
+                    value = updatedValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        double[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.double2x4(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2], oldValue[0][3],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2], oldValue[1][3]));
+                        double[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.double2x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region double3x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.double3x2 double3x2)
+            {
+                double[][] updatedValue = {
+                    new[] { double3x2.c0.x, double3x2.c1.x },
+                    new[] { double3x2.c0.y, double3x2.c1.y },
+                    new[] { double3x2.c0.z, double3x2.c1.z },
+                };
+
+                if (oldElement is MatrixField<DoubleField, double> { RowCount: 3, ColumnCount: 2 } oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(updatedValue);
+                    return (null, false);
+                }
+
+                MatrixField<DoubleField, double> element = new MatrixField<DoubleField, double>(label, 3, 2)
+                {
+                    value = updatedValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        double[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.double3x2(
+                            oldValue[0][0], oldValue[0][1],
+                            oldValue[1][0], oldValue[1][1],
+                            oldValue[2][0], oldValue[2][1]));
+                        double[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.double3x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1],
+                            newValue[2][0], newValue[2][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region double3x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.double3x3 double3x3)
+            {
+                double[][] updatedValue = {
+                    new[] { double3x3.c0.x, double3x3.c1.x, double3x3.c2.x },
+                    new[] { double3x3.c0.y, double3x3.c1.y, double3x3.c2.y },
+                    new[] { double3x3.c0.z, double3x3.c1.z, double3x3.c2.z },
+                };
+
+                if (oldElement is MatrixField<DoubleField, double> { RowCount: 3, ColumnCount: 3 } oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(updatedValue);
+                    return (null, false);
+                }
+
+                MatrixField<DoubleField, double> element = new MatrixField<DoubleField, double>(label, 3, 3)
+                {
+                    value = updatedValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        double[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.double3x3(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2],
+                            oldValue[2][0], oldValue[2][1], oldValue[2][2]));
+                        double[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.double3x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2],
+                            newValue[2][0], newValue[2][1], newValue[2][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region double3x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.double3x4 double3x4)
+            {
+                double[][] updatedValue = {
+                    new[] { double3x4.c0.x, double3x4.c1.x, double3x4.c2.x, double3x4.c3.x },
+                    new[] { double3x4.c0.y, double3x4.c1.y, double3x4.c2.y, double3x4.c3.y },
+                    new[] { double3x4.c0.z, double3x4.c1.z, double3x4.c2.z, double3x4.c3.z },
+                };
+
+                if (oldElement is MatrixField<DoubleField, double> { RowCount: 3, ColumnCount: 4 } oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(updatedValue);
+                    return (null, false);
+                }
+
+                MatrixField<DoubleField, double> element = new MatrixField<DoubleField, double>(label, 3, 4)
+                {
+                    value = updatedValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        double[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.double3x4(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2], oldValue[0][3],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2], oldValue[1][3],
+                            oldValue[2][0], oldValue[2][1], oldValue[2][2], oldValue[2][3]));
+                        double[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.double3x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3],
+                            newValue[2][0], newValue[2][1], newValue[2][2], newValue[2][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region double4x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.double4x2 double4x2)
+            {
+                double[][] updatedValue = {
+                    new[] { double4x2.c0.x, double4x2.c1.x },
+                    new[] { double4x2.c0.y, double4x2.c1.y },
+                    new[] { double4x2.c0.z, double4x2.c1.z },
+                    new[] { double4x2.c0.w, double4x2.c1.w },
+                };
+
+                if (oldElement is MatrixField<DoubleField, double> { RowCount: 4, ColumnCount: 2 } oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(updatedValue);
+                    return (null, false);
+                }
+
+                MatrixField<DoubleField, double> element = new MatrixField<DoubleField, double>(label, 4, 2)
+                {
+                    value = updatedValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        double[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.double4x2(
+                            oldValue[0][0], oldValue[0][1],
+                            oldValue[1][0], oldValue[1][1],
+                            oldValue[2][0], oldValue[2][1],
+                            oldValue[3][0], oldValue[3][1]));
+                        double[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.double4x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1],
+                            newValue[2][0], newValue[2][1],
+                            newValue[3][0], newValue[3][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region double4x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.double4x3 double4x3)
+            {
+                double[][] updatedValue = {
+                    new[] { double4x3.c0.x, double4x3.c1.x, double4x3.c2.x },
+                    new[] { double4x3.c0.y, double4x3.c1.y, double4x3.c2.y },
+                    new[] { double4x3.c0.z, double4x3.c1.z, double4x3.c2.z },
+                    new[] { double4x3.c0.w, double4x3.c1.w, double4x3.c2.w },
+                };
+
+                if (oldElement is MatrixField<DoubleField, double> { RowCount: 4, ColumnCount: 3 } oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(updatedValue);
+                    return (null, false);
+                }
+
+                MatrixField<DoubleField, double> element = new MatrixField<DoubleField, double>(label, 4, 3)
+                {
+                    value = updatedValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        double[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.double4x3(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2],
+                            oldValue[2][0], oldValue[2][1], oldValue[2][2],
+                            oldValue[3][0], oldValue[3][1], oldValue[3][2]));
+                        double[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.double4x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2],
+                            newValue[2][0], newValue[2][1], newValue[2][2],
+                            newValue[3][0], newValue[3][1], newValue[3][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region double4x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.double4x4 double4x4)
+            {
+                double[][] updatedValue = {
+                    new[] { double4x4.c0.x, double4x4.c1.x, double4x4.c2.x, double4x4.c3.x },
+                    new[] { double4x4.c0.y, double4x4.c1.y, double4x4.c2.y, double4x4.c3.y },
+                    new[] { double4x4.c0.z, double4x4.c1.z, double4x4.c2.z, double4x4.c3.z },
+                    new[] { double4x4.c0.w, double4x4.c1.w, double4x4.c2.w, double4x4.c3.w },
+                };
+
+                if (oldElement is MatrixField<DoubleField, double> { RowCount: 4, ColumnCount: 4 } oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(updatedValue);
+                    return (null, false);
+                }
+
+                MatrixField<DoubleField, double> element = new MatrixField<DoubleField, double>(label, 4, 4)
+                {
+                    value = updatedValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        double[][] oldValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.double4x4(
+                            oldValue[0][0], oldValue[0][1], oldValue[0][2], oldValue[0][3],
+                            oldValue[1][0], oldValue[1][1], oldValue[1][2], oldValue[1][3],
+                            oldValue[2][0], oldValue[2][1], oldValue[2][2], oldValue[2][3],
+                            oldValue[3][0], oldValue[3][1], oldValue[3][2], oldValue[3][3]));
+                        double[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.double4x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3],
+                            newValue[2][0], newValue[2][1], newValue[2][2], newValue[2][3],
+                            newValue[3][0], newValue[3][1], newValue[3][2], newValue[3][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float2
+            if (value is Unity.Mathematics.float2 float2)
+            {
+                if (oldElement is Vector2Field oldVector2Field)
+                {
+                    oldVector2Field.SetValueWithoutNotify(float2);
+                    return (null, false);
+                }
+
+                Vector2Field element = new Vector2Field(label)
+                {
+                    value = float2,
+                    viewDataKey = foldoutViewKey,
+                };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = AbsRenderer.ReColor;
+                }
+                if (inHorizontalLayout)
+                {
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(Vector2Field.alignedFieldUssClassName);
+                }
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(AbsRenderer.ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(float2);
+                        setterOrNull((Unity.Mathematics.float2)evt.newValue);
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region float3
+
+            if (value is Unity.Mathematics.float3 float3)
+            {
+                if (oldElement is Vector3Field oldVector3Field)
+                {
+                    oldVector3Field.SetValueWithoutNotify(float3);
+                    return (null, false);
+                }
+
+                Vector3Field element = new Vector3Field(label)
+                {
+                    value = float3,
+                    viewDataKey = foldoutViewKey,
+                };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = AbsRenderer.ReColor;
+                }
+                if (inHorizontalLayout)
+                {
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(Vector3Field.alignedFieldUssClassName);
+                }
+
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(AbsRenderer.ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        setterOrNull((Unity.Mathematics.float3)evt.newValue);
+                    });
+                }
+
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float4
+
+            if (value is Unity.Mathematics.float4 float4)
+            {
+                if (oldElement is Vector4Field oldVector4Field)
+                {
+                    oldVector4Field.SetValueWithoutNotify(float4);
+                    return (null, false);
+                }
+
+                Vector4Field element = new Vector4Field(label)
+                {
+                    value = float4,
+                    viewDataKey = foldoutViewKey,
+                };
+                if (labelGrayColor)
+                {
+                    element.labelElement.style.color = AbsRenderer.ReColor;
+                }
+                if (inHorizontalLayout)
+                {
+                    Label elementLabel = element.Q<Label>();
+                    if (elementLabel != null)
+                    {
+                        elementLabel.style.minWidth = 0;
+                        elementLabel.style.borderRightWidth = 1;
+                        elementLabel.style.borderRightColor = EColor.Gray.GetColor();
+                    }
+                }
+                else
+                {
+                    element.AddToClassList(Vector4Field.alignedFieldUssClassName);
+                }
+                if (setterOrNull == null)
+                {
+                    element.SetEnabled(false);
+                    element.AddToClassList(AbsRenderer.ClassSaintsFieldEditingDisabled);
+                }
+                else
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        setterOrNull((Unity.Mathematics.float4)evt.newValue);
+                    });
+                }
+
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float2x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.float2x2 float2x2)
+            {
+                if (oldElement is MatrixField<FloatField, float> oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(new[]
+                    {
+                        new[] { float2x2.c0.x, float2x2.c1.x },
+                        new[] { float2x2.c0.y, float2x2.c1.y },
+                    });
+                    return (null, false);
+                }
+
+                MatrixField<FloatField, float> element = new MatrixField<FloatField, float>(label, 2, 2)
+                {
+                    value = new[]
+                    {
+                        new[] { float2x2.c0.x, float2x2.c1.x },
+                        new[] { float2x2.c0.y, float2x2.c1.y },
+                    },
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        float[][] newValue = evt.newValue;
+                        // Debug.Log($"{string.Join(", ", newValue[0])}, {string.Join(", ", newValue[1])}");
+                        setterOrNull.Invoke(new Unity.Mathematics.float2x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float2x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.float2x3 float2x3)
+            {
+                if (oldElement is MatrixField<FloatField, float> oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(new[]
+                    {
+                        new[] { float2x3.c0.x, float2x3.c1.x, float2x3.c2.x, },
+                        new[] { float2x3.c0.y, float2x3.c1.y, float2x3.c2.y, },
+                    });
+                    return (null, false);
+                }
+
+                MatrixField<FloatField, float> element = new MatrixField<FloatField, float>(label, 2, 3)
+                {
+                    value = new[]
+                    {
+                        new[] { float2x3.c0.x, float2x3.c1.x, float2x3.c2.x, },
+                        new[] { float2x3.c0.y, float2x3.c1.y, float2x3.c2.y, },
+                    },
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        float[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.float2x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float2x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.float2x4 float2x4)
+            {
+                if (oldElement is MatrixField<FloatField, float> oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(new[]
+                    {
+                        new[] { float2x4.c0.x, float2x4.c1.x, float2x4.c2.x, float2x4.c3.x },
+                        new[] { float2x4.c0.y, float2x4.c1.y, float2x4.c2.y, float2x4.c3.y },
+                    });
+                    return (null, false);
+                }
+
+                MatrixField<FloatField, float> element = new MatrixField<FloatField, float>(label, 2, 4)
+                {
+                    value = new[]
+                    {
+                        new[] { float2x4.c0.x, float2x4.c1.x, float2x4.c2.x, float2x4.c3.x },
+                        new[] { float2x4.c0.y, float2x4.c1.y, float2x4.c2.y, float2x4.c3.y },
+                    },
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        float[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.float2x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float3x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.float3x2 float3x2)
+            {
+                if (oldElement is MatrixField<FloatField, float> oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(new[]
+                    {
+                        new[] { float3x2.c0.x, float3x2.c1.x },
+                        new[] { float3x2.c0.y, float3x2.c1.y },
+                        new[] { float3x2.c0.z, float3x2.c1.z },
+                    });
+                    return (null, false);
+                }
+
+                MatrixField<FloatField, float> element = new MatrixField<FloatField, float>(label, 3, 2)
+                {
+                    value = new[]
+                    {
+                        new[] { float3x2.c0.x, float3x2.c1.x },
+                        new[] { float3x2.c0.y, float3x2.c1.y },
+                        new[] { float3x2.c0.z, float3x2.c1.z },
+                    },
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        float[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.float3x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1],
+                            newValue[2][0], newValue[2][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float3x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.float3x3 float3x3)
+            {
+                if (oldElement is MatrixField<FloatField, float> oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(new[]
+                    {
+                        new[] { float3x3.c0.x, float3x3.c1.x, float3x3.c2.x },
+                        new[] { float3x3.c0.y, float3x3.c1.y, float3x3.c2.y },
+                        new[] { float3x3.c0.z, float3x3.c1.z, float3x3.c2.z },
+                    });
+                    return (null, false);
+                }
+
+                MatrixField<FloatField, float> element = new MatrixField<FloatField, float>(label, 3, 3)
+                {
+                    value = new[]
+                    {
+                        new[] { float3x3.c0.x, float3x3.c1.x, float3x3.c2.x },
+                        new[] { float3x3.c0.y, float3x3.c1.y, float3x3.c2.y },
+                        new[] { float3x3.c0.z, float3x3.c1.z, float3x3.c2.z },
+                    },
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        float[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.float3x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2],
+                            newValue[2][0], newValue[2][1], newValue[2][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float3x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.float3x4 float3x4)
+            {
+                if (oldElement is MatrixField<FloatField, float> oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(new[]
+                    {
+                        new[] { float3x4.c0.x, float3x4.c1.x, float3x4.c2.x, float3x4.c3.x },
+                        new[] { float3x4.c0.y, float3x4.c1.y, float3x4.c2.y, float3x4.c3.y },
+                        new[] { float3x4.c0.z, float3x4.c1.z, float3x4.c2.z, float3x4.c3.z },
+                    });
+                    return (null, false);
+                }
+
+                MatrixField<FloatField, float> element = new MatrixField<FloatField, float>(label, 3, 4)
+                {
+                    value = new[]
+                    {
+                        new[] { float3x4.c0.x, float3x4.c1.x, float3x4.c2.x, float3x4.c3.x },
+                        new[] { float3x4.c0.y, float3x4.c1.y, float3x4.c2.y, float3x4.c3.y },
+                        new[] { float3x4.c0.z, float3x4.c1.z, float3x4.c2.z, float3x4.c3.z },
+                    },
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        float[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.float3x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3],
+                            newValue[2][0], newValue[2][1], newValue[2][2], newValue[2][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float4x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.float4x2 float4x2)
+            {
+                if (oldElement is MatrixField<FloatField, float> oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(new[]
+                    {
+                        new[] { float4x2.c0.x, float4x2.c1.x },
+                        new[] { float4x2.c0.y, float4x2.c1.y },
+                        new[] { float4x2.c0.z, float4x2.c1.z },
+                        new[] { float4x2.c0.w, float4x2.c1.w },
+                    });
+                    return (null, false);
+                }
+
+                MatrixField<FloatField, float> element = new MatrixField<FloatField, float>(label, 4, 2)
+                {
+                    value = new[]
+                    {
+                        new[] { float4x2.c0.x, float4x2.c1.x },
+                        new[] { float4x2.c0.y, float4x2.c1.y },
+                        new[] { float4x2.c0.z, float4x2.c1.z },
+                        new[] { float4x2.c0.w, float4x2.c1.w },
+                    },
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        float[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.float4x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1],
+                            newValue[2][0], newValue[2][1],
+                            newValue[3][0], newValue[3][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float4x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.float4x3 float4x3)
+            {
+                if (oldElement is MatrixField<FloatField, float> oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(new[]
+                    {
+                        new[] { float4x3.c0.x, float4x3.c1.x, float4x3.c2.x },
+                        new[] { float4x3.c0.y, float4x3.c1.y, float4x3.c2.y },
+                        new[] { float4x3.c0.z, float4x3.c1.z, float4x3.c2.z },
+                        new[] { float4x3.c0.w, float4x3.c1.w, float4x3.c2.w },
+                    });
+                    return (null, false);
+                }
+
+                MatrixField<FloatField, float> element = new MatrixField<FloatField, float>(label, 4, 3)
+                {
+                    value = new[]
+                    {
+                        new[] { float4x3.c0.x, float4x3.c1.x, float4x3.c2.x },
+                        new[] { float4x3.c0.y, float4x3.c1.y, float4x3.c2.y },
+                        new[] { float4x3.c0.z, float4x3.c1.z, float4x3.c2.z },
+                        new[] { float4x3.c0.w, float4x3.c1.w, float4x3.c2.w },
+                    },
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        float[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.float4x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2],
+                            newValue[2][0], newValue[2][1], newValue[2][2],
+                            newValue[3][0], newValue[3][1], newValue[3][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region float4x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.float4x4 float4x4)
+            {
+                if (oldElement is MatrixField<FloatField, float> oldFloatsField)
+                {
+                    oldFloatsField.SetValueWithoutNotify(new[]
+                    {
+                        new[] { float4x4.c0.x, float4x4.c1.x, float4x4.c2.x, float4x4.c3.x },
+                        new[] { float4x4.c0.y, float4x4.c1.y, float4x4.c2.y, float4x4.c3.y },
+                        new[] { float4x4.c0.z, float4x4.c1.z, float4x4.c2.z, float4x4.c3.z },
+                        new[] { float4x4.c0.w, float4x4.c1.w, float4x4.c2.w, float4x4.c3.w },
+                    });
+                    return (null, false);
+                }
+
+                MatrixField<FloatField, float> element = new MatrixField<FloatField, float>(label, 4, 4)
+                {
+                    value = new[]
+                    {
+                        new[] { float4x4.c0.x, float4x4.c1.x, float4x4.c2.x, float4x4.c3.x },
+                        new[] { float4x4.c0.y, float4x4.c1.y, float4x4.c2.y, float4x4.c3.y },
+                        new[] { float4x4.c0.z, float4x4.c1.z, float4x4.c2.z, float4x4.c3.z },
+                        new[] { float4x4.c0.w, float4x4.c1.w, float4x4.c2.w, float4x4.c3.w },
+                    },
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(
+                    element,
+                    element.LabelElement,
+                    setterOrNull != null,
+                    labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(value);
+                        float[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.float4x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3],
+                            newValue[2][0], newValue[2][1], newValue[2][2], newValue[2][3],
+                            newValue[3][0], newValue[3][1], newValue[3][2], newValue[3][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region half
+            if (value is Unity.Mathematics.half half)
+            {
+                if (oldElement is MathematicsHalfUShortField halfField)
+                {
+                    halfField.SetValueWithoutNotify(half.value);
+                    return (null, false);
+                }
+
+                MathematicsHalfUShortField element = new MathematicsHalfUShortField(label)
+                {
+                    value = half.value,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.half{value = (ushort)evt.previousValue});
+                        setterOrNull(new Unity.Mathematics.half{value = (ushort)evt.newValue});
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+#endif
+            #endregion
+
             bool valueIsNull = RuntimeUtil.IsNull(value);
 
             IEnumerable<Type> genTypes = valueType.GetInterfaces()
@@ -2215,7 +3918,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         // setterOrNull(Activator.CreateInstance(valueType));
                     })
                     {
-                        text = $"null (Click to Create)",
+                        text = "null (Click to Create)",
                         tooltip = "Click to Create",
                         style =
                         {

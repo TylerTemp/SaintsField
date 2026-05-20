@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 value = value,
             };
 
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(r, setterOrNull, labelGrayColor, inHorizontalLayout);
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(r, setterOrNull != null, labelGrayColor, inHorizontalLayout);
             if(setterOrNull != null)
             {
                 r.RegisterValueChangedCallback(v => setterOrNull.Invoke(v.newValue));
@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                 value = value,
             };
 
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(r, setterOrNull, labelGrayColor, inHorizontalLayout);
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(r, setterOrNull != null, labelGrayColor, inHorizontalLayout);
             if(setterOrNull != null)
             {
                 r.RegisterValueChangedCallback(v => setterOrNull.Invoke(v.newValue));

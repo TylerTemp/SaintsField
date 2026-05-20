@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
 
             TimeSpanField element = new TimeSpanField(label, timeSpanElement);
 
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)

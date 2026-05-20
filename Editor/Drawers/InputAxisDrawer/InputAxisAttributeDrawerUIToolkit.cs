@@ -118,7 +118,7 @@ namespace SaintsField.Editor.Drawers.InputAxisDrawer
                     value = value,
                 };
 
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull,
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
                 labelGrayColor, inHorizontalLayout);
 
             if (setterOrNull != null)

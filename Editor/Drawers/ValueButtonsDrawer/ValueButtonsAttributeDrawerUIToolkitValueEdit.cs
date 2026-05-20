@@ -65,7 +65,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
                 UIToolkitFieldWrapper uiToolkitFieldWrapper = new UIToolkitFieldWrapper(label, visualInput);
                 Add(uiToolkitFieldWrapper);
-                UIToolkitUtils.UIToolkitValueEditAfterProcess(uiToolkitFieldWrapper, setterOrNull,
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(uiToolkitFieldWrapper, setterOrNull != null,
                     labelGrayColor, inHorizontalLayout);
 
                 SubPanel = new VisualElement
