@@ -34,6 +34,12 @@
     -unity-background-image-tint-color: rgb(151, 23, 255);
 }
 
+.warning {
+    /*background-image: resource("d_PauseButton");*/
+    /*-unity-background-image-tint-color: rgb(151, 23, 255);*/
+    background-image: resource("console.warnicon");
+}
+
 .toggleRoot {
     transform-origin: center;
     scale: 0 0;

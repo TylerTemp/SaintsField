@@ -270,18 +270,25 @@ namespace SaintsField.Editor.Utils
         #if SAINTSFIELD_DEBUG
 
         [LayoutStart("Debug", ELayout.FoldoutBox)]
-        [Button("com.unity.mathematics")]
-        private IEnumerator InstallComUnityMathematics()
-        {
-            return DebugInstall("com.unity.mathematics");
-        }
+        [Button("Install com.unity.mathematics")]
+        private IEnumerator InstallComUnityMathematics() => DebugInstall("com.unity.mathematics");
+        [Button("Remove com.unity.mathematics")]
+        private IEnumerator RemoveComUnityMathematics() => DebugRemove("com.unity.mathematics");
 
         private static IEnumerator DebugInstall(string packageName)
         {
-            AddRequest removeRequest = Client.Add(packageName);
+            return DebugRequest(Client.Add(packageName));
+        }
+        private static IEnumerator DebugRemove(string packageName)
+        {
+            return DebugRequest(Client.Remove(packageName));
+        }
+
+        private static IEnumerator DebugRequest(Request request)
+        {
             while (true)
             {
-                switch (removeRequest.Status)
+                switch (request.Status)
                 {
                     case StatusCode.InProgress:
                         yield return null;
@@ -289,7 +296,7 @@ namespace SaintsField.Editor.Utils
                     case StatusCode.Success:
                         yield break;
                     case StatusCode.Failure:
-                        throw new Exception(removeRequest.Error.message);
+                        throw new Exception(request.Error.message);
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

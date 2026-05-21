@@ -36,6 +36,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
             public List<Waiter> Enumerators = new List<Waiter>();
             public IVisualElementScheduledItem ButtonTask;
+            public bool WaiterHasError = false;
         }
 
         // private VisualElement _returnValueContainer;
@@ -147,6 +148,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 Callback = _buttonAttribute.IsCallback ? _buttonAttribute.Label : "",
                 UpdateOneMoreTime = true,
                 Enumerators = new List<Waiter>(),
+                WaiterHasError = false,
             };
             fancyButton.userData = buttonUserData;
 
@@ -302,7 +304,9 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                                 thisHasMoveError = true;
 
                                 VisualElement result = fancyButton.ShowResult(true);
+                                Debug.Log("show error result");
                                 result.Add(MakeErrorBox(e));
+                                buttonUserData.WaiterHasError = true;
                             }
 
                             if (thisHasMoveError)
@@ -326,14 +330,23 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         bool stillHaveRunner = buttonUserData.Enumerators.Count > 0;
                         statusIndicatorElement.EnsureLoading(stillHaveRunner, progress);
 
+                        // ReSharper disable once InvertIf
                         if (!stillHaveRunner)
                         {
                             buttonUserData.ButtonTask?.Pause();
 
+                            // ReSharper disable once InvertIf
                             if (oldCounter > 0)
                             {
-                                statusIndicatorElement.PlayOk();
-                                fancyButton.ShowResult(false);
+                                if (buttonUserData.WaiterHasError)
+                                {
+                                    statusIndicatorElement.PlayWarning();
+                                }
+                                else
+                                {
+                                    statusIndicatorElement.PlayOk();
+                                    fancyButton.ShowResult(false);
+                                }
                             }
                         }
                     }).Every(1);

@@ -19,6 +19,7 @@ namespace SaintsField.Editor.UIToolkitElements
         private readonly VisualElement _ok;
         private readonly VisualElement _error;
         private readonly VisualElement _pause;
+        private readonly VisualElement _warning;
         private readonly VisualElement _progressBar;
 
         // ReSharper disable once MemberCanBePrivate.Global
@@ -31,15 +32,19 @@ namespace SaintsField.Editor.UIToolkitElements
             _ok = root.Q<VisualElement>("OK");
             _error = root.Q<VisualElement>("Error");
             _pause = root.Q<VisualElement>("Pause");
+            _warning = root.Q<VisualElement>("Warning");
             _progressBar = root.Q<VisualElement>("ProgressBar");
 
             _pendingTasks[_loading] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_ok] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_error] = new List<IVisualElementScheduledItem>();
             _pendingTasks[_pause] = new List<IVisualElementScheduledItem>();
+            _pendingTasks[_warning] = new List<IVisualElementScheduledItem>();
             _displayStatus[_loading] = false;
             _displayStatus[_ok] = false;
             _displayStatus[_error] = false;
+            _displayStatus[_pause] = false;
+            _displayStatus[_warning] = false;
 
             hierarchy.Add(root);
 
@@ -76,6 +81,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 EnsureHide(_ok);
                 EnsureHide(_error);
                 EnsureHide(_pause);
+                EnsureHide(_warning);
                 PlayShow(_loading);
                 if (progress >= 0)
                 {
@@ -96,6 +102,7 @@ namespace SaintsField.Editor.UIToolkitElements
             EnsureHide(_ok);
             EnsureHide(_error);
             EnsureHide(_pause);
+            EnsureHide(_warning);
 
             if(curDisplaying)
             {
@@ -117,6 +124,7 @@ namespace SaintsField.Editor.UIToolkitElements
             EnsureHide(_loading);
             EnsureHide(_error);
             EnsureHide(_pause);
+            EnsureHide(_warning);
 
             if (_displayStatus[_ok])
             {
@@ -140,6 +148,7 @@ namespace SaintsField.Editor.UIToolkitElements
             EnsureHide(_loading);
             EnsureHide(_ok);
             EnsureHide(_pause);
+            EnsureHide(_warning);
 
             if (_displayStatus[_error])
             {
@@ -163,6 +172,7 @@ namespace SaintsField.Editor.UIToolkitElements
             EnsureHide(_loading);
             EnsureHide(_ok);
             EnsureHide(_error);
+            EnsureHide(_warning);
 
             if (_displayStatus[_pause])
             {
@@ -179,6 +189,30 @@ namespace SaintsField.Editor.UIToolkitElements
                 TimeoutHide(_pause);
             }
             _displayStatus[_pause] = true;
+        }
+
+        public void PlayWarning()
+        {
+            EnsureHide(_loading);
+            EnsureHide(_ok);
+            EnsureHide(_error);
+            EnsureHide(_pause);
+
+            if (_displayStatus[_warning])
+            {
+                EnsureHide(_warning);
+                _pendingTasks[_warning].Add(schedule.Execute(() =>
+                {
+                    PlayShow(_warning);
+                    TimeoutHide(_warning);
+                }).StartingIn(100));
+            }
+            else
+            {
+                PlayShow(_warning);
+                TimeoutHide(_warning);
+            }
+            _displayStatus[_warning] = true;
         }
 
         private readonly Dictionary<VisualElement, List<IVisualElementScheduledItem>> _pendingTasks =
