@@ -106,10 +106,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.14.4**
+**5.15.0**
 
-1.  Improve: `ShowInInspector` better UI for general class/struct
-2.  Improve: `ReferencePicker` now can handle more cases when copying data from one type to another
+1.  Add: Support for `Unity.Mathematics` package, you can now use `ShowInInspector`/`Button` to display/edit an `bool4` (and more) types in inspector ~~to play tic-tac-toc~~
+2.  Unity Fix: Unity forget to make a drawer for `Unity.Mathematics.half`. It's now handled by SaintsField
+3.  Fix: `ShowInInspector` no longer shows a dropdown field when no other options avaliable for the target general class/struct
 
 ## Usage ##
 
@@ -280,6 +281,7 @@ namespace: `SaintsField`
     *   [Integerate](https://saintsfield.comes.today/saintseditor/integerate)
     *   [Netcode for Game Objects](https://saintsfield.comes.today/saintseditor/netcode-for-game-objects)
     *   [Scriptable Renderer Data](https://saintsfield.comes.today/saintseditor/scriptable-renderer-data)
+    *   [`Unity.Mathematics`](https://saintsfield.comes.today/saintseditor/unitymathematics)
     *   [SaintsBuild Support ##](https://saintsfield.comes.today/saintseditor/saintsbuild-support-)
 *   [Extended Serialization](https://saintsfield.comes.today/extended-serialization)
     *   [`Dictionary<,>`](https://saintsfield.comes.today/extended-serialization/dictionary)

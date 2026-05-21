@@ -1,21 +1,20 @@
-#if SAINTSFIELD_UNITY_MATHEMATICS && !SAINTSFIELD_UNITY_MATHEMATICS_DISABLE
 using System;
-using SaintsField.Editor.UIToolkitElements.EditWrapper;
 using UnityEngine.UIElements;
 
-
-namespace SaintsField.Editor.UIToolkitElements.MathematicsHalfUShort
+namespace SaintsField.Editor.UIToolkitElements.EditWrapper
 {
-    public class MultiHalfsField: BaseField<int[]>
+    public class MultiIntegerField : BaseField<int[]>
     {
-        private readonly RowInputsElement<MathematicsHalfUShortField, int> _rowInputsElement;
+        private readonly RowInputsElement<IntegerField, int> _rowInputsElement;
+
         public int Count => _rowInputsElement.Count;
-        public MultiHalfsField(string label, RowInputsElement<MathematicsHalfUShortField, int> visualInput) : base(label, visualInput)
+
+        public MultiIntegerField(string label, RowInputsElement<IntegerField, int> visualInput) : base(label, visualInput)
         {
             _rowInputsElement = visualInput;
         }
 
-        public MultiHalfsField(string label, int count) : this(label, new RowInputsElement<MathematicsHalfUShortField, int>(count, Creator))
+        public MultiIntegerField(string label, int count) : this(label, new RowInputsElement<IntegerField, int>(count, Creator))
         {
         }
 
@@ -30,7 +29,7 @@ namespace SaintsField.Editor.UIToolkitElements.MathematicsHalfUShort
             _rowInputsElement.SetValueWithoutNotify(newValue);
         }
 
-        private static MathematicsHalfUShortField Creator(int index)
+        private static IntegerField Creator(int index)
         {
             string label = index switch
             {
@@ -40,7 +39,7 @@ namespace SaintsField.Editor.UIToolkitElements.MathematicsHalfUShort
                 3 => "W",
                 _ => throw new ArgumentOutOfRangeException(nameof(index), index, null),
             };
-            MathematicsHalfUShortField result = new MathematicsHalfUShortField(label)
+            IntegerField result = new IntegerField(label)
             {
                 style =
                 {
@@ -55,4 +54,3 @@ namespace SaintsField.Editor.UIToolkitElements.MathematicsHalfUShort
         }
     }
 }
-#endif

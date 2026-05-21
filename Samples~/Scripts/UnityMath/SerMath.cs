@@ -339,7 +339,7 @@ namespace Samples.Scripts.UnityMath
             set => f4x4 = value;
         }
 
-        [LayoutStart("half", ELayout.FoldoutBox)]
+        [LayoutStart("half", ELayout.CollapseBox)]
 
         public half h;
 
@@ -359,12 +359,6 @@ namespace Samples.Scripts.UnityMath
             set => h2 = value;
         }
 
-        [Button]
-        private void Rand()
-        {
-            h2 = new half2(UnityEngine.Random.Range(0f, 1f));
-        }
-
         public half3 h3;
 
         [ShowInInspector]
@@ -381,6 +375,118 @@ namespace Samples.Scripts.UnityMath
         {
             get => h4;
             set => h4 = value;
+        }
+
+        [LayoutStart("int", ELayout.FoldoutBox)]
+
+        public int2 i2;
+
+        [ShowInInspector]
+        private int2 I2
+        {
+            get => i2;
+            set => i2 = value;
+        }
+
+        public int3 i3;
+
+        [ShowInInspector]
+        private int3 I3
+        {
+            get => i3;
+            set => i3 = value;
+        }
+
+        public int4 i4;
+
+        [ShowInInspector]
+        private int4 I4
+        {
+            get => i4;
+            set => i4 = value;
+        }
+
+        [LayoutStart("int x", ELayout.CollapseBox)]
+
+        public int2x2 i2x2;
+
+        [ShowInInspector]
+        private int2x2 I2x2
+        {
+            get => i2x2;
+            set => i2x2 = value;
+        }
+
+        public int2x3 i2x3;
+
+        [ShowInInspector]
+        private int2x3 I2x3
+        {
+            get => i2x3;
+            set => i2x3 = value;
+        }
+
+        public int2x4 i2x4;
+
+        [ShowInInspector]
+        private int2x4 I2x4
+        {
+            get => i2x4;
+            set => i2x4 = value;
+        }
+
+        public int3x2 i3x2;
+
+        [ShowInInspector]
+        private int3x2 I3x2
+        {
+            get => i3x2;
+            set => i3x2 = value;
+        }
+
+        public int3x3 i3x3;
+
+        [ShowInInspector]
+        private int3x3 I3x3
+        {
+            get => i3x3;
+            set => i3x3 = value;
+        }
+
+        public int3x4 i3x4;
+
+        [ShowInInspector]
+        private int3x4 I3x4
+        {
+            get => i3x4;
+            set => i3x4 = value;
+        }
+
+        public int4x2 i4x2;
+
+        [ShowInInspector]
+        private int4x2 I4x2
+        {
+            get => i4x2;
+            set => i4x2 = value;
+        }
+
+        public int4x3 i4x3;
+
+        [ShowInInspector]
+        private int4x3 I4x3
+        {
+            get => i4x3;
+            set => i4x3 = value;
+        }
+
+        public int4x4 i4x4;
+
+        [ShowInInspector]
+        private int4x4 I4x4
+        {
+            get => i4x4;
+            set => i4x4 = value;
         }
     }
 }

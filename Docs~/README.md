@@ -8699,6 +8699,12 @@ public class MyRendererFeature: SaintsScriptableRendererFeature
 }
 ```
 
+### `Unity.Mathematics` ###
+
+`Unity.Mathematics` is supported by `ShowInInspector` and `Button`
+
+Unity forget to make a drawer for `Unity.Mathematics.half`. It's now handled by SaintsField. In case Unity added it back someday, you can disable this function by add marco `SAINTSFIELD_UNITY_MATHEMATICS_FIX_DRAWER_DISABLE`. (Please read the "Add a Marco" section)
+
 ### SaintsBuild Support ##
 
 If you have [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) support, the auto-restored asset will have a notice with all field disabled. It also allows you to one-click remove the auto-restore function and modify the asset within play mode.

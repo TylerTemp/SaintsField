@@ -3216,7 +3216,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(float2);
+                        beforeSet?.Invoke((Unity.Mathematics.float2)evt.previousValue);
                         setterOrNull((Unity.Mathematics.float2)evt.newValue);
                     });
                 }
@@ -3268,7 +3268,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        beforeSet?.Invoke((Unity.Mathematics.float3)evt.previousValue);
                         setterOrNull((Unity.Mathematics.float3)evt.newValue);
                     });
                 }
@@ -3320,8 +3320,111 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        beforeSet?.Invoke((Unity.Mathematics.float4)evt.previousValue);
                         setterOrNull((Unity.Mathematics.float4)evt.newValue);
+                    });
+                }
+
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int2
+            if (value is Unity.Mathematics.int2 int2)
+            {
+                int[] updateValue = { int2.x, int2.y };
+                if (oldElement is MultiIntegerField { Count: 2 } oldMultiIntegerField)
+                {
+                    oldMultiIntegerField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MultiIntegerField element = new MultiIntegerField(label, 2)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int2(previousValue[0], previousValue[1]));
+                        int[] newValue = evt.newValue;
+                        setterOrNull(new Unity.Mathematics.int2(newValue[0], newValue[1]));
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region int3
+
+            if (value is Unity.Mathematics.int3 int3)
+            {
+                int[] updateValue = { int3.x, int3.y, int3.z };
+                if (oldElement is MultiIntegerField { Count: 3 } oldMultiIntegerField)
+                {
+                    oldMultiIntegerField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MultiIntegerField element = new MultiIntegerField(label, 3)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int3(previousValue[0], previousValue[1], previousValue[2]));
+                        int[] newValue = evt.newValue;
+                        setterOrNull(new Unity.Mathematics.int3(newValue[0], newValue[1], newValue[2]));
+                    });
+                }
+
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int4
+
+            if (value is Unity.Mathematics.int4 int4)
+            {
+                int[] updateValue = { int4.x, int4.y, int4.z, int4.w };
+                if (oldElement is MultiIntegerField { Count: 4 } oldMultiIntegerField)
+                {
+                    oldMultiIntegerField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MultiIntegerField element = new MultiIntegerField(label, 4)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int4(previousValue[0], previousValue[1], previousValue[2], previousValue[3]));
+                        int[] newValue = evt.newValue;
+                        setterOrNull(new Unity.Mathematics.int4(newValue[0], newValue[1], newValue[2], newValue[3]));
                     });
                 }
 
@@ -3364,7 +3467,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        float[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.float2x2(
+                            previousValue[0][0], previousValue[0][1],
+                            previousValue[1][0], previousValue[1][1]));
                         float[][] newValue = evt.newValue;
                         // Debug.Log($"{string.Join(", ", newValue[0])}, {string.Join(", ", newValue[1])}");
                         setterOrNull.Invoke(new Unity.Mathematics.float2x2(
@@ -3412,7 +3518,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        float[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.float2x3(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2]));
                         float[][] newValue = evt.newValue;
                         setterOrNull.Invoke(new Unity.Mathematics.float2x3(
                             newValue[0][0], newValue[0][1], newValue[0][2],
@@ -3459,7 +3568,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        float[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.float2x4(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2], previousValue[0][3],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2], previousValue[1][3]));
                         float[][] newValue = evt.newValue;
                         setterOrNull.Invoke(new Unity.Mathematics.float2x4(
                             newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
@@ -3508,7 +3620,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        float[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.float3x2(
+                            previousValue[0][0], previousValue[0][1],
+                            previousValue[1][0], previousValue[1][1],
+                            previousValue[2][0], previousValue[2][1]));
                         float[][] newValue = evt.newValue;
                         setterOrNull.Invoke(new Unity.Mathematics.float3x2(
                             newValue[0][0], newValue[0][1],
@@ -3558,7 +3674,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        float[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.float3x3(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2],
+                            previousValue[2][0], previousValue[2][1], previousValue[2][2]));
                         float[][] newValue = evt.newValue;
                         setterOrNull.Invoke(new Unity.Mathematics.float3x3(
                             newValue[0][0], newValue[0][1], newValue[0][2],
@@ -3608,7 +3728,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        float[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.float3x4(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2], previousValue[0][3],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2], previousValue[1][3],
+                            previousValue[2][0], previousValue[2][1], previousValue[2][2], previousValue[2][3]));
                         float[][] newValue = evt.newValue;
                         setterOrNull.Invoke(new Unity.Mathematics.float3x4(
                             newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
@@ -3660,7 +3784,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        float[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.float4x2(
+                            previousValue[0][0], previousValue[0][1],
+                            previousValue[1][0], previousValue[1][1],
+                            previousValue[2][0], previousValue[2][1],
+                            previousValue[3][0], previousValue[3][1]));
                         float[][] newValue = evt.newValue;
                         setterOrNull.Invoke(new Unity.Mathematics.float4x2(
                             newValue[0][0], newValue[0][1],
@@ -3713,7 +3842,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        float[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.float4x3(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2],
+                            previousValue[2][0], previousValue[2][1], previousValue[2][2],
+                            previousValue[3][0], previousValue[3][1], previousValue[3][2]));
                         float[][] newValue = evt.newValue;
                         setterOrNull.Invoke(new Unity.Mathematics.float4x3(
                             newValue[0][0], newValue[0][1], newValue[0][2],
@@ -3766,9 +3900,428 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 {
                     element.RegisterValueChangedCallback(evt =>
                     {
-                        beforeSet?.Invoke(value);
+                        float[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.float4x4(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2], previousValue[0][3],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2], previousValue[1][3],
+                            previousValue[2][0], previousValue[2][1], previousValue[2][2], previousValue[2][3],
+                            previousValue[3][0], previousValue[3][1], previousValue[3][2], previousValue[3][3]));
                         float[][] newValue = evt.newValue;
                         setterOrNull.Invoke(new Unity.Mathematics.float4x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3],
+                            newValue[2][0], newValue[2][1], newValue[2][2], newValue[2][3],
+                            newValue[3][0], newValue[3][1], newValue[3][2], newValue[3][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int2x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.int2x2 int2x2)
+            {
+                int[][] updateValue =
+                {
+                    new[] { int2x2.c0.x, int2x2.c1.x },
+                    new[] { int2x2.c0.y, int2x2.c1.y },
+                };
+                if (oldElement is MatrixField<IntegerField, int> { RowCount: 2, ColumnCount: 2 } oldIntegerMatrixField)
+                {
+                    oldIntegerMatrixField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixField<IntegerField, int> element = new MatrixField<IntegerField, int>(label, 2, 2)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(element, element.LabelElement, setterOrNull != null, labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int2x2(
+                            previousValue[0][0], previousValue[0][1],
+                            previousValue[1][0], previousValue[1][1]));
+                        int[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.int2x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int2x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.int2x3 int2x3)
+            {
+                int[][] updateValue =
+                {
+                    new[] { int2x3.c0.x, int2x3.c1.x, int2x3.c2.x },
+                    new[] { int2x3.c0.y, int2x3.c1.y, int2x3.c2.y },
+                };
+                if (oldElement is MatrixField<IntegerField, int> { RowCount: 2, ColumnCount: 3 } oldIntegerMatrixField)
+                {
+                    oldIntegerMatrixField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixField<IntegerField, int> element = new MatrixField<IntegerField, int>(label, 2, 3)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(element, element.LabelElement, setterOrNull != null, labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int2x3(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2]));
+                        int[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.int2x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int2x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.int2x4 int2x4)
+            {
+                int[][] updateValue =
+                {
+                    new[] { int2x4.c0.x, int2x4.c1.x, int2x4.c2.x, int2x4.c3.x },
+                    new[] { int2x4.c0.y, int2x4.c1.y, int2x4.c2.y, int2x4.c3.y },
+                };
+                if (oldElement is MatrixField<IntegerField, int> { RowCount: 2, ColumnCount: 4 } oldIntegerMatrixField)
+                {
+                    oldIntegerMatrixField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixField<IntegerField, int> element = new MatrixField<IntegerField, int>(label, 2, 4)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(element, element.LabelElement, setterOrNull != null, labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int2x4(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2], previousValue[0][3],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2], previousValue[1][3]));
+                        int[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.int2x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int3x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.int3x2 int3x2)
+            {
+                int[][] updateValue =
+                {
+                    new[] { int3x2.c0.x, int3x2.c1.x },
+                    new[] { int3x2.c0.y, int3x2.c1.y },
+                    new[] { int3x2.c0.z, int3x2.c1.z },
+                };
+                if (oldElement is MatrixField<IntegerField, int> { RowCount: 3, ColumnCount: 2 } oldIntegerMatrixField)
+                {
+                    oldIntegerMatrixField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixField<IntegerField, int> element = new MatrixField<IntegerField, int>(label, 3, 2)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(element, element.LabelElement, setterOrNull != null, labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int3x2(
+                            previousValue[0][0], previousValue[0][1],
+                            previousValue[1][0], previousValue[1][1],
+                            previousValue[2][0], previousValue[2][1]));
+                        int[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.int3x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1],
+                            newValue[2][0], newValue[2][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int3x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.int3x3 int3x3)
+            {
+                int[][] updateValue =
+                {
+                    new[] { int3x3.c0.x, int3x3.c1.x, int3x3.c2.x },
+                    new[] { int3x3.c0.y, int3x3.c1.y, int3x3.c2.y },
+                    new[] { int3x3.c0.z, int3x3.c1.z, int3x3.c2.z },
+                };
+                if (oldElement is MatrixField<IntegerField, int> { RowCount: 3, ColumnCount: 3 } oldIntegerMatrixField)
+                {
+                    oldIntegerMatrixField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixField<IntegerField, int> element = new MatrixField<IntegerField, int>(label, 3, 3)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(element, element.LabelElement, setterOrNull != null, labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int3x3(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2],
+                            previousValue[2][0], previousValue[2][1], previousValue[2][2]));
+                        int[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.int3x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2],
+                            newValue[2][0], newValue[2][1], newValue[2][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int3x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.int3x4 int3x4)
+            {
+                int[][] updateValue =
+                {
+                    new[] { int3x4.c0.x, int3x4.c1.x, int3x4.c2.x, int3x4.c3.x },
+                    new[] { int3x4.c0.y, int3x4.c1.y, int3x4.c2.y, int3x4.c3.y },
+                    new[] { int3x4.c0.z, int3x4.c1.z, int3x4.c2.z, int3x4.c3.z },
+                };
+                if (oldElement is MatrixField<IntegerField, int> { RowCount: 3, ColumnCount: 4 } oldIntegerMatrixField)
+                {
+                    oldIntegerMatrixField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixField<IntegerField, int> element = new MatrixField<IntegerField, int>(label, 3, 4)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(element, element.LabelElement, setterOrNull != null, labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int3x4(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2], previousValue[0][3],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2], previousValue[1][3],
+                            previousValue[2][0], previousValue[2][1], previousValue[2][2], previousValue[2][3]));
+                        int[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.int3x4(
+                            newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
+                            newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3],
+                            newValue[2][0], newValue[2][1], newValue[2][2], newValue[2][3]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int4x2
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.int4x2 int4x2)
+            {
+                int[][] updateValue =
+                {
+                    new[] { int4x2.c0.x, int4x2.c1.x },
+                    new[] { int4x2.c0.y, int4x2.c1.y },
+                    new[] { int4x2.c0.z, int4x2.c1.z },
+                    new[] { int4x2.c0.w, int4x2.c1.w },
+                };
+                if (oldElement is MatrixField<IntegerField, int> { RowCount: 4, ColumnCount: 2 } oldIntegerMatrixField)
+                {
+                    oldIntegerMatrixField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixField<IntegerField, int> element = new MatrixField<IntegerField, int>(label, 4, 2)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(element, element.LabelElement, setterOrNull != null, labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int4x2(
+                            previousValue[0][0], previousValue[0][1],
+                            previousValue[1][0], previousValue[1][1],
+                            previousValue[2][0], previousValue[2][1],
+                            previousValue[3][0], previousValue[3][1]));
+                        int[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.int4x2(
+                            newValue[0][0], newValue[0][1],
+                            newValue[1][0], newValue[1][1],
+                            newValue[2][0], newValue[2][1],
+                            newValue[3][0], newValue[3][1]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int4x3
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.int4x3 int4x3)
+            {
+                int[][] updateValue =
+                {
+                    new[] { int4x3.c0.x, int4x3.c1.x, int4x3.c2.x },
+                    new[] { int4x3.c0.y, int4x3.c1.y, int4x3.c2.y },
+                    new[] { int4x3.c0.z, int4x3.c1.z, int4x3.c2.z },
+                    new[] { int4x3.c0.w, int4x3.c1.w, int4x3.c2.w },
+                };
+                if (oldElement is MatrixField<IntegerField, int> { RowCount: 4, ColumnCount: 3 } oldIntegerMatrixField)
+                {
+                    oldIntegerMatrixField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixField<IntegerField, int> element = new MatrixField<IntegerField, int>(label, 4, 3)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(element, element.LabelElement, setterOrNull != null, labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int4x3(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2],
+                            previousValue[2][0], previousValue[2][1], previousValue[2][2],
+                            previousValue[3][0], previousValue[3][1], previousValue[3][2]));
+                        int[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.int4x3(
+                            newValue[0][0], newValue[0][1], newValue[0][2],
+                            newValue[1][0], newValue[1][1], newValue[1][2],
+                            newValue[2][0], newValue[2][1], newValue[2][2],
+                            newValue[3][0], newValue[3][1], newValue[3][2]));
+                    });
+                }
+                return (element, false);
+            }
+
+            #endregion
+
+            #region int4x4
+
+            // ReSharper disable once InconsistentNaming
+            if (value is Unity.Mathematics.int4x4 int4x4)
+            {
+                int[][] updateValue =
+                {
+                    new[] { int4x4.c0.x, int4x4.c1.x, int4x4.c2.x, int4x4.c3.x },
+                    new[] { int4x4.c0.y, int4x4.c1.y, int4x4.c2.y, int4x4.c3.y },
+                    new[] { int4x4.c0.z, int4x4.c1.z, int4x4.c2.z, int4x4.c3.z },
+                    new[] { int4x4.c0.w, int4x4.c1.w, int4x4.c2.w, int4x4.c3.w },
+                };
+                if (oldElement is MatrixField<IntegerField, int> { RowCount: 4, ColumnCount: 4 } oldIntegerMatrixField)
+                {
+                    oldIntegerMatrixField.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MatrixField<IntegerField, int> element = new MatrixField<IntegerField, int>(label, 4, 4)
+                {
+                    value = updateValue,
+                    viewDataKey = foldoutViewKey,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcessBase(element, element.LabelElement, setterOrNull != null, labelGrayColor);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        int[][] previousValue = evt.previousValue;
+                        beforeSet?.Invoke(new Unity.Mathematics.int4x4(
+                            previousValue[0][0], previousValue[0][1], previousValue[0][2], previousValue[0][3],
+                            previousValue[1][0], previousValue[1][1], previousValue[1][2], previousValue[1][3],
+                            previousValue[2][0], previousValue[2][1], previousValue[2][2], previousValue[2][3],
+                            previousValue[3][0], previousValue[3][1], previousValue[3][2], previousValue[3][3]));
+                        int[][] newValue = evt.newValue;
+                        setterOrNull.Invoke(new Unity.Mathematics.int4x4(
                             newValue[0][0], newValue[0][1], newValue[0][2], newValue[0][3],
                             newValue[1][0], newValue[1][1], newValue[1][2], newValue[1][3],
                             newValue[2][0], newValue[2][1], newValue[2][2], newValue[2][3],
@@ -3802,6 +4355,141 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     {
                         beforeSet?.Invoke(new Unity.Mathematics.half{value = (ushort)evt.previousValue});
                         setterOrNull(new Unity.Mathematics.half{value = (ushort)evt.newValue});
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region half2
+            if (value is Unity.Mathematics.half2 half2)
+            {
+                int[] updateValue = {
+                    half2.x.value,
+                    half2.y.value,
+                };
+                if (oldElement is MultiHalfsField { Count: 2 } half2Field)
+                {
+
+                    half2Field.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MultiHalfsField element = new MultiHalfsField(label, 2)
+                {
+                    value = updateValue,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.half2
+                        {
+                            x = new Unity.Mathematics.half{value = (ushort)evt.previousValue[0]},
+                            y = new Unity.Mathematics.half{value = (ushort)evt.previousValue[1]},
+                        });
+                        setterOrNull(new Unity.Mathematics.half2
+                        {
+                            x = new Unity.Mathematics.half{value = (ushort)evt.newValue[0]},
+                            y = new Unity.Mathematics.half{value = (ushort)evt.newValue[1]},
+                        });
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region half3
+            if (value is Unity.Mathematics.half3 half3)
+            {
+                int[] updateValue = {
+                    half3.x.value,
+                    half3.y.value,
+                    half3.z.value,
+                };
+                if (oldElement is MultiHalfsField { Count: 3 } half3Field)
+                {
+
+                    half3Field.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MultiHalfsField element = new MultiHalfsField(label, 3)
+                {
+                    value = updateValue,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.half3
+                        {
+                            x = new Unity.Mathematics.half{value = (ushort)evt.previousValue[0]},
+                            y = new Unity.Mathematics.half{value = (ushort)evt.previousValue[1]},
+                            z = new Unity.Mathematics.half{value = (ushort)evt.previousValue[2]},
+                        });
+                        setterOrNull(new Unity.Mathematics.half3
+                        {
+                            x = new Unity.Mathematics.half{value = (ushort)evt.newValue[0]},
+                            y = new Unity.Mathematics.half{value = (ushort)evt.newValue[1]},
+                            z = new Unity.Mathematics.half{value = (ushort)evt.newValue[2]},
+                        });
+                    });
+                }
+
+                return (element, false);
+            }
+            #endregion
+
+            #region half4
+            if (value is Unity.Mathematics.half4 half4)
+            {
+                int[] updateValue = {
+                    half4.x.value,
+                    half4.y.value,
+                    half4.z.value,
+                    half4.w.value,
+                };
+                if (oldElement is MultiHalfsField { Count: 4 } half4Field)
+                {
+
+                    half4Field.SetValueWithoutNotify(updateValue);
+                    return (null, false);
+                }
+
+                MultiHalfsField element = new MultiHalfsField(label, 4)
+                {
+                    value = updateValue,
+                };
+
+                UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null, labelGrayColor, inHorizontalLayout);
+
+                if (setterOrNull != null)
+                {
+                    element.RegisterValueChangedCallback(evt =>
+                    {
+                        beforeSet?.Invoke(new Unity.Mathematics.half4
+                        {
+                            x = new Unity.Mathematics.half{value = (ushort)evt.previousValue[0]},
+                            y = new Unity.Mathematics.half{value = (ushort)evt.previousValue[1]},
+                            z = new Unity.Mathematics.half{value = (ushort)evt.previousValue[2]},
+                            w = new Unity.Mathematics.half{value = (ushort)evt.previousValue[3]},
+                        });
+                        setterOrNull(new Unity.Mathematics.half4
+                        {
+                            x = new Unity.Mathematics.half{value = (ushort)evt.newValue[0]},
+                            y = new Unity.Mathematics.half{value = (ushort)evt.newValue[1]},
+                            z = new Unity.Mathematics.half{value = (ushort)evt.newValue[2]},
+                            w = new Unity.Mathematics.half{value = (ushort)evt.newValue[3]},
+                        });
                     });
                 }
 
