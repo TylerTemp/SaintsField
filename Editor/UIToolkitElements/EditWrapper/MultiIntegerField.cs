@@ -21,11 +21,23 @@ namespace SaintsField.Editor.UIToolkitElements.EditWrapper
         public override int[] value
         {
             get => _rowInputsElement.value;
-            set => _rowInputsElement.value = value;
+            set
+            {
+                if (value.Length == 0)  // BaseField internal call
+                {
+                    return;
+                }
+                _rowInputsElement.value = value;
+            }
         }
 
         public override void SetValueWithoutNotify(int[] newValue)
         {
+            // Debug.Log($"Multi set {Count} values to {string.Join(", ", newValue)}(length={newValue.Length})");
+            if (newValue.Length == 0)  // BaseField internal call
+            {
+                return;
+            }
             _rowInputsElement.SetValueWithoutNotify(newValue);
         }
 

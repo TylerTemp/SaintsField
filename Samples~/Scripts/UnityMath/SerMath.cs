@@ -8,7 +8,7 @@ namespace Samples.Scripts.UnityMath
 {
     public class SerMath : SaintsMonoBehaviour
     {
-        [LayoutStart("bool", ELayout.CollapseBox)]
+        [LayoutStart("bool", ELayout.FoldoutBox)]
 
         public bool2 b2;
 
@@ -37,7 +37,7 @@ namespace Samples.Scripts.UnityMath
             set => b4 = value;
         }
 
-        [LayoutStart("bool x", ELayout.CollapseBox)]
+        [LayoutStart("bool x", ELayout.FoldoutBox)]
 
         public bool2x2 b2x2;
         [ShowInInspector]
@@ -111,7 +111,7 @@ namespace Samples.Scripts.UnityMath
             set => b4x4 = value;
         }
 
-        [LayoutStart("double", ELayout.CollapseBox)]
+        [LayoutStart("double", ELayout.FoldoutBox)]
 
         public double2 d2;
         [ShowInInspector]
@@ -137,7 +137,7 @@ namespace Samples.Scripts.UnityMath
             set => d4 = value;
         }
 
-        [LayoutStart("double x", ELayout.CollapseBox)]
+        [LayoutStart("double x", ELayout.FoldoutBox)]
 
         public double2x2 d2x2;
         [ShowInInspector]
@@ -211,7 +211,7 @@ namespace Samples.Scripts.UnityMath
             set => d4x4 = value;
         }
 
-        [LayoutStart("float", ELayout.CollapseBox)]
+        [LayoutStart("float", ELayout.FoldoutBox)]
 
         public float2 f2;
 
@@ -239,7 +239,7 @@ namespace Samples.Scripts.UnityMath
             set => f4 = value;
         }
 
-        [LayoutStart("float x", ELayout.CollapseBox)]
+        [LayoutStart("float x", ELayout.FoldoutBox)]
 
         public float2x2 f2x2;
 
@@ -339,7 +339,7 @@ namespace Samples.Scripts.UnityMath
             set => f4x4 = value;
         }
 
-        [LayoutStart("half", ELayout.CollapseBox)]
+        [LayoutStart("half", ELayout.FoldoutBox)]
 
         public half h;
 
@@ -406,7 +406,7 @@ namespace Samples.Scripts.UnityMath
             set => i4 = value;
         }
 
-        [LayoutStart("int x", ELayout.CollapseBox)]
+        [LayoutStart("int x", ELayout.FoldoutBox)]
 
         public int2x2 i2x2;
 

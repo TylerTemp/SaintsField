@@ -20,6 +20,10 @@ namespace SaintsField.Editor.UIToolkitElements.EditWrapper
 
         public override void SetValueWithoutNotify(bool[] newValue)
         {
+            if (newValue.Length == 0)  // BaseField internal call
+            {
+                return;
+            }
             _rowBooleansElement.SetValueWithoutNotify(newValue);
         }
 

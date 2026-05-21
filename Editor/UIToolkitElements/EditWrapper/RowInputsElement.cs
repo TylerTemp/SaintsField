@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements.EditWrapper
@@ -45,7 +46,6 @@ namespace SaintsField.Editor.UIToolkitElements.EditWrapper
             _value = newValue;
             for (int index = 0; index < Count; index++)
             {
-                // Debug.Log($"SetValueWithoutNotify {index} = {string.Join(",", _value[index])}");
                 _valueFields[index].SetValueWithoutNotify(_value[index]);
             }
         }

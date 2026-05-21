@@ -3353,8 +3353,14 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.RegisterValueChangedCallback(evt =>
                     {
                         int[] previousValue = evt.previousValue;
-                        beforeSet?.Invoke(new Unity.Mathematics.int2(previousValue[0], previousValue[1]));
                         int[] newValue = evt.newValue;
+
+                        if (newValue.Length == 0)
+                        {
+                            return;
+                        }
+
+                        beforeSet?.Invoke(new Unity.Mathematics.int2(previousValue[0], previousValue[1]));
                         setterOrNull(new Unity.Mathematics.int2(newValue[0], newValue[1]));
                     });
                 }
@@ -3387,8 +3393,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.RegisterValueChangedCallback(evt =>
                     {
                         int[] previousValue = evt.previousValue;
-                        beforeSet?.Invoke(new Unity.Mathematics.int3(previousValue[0], previousValue[1], previousValue[2]));
                         int[] newValue = evt.newValue;
+                        if (newValue.Length == 0)
+                        {
+                            return;
+                        }
+                        beforeSet?.Invoke(new Unity.Mathematics.int3(previousValue[0], previousValue[1], previousValue[2]));
                         setterOrNull(new Unity.Mathematics.int3(newValue[0], newValue[1], newValue[2]));
                     });
                 }
@@ -3422,8 +3432,12 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     element.RegisterValueChangedCallback(evt =>
                     {
                         int[] previousValue = evt.previousValue;
-                        beforeSet?.Invoke(new Unity.Mathematics.int4(previousValue[0], previousValue[1], previousValue[2], previousValue[3]));
                         int[] newValue = evt.newValue;
+                        if (newValue.Length == 0)
+                        {
+                            return;
+                        }
+                        beforeSet?.Invoke(new Unity.Mathematics.int4(previousValue[0], previousValue[1], previousValue[2], previousValue[3]));
                         setterOrNull(new Unity.Mathematics.int4(newValue[0], newValue[1], newValue[2], newValue[3]));
                     });
                 }
