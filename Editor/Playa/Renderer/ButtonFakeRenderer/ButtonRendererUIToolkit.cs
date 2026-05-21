@@ -324,8 +324,12 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             // ReSharper disable once InvertIf
                             if (!moveNext)
                             {
-                                buttonUserData.WaiterHasFinished = true;
                                 finishedEnumerators.Add(waiter);
+
+                                if(!thisHasMoveError)
+                                {
+                                    buttonUserData.WaiterHasFinished = true;
+                                }
                             }
                         }
 

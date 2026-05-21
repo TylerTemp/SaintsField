@@ -6,6 +6,7 @@
 2.  Unity Fix: Unity forget to make a drawer for `Unity.Mathematics.half`. It's now handled by SaintsField
 3.  Fix: `ShowInInspector` no longer shows a dropdown field when no other options avaliable for the target general class/struct
 4.  Fix: `Button` with `IEnumerator` type didn't show errors when any error happens
+5.  Add: `Button` with `IEnumerator`, if none finished successfully, an error icon will show; if some finished successfully (and some failed), a warning icon will show with error messages below. Otherwise shows a success icon.
 
 ## 5.14.4 ##
 
