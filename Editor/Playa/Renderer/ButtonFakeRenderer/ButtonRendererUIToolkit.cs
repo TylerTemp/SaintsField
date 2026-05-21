@@ -37,6 +37,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             public List<Waiter> Enumerators = new List<Waiter>();
             public IVisualElementScheduledItem ButtonTask;
             public bool WaiterHasError = false;
+            public bool WaiterHasFinished = false;
         }
 
         // private VisualElement _returnValueContainer;
@@ -149,6 +150,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 UpdateOneMoreTime = true,
                 Enumerators = new List<Waiter>(),
                 WaiterHasError = false,
+                WaiterHasFinished = false,
             };
             fancyButton.userData = buttonUserData;
 
@@ -304,7 +306,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                                 thisHasMoveError = true;
 
                                 VisualElement result = fancyButton.ShowResult(true);
-                                Debug.Log("show error result");
+                                // Debug.Log("show error result");
                                 result.Add(MakeErrorBox(e));
                                 buttonUserData.WaiterHasError = true;
                             }
@@ -319,8 +321,10 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             }
 
                             // Debug.Log(bindEnumerator.Current);
+                            // ReSharper disable once InvertIf
                             if (!moveNext)
                             {
+                                buttonUserData.WaiterHasFinished = true;
                                 finishedEnumerators.Add(waiter);
                             }
                         }
@@ -336,11 +340,18 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             buttonUserData.ButtonTask?.Pause();
 
                             // ReSharper disable once InvertIf
-                            if (oldCounter > 0)
+                            if (oldCounter > 0)  // last ones finished
                             {
                                 if (buttonUserData.WaiterHasError)
                                 {
-                                    statusIndicatorElement.PlayWarning();
+                                    if(buttonUserData.WaiterHasFinished)
+                                    {
+                                        statusIndicatorElement.PlayWarning();
+                                    }
+                                    else
+                                    {
+                                        statusIndicatorElement.PlayError();
+                                    }
                                 }
                                 else
                                 {
