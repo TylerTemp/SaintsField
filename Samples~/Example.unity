@@ -32778,8 +32778,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.TestMinMax.MaxComp
   intDirect: -17
   vector3: {x: 2, y: 4, z: -17}
-  f: 1
-  color: {r: 0.5, g: 0, b: 0, a: 0.7}
+  f: 0.82
+  color: {r: 0.5, g: 0, b: 0, a: 0.82}
+  wrongCap: 9
 --- !u!1 &1815438673
 GameObject:
   m_ObjectHideFlags: 0

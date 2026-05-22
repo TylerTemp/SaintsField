@@ -164,6 +164,30 @@ namespace SaintsField.Utils
 
         }
 
+        public override string ToString()
+        {
+            switch (SourceType)
+            {
+                case SourceType.NotSupported:
+                case SourceType.NoLimit:
+                    return SourceType.ToString();
+                case SourceType.Callback:
+                    return Callback;
+                case SourceType.Long:
+                    return LongV.ToString();
+                case SourceType.Ulong:
+                    return UlongV.ToString();
+                case SourceType.Double:
+                    // ReSharper disable once SpecifyACultureInStringConversionExplicitly
+                    return DoubleV.ToString();
+                case SourceType.Decimal:
+                    // ReSharper disable once SpecifyACultureInStringConversionExplicitly
+                    return DecimalV.ToString();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(SourceType), SourceType, null);
+            }
+        }
+
         // public NumberLimitParam(sbyte sbyteV)
         // {
         //     SourceType = SourceType.Sbyte;

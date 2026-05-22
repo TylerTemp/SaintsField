@@ -14,5 +14,9 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing.TestMinMax
         public float f;
 
         [MaxValue(0.5, 0.5f, null, nameof(f))] public Color color;
+
+        [MaxValue(9.9f)] public int wrongCap;
+
+        public Rect rec;
     }
 }
