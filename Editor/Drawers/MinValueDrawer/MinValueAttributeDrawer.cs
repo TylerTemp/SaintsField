@@ -382,6 +382,176 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
                         })),
                         _ => ($"Out of bounds {index} for color type", default, null),
                     };
+                case SerializedPropertyType.Rect:
+                    return index switch
+                    {
+                        0 => (string.Empty, new NumberLimitParam(property.rectValue.x), obj =>
+                        {
+                            Rect v = property.rectValue;
+                            property.rectValue = new Rect(Convert.ToSingle(obj), v.y, v.width, v.height);
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        1 => (string.Empty, new NumberLimitParam(property.rectValue.y), obj =>
+                        {
+                            Rect v = property.rectValue;
+                            property.rectValue = new Rect(v.x, Convert.ToSingle(obj), v.width, v.height);
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        2 => (string.Empty, new NumberLimitParam(property.rectValue.width), obj =>
+                        {
+                            Rect v = property.rectValue;
+                            property.rectValue = new Rect(v.x, v.y, Convert.ToSingle(obj), v.height);
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        3 => (string.Empty, new NumberLimitParam(property.rectValue.height), (Action<object>)(obj =>
+                        {
+                            Rect v = property.rectValue;
+                            property.rectValue = new Rect(v.x, v.y, v.width, Convert.ToSingle(obj));
+                            property.serializedObject.ApplyModifiedProperties();
+                        })),
+                        _ => ($"Out of bounds {index} for rect type", default, null),
+                    };
+                case SerializedPropertyType.RectInt:
+                    return index switch
+                    {
+                        0 => (string.Empty, new NumberLimitParam(property.rectIntValue.x), obj =>
+                        {
+                            RectInt v = property.rectIntValue;
+                            property.rectIntValue = new RectInt(ToInt32Ceiling(obj), v.y, v.width, v.height);
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        1 => (string.Empty, new NumberLimitParam(property.rectIntValue.y), obj =>
+                        {
+                            RectInt v = property.rectIntValue;
+                            property.rectIntValue = new RectInt(v.x, ToInt32Ceiling(obj), v.width, v.height);
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        2 => (string.Empty, new NumberLimitParam(property.rectIntValue.width), obj =>
+                        {
+                            RectInt v = property.rectIntValue;
+                            property.rectIntValue = new RectInt(v.x, v.y, ToInt32Ceiling(obj), v.height);
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        3 => (string.Empty, new NumberLimitParam(property.rectIntValue.height), (Action<object>)(obj =>
+                        {
+                            RectInt v = property.rectIntValue;
+                            property.rectIntValue = new RectInt(v.x, v.y, v.width, ToInt32Ceiling(obj));
+                            property.serializedObject.ApplyModifiedProperties();
+                        })),
+                        _ => ($"Out of bounds {index} for rectInt type", default, null),
+                    };
+                case SerializedPropertyType.Bounds:
+                    return index switch
+                    {
+                        0 => (string.Empty, new NumberLimitParam(property.boundsValue.center.x), obj =>
+                        {
+                            property.boundsValue = new Bounds {
+                                center = new Vector3(Convert.ToSingle(obj), property.boundsValue.center.y, property.boundsValue.center.z),
+                                extents = property.boundsValue.extents,
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        1 => (string.Empty, new NumberLimitParam(property.boundsValue.center.y), obj =>
+                        {
+                            property.boundsValue = new Bounds {
+                                center = new Vector3(property.boundsValue.center.x, Convert.ToSingle(obj), property.boundsValue.center.z),
+                                extents = property.boundsValue.extents,
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        2 => (string.Empty, new NumberLimitParam(property.boundsValue.center.z), obj =>
+                        {
+                            property.boundsValue = new Bounds {
+                                center = new Vector3(property.boundsValue.center.x, property.boundsValue.center.y, Convert.ToSingle(obj)),
+                                extents = property.boundsValue.extents,
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        3 => (string.Empty, new NumberLimitParam(property.boundsValue.extents.x), obj =>
+                        {
+                            property.boundsValue = new Bounds
+                            {
+                                center = property.boundsValue.center,
+                                extents = new Vector3(Convert.ToSingle(obj), property.boundsValue.extents.y, property.boundsValue.extents.z),
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        4 => (string.Empty, new NumberLimitParam(property.boundsValue.extents.y), obj =>
+                        {
+                            property.boundsValue = new Bounds
+                            {
+                                center = property.boundsValue.center,
+                                extents = new Vector3(property.boundsValue.extents.x, Convert.ToSingle(obj), property.boundsValue.extents.z),
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        5 => (string.Empty, new NumberLimitParam(property.boundsValue.extents.z), (Action<object>)(obj =>
+                        {
+                            property.boundsValue = new Bounds
+                            {
+                                center = property.boundsValue.center,
+                                extents = new Vector3(property.boundsValue.extents.x, property.boundsValue.extents.y, Convert.ToSingle(obj)),
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        })),
+                        _ => ($"Out of bounds {index} for bounds type", default, null),
+                    };
+                case SerializedPropertyType.BoundsInt:
+                    return index switch
+                    {
+                        0 => (string.Empty, new NumberLimitParam(property.boundsIntValue.position.x), obj =>
+                        {
+                            property.boundsIntValue = new BoundsInt {
+                                position = new Vector3Int(ToInt32Ceiling(obj), property.boundsIntValue.position.y, property.boundsIntValue.position.z),
+                                size =property.boundsIntValue.size,
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        1 => (string.Empty, new NumberLimitParam(property.boundsIntValue.position.y), obj =>
+                        {
+                            property.boundsIntValue = new BoundsInt {
+                                position =new Vector3Int(property.boundsIntValue.position.x, ToInt32Ceiling(obj), property.boundsIntValue.position.z),
+                                size =property.boundsIntValue.size,
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        2 => (string.Empty, new NumberLimitParam(property.boundsIntValue.position.z), obj =>
+                        {
+                            property.boundsIntValue = new BoundsInt {
+                                position =new Vector3Int(property.boundsIntValue.position.x, property.boundsIntValue.position.y, ToInt32Ceiling(obj)),
+                                size =property.boundsIntValue.size,
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        3 => (string.Empty, new NumberLimitParam(property.boundsIntValue.size.x), obj =>
+                        {
+                            property.boundsIntValue = new BoundsInt
+                            {
+                                position =property.boundsIntValue.position,
+                                size =new Vector3Int(ToInt32Ceiling(obj), property.boundsIntValue.size.y, property.boundsIntValue.size.z),
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        4 => (string.Empty, new NumberLimitParam(property.boundsIntValue.size.y), obj =>
+                        {
+                            property.boundsIntValue = new BoundsInt
+                            {
+                                position =property.boundsIntValue.position,
+                                size =new Vector3Int(property.boundsIntValue.size.x, ToInt32Ceiling(obj), property.boundsIntValue.size.z),
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        }),
+                        5 => (string.Empty, new NumberLimitParam(property.boundsIntValue.size.z), (Action<object>)(obj =>
+                        {
+                            property.boundsIntValue = new BoundsInt
+                            {
+                                position =property.boundsIntValue.position,
+                                size =new Vector3Int(property.boundsIntValue.size.x, property.boundsIntValue.size.y, ToInt32Ceiling(obj)),
+                            };
+                            property.serializedObject.ApplyModifiedProperties();
+                        })),
+                        _ => ($"Out of bounds {index} for boundsInt type", default, null),
+                    };
             }
 
             string vecName;
@@ -424,13 +594,13 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
                         case SourceType.Long:
                             if (sourceNumber.LongV < requiredLimit.LongV)
                             {
-                                return ($"Min {requiredLimit.LongV}, get {sourceNumber.LongV}", () => apply(sourceNumber.LongV));
+                                return ($"Min {requiredLimit}, get {sourceNumber}", () => apply(requiredLimit.LongV));
                             }
                             break;
                         case SourceType.Ulong:
                             if (sourceNumber.LongV >= 0 && (ulong)sourceNumber.LongV < requiredLimit.UlongV)
                             {
-                                return ($"Min {requiredLimit.UlongV}, get {sourceNumber.LongV}", () => apply(sourceNumber.LongV));
+                                return ($"Min {requiredLimit}, get {sourceNumber}", () => apply(requiredLimit.LongV));
                             }
                             break;
                         case SourceType.Double:

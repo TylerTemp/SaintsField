@@ -32776,11 +32776,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e531a489e5e05d46b315cb2895b2ac3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.TestMinMax.MaxComp
-  intDirect: -17
-  vector3: {x: 2, y: 4, z: -17}
+  intDirect: 0
+  vector3: {x: 0, y: 0, z: 0}
   f: 0.82
   color: {r: 0.5, g: 0, b: 0, a: 0.82}
-  wrongCap: 9
+  wrongCap: 0
+  rec:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 46}
+    m_Extent: {x: 0, y: 0, z: 1}
 --- !u!1 &1815438673
 GameObject:
   m_ObjectHideFlags: 0
