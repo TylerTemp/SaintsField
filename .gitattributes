@@ -4,3 +4,4 @@
 *.prefab diff -merge -text
 *.meta diff -merge text
 *.dll filter=lfs diff=lfs merge=lfs -text
+*.fbx filter=lfs diff=lfs merge=lfs -text

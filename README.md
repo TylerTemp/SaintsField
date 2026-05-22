@@ -110,26 +110,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.15.1**
+**5.15.2**
 
-1.  `MinValue`/`MaxValue` now support all number types (previously only int/float)
-2.  `MinValue`/`MaxValue` now support all combo number types
-
-**number types**
-
-*   `int`, `uint`, `sbyte`, `byte`, `short`, `ushort`,
-*   `long`, `ulong`
-*   `float`, `double`
-*   `decimal`
-
-**combo types**
-
-*   `Vector2`, `Vector2Int`, `Vector3`, `Vector3Int`, `Vector4`
-*   `Quaternion`
-*   `Color`, `Color32`
-*   `Rect`, `RectInt`
-*   `Bounds`, `BoundsInt`
-*   Custom type which has `x`, `y`, `z`, `w` properties, and they are all number types
+`AssetPreview` now support interact if the target is a 3D model, materal etc.
 
 ## Usage ##
 

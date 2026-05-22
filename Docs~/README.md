@@ -5549,7 +5549,7 @@ Note: Recommended to use `AboveImage`/`BelowImage` for image/sprite/texture2D.
 
     See the `GroupBy` section
 
-*   AllowMultiple: No
+*   Allow Multiple: No
 
 ```csharp
 using SaintsField;
@@ -5560,6 +5560,18 @@ using SaintsField;
 ```
 
 ![asset_preview](https://github.com/TylerTemp/SaintsField/assets/6391063/ffed3715-f531-43d0-b4c3-98d20d419b3e)
+
+If the target is a 3D model, materal etc, the previwe panel is interactive
+
+```csharp
+using SaintsField;
+
+[AssetPreview] public GameObject prefabWithModel;
+[AssetPreview] public GameObject fbx;
+[AssetPreview] public Material drawMaterial;
+```
+
+[![video](https://github.com/user-attachments/assets/bcfcac8c-c440-4ef6-86fd-27b6a85a95a5)](https://github.com/user-attachments/assets/dcbf69d7-dda8-484e-9548-d913d56d1a93)
 
 #### `AboveImage`/`BelowImage` ####
 

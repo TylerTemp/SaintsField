@@ -1,30 +1,58 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
+using Image = UnityEngine.UIElements.Image;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
 {
     public partial class AssetPreviewAttributeDrawer
     {
-
-        public class AssetPreviewField : BaseField<string>
+        public class AssetPreviewContainer : VisualElement
         {
-            public readonly VisualElement ImageContainerElement;
             public readonly Image ImageElement;
+            public readonly VisualElement InteractivePreviewContainer;
 
-            public AssetPreviewField(string label, VisualElement imageContainer, Image image) : base(label,
-                imageContainer)
+            public AssetPreviewContainer()
             {
-                ImageContainerElement = imageContainer;
-                ImageElement = image;
+                ImageElement = new Image
+                {
+                    scaleMode = ScaleMode.ScaleToFit,
+                    sourceRect = new Rect(0, 0, 0, 0),
+                    // style =
+                    // {
+                    //     flexGrow = 1,
+                    //     // flexShrink = 1,
+                    // },
+                };
+                hierarchy.Add(ImageElement);
+                InteractivePreviewContainer = new VisualElement();
+                hierarchy.Add(InteractivePreviewContainer);
+            }
+        }
+
+
+        public class AssetPreviewField : BaseField<Object>
+        {
+            // public readonly VisualElement ImageContainerElement;
+            // public readonly Image ImageElement;
+            public readonly AssetPreviewContainer AssetPreviewContainer;
+
+            public AssetPreviewField(string label, AssetPreviewContainer assetPreviewContainer) : base(label,
+                assetPreviewContainer)
+            {
+                AssetPreviewContainer = assetPreviewContainer;
+                // AssetPreviewContainer input = this.
+                // ImageContainerElement = imageContainer;
+                // ImageElement = image;
             }
         }
 
@@ -40,8 +68,8 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                 return null;
             }
 
-            Texture2D preview = GetPreview(GetCurObject(property, info, parent));
-            return CreateUIToolkitElement(property, index, preview, assetPreviewAttribute, info, parent);
+            // Texture2D preview = GetPreview(GetCurObject(property, info, parent));
+            return CreateUIToolkitElement(property, index, assetPreviewAttribute);
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -54,18 +82,19 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                 return null;
             }
 
-            Texture2D preview = GetPreview(GetCurObject(property, info, parent));
-            return CreateUIToolkitElement(property, index, preview, assetPreviewAttribute, info, parent);
+            // Texture2D preview = GetPreview(GetCurObject(property, info, parent));
+            return CreateUIToolkitElement(property, index, assetPreviewAttribute);
         }
 
-        private struct Payload
+        private class Payload
         {
-            // ReSharper disable InconsistentNaming
             public Object ObjectReferenceValue;
-
             public float ProcessedWidth;
-            // ReSharper enable InconsistentNaming
+            public UnityEditor.Editor Editor;
+            public bool UseEditor;
         }
+
+        private const int InteractiveDefaultSize = 300;
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
@@ -80,71 +109,158 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
             }
 
             AssetPreviewField root = container.Q<AssetPreviewField>(NameRoot(property, index));
-            Image image = root.ImageElement;
-            Payload payload = (Payload)image.userData;
+            // Image image = root.ImageElement;
+            Payload payload = (Payload)root.userData;
 
             Object curObject = GetCurObject(property, info, parent);
 
-            // Debug.Log($"cur={curInstanceId}, pre={preInstanceId}");
             if (ReferenceEquals(payload.ObjectReferenceValue, curObject))
             {
+                // Debug.Log($"same object, skip {curObject}");
                 return;
             }
 
-            _previewTexture = null;
-            root.style.display = DisplayStyle.None;
-
-            if (curObject == null)
+            if (RuntimeUtil.IsNull(curObject))
             {
-                image.userData = new Payload
+                payload.ObjectReferenceValue = null;
+                root.style.display = DisplayStyle.None;
+                // Debug.Log($"null object, skip");
+                return;
+            }
+
+            payload.ObjectReferenceValue = curObject;
+
+            bool hasPreviewGui;
+            if (curObject is Texture or Sprite or Graphic or UnityEngine.UI.Image)
+            {
+                hasPreviewGui = false;
+            }
+            else
+            {
+                UnityEditor.Editor.CreateCachedEditor(
+                    curObject,
+                    null,
+                    ref payload.Editor);
+                hasPreviewGui = payload.Editor.HasPreviewGUI();
+            }
+
+            AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
+
+            if (hasPreviewGui)
+            {
+                payload.UseEditor = true;
+                UIToolkitUtils.SetDisplayStyle(root.AssetPreviewContainer.ImageElement, DisplayStyle.None);
+                if(root.AssetPreviewContainer.InteractivePreviewContainer.childCount > 0)
                 {
-                    ObjectReferenceValue = null,
-                    ProcessedWidth = payload.ProcessedWidth,
-                };
-                return;
-            }
+                    root.AssetPreviewContainer.InteractivePreviewContainer.Clear();
+                }
+                UIToolkitUtils.SetDisplayStyle(root.AssetPreviewContainer.InteractivePreviewContainer, DisplayStyle.Flex);
 
-            Texture2D preview = GetPreview(curObject);
+                root.AssetPreviewContainer.InteractivePreviewContainer.Add(new IMGUIContainer(() =>
+                {
+                    if (payload.Editor == null)
+                    {
+                        return;
+                    }
 
-            // UpdateImage(image, preview, (AssetPreviewAttribute)saintsAttribute);
-            if (preview != null)
-            {
-                AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
-                SetImage(root, image, preview);
+                    float size = InteractiveDefaultSize;
+                    if (payload.ProcessedWidth > 0)
+                    {
+                        size = payload.ProcessedWidth;
+                    }
+                    // Debug.Log(size);
+                    Rect rect = GUILayoutUtility.GetRect(size, size);
+
+                    // cachedEditor.OnPreviewGUI(
+                    //     rect,
+                    //     EditorStyles.helpBox);
+                    payload.Editor.OnInteractivePreviewGUI(rect, EditorStyles.helpBox);
+                }));
                 OnRootGeoChanged(
                     root,
                     assetPreviewAttribute.Width, assetPreviewAttribute.Height);
             }
+            else
+            {
+                // Debug.Log("processing preview thumbnail");
+                if (payload.Editor != null)
+                {
+                    Object.DestroyImmediate(payload.Editor);
+                    payload.Editor = null;
+                }
+                if(root.AssetPreviewContainer.InteractivePreviewContainer.childCount > 0)
+                {
+
+                    root.AssetPreviewContainer.InteractivePreviewContainer.Clear();
+                }
+                UIToolkitUtils.SetDisplayStyle(root.AssetPreviewContainer.InteractivePreviewContainer, DisplayStyle.None);
+                payload.UseEditor = false;
+
+                _previewTexture = null;
+                Texture2D preview = GetPreview(curObject);
+                // Debug.Log($"try get preview {preview!=null}");
+                if (preview != null)
+                {
+                    UIToolkitUtils.SetDisplayStyle(root.AssetPreviewContainer.ImageElement, DisplayStyle.Flex);
+
+                    SetImage(root, root.AssetPreviewContainer.ImageElement, preview);
+                    // Debug.Log($"set preview {preview}");
+                    OnRootGeoChanged(
+                        root,
+                        assetPreviewAttribute.Width, assetPreviewAttribute.Height);
+                }
+                else if (AssetPreview.IsLoadingAssetPreview(curObject.
+#if UNITY_6000_4_OR_NEWER
+                        GetEntityId
+#else
+                        GetInstanceID
+#endif
+                                ()))
+                {
+                    // Debug.Log("still processing, will be updated later");
+                    payload.ObjectReferenceValue = null;
+                }
+
+            }
         }
 
-        private static VisualElement CreateUIToolkitElement(SerializedProperty property, int index, Texture2D preview,
-            AssetPreviewAttribute assetPreviewAttribute, FieldInfo info, object parent)
+        private static VisualElement CreateUIToolkitElement(SerializedProperty property, int index,
+            AssetPreviewAttribute assetPreviewAttribute)
         {
-            Image image = new Image
-            {
-                scaleMode = ScaleMode.ScaleToFit,
-                sourceRect = new Rect(0, 0, 0, 0),
-                // style =
-                // {
-                //     flexGrow = 1,
-                //     // flexShrink = 1,
-                // },
-            };
-            VisualElement imageContainer = new VisualElement
+            AssetPreviewContainer previewContainer = new AssetPreviewContainer
             {
                 style =
                 {
                     flexDirection = FlexDirection.Row,
                 },
             };
-            imageContainer.Add(image);
+            //
+            // Image image = new Image
+            // {
+            //     scaleMode = ScaleMode.ScaleToFit,
+            //     sourceRect = new Rect(0, 0, 0, 0),
+            //     // style =
+            //     // {
+            //     //     flexGrow = 1,
+            //     //     // flexShrink = 1,
+            //     // },
+            // };
+            // VisualElement imageContainer = new VisualElement
+            // {
+            //     style =
+            //     {
+            //         flexDirection = FlexDirection.Row,
+            //     },
+            // };
+            // imageContainer.Add(image);
 
-            AssetPreviewField assetPreviewField = new AssetPreviewField(" ", imageContainer, image)
+            AssetPreviewField assetPreviewField = new AssetPreviewField(" ", previewContainer)
             {
                 name = NameRoot(property, index),
+                userData = new Payload(),
             };
 
-            assetPreviewField.AddToClassList("unity-base-field__aligned");
+            assetPreviewField.AddToClassList(AssetPreviewField.alignedFieldUssClassName);
 
             switch (assetPreviewAttribute.Align)
             {
@@ -153,11 +269,11 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                     break;
                 case EAlign.Center:
                     assetPreviewField.labelElement.style.display = DisplayStyle.None;
-                    assetPreviewField.ImageContainerElement.style.justifyContent = Justify.Center;
+                    previewContainer.style.justifyContent = Justify.Center;
                     break;
                 case EAlign.End:
                     assetPreviewField.labelElement.style.display = DisplayStyle.None;
-                    assetPreviewField.ImageContainerElement.style.justifyContent = Justify.FlexEnd;
+                    previewContainer.style.justifyContent = Justify.FlexEnd;
                     break;
                 case EAlign.FieldStart:
                     break;
@@ -170,25 +286,25 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
 
             // image.AddToClassList(NameImage(property, index));
 
-            SetImage(assetPreviewField, image, preview);
-            if (preview == null)
-            {
-                image.userData = new Payload
-                {
-                    ObjectReferenceValue = null,
-                    ProcessedWidth = 0,
-                };
-            }
-            else
-            {
-                image.style.width = preview.width;
-                image.style.height = preview.height;
-                image.userData = new Payload
-                {
-                    ObjectReferenceValue = GetCurObject(property, info, parent),
-                    ProcessedWidth = 0,
-                };
-            }
+            // SetImage(assetPreviewField, image, preview);
+            // if (preview == null)
+            // {
+            //     image.userData = new Payload
+            //     {
+            //         ObjectReferenceValue = null,
+            //         ProcessedWidth = 0,
+            //     };
+            // }
+            // else
+            // {
+            //     image.style.width = preview.width;
+            //     image.style.height = preview.height;
+            //     image.userData = new Payload
+            //     {
+            //         ObjectReferenceValue = GetCurObject(property, info, parent),
+            //         ProcessedWidth = 0,
+            //     };
+            // }
 
             assetPreviewField.AddToClassList(ClassAllowDisable);
 
@@ -212,7 +328,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
 
         private static void OnRootGeoChanged(AssetPreviewField root, int widthConfig, int heightConfig)
         {
-            Image image = root.ImageElement;
+            AssetPreviewContainer previewContainer = root.AssetPreviewContainer;
             if (root.style.display == DisplayStyle.None)
             {
                 return;
@@ -220,57 +336,71 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
 
             float rootWidth = root.resolvedStyle.width;
 
-            if (rootWidth < Mathf.Epsilon)
+            if (rootWidth < Mathf.Epsilon || float.IsNaN(rootWidth))
             {
                 return;
             }
 
-            float fakeLabelWidth = root.labelElement.style.display == DisplayStyle.None
-                ? 0
-                : root.labelElement.resolvedStyle.width;
+            float fakeLabelWidth;
+            if (root.labelElement.style.display == DisplayStyle.None)
+            {
+                fakeLabelWidth = 0;
+            }
+            else
+            {
+                fakeLabelWidth = root.labelElement.resolvedStyle.width;
+                if (float.IsNaN(fakeLabelWidth))
+                {
+                    return;
+                }
+            }
 
-            float imageWidth = image.resolvedStyle.width;
-
-            if (new[] { rootWidth, fakeLabelWidth, imageWidth }.Any(float.IsNaN))
+            Payload payload = (Payload)root.userData;
+            if (Mathf.Approximately(payload.ProcessedWidth, rootWidth))
             {
                 return;
             }
 
-            Payload payload = (Payload)image.userData;
-
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (payload.ProcessedWidth == rootWidth)
+            if (payload.UseEditor)
             {
-                return;
+                int maxWidth = Mathf.FloorToInt(rootWidth - fakeLabelWidth);
+                int width = InteractiveDefaultSize;
+                // int height = InteractiveDefaultSize;
+                if (maxWidth > 0)
+                {
+                    (width, _) = Tex.GetProperScaleRect(
+                        maxWidth,
+                        widthConfig, heightConfig, InteractiveDefaultSize, InteractiveDefaultSize);
+                }
+                payload.ProcessedWidth = width;
             }
-
-            image.userData = new Payload
+            else
             {
-                ObjectReferenceValue = payload.ObjectReferenceValue,
-                ProcessedWidth = rootWidth,
-            };
+                payload.ProcessedWidth = rootWidth;
 
-            if (image.image == null)
-            {
-                return;
-            }
+                if (previewContainer.ImageElement.image == null)
+                {
+                    return;
+                }
+                int maxWidth = Mathf.FloorToInt(rootWidth - fakeLabelWidth);
 
-            int maxWidth = Mathf.FloorToInt(rootWidth - fakeLabelWidth);
-            int width = 0;
-            int height = 0;
-            if (maxWidth > 0)
-            {
-                Texture2D preview = (Texture2D)image.image;
-                (width, height) = Tex.GetProperScaleRect(
-                    maxWidth,
-                    widthConfig, heightConfig, preview.width, preview.height);
+                int width = 0;
+                int height = 0;
+                if (maxWidth > 0)
+                {
+                    Texture2D preview = (Texture2D)previewContainer.ImageElement.image;
+                    (width, height) = Tex.GetProperScaleRect(
+                        maxWidth,
+                        widthConfig, heightConfig, preview.width, preview.height);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ASSET_PREVIEW
-                Debug.Log($"{width}x{height}<-rootWidth={rootWidth}, fakeLabel={fakeLabelWidth}, widthConfig={widthConfig}, heightConfig={heightConfig}, preview={preview.width}x{preview.height}");
+                    Debug.Log($"{width}x{height}<-rootWidth={rootWidth}, fakeLabel={fakeLabelWidth}, widthConfig={widthConfig}, heightConfig={heightConfig}, preview={preview.width}x{preview.height}");
 #endif
+                }
+
+                previewContainer.ImageElement.style.width = Mathf.Max(width, 0);
+                previewContainer.ImageElement.style.height = Mathf.Max(height, 0);
             }
 
-            image.style.width = Mathf.Max(width, 0);
-            image.style.height = Mathf.Max(height, 0);
         }
     }
 }

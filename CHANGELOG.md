@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.15.2 ##
+
+`AssetPreview` now support interact if the target is a 3D model, materal etc.
+
 ## 5.15.1 ##
 
 1.  `MinValue`/`MaxValue` now support all number types (previously only int/float)
