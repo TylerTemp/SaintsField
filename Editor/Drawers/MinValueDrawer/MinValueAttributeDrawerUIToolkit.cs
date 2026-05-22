@@ -54,6 +54,11 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
 
             void Refresh()
             {
+                if (!SerializedUtils.IsOk(property))
+                {
+                    return;
+                }
+
                 (IReadOnlyList<string> errors, IReadOnlyList<(string message, Action fix)> checkerResults) = CheckPropertyValue(property, minValueAttribute, onValueChangedCallback, info, parent);
                 foreach ((string _, Action fix)  in checkerResults)
                 {

@@ -21,6 +21,24 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
         {
             List<string> errors = new List<string>(4);
             List<(string message, Action fix)> checkerResults = new List<(string message, Action fix)>(4);
+
+            Type memberType;
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
+            switch (info)
+            {
+                case FieldInfo fieldInfo:
+                    memberType = fieldInfo.FieldType;
+                    break;
+                case PropertyInfo propertyInfo:
+                    memberType = propertyInfo.PropertyType;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(info), info, null);
+            }
+
+            Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                ? ReflectUtils.GetElementType(memberType)
+                : memberType;
             // bool changed = false;
             for (int index = 0; index < maxValueAttribute.Positions.Count; index++)
             {
@@ -55,7 +73,7 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
                     requiredLimit = newLimit;
                 }
 
-                (string sourceError, NumberLimitParam sourceNumber, Action<object> apply) = ParsePropertySource(index, property);
+                (string sourceError, NumberLimitParam sourceNumber, Action<object> apply) = ParsePropertySource(index, property, fieldType);
                 if (sourceError != string.Empty)
                 {
                     errors.Add(sourceError);
@@ -160,8 +178,9 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
             }
         }
 
-        private static (string sourceError, NumberLimitParam sourceNumber, Action<object> apply) ParsePropertySource(int index, SerializedProperty property)
+        private static (string sourceError, NumberLimitParam sourceNumber, Action<object> apply) ParsePropertySource(int index, SerializedProperty property, Type fieldType)
         {
+            // ReSharper disable once InvertIf
             if (index == 0)
             {
                 (string propDirectError, NumberLimitParam propDirectNumber, Action<object> apply) r = ParsePropertyDirect(property);
@@ -171,11 +190,12 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
                 }
             }
 
-            return ParsePropertyAtPosition(index, property);
+            return ParsePropertyAtPosition(index, property, fieldType);
         }
 
         private static (string propDirectError, NumberLimitParam propDirectNumber, Action<object> apply) ParsePropertyDirect(SerializedProperty property)
         {
+            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (property.numericType)
             {
                 case SerializedPropertyNumericType.Unknown:
@@ -225,7 +245,7 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
             }
         }
 
-        private static (string sourceError, NumberLimitParam sourceNumber, Action<object> apply) ParsePropertyAtPosition(int index, SerializedProperty property)
+        private static (string sourceError, NumberLimitParam sourceNumber, Action<object> apply) ParsePropertyAtPosition(int index, SerializedProperty property, Type fieldType)
         {
             switch (property.propertyType)
             {
@@ -354,34 +374,41 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
                         _ => ($"Out of bounds {index} for quaternion type", default, null),
                     };
                 case SerializedPropertyType.Color:
+                {
+                    bool isColor32 = fieldType == typeof(Color32);
                     return index switch
                     {
-                        0 => (string.Empty, new NumberLimitParam(property.colorValue.r), obj =>
+                        0 => (string.Empty, new NumberLimitParam(SerializedToColor32(property.colorValue.r, isColor32)), obj =>
                         {
+                            float serValue = LimitToSerColor(obj, isColor32);
                             Color c = property.colorValue;
-                            property.colorValue = new Color(Convert.ToSingle(obj), c.g, c.b, c.a);
+                            property.colorValue = new Color(serValue, c.g, c.b, c.a);
                             property.serializedObject.ApplyModifiedProperties();
                         }),
-                        1 => (string.Empty, new NumberLimitParam(property.colorValue.g), obj =>
+                        1 => (string.Empty, new NumberLimitParam(SerializedToColor32(property.colorValue.g, isColor32)), obj =>
                         {
+                            float serValue = LimitToSerColor(obj, isColor32);
                             Color c = property.colorValue;
-                            property.colorValue = new Color(c.r, Convert.ToSingle(obj), c.b, c.a);
+                            property.colorValue = new Color(c.r, serValue, c.b, c.a);
                             property.serializedObject.ApplyModifiedProperties();
                         }),
-                        2 => (string.Empty, new NumberLimitParam(property.colorValue.b), obj =>
+                        2 => (string.Empty, new NumberLimitParam(SerializedToColor32(property.colorValue.b, isColor32)), obj =>
                         {
+                            float serValue = LimitToSerColor(obj, isColor32);
                             Color c = property.colorValue;
-                            property.colorValue = new Color(c.r, c.g, Convert.ToSingle(obj), c.a);
+                            property.colorValue = new Color(c.r, c.g, serValue, c.a);
                             property.serializedObject.ApplyModifiedProperties();
                         }),
-                        3 => (string.Empty, new NumberLimitParam(property.colorValue.a), (Action<object>)(obj =>
+                        3 => (string.Empty, new NumberLimitParam(SerializedToColor32(property.colorValue.a, isColor32)), obj =>
                         {
+                            float serValue = LimitToSerColor(obj, isColor32);
                             Color c = property.colorValue;
-                            property.colorValue = new Color(c.r, c.g, c.b, Convert.ToSingle(obj));
+                            property.colorValue = new Color(c.r, c.g, c.b, serValue);
                             property.serializedObject.ApplyModifiedProperties();
-                        })),
+                        }),
                         _ => ($"Out of bounds {index} for color type", default, null),
                     };
+                }
                 case SerializedPropertyType.Rect:
                     return index switch
                     {
@@ -584,6 +611,15 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
             return ParsePropertyDirect(subProp);
         }
 
+        private static object SerializedToColor32(float serColorValue, bool isColor32)
+        {
+            if (isColor32)
+            {
+                return (int)(serColorValue * 255);
+            }
+            return serColorValue;
+        }
+
         private static (string message, Action fix) CheckLimitAndApply(NumberLimitParam sourceNumber, NumberLimitParam requiredLimit, Action<object> apply)
         {
             switch (sourceNumber.SourceType)
@@ -751,6 +787,17 @@ namespace SaintsField.Editor.Drawers.MaxValueDrawer
             }
 
             return ("", null);
+        }
+
+        private static float LimitToSerColor(object obj, bool isColor32)
+        {
+            if (!isColor32)
+            {
+                return Convert.ToSingle(obj);
+            }
+
+            int intValue = ToInt32Floor(obj);
+            return Mathf.Clamp(intValue / 255f, 0f, 1f);
         }
 
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,

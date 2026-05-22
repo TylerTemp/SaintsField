@@ -24,6 +24,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing.TestMinMax
         [MaxValue(position2: 2, position5: 2)]
         public BoundsInt boundsInt;
 
+        [MinValue(100)]
+        [MaxValue(150)]
         public Color32 color32;
 
     }
