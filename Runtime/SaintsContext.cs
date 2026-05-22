@@ -1,9 +1,8 @@
-
-using System.Linq;
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using SaintsField.Utils;
 using UnityEditor;
+using System.Linq;
 #endif
 
 namespace SaintsField

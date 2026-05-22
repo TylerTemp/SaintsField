@@ -3995,14 +3995,58 @@ private string ValidateValArr(int v, int index) => $"ValidateValArr[{index}]: {v
 
 #### `MinValue` / `MaxValue` ####
 
-Limit for int/float field
+Limit for number field. Support single number like int, float, and combo numbers like vector, color. Supported types are:
 
-They have the same overrides:
+**number types**
 
-*   `float value`: directly limit to a number value
-*   `string valueCallback`: a callback or property for limit
+*   `int`, `uint`, `sbyte`, `byte`, `short`, `ushort`, 
+*   `long`, `ulong`
+*   `float`, `double`
+*   `decimal`
 
-*   AllowMultiple: Yes
+**combo types**
+
+*   `Vector2`, `Vector2Int`, `Vector3`, `Vector3Int`, `Vector4`
+*   `Quaternion`
+*   `Color`, `Color32`
+*   `Rect`, `RectInt`
+*   `Bounds`, `BoundsInt`
+*   Custom type which has `x`, `y`, `z`, `w` properties, and they are all number types
+
+**Parameters**
+
+It accepts 1~6 parameters. For each parameter:
+
+1.  If it's a number type, use that value
+2.  If it's a string, use as callback. The callback must return either a number type, or `null` for no limit
+3.  If it's `null`, then no limit for this number
+
+For each parameter:
+
+*   `object position0=null`: limit for first number. If it's number types, limit this number field. Otherwise, limit for:
+    *   `x` value for vector types, `Quaternion`, and rect types, and custom type 
+    *   `r` value for color types
+    *   `x` value for `Bounds.center` and `BoundsInt.position`
+*   `object position1=null`: limit for:
+    *   `y` value for vector types, `Quaternion`, and rect types, and custom type
+    *   `g` value for color types
+    *   `y` value for `Bounds.center` and `BoundsInt.position`
+*   `object position2=null`: limit for:
+    *   `z` value for vector types, `Quaternion`, and custom type
+    *   `width` for rect types
+    *   `b` value for color types
+    *   `z` value for `Bounds.center` and `BoundsInt.position`
+*   `object position3=null`: limit for:
+    *   `w` value for vector types, `Quaternion`, and custom type
+    *   `height` for rect types
+    *   `a` value for color types
+    *   `x` value for `Bounds.extents` and `BoundsInt.size`
+*   `object position4=null`: limit for:
+    *   `y` value for `Bounds.extents` and `BoundsInt.size`
+*   `object position5=null`: limit for:
+    *   `z` value for `Bounds.extents` and `BoundsInt.size`
+
+Allow Multiple: Yes
 
 ```csharp
 using SaintsField;
@@ -4015,6 +4059,33 @@ public int upLimit;
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/7714fa76-fc5c-4ebc-9aae-be189cef7743)](https://github.com/TylerTemp/SaintsField/assets/6391063/ea2efa8d-86e6-46ba-bd7d-23e7577f7604)
 
+Example:
+
+```csharp
+// Color, but requires alpha=1 (no transparent)
+
+using SaintsField;
+
+[MinValue(position3: 255)]
+[MaxValue(position3: 255)]
+public Color32 color32NoAlpha;
+
+[MinValue(position3: 1)]
+[MaxValue(position3: 1)]
+public Color color32Alpha;
+```
+
+Example with callback field walk:
+
+```csharp
+[MinMaxSlider(10, 20)] public Vector2Int heightRange;
+
+[MinValue(position3: nameof(heightRange) + ".x")]
+[MaxValue(position3: nameof(heightRange) + ".y")]
+public Rect rectHeightLimited;
+```
+
+[![video](https://github.com/user-attachments/assets/6d6e729a-26f1-4580-a7e9-657bc9aebb21)](https://github.com/user-attachments/assets/bfb9c209-5feb-4e27-8bcb-846786ea9172)
 
 #### `RequireType` ####
 

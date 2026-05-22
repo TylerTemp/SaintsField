@@ -947,6 +947,8 @@ namespace SaintsField.Editor.Utils
                                     pooled.target = listView;
                                     listView.SendEvent(pooled);
                                 }
+
+                                SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke();
                             }).Every(100);
 
                             AddContextualMenuReset(listViewToggle, property, fieldInfo, parent);
@@ -1037,6 +1039,7 @@ namespace SaintsField.Editor.Utils
                             },
                         };
                         longField.BindProperty(property);
+                        longField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                         ApplyBasicStyles(longField, inHorizontalLayout);
                         AddContextualMenuReset(longField, property, fieldInfo, parent);
                         return longField;
@@ -1063,6 +1066,7 @@ namespace SaintsField.Editor.Utils
                             },
                         };
                         unsignedLongField.BindProperty(property);
+                        unsignedLongField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                         ApplyBasicStyles(unsignedLongField, inHorizontalLayout);
                         AddContextualMenuReset(unsignedLongField, property, fieldInfo, parent);
                         return unsignedLongField;
@@ -1109,6 +1113,7 @@ namespace SaintsField.Editor.Utils
                             },
                         };
                         integerField.BindProperty(property);
+                        integerField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                         ApplyBasicStyles(integerField, inHorizontalLayout);
                         AddContextualMenuReset(integerField, property, fieldInfo, parent);
 
@@ -1136,6 +1141,7 @@ namespace SaintsField.Editor.Utils
                             },
                         };
                         unsignedIntegerField.BindProperty(property);
+                        unsignedIntegerField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                         ApplyBasicStyles(unsignedIntegerField, inHorizontalLayout);
                         AddContextualMenuReset(unsignedIntegerField, property, fieldInfo, parent);
 
@@ -1183,6 +1189,7 @@ namespace SaintsField.Editor.Utils
                             },
                         };
                         element.BindProperty(property);
+                        element.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                         ApplyBasicStyles(element, inHorizontalLayout);
                         AddContextualMenuReset(element, property, fieldInfo, parent);
 
@@ -1209,6 +1216,7 @@ namespace SaintsField.Editor.Utils
                             },
                         };
                         element.BindProperty(property);
+                        element.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                         ApplyBasicStyles(element, inHorizontalLayout);
                         AddContextualMenuReset(element, property, fieldInfo, parent);
 
@@ -1235,6 +1243,7 @@ namespace SaintsField.Editor.Utils
                             },
                         };
                         element.BindProperty(property);
+                        element.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                         ApplyBasicStyles(element, inHorizontalLayout);
                         AddContextualMenuReset(element, property, fieldInfo, parent);
 
@@ -1261,6 +1270,7 @@ namespace SaintsField.Editor.Utils
                             },
                         };
                         element.BindProperty(property);
+                        element.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                         ApplyBasicStyles(element, inHorizontalLayout);
                         AddContextualMenuReset(element, property, fieldInfo, parent);
                         return element;
@@ -1287,6 +1297,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     toggle.BindProperty(property);
+                    toggle.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     toggle.AddToClassList(Toggle.alignedFieldUssClassName);
                     toggle.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     toggle.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
@@ -1340,6 +1351,7 @@ namespace SaintsField.Editor.Utils
                             },
                         };
                         doubleField.BindProperty(property);
+                        doubleField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
 
                         ApplyBasicStyles(doubleField, inHorizontalLayout);
                         return doubleField;
@@ -1389,6 +1401,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     textField.BindProperty(property);
+                    textField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(textField, inHorizontalLayout);
                     if(canAddContextReset)
                     {
@@ -1415,6 +1428,7 @@ namespace SaintsField.Editor.Utils
                     };
 
                     colorField.BindProperty(property);
+                    colorField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(colorField, inHorizontalLayout);
                     if(canAddContextReset)
                     {
@@ -1448,6 +1462,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     objectField.BindProperty(property);
+                    objectField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(objectField, inHorizontalLayout);
 
                     if (string.IsNullOrEmpty(label))  // ObjectField.label has issue in SaintsDictionary. This is a workaround
@@ -1481,6 +1496,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     layerMaskField.BindProperty(property);
+                    layerMaskField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(layerMaskField, inHorizontalLayout);
                     if(canAddContextReset)
                     {
@@ -1538,6 +1554,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     vector2Field.BindProperty(property);
+                    vector2Field.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     vector2Field.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     vector2Field.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
                     if (inHorizontalLayout)
@@ -1580,6 +1597,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     vector3Field.BindProperty(property);
+                    vector3Field.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     vector3Field.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     vector3Field.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
 
@@ -1624,6 +1642,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     vector4Field.BindProperty(property);
+                    vector4Field.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     vector4Field.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     vector4Field.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
 
@@ -1667,6 +1686,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     rectField.BindProperty(property);
+                    rectField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     rectField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     rectField.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
 
@@ -1711,6 +1731,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     integerField.BindProperty(property);
+                    integerField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(integerField, inHorizontalLayout);
                     if(canAddContextReset)
                     {
@@ -1737,6 +1758,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     textField.BindProperty(property);
+                    textField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(textField, inHorizontalLayout);
                     if(canAddContextReset)
                     {
@@ -1762,6 +1784,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     curveField.BindProperty(property);
+                    curveField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(curveField, inHorizontalLayout);
                     if(canAddContextReset)
                     {
@@ -1788,6 +1811,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     boundsField.BindProperty(property);
+                    boundsField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     boundsField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     boundsField.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
                     if (inHorizontalLayout)
@@ -1844,6 +1868,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     gradientField.BindProperty(property);
+                    gradientField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(gradientField, inHorizontalLayout);
                     if(canAddContextReset)
                     {
@@ -1872,6 +1897,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     integerField.BindProperty(property);
+                    integerField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(integerField, inHorizontalLayout);
                     if(canAddContextReset)
                     {
@@ -1897,6 +1923,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     vector2IntField.BindProperty(property);
+                    vector2IntField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     vector2IntField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     vector2IntField.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
 
@@ -1937,6 +1964,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     vector3IntField.BindProperty(property);
+                    vector3IntField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     vector3IntField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     vector3IntField.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
 
@@ -1977,6 +2005,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     rectIntField.BindProperty(property);
+                    rectIntField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     rectIntField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     rectIntField.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
 
@@ -2017,6 +2046,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     boundsIntField.BindProperty(property);
+                    boundsIntField.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     boundsIntField.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     boundsIntField.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
 
@@ -2057,6 +2087,7 @@ namespace SaintsField.Editor.Utils
                         },
                     };
                     hash128Field.BindProperty(property);
+                    hash128Field.RegisterValueChangedCallback(_ => SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke());
                     ApplyBasicStyles(hash128Field, inHorizontalLayout);
                     AddContextualMenuReset(hash128Field, property, fieldInfo, parent);
                     return hash128Field;

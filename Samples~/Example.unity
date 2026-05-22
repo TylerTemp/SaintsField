@@ -32167,9 +32167,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59676540fac9c3a488bd465f37416bc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upLimit: 5
+  upLimit: 100
   min0Max: 3
-  fMinMax10: 9.15
+  fMinMax10: 100
 --- !u!1 &1774553391
 GameObject:
   m_ObjectHideFlags: 0
@@ -32778,18 +32778,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.TestMinMax.MaxComp
   intDirect: 0
   vector3: {x: 0, y: 0, z: 0}
-  f: 0.82
-  color: {r: 0.5, g: 0, b: 0, a: 0.82}
+  f: 0
+  color: {r: 0, g: 0, b: 0, a: 0}
   wrongCap: 0
-  rec:
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  boundsInt:
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Size: {x: 0, y: 0, z: 0}
+  color32:
+    serializedVersion: 2
+    rgba: 100
+  manualLimit: 6
+  min0Max: 0
+  fLimitTo10: 6
+  color32NoAlpha:
+    serializedVersion: 2
+    rgba: 4278190080
+  color32Alpha: {r: 0, g: 0, b: 0, a: 1}
+  heightRange: {x: 11, y: 17}
+  rectHeightLimited:
     serializedVersion: 2
     x: 0
     y: 0
     width: 0
-    height: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 46}
-    m_Extent: {x: 0, y: 0, z: 1}
+    height: 11
 --- !u!1 &1815438673
 GameObject:
   m_ObjectHideFlags: 0

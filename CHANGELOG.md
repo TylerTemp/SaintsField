@@ -1,5 +1,26 @@
 # Changelog
 
+## 5.15.1 ##
+
+1.  `MinValue`/`MaxValue` now support all number types (previously only int/float)
+2.  `MinValue`/`MaxValue` now support all combo number types
+
+**number types**
+
+*   `int`, `uint`, `sbyte`, `byte`, `short`, `ushort`,
+*   `long`, `ulong`
+*   `float`, `double`
+*   `decimal`
+
+**combo types**
+
+*   `Vector2`, `Vector2Int`, `Vector3`, `Vector3Int`, `Vector4`
+*   `Quaternion`
+*   `Color`, `Color32`
+*   `Rect`, `RectInt`
+*   `Bounds`, `BoundsInt`
+*   Custom type which has `x`, `y`, `z`, `w` properties, and they are all number types
+
 ## 5.15.0 ##
 
 1.  Add: Support for `Unity.Mathematics` package, you can now use `ShowInInspector`/`Button` to display/edit an `bool4` (and more) types in inspector ~~to play tic-tac-toc~~

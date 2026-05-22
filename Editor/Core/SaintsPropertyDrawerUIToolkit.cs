@@ -479,7 +479,6 @@ namespace SaintsField.Editor.Core
                 // fieldElement.style.flexShrink = 1;
                 fieldElement.style.flexGrow = 1;
                 fieldElement.AddToClassList(ClassFieldUIToolkit(property));
-                // fieldElement.RegisterValueChangeCallback(_ => SetValueChanged(property, true));
 
                 fieldContainer.Add(fieldElement);
                 fieldContainer.userData = fieldAttributeWithIndex;

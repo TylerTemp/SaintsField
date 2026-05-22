@@ -12,6 +12,7 @@ namespace SaintsField.Editor.Core
         {
             EditorApplication.hierarchyChanged += OnHierarchyChanged;
             EditorApplication.projectChanged += OnProjectChanged;
+            OnSaintsFieldChangedEvent.AddListener(OnAnyEvent.Invoke);
         }
 
         public static readonly UnityEvent OnHierarchyChangedEvent = new UnityEvent();
@@ -27,5 +28,12 @@ namespace SaintsField.Editor.Core
             OnProjectChangedEvent.Invoke();
             OnAnyEvent.Invoke();
         }
+
+        public static readonly UnityEvent OnSaintsFieldChangedEvent = new UnityEvent();
+        // private static void OnProjectChanged()
+        // {
+        //     OnProjectChangedEvent.Invoke();
+        //     OnAnyEvent.Invoke();
+        // }
     }
 }
