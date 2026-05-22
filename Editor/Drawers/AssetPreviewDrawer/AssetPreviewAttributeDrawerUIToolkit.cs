@@ -145,7 +145,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                 {
                     Object.DestroyImmediate(payload.Editor);
                     UnityEditor.Editor.CreateCachedEditor(
-                        comp,
+                        comp.gameObject,
                         null,
                         ref payload.Editor);
                 }
