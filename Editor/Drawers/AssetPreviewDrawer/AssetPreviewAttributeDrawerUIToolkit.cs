@@ -141,6 +141,14 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                     curObject,
                     null,
                     ref payload.Editor);
+                if (curObject is Component comp && !payload.Editor.HasPreviewGUI())
+                {
+                    Object.DestroyImmediate(payload.Editor);
+                    UnityEditor.Editor.CreateCachedEditor(
+                        comp,
+                        null,
+                        ref payload.Editor);
+                }
                 hasPreviewGui = payload.Editor.HasPreviewGUI();
             }
 
