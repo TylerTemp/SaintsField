@@ -8820,10 +8820,13 @@ public partial class SerDictionaryExample : MonoBehaviour
 
 ![](https://github.com/user-attachments/assets/37166a71-cd58-4765-aec4-5c9aabdb02b1)
 
-Because it uses `SaintsDictionary` internally, if you want to receive the field value for `OnValueChanged`, you need to use `SaintsDictionary<,>` instead.
+Because it uses `SaintsDictionary` internally, if you want to receive the field value for `OnValueChanged`, you need to use `IDictionary<,>` or `SaintsDictionary<,>` as callback parameter.
 
 ```csharp
+[SaintsSerialized, OnValueChanged(nameof(ChangedWatcher))] private Dictionary<string, int> _myDictionary;
 
+// Either `IDictionary` or `SaintsDictionary` type 
+private void ChangedWatcher(IDictionary<string, int> dic) => Debug.Log(dic);
 ```
 
 ### `HashSet<>` ###
