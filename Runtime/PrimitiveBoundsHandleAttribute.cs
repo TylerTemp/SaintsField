@@ -3,13 +3,12 @@ using System.Diagnostics;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
-    public class RadiusHandleAttribute: PropertyAttribute, ISaintsAttribute
+    public class PrimitiveBoundsHandleAttribute: PropertyAttribute, ISaintsAttribute
     {
         public SaintsAttributeType AttributeType => SaintsAttributeType.Other;
         public string GroupBy => string.Empty;
@@ -22,7 +21,7 @@ namespace SaintsField
         public readonly Color Color;
         public readonly string ColorCallback;
 
-        public RadiusHandleAttribute(
+        public PrimitiveBoundsHandleAttribute(
             string space = "this",
             float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f, string posOffsetCallback = null,
             EColor eColor = EColor.White, float alpha = 1f, string color = null

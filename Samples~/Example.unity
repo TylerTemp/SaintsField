@@ -6234,6 +6234,61 @@ Transform:
   - {fileID: 1044114291}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &591791687
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 591791688}
+  - component: {fileID: 591791689}
+  m_Layer: 0
+  m_Name: RectHandleExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &591791688
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591791687}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.34, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1318514131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &591791689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591791687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c0ce04c811163645b35121b83b6d0f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.HandleExamples.BoundsHandle.RectHandleExample
+  rect:
+    serializedVersion: 2
+    x: 0.37157524
+    y: 0.45555875
+    width: 0.9436567
+    height: 0.89403325
+  rectInt:
+    x: 2
+    y: 0
+    width: 2
+    height: 2
 --- !u!1 &597926528
 GameObject:
   m_ObjectHideFlags: 0
@@ -25705,6 +25760,8 @@ Transform:
   - {fileID: 1131725877}
   - {fileID: 1250645940}
   - {fileID: 726303643}
+  - {fileID: 1360720508}
+  - {fileID: 591791688}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1325345795
@@ -26248,6 +26305,56 @@ MonoBehaviour:
   hidePlay: 
   hideEditOrBool: 
   hideEditAndBool: 
+--- !u!1 &1360720507
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1360720508}
+  - component: {fileID: 1360720509}
+  m_Layer: 0
+  m_Name: BoundsHandleExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1360720508
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360720507}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.332, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1318514131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1360720509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360720507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9f7d3d58c9eb864b85b7241356f25c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.BoundsHandleExample
+  bounds:
+    m_Center: {x: -0.14473975, y: 0.17238349, z: 0}
+    m_Extent: {x: 1.6899971, y: 0.8302707, z: 0.72}
+  boundsInt:
+    m_Position: {x: 2, y: 0, z: 0}
+    m_Size: {x: 2, y: 2, z: 3}
 --- !u!1 &1373075611
 GameObject:
   m_ObjectHideFlags: 0
@@ -33799,7 +33906,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60d0e73a57112034a93e4e2049ba4621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.HandleExamples.RadiusHandle.RadiusWorldParent
-  floatRadius: 1
+  floatWorldRadius: 1
+  floatLocalRadius: 1
 --- !u!1 &1871678694
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,6 +8,7 @@ namespace SaintsField.Samples.Scripts.HandleExamples.RadiusHandle
 
         [Space]
 
+        [GetInChildren]
         public GameObject scaleTarget;
         public Vector3 positionOffset;
 
