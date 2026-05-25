@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.16.0 ##
+
+Add: `RadiusHandle` to adjust a radius in the scene. Support setting parent, offset, and colors.
+
 ## 5.15.2 ##
 
 `AssetPreview` now support interact if the target is a 3D model, materal etc.

@@ -11,7 +11,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
     public abstract partial class OneDirectionHandleBase
     {
 
-        private readonly Dictionary<string, OneDirectionInfo> _idToInfoImGui = new Dictionary<string, OneDirectionInfo>();
+        private static readonly Dictionary<string, OneDirectionInfo> IDToInfoImGui = new Dictionary<string, OneDirectionInfo>();
         // private static string GetKey(SerializedProperty property) => $"{property.serializedObject.targetObject.GetInstanceID()}_{property.propertyPath}";
 
         // private string _cacheKey;
@@ -20,9 +20,9 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
             SerializedProperty property, MemberInfo info, object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
-            if (!_idToInfoImGui.TryGetValue(key, out OneDirectionInfo oneDirectionInfo))
+            if (!IDToInfoImGui.TryGetValue(key, out OneDirectionInfo oneDirectionInfo))
             {
-                _idToInfoImGui[key] = oneDirectionInfo = new OneDirectionInfo
+                IDToInfoImGui[key] = oneDirectionInfo = new OneDirectionInfo
                 {
                     SerializedProperty = property,
                     MemberInfo = info,
@@ -38,7 +38,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
                 void OnSceneGUIIMGUI(SceneView sceneView)
                 {
                     // ReSharper disable once InvertIf
-                    if (_idToInfoImGui.TryGetValue(key, out OneDirectionInfo arrowInfo))
+                    if (IDToInfoImGui.TryGetValue(key, out OneDirectionInfo arrowInfo))
                     {
                         // ReSharper disable once InvertIf
                         if (!OnSceneGUIInternal(sceneView, arrowInfo))
@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 
                 NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
-                    _idToInfoImGui.Remove(key);
+                    IDToInfoImGui.Remove(key);
                     SceneView.duringSceneGui -= OnSceneGUIIMGUI;
                 });
 

@@ -2500,7 +2500,7 @@ namespace SaintsField.Editor.Utils
             {
                 return new TargetWorldPosInfo
                 {
-                    Error = $"Property disposed",
+                    Error = "Property disposed",
                 };
             }
 

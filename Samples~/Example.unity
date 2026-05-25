@@ -12880,6 +12880,55 @@ MonoBehaviour:
   - 
   - 
   - 
+--- !u!1 &726303642
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 726303643}
+  - component: {fileID: 726303644}
+  m_Layer: 0
+  m_Name: RadiusHandleExample
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &726303643
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726303642}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1861813167}
+  m_Father: {fileID: 1318514131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &726303644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726303642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad24c2ecf428a404384b834296e84a0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.HandleExamples.RadiusHandleExample
+  floatRadius: 1
+  scaleTarget: {fileID: 1861813166}
+  positionOffset: {x: 0, y: 0, z: 0}
+  doubleRadius: 1
 --- !u!1 &727209740
 GameObject:
   m_ObjectHideFlags: 0
@@ -24699,6 +24748,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 142339351076478d999c809bf8f02511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneKey: 
+  sceneKeySep: 
 --- !u!1 &1242835953
 GameObject:
   m_ObjectHideFlags: 0
@@ -25653,6 +25704,7 @@ Transform:
   - {fileID: 1701164492}
   - {fileID: 1131725877}
   - {fileID: 1250645940}
+  - {fileID: 726303643}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1325345795
@@ -33703,6 +33755,51 @@ Transform:
   - {fileID: 2064374387}
   m_Father: {fileID: 1352272463}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1861813166
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1861813167}
+  - component: {fileID: 1861813168}
+  m_Layer: 0
+  m_Name: Scale0.5
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1861813167
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1861813166}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.12118455, y: -0.09570269, z: 0.0652261, w: 0.98585033}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 726303643}
+  m_LocalEulerAnglesHint: {x: 14.562, y: -10.29, z: 6.252}
+--- !u!114 &1861813168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1861813166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60d0e73a57112034a93e4e2049ba4621, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.HandleExamples.RadiusHandle.RadiusWorldParent
+  floatRadius: 1
 --- !u!1 &1871678694
 GameObject:
   m_ObjectHideFlags: 0
@@ -37033,8 +37130,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   go: {fileID: 5246858966939522138, guid: 200e91449e4f9914082adbd8d8aabcb6, type: 3}
   fbx: {fileID: 919132149155446097, guid: 7b77a8836174b9e4b9abfab286e4adb1, type: 3}
-  drawTexture2D: {fileID: 2800000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}
   drawMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  drawTexture2D: {fileID: 2800000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}
   sprite: {fileID: 21300000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}
   sprites:
   - {fileID: 21300000, guid: c231b32559cc28646add1e501cb2d3f5, type: 3}

@@ -7,19 +7,16 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 {
     public static class HandleUtils
     {
-        public static (string error, Transform result) GetSpaceTransform(Util.TargetWorldPosInfo targetWorldPosInfo, string parentSpace, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
+        public static (string error, Transform result) GetSpaceTransform(string parentSpace, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
         {
-            if (targetWorldPosInfo.Transform != null)
-            {
-                return ("", targetWorldPosInfo.Transform);
-            }
-
-            Debug.Assert(parentSpace != null);
-
             Transform spaceTrans;
 
             Object spaceTarget;
             if (parentSpace == "this")
+            {
+                spaceTarget = serializedProperty.serializedObject.targetObject;
+            }
+            else if (parentSpace == null)
             {
                 spaceTarget = serializedProperty.serializedObject.targetObject;
             }
@@ -48,6 +45,18 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
 
             // wireDiscInfo.SpaceTransform = spaceTrans;
             return ("", spaceTrans);
+        }
+
+        public static (string error, Transform result) GetSpaceTransformCheckingTarget(Util.TargetWorldPosInfo targetWorldPosInfo, string parentSpace, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
+        {
+            if (targetWorldPosInfo.Transform != null)
+            {
+                return ("", targetWorldPosInfo.Transform);
+            }
+
+            Debug.Assert(parentSpace != null);
+
+            return GetSpaceTransform(parentSpace, serializedProperty, memberInfo, parent);
         }
 
         public static Vector3 GetLocalToWorldScale(Transform transform)

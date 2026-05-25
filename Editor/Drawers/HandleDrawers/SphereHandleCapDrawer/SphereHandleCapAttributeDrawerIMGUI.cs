@@ -9,22 +9,22 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 {
     public partial class SphereHandleCapAttributeDrawer
     {
-        private readonly Dictionary<string, SphereInfo> _idToSphereInfo = new Dictionary<string, SphereInfo>();
+        private static readonly Dictionary<string, SphereInfo> IDToSphereInfo = new Dictionary<string, SphereInfo>();
         private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
 
-        private SphereInfo EnsureWireDiscInfo(SphereHandleCapAttribute sphereHandleCapAttribute,
+        private static SphereInfo EnsureWireDiscInfo(SphereHandleCapAttribute sphereHandleCapAttribute,
             SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
         {
             string key = GetKey(serializedProperty);
-            if (!_idToSphereInfo.TryGetValue(key, out SphereInfo sphereInfo))
+            if (!IDToSphereInfo.TryGetValue(key, out SphereInfo sphereInfo))
             {
-                _idToSphereInfo[key] = sphereInfo =
+                IDToSphereInfo[key] = sphereInfo =
                     CreateSphereInfo(sphereHandleCapAttribute, serializedProperty, memberInfo, parent);
 
                 // ReSharper disable once InconsistentNaming
                 void OnSceneGUIIMGUI(SceneView sceneView)
                 {
-                    if (!_idToSphereInfo.TryGetValue(key, out SphereInfo innerSphereInfo))
+                    if (!IDToSphereInfo.TryGetValue(key, out SphereInfo innerSphereInfo))
                     {
                         return;
                     }
@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 
                 NoLongerInspectingWatch(serializedProperty.serializedObject.targetObject, key, () =>
                 {
-                    _idToSphereInfo.Remove(key);
+                    IDToSphereInfo.Remove(key);
                     SceneView.duringSceneGui -= OnSceneGUIIMGUI;
                     HandleVisibility.SetOutView(sphereInfo.Id);
                 });

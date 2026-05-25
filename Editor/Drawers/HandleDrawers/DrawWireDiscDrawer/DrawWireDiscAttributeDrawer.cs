@@ -259,8 +259,6 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
             wireDiscInfo.Error = "";
         }
 
-
-
         private static WireDiscInfo CreateWireDiscInfo(DrawWireDiscAttribute drawWireDiscAttribute, SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
         {
             WireDiscInfo wireDiscInfo = new WireDiscInfo
@@ -287,7 +285,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
                 return;
             }
 
-            (string error, Transform trans) = HandleUtils.GetSpaceTransform(wireDiscInfo.TargetWorldPosInfo,
+            (string error, Transform trans) = HandleUtils.GetSpaceTransformCheckingTarget(wireDiscInfo.TargetWorldPosInfo,
                 wireDiscInfo.DrawWireDiscAttribute.Space, wireDiscInfo.SerializedProperty, wireDiscInfo.MemberInfo,
                 wireDiscInfo.Parent);
 

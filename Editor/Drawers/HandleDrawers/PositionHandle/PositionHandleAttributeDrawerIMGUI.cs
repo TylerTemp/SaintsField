@@ -9,16 +9,16 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 {
     public partial class PositionHandleAttributeDrawer
     {
-        private readonly Dictionary<string, PositionHandleInfo> _idToInfoImGui = new Dictionary<string, PositionHandleInfo>();
+        private static readonly Dictionary<string, PositionHandleInfo> IDToInfoImGui = new Dictionary<string, PositionHandleInfo>();
 
-        private PositionHandleInfo EnsureKey(SerializedProperty property, PositionHandleAttribute positionHandleAttribute,
+        private static PositionHandleInfo EnsureKey(SerializedProperty property, PositionHandleAttribute positionHandleAttribute,
             MemberInfo info,
             object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
-            if (!_idToInfoImGui.TryGetValue(key, out PositionHandleInfo positionHandleInfo))
+            if (!IDToInfoImGui.TryGetValue(key, out PositionHandleInfo positionHandleInfo))
             {
-                _idToInfoImGui[key] = positionHandleInfo = new PositionHandleInfo
+                IDToInfoImGui[key] = positionHandleInfo = new PositionHandleInfo
                 {
                     SerializedProperty = property,
                     MemberInfo = info,
@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
                 // ReSharper disable once InconsistentNaming
                 void OnSceneGUIIMGUI(SceneView sceneView)
                 {
-                    if (!_idToInfoImGui.TryGetValue(key, out PositionHandleInfo innerPositionHandle))
+                    if (!IDToInfoImGui.TryGetValue(key, out PositionHandleInfo innerPositionHandle))
                     {
                         return;
                     }
@@ -40,7 +40,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 
                 NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
-                    _idToInfoImGui.Remove(key);
+                    IDToInfoImGui.Remove(key);
                     HandleVisibility.SetOutView(positionHandleInfo.Id);
                     SceneView.duringSceneGui -= OnSceneGUIIMGUI;
                 });

@@ -9,13 +9,13 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 {
     public partial class DrawLabelAttributeDrawer
     {
-        private readonly Dictionary<string, LabelInfo> _idToLabelInfo = new Dictionary<string, LabelInfo>();
+        private static readonly Dictionary<string, LabelInfo> IDToLabelInfo = new Dictionary<string, LabelInfo>();
 
-        private LabelInfo EnsureKey(DrawLabelAttribute drawLabelAttribute, SerializedProperty property, MemberInfo info,
+        private static LabelInfo EnsureKey(DrawLabelAttribute drawLabelAttribute, SerializedProperty property, MemberInfo info,
             object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
-            if(!_idToLabelInfo.TryGetValue(key, out LabelInfo labelInfo))
+            if(!IDToLabelInfo.TryGetValue(key, out LabelInfo labelInfo))
             {
                 labelInfo = new LabelInfo
                 {
@@ -28,12 +28,12 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
                     Content = drawLabelAttribute.Content,
                     Color = drawLabelAttribute.Color,
                 };
-                _idToLabelInfo[key] = labelInfo;
+                IDToLabelInfo[key] = labelInfo;
 
                 // ReSharper disable once InconsistentNaming
                 void OnSceneGUIIMGUI(SceneView sceneView)
                 {
-                    if (!_idToLabelInfo.TryGetValue(key, out LabelInfo innerLabelInfo))
+                    if (!IDToLabelInfo.TryGetValue(key, out LabelInfo innerLabelInfo))
                     {
                         return;
                     }
@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 
                 NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
                 {
-                    _idToLabelInfo.Remove(key);
+                    IDToLabelInfo.Remove(key);
                     SceneView.duringSceneGui -= OnSceneGUIIMGUI;
                 });
                 SceneView.duringSceneGui += OnSceneGUIIMGUI;

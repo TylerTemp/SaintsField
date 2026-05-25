@@ -236,7 +236,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
                 return;
             }
 
-            (string error, Transform trans) = HandleUtils.GetSpaceTransform(sphereInfo.TargetWorldPosInfo,
+            (string error, Transform trans) = HandleUtils.GetSpaceTransformCheckingTarget(sphereInfo.TargetWorldPosInfo,
                 sphereInfo.SphereHandleCapAttribute.Space, sphereInfo.SerializedProperty, sphereInfo.MemberInfo,
                 sphereInfo.Parent);
 

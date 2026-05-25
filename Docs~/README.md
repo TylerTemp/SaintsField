@@ -7017,6 +7017,41 @@ public GameObject[] objPos;  // use obj's position
 
 ![image](https://github.com/user-attachments/assets/4f31ad1e-1818-409c-91ae-48f4e766a8fb)
 
+### `RadiusHandle` ###
+
+adjust a radius in scene. Support setting parent, offset, and colors.
+
+The target filed must be number types, like int, float, double, long, short, etc.
+
+**Parameters**
+
+*   `string space = "this"`: parent of the radius. When using `this`, use the current object as target space. When using `null`, use world space and no rotation at all. 
+     Otherwise, use the target field/callback as the parent.
+*   `float posXOffset = 0f`: local position offset at the x axis
+*   `float posYOffset = 0f`: local position offset at the y axis
+*   `float posZOffset = 0f`: local position offset at the z axis
+*   `string posOffsetCallback = null`: use a field/callback as the local position offset. Must return a Vector3.
+*   `EColor eColor = EColor.White`: color of the handle
+*   `float alpha = 1f`: color's alpha of the handle
+*   `string color = null`: use a color for the handle. If starts with `#`, a hex color is used. Otherwise, use the target field/callback which the value/return-value must be a Color.
+
+```csharp
+[RadiusHandle] public float floatRadius;
+
+[Space]
+
+public GameObject scaleTarget;
+public Vector3 positionOffset;
+
+[RadiusHandle(
+    space: nameof(scaleTarget),  // parent space
+    posOffsetCallback: nameof(positionOffset),  // can be field/property/callback for local position offset
+    eColor: EColor.Blue)]
+public double doubleRadius;
+```
+
+[![video](https://github.com/user-attachments/assets/8488e213-49b3-4901-a033-1ac4a6f97e8e)](https://github.com/user-attachments/assets/40b24511-89d2-421a-ab5f-64e7323bd26f)
+
 ## Component Header ##
 
 Component Header allows you to draw extra stuffs on a component like this:

@@ -10,10 +10,10 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawWireDiscDrawer
 {
     public partial class DrawWireDiscAttributeDrawer
     {
-        private readonly Dictionary<string, WireDiscInfo> _idToWireDiscInfo = new Dictionary<string, WireDiscInfo>();
+        private static readonly Dictionary<string, WireDiscInfo> _idToWireDiscInfo = new Dictionary<string, WireDiscInfo>();
         private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
 
-        private WireDiscInfo EnsureWireDiscInfo(DrawWireDiscAttribute drawWireDiscAttribute,
+        private static WireDiscInfo EnsureWireDiscInfo(DrawWireDiscAttribute drawWireDiscAttribute,
             SerializedProperty serializedProperty, MemberInfo memberInfo, object parent)
         {
             string key = GetKey(serializedProperty);

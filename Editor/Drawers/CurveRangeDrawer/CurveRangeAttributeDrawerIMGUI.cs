@@ -9,7 +9,27 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
 {
     public partial class CurveRangeAttributeDrawer
     {
-        private string _error;
+        private class InfoImGui
+        {
+            public string Error = "";
+        }
+
+        private static readonly Dictionary<string, InfoImGui> InfoImGuiCache = new Dictionary<string, InfoImGui>();
+
+        private static InfoImGui EnsureKey(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoImGuiCache.TryGetValue(key, out InfoImGui infoImGui))
+            {
+                return infoImGui;
+            }
+
+            infoImGui = new InfoImGui();
+            InfoImGuiCache[key] = infoImGui;
+
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoImGuiCache.Remove(key));
+            return infoImGui;
+        }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
@@ -24,8 +44,9 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
             FieldInfo info, object parent)
         {
-            _error = CheckHasError(property);
-            if (_error != "")
+            InfoImGui cachedInfo = EnsureKey(property);
+            cachedInfo.Error = CheckHasError(property);
+            if (cachedInfo.Error != "")
             {
                 DefaultDrawer(position, property, label, info);
                 return;
@@ -67,19 +88,23 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
-            object parent) => _error != "";
+            object parent) => EnsureKey(property).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) =>
-            _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        {
+            string error = EnsureKey(property).Error;
+            return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
+        }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) =>
-            _error == ""
-                ? position
-                : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+        {
+            string error = EnsureKey(property).Error;
+            return error == "" ? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);
+        }
 
     }
 }
