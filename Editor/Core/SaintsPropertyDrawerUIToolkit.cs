@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -648,7 +648,7 @@ namespace SaintsField.Editor.Core
         //     _saintsPropertyInfoInjects.Add(func);
         // }
 
-#if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property, allAttributes);
@@ -982,7 +982,7 @@ namespace SaintsField.Editor.Core
                                 // ReSharper disable once ConvertToConstant.Local
                 bool isReference = property.propertyType == SerializedPropertyType.ManagedReference || property.propertyType == SerializedPropertyType.Generic;
 
-// #if UNITY_2021_3_OR_NEWER
+// #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 //                         property.propertyType == SerializedPropertyType.ManagedReference
 // #else
 //                         // HashSet<string> trackedSubPropertyNames = new HashSet<string>();
@@ -1283,7 +1283,7 @@ namespace SaintsField.Editor.Core
 //                     onValueChangedCallback(curValue);
 //                 }
 //
-// // #if UNITY_2021_3_OR_NEWER
+// // #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 //                 if (isReference && !hasTracker)
 //                 {
 //                     // reference changing will destroy the old one, and create a new one (weird... what's wrong with you Unity...)
@@ -1303,7 +1303,7 @@ namespace SaintsField.Editor.Core
 
         protected static void TrackPropertyManagedUIToolkit(Action<object> onValueChangedCallback, SerializedProperty watchSubProperty, int propertyIndex, MemberInfo memberInfo, VisualElement tracker, object newFetchParent)
         {
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
             foreach ((string _, SerializedProperty subProperty) in SaintsRowAttributeDrawer.GetSerializableFieldInfo(watchSubProperty))
             {
                 // int propertyIndex = SerializedUtils.PropertyPathIndex(getValueProperty.propertyPath);

@@ -17,6 +17,7 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
     [CustomPropertyDrawer(typeof(SaintsDecimal), true)]
     public partial class SaintsDecimalDrawer: SaintsPropertyDrawer
     {
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
@@ -82,5 +83,6 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
                 }
             }));
         }
+#endif
     }
 }

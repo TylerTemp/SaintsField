@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using SaintsField.ScriptableRenderer;
 using UnityEditor;
 using UnityEditor.Rendering.Universal;
@@ -16,3 +17,4 @@ namespace SaintsField.Editor.Playa.ScriptableRenderer
         }
     }
 }
+#endif

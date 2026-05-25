@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
@@ -75,3 +76,5 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
         }
     }
 }
+
+#endif

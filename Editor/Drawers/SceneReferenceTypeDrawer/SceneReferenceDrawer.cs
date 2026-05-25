@@ -18,6 +18,7 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
     [CustomPropertyDrawer(typeof(SceneReference))]
     public class SceneReferenceDrawer: SaintsPropertyDrawer
     {
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected override bool UseCreateFieldUIToolKit => true;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -119,5 +120,6 @@ namespace SaintsField.Editor.Drawers.SceneReferenceTypeDrawer
                 }
             }
         }
+#endif
     }
 }

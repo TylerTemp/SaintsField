@@ -14,7 +14,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 {
     public partial class SpineSlotPickerAttributeDrawer

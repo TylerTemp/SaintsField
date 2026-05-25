@@ -1,3 +1,4 @@
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +16,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-#if UNITY_2022_2_OR_NEWER
 namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 {
     public partial class SaintsHashSetDrawer

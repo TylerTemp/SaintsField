@@ -766,7 +766,7 @@ namespace SaintsField.Editor.Core
         public void Dispose()
         {
             OnDisposeIMGUI();
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
             OnDisposeUIToolkit();
 #endif
         }

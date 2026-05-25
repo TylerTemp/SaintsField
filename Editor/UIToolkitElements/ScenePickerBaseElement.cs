@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
@@ -133,3 +134,4 @@ namespace SaintsField.Editor.UIToolkitElements
         protected abstract void OnSceneFieldChanged(ChangeEvent<Object> evt);
     }
 }
+#endif

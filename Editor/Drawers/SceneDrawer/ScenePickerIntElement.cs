@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -271,3 +272,4 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
         }
     }
 }
+#endif

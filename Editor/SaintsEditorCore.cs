@@ -35,7 +35,7 @@ namespace SaintsField.Editor
         }
 
         private IMakeRenderer GetMakeRender() => _makeRenderer ?? this;
-
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public VisualElement CreateInspectorGUI()
         {
             if (!Target)
@@ -158,7 +158,7 @@ namespace SaintsField.Editor
 
             return root;
         }
-
+#endif
         private void OnSearchUIToolkit(string search)
         {
             foreach (ISaintsRenderer saintsRenderer in _hasElementRenderersUIToolkit)

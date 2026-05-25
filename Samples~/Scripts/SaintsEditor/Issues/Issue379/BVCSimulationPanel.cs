@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
 using System;
 using System.Collections.Generic;

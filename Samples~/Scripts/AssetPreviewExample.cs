@@ -15,5 +15,7 @@ namespace SaintsField.Samples.Scripts
 
         [AssetPreview] public Sprite multi1;
         [AssetPreview] public Sprite multi2;
+
+        // [AssetPreview] public Address
     }
 }

@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,7 +42,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             Texture2D pickerImage = EditorGUIUtility.IconContent("d_pick_uielements").image as Texture2D;
             Button button = new Button
             {
-                // text = "‚óè",
+                // text = "‚ó?,
                 style =
                 {
                     // position = Position.Absolute,

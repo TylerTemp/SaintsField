@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
         {
             Button selectorButton = new Button
             {
-                // text = "‚óè",
+                // text = "‚ó?,
                 style =
                 {
                     backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown.png"),

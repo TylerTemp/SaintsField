@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -903,3 +904,4 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         }
     }
 }
+#endif

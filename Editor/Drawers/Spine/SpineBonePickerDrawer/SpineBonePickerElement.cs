@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Drawing;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
@@ -168,3 +169,5 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
         }
     }
 }
+
+#endif

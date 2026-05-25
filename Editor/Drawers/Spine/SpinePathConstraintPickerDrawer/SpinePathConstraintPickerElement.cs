@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -161,3 +162,5 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -128,3 +129,4 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
         }
     }
 }
+#endif

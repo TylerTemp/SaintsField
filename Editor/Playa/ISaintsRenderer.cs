@@ -8,7 +8,7 @@ namespace SaintsField.Editor.Playa
 {
     public interface ISaintsRenderer
     {
-#if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         VisualElement CreateVisualElement(VisualElement inspectorRoot);
 #endif
         bool InAnyHorizontalLayout { get; set; }

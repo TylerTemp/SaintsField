@@ -72,22 +72,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return _guiColorAttribute != null;
         }
 
-        public string ApplyGuiColor(VisualElement result)
-        {
-            if (!HasGuiColor())
-            {
-                return "";
-            }
-            (string error, Color color) = GUIColorAttributeDrawer.GetColor(_guiColorAttribute, FieldWithInfo.SerializedProperty,
-                (MemberInfo)FieldWithInfo.FieldInfo ?? (MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
 
-            if (error == "")
-            {
-                UIToolkitUtils.ApplyColor(result, color);
-            }
-
-            return error;
-        }
 
         protected static MemberInfo GetMemberInfo(SaintsFieldWithInfo info)
         {
@@ -442,5 +427,81 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return "";
         }
 
+
+        public static (object rawMemberValue, object useTarget) GetRefreshedTarget(SaintsFieldWithInfo fieldWithInfo, object eachTarget)
+        {
+            // bool isStruct = ReflectUtils.TypeIsStruct(eachTarget.GetType());
+            object useTarget = eachTarget;
+            object rawMemberValue = eachTarget;
+            if (fieldWithInfo.TargetParent != null && fieldWithInfo.TargetMemberInfo != null)
+            {
+                switch (fieldWithInfo.TargetMemberInfo)
+                {
+                    case FieldInfo fieldInfo:
+                    {
+                        try
+                        {
+                            useTarget = rawMemberValue =  fieldInfo.GetValue(fieldWithInfo.TargetParent);
+                            if (fieldWithInfo.TargetMemberIndex != -1)
+                            {
+                                useTarget = GetCollectionIndex(useTarget, fieldWithInfo.TargetMemberIndex);
+                            }
+                            // Debug.Log($"useTarget={useTarget}");
+                        }
+#pragma warning disable CS0168 // Variable is declared but never used
+                        catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                        {
+                            // ignored
+#if SAINTSFIELD_DEBUG
+                            Debug.LogException(e);
+#endif
+                        }
+                    }
+                        break;
+                    case PropertyInfo propertyInfo:
+                    {
+                        if (propertyInfo.CanRead)
+                        {
+                            try
+                            {
+                                useTarget = rawMemberValue = propertyInfo.GetValue(fieldWithInfo.TargetParent);
+                                if (fieldWithInfo.TargetMemberIndex != -1)
+                                {
+                                    useTarget = GetCollectionIndex(useTarget, fieldWithInfo.TargetMemberIndex);
+                                }
+                            }
+#pragma warning disable CS0168 // Variable is declared but never used
+                            catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                            {
+                                // ignored
+#if SAINTSFIELD_DEBUG
+                                Debug.LogException(e);
+#endif
+                            }
+                        }
+                    }
+                        break;
+                }
+            }
+
+            return (rawMemberValue, useTarget);
+        }
+
+        private static readonly Type[] SkipTypes = { typeof(IntPtr), typeof(UIntPtr), typeof(void) };
+
+        public static bool SkipTypeDrawing(Type checkType)
+        {
+            foreach (Type disallowType in SkipTypes)
+            {
+                if (disallowType.IsAssignableFrom(checkType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

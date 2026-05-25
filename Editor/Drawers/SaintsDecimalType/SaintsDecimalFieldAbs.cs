@@ -1,3 +1,4 @@
+#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -129,3 +130,4 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 
 
 }
+#endif

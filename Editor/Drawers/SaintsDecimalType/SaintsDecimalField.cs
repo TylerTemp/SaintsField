@@ -1,3 +1,4 @@
+#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.SaintsDecimalType
@@ -17,3 +18,4 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
         protected override SerializedProperty GetMidProp(SerializedProperty property) => property.FindPropertyRelative(nameof(SaintsDecimal.mid));
     }
 }
+#endif

@@ -41,6 +41,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             EditorApplication.ExecuteMenuItem("Window/Animation/Animator");
         }
 
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public static void ShowDropdown(int selectedIndex, IReadOnlyList<AnimatorStateChanged> animatorStates, RuntimeAnimatorController runtimeAnimatorController, Rect rootWorldBound, Action<AnimatorStateChanged> onChange)
         {
             AdvancedDropdownList<AnimatorStateChanged> lis =
@@ -98,6 +99,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
 
             PopupWindow.Show(worldBound, sa);
         }
+#endif
 
         private static string StateListItemLabel(AnimatorStateChanged animatorStateInfo)
         {
@@ -122,7 +124,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                 + clipText
                 + ": " + animatorStateInfo.layer.name;
         }
-
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public static void StateButtonLabel(Label label, AnimatorStateChanged animatorStateInfo, RichTextDrawer richTextDrawer)
         {
             List<RichTextDrawer.RichTextChunk> chunks = new List<RichTextDrawer.RichTextChunk>();
@@ -143,5 +145,6 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
 
             UIToolkitUtils.SetLabel(label, chunks, richTextDrawer);
         }
+#endif
     }
 }

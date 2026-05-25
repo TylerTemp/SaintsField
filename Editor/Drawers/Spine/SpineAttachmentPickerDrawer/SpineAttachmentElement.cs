@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 #if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
@@ -79,4 +80,6 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
         }
     }
 }
+#endif
+
 #endif

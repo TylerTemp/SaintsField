@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -301,7 +301,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             }
                             catch (Exception e)
                             {
-                                Debug.LogException(e);
+                                Debug.LogException(e.InnerException ?? e);
                                 moveNext = false;
                                 thisHasMoveError = true;
 

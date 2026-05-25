@@ -1,10 +1,9 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
@@ -163,3 +162,4 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
 
     }
 }
+#endif

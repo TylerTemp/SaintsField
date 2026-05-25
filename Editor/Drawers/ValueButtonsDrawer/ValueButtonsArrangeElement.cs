@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using SaintsField.Editor.UIToolkitElements.ValueButtons;
 
 namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
@@ -19,3 +20,4 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
         }
     }
 }
+#endif

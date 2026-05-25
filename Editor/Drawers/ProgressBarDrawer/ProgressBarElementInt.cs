@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Reflection;
 using SaintsField.Editor.Utils;
@@ -340,3 +341,4 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
         }
     }
 }
+#endif

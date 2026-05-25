@@ -1,3 +1,4 @@
+#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -43,3 +44,4 @@ namespace SaintsField.Editor.Drawers.Mathematics
         }
     }
 }
+#endif

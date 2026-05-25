@@ -1,4 +1,3 @@
-#if UNITY_2021_2_OR_NEWER
 using System;
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
@@ -124,6 +123,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             }
         }
 
+#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public static void MakeDropdown<T>(T curValue, Shader shader, ShaderPropertyType? shaderPropertyType, VisualElement root, Action<T> onValueChangedCallback)
         {
             bool isString = typeof(T) == typeof(string);
@@ -182,6 +182,6 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
             UnityEditor.PopupWindow.Show(worldBound, sa);
         }
+#endif
     }
 }
-#endif

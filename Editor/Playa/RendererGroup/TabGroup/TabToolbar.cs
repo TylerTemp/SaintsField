@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
@@ -143,3 +144,4 @@ namespace SaintsField.Editor.Playa.RendererGroup.TabGroup
         }
     }
 }
+#endif

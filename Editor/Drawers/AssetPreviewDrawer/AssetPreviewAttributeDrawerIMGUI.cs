@@ -3,21 +3,76 @@ using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
 {
     public partial class AssetPreviewAttributeDrawer
     {
-        private Texture2D _previewTexture;
-        // private int _cachedWidth;
-        // private int _cachedHeight;
-        // private Texture2D _cachedWidthTexture;
-
-        ~AssetPreviewAttributeDrawer()
+        private class ImGuiCacheInfo
         {
-            _previewTexture = null;
+            public Object ObjectReferenceValue;
+            public UnityEditor.Editor Editor;
+            public bool UseEditor;
+        }
+
+        private static readonly Dictionary<string, ImGuiCacheInfo> ImGuiCache = new Dictionary<string, ImGuiCacheInfo>();
+
+        private static ImGuiCacheInfo EnsureKey(SerializedProperty property, int propertyIndex)
+        {
+            string key = $"{SerializedUtils.GetUniqueId(property)}_{propertyIndex}";
+            if (ImGuiCache.TryGetValue(key, out ImGuiCacheInfo info))
+            {
+                return info;
+            }
+
+            info = new ImGuiCacheInfo();
+            ImGuiCache[key] = info;
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
+            {
+                if (info.Editor != null)
+                {
+                    Object.DestroyImmediate(info.Editor);
+                    info.Editor = null;
+                }
+                ImGuiCache.Remove(key);
+            });
+
+            return info;
+        }
+
+        private static void PrepareCache(ImGuiCacheInfo cache, Object curObject)
+        {
+            if (ReferenceEquals(cache.ObjectReferenceValue, curObject))
+            {
+                return;
+            }
+
+            cache.ObjectReferenceValue = curObject;
+            cache.UseEditor = false;
+
+            if (cache.Editor != null)
+            {
+                Object.DestroyImmediate(cache.Editor);
+                cache.Editor = null;
+            }
+
+            if (RuntimeUtil.IsNull(curObject) || curObject is Texture or Sprite or UnityEngine.UI.Graphic or UnityEngine.UI.Image)
+            {
+                return;
+            }
+
+            UnityEditor.Editor.CreateCachedEditor(curObject, null, ref cache.Editor);
+            if (curObject is Component comp && cache.Editor != null && !cache.Editor.HasPreviewGUI())
+            {
+                Object.DestroyImmediate(cache.Editor);
+                cache.Editor = null;
+                UnityEditor.Editor.CreateCachedEditor(comp.gameObject, null, ref cache.Editor);
+            }
+            cache.UseEditor = cache.Editor != null && cache.Editor.HasPreviewGUI();
         }
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -37,7 +92,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
             }
 
             return ((AssetPreviewAttribute)saintsAttribute).Above
-                ? GetExtraHeight(property, width, saintsAttribute, info, parent)
+                ? GetExtraHeight(property, width, saintsAttribute, index, info, parent)
                 : 0;
         }
 
@@ -50,7 +105,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                 return position;
             }
 
-            return Draw(position, property, saintsAttribute, info, parent);
+            return Draw(position, property, saintsAttribute, index: 0, info, parent);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
@@ -79,7 +134,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
 
             return ((AssetPreviewAttribute)saintsAttribute).Above
                 ? 0
-                : GetExtraHeight(property, width, saintsAttribute, info, parent);
+                : GetExtraHeight(property, width, saintsAttribute, index, info, parent);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
@@ -92,23 +147,39 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                 return ImGuiHelpBox.Draw(position, error, MessageType.Error);
             }
 
-            return Draw(position, property, saintsAttribute, info, parent);
+            return Draw(position, property, saintsAttribute, index, info, parent);
         }
 
         private float GetExtraHeight(SerializedProperty property, float width, ISaintsAttribute saintsAttribute,
-            FieldInfo info, object parent)
+            int index, FieldInfo info, object parent)
         {
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
-            // int maxWidth = assetPreviewAttribute.Width;
-            // // int useWidth = maxWidth == -1? Mathf.FloorToInt(width): Mathf.Min(maxWidth, Mathf.FloorToInt(width));
-            // int maxHeight = assetPreviewAttribute.Height;
-
             if (width - 1 < Mathf.Epsilon)
             {
                 return 0;
             }
 
-            Texture2D previewTexture = GetPreview(GetCurObject(property, info, parent));
+            ImGuiCacheInfo cache = EnsureKey(property, index);
+            Object curObject = GetCurObject(property, info, parent);
+            PrepareCache(cache, curObject);
+            if (cache.UseEditor)
+            {
+                float useWidthForEditor = assetPreviewAttribute.Align == EAlign.FieldStart
+                    ? Mathf.Max(width - EditorGUIUtility.labelWidth, 1)
+                    : width;
+                int maxWidth = Mathf.FloorToInt(useWidthForEditor);
+                int resultWidth = InteractiveDefaultSize;
+                if (maxWidth > 0)
+                {
+                    (resultWidth, _) = Tex.GetProperScaleRect(
+                        maxWidth,
+                        assetPreviewAttribute.Width, assetPreviewAttribute.Height,
+                        InteractiveDefaultSize, InteractiveDefaultSize);
+                }
+                return resultWidth;
+            }
+
+            Texture2D previewTexture = GetPreview(curObject);
             if (previewTexture == null)
             {
                 return 0;
@@ -118,71 +189,86 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                 ? Mathf.Max(width - EditorGUIUtility.labelWidth, 1)
                 : width;
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ASSET_PREVIEW
-            Debug.Log($"#AssetPreview# useWidth={useWidth}, width={width}, labelWidth={EditorGUIUtility.labelWidth}, Align={assetPreviewAttribute.Align}");
-#endif
-
-            (int width, int height) size =
-                Tex.GetProperScaleRect(
-                    Mathf.FloorToInt(useWidth),
-                    assetPreviewAttribute.Width, assetPreviewAttribute.Height,
-                    previewTexture.width, previewTexture.height);
-            // GetPreviewScaleSize(maxWidth, maxHeight, useWidth, previewTexture);
-            // ReSharper disable once Unity.NoNullPropagation
-            float result = size.height;
-            // Debug.Log($"GetExtraHeight: {result}");
-            return result;
+            (int _, int height) size = Tex.GetProperScaleRect(
+                Mathf.FloorToInt(useWidth),
+                assetPreviewAttribute.Width, assetPreviewAttribute.Height,
+                previewTexture.width, previewTexture.height);
+            return size.height;
         }
 
-        private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info,
+        private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
             AssetPreviewAttribute assetPreviewAttribute = (AssetPreviewAttribute)saintsAttribute;
-            // int maxWidth = assetPreviewAttribute.Width;
-            // // int useWidth = maxWidth == -1? Mathf.FloorToInt(position.width): Mathf.Min(maxWidth, Mathf.FloorToInt(position.width));
-            // // int maxHeight = Mathf.Min(assetPreviewAttribute.MaxHeight, Mathf.FloorToInt(position.height));
-            // int maxHeight = assetPreviewAttribute.Height;
-
-            // return position;
-
             if (position.width - 1 < Mathf.Epsilon)
             {
                 return position;
             }
 
-            Texture2D previewTexture = GetPreview(GetCurObject(property, info, parent));
-
-            if (previewTexture == null || previewTexture.width == 1)
-            {
-                return position;
-            }
-
-            // Debug.Log($"render texture {previewTexture.width}x{previewTexture.height} @ {position}");
+            ImGuiCacheInfo cache = EnsureKey(property, index);
+            Object curObject = GetCurObject(property, info, parent);
+            PrepareCache(cache, curObject);
 
             float useWidth = assetPreviewAttribute.Align == EAlign.FieldStart
                 ? Mathf.Max(position.width - EditorGUIUtility.labelWidth, 1)
                 : position.width;
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ASSET_PREVIEW
-            Debug.Log($"useWidth={useWidth}, width={position.width}, labelWidth={EditorGUIUtility.labelWidth}, Align={assetPreviewAttribute.Align}");
-#endif
+            int maxWidth = Mathf.FloorToInt(useWidth);
+
+            if (cache.UseEditor && cache.Editor != null)
+            {
+                int scaleSize = InteractiveDefaultSize;
+                if (maxWidth > 0)
+                {
+                    (scaleSize, _) = Tex.GetProperScaleRect(
+                        maxWidth,
+                        assetPreviewAttribute.Width, assetPreviewAttribute.Height,
+                        InteractiveDefaultSize, InteractiveDefaultSize);
+                }
+
+                float xOffsetInteractive;
+                switch (assetPreviewAttribute.Align)
+                {
+                    case EAlign.Start:
+                        xOffsetInteractive = 0;
+                        break;
+                    case EAlign.Center:
+                        xOffsetInteractive = (position.width - scaleSize) / 2f;
+                        break;
+                    case EAlign.End:
+                        xOffsetInteractive = position.width - scaleSize;
+                        break;
+                    case EAlign.FieldStart:
+                        xOffsetInteractive = EditorGUIUtility.labelWidth;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                Rect previewRect = new Rect(position.x + xOffsetInteractive, position.y, scaleSize, scaleSize);
+                cache.Editor.OnInteractivePreviewGUI(previewRect, EditorStyles.helpBox);
+                return RectUtils.SplitHeightRect(position, scaleSize).leftRect;
+            }
+
+            Texture2D previewTexture = GetPreview(curObject);
+            if (previewTexture == null || previewTexture.width == 1)
+            {
+                return position;
+            }
 
             (int scaleWidth, int scaleHeight) = Tex.GetProperScaleRect(
-                Mathf.FloorToInt(useWidth),
+                maxWidth,
                 assetPreviewAttribute.Width, assetPreviewAttribute.Height,
                 previewTexture.width, previewTexture.height);
-            // GetPreviewScaleSize(maxWidth, maxHeight, useWidth, previewTexture);
 
-            EAlign align = assetPreviewAttribute.Align;
             float xOffset;
-            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            switch (align)
+            switch (assetPreviewAttribute.Align)
             {
                 case EAlign.Start:
                     xOffset = 0;
                     break;
                 case EAlign.Center:
-                    xOffset = (position.width - scaleWidth) / 2;
+                    xOffset = (position.width - scaleWidth) / 2f;
                     break;
                 case EAlign.End:
                     xOffset = position.width - scaleWidth;
@@ -191,26 +277,17 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                     xOffset = EditorGUIUtility.labelWidth;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(align), align, null);
+                    throw new ArgumentOutOfRangeException();
             }
 
-            Rect previewRect = new Rect(position)
+            Rect textureRect = new Rect(position)
             {
                 x = position.x + xOffset,
-                height = scaleHeight,
                 width = scaleWidth,
+                height = scaleHeight,
             };
-
-            // GUI.Label(previewRect, previewTexture);
-            GUI.DrawTexture(previewRect, previewTexture, ScaleMode.ScaleToFit);
-
-            // EditorGUI.DrawRect(previewRect, Color.blue);
-
-            Rect leftOutRect = RectUtils.SplitHeightRect(position, scaleHeight).leftRect;
-            // Debug.Log($"leftOutRect={leftOutRect}");
-
-            // return leftOutRect;
-            return leftOutRect;
+            GUI.DrawTexture(textureRect, previewTexture, ScaleMode.ScaleToFit);
+            return RectUtils.SplitHeightRect(position, scaleHeight).leftRect;
         }
     }
 }

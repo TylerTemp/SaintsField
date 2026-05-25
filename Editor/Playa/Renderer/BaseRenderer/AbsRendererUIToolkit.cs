@@ -1,4 +1,4 @@
-﻿#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,9 +6,8 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.FieldContextMenuDrawer;
+using SaintsField.Editor.Drawers.GUIColor;
 using SaintsField.Editor.Linq;
-#if UNITY_2021_2_OR_NEWER
-#endif
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -254,87 +253,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         // before set: useful for struct editing that C# will mess-up and change the value of the reference you have
 
-        private static readonly Type[] SkipTypes = { typeof(IntPtr), typeof(UIntPtr), typeof(void) };
 
-        public static bool SkipTypeDrawing(Type checkType)
-        {
-            foreach (Type disallowType in SkipTypes)
-            {
-                if (disallowType.IsAssignableFrom(checkType))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
 
         public static string GetDropdownTypeLabel(Type type)
         {
             return type == null
                 ? "null"
                 : $"{type.Name}: <color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>{type.Namespace}</color>";
-        }
-
-        public static (object rawMemberValue, object useTarget) GetRefreshedTarget(SaintsFieldWithInfo fieldWithInfo, object eachTarget)
-        {
-            // bool isStruct = ReflectUtils.TypeIsStruct(eachTarget.GetType());
-            object useTarget = eachTarget;
-            object rawMemberValue = eachTarget;
-            if (fieldWithInfo.TargetParent != null && fieldWithInfo.TargetMemberInfo != null)
-            {
-                switch (fieldWithInfo.TargetMemberInfo)
-                {
-                    case FieldInfo fieldInfo:
-                    {
-                        try
-                        {
-                            useTarget = rawMemberValue =  fieldInfo.GetValue(fieldWithInfo.TargetParent);
-                            if (fieldWithInfo.TargetMemberIndex != -1)
-                            {
-                                useTarget = GetCollectionIndex(useTarget, fieldWithInfo.TargetMemberIndex);
-                            }
-                            // Debug.Log($"useTarget={useTarget}");
-                        }
-#pragma warning disable CS0168 // Variable is declared but never used
-                        catch (Exception e)
-#pragma warning restore CS0168 // Variable is declared but never used
-                        {
-                            // ignored
-#if SAINTSFIELD_DEBUG
-                            Debug.LogException(e);
-#endif
-                        }
-                    }
-                        break;
-                    case PropertyInfo propertyInfo:
-                    {
-                        if (propertyInfo.CanRead)
-                        {
-                            try
-                            {
-                                useTarget = rawMemberValue = propertyInfo.GetValue(fieldWithInfo.TargetParent);
-                                if (fieldWithInfo.TargetMemberIndex != -1)
-                                {
-                                    useTarget = GetCollectionIndex(useTarget, fieldWithInfo.TargetMemberIndex);
-                                }
-                            }
-#pragma warning disable CS0168 // Variable is declared but never used
-                            catch (Exception e)
-#pragma warning restore CS0168 // Variable is declared but never used
-                            {
-                                // ignored
-#if SAINTSFIELD_DEBUG
-                                Debug.LogException(e);
-#endif
-                            }
-                        }
-                    }
-                        break;
-                }
-            }
-
-            return (rawMemberValue, useTarget);
         }
 
         public string GetLabel()
@@ -623,6 +548,22 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         break;
                 }
             }
+        }
+        public string ApplyGuiColor(VisualElement result)
+        {
+            if (!HasGuiColor())
+            {
+                return "";
+            }
+            (string error, Color color) = GUIColorAttributeDrawer.GetColor(_guiColorAttribute, FieldWithInfo.SerializedProperty,
+                (MemberInfo)FieldWithInfo.FieldInfo ?? (MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
+
+            if (error == "")
+            {
+                UIToolkitUtils.ApplyColor(result, color);
+            }
+
+            return error;
         }
     }
 }

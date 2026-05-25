@@ -267,13 +267,21 @@ namespace SaintsField.Editor.Utils
 
         #region Debug
 
-        #if SAINTSFIELD_DEBUG
+#if SAINTSFIELD_DEBUG
 
         [LayoutStart("Debug", ELayout.FoldoutBox)]
         [Button("Install com.unity.mathematics")]
         private IEnumerator InstallComUnityMathematics() => DebugInstall("com.unity.mathematics");
         [Button("Remove com.unity.mathematics")]
         private IEnumerator RemoveComUnityMathematics() => DebugRemove("com.unity.mathematics");
+
+#if !SAINTSFIELD_ADDRESSABLE
+        [Button("Install com.unity.addressables")]
+        private IEnumerator InstallComAddressables() => DebugInstall("com.unity.addressables");
+#else
+        [Button("Remove com.unity.addressables")]
+        private IEnumerator RemoveComAddressables() => DebugRemove("com.unity.addressables");
+#endif
 
         private static IEnumerator DebugInstall(string packageName)
         {
@@ -303,7 +311,7 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        #endif
+#endif
 
         #endregion
     }

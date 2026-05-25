@@ -167,7 +167,7 @@ namespace SaintsField.Editor.Drawers
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             OnGUIPayload onGuiPayload, FieldInfo info, object parent) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
 
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         #region UIToolkit
 
         private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ButtonAddOnClick";

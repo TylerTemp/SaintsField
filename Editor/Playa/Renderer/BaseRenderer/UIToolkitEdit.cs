@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -4782,3 +4783,4 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         public static readonly HashSet<string> ExpandedValue = new HashSet<string>();
     }
 }
+#endif

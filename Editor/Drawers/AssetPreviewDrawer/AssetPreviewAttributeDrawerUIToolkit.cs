@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -93,8 +93,6 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
             public UnityEditor.Editor Editor;
             public bool UseEditor;
         }
-
-        private const int InteractiveDefaultSize = 300;
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
@@ -204,7 +202,6 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                 UIToolkitUtils.SetDisplayStyle(root.AssetPreviewContainer.InteractivePreviewContainer, DisplayStyle.None);
                 payload.UseEditor = false;
 
-                _previewTexture = null;
                 Texture2D preview = GetPreview(curObject);
                 // Debug.Log($"try get preview {preview!=null}");
                 if (preview != null)

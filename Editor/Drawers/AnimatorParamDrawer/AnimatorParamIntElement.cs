@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
@@ -49,6 +49,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
+#if  !SAINTSFIELD_UI_TOOLKIT_DISABLE
         private void RefreshDisplay()
         {
             if (_animatorParameters is null)
@@ -80,6 +81,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
             string wrongLabel = $"<color=red>?</color> ({CachedValue})";
             UIToolkitUtils.SetLabel(Label, new []{new RichTextDrawer.RichTextChunk(wrongLabel, false, wrongLabel)}, _richTextDrawer);
         }
+#endif
     }
 
     public class AnimatorParamIntField: BaseField<int>

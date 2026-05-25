@@ -17,7 +17,9 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
     [CustomPropertyDrawer(typeof(AssetPreviewAttribute), true)]
     public partial class AssetPreviewAttributeDrawer : SaintsPropertyDrawer
     {
-        private Texture2D GetPreview(Object target)
+        private const int InteractiveDefaultSize = 300;
+
+        private static Texture2D GetPreview(Object target)
         {
             // Debug.Log(target);
             if (!target)
@@ -30,73 +32,36 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
                 target = c.gameObject;
             }
 
-            // if (property.propertyType != SerializedPropertyType.ObjectReference ||
-            //     property.objectReferenceValue == null)
-            // {
-            //     return null;
-            // }
-            // Debug.Log($"check preview {_previewTexture?.width}");
-            if(_previewTexture == null || _previewTexture.width == 1)
+            Texture2D previewTexture;
+            try
             {
-                // Debug.Log($"load preview {target}");
-
-                if(AssetPreview.IsLoadingAssetPreview(target.
-#if UNITY_6000_4_OR_NEWER
-                       GetEntityId
-#else
-                       GetInstanceID
-#endif
-                ()))
-
-                {
-                    return null;
-                }
-
-                try
-                {
-                    _previewTexture = AssetPreview.GetAssetPreview(target);
-                }
-                catch (AssertionException)  // Unity: Assertion failed on expression: 'i->previewArtifactID == found->second.previewArtifactID'
-                {
-                    return null;
-                }
+                previewTexture = AssetPreview.GetAssetPreview(target);
             }
-
-            if (_previewTexture == null || _previewTexture.width == 1)
+            catch (AssertionException)  // Unity: Assertion failed on expression: 'i->previewArtifactID == found->second.previewArtifactID'
             {
                 return null;
             }
 
-            return _previewTexture;
+            if(AssetPreview.IsLoadingAssetPreview(target.
+#if UNITY_6000_4_OR_NEWER
+                   GetEntityId
+#else
+                   GetInstanceID
+#endif
+                       ()))
 
-            // bool widthOk = width == -1 || _previewTexture.width <= viewWidth;
-            // bool heightOk = maxHeight == -1 && _previewTexture.height <= maxHeight;
-            // if (widthOk && heightOk)
-            // {
-            //     return _cachedWidthTexture = _previewTexture;
-            // }
-            //
-            // // Debug.Log($"viewWidth={viewWidth}, width={width}, maxHeight={maxHeight}, _previewTexture.width={_previewTexture.width}, _previewTexture.height={_previewTexture.height}");
-            // (int scaleWidth, int scaleHeight) = Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), width, maxHeight, _previewTexture.width, _previewTexture.height);
-            // // Debug.Log($"scaleWidth={scaleWidth}, scaleHeight={scaleHeight}");
-            //
-            // if (_cachedWidth == scaleWidth && _cachedHeight == scaleHeight && _cachedWidthTexture != null && _cachedWidthTexture.width != 1 && _cachedWidthTexture.height != 1)
-            // {
-            //     return _cachedWidthTexture;
-            // }
-            // _cachedWidth = scaleWidth;
-            // _cachedHeight = scaleHeight;
-            // // return _cachedWidthTexture = formatted;
-            //
-            // // _cachedWidthTexture = Tex.TextureTo(_previewTexture, scaleWidth, scaleHeight);
-            // _cachedWidthTexture = _previewTexture;
-            //
-            // if (_cachedWidthTexture.width == 1)
-            // {
-            //     return _previewTexture;
-            // }
-            //
-            // return _cachedWidthTexture;
+            {
+                return null;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if(previewTexture == null)
+            {
+                // Debug.Log($"load preview {target}");
+                return null;
+            }
+
+            return previewTexture;
         }
 
         private static string MismatchError(SerializedProperty property, FieldInfo info, object parent)

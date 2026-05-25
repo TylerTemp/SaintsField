@@ -1,3 +1,4 @@
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Collections.Generic;
 using SaintsField.Editor.Utils;
 using UnityEngine;
@@ -267,3 +268,4 @@ namespace SaintsField.Editor.UIToolkitElements
         }
     }
 }
+#endif

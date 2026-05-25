@@ -30,6 +30,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
         // private RichTextDrawer _richTextDrawer;
 
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent) =>
@@ -251,5 +252,6 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 }
             }
         }
+#endif
     }
 }

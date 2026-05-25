@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
@@ -5,7 +6,6 @@ using SaintsField.Editor.UIToolkitElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-#if UNITY_2021_3_OR_NEWER
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
 {
     public class FlagsDropdownElement: IntDropdownElement

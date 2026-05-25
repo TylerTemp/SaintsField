@@ -74,6 +74,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
             }
         }
 
+#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public static void MakeDropdown(bool isString, object curValue, VisualElement root, Action<object> onValueChangedCallback)
         {
             AdvancedDropdownList<SortingLayerInfo> dropdown = new AdvancedDropdownList<SortingLayerInfo>();
@@ -162,5 +163,6 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
 
             UnityEditor.PopupWindow.Show(worldBound, sa);
         }
+#endif
     }
 }

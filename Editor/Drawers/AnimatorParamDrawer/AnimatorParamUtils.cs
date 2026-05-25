@@ -34,7 +34,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     return null;
             }
         }
-
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public static void ShowDropdown(bool isString, object curValue, IReadOnlyList<AnimatorControllerParameter> animatorControllerParams, Animator _cachedAnimator, Rect rootWorldBound, Action<AnimatorControllerParameter> setValue)
         {
             _brownColor ??= $"#{ColorUtility.ToHtmlStringRGB(EColor.Brown.GetColor())}";
@@ -102,6 +102,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 
             PopupWindow.Show(worldBound, sa);
         }
+#endif
 
     }
 }

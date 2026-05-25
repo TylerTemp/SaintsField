@@ -74,9 +74,8 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue379
         [Button]
         public void ShowSimWindow()
         {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !SAINTSFIELD_UI_TOOLKIT_DISABLE
           BVCSimulationPanel.OpenNewWindow(this);
-
 #endif
         }
 

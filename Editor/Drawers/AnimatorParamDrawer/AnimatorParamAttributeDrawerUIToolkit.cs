@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -210,7 +210,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                 }
             }));
         }
-        
+
         private static MetaInfo GetMetaInfoShowInInspector(AnimatorParamAttribute animatorParamAttribute, object parent)
         {
             Animator animator;
@@ -407,7 +407,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                 });
             }
         }
-        
+
         public static VisualElement UIToolkitValueEditInt(VisualElement oldElement, AnimatorParamAttribute animatorParamAttribute, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
         {
             MetaInfo metaInfo = GetMetaInfoShowInInspector(

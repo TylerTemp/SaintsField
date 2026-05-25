@@ -1,4 +1,4 @@
-#if UNITY_2022_2_OR_NEWER  // Only this requires 2022.2+
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE  // Only this requires 2022.2+
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SeparatorDrawer;

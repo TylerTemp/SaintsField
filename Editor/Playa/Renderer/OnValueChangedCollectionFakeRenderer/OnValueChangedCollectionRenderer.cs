@@ -47,6 +47,7 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
         private int _curLength;
         private HelpBox _helpBox;
 
+#if  !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {
@@ -127,5 +128,6 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
             UIToolkitUtils.SetHelpBox(_helpBox, error);
             return baseResult;
         }
+#endif
     }
 }
