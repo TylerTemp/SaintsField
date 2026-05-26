@@ -6712,6 +6712,96 @@ private string LabelName(MeshRenderer target, int index) => $"{target.name}[{ind
 
 [![video](https://github.com/user-attachments/assets/e8971069-182e-4ea6-b23a-4dc93fc05457)](https://github.com/user-attachments/assets/358001c8-f433-40e9-8a61-2fc63f9998c6)
 
+### `RotationHandle` ###
+
+Draw a rotation handle on the target to adjust.
+
+*   If it's a GameObject or Component, rotate the target
+*   If it's a Quaternion, save the rotation to the target. The parent space is decided by the `space` parameter
+*   If it's a Vector3, save the rotation as Vector3. Note: quaternion converting to Vector3 will have value flicking (because quaternion is actually a 4-demision value). You can still convert between the two types, but the number value of each axis may not "look" correct when you drag the handle. For example, you may notice all axis value changes when you only drag one.
+*   If it's a number (int, double, float, long etc.), use it as the z-axis rotation.
+
+**Parameters**
+
+*   `string space = "this"`: : parent of the rotation. When using `this`, use the current object as target space. When using `null`, use world space.
+    Otherwise, use the target field/callback as the parent.
+*   `float posXOffset = 0f`: local position offset at the x axis
+*   `float posYOffset = 0f`: local position offset at the y axis
+*   `float posZOffset = 0f`: local position offset at the z axis
+*   `string posOffsetCallback = null`: use a field/callback as the local position offset. Must return a Vector3.
+
+```csharp
+using SaintsField;
+
+[RotationHandle]  // make a target always show rotation handle by default
+public GameObject go;
+
+// make a vector3 rotation as a local rotation inside go
+[RotationHandle(nameof(go))]
+[OnValueChanged(nameof(ApplyRotToChild))]  // let's see the changes in real time
+public Quaternion rotationInside;
+
+public Transform applyTo;
+private void ApplyRotToChild(Quaternion rotation)
+{
+    // Debug.Log(rotation);
+    applyTo.transform.localRotation = rotation;
+}
+
+[RotationHandle] public float rotationZFor2D;  // in 2D game usually only z axis works
+
+// lets lock x, z to 0 using MinValue/MaxValue
+[MinValue(position0: 0, position2: 0)]
+[MaxValue(position0: 0, position2: 0)]
+[RotationHandle]
+public Quaternion quaternionLock;
+```
+
+[![video](https://github.com/user-attachments/assets/36b76ac1-ee33-4566-a7c3-3b48e0c31329)](https://github.com/user-attachments/assets/669ba376-0a53-4ced-be4d-2fc6a265ceb2)
+
+### `ScaleHandle` ###
+
+Draw a scale handle on the target to adjust.
+
+*   If it's a Vector2, save the scale as Vector2
+*   If it's a Vector2Int, save the scale as Vector2Int
+*   If it's a Vector3, save the scale as Vector3
+*   If it's a Vector3Int, save the scale as Vector3Int
+*   If it's a number (int, double, float, long etc.), use it as a uniform xyz scale. When write back from the handle, save the x value.
+
+**Parameters**
+
+*   `string space = "this"`: parent of the handle. When using `this`, use the current object as target space. When using `null`, use world space.
+    Otherwise, use the target field/callback as the parent.
+*   `float posXOffset = 0f`: local position offset at the x axis
+*   `float posYOffset = 0f`: local position offset at the y axis
+*   `float posZOffset = 0f`: local position offset at the z axis
+*   `string posOffsetCallback = null`: use a field/callback as the local position offset. Must return a Vector3.
+
+```csharp
+using SaintsField;
+
+[ScaleHandle] public Vector3 localScale3 = Vector3.one;
+[ScaleHandle] public Vector2 localScale2 = Vector2.one;
+[ScaleHandle] public Vector3Int localScale3Int = Vector3Int.one;
+[ScaleHandle] public float uniformScale = 1f;
+
+public Transform root;
+
+// use callback target as handle parent space
+[ScaleHandle(nameof(root))]
+[OnValueChanged(nameof(ApplyScaleToChild))]
+public Vector3 scaleInside;
+
+public Transform applyTo;
+private void ApplyScaleToChild(Vector3 scale)
+{
+    applyTo.transform.localScale = scale;
+}
+```
+
+[![video](https://github.com/user-attachments/assets/53570ab0-84d5-45fc-b719-8c3bf3aa6026)](https://github.com/user-attachments/assets/4c8ff24d-09e1-4c46-8a39-c2d44cd80c87)
+
 ### `DrawLine` ###
 
 Draw a line between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
@@ -7051,6 +7141,39 @@ public double doubleRadius;
 ```
 
 [![video](https://github.com/user-attachments/assets/8488e213-49b3-4901-a033-1ac4a6f97e8e)](https://github.com/user-attachments/assets/40b24511-89d2-421a-ab5f-64e7323bd26f)
+
+### `PrimitiveBoundsHandle` ###
+
+Draw a rect handle (for `Rect`, `RectInt`) or bounds handle (for `Bounds`, `BoundsInt`) to adjust corresponding values of the field.
+
+**Parameters**:
+
+*   `string space = "this"`: parent of the rect/bounds. When using `this`, use the current object as target space. When using `null`, use world space and no rotation at all.
+    Otherwise, use the target field/callback as the parent.
+*   `float posXOffset = 0f`: local position offset at the x axis
+*   `float posYOffset = 0f`: local position offset at the y axis
+*   `float posZOffset = 0f`: local position offset at the z axis
+*   `string posOffsetCallback = null`: use a field/callback as the local position offset. Must return a Vector3.
+*   `EColor eColor = EColor.White`: color of the handle
+*   `float alpha = 1f`: color's alpha of the handle
+*   `string color = null`: use a color for the handle. If starts with `#`, a hex color is used. Otherwise, use the target field/callback which the value/return-value must be a Color.
+
+```csharp
+using SaintsField;
+[PrimitiveBoundsHandle] public Rect rect;
+[PrimitiveBoundsHandle(eColor: EColor.Aqua)] public RectInt rectInt;
+```
+
+[![video](https://github.com/user-attachments/assets/37dcfe56-be32-40be-9e35-81fec9afb9aa)](https://github.com/user-attachments/assets/dd9a894d-709a-46f3-b16c-f67c9d257293)
+
+```csharp
+using SaintsField;
+
+[PrimitiveBoundsHandle] public Bounds bounds;
+[PrimitiveBoundsHandle(eColor: EColor.Aqua)] public BoundsInt boundsInt;
+```
+
+[![video](https://github.com/user-attachments/assets/6afd879a-724c-4f50-9524-4fef0c0497e2)](https://github.com/user-attachments/assets/7a7c387a-64ef-4219-99db-b492accd13f6)
 
 ## Component Header ##
 

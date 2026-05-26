@@ -11,8 +11,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
 {
     public partial class SphereHandleCapAttributeDrawer
     {
-        private static string NameDrawWireDisc(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_DrawWireDisc";
-        private static string NameDrawWireDiscHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_DrawWireDisc_HelpBox";
+        private static string NameSphereHandleDisc(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_DrawWireDisc";
+        private static string NameSphereHandleDiscHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_DrawWireDisc_HelpBox";
 
         // private SphereInfo _sphereInfo;
 
@@ -26,7 +26,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
                 {
                     display = DisplayStyle.None,
                 },
-                name = NameDrawWireDiscHelpBox(property, index),
+                name = NameSphereHandleDiscHelpBox(property, index),
             };
         }
 
@@ -36,11 +36,11 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SphereHandleCapDrawer
         {
             VisualElement child = new VisualElement
             {
-                name = NameDrawWireDisc(property, index),
+                name = NameSphereHandleDisc(property, index),
             };
 
             SphereInfo sphereInfo = CreateSphereInfo((SphereHandleCapAttribute) saintsAttribute, property, info, parent);
-            HelpBox helpBox = container.Q<HelpBox>(name: NameDrawWireDiscHelpBox(property, index));
+            HelpBox helpBox = container.Q<HelpBox>(name: NameSphereHandleDiscHelpBox(property, index));
 
             UpdateErrorBox(helpBox, sphereInfo);
 

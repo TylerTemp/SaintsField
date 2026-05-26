@@ -213,7 +213,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                 return;
             }
 
-            if (Event.current.button == 1 && Event.current.type == EventType.MouseDown)
+            if (Event.current.button == 1 && Event.current.type == EventType.MouseDown && Event.current.shift)
             {
                 _lastRightClickPos = Event.current.mousePosition;
                 _lastRightClickTime = EditorApplication.timeSinceStartup;
@@ -345,6 +345,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers
                             {
                                 // Debug.Log(findTargetRecord.ItemDisplay);
                                 SetHidden(findTargetRecord.Info.Id, !findTargetRecord.Hidden);
+                                _showSelectingPanel = false;
                                 return;
                             }
 

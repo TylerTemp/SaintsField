@@ -38,11 +38,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RadiusHandleDrawer
             HelpBox helpBox = container.Q<HelpBox>(NameRadiusHandleInfoHelpBox(property, index));
             RadiusHandleInfo radiusHandleInfo = CreateRadiusHandleInfo((RadiusHandleAttribute) saintsAttribute, property, index, info, parent);
             helpBox.userData = radiusHandleInfo;
-            helpBox.RegisterCallback<AttachToPanelEvent>(_ =>
-            {
-                SceneView.duringSceneGui += OnSceneGui;
-                SceneView.RepaintAll();
-            });
+            SceneView.duringSceneGui += OnSceneGui;
+            SceneView.RepaintAll();
             helpBox.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
                 SceneView.duringSceneGui -= OnSceneGui;

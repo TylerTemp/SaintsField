@@ -110,9 +110,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.16.0**
+**5.17.0**
 
-Add: `RadiusHandle` to adjust a radius in the scene. Support setting parent, offset, and colors.
+1.  Add `PrimitiveBoundsHandle` to draw & change rect/bounds types
+2.  Add `RotationHandle` to draw & change `quaternion`, `vector3`, or a roration of an object
+2.  Add `ScaleHandle` to draw & change vector value, number value, or a scale of an object
 
 ## Usage ##
 
@@ -231,12 +233,15 @@ Add: `RadiusHandle` to adjust a radius in the scene. Support setting parent, off
     *   [`SceneViewPicker`](https://saintsfield.comes.today/handles/sceneviewpicker)
     *   [`DrawLabel`](https://saintsfield.comes.today/handles/drawlabel)
     *   [`PositionHandle`](https://saintsfield.comes.today/handles/positionhandle)
+    *   [`RotationHandle`](https://saintsfield.comes.today/handles/rotationhandle)
+    *   [`ScaleHandle`](https://saintsfield.comes.today/handles/scalehandle)
     *   [`DrawLine`](https://saintsfield.comes.today/handles/drawline)
     *   [`SaintsArrow`](https://saintsfield.comes.today/handles/saintsarrow)
     *   [`ArrowHandleCap`](https://saintsfield.comes.today/handles/arrowhandlecap)
     *   [`DrawWireDisc`](https://saintsfield.comes.today/handles/drawwiredisc)
     *   [`SphereHandleCap`](https://saintsfield.comes.today/handles/spherehandlecap)
     *   [`RadiusHandle`](https://saintsfield.comes.today/handles/radiushandle)
+    *   [`PrimitiveBoundsHandle`](https://saintsfield.comes.today/handles/primitiveboundshandle)
 *   [Component Header](https://saintsfield.comes.today/component-header)
     *   [Runtime Saver](https://saintsfield.comes.today/component-header/runtime-saver)
     *   [`HeaderButton` / `HeaderLeftButton`](https://saintsfield.comes.today/component-header/headerbutton--headerleftbutton)

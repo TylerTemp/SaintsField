@@ -46,11 +46,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
                 name = NameDrawLabel(property),
             };
 
-            child.RegisterCallback<AttachToPanelEvent>(_ =>
-            {
-                SceneView.duringSceneGui += OnSceneGUIUIToolkit;
-                SceneView.RepaintAll();
-            });
+            SceneView.duringSceneGui += OnSceneGUIUIToolkit;
+            SceneView.RepaintAll();
             child.RegisterCallback<DetachFromPanelEvent>(_ => SceneView.duringSceneGui -= OnSceneGUIUIToolkit);
             container.Add(child);
 

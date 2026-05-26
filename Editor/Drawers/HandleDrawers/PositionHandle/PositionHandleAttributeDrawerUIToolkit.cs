@@ -47,11 +47,8 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             {
                 name = NamePositionHandle(property),
             };
-            child.RegisterCallback<AttachToPanelEvent>(_ =>
-            {
-                SceneView.duringSceneGui += OnSceneGUIUIToolkit;
-                SceneView.RepaintAll();
-            });
+            SceneView.duringSceneGui += OnSceneGUIUIToolkit;
+            SceneView.RepaintAll();
             child.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
                 SceneView.duringSceneGui -= OnSceneGUIUIToolkit;

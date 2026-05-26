@@ -8,11 +8,11 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
+namespace SaintsField.Editor.Drawers.HandleDrawers.ScaleHandleDrawer
 {
-    public partial class PrimitiveBoundsHandleAttributeDrawer
+    public partial class ScaleHandleAttributeDrawer
     {
-        private static string NamePrimitiveBoundsHandleHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_PrimitiveBoundsHandle_HelpBox";
+        private static string NameScaleHandleHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_ScaleHandle_HelpBox";
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
                 {
                     display = DisplayStyle.None,
                 },
-                name = NamePrimitiveBoundsHandleHelpBox(property, index),
+                name = NameScaleHandleHelpBox(property, index),
             };
         }
 
@@ -32,33 +32,40 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            HelpBox helpBox = container.Q<HelpBox>(NamePrimitiveBoundsHandleHelpBox(property, index));
-            PrimitiveBoundsHandleInfo handleInfo = CreatePrimitiveBoundsHandleInfo((PrimitiveBoundsHandleAttribute)saintsAttribute, property, index, info, parent);
-            helpBox.userData = handleInfo;
+            HelpBox helpBox = container.Q<HelpBox>(NameScaleHandleHelpBox(property, index));
+            ScaleHandleAttribute scaleHandleAttribute = (ScaleHandleAttribute)saintsAttribute;
+            ScaleHandleInfo scaleHandleInfo = CreateScaleHandleInfo(
+                scaleHandleAttribute,
+                property,
+                index,
+                onValueChangedCallback,
+                info,
+                parent);
+            helpBox.userData = scaleHandleInfo;
             SceneView.duringSceneGui += OnSceneGui;
             SceneView.RepaintAll();
             helpBox.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
                 SceneView.duringSceneGui -= OnSceneGui;
-                HandleVisibility.SetOutView(handleInfo.Id);
+                HandleVisibility.SetOutView(scaleHandleInfo.Id);
             });
             return;
 
             void OnSceneGui(SceneView sceneView)
             {
-                OnSceneGUIInternal(sceneView, handleInfo);
+                OnSceneGUIInternal(sceneView, scaleHandleInfo);
             }
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            Action<object> onValueChanged, FieldInfo info)
         {
-            HelpBox helpBox = container.Q<HelpBox>(name: NamePrimitiveBoundsHandleHelpBox(property, index));
-            PrimitiveBoundsHandleInfo handleInfo = (PrimitiveBoundsHandleInfo)helpBox.userData;
-            UIToolkitUtils.SetHelpBox(helpBox, handleInfo.Error);
+            HelpBox helpBox = container.Q<HelpBox>(name: NameScaleHandleHelpBox(property, index));
+            ScaleHandleInfo scaleHandleInfo = (ScaleHandleInfo)helpBox.userData;
+            UIToolkitUtils.SetHelpBox(helpBox, scaleHandleInfo.Error);
         }
     }
 }
+
 #endif

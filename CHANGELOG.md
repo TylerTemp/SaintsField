@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.17.0 ##
+
+1.  Add `PrimitiveBoundsHandle` to draw & change rect/bounds types
+2.  Add `RotationHandle` to draw & change `quaternion`, `vector3`, or a roration of an object
+2.  Add `ScaleHandle` to draw & change vector value, number value, or a scale of an object
+
 ## 5.16.0 ##
 
 Add: `RadiusHandle` to adjust a radius in the scene. Support setting parent, offset, and colors.

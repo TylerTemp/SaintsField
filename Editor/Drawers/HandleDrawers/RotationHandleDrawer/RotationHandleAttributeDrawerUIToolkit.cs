@@ -8,11 +8,11 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
+namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
 {
-    public partial class PrimitiveBoundsHandleAttributeDrawer
+    public partial class RotationHandleAttributeDrawer
     {
-        private static string NamePrimitiveBoundsHandleHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_PrimitiveBoundsHandle_HelpBox";
+        private static string NameRotationHandleHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}_RotationHandle_HelpBox";
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
                 {
                     display = DisplayStyle.None,
                 },
-                name = NamePrimitiveBoundsHandleHelpBox(property, index),
+                name = NameRotationHandleHelpBox(property, index),
             };
         }
 
@@ -32,33 +32,34 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PrimitiveBoundsHandleDrawer
             int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            HelpBox helpBox = container.Q<HelpBox>(NamePrimitiveBoundsHandleHelpBox(property, index));
-            PrimitiveBoundsHandleInfo handleInfo = CreatePrimitiveBoundsHandleInfo((PrimitiveBoundsHandleAttribute)saintsAttribute, property, index, info, parent);
-            helpBox.userData = handleInfo;
+            HelpBox helpBox = container.Q<HelpBox>(NameRotationHandleHelpBox(property, index));
+            RotationHandleAttribute rotationHandleAttribute = (RotationHandleAttribute)saintsAttribute;
+            RotationHandleInfo rotationHandleInfo = CreateRotationHandleInfo(rotationHandleAttribute, property, index, onValueChangedCallback, info, parent);
+            helpBox.userData = rotationHandleInfo;
             SceneView.duringSceneGui += OnSceneGui;
             SceneView.RepaintAll();
             helpBox.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
                 SceneView.duringSceneGui -= OnSceneGui;
-                HandleVisibility.SetOutView(handleInfo.Id);
+                HandleVisibility.SetOutView(rotationHandleInfo.Id);
             });
             return;
 
             void OnSceneGui(SceneView sceneView)
             {
-                OnSceneGUIInternal(sceneView, handleInfo);
+                OnSceneGUIInternal(sceneView, rotationHandleInfo);
             }
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            Action<object> onValueChanged, FieldInfo info)
         {
-            HelpBox helpBox = container.Q<HelpBox>(name: NamePrimitiveBoundsHandleHelpBox(property, index));
-            PrimitiveBoundsHandleInfo handleInfo = (PrimitiveBoundsHandleInfo)helpBox.userData;
-            UIToolkitUtils.SetHelpBox(helpBox, handleInfo.Error);
+            HelpBox helpBox = container.Q<HelpBox>(name: NameRotationHandleHelpBox(property, index));
+            RotationHandleInfo rotationHandleInfo = (RotationHandleInfo)helpBox.userData;
+            UIToolkitUtils.SetHelpBox(helpBox, rotationHandleInfo.Error);
         }
     }
 }
+
 #endif
