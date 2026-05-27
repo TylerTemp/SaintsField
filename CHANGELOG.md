@@ -2,8 +2,9 @@
 
 ## 5.17.1 ##
 
-1.  Fix: "Runtime Saver" didn't write the change to disk, and lost them when restart Unity.
-2.  Change: `DOTween` support is now disabled by default as `DOTween` refuses to provide a legal `asmdef`, which can break this package. You can follow the setup guild by clicking "Window" - "Saints Field" - "Enable DOTween Support"
+1.  Fix: "Runtime Saver" didn't write the change to disk, and lost them when restart Unity
+2.  Fix: "Runtime Saver" cloud not write back changes if the target is a scene which are closed when entered editor mode
+3.  Change: `DOTween` support is now disabled by default as `DOTween` refuses to provide a legal `asmdef`, which can break this package. You can follow the setup guild by clicking "Window" - "Saints Field" - "Enable DOTween Support"
 
 ## 5.17.0 ##
 
