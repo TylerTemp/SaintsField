@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Utils.RuntimeSave
@@ -15,13 +17,15 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 return;
             }
 
+            string globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString();
+
 #if SAINTSFIELD_DEBUG
             Debug.Log($"start to save {component}");
 #endif
 
             RuntimeSaver saver = RuntimeSaver.instance;
 
-            saver.pathSavers.RemoveAll(each => ReferenceEquals(each.targetObject, component));
+            saver.pathSavers.RemoveAll(each => each.globalObjectIdString == globalObjectIdString);
 
             List<PathSaver> pathSavers = new List<PathSaver>();
             using(SerializedObject serializedObject = new SerializedObject(component))
@@ -62,7 +66,6 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 {
                     yield return new PathSaver
                     {
-                        targetObject = component,
                         targetInstanceId = component.
 #if UNITY_6000_4_OR_NEWER
                             GetEntityId
@@ -73,6 +76,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 
                                 (),
                         globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
+                        scenePath = component.gameObject.scene.path,
                         propertyPath = property.propertyPath,
                         propertyType = SaverPropertyType.ArraySize,
                         intValue = property.arraySize,
@@ -115,7 +119,6 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 
                 yield return new PathSaver
                 {
-                    targetObject = component,
                     targetInstanceId = component.
 #if UNITY_6000_4_OR_NEWER
                             GetEntityId
@@ -125,6 +128,8 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 #endif
 
                             (),
+                    globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
+                    scenePath = component.gameObject.scene.path,
                     propertyPath = property.propertyPath,
                     propertyType = SaverPropertyType.ManagedReferenceFullTypename,
                     stringValue =  property.managedReferenceFullTypename,
@@ -150,7 +155,6 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 
             PathSaver pathSaver = new PathSaver
             {
-                targetObject = component,
                 targetInstanceId = component.
 #if UNITY_6000_4_OR_NEWER
                             GetEntityId
@@ -161,6 +165,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 
                         (),
                 globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
+                scenePath = component.gameObject.scene.path,
                 propertyPath = property.propertyPath,
                 propertyType = GetSaverPropertyType(property),
             };
@@ -409,34 +414,13 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 
         public static void RestoreComponent(PathSaver pathSaver)
         {
-            Object target = pathSaver.targetObject;
-
-            if (target == null && pathSaver.targetInstanceId != 0)
+            if (!GlobalObjectId.TryParse(pathSaver.globalObjectIdString, out GlobalObjectId id))
             {
-
-#pragma warning disable CS0618 // Type or member is obsolete
-                target = EditorUtility.
-#if UNITY_6000_4_OR_NEWER
-                    EntityIdToObject
-#else
-                    InstanceIDToObject
-#endif
-
-                        (pathSaver.targetInstanceId);
-#pragma warning restore CS0618 // Type or member is obsolete
-
+                Debug.LogWarning($"failed to parse {pathSaver.globalObjectIdString}");
+                return;
             }
 
-            if (target == null)
-            {
-                if (!GlobalObjectId.TryParse(pathSaver.globalObjectIdString, out GlobalObjectId id))
-                {
-                    Debug.LogWarning($"failed to parse {pathSaver.globalObjectIdString}");
-                    return;
-                }
-
-                target = GlobalObjectId.GlobalObjectIdentifierToObjectSlow(id);
-            }
+            Component target = GlobalObjectId.GlobalObjectIdentifierToObjectSlow(id) as Component;
 
             if (target == null)
             {
@@ -591,7 +575,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                     break;
             }
 
-#if SAINTSFIELD_DEBUG
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
             Debug.Log($"restored {target.GetType().Name}.{pathSaver.propertyPath}=({pathSaver.propertyType})");
             if(property.propertyType == SerializedPropertyType.Generic && property.isArray)
             {
@@ -600,6 +584,14 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 #endif
 
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
+
+            EditorUtility.SetDirty(target);
+
+            Scene targetScene = target.gameObject.scene;
+            if (targetScene.IsValid() && targetScene.isLoaded)
+            {
+                EditorSceneManager.MarkSceneDirty(targetScene);
+            }
         }
 
         private static (bool craeted, object value) CreateManagedReferenceInstance(string fullTypename)

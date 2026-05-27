@@ -6,11 +6,6 @@ namespace SaintsField.Editor.Utils.RuntimeSave
     [Serializable]
     public struct PathSaver
     {
-        // Direct reference to the component. Unity remaps the InstanceID across
-        // play-mode exit, so this is far more reliable than a GlobalObjectId
-        // captured during play mode (which has identifierType=2 and becomes
-        // unresolvable in edit mode).
-        public UnityEngine.Object targetObject;
         public
 #if UNITY_6000_4_OR_NEWER
             EntityId
@@ -21,6 +16,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 
         // public UnityEngine.Object propertyObject;
         public string globalObjectIdString;
+        public string scenePath;
 
         public string propertyPath;
         public SaverPropertyType propertyType;
