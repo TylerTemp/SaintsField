@@ -110,11 +110,10 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.17.0**
+**5.17.1**
 
-1.  Add `PrimitiveBoundsHandle` to draw & change rect/bounds types
-2.  Add `RotationHandle` to draw & change `quaternion`, `vector3`, or a roration of an object
-2.  Add `ScaleHandle` to draw & change vector value, number value, or a scale of an object
+1.  Fix: "Runtime Saver" didn't write the change to disk, and lost them when restart Unity.
+2.  Change: `DOTween` support is now disabled by default as `DOTween` refuses to provide a legal `asmdef`, which can break this package. You can follow the setup guild by clicking "Window" - "Saints Field" - "Enable DOTween Support"
 
 ## Usage ##
 

@@ -8526,6 +8526,9 @@ using SaintsField.Spine;
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
+> [!IMPORTANT]
+> Use "Window" - "Saints Field" - "Enable DOTween Support" to enable this function
+
 A method decorator to play a `DOTween` animation returned by the method.
 
 The method should not have required parameters, and need to return a `Tween` or a `Sequence` (`Sequence` is actually also a tween).
@@ -9812,8 +9815,8 @@ Go to `Tools` - `Saints Field` to enable/disable functions you want
 2.  Write marcos like this:
 
     ```bash
-    #"Disable DOTween"
-    -define:SAINTSFIELD_DOTWEEN_DISABLE
+    #"Enable DOTween"
+    -define:SAINTSFIELD_DOTWEEN_ENABLE
 
     #"Disable Addressable"
     -define:SAINTSFIELD_ADDRESSABLE_DISABLE

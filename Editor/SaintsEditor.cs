@@ -33,7 +33,7 @@ using Unity.Profiling;
 // using Microsoft.CodeAnalysis;
 // using Microsoft.CodeAnalysis.CSharp;
 // using Microsoft.CodeAnalysis.CSharp.Syntax;
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
 using DG.DOTweenEditor;
 #endif
 
@@ -50,7 +50,7 @@ namespace SaintsField.Editor
         [NonSerialized]
         public bool EditorShowMonoScript = true;
 
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
         private static readonly HashSet<IDOTweenPlayRecorder> AliveInstances = new HashSet<IDOTweenPlayRecorder>();
         public static void RemoveInstance(IDOTweenPlayRecorder doTweenPlayRecorder)
         {
@@ -746,7 +746,7 @@ namespace SaintsField.Editor
             }
 
             ISaintsRendererGroup group =
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
                     rendererGroupInfo.Config.IsDoTween
                         // ReSharper disable once RedundantCast
                         ? (ISaintsRendererGroup)new DOTweenPlayGroup(rendererGroupInfo.Target)
@@ -1191,7 +1191,7 @@ namespace SaintsField.Editor
                         {
                             baseRenderers.Add(new ButtonCustomContextMenuRenderer(customContextMenuAttribute, serializedObject, fieldWithInfo));
                         }
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
                         if (playaAttribute is DOTweenPlayAttribute)
                         {
                             baseRenderers.Add(new DOTweenPlayRenderer(serializedObject, fieldWithInfo));
@@ -1515,7 +1515,7 @@ namespace SaintsField.Editor
         public virtual void OnEnable()
         {
             DrawHeaderGUI.EnsureInitLoad();
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
             AliveInstances.Add(this);
 #endif
 
@@ -1527,7 +1527,7 @@ namespace SaintsField.Editor
 
         public virtual void OnDestroy()
         {
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
             RemoveInstance(this);
 #endif
 

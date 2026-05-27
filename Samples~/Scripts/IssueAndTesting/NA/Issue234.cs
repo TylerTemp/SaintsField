@@ -1,5 +1,5 @@
 using System;
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
 using DG.Tweening;
 #endif
 using SaintsField.Playa;
@@ -25,7 +25,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA
 
             public SpriteRenderer spriteRenderer;
 
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
             [DOTweenPlay]
             private Sequence PlayColor()
             {

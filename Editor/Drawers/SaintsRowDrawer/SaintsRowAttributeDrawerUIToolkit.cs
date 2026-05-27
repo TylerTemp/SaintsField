@@ -347,7 +347,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             // VisualElement actualContainer = root.Q<VisualElement>(NameActualContainer(property));
 
             root.Add(bodyElement);
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
             bodyElement.RegisterCallback<AttachToPanelEvent>(_ => SaintsEditor.AddInstance(doTweenPlayRecorder));
             bodyElement.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditor.RemoveInstance(doTweenPlayRecorder));
 #endif

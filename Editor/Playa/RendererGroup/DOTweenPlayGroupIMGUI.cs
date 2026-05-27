@@ -1,4 +1,4 @@
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
 using System.Linq;
 using System.Reflection;
 using DG.DOTweenEditor;

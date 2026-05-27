@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.17.1 ##
+
+1.  Fix: "Runtime Saver" didn't write the change to disk, and lost them when restart Unity.
+2.  Change: `DOTween` support is now disabled by default as `DOTween` refuses to provide a legal `asmdef`, which can break this package. You can follow the setup guild by clicking "Window" - "Saints Field" - "Enable DOTween Support"
+
 ## 5.17.0 ##
 
 1.  Add `PrimitiveBoundsHandle` to draw & change rect/bounds types

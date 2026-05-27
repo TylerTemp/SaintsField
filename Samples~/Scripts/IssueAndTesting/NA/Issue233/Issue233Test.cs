@@ -1,7 +1,7 @@
 using System;
 using SaintsField.Playa;
 using UnityEngine;
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
 using DG.Tweening;
 #endif
 
@@ -21,7 +21,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue233
 
             [BelowImage(maxWidth: 25)] public SpriteRenderer spriteRenderer;
 
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
             [DOTweenPlay]
             private Sequence PlayColor()
             {

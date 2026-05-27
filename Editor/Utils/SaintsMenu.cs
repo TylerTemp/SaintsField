@@ -13,6 +13,7 @@ using SaintsField.Editor.I2Setup;
 #endif
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEditor.Compilation;
 #if UNITY_2023_1_OR_NEWER
 using UnityEditor.Build;
 #endif
@@ -122,21 +123,49 @@ namespace SaintsField.Editor.Utils
         #region DOTween
 
         // ReSharper disable once InconsistentNaming
-        private const string DisableDOTweenPath = RuntimeUtil.MenuRoot + "Disable DOTween Support";
+        private const string EnableDOTweenPath = RuntimeUtil.MenuRoot + "Enable DOTween Support";
         // ReSharper disable once InconsistentNaming
-        [MenuItem(DisableDOTweenPath, priority = 100)]
-        public static void DisableDOTween()
+        [MenuItem(EnableDOTweenPath, priority = 100)]
+        public static void EnableDOTween()
         {
-#if SAINTSFIELD_DOTWEEN_DISABLED
-            RemoveCompileDefine
+            const string enableMarco = "SAINTSFIELD_DOTWEEN_ENABLE";
+#if SAINTSFIELD_DOTWEEN_ENABLE && false
+            RemoveCompileDefine(enableMarco);
 #else
-            AddCompileDefine
+            // DOTween/Modules/DOTween.Modules.asmdef
+            if(IsDoTweenSetup())
+            {
+                AddCompileDefine(enableMarco);
+            }
+            else
+            {
+                // ReSharper disable once InvertIf
+                if (EditorUtility.DisplayDialog(
+                        "DOTween Modules not enabled",
+                        "You need to setup a DOTween ASMDEF to use this function.\nPlease go Tools/Demigiant/DOTween Utility Panel, click \"Create ASMDEF...\"",
+                        "Open",
+                        "Cancel"))
+                {
+                    if (EditorApplication.ExecuteMenuItem("Tools/Demigiant/DOTween Utility Panel"))
+                    {
+                        return;
+                    }
+
+                    EditorUtility.DisplayDialog(
+                        "DOTween Utility Failed",
+                        "DOTween Utility Panel failed to open. Please manually \"Create ASMDEF...\" for DOTween",
+                        "Close");
+                }
+            }
 #endif
-                ("SAINTSFIELD_DOTWEEN_DISABLED");
         }
 
+        private static bool IsDoTweenSetup() => CompilationPipeline
+            .GetAssemblies()
+            .Any(a => a.name == "DOTween.Modules");
+
         // ReSharper disable once InconsistentNaming
-        [MenuItem(DisableDOTweenPath, true)]
+        [MenuItem(EnableDOTweenPath, true)]
         public static bool DisableDOTweenValidate() =>
 #if DOTWEEN
             true
@@ -482,11 +511,11 @@ namespace SaintsField.Editor.Utils
 #endif
             );
 
-            Menu.SetChecked(DisableDOTweenPath,
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
-                false
-#else
+            Menu.SetChecked(EnableDOTweenPath,
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
                 true
+#else
+                false
 #endif
             );
 

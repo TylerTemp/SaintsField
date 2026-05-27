@@ -1,6 +1,6 @@
 using UnityEngine;
 using SaintsField.Playa;
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
 using DG.Tweening;
 #endif
 
@@ -19,7 +19,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         // [ShowInInspector]
         // public const string Title = "This is Color Tween";
 
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
         [DOTweenPlay("Color")]
         private Sequence PlayColor()
         {
@@ -56,7 +56,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 //         [Button("Tween above me")]
 //         private void Nothing2() {}
 //
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
         [DOTweenPlay("Position")]
         private Sequence PlayTween2()
         {

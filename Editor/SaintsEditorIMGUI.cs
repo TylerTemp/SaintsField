@@ -49,7 +49,7 @@ namespace SaintsField.Editor
             {
                 _renderers = Setup(Array.Empty<string>(), serializedObject, this, targets);
             }
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+#if DOTWEEN && SAINTSFIELD_DOTWEEN_ENABLE
             AliveInstances.Add(this);
 #endif
 
