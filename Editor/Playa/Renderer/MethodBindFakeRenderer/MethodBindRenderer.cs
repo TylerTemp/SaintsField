@@ -172,7 +172,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                     : GetButton(eventTarget, target);
                 if (!uiButton)
                 {
-                    return ("Button not found", false, null, null, null, default, false, null, null);
+                    return ($"{methodInfo.Name}: Button not found", false, null, null, null, default, false, null, null);
                 }
 
                 unityEventContainerObject = uiButton;
@@ -182,7 +182,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             {
                 if (string.IsNullOrEmpty(eventTarget))
                 {
-                    return ("Event target is empty", false, null, null, null, default, false, null, null);
+                    return ($"{methodInfo.Name}: Event target is empty", false, null, null, null, default, false, null, null);
                 }
 
                 List<string> attrNames = new List<string>();
@@ -224,7 +224,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
                         if (foundTarget == null)
                         {
-                            return ($"{searchAttr} is null", false, null, null, null, default, false, null, null);
+                            return ($"{methodInfo.Name}: {searchAttr} is null", false, null, null, null, default, false, null, null);
                         }
 
                         accTarget = foundTarget;
@@ -238,7 +238,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
             if (unityEventBase == null)
             {
-                return ("Event not found", false, unityEventContainerObject, null, expectedValue, default, false, null, null);
+                return ($"{methodInfo.Name}: Event not found", false, unityEventContainerObject, null, expectedValue, default, false, null, null);
             }
 
             bool needsValue = methodInfo.GetParameters().Length > 0;
@@ -455,7 +455,14 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 return TryFindButton(target);
             }
 
-            (string error, object value) = Util.GetOfNoParams<object>(target, by, null);
+            (string error, MemberInfo _, object value) = Util.GetOf<object>(
+                by,
+                null,
+                null,
+                null,
+                target,
+                null);
+            // Debug.Log($"find {value} path {by} on {target}");
             return error != ""
                 ? null
                 : TryFindButton(value);
