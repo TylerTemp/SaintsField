@@ -17,15 +17,20 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 return;
             }
 
-            string globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString();
+            string globalComponentIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString();
 
 #if SAINTSFIELD_DEBUG
-            Debug.Log($"start to save {component}");
+            Debug.Log($"start to save {component} as {globalComponentIdString}");
 #endif
 
             RuntimeSaver saver = RuntimeSaver.instance;
 
-            saver.pathSavers.RemoveAll(each => each.globalObjectIdString == globalObjectIdString);
+            // Here is a catch:
+            // Object A as Id as IdA
+            // Once Object A is destroyed, when adding a new component, Unity may re-use this IdA
+            // Thus, let's compare the type name also
+            string typeName = component.GetType().AssemblyQualifiedName;
+            saver.pathSavers.RemoveAll(each => each.globalComponentIdString == globalComponentIdString && each.globalComponentTypeString == typeName);
 
             List<PathSaver> pathSavers = new List<PathSaver>();
             using(SerializedObject serializedObject = new SerializedObject(component))
@@ -64,23 +69,11 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             {
                 if (property.isArray)
                 {
-                    yield return new PathSaver
-                    {
-                        targetInstanceId = component.
-#if UNITY_6000_4_OR_NEWER
-                            GetEntityId
-#else
-
-                            GetInstanceID
-#endif
-
-                                (),
-                        globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
-                        scenePath = component.gameObject.scene.path,
-                        propertyPath = property.propertyPath,
-                        propertyType = SaverPropertyType.ArraySize,
-                        intValue = property.arraySize,
-                    };
+                    PathSaver arraySizeSaver = CreateBasePathSaver(component);
+                    arraySizeSaver.propertyPath = property.propertyPath;
+                    arraySizeSaver.propertyType = SaverPropertyType.ArraySize;
+                    arraySizeSaver.intValue = property.arraySize;
+                    yield return arraySizeSaver;
                     for (int arrayIndex = 0; arrayIndex < property.arraySize; arrayIndex++)
                     {
                         SerializedProperty arrayProperty = property.GetArrayElementAtIndex(arrayIndex);
@@ -117,23 +110,11 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 //     longValue = property.managedReferenceId,
                 // };
 
-                yield return new PathSaver
-                {
-                    targetInstanceId = component.
-#if UNITY_6000_4_OR_NEWER
-                            GetEntityId
-#else
-
-                        GetInstanceID
-#endif
-
-                            (),
-                    globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
-                    scenePath = component.gameObject.scene.path,
-                    propertyPath = property.propertyPath,
-                    propertyType = SaverPropertyType.ManagedReferenceFullTypename,
-                    stringValue =  property.managedReferenceFullTypename,
-                };
+                PathSaver managedReferenceSaver = CreateBasePathSaver(component);
+                managedReferenceSaver.propertyPath = property.propertyPath;
+                managedReferenceSaver.propertyType = SaverPropertyType.ManagedReferenceFullTypename;
+                managedReferenceSaver.stringValue = property.managedReferenceFullTypename;
+                yield return managedReferenceSaver;
                 // yield return new PathSaver
                 // {
                 //     targetObject = component,
@@ -153,22 +134,9 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 yield break;
             }
 
-            PathSaver pathSaver = new PathSaver
-            {
-                targetInstanceId = component.
-#if UNITY_6000_4_OR_NEWER
-                            GetEntityId
-#else
-
-                    GetInstanceID
-#endif
-
-                        (),
-                globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
-                scenePath = component.gameObject.scene.path,
-                propertyPath = property.propertyPath,
-                propertyType = GetSaverPropertyType(property),
-            };
+            PathSaver pathSaver = CreateBasePathSaver(component);
+            pathSaver.propertyPath = property.propertyPath;
+            pathSaver.propertyType = GetSaverPropertyType(property);
 
             switch (property.propertyType)
             {
@@ -261,6 +229,33 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             }
 
             yield return pathSaver;
+        }
+
+        private static PathSaver CreateBasePathSaver(Component component)
+        {
+            // Debug.Log($"comp id={GlobalObjectId.GetGlobalObjectIdSlow(component).ToString()}");
+            return new PathSaver
+            {
+                globalGameObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component.gameObject).ToString(),
+                gameObjectHierarchyPath = GetGameObjectHierarchyPath(component.gameObject),
+                globalComponentIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
+                globalComponentTypeString = component.GetType().AssemblyQualifiedName,
+                scenePath = component.gameObject.scene.path,
+            };
+        }
+
+        private static string GetGameObjectHierarchyPath(GameObject gameObject)
+        {
+            List<string> pathParts = new List<string>();
+            Transform current = gameObject.transform;
+            while (current != null)
+            {
+                pathParts.Add(current.name);
+                current = current.parent;
+            }
+
+            pathParts.Reverse();
+            return string.Join("/", pathParts);
         }
 
         private static SaverPropertyType GetSaverPropertyType(SerializedProperty property)
@@ -412,27 +407,165 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             return pathSaver;
         }
 
-        public static void RestoreComponent(PathSaver pathSaver)
+        public static bool RemoveComponent(Component component)
         {
-            if (!GlobalObjectId.TryParse(pathSaver.globalObjectIdString, out GlobalObjectId id))
+            if (component == null)
             {
-                Debug.LogWarning($"failed to parse {pathSaver.globalObjectIdString}");
+                return false;
+            }
+
+            string globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString();
+
+#if SAINTSFIELD_DEBUG
+            Debug.Log($"start to save {component}");
+#endif
+
+            RuntimeSaver saver = RuntimeSaver.instance;
+
+            int removedCount = saver.pathSavers.RemoveAll(each => each.globalComponentIdString == globalObjectIdString);
+            return removedCount > 0;
+        }
+
+        public static void RestoreComponent(PathSaver pathSaver, Scene targetScene, IDictionary<string, Component> keyToNewComp)
+        {
+            if (!GlobalObjectId.TryParse(pathSaver.globalComponentIdString, out GlobalObjectId id))
+            {
+                Debug.LogWarning($"failed to parse {pathSaver.globalComponentIdString}");
                 return;
             }
 
             Component target = GlobalObjectId.GlobalObjectIdentifierToObjectSlow(id) as Component;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
+            Debug.Log($"Load component {target} from {id}");
+#endif
+            string newCompKey = $"{pathSaver.globalGameObjectIdString}_{pathSaver.globalComponentIdString}";
+
+            if (target == null && keyToNewComp.TryGetValue(newCompKey, out Component cachedComp))
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
+                Debug.Log($"Use cached new component {cachedComp}");
+#endif
+                target = cachedComp;
+            }
+
+            // Prefab can not be located by GlobalObjectId, try search for it
+
+            #region Prefab Search
+            if(target == null)
+            {
+                string searchPath = pathSaver.gameObjectHierarchyPath;
+                (bool found, GameObject foundGo) = FindInScene(targetScene, searchPath);
+                if (found)
+                {
+                    GlobalObjectId foundGoId = GlobalObjectId.GetGlobalObjectIdSlow(foundGo);
+                    (bool converted, GlobalObjectId foundUnpackId) = ConvertPrefabGidToUnpackedGid(foundGoId);
+                    if (!converted)
+                    {
+                        Debug.LogWarning($"failed to convert gameObject at {targetScene.name}.{searchPath}");
+                        return;
+                    }
+
+                    bool targetMatch = foundUnpackId.ToString() == pathSaver.globalGameObjectIdString;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
+                    Debug.Log($"Found {targetMatch} GameObject, edit={foundGoId}, play={pathSaver.globalGameObjectIdString}");
+#endif
+                    if (!targetMatch)
+                    {
+                        Debug.LogWarning(
+                            $"gameObject at {targetScene.name}.{searchPath} id mismatch(saved={pathSaver.globalGameObjectIdString}, get={foundGoId})");
+                        return;
+                    }
+
+                    foreach (Component editComp in foundGo.GetComponents<Component>())
+                    {
+                        GlobalObjectId foundCompId = GlobalObjectId.GetGlobalObjectIdSlow(editComp);
+                        (bool convertedComp, GlobalObjectId foundUnpackCompId) =
+                            ConvertPrefabGidToUnpackedGid(foundCompId);
+                        if (convertedComp && foundUnpackCompId.ToString() == pathSaver.globalComponentIdString)
+                        {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
+                            Debug.Log(
+                                $"Found {editComp} Component for edit={foundCompId} play={pathSaver.globalComponentIdString}");
+#endif
+                            target = editComp;
+                            break;
+                        }
+                    }
+
+                    if (target == null) // not found, this is either wrong, or an add component
+                    {
+                        if (pathSaver.toDestroy)
+                        {
+                            Debug.LogWarning(
+                                $"failed to remove component {pathSaver.globalComponentTypeString} on GameObject {foundGo}({pathSaver.globalGameObjectIdString}): target component {pathSaver.globalComponentIdString} not found on the target");
+                            return;
+                        }
+
+                        // it's add component, and we just don't add it yet
+                        // not possible it's already add: it's already been checked above
+                        Debug.Assert(!keyToNewComp.ContainsKey(newCompKey));
+                        (bool created, Component component) =
+                            AddComponentToGo(foundGo, pathSaver.globalComponentTypeString);
+                        if (!created)
+                        {
+                            return;
+                        }
+
+                        keyToNewComp[newCompKey] = component;
+                        target = component;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"not found path {searchPath} in {targetScene.name}, skip");
+                    return;
+                }
+            }
+            #endregion
+
+            if (pathSaver.toDestroy)
+            {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
+                Debug.Log($"Remove component {target}");
+#endif
+                if (target == null)
+                {
+                    Debug.LogWarning($"Failed to remove component: target is already null ({pathSaver.globalComponentIdString})");
+                    return;
+                }
+
+                Undo.DestroyObjectImmediate(target);
+                return;
+            }
 
             if (target == null)
             {
-                Debug.LogWarning($"failed to find {pathSaver.globalObjectIdString}");
-                return;
+                if (!GlobalObjectId.TryParse(pathSaver.globalGameObjectIdString, out GlobalObjectId gameObjectId))
+                {
+                    Debug.LogWarning($"failed to parse {pathSaver.globalGameObjectIdString} GameObject");
+                    return;
+                }
+
+                GameObject targetGameObject =
+                    GlobalObjectId.GlobalObjectIdentifierToObjectSlow(gameObjectId) as GameObject;
+                if (targetGameObject == null)
+                {
+                    Debug.LogWarning($"failed to find {pathSaver.globalGameObjectIdString}");
+                    return;
+                }
+
+                (bool created, Component component) = AddComponentToGo(targetGameObject, pathSaver.globalComponentTypeString);
+                if (!created)
+                {
+                    return;
+                }
+                keyToNewComp[newCompKey] = component;
+                target = component;
             }
 
             if (string.IsNullOrEmpty(pathSaver.propertyPath))
             {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"failed to restore {pathSaver.globalObjectIdString}/{pathSaver.propertyPath}");
-#endif
+                Debug.LogWarning($"failed to restore {pathSaver.globalComponentIdString}/{pathSaver.propertyPath}");
                 return;
             }
 
@@ -442,13 +575,11 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             SerializedProperty property = serializedObject.FindProperty(pathSaver.propertyPath);
             if (property == null)
             {
-#if SAINTSFIELD_DEBUG
                 Debug.LogWarning($"failed to find property {pathSaver.propertyPath} on {target}");
-#endif
                 return;
             }
 
-#if SAINTSFIELD_DEBUG
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
             Debug.Log($"restoring {target.GetType().Name}.{pathSaver.propertyPath}=({pathSaver.propertyType})");
 #endif
 
@@ -586,12 +717,25 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
 
             EditorUtility.SetDirty(target);
+            EditorSceneManager.MarkSceneDirty(targetScene);
+        }
 
-            Scene targetScene = target.gameObject.scene;
-            if (targetScene.IsValid() && targetScene.isLoaded)
+        private static (bool created, Component result) AddComponentToGo(GameObject targetGameObject, string globalComponentTypeString)
+        {
+            Type componentType = Type.GetType(globalComponentTypeString);
+            if (componentType == null)
             {
-                EditorSceneManager.MarkSceneDirty(targetScene);
+                Debug.LogWarning(
+                    $"failed to get type {globalComponentTypeString} to add to gameObject {targetGameObject.name}");
+                return (false, null);
             }
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
+            Debug.Log($"Add new component {componentType} to {targetGameObject.name} GameObject");
+#endif
+            Component component = targetGameObject.AddComponent(componentType);
+            EditorUtility.SetDirty(targetGameObject);
+            return (true, component);
         }
 
         private static (bool craeted, object value) CreateManagedReferenceInstance(string fullTypename)
@@ -636,6 +780,72 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 Debug.LogError($"Failed to create instance of {className}: {e.Message}");
                 return (false, null);
             }
+        }
+
+        public static void DestroyComponent(Component component)
+        {
+            string globalObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString();
+
+#if SAINTSFIELD_DEBUG
+            Debug.Log($"start to record destroy {component} as {globalObjectIdString}");
+#endif
+
+            RuntimeSaver saver = RuntimeSaver.instance;
+
+            string typeName = component.GetType().AssemblyQualifiedName;
+            saver.pathSavers.RemoveAll(each => each.globalComponentIdString == globalObjectIdString && each.globalComponentTypeString == typeName);
+
+            PathSaver pathSaver = CreateBasePathSaver(component);
+            pathSaver.toDestroy = true;
+
+            saver.pathSavers.Add(pathSaver);
+            saver.SaveToDisk();
+        }
+
+        private static (bool found, GameObject result) FindInScene(Scene scene, string path)
+        {
+            if (!scene.IsValid() || !scene.isLoaded)
+            {
+                return default;
+            }
+
+            string trimPath = path.Trim('/');
+
+            string[] parts = trimPath.Split('/');
+            Debug.Assert(parts.Length != 0, trimPath);
+
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                if (root.name != parts[0])
+                {
+                    continue;
+                }
+
+                Transform current = root.transform;
+
+                for (int i = 1; i < parts.Length; i++)
+                {
+                    current = current.Find(parts[i]);
+                    if (current == null)
+                        return default;
+                }
+
+                return (true, current.gameObject);
+            }
+
+            return default;
+        }
+
+        /// <see href="https://uninomicon.com/globalobjectid">Prefabs have two GlobalObjectIds</see>
+        private static (bool converted, GlobalObjectId result) ConvertPrefabGidToUnpackedGid(GlobalObjectId id)
+        {
+            ulong fileId = (id.targetObjectId ^ id.targetPrefabId) & 0x7fffffffffffffff;
+            bool success = GlobalObjectId.TryParse(
+                $"GlobalObjectId_V1-{id.identifierType}-{id.assetGUID}-{fileId}-0",
+                out GlobalObjectId unpackedGid);
+            // Assert.IsTrue(success);
+            // return unpackedGid;
+            return (success, unpackedGid);
         }
     }
 }

@@ -6,17 +6,14 @@ namespace SaintsField.Editor.Utils.RuntimeSave
     [Serializable]
     public struct PathSaver
     {
-        public
-#if UNITY_6000_4_OR_NEWER
-            EntityId
-#else
-            int
-#endif
-            targetInstanceId;
-
         // public UnityEngine.Object propertyObject;
-        public string globalObjectIdString;
+        public string globalGameObjectIdString;
+        public string gameObjectHierarchyPath;
+        public string globalComponentIdString;
+        public string globalComponentTypeString;
         public string scenePath;
+
+        public bool toDestroy;
 
         public string propertyPath;
         public SaverPropertyType propertyType;

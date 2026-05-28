@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.17.2 ##
+
+1.  Add: "Runtime Saver" now can save new added component
+2.  Add: "Runtime Saver" now can save if a component need to remove by right click
+3.  Fix: "Runtime Saver" now can find a prefab that is already placed in a scene
+
 ## 5.17.1 ##
 
 1.  Fix: "Runtime Saver" didn't write the change to disk, and lost them when restart Unity

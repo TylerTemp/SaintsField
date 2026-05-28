@@ -345,10 +345,75 @@ namespace SaintsField.Editor.HeaderGUI
 
         private static Texture2D _saveIconTexture;
         private static Texture2D _checkIconTexture;
+        private static Texture2D _trashIconTexture;
+
+        private enum RuntimeSaveAnimIcon
+        {
+            Check,
+            Trash,
+        }
 
         // Per-target check animation state
         private const double CheckAnimDuration = 1.0; // seconds total before reverting to save icon
         private static readonly Dictionary<int, double> SaveCheckAnimEndTime = new Dictionary<int, double>();
+        private static readonly Dictionary<int, RuntimeSaveAnimIcon> RuntimeSaveAnimIcons = new Dictionary<int, RuntimeSaveAnimIcon>();
+
+        private static void SaveRuntimeComponents(Object[] targets, int targetKey)
+        {
+            foreach (Object target in targets)
+            {
+                if (target is Component component)
+                {
+                    RuntimeSaverUtil.SaveComponent(component);
+                }
+            }
+
+            AnimateRuntimeSaveIcon(targetKey, RuntimeSaveAnimIcon.Check);
+        }
+
+        private static void AnimateRuntimeSaveIcon(int targetKey, RuntimeSaveAnimIcon icon)
+        {
+            SaveCheckAnimEndTime[targetKey] = EditorApplication.timeSinceStartup + CheckAnimDuration;
+            RuntimeSaveAnimIcons[targetKey] = icon;
+            InternalEditorUtility.RepaintAllViews();
+        }
+
+        private static void ShowRuntimeSaveContextMenu(Object[] targets, int targetKey)
+        {
+            GenericMenu menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Remove Saved Values"), false, () =>
+            {
+                bool anyDeleted = false;
+                foreach (Object target in targets)
+                {
+                    if (target is Component component)
+                    {
+                        bool deleted = RuntimeSaverUtil.RemoveComponent(component);
+                        if (deleted)
+                        {
+                            anyDeleted = true;
+                        }
+                    }
+                }
+
+                if (anyDeleted)
+                {
+                    AnimateRuntimeSaveIcon(targetKey, RuntimeSaveAnimIcon.Trash);
+                }
+            });
+            menu.AddItem(new GUIContent("Destroy And Save"), false, () =>
+            {
+                foreach (Object target in targets)
+                {
+                    if (target is Component component && component != null)
+                    {
+                        RuntimeSaverUtil.DestroyComponent(component);
+                        Object.DestroyImmediate(component);
+                    }
+                }
+            });
+            menu.ShowAsContext();
+        }
 
         private static bool DrawMethod(Rect rectangle, Object[] targets)
         {
@@ -421,9 +486,11 @@ namespace SaintsField.Editor.HeaderGUI
             // SearchableSaintsEditors.Remove(removeSaintsEditor);
 
             bool runtimeSaveIcon = SaintsFieldConfigUtil.GetMonoBehaviorRuntimeSave();
-            _checkIconTexture ??= Util.LoadResource<Texture2D>("check.png");
             if(runtimeSaveIcon)
             {
+                _checkIconTexture ??= Util.LoadResource<Texture2D>("check.png");
+                _trashIconTexture ??= Util.LoadResource<Texture2D>("trash.png");
+
                 Rect useRect = new Rect(rectangle);
                 // Debug.Log(useRect);
                 // EditorGUI.DrawRect(useRect, Color.green);
@@ -437,6 +504,13 @@ namespace SaintsField.Editor.HeaderGUI
                 int targetKey = firstTarget.GetInstanceID();
                 double now = EditorApplication.timeSinceStartup;
                 bool isAnimating = SaveCheckAnimEndTime.TryGetValue(targetKey, out double animEnd) && now < animEnd;
+                Event currentEvent = Event.current;
+
+                if (currentEvent.type == EventType.MouseDown && currentEvent.button == 1 && useRect.Contains(currentEvent.mousePosition))
+                {
+                    ShowRuntimeSaveContextMenu(targets, targetKey);
+                    currentEvent.Use();
+                }
 
                 if (isAnimating)
                 {
@@ -458,22 +532,18 @@ namespace SaintsField.Editor.HeaderGUI
                     iconRect.y += pad;
                     iconRect.width -= pad * 2;
                     iconRect.height -= pad * 2;
+                    RuntimeSaveAnimIcon animIcon = RuntimeSaveAnimIcons.TryGetValue(targetKey, out RuntimeSaveAnimIcon currentAnimIcon)
+                        ? currentAnimIcon
+                        : RuntimeSaveAnimIcon.Check;
                     using(new GUIColorScoop(Color.green))
                     {
-                        GUI.DrawTexture(iconRect, _checkIconTexture, ScaleMode.ScaleToFit, true);
+                        GUI.DrawTexture(iconRect, animIcon == RuntimeSaveAnimIcon.Trash ? _trashIconTexture : _checkIconTexture, ScaleMode.ScaleToFit, true);
                     }
                     // GUI.color = prevColor;
 
                     if (GUI.Button(useRect, GUIContent.none, GUIStyle.none))
                     {
-                        foreach (Object target in targets)
-                        {
-                            if (target is Component component)
-                            {
-                                RuntimeSaverUtil.SaveComponent(component);
-                            }
-                        }
-                        SaveCheckAnimEndTime[targetKey] = EditorApplication.timeSinceStartup + CheckAnimDuration;
+                        SaveRuntimeComponents(targets, targetKey);
                     }
 
                     if (Event.current.type == EventType.Repaint)
@@ -491,6 +561,7 @@ namespace SaintsField.Editor.HeaderGUI
                 else
                 {
                     SaveCheckAnimEndTime.Remove(targetKey);
+                    RuntimeSaveAnimIcons.Remove(targetKey);
 
                     GUIContent content = new GUIContent(_saveIconTexture)
                     {
@@ -506,16 +577,7 @@ namespace SaintsField.Editor.HeaderGUI
                     );
                     if (change.changed)
                     {
-                        foreach (Object target in targets)
-                        {
-                            if (target is Component component)
-                            {
-                                RuntimeSaverUtil.SaveComponent(component);
-                            }
-                        }
-
-                        // Trigger animation: show green check for CheckAnimDuration, then revert to save icon
-                        SaveCheckAnimEndTime[targetKey] = EditorApplication.timeSinceStartup + CheckAnimDuration;
+                        SaveRuntimeComponents(targets, targetKey);
                         InternalEditorUtility.RepaintAllViews();
                     }
                 }

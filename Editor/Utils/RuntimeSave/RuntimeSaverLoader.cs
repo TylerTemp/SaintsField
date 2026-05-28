@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -53,16 +54,25 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 #endif
             Scene previouslyActiveScene = SceneManager.GetActiveScene();
             Dictionary<string, Scene> manuallyOpenedScenes = new Dictionary<string, Scene>();
-            foreach (PathSaver pathSaver in RuntimeSaver.instance.pathSavers)
+            Dictionary<string, Component> newAddComponents = new Dictionary<string, Component>();
+            foreach (IGrouping<string, PathSaver> sceneGroup in RuntimeSaver.instance.pathSavers.GroupBy(each => each.scenePath))
             {
-                if (!EnsureTargetSceneLoaded(pathSaver, manuallyOpenedScenes))
+                (bool open, Scene scene) = EnsureTargetSceneLoaded(sceneGroup.Key, manuallyOpenedScenes);
+                if (!open)
                 {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
+                    Debug.Log($"RestoreRuntimeSaver scene {sceneGroup.Key} not loaded, skip");
+#endif
                     continue;
                 }
 
-                RuntimeSaverUtil.RestoreComponent(pathSaver);
+                foreach (PathSaver pathSaver in sceneGroup.OrderByDescending(each => each.toDestroy))
+                {
+                    RuntimeSaverUtil.RestoreComponent(pathSaver, scene, newAddComponents);
+                }
             }
 
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
             foreach (Scene manuallyOpenedScene in manuallyOpenedScenes.Values)
             {
                 if (!manuallyOpenedScene.IsValid() || !manuallyOpenedScene.isLoaded)
@@ -80,33 +90,30 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             }
         }
 
-        private static bool EnsureTargetSceneLoaded(PathSaver pathSaver, IDictionary<string, Scene> manuallyOpenedScenes)
+        private static (bool open, Scene target) EnsureTargetSceneLoaded(string scenePath, IDictionary<string, Scene> manuallyOpenedScenes)
         {
-            if (string.IsNullOrEmpty(pathSaver.scenePath))
-            {
-                return true;
-            }
+            Debug.Assert(!string.IsNullOrEmpty(scenePath));
 
-            Scene scene = SceneManager.GetSceneByPath(pathSaver.scenePath);
+            Scene scene = SceneManager.GetSceneByPath(scenePath);
             if (scene.IsValid() && scene.isLoaded)
             {
-                return true;
+                return (true, scene);
             }
 
-            if (manuallyOpenedScenes.ContainsKey(pathSaver.scenePath))
+            if (manuallyOpenedScenes.TryGetValue(scenePath, out Scene manuallyOpenedScene))
             {
-                return true;
+                return (true, manuallyOpenedScene);
             }
 
-            Scene openedScene = EditorSceneManager.OpenScene(pathSaver.scenePath, OpenSceneMode.Additive);
+            Scene openedScene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
             if (!openedScene.IsValid() || !openedScene.isLoaded)
             {
-                Debug.LogWarning($"failed to open scene {pathSaver.scenePath} for runtime restore");
-                return false;
+                Debug.LogWarning($"failed to open scene {scenePath} for runtime restore");
+                return (false, default);
             }
 
-            manuallyOpenedScenes[pathSaver.scenePath] = openedScene;
-            return true;
+            manuallyOpenedScenes[scenePath] = openedScene;
+            return (true, openedScene);
         }
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER

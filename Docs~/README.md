@@ -7190,13 +7190,22 @@ If you have `SaintsEditor` enabled, this works by default.
 > [!NOTE]
 > This feature is enabled by default and no `SaintsEditor` required
 
-When in play mode, an save icon will display on the component. If saved, the saved value will be write back to component once you exit play mode.
+When in play mode, an save icon will display on the component:
+*   If saved, the saved value will be write back to component once you exit play mode.
+*   If you accidentally saved, right click on save icon and click "Remove Saved Values", the changes in runtime will not be write back for this component
+*   To remove a component, right click on save icon and click "Destroy And Save"
+*   To add a new component, after adding it, click save icon in the component header
 
-Note: this will not work for prefabs, because prefabs will always get `Instantiate`-d in play mode. Please directly edit the prefab file instead.
+> [!NOTE]
+> For prefabs which are already drop in scene, the saver will looking for it by hierarchy path instead of globalObjectId (because prefabs in scene get two different ids in play/edit mode). If you change the hierarchy path (rename, or change parents), the saved value will be lost. Only prefabs in scene has this issue
 
 (Disable this function in `Tools` - `Saints Field` - `Edit Config...` - `Component Runtime Save`)
 
 [![video](https://github.com/user-attachments/assets/2b445a4d-e650-44ed-a7f3-2e5224e806cf)](https://github.com/user-attachments/assets/1fa4a1d6-e2c6-4cb1-8c86-24aae447d8c4)
+
+Example of undo save, and save to destroy
+
+[![video](https://github.com/user-attachments/assets/0c47af56-d119-48e1-b050-f3055163579a)](https://github.com/user-attachments/assets/4ab7738d-88b2-4ee8-a655-0477146411df)
 
 ### `HeaderButton` / `HeaderLeftButton` ###
 
