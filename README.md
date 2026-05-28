@@ -114,6 +114,7 @@ namespace: `SaintsField`
 
 1.  Fix: Align logic of field button with `Button`
 2.  Add: `OnEvent` and `OnButtonClick` now has a UI so you can see where it's been bind, and shows error if the bind failed
+3.  Fix: `OnButtonClick` cloud not upwalk/downwalk when `buttonTarget` is a relative path
 
 ## Usage ##
 
