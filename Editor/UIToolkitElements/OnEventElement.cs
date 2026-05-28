@@ -77,11 +77,17 @@ namespace SaintsField.Editor.UIToolkitElements
                     new RichTextDrawer.EmptyRichTextTagProvider(),
                     viewDataKey
                 );
+                // ReSharper disable once InvertIf
                 if (result != null)
                 {
                     _valueContainer.Clear();
                     _valueContainer.Add(result);
+                    UIToolkitUtils.SetDisplayStyle(_valueContainer, DisplayStyle.Flex);
                 }
+            }
+            else
+            {
+                UIToolkitUtils.SetDisplayStyle(_valueContainer, DisplayStyle.None);
             }
         }
     }

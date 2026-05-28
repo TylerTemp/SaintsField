@@ -21,12 +21,13 @@
 .eventName {
     -unity-text-align: middle-left;
     margin-left: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .targetObject {
     border-radius: 0;
 }
-
 
 .targetObject > .unity-base-field__input {
     border-radius: 0;
