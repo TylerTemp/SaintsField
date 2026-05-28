@@ -81,7 +81,9 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 }
             }
 
-            string targetEventName = $"{_methodBindAttribute.EventTarget.Split('.').Last()}{eventSuffix}";
+            string targetEventName = _methodBindAttribute.EventTarget == null
+                ? "On Click"
+                : $"{_methodBindAttribute.EventTarget.Split('.').Last()}{eventSuffix}";
 
             _onEventWithErrorElement = new OnEventWithErrorElement(ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name), targetEventName, $"{FieldWithInfo.MemberId}[{targetEventName}]");
             _onEventWithErrorElement.RegisterCallback<AttachToPanelEvent>(_ =>

@@ -21,14 +21,13 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         }
 
         public UnityEvent<int> intEvent;
-
-        [SerializeField, GetComponentInChildren]
-        private CustomEventChild _child;
-
         [OnEvent(nameof(_child) + "._intEvent", value: 1)]
         public void OnChildInt(int int1)  // this is static parameter binding
         {
         }
+        [SerializeField, GetComponentInChildren, Expandable]
+        private CustomEventChild _child;
+
 
         // can not bind this one
         // // [OnEvent(nameof(intIntEvent), value: 3)]

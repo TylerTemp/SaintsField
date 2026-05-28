@@ -5744,7 +5744,9 @@ public void OnButtonClickComp(UnityEngine.Object value)
 }
 ```
 
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/25c6b4fc-77f4-4731-a9a3-b84573fce179)
+It'll display a UI that where the event is binded
+
+![image](https://github.com/user-attachments/assets/79be0018-387f-427c-aacb-bfd4f7b43187)
 
 Note:
 
@@ -5785,7 +5787,7 @@ public void OnInt1(int int1)  // static parameter binding
 }
 ```
 
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/34db0516-6aad-4394-a6bc-e57bd97b6b57)
+![image](https://github.com/user-attachments/assets/14510933-bd6f-4e29-97b7-2cbe6de75c10)
 
 Example of using dot(s):
 
@@ -5799,15 +5801,18 @@ public class CustomEventChild : MonoBehaviour
 // CustomEventExample.cs
 public class CustomEventExample : MonoBehaviour
 {
-    public CustomEventChild _child;
-
     // it will find the `_intEvent` on the `_child` field
     [OnEvent(nameof(_child) + "._intEvent")]
     public void OnChildInt(int int1)
     {
     }
+    
+    [Expandable]
+    public CustomEventChild _child;
 }
 ```
+
+![](https://github.com/user-attachments/assets/419700a4-a0cd-4cb7-8338-da651643c38a)
 
 #### `ColorPalette` ####
 

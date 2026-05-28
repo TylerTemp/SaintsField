@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.17.3 ##
+
+1.  Fix: Align logic of field button with `Button`
+2.  Add: `OnEvent` and `OnButtonClick` now has a UI so you can see where it's been bind, and shows error if the bind failed
+
 ## 5.17.2 ##
 
 1.  Add: "Runtime Saver" now can save new added component

@@ -4557,19 +4557,6 @@ MonoBehaviour:
   _intEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
-          today.comes.saintsfield.Samples
-        m_MethodName: OnChildInt
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 1056404281}
         m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
           SaintsField.Samples
