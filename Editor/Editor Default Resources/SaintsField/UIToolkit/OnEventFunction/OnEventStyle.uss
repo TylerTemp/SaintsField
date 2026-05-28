@@ -1,0 +1,33 @@
+.body {
+    flex-grow: 1;
+    flex-direction: row;
+    border-bottom-color: rgb(32, 32, 32);
+    border-bottom-width: 1px;
+    border-left-color: rgb(32, 32, 32);
+    border-left-width: 1px;
+    border-right-color: rgb(32, 32, 32);
+    border-right-width: 1px;
+    padding: 3px;
+    background-color: rgb(70, 70, 70);
+}
+
+.evenSpace {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    min-width: 0;
+}
+
+.eventName {
+    -unity-text-align: middle-left;
+    margin-left: 3px;
+}
+
+.targetObject {
+    border-radius: 0;
+}
+
+
+.targetObject > .unity-base-field__input {
+    border-radius: 0;
+}

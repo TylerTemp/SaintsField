@@ -27,10 +27,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
 
         public UnityEventCallStateSelector()
         {
-            if(_treeAsset == null)
-            {
-                _treeAsset = Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsEvent/CallStateButton.uxml");
-            }
+            _treeAsset ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/SaintsEvent/CallStateButton.uxml");
 
             _treeAsset.CloneTree(this);
             _button = this.Q<Button>();

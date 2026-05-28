@@ -4557,9 +4557,22 @@ MonoBehaviour:
   _intEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1056404279}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
           today.comes.saintsfield.Samples
+        m_MethodName: OnChildInt
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1056404281}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          SaintsField.Samples
         m_MethodName: OnChildInt
         m_Mode: 3
         m_Arguments:
@@ -5009,7 +5022,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1056404280}
-  - component: {fileID: 1056404279}
+  - component: {fileID: 1056404281}
   m_Layer: 0
   m_Name: OnEventExample
   m_TagString: Untagged
@@ -5017,64 +5030,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1056404279
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1056404278}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fb26404a0f3303438643da35bd086d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  intIntEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1056404279}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
-          today.comes.saintsfield.Samples
-        m_MethodName: OnInt1
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1056404279}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
-          today.comes.saintsfield.Samples
-        m_MethodName: OnInt2
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  intEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1056404279}
-        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
-          today.comes.saintsfield.Samples
-        m_MethodName: OnInt1
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _child: {fileID: 993888195}
 --- !u!4 &1056404280
 Transform:
   m_ObjectHideFlags: 0
@@ -5091,6 +5046,64 @@ Transform:
   - {fileID: 993888194}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1056404281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056404278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fb26404a0f3303438643da35bd086d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample
+  intIntEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1056404281}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          SaintsField.Samples
+        m_MethodName: OnInt1
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1056404281}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          SaintsField.Samples
+        m_MethodName: OnInt2
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  intEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1056404281}
+        m_TargetAssemblyTypeName: SaintsField.Samples.Scripts.SaintsEditor.CustomEventExample,
+          SaintsField.Samples
+        m_MethodName: OnInt1
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _child: {fileID: 993888195}
 --- !u!1 &1063381130
 GameObject:
   m_ObjectHideFlags: 0

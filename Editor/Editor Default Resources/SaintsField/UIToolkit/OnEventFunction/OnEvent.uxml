@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/OnEventFunction/OnEventStyle.uss?fileID=7433441132597879392&amp;guid=3cfb3918d1e9ea34abd07d8f09d9f76b&amp;type=3#OnEventStyle"/>
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor%20Default%20Resources/SaintsField/UIToolkit/PropertyFieldHideSelector.uss?fileID=7433441132597879392&amp;guid=4d2b9a87d9e64199908e325e25ba0049&amp;type=3#PropertyFieldHideSelector"/>
+    <ui:VisualElement name="container" class="unity-event__container" style="flex-grow: 1;">
+        <ui:Label name="title" class="unity-list-view__header"/>
+        <ui:VisualElement name="body" class="body">
+            <SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements.UnityEventCallStateSelector name="UnityEventCallStateSelector" enabled="false"/>
+            <uie:ObjectField name="targetObject" class="evenSpace targetObject"/>
+            <ui:Label name="eventName" class="evenSpace eventName"/>
+            <ui:VisualElement name="valueContainer" class="evenSpace"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
