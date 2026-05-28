@@ -27,7 +27,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
         protected abstract void AppendInvokeResult(VisualElement container, SerializedProperty property, int index, MethodInfo methodInfo, object parent, object result);
 
         protected static VisualElement DrawUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index, FieldInfo info, object parent, VisualElement container)
+            int index)
         {
             DecButtonAttribute decButtonAttribute = (DecButtonAttribute) saintsAttribute;
 
@@ -62,6 +62,8 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 CleanResult(container, property, index);
                 buttonUserData.Enumerators.Clear();
                 buttonUserData.ButtonTask?.Pause();
+                buttonUserData.WaiterHasError = false;
+                buttonUserData.WaiterHasFinished = false;
 
                 // string buttonError = "";
                 // ReSharper disable once PossibleNullReferenceException
@@ -123,6 +125,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 }
 
                 fancyButton.ShowCloseButton(true);
+                fancyButton.StatusIndicator.PlayLoading();
                 // ReSharper disable once PossibleNullReferenceException
                 // ReSharper disable once AccessToModifiedClosure
                 buttonUserData.ButtonTask = fancyButton.schedule.Execute(() =>
@@ -157,6 +160,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                             Debug.LogException(e);
                             moveNext = false;
                             thisHasMoveError = true;
+                            buttonUserData.WaiterHasError = true;
 
                             AppendErrorResult(container, property, index, e.InnerException?.Message ?? e.Message);
                         }
@@ -174,6 +178,10 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                         if (!moveNext)
                         {
                             finishedEnumerators.Add(waiter);
+                            if (!thisHasMoveError)
+                            {
+                                buttonUserData.WaiterHasFinished = true;
+                            }
                         }
                     }
 
@@ -193,7 +201,21 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
                         if (oldCounter > 0)
                         {
-                            fancyButton.StatusIndicator.PlayOk();
+                            if (buttonUserData.WaiterHasError)
+                            {
+                                if (buttonUserData.WaiterHasFinished)
+                                {
+                                    fancyButton.StatusIndicator.PlayWarning();
+                                }
+                                else
+                                {
+                                    fancyButton.StatusIndicator.PlayError();
+                                }
+                            }
+                            else
+                            {
+                                fancyButton.StatusIndicator.PlayOk();
+                            }
                         }
                     }
                 }).Every(1);

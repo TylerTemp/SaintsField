@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.BelowButtonDrawer
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, FieldInfo info, object parent)
         {
-            VisualElement btn = DrawUIToolkit(property, saintsAttribute, index, info, parent, container);
+            VisualElement btn = DrawUIToolkit(property, saintsAttribute, index);
             btn.style.flexGrow = 1;
             btn.style.flexShrink = 1;
             return btn;
