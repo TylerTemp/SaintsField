@@ -1,11 +1,11 @@
-#if SAINTSFIELD_SERIALIZATION && !SAINTSFIELD_SERIALIZATION_DISABLED && UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using SaintsField.Editor.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements
+namespace SaintsField.Editor.UIToolkitElements
 {
 #if UNITY_6000_0_OR_NEWER
     [UxmlElement]

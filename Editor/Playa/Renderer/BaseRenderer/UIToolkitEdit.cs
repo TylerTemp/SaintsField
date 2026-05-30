@@ -31,7 +31,9 @@ using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.UIToolkitElements.EditWrapper;
+#if SAINTSFIELD_UNITY_MATHEMATICS && !SAINTSFIELD_UNITY_MATHEMATICS_DISABLE
 using SaintsField.Editor.UIToolkitElements.MathematicsHalfUShort;
+#endif
 using SaintsField.Editor.UIToolkitElements.Vector2DoubleType;
 using SaintsField.Editor.UIToolkitElements.Vector3DoubleType;
 using SaintsField.Editor.UIToolkitElements.Vector4DoubleType;

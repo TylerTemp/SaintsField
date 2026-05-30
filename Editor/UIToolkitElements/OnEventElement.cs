@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements;
+using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using UnityEditor.UIElements;
