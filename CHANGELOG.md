@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.17.4 ##
+
+Fix: Dependency error [#393](https://github.com/TylerTemp/SaintsField/issues/393)
+
 ## 5.17.3 ##
 
 1.  Fix: Align logic of field button with `Button`
