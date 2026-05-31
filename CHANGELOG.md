@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.17.4 ##
+## 5.17.5 ##
 
 Fix: Dependency error [#393](https://github.com/TylerTemp/SaintsField/issues/393)
 
