@@ -8321,7 +8321,7 @@ A picker to select an addressable scene into a string field.
 
 ![](https://github.com/user-attachments/assets/98702d20-4328-429b-b334-ef3f2199744c)
 
-### `AddressableSubAssetRequired` ##
+### `AddressableSubAssetRequired` ###
 
 Validate if a sub-asset is signed in type like `Addressable.AssetReferenceSprite`
 
@@ -9002,7 +9002,7 @@ public class MyRendererFeature: SaintsScriptableRendererFeature
 
 Unity forget to make a drawer for `Unity.Mathematics.half`. It's now handled by SaintsField. In case Unity added it back someday, you can disable this function by add marco `SAINTSFIELD_UNITY_MATHEMATICS_FIX_DRAWER_DISABLE`. (Please read the "Add a Marco" section)
 
-### SaintsBuild Support ##
+### SaintsBuild Support ###
 
 If you have [`SaintsBuild`](https://github.com/TylerTemp/SaintsBuild) support, the auto-restored asset will have a notice with all field disabled. It also allows you to one-click remove the auto-restore function and modify the asset within play mode.
 
