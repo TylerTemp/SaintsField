@@ -237,25 +237,66 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             return new PathSaver
             {
                 globalGameObjectIdString = GlobalObjectId.GetGlobalObjectIdSlow(component.gameObject).ToString(),
-                gameObjectHierarchyPath = GetGameObjectHierarchyPath(component.gameObject),
+                gameObjectHierarchyPaths = GetGameObjectHierarchyPaths(component.gameObject),
                 globalComponentIdString = GlobalObjectId.GetGlobalObjectIdSlow(component).ToString(),
                 globalComponentTypeString = component.GetType().AssemblyQualifiedName,
                 scenePath = component.gameObject.scene.path,
             };
         }
 
-        private static string GetGameObjectHierarchyPath(GameObject gameObject)
+        private static List<GameObjectHierarchyPath> GetGameObjectHierarchyPaths(GameObject gameObject)
         {
-            List<string> pathParts = new List<string>();
+            List<GameObjectHierarchyPath> pathParts = new List<GameObjectHierarchyPath>();
             Transform current = gameObject.transform;
             while (current != null)
             {
-                pathParts.Add(current.name);
+                pathParts.Add(new GameObjectHierarchyPath(current.name, GetSameNameIndex(current)));
                 current = current.parent;
             }
 
             pathParts.Reverse();
-            return string.Join("/", pathParts);
+            return pathParts;
+        }
+
+        private static int GetSameNameIndex(Transform target)
+        {
+            int sameNameIndex = 0;
+
+            if (target.parent != null)
+            {
+                Transform parent = target.parent;
+                for (int i = 0; i < parent.childCount; i++)
+                {
+                    Transform child = parent.GetChild(i);
+                    if (child == target)
+                    {
+                        break;
+                    }
+
+                    if (child.name == target.name)
+                    {
+                        sameNameIndex++;
+                    }
+                }
+
+                return sameNameIndex;
+            }
+
+            Scene scene = target.gameObject.scene;
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                if (root.transform == target)
+                {
+                    break;
+                }
+
+                if (root.name == target.name)
+                {
+                    sameNameIndex++;
+                }
+            }
+
+            return sameNameIndex;
         }
 
         private static SaverPropertyType GetSaverPropertyType(SerializedProperty property)
@@ -453,7 +494,8 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             #region Prefab Search
             if(target == null)
             {
-                string searchPath = pathSaver.gameObjectHierarchyPath;
+                List<GameObjectHierarchyPath> searchPath = pathSaver.gameObjectHierarchyPaths;
+                string searchPathLog = GetHierarchyPathForLog(searchPath);
                 (bool found, GameObject foundGo) = FindInScene(targetScene, searchPath);
                 if (found)
                 {
@@ -461,7 +503,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                     (bool converted, GlobalObjectId foundUnpackId) = ConvertPrefabGidToUnpackedGid(foundGoId);
                     if (!converted)
                     {
-                        Debug.LogWarning($"failed to convert gameObject at {targetScene.name}.{searchPath}");
+                        Debug.LogWarning($"failed to convert gameObject at {targetScene.name}.{searchPathLog}");
                         return;
                     }
 
@@ -471,9 +513,21 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 #endif
                     if (!targetMatch)
                     {
-                        Debug.LogWarning(
-                            $"gameObject at {targetScene.name}.{searchPath} id mismatch(saved={pathSaver.globalGameObjectIdString}, get={foundGoId})");
-                        return;
+                        (bool fallbackFound, GameObject fallbackFoundGo) =
+                            TryFindPrefabObjectByUnpackedGid(targetScene, pathSaver.globalGameObjectIdString);
+                        if (fallbackFound)
+                        {
+                            foundGo = fallbackFoundGo;
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RUNTIME_SAVER
+                            Debug.Log($"Fallback prefab search matched GameObject {foundGo}");
+#endif
+                        }
+                        else
+                        {
+                            Debug.LogWarning(
+                                $"gameObject at {targetScene.name}.{searchPathLog} id mismatch(saved={pathSaver.globalGameObjectIdString}, get={foundGoId})");
+                            return;
+                        }
                     }
 
                     foreach (Component editComp in foundGo.GetComponents<Component>())
@@ -517,7 +571,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 }
                 else
                 {
-                    Debug.LogWarning($"not found path {searchPath} in {targetScene.name}, skip");
+                    Debug.LogWarning($"not found path {searchPathLog} in {targetScene.name}, skip");
                     return;
                 }
             }
@@ -802,38 +856,132 @@ namespace SaintsField.Editor.Utils.RuntimeSave
             saver.SaveToDisk();
         }
 
-        private static (bool found, GameObject result) FindInScene(Scene scene, string path)
+        private static (bool found, GameObject result) FindInScene(Scene scene, IReadOnlyList<GameObjectHierarchyPath> path)
         {
             if (!scene.IsValid() || !scene.isLoaded)
             {
                 return default;
             }
 
-            string trimPath = path.Trim('/');
-
-            string[] parts = trimPath.Split('/');
-            Debug.Assert(parts.Length != 0, trimPath);
-
-            foreach (GameObject root in scene.GetRootGameObjects())
+            if (path == null || path.Count == 0)
             {
-                if (root.name != parts[0])
+                return default;
+            }
+
+            Transform current = FindRootByHierarchyPath(scene, path[0]);
+            if (current == null)
+            {
+                return default;
+            }
+
+            for (int i = 1; i < path.Count; i++)
+            {
+                current = FindChildByHierarchyPath(current, path[i]);
+                if (current == null)
+                {
+                    return default;
+                }
+            }
+
+            return (true, current.gameObject);
+        }
+
+        private static Transform FindRootByHierarchyPath(Scene scene, GameObjectHierarchyPath node)
+        {
+            int currentSameNameIndex = 0;
+            foreach (GameObject rootGameObject in scene.GetRootGameObjects())
+            {
+                if (rootGameObject.name != node.nodeName)
                 {
                     continue;
                 }
 
-                Transform current = root.transform;
-
-                for (int i = 1; i < parts.Length; i++)
+                if (currentSameNameIndex == node.sameNameIndex)
                 {
-                    current = current.Find(parts[i]);
-                    if (current == null)
-                        return default;
+                    return rootGameObject.transform;
                 }
 
-                return (true, current.gameObject);
+                currentSameNameIndex++;
+            }
+
+            return null;
+        }
+
+        private static Transform FindChildByHierarchyPath(Transform parent, GameObjectHierarchyPath node)
+        {
+            int currentSameNameIndex = 0;
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                Transform child = parent.GetChild(i);
+                if (child.name != node.nodeName)
+                {
+                    continue;
+                }
+
+                if (currentSameNameIndex == node.sameNameIndex)
+                {
+                    return child;
+                }
+
+                currentSameNameIndex++;
+            }
+
+            return null;
+        }
+
+        private static string GetHierarchyPathForLog(IReadOnlyList<GameObjectHierarchyPath> hierarchyPaths)
+        {
+            if (hierarchyPaths == null || hierarchyPaths.Count == 0)
+            {
+                return "<empty>";
+            }
+
+            List<string> nodes = new List<string>(hierarchyPaths.Count);
+            foreach (GameObjectHierarchyPath node in hierarchyPaths)
+            {
+                nodes.Add($"{node.nodeName}[{node.sameNameIndex}]");
+            }
+
+            return "/" + string.Join("/", nodes);
+        }
+
+        private static (bool found, GameObject result) TryFindPrefabObjectByUnpackedGid(Scene scene, string expectedUnpackedGid)
+        {
+            foreach (GameObject gameObject in EnumerateSceneGameObjects(scene))
+            {
+                if (!PrefabUtility.IsPartOfPrefabInstance(gameObject))
+                {
+                    continue;
+                }
+
+                GlobalObjectId gameObjectId = GlobalObjectId.GetGlobalObjectIdSlow(gameObject);
+                (bool converted, GlobalObjectId unpackedId) = ConvertPrefabGidToUnpackedGid(gameObjectId);
+                if (!converted)
+                {
+                    continue;
+                }
+
+                if (unpackedId.ToString() != expectedUnpackedGid)
+                {
+                    continue;
+                }
+
+                return (true, gameObject);
             }
 
             return default;
+        }
+
+        private static IEnumerable<GameObject> EnumerateSceneGameObjects(Scene scene)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (GameObject rootGameObject in scene.GetRootGameObjects())
+            {
+                foreach (Transform allTrans in rootGameObject.GetComponentsInChildren<Transform>(true))
+                {
+                    yield return allTrans.gameObject;
+                }
+            }
         }
 
         /// <see href="https://uninomicon.com/globalobjectid">Prefabs have two GlobalObjectIds</see>

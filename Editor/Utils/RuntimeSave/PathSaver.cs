@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SaintsField.Editor.Utils.RuntimeSave
@@ -8,7 +9,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
     {
         // public UnityEngine.Object propertyObject;
         public string globalGameObjectIdString;
-        public string gameObjectHierarchyPath;
+        public List<GameObjectHierarchyPath> gameObjectHierarchyPaths;
         public string globalComponentIdString;
         public string globalComponentTypeString;
         public string scenePath;

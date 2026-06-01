@@ -544,10 +544,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5afe7bad4e2fc54da011f2631b9e6e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkAudioListener
-  isDefaultListener: 1
-  bOverrideScalingFactor: 0
-  scalingFactor: -1
-  listenerId: 0
 --- !u!114 &29054852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -560,18 +556,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa955cffcc8f37f4bb626f60ca9f8a30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
-  m_listeners:
-    initialListenerList: []
-    useDefaultListeners: 1
-  isEnvironmentAware: 1
-  isStaticObject: 0
-  usePositionOffsetData: 0
-  m_positionOffsetData:
-    KeepMe: 0
-    positionOffset: {x: 0, y: 0, z: 0}
-  scalingFactor: 1
-  m_posOffsetData: {fileID: 0}
-  listenerMask: 1
 --- !u!114 &29054853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12725,6 +12709,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e64d323a8ad41341ab2ce300485e661, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.I2PickerExample
+  ls1:
+    mTerm: 
+    mRTL_IgnoreArabicFix: 0
+    mRTL_MaxLineLength: 0
+    mRTL_ConvertNumbers: 0
+    m_DontLocalizeParameters: 0
+  lang: 
 --- !u!1 &689768759
 GameObject:
   m_ObjectHideFlags: 0
@@ -20083,7 +20074,7 @@ GameObject:
   - component: {fileID: 874377216}
   - component: {fileID: 874377217}
   m_Layer: 0
-  m_Name: Slider
+  m_Name: SliderHandleExample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20097,11 +20088,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 874377215}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.37354738, z: -0, w: 0.9276111}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 919087752}
   m_Father: {fileID: 1318514131}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &874377217
@@ -20113,10 +20105,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 874377215}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d19c770cc37fbf94c91d2e3241a6996b, type: 3}
+  m_Script: {fileID: 11500000, guid: a756dd69b840ebc40a49d66209a6b762, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SaintsField.Samples.EditorTest::SaintsField.Samples.EditorTest.HandleSlider.SliderExample
-  m_TargetPosition: {x: 1.9225677, y: 0, z: 2}
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.HandleExamples.SliderHandle.SliderHandle
+  defaultLength: 1
+  anotherSpace: {fileID: 919087751}
+  upShot: {x: 0.41701204, y: 0.41701204}
 --- !u!1 &883682258
 GameObject:
   m_ObjectHideFlags: 0
@@ -20820,6 +20814,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   naScriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
   scriptable: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+--- !u!1 &919087751
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919087752}
+  m_Layer: 0
+  m_Name: Child
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &919087752
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919087751}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 874377216}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &924766851
 GameObject:
   m_ObjectHideFlags: 0
@@ -30151,6 +30176,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 449cc37fa57b668499b6a9223559c61e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ls1:
+    mTerm: 
+    mRTL_IgnoreArabicFix: 0
+    mRTL_MaxLineLength: 0
+    mRTL_ConvertNumbers: 0
+    m_DontLocalizeParameters: 0
+  ls2:
+    mTerm: 
+    mRTL_IgnoreArabicFix: 0
+    mRTL_MaxLineLength: 0
+    mRTL_ConvertNumbers: 0
+    m_DontLocalizeParameters: 0
 --- !u!1 &1597261713
 GameObject:
   m_ObjectHideFlags: 0
@@ -37958,9 +37995,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 652085bedf7dcfd4091b3aa9b1255732, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples.EditorTest::LightColorLerp
-  m_Color1: {r: 1, g: 0, b: 0, a: 1}
-  m_Color2: {r: 0, g: 1, b: 0, a: 1}
-  m_Amount: 0.363
 --- !u!1 &2137894679
 GameObject:
   m_ObjectHideFlags: 0

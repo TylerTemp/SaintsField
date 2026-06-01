@@ -2951,7 +2951,7 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
                     Debug.Log($"#Search# searching token@{tokenIndex}={search.Token} of property={property.name}@{arrayElementIndex} with seachedObjects={string.Join(",", searchedObjects)}");
 #endif
-                    if (!Util.SearchObject(childObject, search.Token, searchedObjects))
+                    if (!SearchObject(childObject, search.Token, searchedObjects))
                     {
                         all = false;
                         break;
@@ -2986,6 +2986,61 @@ namespace SaintsField.Editor.Utils
             }
 
             return true;
+        }
+
+        private static Mesh _coneMesh;
+        private const float ConeTipVisualScale = 0.2f;
+        // Unity's HandleUtility.DistanceToCone follows the built-in Handles.coneMesh pivot convention.
+        // In our exported mesh version (pivot moved to cone tip), local tip is at z=0 while legacy
+        // built-in cone tip is at +0.7 (for size=1). Keep this value in sync if the cone mesh changes.
+        private const float LegacyConeTipOffset = 0.7f;
+
+        public static float DistanceToConeTipPivot(Vector3 position, Quaternion rotation, float size)
+        {
+            float actualSize = size * ConeTipVisualScale;
+            Vector3 legacyPivotPosition = position - rotation * (Vector3.forward * (LegacyConeTipOffset * actualSize));
+            return HandleUtility.DistanceToCone(legacyPivotPosition, rotation, actualSize);
+        }
+
+        public static void ConeTipHandleCap(
+            int controlID,
+            Vector3 position,
+            Quaternion rotation,
+            float size,
+            EventType eventType)
+        {
+            switch (eventType)
+            {
+                case EventType.MouseMove:
+                case EventType.Layout:
+                    HandleUtility.AddControl(controlID, DistanceToConeTipPivot(position, rotation, size));
+                    break;
+                case EventType.Repaint:
+                {
+                    _coneMesh ??= LoadResource<Mesh>("3D/HandlesConeMesh.asset");
+                    Graphics.DrawMeshNow(_coneMesh, StartCapDraw(position, rotation, size * ConeTipVisualScale));
+                }
+                    break;
+            }
+        }
+
+        internal static Matrix4x4 StartCapDraw(Vector3 position, Quaternion rotation, float size)
+        {
+            Shader.SetGlobalColor("_HandleColor", realHandleColor);
+            Shader.SetGlobalFloat("_HandleSize", size);
+            Matrix4x4 matrix4x4 = Handles.matrix * Matrix4x4.TRS(position, rotation, Vector3.one);
+            Shader.SetGlobalMatrix("_ObjectToWorld", matrix4x4);
+            HandleUtility.handleMaterial.SetFloat("_HandleZTest", (float) Handles.zTest);
+            HandleUtility.handleMaterial.SetPass(0);
+            return matrix4x4;
+        }
+
+        internal static Color realHandleColor
+        {
+            get
+            {
+                return Handles.color * new Color(1f, 1f, 1f, 0.5f) + (Handles.lighting ? new Color(0.0f, 0.0f, 0.0f, 0.5f) : new Color(0.0f, 0.0f, 0.0f, 0.0f));
+            }
         }
     }
 }

@@ -110,9 +110,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.17.5**
+**5.18.0**
 
-Fix: Dependency error [#393](https://github.com/TylerTemp/SaintsField/issues/393)
+1.  Add: "Runtime Saver" now saves the index of the node for prefab object (instead of plain path) to better find the target object after exit play mode
+2.  Add: "Runtime Saver" now fallback searching the scene's prefabs for the target object if the target can not be found (because of rename, hierarchy changes etc) after exit play mode
+3.  Add: `SliderHandle` scene handle to edit for number / vector types in distance. Useful as a ruler.
 
 ## Usage ##
 
@@ -239,6 +241,7 @@ Fix: Dependency error [#393](https://github.com/TylerTemp/SaintsField/issues/393
     *   [`DrawWireDisc`](https://saintsfield.comes.today/handles/drawwiredisc)
     *   [`SphereHandleCap`](https://saintsfield.comes.today/handles/spherehandlecap)
     *   [`RadiusHandle`](https://saintsfield.comes.today/handles/radiushandle)
+    *   [`SliderHandle`](https://saintsfield.comes.today/handles/sliderhandle)
     *   [`PrimitiveBoundsHandle`](https://saintsfield.comes.today/handles/primitiveboundshandle)
 *   [Component Header](https://saintsfield.comes.today/component-header)
     *   [Runtime Saver](https://saintsfield.comes.today/component-header/runtime-saver)

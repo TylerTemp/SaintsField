@@ -7147,6 +7147,45 @@ public double doubleRadius;
 
 [![video](https://github.com/user-attachments/assets/8488e213-49b3-4901-a033-1ac4a6f97e8e)](https://github.com/user-attachments/assets/40b24511-89d2-421a-ab5f-64e7323bd26f)
 
+### `SliderHandle` ###
+
+Draw a one-axis slider handle in scene to adjust number/vector values as distance.
+
+The target field supports Unity serialized number types (`int`, `uint`, `long`, `ulong`, `float`, `double`, etc.) and vector types (`Vector2`, `Vector2Int`, `Vector3`, `Vector3Int`, `Vector4`).
+For vector types, the result is written back to all components (`x/y/z/w`) with the same value.
+
+This is useful as a ruler.
+
+**Parameters**
+
+*   `string space = "this"`: parent space.  
+    `this` uses current target transform, `null` uses world space behavior, otherwise use target field/callback transform.
+*   `float directionX = 0f, float directionY = 1f, float directionZ = 0f`: direction axis.
+*   `string directionCallback = null`: callback/field/property for direction (`Vector3`).
+*   `float size = -1f`: handle size. If `size <= 0`, it uses constant screen-space size (no scale in camera distance).
+*   `float snap = -1f`: snap distance. If `snap <= 0`, snapping is disabled.
+*   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: local position offset.
+*   `string posOffsetCallback = null`: callback/field/property for position offset (`Vector3`).
+*   `EColor eColor = EColor.White`: color of slider handle.
+*   `float alpha = 1f`: alpha of the color.
+*   `string color = null`: optional hex color (`#...`) or callback.
+
+```csharp
+using SaintsField;
+
+[SliderHandle] public float defaultLength = 1f;
+
+[Space]
+[GetInChildren] public GameObject anotherSpace;
+
+// Make it in local space of another object
+// and change the direction too.
+// `vector` types will get all axis the same value
+[SliderHandle(space: nameof(anotherSpace), directionX: 1, directionY: 1, eColor: EColor.Green)] public Vector2 upShot;
+```
+
+[![video](https://github.com/user-attachments/assets/bd951ccc-27b9-4ca9-8390-a41048ba4130)](https://github.com/user-attachments/assets/2f7f48c4-9024-4173-8b96-50a39c1c4cf7)
+
 ### `PrimitiveBoundsHandle` ###
 
 Draw a rect handle (for `Rect`, `RectInt`) or bounds handle (for `Bounds`, `BoundsInt`) to adjust corresponding values of the field.
