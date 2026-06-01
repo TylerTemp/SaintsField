@@ -4,7 +4,7 @@
     <ui:VisualElement name="container" class="unity-event__container" style="flex-grow: 1;">
         <ui:Label name="title" class="unity-list-view__header"/>
         <ui:VisualElement name="body" class="body">
-            <SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer.UIToolkitElements.UnityEventCallStateSelector name="UnityEventCallStateSelector" enabled="false"/>
+            <SaintsField.Editor.UIToolkitElements.UnityEventCallStateSelector name="UnityEventCallStateSelector" enabled="false"/>
             <uie:ObjectField name="targetObject" class="evenSpace targetObject"/>
             <ui:Label name="eventName" class="evenSpace eventName"/>
             <ui:VisualElement name="valueContainer" class="evenSpace"/>
