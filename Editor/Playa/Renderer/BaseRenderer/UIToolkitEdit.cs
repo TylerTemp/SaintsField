@@ -4574,7 +4574,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             #region List
             if (value is IEnumerable enumerableValue)
             {
-                // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+                Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
+#endif
                 return (ListDrawerSettingsRenderer.UIToolkitValueEdit(
                         oldElement,
                         label,
@@ -4666,11 +4668,16 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             // ReSharper disable once InvertIf
             if (oldElement is GeneralTypeEdit gte && gte.ClassListContains(foldoutViewKey))
             {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+                Debug.Log($"CheckRefresh! (name={foldoutViewKey})");
+#endif
                 gte.CheckRefresh(label, valueType, value, beforeSet, setterOrNull, targets);
                 return (null, true);
             }
 
-            // Debug.Log($"recreated! {oldElement}{oldElement?.name}(name={foldoutViewKey})");
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+            Debug.Log($"recreated! {oldElement}{oldElement?.name}(name={foldoutViewKey})");
+#endif
 
             GeneralTypeEdit newCreated = new GeneralTypeEdit(
                 label,

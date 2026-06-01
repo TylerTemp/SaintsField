@@ -256,6 +256,10 @@ namespace SaintsField.Editor.UIToolkitElements
                 _cachedDropdownList = dropdownList;
             }
 
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
+            Debug.Log($"_curValue={_curValue}, value={value}, update={_curValue != value}");
+#endif
+
             if (!_init || _curValue != value)
             {
                 _curValue = value;
