@@ -1,5 +1,11 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: `ShowInInspector` can not properly update field inside a non-UnityObject class/struct type [#395](https://github.com/TylerTemp/SaintsField/issues/395)
+2.  Improve: `ShowInInspector` now use Button to toggle between `null` and instance when there is only one type avaliable for the target type
+3.  Fix: `ShowInInspector` did not clean the UnityObject field when switching from UnityObject type to non-UnityObject type
+
 ## 5.18.0 ##
 
 1.  Add: "Runtime Saver" now saves the index of the node for prefab object (instead of plain path) to better find the target object after exit play mode
