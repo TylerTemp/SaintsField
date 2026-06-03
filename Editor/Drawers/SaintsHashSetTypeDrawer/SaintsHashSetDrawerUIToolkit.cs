@@ -9,6 +9,7 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -680,13 +681,19 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
                 // };
                 // element.Add(wrapContainer);
 
+                // Debug.Log($"render item {elementProp.propertyPath}/keyWrapType={keyWrapType}/wrapField={wrapField}/wrapType={wrapType}");
+
                 VisualElement resultElement =
                     SaintsWrapUtils.CreateCellElement(
                         keyWrapType,
                         wrapField,
                         wrapType,
                         elementProp,
-                        ReflectCache.GetCustomAttributes<Attribute>(info),
+                        ReflectCache
+                            .GetCustomAttributes<Attribute>(info)
+                            .Where(each => each is not SaintsHashSetAttribute)
+                            .Where(each => each is PropertyAttribute or InjectAttributeBase)
+                            .ToArray(),
                         injectAttributes,
                         hasSerializeReference, this, this, wrapParent
                     );

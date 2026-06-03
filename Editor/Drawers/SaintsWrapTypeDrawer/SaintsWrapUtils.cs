@@ -228,7 +228,9 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                         .OfType<ISaintsAttribute>()
                         .FirstOrDefault();
 
-                    // Debug.Log(saintsAttr);
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
+                    Debug.Log(saintsAttr);
+#endif
 
                     useAttribute = saintsAttr as Attribute;
                     if (saintsAttr != null)
@@ -262,9 +264,9 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
                 useDrawerType = typeof(BaseWrapDrawer);
             }
 
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-//             Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath}/{useDrawerType}");
-// #endif
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
+            Debug.Log($"{info.Name}: {serializedBaseProperty.propertyPath}/{useDrawerType}");
+#endif
 
             SaintsCellRenderer renderer = null;
             IPlayaAttribute[] playaAttributes = allCustomAttributes.OfType<IPlayaAttribute>().ToArray();
