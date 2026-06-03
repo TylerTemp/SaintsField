@@ -252,7 +252,7 @@ namespace SaintsField.Editor.UIToolkitElements
                         newDropdownButtonLabel =
                             $"{_unityObjectOverrideType.Name} <color=#808080>({_unityObjectOverrideType.Namespace})</color>";
                         newCreateButtonLabel =
-                            $"({_unityObjectOverrideType.Name} -> Null <color=#808080>({_unityObjectOverrideType.Namespace})</color>";
+                            $"{_unityObjectOverrideType.Name} -> Null <color=#808080>({_unityObjectOverrideType.Namespace})</color>";
                         newCreateButtonTooltip = "Click to set to null";
                     }
                     else
@@ -278,7 +278,7 @@ namespace SaintsField.Editor.UIToolkitElements
                     newDropdownButtonLabel =
                         $"{instanceFieldType!.Name} <color=#808080>({instanceFieldType.Namespace})</color>";
                     newCreateButtonLabel = $"{instanceFieldType!.Name} -> Null <color=#808080>({instanceFieldType.Namespace})</color>";
-                    newCreateButtonTooltip = $"Click to set to null";
+                    newCreateButtonTooltip = "Click to set to null";
                 }
 
                 if (_dropdownBtn.ButtonLabelElement.text != newDropdownButtonLabel)
