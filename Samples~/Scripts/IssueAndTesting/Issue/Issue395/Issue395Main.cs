@@ -9,7 +9,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue395
         public void TakeScreenshot(ScreenshotCustomization customization = null)
         {
             Debug.Log(customization);
-            Debug.Log(customization?.SpineMoments);
+            Debug.Log(customization?.SpineMoments?.Count);
         }
 
     }

@@ -4606,64 +4606,64 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }), false);
             }
 
-            if (valueIsNull)
-            {
-                if (valueType.IsArray || typeof(IList).IsAssignableFrom(valueType))
-                {
-                    if (oldElement is LabelButtonField oldLabel && oldLabel.ClassListContains(foldoutViewKey))
-                    {
-                        return (null, false);
-                    }
-                    LabelButtonField labelButtonField = new LabelButtonField(label, new Button(() =>
-                    {
-                        beforeSet?.Invoke(value);
-                        object result = valueType.IsArray
-                            ? Array.CreateInstance(ReflectUtils.GetElementType(valueType), 0)
-                            : Activator.CreateInstance(valueType);
-                        setterOrNull(result);
-                        // return;
-                        // setterOrNull(Activator.CreateInstance(valueType));
-                    })
-                    {
-                        text = "null (Click to Create)",
-                        tooltip = "Click to Create",
-                        style =
-                        {
-                            flexGrow = 1,
-                            unityTextAlign = TextAnchor.MiddleLeft,
-                        },
-                    });
-                    if (labelGrayColor)
-                    {
-                        labelButtonField.labelElement.style.color = AbsRenderer.ReColor;
-                    }
-                    labelButtonField.AddToClassList(LabelButtonField.alignedFieldUssClassName);
-                    labelButtonField.AddToClassList(foldoutViewKey);
-                    return (labelButtonField, true);
-                }
-
-                if (setterOrNull == null)
-                {
-                    TextField textField = new TextField(label)
-                    {
-                        value = "null",
-                        pickingMode = PickingMode.Ignore,
-                    };
-                    if (labelGrayColor)
-                    {
-                        textField.labelElement.style.color = AbsRenderer.ReColor;
-                    }
-
-                    // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-                    if(_nullUss is null)  // bypass life circle
-                    {
-                        _nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
-                    }
-                    textField.styleSheets.Add(_nullUss);
-
-                    return (WrapVisualElement(textField), true);
-                }
-            }
+            // if (valueIsNull)
+            // {
+            //     if (valueType.IsArray || typeof(IList).IsAssignableFrom(valueType))
+            //     {
+            //         if (oldElement is LabelButtonField oldLabel && oldLabel.ClassListContains(foldoutViewKey))
+            //         {
+            //             return (null, false);
+            //         }
+            //         LabelButtonField labelButtonField = new LabelButtonField(label, new Button(() =>
+            //         {
+            //             beforeSet?.Invoke(value);
+            //             object result = valueType.IsArray
+            //                 ? Array.CreateInstance(ReflectUtils.GetElementType(valueType), 0)
+            //                 : Activator.CreateInstance(valueType);
+            //             setterOrNull(result);
+            //             // return;
+            //             // setterOrNull(Activator.CreateInstance(valueType));
+            //         })
+            //         {
+            //             text = "null (Click to Create)",
+            //             tooltip = "Click to Create",
+            //             style =
+            //             {
+            //                 flexGrow = 1,
+            //                 unityTextAlign = TextAnchor.MiddleLeft,
+            //             },
+            //         });
+            //         if (labelGrayColor)
+            //         {
+            //             labelButtonField.labelElement.style.color = AbsRenderer.ReColor;
+            //         }
+            //         labelButtonField.AddToClassList(LabelButtonField.alignedFieldUssClassName);
+            //         labelButtonField.AddToClassList(foldoutViewKey);
+            //         return (labelButtonField, true);
+            //     }
+            //
+            //     if (setterOrNull == null)
+            //     {
+            //         TextField textField = new TextField(label)
+            //         {
+            //             value = "null",
+            //             pickingMode = PickingMode.Ignore,
+            //         };
+            //         if (labelGrayColor)
+            //         {
+            //             textField.labelElement.style.color = AbsRenderer.ReColor;
+            //         }
+            //
+            //         // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+            //         if(_nullUss is null)  // bypass life circle
+            //         {
+            //             _nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
+            //         }
+            //         textField.styleSheets.Add(_nullUss);
+            //
+            //         return (WrapVisualElement(textField), true);
+            //     }
+            // }
 
             // ReSharper disable once InvertIf
             if (oldElement is GeneralTypeEdit gte && gte.ClassListContains(foldoutViewKey))

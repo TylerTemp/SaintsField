@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         {
                             return;
                         }
-                        Debug.Log($"para value changed: {parameterInfo.Name}, {paraContainer.Children().FirstOrDefault()}");
+                        // Debug.Log($"para value changed: {parameterInfo.Name}, {paraContainer.Children().FirstOrDefault()}");
                         VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                             paraContainer.Children().FirstOrDefault(),
                             parameterInfo.Name,

@@ -71,7 +71,7 @@ namespace SaintsField.Editor.UIToolkitElements
             firstChild.Add(_dropdownBtn);
 
             _dropdownBtn.style.marginLeft = 0;
-            _dropdownBtn.labelElement.style.marginLeft = 0;
+            // _dropdownBtn.labelElement.style.marginLeft = 0;
 
             if (labelGrayColor)
             {
@@ -132,21 +132,22 @@ namespace SaintsField.Editor.UIToolkitElements
             }
 
             bool nullValue = value == null;
-            // UIToolkitUtils.SetDisplayStyle(_checkMark, nullValue? DisplayStyle.None: DisplayStyle.Flex);
-            Visibility checkMarkVisibility;
-            if (nullValue && !_canHaveUnityTypes.Contains(_unityObjectOverrideType))
-            {
-                checkMarkVisibility = Visibility.Hidden;
-            }
-            else
-            {
-                checkMarkVisibility = Visibility.Visible;
-            }
-
-            if (_checkMark.style.visibility != checkMarkVisibility)
-            {
-                _checkMark.style.visibility = checkMarkVisibility;
-            }
+            UIToolkitUtils.SetDisplayStyle(_checkMark, nullValue? DisplayStyle.None: DisplayStyle.Flex);
+            _dropdownBtn.labelElement.style.marginLeft = nullValue ? 3 : 0;
+            // Visibility checkMarkVisibility;
+            // if (nullValue && !_canHaveUnityTypes.Contains(_unityObjectOverrideType))
+            // {
+            //     checkMarkVisibility = Visibility.Hidden;
+            // }
+            // else
+            // {
+            //     checkMarkVisibility = Visibility.Visible;
+            // }
+            //
+            // if (_checkMark.style.visibility != checkMarkVisibility)
+            // {
+            //     _checkMark.style.visibility = checkMarkVisibility;
+            // }
 
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             // if (nullValue && this.value && _canHaveUnityTypes.Count == 0)
@@ -260,7 +261,8 @@ namespace SaintsField.Editor.UIToolkitElements
             Debug.Log($"_curValue={_curValue}, value={value}, update={_curValue != value}");
 #endif
 
-            if (!_init || _curValue != value)
+            // When expanded, the sub-fields might need update. So also update if it's expanded (this.value==true)
+            if (!_init || _curValue != value || this.value)
             {
                 _curValue = value;
                 if (this.value)  // expanded
@@ -498,6 +500,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 // ReSharper disable once InvertIf
                 if(result != null)
                 {
+                    oldItemElement?.RemoveFromHierarchy();
                     result.AddToClassList(subId);
                     fieldsBody.Add(result);
                 }
