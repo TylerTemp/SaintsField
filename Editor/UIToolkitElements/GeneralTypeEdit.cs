@@ -46,7 +46,12 @@ namespace SaintsField.Editor.UIToolkitElements
                     {
                         paddingLeft = 2,
                         paddingRight = 2,
+                        unityTextAlign = TextAnchor.MiddleLeft,
+                        flexGrow = 1,
+                        flexShrink = 1,
+                        textOverflow = TextOverflow.Ellipsis,
                     },
+                    displayTooltipWhenElided = false,
                 });
             }
         }
@@ -108,6 +113,8 @@ namespace SaintsField.Editor.UIToolkitElements
             _nullOrCreateButtonField.style.display = DisplayStyle.None;
             _nullOrCreateButtonField.style.marginLeft = 0;
             _nullOrCreateButtonField.style.marginRight = 0;
+            _nullOrCreateButtonField.style.flexGrow = 1;
+            _nullOrCreateButtonField.style.flexShrink = 1;
             _nullOrCreateButtonField.labelElement.style.marginLeft = 0;
             _nullOrCreateButtonField.AddToClassList(NullOrCreateButtonField.alignedFieldUssClassName);
             if (labelGrayColor)
@@ -144,13 +151,13 @@ namespace SaintsField.Editor.UIToolkitElements
                     }
 
                     SetToType(_optionTypes[0]);
-                    _nullOrCreateButtonField.Button.text =
-                        $"Set To Null ({_optionTypes[0].Name} <color=#808080>({_optionTypes[0].Namespace})</color>)";
+                    // _nullOrCreateButtonField.Button.text =
+                    //     $"Set To Null ({_optionTypes[0].Name} <color=#808080>({_optionTypes[0].Namespace})</color>)";
                 }
                 else
                 {
                     SetToType(null);
-                    _nullOrCreateButtonField.Button.text = $"Null (Create {_optionTypes[0].Name} <color=#808080>{_optionTypes[0].Namespace})</color>)";
+                    // _nullOrCreateButtonField.Button.text = $"Null (Create {_optionTypes[0].Name} <color=#808080>{_optionTypes[0].Namespace})</color>)";
                 }
             };
 
@@ -222,11 +229,11 @@ namespace SaintsField.Editor.UIToolkitElements
                 ? null
                 : value!.GetType();
 
-            if (!_init || _curType != instanceFieldType || onUnityType)
+            if (!_init || _curType != instanceFieldType || onUnityType || _optionTypes.Length <= 1)
             {
+                Type fieldType = valueType ?? value!.GetType();
                 if(_optionTypes.Length == 0)
                 {
-                    Type fieldType = valueType ?? value!.GetType();
                     _optionTypes = ReferencePickerAttributeDrawer
                         .GetTypesDerivedFrom(fieldType)
                         .ToArray();
@@ -234,6 +241,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
                 string newDropdownButtonLabel;
                 string newCreateButtonLabel;
+                string newCreateButtonTooltip;
                 if (value == null)
                 {
                     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
@@ -244,22 +252,33 @@ namespace SaintsField.Editor.UIToolkitElements
                         newDropdownButtonLabel =
                             $"{_unityObjectOverrideType.Name} <color=#808080>({_unityObjectOverrideType.Namespace})</color>";
                         newCreateButtonLabel =
-                            $"Set to Null ({_unityObjectOverrideType.Name} <color=#808080>{_unityObjectOverrideType.Namespace}</color>)";
+                            $"({_unityObjectOverrideType.Name} -> Null <color=#808080>({_unityObjectOverrideType.Namespace})</color>";
+                        newCreateButtonTooltip = "Click to set to null";
                     }
                     else
                     {
                         newDropdownButtonLabel = "Null";
 
-                        newCreateButtonLabel = _optionTypes.Length == 0
-                            ? "Null"
-                            : $"Null (Create {_optionTypes[0].Name} <color=#808080>{_optionTypes[0].Namespace})</color>)";
+                        if (_optionTypes.Length == 0)
+                        {
+                            newCreateButtonLabel = "Null";
+                            newCreateButtonTooltip = $"No implement for {fieldType.Name} <color=#808080>({fieldType.Namespace})</color>";
+                        }
+                        else
+                        {
+                            newCreateButtonLabel =
+                                $"Null -> {_optionTypes[0].Name} <color=#808080>{_optionTypes[0].Namespace})</color>";
+                            newCreateButtonTooltip = $"Click to create {_optionTypes[0].Name}";
+                        }
+
                     }
                 }
                 else
                 {
                     newDropdownButtonLabel =
                         $"{instanceFieldType!.Name} <color=#808080>({instanceFieldType.Namespace})</color>";
-                    newCreateButtonLabel = $"Set To Null ({instanceFieldType!.Name} <color=#808080>({instanceFieldType.Namespace})</color>)";
+                    newCreateButtonLabel = $"{instanceFieldType!.Name} -> Null <color=#808080>({instanceFieldType.Namespace})</color>";
+                    newCreateButtonTooltip = $"Click to set to null";
                 }
 
                 if (_dropdownBtn.ButtonLabelElement.text != newDropdownButtonLabel)
@@ -271,9 +290,13 @@ namespace SaintsField.Editor.UIToolkitElements
                 {
                     _nullOrCreateButtonField.Button.text = newCreateButtonLabel;
                 }
+                if (_nullOrCreateButtonField.Button.tooltip != newCreateButtonTooltip)
+                {
+                    _nullOrCreateButtonField.Button.tooltip = newCreateButtonTooltip;
+                }
             }
 
-            if (!_init || _curType != instanceFieldType || _optionTypes.Length <= 1)
+            if (!_init || _curType != instanceFieldType)
             {
                 _curType = instanceFieldType;
                 Type fieldType = valueType ?? value!.GetType();
