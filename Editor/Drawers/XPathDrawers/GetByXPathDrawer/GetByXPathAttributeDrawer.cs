@@ -147,7 +147,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             return valid ? (true, result) : (false, null);
         }
 
-        private static (string error, Type expectType, Type expectInterface) GetExpectedTypeOfProp(
+        public static (string error, Type expectType, Type expectInterface) GetExpectedTypeOfProp(
             SerializedProperty property, MemberInfo info)
         {
             Type targetType = info is FieldInfo fi ? fi.FieldType : ((PropertyInfo)info).PropertyType;
