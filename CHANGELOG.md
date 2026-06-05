@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP ##
+
+1.  Fix: `ShowInInspector` incorrectly handled enum types and gave underlay types instead [#398](https://github.com/TylerTemp/SaintsField/issues/398)
+
 ## 5.18.1 ##
 
 1.  Fix: `ShowInInspector` can not properly update field inside a non-UnityObject class/struct type [#395](https://github.com/TylerTemp/SaintsField/issues/395)

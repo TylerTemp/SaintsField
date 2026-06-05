@@ -1,7 +1,12 @@
 fileFormatVersion: 2
 guid: 8b7fea57c81a2ba47b6e2cbaa33a5fce
-DefaultImporter:
+ScriptedImporter:
+  internalIDToNameTable: []
   externalObjects: {}
+  serializedVersion: 2
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+  script: {fileID: 11500000, guid: f9dfe2e8df981a348a902f4225309e89, type: 3}
+  useName: 
+  fallbackColor: {r: 0.5943396, g: 0, b: 0, a: 1}

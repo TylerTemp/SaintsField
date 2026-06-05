@@ -141,7 +141,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                     else
                     {
-                        enumDropdown.Add("Nothing", newInfo.IsULong? 0UL: 0L);
+                        enumDropdown.Add("Nothing", Enum.ToObject(fieldType, newInfo.IsULong? 0UL: 0L));
                     }
 
                     if (newInfo.IsULong)
@@ -154,16 +154,19 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     }
                     if (containsEverythingOrNothing)
                     {
-                        curValues.Add(newInfo.IsULong? 0UL: 0L);
+                        // curValues.Add(Convert.ChangeType(newInfo.IsULong ? 0UL : 0L, fieldType));
+                        curValues.Add(Enum.ToObject(fieldType, newInfo.IsULong ? 0UL : 0L));
                     }
 
                     if (newInfo.EverythingValue.HasValue)
                     {
-                        enumDropdown.Add(newInfo.EverythingValue.Label, newInfo.IsULong? (ulong)newInfo.EverythingValue.Value: (long)newInfo.EverythingValue.Value);
+                        enumDropdown.Add(
+                            newInfo.EverythingValue.Label,
+                            newInfo.EverythingValue.Value);
                     }
                     else
                     {
-                        enumDropdown.Add("Everything", newInfo.IsULong? (ulong)newInfo.EverythingBit: (long)newInfo.EverythingBit);
+                        enumDropdown.Add("Everything", newInfo.EverythingBit);
                     }
 
                     if (!containsEverythingOrNothing)
@@ -214,10 +217,15 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         {
                             if (enumInfo.Value == refDrawPayload.Value)
                             {
-                                curValues.Add(value);
+                                curValues.Add(enumInfo.Value);
                             }
                         }
                     }
+                }
+
+                if (!isFlags)
+                {
+                    curValues.Add(refDrawPayload.Value);
                 }
 
                 #endregion
@@ -229,6 +237,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                     SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
                     Error = "",
                 };
+
+                // Debug.Log($"list={string.Join(",", enumDropdown.Select(each => each.value))}, cur={string.Join(",", curValues)}");
 
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(newDropdownButton.worldBound);
 
@@ -279,20 +289,20 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                                 else
                                 {
                                     long curItemLong = Convert.ToInt64(curItem);
-                                    long everthingBit = Convert.ToInt64(newInfo.EverythingBit);
+                                    long everythingBit = Convert.ToInt64(newInfo.EverythingBit);
                                     long refValueLong = Convert.ToInt64(refDrawPayload.Value);
                                     long newValue;
                                     if (curItemLong == 0)
                                     {
                                         newValue = 0L;
                                     }
-                                    else if (curItemLong == everthingBit)
+                                    else if (curItemLong == everythingBit)
                                     {
-                                        newValue = everthingBit;
+                                        newValue = everythingBit;
                                     }
                                     else if (on)
                                     {
-                                        if (refValueLong == everthingBit)
+                                        if (refValueLong == everythingBit)
                                         {
                                             newValue = curItemLong;
                                         }
@@ -305,15 +315,16 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                                     {
                                         newValue = EnumFlagsUtil.SetOffBit(refValueLong, curItemLong);
                                     }
-                                    refDrawPayload.Value = newValue;
+                                    object newValueAsType = Enum.ToObject(fieldType, newValue);
+                                    refDrawPayload.Value = newValueAsType;
                                     // Debug.Log($"setterOrNull({newValue})");
-                                    setterOrNull(Convert.ChangeType(newValue, fieldType.GetEnumUnderlyingType()));
+                                    setterOrNull(newValueAsType);
                                 }
                             }
                             else
                             {
                                 // Debug.Log($"setterOrNull({curItem})");
-                                setterOrNull(Convert.ChangeType(curItem, fieldType.GetEnumUnderlyingType()));
+                                setterOrNull(curItem);
                             }
                         }
                         return null;

@@ -112,18 +112,19 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         {
                             return;
                         }
-                        // Debug.Log($"para value changed: {parameterInfo.Name}, {paraContainer.Children().FirstOrDefault()}");
+                        // Debug.Log($"para value changed: {parameterInfo.Name}={parameterValues[index]}, {paraContainer.Children().FirstOrDefault()}");
                         VisualElement r = UIToolkitEdit.UIToolkitValueEdit(
                             paraContainer.Children().FirstOrDefault(),
                             parameterInfo.Name,
                             paraType,
-                            paraValue,
+                            parameterValues[index],
                             null,
                             newValue =>
                             {
-                                paraValue = parameterValues[index] = newValue;
+                                parameterValues[index] = newValue;
                                 paraValueChanged = true;
                                 fancyButton.ShowResult(false);
+                                // Debug.Log($"param {index} set to {newValue}");
                             },
                             false,
                             InAnyHorizontalLayout,
