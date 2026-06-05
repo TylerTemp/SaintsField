@@ -1,8 +1,10 @@
 # Changelog
 
-## WIP ##
+## 5.18.2 ##
 
 1.  Fix: `ShowInInspector` incorrectly handled enum types and gave underlay types instead [#398](https://github.com/TylerTemp/SaintsField/issues/398)
+2.  Fix: "Auto Getters" did not work with `SaintsSerialized` (e.g. interface type)
+3.  Fix: "OnEvent" was not able to actually bind the method due to last refact.
 
 ## 5.18.1 ##
 

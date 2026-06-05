@@ -220,20 +220,6 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             // Debug.Log(info.DeclaringType);
             // Debug.Log(info.ReflectedType);
 
-            // SaintsSerializedActualAttribute saintsSerializedActual = ReflectCache.GetCustomAttributes<SaintsSerializedActualAttribute>(info).FirstOrDefault();
-            // // Debug.Log($"{saintsSerializedActual?.Path}/{saintsSerializedActual?.PathType}");
-            // if (saintsSerializedActual != null)
-            // {
-            //     if (label.EndsWith("__Saints Serialized__"))
-            //     {
-            //         label = label[..^"__Saints Serialized__".Length];
-            //     }
-            //     // Debug.Log($"{info.Name}/{property.propertyPath}/{saintsSerializedActual.Name}/{saintsSerializedActual.ElementType}");
-            //     VisualElement renderSerializedActual = RenderSerializedActual(saintsSerializedActual, label, property, (FieldInfo)info, inHorizontalLayout, parent, richTextTagProvider);
-            //     root.Add(renderSerializedActual);
-            //     return;
-            // }
-
             // Debug.Log($"{property.propertyPath}: {inHorizontalLayout}");
             object value = null;
             if (property.propertyType == SerializedPropertyType.ManagedReference)

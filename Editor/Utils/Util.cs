@@ -22,7 +22,9 @@ namespace SaintsField.Editor.Utils
 {
     public static class Util
     {
-        public const string SerializedFieldName = "_saintsSerializedProperties";
+        // public const string SerializedFieldName = "_saintsSerializedProperties";
+        public const string SaintsSerializedLabelSuffix = "__Saints Serialized__";
+        public const string SaintsSerializedVarSuffix = "__SaintsSerialized__";
 
         public static readonly string[] ResourceSearchFolder = {
             "Assets/Editor Default Resources/SaintsField",

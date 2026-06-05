@@ -1,6 +1,7 @@
 using System;
 using SaintsField.Samples.Scripts.RequiredTypeExample;
 using UnityEngine;
+using IMyInterface = SaintsField.Samples.Scripts.SaintsEditor.Testing.GetForInterfaceTest.IMyInterface;
 
 namespace SaintsField.Samples.Scripts
 {

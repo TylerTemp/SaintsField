@@ -96,6 +96,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
                         continue;
                     }
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+                    Debug.Log($"#GetByXPath# OptimizationPayload failed: {error}");
+#endif
                 }
 // #endif
 

@@ -32,9 +32,9 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
             string label = GetPreferredLabel(property);
-            if (!string.IsNullOrEmpty(label) && label.EndsWith("__Saints Serialized__"))
+            if (!string.IsNullOrEmpty(label) && label.EndsWith(Util.SaintsSerializedLabelSuffix))
             {
-                label = label[..^"__Saints Serialized__".Length];
+                label = label[..^Util.SaintsSerializedLabelSuffix.Length];
             }
             SaintsSerializedActualAttribute saintsSerializedActual = ReflectCache.GetCustomAttributes<SaintsSerializedActualAttribute>(info).First();
 

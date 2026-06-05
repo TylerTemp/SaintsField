@@ -91,9 +91,6 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
         public Nested1 nested1;
 
-        // [Button] private TestULongEnum inNest() => nested1.InNested1;
-        // [ShowInInspector] private object D => nested1__SaintsSerialized__;
-
         [Serializable]
         public partial struct Nested2
         {

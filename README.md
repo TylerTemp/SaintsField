@@ -110,12 +110,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.18.1**
+**5.18.2**
 
-1.  Fix: `ShowInInspector` can not properly update field inside a non-UnityObject class/struct type [#395](https://github.com/TylerTemp/SaintsField/issues/395)
-2.  Improve: `ShowInInspector` now use Button to toggle between `null` and instance when there is only one type avaliable for the target type
-3.  Fix: `ShowInInspector` did not clean the UnityObject field when switching from UnityObject type to non-UnityObject type
-4.  Fix: `SaintsHashSet` attribute gave error because it did not work with downpour system [#396](https://github.com/TylerTemp/SaintsField/issues/396)
+1.  Fix: `ShowInInspector` incorrectly handled enum types and gave underlay types instead [#398](https://github.com/TylerTemp/SaintsField/issues/398)
+2.  Fix: "Auto Getters" did not work with `SaintsSerialized` (e.g. interface type)
+3.  Fix: "OnEvent" was not able to actually bind the method due to last refact.
 
 ## Usage ##
 

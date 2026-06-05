@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.SaintsXPathParser.Optimization;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -334,6 +335,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             // Debug.Log($"{compType}/{fieldType}");
             bool typeIsGameObject = type == typeof(GameObject) || type.IsSubclassOf(typeof(GameObject));
             bool typeIsComponent = type == typeof(Component) || type.IsSubclassOf(typeof(Component));
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+            Debug.Log($"typeIsGameObject={typeIsGameObject}, typeIsComponent={typeIsComponent}");
+#endif
 
             Transform transform;
             switch (property.serializedObject.targetObject)
@@ -386,7 +390,38 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return ("", results.Count > 0, results);
             }
 
-            return ("", false, Array.Empty<object>());
+            // not gameObject, not Component. This can be a UnityEngine.Object but requires for interface
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
+            Debug.Log($"types: {fieldType}/{interfaceType}");
+#endif
+            if (interfaceType != null)
+            {
+                List<object> found = new List<object>();
+                foreach (Transform searchTarget in searchTargets)
+                {
+                    foreach (Transform eachComponent in searchTarget.GetComponentsInChildren<Transform>(includeInactive))
+                    {
+                        GameObject eachGo = eachComponent.gameObject;
+                        if (!includeInactive && !eachGo.activeInHierarchy)
+                        {
+                            continue;
+                        }
+
+                        if (interfaceType.IsInstanceOfType(eachComponent) && fieldType.IsInstanceOfType(eachComponent))
+                        {
+                            found.Add(eachComponent);
+                        }
+                        if (interfaceType.IsInstanceOfType(eachGo) && fieldType.IsInstanceOfType(eachGo))
+                        {
+                            found.Add(eachGo);
+                        }
+                    }
+                }
+                return ("", false, found);
+            }
+
+            return ($"Unable to get from child for type {fieldType}", false, Array.Empty<object>());
+            // return ("", false, Array.Empty<object>());
         }
 
         private static IEnumerable<Object> GetInChildrenFilterComponent(Component component, Type type, Type fieldType)

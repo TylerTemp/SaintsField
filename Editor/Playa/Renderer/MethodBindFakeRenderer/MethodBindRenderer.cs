@@ -88,16 +88,18 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 return ("Event not found", null);
             }
 
-            if (methodParams.Length == 0 || foundHasValue)
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
-                Debug.Log(
-                    foundHasValue
-                        ? $"`{methodInfo.Name}` already added to `{foundEventBase}` on `{foundContainerObject}` with value type `{foundValueType}` and value `{foundExistingValue}`"
-                        : $"`{methodInfo.Name}` already added to `{foundEventBase}`");
-#endif
-                return ("", null);
-            }
+//             if (methodParams.Length == 0 || foundHasValue)
+//             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_BIND_RENDERER
+//                 Debug.Log(methodParams.Length);
+//                 Debug.Log(foundHasValue);
+//                 Debug.Log(
+//                     foundHasValue
+//                         ? $"`{methodInfo.Name}` already added to `{foundEventBase}` on `{foundContainerObject}` with value type `{foundValueType}` and value `{foundExistingValue}`"
+//                         : $"`{methodInfo.Name}` already added to `{foundEventBase}`");
+// #endif
+//                 return ("", null);
+//             }
 
             List<Type> invokeRequiredTypes = new List<Type>();
             Type unityEventType = foundEventBase.GetType();
@@ -108,7 +110,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
             // UnityAction action = (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), target, methodInfo);
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_BIND_RENDERER
             Debug.Log($"add `{methodInfo.Name}` to `{foundEventBase}` event on target {foundContainerObject}");
 #endif
 
@@ -249,7 +251,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 UnityEventCallState callStatus = unityEventBase.GetPersistentListenerState(eventIndex);
                 if (!ReferenceEquals(persistentTarget, target) || persistentMethodName != methodInfo.Name)
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_BIND_RENDERER
                     Debug.Log($"skip {persistentTarget}->{target}, {persistentMethodName} -> {methodInfo.Name}");
 #endif
                     continue;
@@ -257,7 +259,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
                 if (!needsValue)
                 {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_BIND_RENDERER
                     Debug.Log("found persistent with no value");
 #endif
                     return ("", true, unityEventContainerObject, unityEventBase, expectedValue, callStatus, false, null, null);
@@ -265,7 +267,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
 
                 (string valueError, bool hasPersistentValue, object persistentValue) =
                     PersistentListenerValueEquals(unityEventBase, eventIndex);
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_BIND_RENDERER
                 Debug.Log($"hasPersistentValue={hasPersistentValue},  persistentValue={persistentValue}, expectedValue={expectedValue}");
 #endif
                 if (valueError != "")
@@ -284,7 +286,7 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
                 }
             }
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_BIND_RENDERER
             Debug.Log($"found nothing from {unityEventBase.GetPersistentEventCount()} events");
 #endif
             return ("", false, unityEventContainerObject, unityEventBase, expectedValue, unityEventCallState, false, null, null);
