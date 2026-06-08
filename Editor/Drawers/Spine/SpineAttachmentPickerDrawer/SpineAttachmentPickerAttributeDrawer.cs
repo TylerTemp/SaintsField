@@ -260,8 +260,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
 
         private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, SpineAttachmentUtils.AttachmentsResult attachmentsResult, bool subAsSep)
         {
-            AdvancedDropdownList<string> dropdownListValue =
-                new AdvancedDropdownList<string>(attachmentsResult.TargetName)
+            Dropdown<string> dropdownListValue =
+                new Dropdown<string>(attachmentsResult.TargetName)
                 {
                     { "[Empty String]", "" },
                 };
@@ -278,7 +278,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
                 }
                 else
                 {
-                    dropdownListValue.Add(new AdvancedDropdownList<string>(attachmentInfo.Path, attachmentInfo.Name, icon: attachmentInfo.Icon, disabled: attachmentInfo.Disabled));
+                    dropdownListValue.Add(new Dropdown<string>(attachmentInfo.Path, attachmentInfo.Name, icon: attachmentInfo.Icon, disabled: attachmentInfo.Disabled));
                 }
             }
 

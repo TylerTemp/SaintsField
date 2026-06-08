@@ -51,10 +51,10 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(dropdownRect, new GUIContent(" "), FocusType.Keyboard))
             {
-                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>
+                Dropdown<Type> dropdownList = new Dropdown<Type>
                 {
                     {"[Null]", null},
-                    AdvancedDropdownList<Type>.Separator(),
+                    Dropdown<Type>.Separator(),
                 };
 
                 int totalCount = 1;
@@ -62,7 +62,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                 {
                     totalCount += 1;
                     string displayName = $"{type.Name}: {type.Namespace}";
-                    dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
+                    dropdownList.Add(new Dropdown<Type>(displayName, type));
                 }
 
                 Vector2 size = new Vector2(position.width, totalCount * SingleLineHeight + AdvancedDropdownAttribute.DefaultTitleHeight);

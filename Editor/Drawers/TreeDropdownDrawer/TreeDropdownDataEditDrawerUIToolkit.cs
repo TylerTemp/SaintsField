@@ -129,7 +129,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             {
                 #region MetaInfo
 
-                AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>("");
+                Dropdown<object> enumDropdown = new Dropdown<object>("");
                 List<object> curValues = new List<object>();
                 bool containsEverythingOrNothing = false;
 

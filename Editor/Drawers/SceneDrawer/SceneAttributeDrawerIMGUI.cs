@@ -121,10 +121,10 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
         private static void DrawDropdown(IReadOnlyList<string> sceneNames, int selectedIndex, string fallbackName, Rect position, GUIContent label, Action<string, int> onSelected)
         {
-            AdvancedDropdownList<int> dropdownList = new AdvancedDropdownList<int>("Pick a Scene");
+            Dropdown<int> dropdownList = new Dropdown<int>("Pick a Scene");
             foreach ((string sceneName, int index) in sceneNames.WithIndex())
             {
-                dropdownList.Add(new AdvancedDropdownList<int>($"[{index}] {sceneName}", index));
+                dropdownList.Add(new Dropdown<int>($"[{index}] {sceneName}", index));
             }
 
             dropdownList.AddSeparator();

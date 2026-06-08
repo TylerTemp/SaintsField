@@ -111,7 +111,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
         private static void ShowDropdown(SerializedProperty property, VisualElement root, AddressableAddressAttribute addressableAddressAttribute, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-            AdvancedDropdownList<string> dropdown = new AdvancedDropdownList<string>();
+            Dropdown<string> dropdown = new Dropdown<string>();
 
             string selected = null;
             if (settings == null)
@@ -125,7 +125,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
 
                 foreach (string key in keys)
                 {
-                    dropdown.Add(new AdvancedDropdownList<string>(key, key));
+                    dropdown.Add(new Dropdown<string>(key, key));
                     if (property.stringValue == key)
                     {
                         selected = key;

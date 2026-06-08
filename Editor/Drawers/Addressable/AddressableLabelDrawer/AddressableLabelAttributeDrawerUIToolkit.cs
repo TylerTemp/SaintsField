@@ -107,7 +107,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
         private static void ShowDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-            AdvancedDropdownList<string> dropdown = new AdvancedDropdownList<string>();
+            Dropdown<string> dropdown = new Dropdown<string>();
 
             string selected = null;
             if (settings == null)
@@ -120,7 +120,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
 
                 foreach (string label in labels)
                 {
-                    dropdown.Add(new AdvancedDropdownList<string>(label, label));
+                    dropdown.Add(new Dropdown<string>(label, label));
                     if (property.stringValue == label)
                     {
                         selected = label;

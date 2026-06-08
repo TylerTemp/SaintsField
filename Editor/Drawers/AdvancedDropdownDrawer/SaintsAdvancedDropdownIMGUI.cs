@@ -9,14 +9,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
     public class SaintsAdvancedDropdownIMGUI : AdvancedDropdown
     {
-        private readonly IAdvancedDropdownList _dropdownListValue;
+        private readonly IDropdown _dropdownListValue;
 
         private readonly Dictionary<AdvancedDropdownItem, object> _itemToValue = new Dictionary<AdvancedDropdownItem, object>();
         private readonly Action<object> _setValueCallback;
         private readonly Func<string, Texture2D> _getIconCallback;
         private readonly Rect _showRect;
 
-        public SaintsAdvancedDropdownIMGUI(IAdvancedDropdownList dropdownListValue, Vector2 size, Rect showRect, AdvancedDropdownState state, Action<object> setValueCallback, Func<string, Texture2D> getIconCallback) : base(state)
+        public SaintsAdvancedDropdownIMGUI(IDropdown dropdownListValue, Vector2 size, Rect showRect, AdvancedDropdownState state, Action<object> setValueCallback, Func<string, Texture2D> getIconCallback) : base(state)
         {
             _dropdownListValue = dropdownListValue;
             _setValueCallback = setValueCallback;
@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return root;
         }
 
-        private AdvancedDropdownItem MakeUnityAdvancedDropdownItem(IAdvancedDropdownList item)
+        private AdvancedDropdownItem MakeUnityAdvancedDropdownItem(IDropdown item)
         {
             // if (item.isSeparator)
             // {
@@ -55,9 +55,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             };
         }
 
-        private void MakeChildren(AdvancedDropdownItem parent, IEnumerable<IAdvancedDropdownList> children)
+        private void MakeChildren(AdvancedDropdownItem parent, IEnumerable<IDropdown> children)
         {
-            foreach (IAdvancedDropdownList childItem in children)
+            foreach (IDropdown childItem in children)
             {
                 if (childItem.isSeparator)
                 {

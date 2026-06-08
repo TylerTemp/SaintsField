@@ -66,8 +66,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
         private static AdvancedDropdownMetaInfo GetMetaInfoString(string selectedSpineAnimationInfo, SkeletonDataAsset skeletonDataAsset)
         {
             ExposedList<Animation> animations = skeletonDataAsset.GetAnimationStateData().SkeletonData.Animations;
-            AdvancedDropdownList<string> dropdownListValue =
-                new AdvancedDropdownList<string>(skeletonDataAsset.name)
+            Dropdown<string> dropdownListValue =
+                new Dropdown<string>(skeletonDataAsset.name)
                 {
                     { "[Null]", null },
                 };
@@ -109,8 +109,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 
         private static AdvancedDropdownMetaInfo GetMetaInfoAsset(AnimationReferenceAsset selectedSpineAnimationInfo, SkeletonDataAsset skeletonDataAsset)
         {
-            AdvancedDropdownList<AnimationReferenceAsset> dropdownListValue =
-                new AdvancedDropdownList<AnimationReferenceAsset>(skeletonDataAsset.name)
+            Dropdown<AnimationReferenceAsset> dropdownListValue =
+                new Dropdown<AnimationReferenceAsset>(skeletonDataAsset.name)
                 {
                     { "[Null]", null },
                 };

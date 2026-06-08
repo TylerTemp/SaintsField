@@ -19,6 +19,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
     public partial class DropdownAttributeDrawer: SaintsPropertyDrawer
     {
         private string _error = "";
+        private static readonly HashSet<string> DeprecatedDropdownWarningKeys = new HashSet<string>();
         private const BindingFlags BindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
                                       BindingFlags.Public | BindingFlags.DeclaredOnly;
 
@@ -73,14 +74,14 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
 
             string error;
-            IDropdownList dropdownListValue = null;
+            IMenuDropdown dropdownListValue = null;
             if (dropdownAttribute.FuncName == null)
             {
                 Type enumType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
                 if(enumType.IsEnum)
                 {
                     Array enumValues = Enum.GetValues(enumType);
-                    DropdownList<object> enumDropdown = new DropdownList<object>();
+                    MenuDropdown<object> enumDropdown = new MenuDropdown<object>();
                     foreach (object enumValue in enumValues)
                     {
                         enumDropdown.Add(ReflectUtils.GetRichLabelFromEnum(enumType, enumValue).value, enumValue);
@@ -103,11 +104,22 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 {
                     switch (getOfDropdownListValue)
                     {
-                        case IDropdownList dl:
+                        case IDropdown defaultDropdown:
+                        {
+                            dropdownListValue = ConvertDeprecatedDropdown(defaultDropdown);
+                            string warningKey = SerializedUtils.GetUniqueId(property);
+                            if (DeprecatedDropdownWarningKeys.Add(warningKey))
+                            {
+                                Debug.LogWarning(
+                                    $"{nameof(IDropdown)} returned from `{dropdownAttribute.FuncName}` on `{field.Name}` is deprecated. Please use MenuDropdown<T> instead.");
+                            }
+                        }
+                            break;
+                        case IMenuDropdown dl:
                             dropdownListValue = dl;
                             break;
                         case IEnumerable e:
-                            dropdownListValue = new DropdownList<object>(e.Cast<object>().Select(each => (each?.ToString() ?? "", each)));
+                            dropdownListValue = new MenuDropdown<object>(e.Cast<object>().Select(each => (each?.ToString() ?? "", each)));
                             break;
                         default:
                             error = $"Value {getOfDropdownListValue} is not acceptable type";
@@ -146,7 +158,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             // string curDisplay = "";
             Debug.Assert(dropdownListValue != null);
 
-            (string uniqueError, IDropdownList dropdownListValueUnique) = GetUniqueList(dropdownListValue, dropdownAttribute.EUnique, curValue, property, field, parentObj);
+            (string uniqueError, IMenuDropdown dropdownListValueUnique) = GetUniqueList(dropdownListValue, dropdownAttribute.EUnique, curValue, property, field, parentObj);
 
             if (uniqueError != "")
             {
@@ -185,7 +197,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             };
         }
 
-        private static (string uniqueError, IDropdownList dropdownListValueUnique) GetUniqueList(IDropdownList dropdownListValue, EUnique eUnique, object curValue, SerializedProperty property, FieldInfo info, object parent)
+        private static (string uniqueError, IMenuDropdown dropdownListValueUnique) GetUniqueList(IMenuDropdown dropdownListValue, EUnique eUnique, object curValue, SerializedProperty property, FieldInfo info, object parent)
         {
             if(eUnique == EUnique.None)
             {
@@ -222,7 +234,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
                 existsValues.Add(otherValue);
             }
 
-            DropdownList<object> newResult = new DropdownList<object>();
+            MenuDropdown<object> newResult = new MenuDropdown<object>();
             foreach ((string name, object value, bool disabled, bool separator) eachValue in dropdownListValue)
             {
                 bool exists = existsValues.Any(each => Util.GetIsEqual(each, eachValue.value));
@@ -245,6 +257,59 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
             }
 
             return ("", newResult);
+        }
+
+        private static IMenuDropdown ConvertDeprecatedDropdown(IDropdown dropdown)
+        {
+            MenuDropdown<object> result = new MenuDropdown<object>();
+            AddDeprecatedDropdownChildren(result, dropdown, "");
+            return result;
+        }
+
+        private static void AddDeprecatedDropdownChildren(MenuDropdown<object> result, IDropdown parent, string parentPath)
+        {
+            foreach (IAdvancedDropdownList child in parent.children)
+            {
+                string displayName = EscapeSlashInsideTags(child.displayName ?? "");
+                string itemPath = string.IsNullOrEmpty(parentPath) ? displayName : $"{parentPath}/{displayName}";
+
+                if (child.isSeparator)
+                {
+                    result.AddSeparator(parentPath);
+                    continue;
+                }
+
+                if (child.children.Count > 0)
+                {
+                    AddDeprecatedDropdownChildren(result, child, itemPath);
+                    continue;
+                }
+
+                result.Add(itemPath, child.value, child.disabled);
+            }
+        }
+
+        private static string EscapeSlashInsideTags(string value)
+        {
+            bool inTag = false;
+            char[] chars = value.ToCharArray();
+            for (int index = 0; index < chars.Length; index++)
+            {
+                switch (chars[index])
+                {
+                    case '<':
+                        inTag = true;
+                        break;
+                    case '>':
+                        inTag = false;
+                        break;
+                    case '/' when inTag:
+                        chars[index] = '\u2215';
+                        break;
+                }
+            }
+
+            return new string(chars);
         }
     }
 }

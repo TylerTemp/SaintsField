@@ -187,7 +187,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                     .GetTypesDerivedFrom(fieldType)
                     .ToArray();
 
-                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>();
+                Dropdown<Type> dropdownList = new Dropdown<Type>();
                 bool canBeNull = !fieldType.IsValueType;
                 if(canBeNull)
                 {
@@ -201,7 +201,7 @@ namespace SaintsField.Editor.Drawers.SaintsEventBaseTypeDrawer
                 foreach (Type type in optionTypes)
                 {
                     string displayName = AbsRenderer.GetDropdownTypeLabel(type);
-                    dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
+                    dropdownList.Add(new Dropdown<Type>(displayName, type));
                 }
 
                 AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo

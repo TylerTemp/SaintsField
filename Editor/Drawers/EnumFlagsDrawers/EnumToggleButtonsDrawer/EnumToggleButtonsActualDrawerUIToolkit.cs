@@ -129,7 +129,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                 .longValue;
                             object curValue = Enum.ToObject(metaInfo.EnumType, longValue);
 
-                            AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>("");
+                            Dropdown<object> enumDropdown = new Dropdown<object>("");
                             foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(targetType))
                             {
                                 // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
@@ -139,7 +139,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                         enumValue.ToString(),
                                     }
                                     : new HashSet<string>();
-                                enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue)
+                                enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue)
                                 {
                                     ExtraSearches = extraSearches,
                                 });
@@ -443,7 +443,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                 .ulongValue;
                             object curValue = Enum.ToObject(metaInfo.EnumType, longValue);
 
-                            AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>("");
+                            Dropdown<object> enumDropdown = new Dropdown<object>("");
                             foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(targetType))
                             {
                                 // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
@@ -453,7 +453,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                                         enumValue.ToString(),
                                     }
                                     : new HashSet<string>();
-                                enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue)
+                                enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue)
                                 {
                                     ExtraSearches = extraSearches,
                                 });

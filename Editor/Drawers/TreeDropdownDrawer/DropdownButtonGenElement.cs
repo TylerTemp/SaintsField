@@ -188,7 +188,7 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             bool isULong = _metaInfo.UnderType == typeof(ulong);
             #region MetaInfo
 
-            AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>("");
+            Dropdown<object> enumDropdown = new Dropdown<object>("");
             List<object> curValues = new List<object>();
             object curValue = Enum.ToObject(_metaInfo.EnumType, value);
             bool containsEverythingOrNothing = false;

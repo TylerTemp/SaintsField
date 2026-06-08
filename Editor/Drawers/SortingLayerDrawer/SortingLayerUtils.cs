@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
 #if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public static void MakeDropdown(bool isString, object curValue, VisualElement root, Action<object> onValueChangedCallback)
         {
-            AdvancedDropdownList<SortingLayerInfo> dropdown = new AdvancedDropdownList<SortingLayerInfo>();
+            Dropdown<SortingLayerInfo> dropdown = new Dropdown<SortingLayerInfo>();
             if (isString)
             {
                 dropdown.Add("[Empty String]", new SortingLayerInfo(SortingLayerItemType.EmptyString, ""));
@@ -93,7 +93,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
                 foreach (SortingLayer sortingLayer in SortingLayer.layers)
                 {
                     SortingLayerInfo layerInfo = new SortingLayerInfo(sortingLayer.id, sortingLayer.name);
-                    dropdown.Add(new AdvancedDropdownList<SortingLayerInfo>(
+                    dropdown.Add(new Dropdown<SortingLayerInfo>(
                         $"{sortingLayer.name} <color=#808080>{sortingLayer.id}</color>",
                         layerInfo));
                     // ReSharper disable once InvertIf

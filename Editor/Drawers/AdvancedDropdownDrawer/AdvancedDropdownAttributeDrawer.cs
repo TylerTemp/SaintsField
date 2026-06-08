@@ -53,11 +53,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             string funcName = advancedDropdownAttribute.FuncName;
 
             string error;
-            IAdvancedDropdownList dropdownListValue = null;
+            IDropdown dropdownListValue = null;
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Options)
             {
-                AdvancedDropdownList<object> optionsDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                Dropdown<object> optionsDropdown = new Dropdown<object>(isImGui? "Pick an Option": "");
                 foreach (object value in advancedDropdownAttribute.Options)
                 {
                     optionsDropdown.Add(RuntimeUtil.IsNull(value)? "[Null]": value.ToString(), value);
@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
             else if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Tuples)
             {
-                AdvancedDropdownList<object> tuplesDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                Dropdown<object> tuplesDropdown = new Dropdown<object>(isImGui? "Pick an Option": "");
                 foreach ((string path, object value) in advancedDropdownAttribute.Tuples)
                 {
                     tuplesDropdown.Add(path, value);
@@ -90,7 +90,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 // Debug.Log(elementType);
                 if (elementType == typeof(bool))
                 {
-                    AdvancedDropdownList<object> boolDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "")
+                    Dropdown<object> boolDropdown = new Dropdown<object>(isImGui? "Pick an Enum": "")
                     {
                         {"True", true },
                         {"False", false },
@@ -101,7 +101,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 }
                 else if(elementType.IsEnum)
                 {
-                    AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "");
+                    Dropdown<object> enumDropdown = new Dropdown<object>(isImGui? "Pick an Enum": "");
                     foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(elementType))
                     {
                         // Debug.Log($"enum={enumLabel}, rich={enumRichLabel}");
@@ -113,7 +113,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             : new HashSet<string>();
                         if (flat)
                         {
-                            enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue)
+                            enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue)
                             {
                                 ExtraSearches = extraSearches,
                             });
@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 }
                 else
                 {
-                    AdvancedDropdownList<object> staticDropdown = new AdvancedDropdownList<object>(isImGui? $"Pick a {elementType.Name}": "");
+                    Dropdown<object> staticDropdown = new Dropdown<object>(isImGui? $"Pick a {elementType.Name}": "");
 
                     Dictionary<object, List<string>> valueToNames = new Dictionary<object, List<string>>();
 
@@ -179,7 +179,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             displayName = names[0] + (names.Count <= 1? "": $" <color=#808080ff>({string.Join(",", names.Skip(1))})</color>");
                         }
 
-                        staticDropdown.Add(new AdvancedDropdownList<object>(displayName, value));
+                        staticDropdown.Add(new Dropdown<object>(displayName, value));
                     }
 
                     error = "";
@@ -192,19 +192,19 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 (string getOfError, MemberInfo _, object obj) =
                     Util.GetOf<object>(funcName, null, property, field, parentObj, null);
                 error = getOfError;
-                if (obj is IAdvancedDropdownList getOfDropdownListValue)
+                if (obj is IDropdown getOfDropdownListValue)
                 {
                     getOfDropdownListValue.SelfCompact();
                     dropdownListValue = getOfDropdownListValue;
                 }
                 else if (obj is IEnumerable ieObj)
                 {
-                    AdvancedDropdownList<object> list = new AdvancedDropdownList<object>(isImGui? "Pick an item": "");
+                    Dropdown<object> list = new Dropdown<object>(isImGui? "Pick an item": "");
                     foreach (object each in ieObj)
                     {
                         if (flat)
                         {
-                            list.Add(new AdvancedDropdownList<object>($"{each}", each));
+                            list.Add(new Dropdown<object>($"{each}", each));
                         }
                         else
                         {
@@ -254,7 +254,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
 
             // process the unique options
-            (string uniqueError, IAdvancedDropdownList dropdownListValueUnique) = GetUniqueList(dropdownListValue, advancedDropdownAttribute.EUnique, curValue, property, field, parentObj);
+            (string uniqueError, IDropdown dropdownListValueUnique) = GetUniqueList(dropdownListValue, advancedDropdownAttribute.EUnique, curValue, property, field, parentObj);
 
             if (uniqueError != "")
             {
@@ -283,7 +283,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             };
         }
 
-        private static (string error, IAdvancedDropdownList dropdownList) GetUniqueList(IAdvancedDropdownList dropdownListValue, EUnique eUnique, object curValue, SerializedProperty property, MemberInfo info, object parent)
+        private static (string error, IDropdown dropdownList) GetUniqueList(IDropdown dropdownListValue, EUnique eUnique, object curValue, SerializedProperty property, MemberInfo info, object parent)
         {
             if(eUnique == EUnique.None)
             {
@@ -333,11 +333,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             string funcName = advancedDropdownAttribute.FuncName;
 
             string error;
-            IAdvancedDropdownList dropdownListValue = null;
+            IDropdown dropdownListValue = null;
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Options)
             {
-                AdvancedDropdownList<object> optionsDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                Dropdown<object> optionsDropdown = new Dropdown<object>(isImGui? "Pick an Option": "");
                 foreach (object value in advancedDropdownAttribute.Options)
                 {
                     optionsDropdown.Add(RuntimeUtil.IsNull(value)? "[Null]": value.ToString(), value);
@@ -348,7 +348,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
             else if (advancedDropdownAttribute.BehaveMode == PathedDropdownAttribute.Mode.Tuples)
             {
-                AdvancedDropdownList<object> tuplesDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Option": "");
+                Dropdown<object> tuplesDropdown = new Dropdown<object>(isImGui? "Pick an Option": "");
                 foreach ((string path, object value) in advancedDropdownAttribute.Tuples)
                 {
                     tuplesDropdown.Add(path, value);
@@ -361,7 +361,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             {
                 if (elementType == typeof(bool))
                 {
-                    AdvancedDropdownList<object> boolDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "")
+                    Dropdown<object> boolDropdown = new Dropdown<object>(isImGui? "Pick an Enum": "")
                     {
                         {"True", true },
                         {"False", false },
@@ -372,12 +372,12 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 }
                 else if(elementType.IsEnum)
                 {
-                    AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "");
+                    Dropdown<object> enumDropdown = new Dropdown<object>(isImGui? "Pick an Enum": "");
                     foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(elementType))
                     {
                         if (flat)
                         {
-                            enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue));
+                            enumDropdown.Add(new Dropdown<object>(enumRichLabel ?? enumLabel, enumValue));
                         }
                         else {
                             enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue);
@@ -389,7 +389,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 }
                 else
                 {
-                    AdvancedDropdownList<object> staticDropdown = new AdvancedDropdownList<object>(isImGui? $"Pick a {elementType.Name}": "");
+                    Dropdown<object> staticDropdown = new Dropdown<object>(isImGui? $"Pick a {elementType.Name}": "");
 
                     Dictionary<object, List<string>> valueToNames = new Dictionary<object, List<string>>();
 
@@ -440,7 +440,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                             displayName = names[0] + (names.Count <= 1? "": $" <color=#808080ff>({string.Join(",", names.Skip(1))})</color>");
                         }
 
-                        staticDropdown.Add(new AdvancedDropdownList<object>(displayName, value));
+                        staticDropdown.Add(new Dropdown<object>(displayName, value));
                     }
 
                     error = "";
@@ -453,19 +453,19 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 (object obj, string getOfError) = GetCallbackForShowInInspector(funcName, v, parentObj);
                     // Util.GetOf<object>(funcName, null, property, field, parentObj);
                 error = getOfError;
-                if (obj is IAdvancedDropdownList getOfDropdownListValue)
+                if (obj is IDropdown getOfDropdownListValue)
                 {
                     getOfDropdownListValue.SelfCompact();
                     dropdownListValue = getOfDropdownListValue;
                 }
                 else if (obj is IEnumerable ieObj)
                 {
-                    AdvancedDropdownList<object> list = new AdvancedDropdownList<object>(isImGui? "Pick an item": "");
+                    Dropdown<object> list = new Dropdown<object>(isImGui? "Pick an item": "");
                     foreach (object each in ieObj)
                     {
                         if (flat)
                         {
-                            list.Add(new AdvancedDropdownList<object>($"{each}", each));
+                            list.Add(new Dropdown<object>($"{each}", each));
                         }
                         else
                         {
@@ -500,7 +500,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
             // process the unique options
             // This won't work for ShowInInspector because we can not find siblings
-            // (string uniqueError, IAdvancedDropdownList dropdownListValueUnique) =
+            // (string uniqueError, IDropdown dropdownListValueUnique) =
             //     GetUniqueListShowInInspector(dropdownListValue, advancedDropdownAttribute.EUnique, curValue, field, parentObj);
             //
             // if (uniqueError != "")
@@ -607,31 +607,31 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return ($"Target `{callback}` not found", null);
         }
 
-        private static AdvancedDropdownList<object> ReWrapUniqueList(IAdvancedDropdownList dropdownListValue, EUnique eUnique, List<object> existsValues, object curValue)
+        private static Dropdown<object> ReWrapUniqueList(IDropdown dropdownListValue, EUnique eUnique, List<object> existsValues, object curValue)
         {
-            AdvancedDropdownList<object> dropdownList = new AdvancedDropdownList<object>(dropdownListValue.displayName, dropdownListValue.disabled, dropdownListValue.icon);
-            IReadOnlyList<AdvancedDropdownList<object>> children = ReWrapUniqueChildren(dropdownListValue.children, eUnique, existsValues, curValue);
+            Dropdown<object> dropdownList = new Dropdown<object>(dropdownListValue.displayName, dropdownListValue.disabled, dropdownListValue.icon);
+            IReadOnlyList<Dropdown<object>> children = ReWrapUniqueChildren(dropdownListValue.children, eUnique, existsValues, curValue);
             dropdownList.SetChildren(children.ToList());
             return dropdownList;
         }
 
-        private static IReadOnlyList<AdvancedDropdownList<object>> ReWrapUniqueChildren(IReadOnlyList<IAdvancedDropdownList> children, EUnique eUnique, IReadOnlyList<object> existsValues, object curValue)
+        private static IReadOnlyList<Dropdown<object>> ReWrapUniqueChildren(IReadOnlyList<IDropdown> children, EUnique eUnique, IReadOnlyList<object> existsValues, object curValue)
         {
-            List<AdvancedDropdownList<object>> newChildren = new List<AdvancedDropdownList<object>>();
-            foreach (IAdvancedDropdownList originChild in children)
+            List<Dropdown<object>> newChildren = new List<Dropdown<object>>();
+            foreach (IDropdown originChild in children)
             {
                 if (originChild.isSeparator)
                 {
-                    newChildren.Add(AdvancedDropdownList<object>.Separator());
+                    newChildren.Add(Dropdown<object>.Separator());
                 }
                 else if (originChild.ChildCount() > 0)  // has sub child
                 {
-                    IReadOnlyList<AdvancedDropdownList<object>> subChildren = ReWrapUniqueChildren(originChild.children, eUnique, existsValues, curValue);
+                    IReadOnlyList<Dropdown<object>> subChildren = ReWrapUniqueChildren(originChild.children, eUnique, existsValues, curValue);
                     if (subChildren.Any(each => !each.isSeparator))
                     {
                         bool isDisabled = originChild.disabled ||
                                           subChildren.All(each => each.isSeparator || each.disabled);
-                        AdvancedDropdownList<object> newChild = new AdvancedDropdownList<object>(originChild.displayName, isDisabled, originChild.icon);
+                        Dropdown<object> newChild = new Dropdown<object>(originChild.displayName, isDisabled, originChild.icon);
                         newChild.SetChildren(subChildren.ToList());
                         newChildren.Add(newChild);
                     }
@@ -642,7 +642,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     bool exists = existsValues.Any(each => Util.GetIsEqual(each, childValue));
                     if (!exists)
                     {
-                        newChildren.Add(new AdvancedDropdownList<object>(
+                        newChildren.Add(new Dropdown<object>(
                             originChild.displayName,
                             originChild.value,
                             originChild.disabled,
@@ -651,7 +651,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     }
                     else if (eUnique == EUnique.Disable)
                     {
-                        newChildren.Add(new AdvancedDropdownList<object>(
+                        newChildren.Add(new Dropdown<object>(
                             originChild.displayName,
                             originChild.value,
                             true,
@@ -662,7 +662,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     {
                         if (Util.GetIsEqual(originChild.value, curValue))
                         {
-                            newChildren.Add(new AdvancedDropdownList<object>(
+                            newChildren.Add(new Dropdown<object>(
                                 originChild.displayName,
                                 originChild.value,
                                 true,
@@ -689,10 +689,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         }
 
 
-        // private static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> FlattenChild(IReadOnlyList<string> stackDisplays, IEnumerable<IAdvancedDropdownList> children)
-        private static IEnumerable<FlattenInfo> FlattenChild(IReadOnlyList<string> stackDisplays, IEnumerable<IAdvancedDropdownList> children)
+        // private static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> FlattenChild(IReadOnlyList<string> stackDisplays, IEnumerable<IDropdown> children)
+        private static IEnumerable<FlattenInfo> FlattenChild(IReadOnlyList<string> stackDisplays, IEnumerable<IDropdown> children)
         {
-            foreach (IAdvancedDropdownList child in children)
+            foreach (IDropdown child in children)
             {
                 if (child.ChildCount() > 0)
                 {
@@ -735,14 +735,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        // public static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> Flatten(IAdvancedDropdownList roots)
-        public static IEnumerable<FlattenInfo> Flatten(IAdvancedDropdownList roots)
+        // public static IEnumerable<(IReadOnlyList<string> stackDisplays, string display, string icon, bool disabled, object value)> Flatten(IDropdown roots)
+        public static IEnumerable<FlattenInfo> Flatten(IDropdown roots)
         {
-            foreach (IAdvancedDropdownList root in roots)
+            foreach (IDropdown root in roots)
             {
                 if (root.ChildCount() > 0)
                 {
-                    // IAdvancedDropdownList children = root.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
+                    // IDropdown children = root.Item3.Cast<(string, object, List<object>, bool, string, bool)>().ToList();
                     foreach (FlattenInfo child in FlattenChild(new[]{root.displayName}, root.children.Where(each => !each.isSeparator)))
                     {
                         yield return child;

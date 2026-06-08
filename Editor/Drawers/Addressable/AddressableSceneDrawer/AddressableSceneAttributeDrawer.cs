@@ -66,13 +66,13 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
         private static AdvancedDropdownMetaInfo GetMetaInfo(string key, IEnumerable<AddressableAssetEntry> assetEntries, bool sepAsSub, bool isImGui)
         {
-            AdvancedDropdownList<AddressableAssetEntry>
-                advancedDropdownList = new AdvancedDropdownList<AddressableAssetEntry>(isImGui? "Pick A Scene": "")
+            Dropdown<AddressableAssetEntry>
+                dropdown = new Dropdown<AddressableAssetEntry>(isImGui? "Pick A Scene": "")
                 {
                     {"[Null]", null},
                 };
 
-            advancedDropdownList.AddSeparator();
+            dropdown.AddSeparator();
 
             AddressableAssetEntry curValue = null;
 
@@ -85,15 +85,15 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
                 if (sepAsSub)
                 {
-                    advancedDropdownList.Add(assetEntry.address, assetEntry);
+                    dropdown.Add(assetEntry.address, assetEntry);
                 }
                 else
                 {
-                    advancedDropdownList.Add(new AdvancedDropdownList<AddressableAssetEntry>(assetEntry.address, assetEntry));
+                    dropdown.Add(new Dropdown<AddressableAssetEntry>(assetEntry.address, assetEntry));
                 }
             }
 
-            advancedDropdownList.SelfCompact();
+            dropdown.SelfCompact();
 
             #region Get Cur Value
 
@@ -104,7 +104,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             }
             else
             {
-                (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stack, string _) = AdvancedDropdownUtil.GetSelected(curValue, Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), advancedDropdownList);
+                (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stack, string _) = AdvancedDropdownUtil.GetSelected(curValue, Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), dropdown);
                 curStack = stack;
             }
 
@@ -116,7 +116,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                 // FieldInfo = field,
                 // CurDisplay = display,
                 CurValues = curValue == null? Array.Empty<AddressableAssetEntry>(): new []{curValue},
-                DropdownListValue = advancedDropdownList,
+                DropdownListValue = dropdown,
                 SelectStacks = curStack,
             };
         }

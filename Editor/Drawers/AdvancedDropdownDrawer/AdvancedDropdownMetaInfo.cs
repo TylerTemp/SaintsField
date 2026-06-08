@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
         public string CurDisplay;
         public IReadOnlyList<object> CurValues;
-        public IAdvancedDropdownList DropdownListValue;
+        public IDropdown DropdownListValue;
         public IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> SelectStacks;
         // ReSharper enable InconsistentNaming
     }

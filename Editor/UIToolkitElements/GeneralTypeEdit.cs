@@ -305,7 +305,7 @@ namespace SaintsField.Editor.UIToolkitElements
                     .GetTypesDerivedFrom(fieldType)
                     .ToArray();
 
-                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>();
+                Dropdown<Type> dropdownList = new Dropdown<Type>();
                 bool canBeNull = !fieldType.IsValueType;
                 if(canBeNull)
                 {
@@ -351,7 +351,7 @@ namespace SaintsField.Editor.UIToolkitElements
                     }
                     list.Add(type);
                     // string displayName = FormatTypeName(type);
-                    // dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
+                    // dropdownList.Add(new Dropdown<Type>(displayName, type));
                 }
 
                 IOrderedEnumerable<string> nameSpaceToTypesSorted = nameSpaceToTypes.Keys.OrderBy(each => each);
@@ -359,7 +359,7 @@ namespace SaintsField.Editor.UIToolkitElements
                 {
                     List<Type> types = nameSpaceToTypes[@namespace];
                     // types.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
-                    AdvancedDropdownList<Type> namespaceTypes = new AdvancedDropdownList<Type>(@namespace == ""? "[No Namespace]": @namespace);
+                    Dropdown<Type> namespaceTypes = new Dropdown<Type>(@namespace == ""? "[No Namespace]": @namespace);
                     foreach (Type eachType in types)
                     {
                         namespaceTypes.Add(eachType.Name, eachType);
@@ -403,7 +403,7 @@ namespace SaintsField.Editor.UIToolkitElements
 
         }
 
-        private AdvancedDropdownList<Type> _cachedDropdownList;
+        private Dropdown<Type> _cachedDropdownList;
 
         private void OnDropdown()
         {

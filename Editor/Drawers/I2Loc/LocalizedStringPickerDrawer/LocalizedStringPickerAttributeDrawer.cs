@@ -30,20 +30,20 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                 : "";
         }
 
-        // private static AdvancedDropdownList<string> _dropdownListCache;
+        // private static Dropdown<string> _dropdownListCache;
         private static readonly Regex SizeReg = new Regex("</?size(?:=[^>]*)?>");
 
         private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, bool isImGui)
         {
             List<string> terms = LocalizationManager.GetTermsList();
-            AdvancedDropdownList<string>
-                advancedDropdownList = new AdvancedDropdownList<string>(isImGui? "Pick A Term": "")
+            Dropdown<string>
+                dropdown = new Dropdown<string>(isImGui? "Pick A Term": "")
                 {
                     {"[Null]", ""},
                     {"[Inferred from Text]", " "},
                 };
 
-            advancedDropdownList.AddSeparator();
+            dropdown.AddSeparator();
 
             foreach (string term in terms)
             {
@@ -80,11 +80,11 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                 }
 
                 // string displayName = $"{term} <color=gray>{noBrTrans}</color>";
-                // advancedDropdownList.Add(displayName, term);
-                AdvancedDropdownList<string>.AddByNames(advancedDropdownList, new Queue<string>(sep), term, extraSearches: extraSearches);
+                // Dropdown.Add(displayName, term);
+                Dropdown<string>.AddByNames(dropdown, new Queue<string>(sep), term, extraSearches: extraSearches);
             }
 
-            advancedDropdownList.SelfCompact();
+            dropdown.SelfCompact();
 
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> curStack;
             if (curValue == "")
@@ -93,7 +93,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
             }
             else
             {
-                (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stack, string _) = AdvancedDropdownUtil.GetSelected(curValue, Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), advancedDropdownList);
+                (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stack, string _) = AdvancedDropdownUtil.GetSelected(curValue, Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), dropdown);
                 curStack = stack;
             }
 
@@ -103,7 +103,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                 // FieldInfo = field,
                 // CurDisplay = display,
                 CurValues = new []{curValue},
-                DropdownListValue = advancedDropdownList,
+                DropdownListValue = dropdown,
                 SelectStacks = curStack,
             };
         }

@@ -554,7 +554,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         private struct SearchPathStack
         {
             public IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> SelectStacks;
-            public IAdvancedDropdownList Target;
+            public IDropdown Target;
 
             public override string ToString()
             {
@@ -562,12 +562,12 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        private static IEnumerable<SearchPathStack> SearchPath(IReadOnlyList<string> searchFragments, IAdvancedDropdownList dropdownList)
+        private static IEnumerable<SearchPathStack> SearchPath(IReadOnlyList<string> searchFragments, IDropdown dropdownList)
         {
             return SearchPathRec(searchFragments, dropdownList, Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), Array.Empty<string>());
         }
 
-        private static IEnumerable<SearchPathStack> SearchPathRec(IReadOnlyList<string> searchFragments, IAdvancedDropdownList dropdownList, IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stackAccs, IReadOnlyList<string> parentDisplays)
+        private static IEnumerable<SearchPathStack> SearchPathRec(IReadOnlyList<string> searchFragments, IDropdown dropdownList, IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stackAccs, IReadOnlyList<string> parentDisplays)
         {
             if (dropdownList.ChildCount() == 0)
             {
@@ -575,7 +575,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 yield break;
             }
 
-            foreach ((IAdvancedDropdownList child, int index) in dropdownList.children.WithIndex().Where(each => each.value.ChildCount() > 0))
+            foreach ((IDropdown child, int index) in dropdownList.children.WithIndex().Where(each => each.value.ChildCount() > 0))
             {
                 AdvancedDropdownAttributeDrawer.SelectStack thisStack = new AdvancedDropdownAttributeDrawer.SelectStack
                 {
@@ -637,7 +637,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 toolbarBreadcrumbs.PopItem();
             }
 
-            // IAdvancedDropdownList target = dropdownList;
+            // IDropdown target = dropdownList;
             foreach ((AdvancedDropdownAttributeDrawer.SelectStack stack, int stackDepth) in pageStack.WithIndex())
             {
                 // int curStackDepth = stackDepth;
@@ -705,7 +705,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
         private void SwapPage(
             IReadOnlyList<object> curValues,
             bool allowUnSelect,
-            IAdvancedDropdownList mainDropdownList,
+            IDropdown mainDropdownList,
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> selectStack,
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> pageStack,
             bool animRightToLeft)
@@ -714,13 +714,13 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             Debug.Log($"selectStack={string.Join("->", selectStack.Select(each => $"{each.Display}/{each.Index}"))}");
             Debug.Log($"pageStack={string.Join("->", pageStack.Select(each => $"{each.Display}/{each.Index}"))}");
 #endif
-            (IReadOnlyList<IAdvancedDropdownList> displayPage, IReadOnlyList<int> selectIndices) = GetPage(
+            (IReadOnlyList<IDropdown> displayPage, IReadOnlyList<int> selectIndices) = GetPage(
                 mainDropdownList,
                 curValues,
                 new Queue<AdvancedDropdownAttributeDrawer.SelectStack>(pageStack.SkipLast(1)),
                 new Queue<AdvancedDropdownAttributeDrawer.SelectStack>(selectStack));
 
-            // _displayPage = new List<IAdvancedDropdownList>(displayPage);
+            // _displayPage = new List<IDropdown>(displayPage);
             _displayPage.Clear();
             _displayKeyboardHighlight = -1;
 
@@ -776,7 +776,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             bool anyHasIcon = false;
             List<Image> iconImages = new List<Image>(displayPage.Count);
 
-            foreach ((IAdvancedDropdownList dropdownItem, int index) in displayPage.WithIndex())
+            foreach ((IDropdown dropdownItem, int index) in displayPage.WithIndex())
             {
                 if (dropdownItem.isSeparator)
                 {
@@ -960,8 +960,8 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             ((VisualElement)evt.target).RemoveFromHierarchy();
         }
 
-        private static (IReadOnlyList<IAdvancedDropdownList> pageItems, IReadOnlyList<int> selectIndices) GetPage(
-            IAdvancedDropdownList dropdownList,
+        private static (IReadOnlyList<IDropdown> pageItems, IReadOnlyList<int> selectIndices) GetPage(
+            IDropdown dropdownList,
             IReadOnlyList<object> curValues,
             Queue<AdvancedDropdownAttributeDrawer.SelectStack> pageStack,
             Queue<AdvancedDropdownAttributeDrawer.SelectStack> selectStack
@@ -971,7 +971,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             {
                 List<int> rootIndices = new List<int>();
 
-                foreach ((IAdvancedDropdownList eachChild, int eachIndex) in dropdownList.children.WithIndex())
+                foreach ((IDropdown eachChild, int eachIndex) in dropdownList.children.WithIndex())
                 {
                     if (eachChild.ChildCount() > 0)
                     {
@@ -1009,9 +1009,9 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return GetPage(dropdownList.children[index], curValues, pageStack, selectStack);
         }
 
-        private static bool CheckAnySelect(IReadOnlyList<IAdvancedDropdownList> eachChildChildren, IReadOnlyList<object> curValues)
+        private static bool CheckAnySelect(IReadOnlyList<IDropdown> eachChildChildren, IReadOnlyList<object> curValues)
         {
-            foreach (IAdvancedDropdownList subChild in eachChildChildren)
+            foreach (IDropdown subChild in eachChildChildren)
             {
                 if (subChild.isSeparator)
                 {

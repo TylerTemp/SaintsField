@@ -49,8 +49,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
         private static AdvancedDropdownMetaInfo GetMetaInfo(bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo selectedShaderInfo, IEnumerable<ShaderParamUtils.ShaderCustomInfo> shaderInfos, bool isImGui)
         {
-            AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo> dropdownListValue =
-                new AdvancedDropdownList<ShaderParamUtils.ShaderCustomInfo>(isImGui? "Shader Parameters": "");
+            Dropdown<ShaderParamUtils.ShaderCustomInfo> dropdownListValue =
+                new Dropdown<ShaderParamUtils.ShaderCustomInfo>(isImGui? "Shader Parameters": "");
 
             IReadOnlyList<object> curValues = foundShaderInfo
                 ? new[] { (object)selectedShaderInfo }

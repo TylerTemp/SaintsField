@@ -109,8 +109,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSlotPickerDrawer
 
         private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, IReadOnlyList<SpineSlotUtils.SlotInfo> slots, bool isImGui)
         {
-            AdvancedDropdownList<SlotData> dropdownListValue =
-                new AdvancedDropdownList<SlotData>(isImGui? "Select Slot": "")
+            Dropdown<SlotData> dropdownListValue =
+                new Dropdown<SlotData>(isImGui? "Select Slot": "")
                 {
                     { "[Empty String]", null },
                 };

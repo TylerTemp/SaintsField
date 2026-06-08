@@ -350,7 +350,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             Rect groupRowButton = EditorGUI.PrefixLabel(groupRow, new GUIContent("Group"));
             if (EditorGUI.DropdownButton(groupRowButton, new GUIContent(cacheInfo.GroupName), FocusType.Keyboard))
             {
-                AdvancedDropdownList<string> dropdownListValue = new AdvancedDropdownList<string>("Select a Group");
+                Dropdown<string> dropdownListValue = new Dropdown<string>("Select a Group");
                 string[] curValues = settings.groups.Select(each => each.Name).ToArray();
 
                 dropdownListValue.Add("None", "");

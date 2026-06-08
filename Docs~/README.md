@@ -4220,13 +4220,11 @@ public Vector2Int v2Value;
 
 A tree dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
 
-This is the same as `AdvancedDropdown`, except it uses a tree view to pick.
-
 This is the recommended way to make a searchable dropdown.
 
 **Arguments**
 
-*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
+*   `string funcName=null` callback function. Must return either a `Dropdown<T>` or a `IEnumerable<object>` (list/array etc.).
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
     When omitted, it will try to find all the static values from the field type.
     You can use `../` to get upward callback/property for a callback
@@ -4257,9 +4255,9 @@ Second, it can set labels for these items with rich text support
 ```csharp
 [Dropdown(nameof(QuickDrop))] public float percent;
 
-private AdvancedDropdownList<float> QuickDrop()
+private Dropdown<float> QuickDrop()
 {
-    AdvancedDropdownList<float> result = new AdvancedDropdownList<float>
+    Dropdown<float> result = new Dropdown<float>
     {
         { "20%", 0.2f },
         { "40%", 0.4f },
@@ -4284,32 +4282,32 @@ using SaintsField;
 
 [Dropdown(nameof(AdvDropdown))] public int drops;
 
-public AdvancedDropdownList<int> AdvDropdown()
+public Dropdown<int> AdvDropdown()
 {
-    return new AdvancedDropdownList<int>
+    return new Dropdown<int>
     {
         // a grouped value
-        new AdvancedDropdownList<int>("First Half")
+        new Dropdown<int>("First Half")
         {
             // with icon
-            new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+            new Dropdown<int>("Monday", 1, icon: "eye.png"),
             // no icon
-            new AdvancedDropdownList<int>("Tuesday", 2),
+            new Dropdown<int>("Tuesday", 2),
         },
-        new AdvancedDropdownList<int>("Second Half")
+        new Dropdown<int>("Second Half")
         {
-            new AdvancedDropdownList<int>("Wednesday")
+            new Dropdown<int>("Wednesday")
             {
-                new AdvancedDropdownList<int>("Morning", 3, icon: "star.png"),
-                new AdvancedDropdownList<int>("Afternoon", 8),
+                new Dropdown<int>("Morning", 3, icon: "star.png"),
+                new Dropdown<int>("Afternoon", 8),
             },
-            new AdvancedDropdownList<int>("Thursday", 4, true, icon: "star.png"),
+            new Dropdown<int>("Thursday", 4, true, icon: "star.png"),
         },
         // direct value
-        new AdvancedDropdownList<int>("Friday", 5, true),
-        AdvancedDropdownList<int>.Separator(),
-        new AdvancedDropdownList<int>("Saturday", 6, icon: "star.png"),
-        new AdvancedDropdownList<int>("Sunday", 7, icon: "star.png"),
+        new Dropdown<int>("Friday", 5, true),
+        Dropdown<int>.Separator(),
+        new Dropdown<int>("Saturday", 6, icon: "star.png"),
+        new Dropdown<int>("Sunday", 7, icon: "star.png"),
     };
 }
 ```
@@ -4468,55 +4466,55 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 
 **Arguments**
 
-*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
+*   `string funcName=null` callback function. Must return either a `Dropdown<T>` or a `IEnumerable<object>` (list/array etc.).
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
     When omitted, it will try to find all the static values from the field type.
     You can use `../` to get upward callback/property for a callback
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
 
-**`AdvancedDropdownList<T>`**
+**`Dropdown<T>`**
 
 *   `string displayName` item name to display
-*   `T value` or `IEnumerable<AdvancedDropdownList<T>> children`: value means it's a value item. Otherwise, it's a group of items, which the values are specified by `children`
+*   `T value` or `IEnumerable<Dropdown<T>> children`: value means it's a value item. Otherwise, it's a group of items, which the values are specified by `children`
 *   `bool disabled = false` if item is disabled
 *   `string icon = null` the icon for the item.
 
     Note: setting an icon for a parent group will result a weird issue on its subpage's title and block the items. This is not fixable unless Unity decide to fix it.
 
-*   `bool isSeparator = false` if item is a separator. You should not use this, but `AdvancedDropdownList<T>.Separator()` instead
+*   `bool isSeparator = false` if item is a separator. You should not use this, but `Dropdown<T>.Separator()` instead
 
 ```csharp
 using SaintsField;
 
 [AdvancedDropdown(nameof(AdvDropdown)), BelowText(nameof(drops), true)] public int drops;
 
-public AdvancedDropdownList<int> AdvDropdown()
+public Dropdown<int> AdvDropdown()
 {
-    return new AdvancedDropdownList<int>("Days")
+    return new Dropdown<int>("Days")
     {
         // a grouped value
-        new AdvancedDropdownList<int>("First Half")
+        new Dropdown<int>("First Half")
         {
             // with icon
-            new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+            new Dropdown<int>("Monday", 1, icon: "eye.png"),
             // no icon
-            new AdvancedDropdownList<int>("Tuesday", 2),
+            new Dropdown<int>("Tuesday", 2),
         },
-        new AdvancedDropdownList<int>("Second Half")
+        new Dropdown<int>("Second Half")
         {
-            new AdvancedDropdownList<int>("Wednesday")
+            new Dropdown<int>("Wednesday")
             {
-                new AdvancedDropdownList<int>("Morning", 3, icon: "eye.png"),
-                new AdvancedDropdownList<int>("Afternoon", 8),
+                new Dropdown<int>("Morning", 3, icon: "eye.png"),
+                new Dropdown<int>("Afternoon", 8),
             },
-            new AdvancedDropdownList<int>("Thursday", 4, true, icon: "eye.png"),
+            new Dropdown<int>("Thursday", 4, true, icon: "eye.png"),
         },
         // direct value
-        new AdvancedDropdownList<int>("Friday", 5, true),
-        AdvancedDropdownList<int>.Separator(),
-        new AdvancedDropdownList<int>("Saturday", 6, icon: "eye.png"),
-        new AdvancedDropdownList<int>("Sunday", 7, icon: "eye.png"),
+        new Dropdown<int>("Friday", 5, true),
+        Dropdown<int>.Separator(),
+        new Dropdown<int>("Saturday", 6, icon: "eye.png"),
+        new Dropdown<int>("Sunday", 7, icon: "eye.png"),
     };
 }
 ```
@@ -4536,9 +4534,9 @@ using SaintsField;
 
 [AdvancedDropdown(nameof(AdvDropdown))] public int selectIt;
 
-public AdvancedDropdownList<int> AdvDropdown()
+public Dropdown<int> AdvDropdown()
 {
-    return new AdvancedDropdownList<int>("Days")
+    return new Dropdown<int>("Days")
     {
         {"First Half/Monday", 1, false, "star.png"},  // enabled, with icon
         {"First Half/Tuesday", 2},
@@ -4565,9 +4563,9 @@ using SaintsField;
 
 [AdvancedDropdown(nameof(AdvDropdownNoNest))] public int searchableDropdown;
 
-public AdvancedDropdownList<int> AdvDropdownNoNest()
+public Dropdown<int> AdvDropdownNoNest()
 {
-    return new AdvancedDropdownList<int>("Days")
+    return new Dropdown<int>("Days")
     {
         {"Monday", 1},
         {"Tuesday", 2, true},  // disabled
@@ -4704,7 +4702,7 @@ A dropdown selector. Supports reference type, sub-menu, separator, and disabled 
 
 If you want a searchable dropdown, see `AdvancedDropdown`.
 
-*   `string funcName=null` callback function. Must return a `DropdownList<T>`.
+*   `string funcName=null` callback function. Must return a `MenuDropdown<T>`.
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
 *   `bool slashAsSub=true` treat `/` as a sub item.
 
@@ -4726,9 +4724,9 @@ public GameObject _go1;
 public GameObject _go2;
 [MenuDropdown(nameof(GetDropdownRefs))] public GameObject _refs;
 
-private DropdownList<float> GetDropdownItems()
+private MenuDropdown<float> GetDropdownItems()
 {
-    return new DropdownList<float>
+    return new MenuDropdown<float>
     {
         { "1", 1.0f },
         { "2", 2.0f },
@@ -4737,7 +4735,7 @@ private DropdownList<float> GetDropdownItems()
     };
 }
 
-private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
+private MenuDropdown<GameObject> GetDropdownRefs => new MenuDropdown<GameObject>
 {
     {_go1.name, _go1},
     {_go2.name, _go2},
@@ -4755,17 +4753,17 @@ using SaintsField;
 [MenuDropdown(nameof(GetDropdownItems))]
 public Color color;
 
-private DropdownList<Color> GetDropdownItems()
+private MenuDropdown<Color> GetDropdownItems()
 {
-    return new DropdownList<Color>
+    return new MenuDropdown<Color>
     {
         { "Black", Color.black },
         { "White", Color.white },
-        DropdownList<Color>.Separator(),
+        MenuDropdown<Color>.Separator(),
         { "Basic/Red", Color.red, true },  // the third arg means it's disabled
         { "Basic/Green", Color.green },
         { "Basic/Blue", Color.blue },
-        DropdownList<Color>.Separator("Basic/"),
+        MenuDropdown<Color>.Separator("Basic/"),
         { "Basic/Magenta", Color.magenta },
         { "Basic/Cyan", Color.cyan },
     };
@@ -4775,7 +4773,7 @@ private DropdownList<Color> GetDropdownItems()
 And you can always manually add it:
 
 ```csharp
-DropdownList<Color> dropdownList = new DropdownList<Color>();
+MenuDropdown<Color> dropdownList = new MenuDropdown<Color>();
 dropdownList.Add("Black", Color.black);  // add an item
 dropdownList.Add("White", Color.white, true);  // and a disabled item
 dropdownList.AddSeparator();  // add a separator
@@ -5139,13 +5137,13 @@ private int ShowValueButton([ValueButtons(nameof(ValueButtonsOptionProvider))] i
 [ValueButtons(nameof(ValueButtonsResultProvider))]
 private int ShowValueButton([ValueButtons(nameof(ValueButtonsOptionProvider))] int opt) => opt;
 
-private AdvancedDropdownList<int> ValueButtonsOptionProvider() => new AdvancedDropdownList<int>
+private Dropdown<int> ValueButtonsOptionProvider() => new Dropdown<int>
 {
     { "<icon=lightMeter/greenLight/>", 2 },
     { "<icon=lightMeter/redLight/>", 4 },
 };
 
-private AdvancedDropdownList<int> ValueButtonsResultProvider() => new AdvancedDropdownList<int>
+private Dropdown<int> ValueButtonsResultProvider() => new Dropdown<int>
 {
     { "<icon=toggle on focus@2x/>", 2 },
     { "<icon=toggle focus@2x/>", 4 },
@@ -6609,7 +6607,7 @@ public string layoutEnd;
 
 `Handles` is drawn in the scene view instead of inspector.
 
-When using handles (except `SceneViewPicker` and `DrawLabel`), you can use right click to show/hide some handles.
+When using handles (except `SceneViewPicker` and `DrawLabel`), you can use `shift` + `right click` in scene to show/hide some handles.
 
 ![image](https://github.com/user-attachments/assets/d86350c6-bd97-43d0-a7ef-1c959cd22364)
 
@@ -9428,9 +9426,9 @@ public class ExampleSo: SaintsEditorWindow
 
     private IReadOnlyList<ScriptableObject> GetAllSo() => Resources.LoadAll<ScriptableObject>("");
 
-    private AdvancedDropdownList<ScriptableObject> ShowDropdown()
+    private Dropdown<ScriptableObject> ShowDropdown()
     {
-        AdvancedDropdownList<ScriptableObject> down = new AdvancedDropdownList<ScriptableObject>();
+        Dropdown<ScriptableObject> down = new Dropdown<ScriptableObject>();
         down.Add("[Null]", null);
         foreach (ScriptableObject scriptableObject in GetAllSo())
         {

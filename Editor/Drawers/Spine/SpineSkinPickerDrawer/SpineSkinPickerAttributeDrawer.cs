@@ -41,8 +41,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineSkinPickerDrawer
 
         private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, ExposedList<Skin> skins, bool isImGui)
         {
-            AdvancedDropdownList<string> dropdownListValue =
-                new AdvancedDropdownList<string>(isImGui? "Select Skin": "")
+            Dropdown<string> dropdownListValue =
+                new Dropdown<string>(isImGui? "Select Skin": "")
                 {
                     { "[Empty String]", "" },
                 };

@@ -106,7 +106,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             #endregion
         }
 
-        private static int GetValueItemCounts(IAdvancedDropdownList dropdownList)
+        private static int GetValueItemCounts(IDropdown dropdownList)
         {
             if (dropdownList.isSeparator)
             {

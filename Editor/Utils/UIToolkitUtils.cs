@@ -2846,7 +2846,7 @@ namespace SaintsField.Editor.Utils
                 // dropBound.height = SaintsPropertyDrawer.SingleLineHeight;
 
                 object managedReferenceValue = property.managedReferenceValue;
-                AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>
+                Dropdown<Type> dropdownList = new Dropdown<Type>
                 {
                     {"[Null]", null},
                 };
@@ -2864,7 +2864,7 @@ namespace SaintsField.Editor.Utils
                     }
                     list.Add(type);
                     // string displayName = FormatTypeName(type);
-                    // dropdownList.Add(new AdvancedDropdownList<Type>(displayName, type));
+                    // dropdownList.Add(new Dropdown<Type>(displayName, type));
                 }
 
                 IOrderedEnumerable<string> nameSpaceToTypesSorted = nameSpaceToTypes.Keys.OrderBy(each => each);
@@ -2872,7 +2872,7 @@ namespace SaintsField.Editor.Utils
                 {
                     List<Type> types = nameSpaceToTypes[@namespace];
                     // types.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
-                    AdvancedDropdownList<Type> namespaceTypes = new AdvancedDropdownList<Type>(@namespace == ""? "[No Namespace]": @namespace);
+                    Dropdown<Type> namespaceTypes = new Dropdown<Type>(@namespace == ""? "[No Namespace]": @namespace);
                     foreach (Type eachType in types)
                     {
                         namespaceTypes.Add(eachType.Name, eachType);
