@@ -1,6 +1,6 @@
 # Changelog
 
-## WIP ##
+## 5.18.3 ##
 
 1.  Rename: Rename dropdown related types to easier remember. The old names can still be used.
 2.  Change: Handles context menu changed to `shift`+`right click` in scene view to avoid conflict with Unity's default context menu

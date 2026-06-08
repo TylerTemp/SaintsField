@@ -110,11 +110,15 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.18.2**
+**5.18.3**
 
-1.  Fix: `ShowInInspector` incorrectly handled enum types and gave underlay types instead [#398](https://github.com/TylerTemp/SaintsField/issues/398)
-2.  Fix: "Auto Getters" did not work with `SaintsSerialized` (e.g. interface type)
-3.  Fix: "OnEvent" was not able to actually bind the method due to last refact.
+1.  Rename: Rename dropdown related types to easier remember. The old names can still be used.
+2.  Change: Handles context menu changed to `shift`+`right click` in scene view to avoid conflict with Unity's default context menu
+
+New Name | Old Name                 | Used By
+---------|--------------------------|----------
+`Dropdown<>` | `AdvancedDropdownList<>` | `Dropdown`, `AdvancedDropdown`, `TreeDropdown`
+`MenuDropdown<>` | `DropdownList<>` | `MenuDropdown`
 
 ## Usage ##
 
