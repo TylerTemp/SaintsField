@@ -31,8 +31,9 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             return EditorGUI.GetPropertyHeight(valueProp, label, true);
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
             if (_imGuiPropInfo == null)

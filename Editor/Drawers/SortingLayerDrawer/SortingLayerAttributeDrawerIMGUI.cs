@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             string[] layers = SortingLayer.layers.Select(each => each.name).ToArray();
@@ -74,7 +74,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) => ImGuiHelpBox.Draw(position,
+            FieldInfo info, object parent) => ImGuiHelpBox.Draw(position,
             $"Expect string or int, get {property.propertyType}", MessageType.Error);
 
     }

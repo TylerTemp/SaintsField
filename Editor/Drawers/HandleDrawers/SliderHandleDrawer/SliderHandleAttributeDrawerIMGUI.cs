@@ -64,7 +64,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.SliderHandleDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             string error = EnsureKey(property, (SliderHandleAttribute)saintsAttribute, index, info, parent).Error;
             return error == ""

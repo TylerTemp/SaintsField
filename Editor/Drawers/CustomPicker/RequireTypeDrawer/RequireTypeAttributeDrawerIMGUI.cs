@@ -14,21 +14,40 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
     {
         #region IMGUI
 
-        // ReSharper disable once InconsistentNaming
-        protected string _error { private get; set; } = "";
-        protected bool ImGuiFirstChecked { get; private set; }
+        private class InfoIMGUI
+        {
+            public string Error = "";
+            public bool FirstChecked;
+            public object PreviousValue;
+        }
 
-        private Object _previousValue;
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
+
+        private static InfoIMGUI EnsureInfo(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI infoCache))
+            {
+                return infoCache;
+            }
+
+            InfoCacheIMGUI[key] = infoCache = new InfoIMGUI();
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
+            {
+                InfoCacheIMGUI.Remove(key);
+            });
+            return infoCache;
+        }
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            _previousValue = property.objectReferenceValue;
+            EnsureInfo(property).PreviousValue = property.objectReferenceValue;
             return base.DrawPreLabelImGui(position, property, saintsAttribute, info, parent);
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             RequireTypeAttribute requireTypeAttribute = (RequireTypeAttribute)saintsAttribute;
             return requireTypeAttribute.CustomPicker ? 20 : 0;
@@ -39,7 +58,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             RequireTypeAttribute requireTypeAttribute = (RequireTypeAttribute)saintsAttribute;
             IReadOnlyList<Type> requiredTypes = requireTypeAttribute.RequiredTypes;
@@ -59,14 +78,15 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
                 if (GUI.Button(position, "●", _imGuiButtonStyle))
                 {
-                    OpenSelectorWindowIMGUI(property, requireTypeAttribute, info, onGUIPayload.SetValue, parent);
+                    OpenSelectorWindowIMGUI(property, requireTypeAttribute, info, newValue => TriggerChangedIMGUI(property, newValue), parent);
                 }
             }
 
-            if (!ImGuiFirstChecked || onGUIPayload.changed)
+            InfoIMGUI cacheInfo = EnsureInfo(property);
+            if (!cacheInfo.FirstChecked)
             {
                 // Debug.Log($"onGUIPayload.changed={onGUIPayload.changed}/_imGuiFirstChecked={_imGuiFirstChecked}");
-                _error = "";
+                cacheInfo.Error = "";
                 // bool isFirstCheck = !_imGuiFirstChecked;
                 // Debug.Log($"_imGuiFirstChecked={_imGuiFirstChecked}/freeSign={fieldInterfaceAttribute.FreeSign}");
 
@@ -86,22 +106,22 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                     string errorMessage = $"{curValue} has no component{(missingTypeNames.Count > 1? "s": "")} {string.Join(", ", missingTypeNames)}.";
                     // freeSign will always give error information
                     // but if you never passed the first check, then sign as you want and it'll always just show error
-                    if (!ImGuiFirstChecked || requireTypeAttribute.FreeSign)
+                    if (!cacheInfo.FirstChecked || requireTypeAttribute.FreeSign)
                     {
                         // Debug.Log($"isFirstCheck={isFirstCheck}/freeSign={fieldInterfaceAttribute.FreeSign}");
-                        _error = errorMessage;
+                        cacheInfo.Error = errorMessage;
                     }
                     else  // it's not freeSign, and you've already got a correct answer. So revert to the old value.
                     {
                         // property.objectReferenceValue = _previousValue;
-                        RestorePreviousValue(property, info, parent);
-                        onGUIPayload.SetValue(GetPreviousValue());
-                        Debug.LogWarning($"{errorMessage} Change reverted to {(_previousValue==null? "null": _previousValue.ToString())}.");
+                        RestorePreviousValue(property, info, parent, cacheInfo.PreviousValue);
+                        TriggerChangedIMGUI(property, GetPreviousValue(cacheInfo.PreviousValue));
+                        Debug.LogWarning($"{errorMessage} Change reverted to {(cacheInfo.PreviousValue==null? "null": cacheInfo.PreviousValue.ToString())}.");
                     }
                 }
                 else
                 {
-                    ImGuiFirstChecked = true;
+                    cacheInfo.FirstChecked = true;
                 }
             }
 
@@ -110,13 +130,13 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
         protected virtual Object GetCurFieldValue(SerializedProperty property, RequireTypeAttribute _) => property.objectReferenceValue;
 
-        protected virtual void RestorePreviousValue(SerializedProperty property, FieldInfo info, object parent)
+        protected virtual void RestorePreviousValue(SerializedProperty property, FieldInfo info, object parent, object previousValue)
         {
-            property.objectReferenceValue = _previousValue;
-            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, _previousValue);
+            property.objectReferenceValue = (Object)previousValue;
+            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, previousValue);
         }
 
-        protected virtual object GetPreviousValue() => _previousValue;
+        protected virtual object GetPreviousValue(object previousValue) => previousValue;
 
 
         private static IEnumerable<Object> GetQualifiedInterfaces(IReadOnlyList<Object> toCheckTargets,
@@ -246,15 +266,19 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
-            object parent) => _error != "";
+            object parent) => EnsureInfo(property).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth, MessageType.Error);
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        {
+            string error = EnsureInfo(property).Error;
+            return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, EditorGUIUtility.currentViewWidth, MessageType.Error);
+        }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, EnsureInfo(property).Error, MessageType.Error);
         #endregion
     }
 }

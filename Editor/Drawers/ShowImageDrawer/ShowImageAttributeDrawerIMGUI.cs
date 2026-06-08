@@ -74,7 +74,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             if (_error != "")
             {
@@ -116,7 +116,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             if (_error != "")
             {

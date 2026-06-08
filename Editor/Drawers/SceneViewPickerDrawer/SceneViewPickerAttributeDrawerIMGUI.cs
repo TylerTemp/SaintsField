@@ -12,7 +12,7 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
     public partial class SceneViewPickerAttributeDrawer
     {
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             Scene currentScene = GetScene(property.serializedObject.targetObject);
             if (!currentScene.IsValid())
@@ -31,8 +31,9 @@ namespace SaintsField.Editor.Drawers.SceneViewPickerDrawer
         private static readonly Dictionary<string, ImGuiConfig> ImGuiCache = new Dictionary<string, ImGuiConfig>();
 
 
-        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info,
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
             Scene currentScene = GetScene(property.serializedObject.targetObject);

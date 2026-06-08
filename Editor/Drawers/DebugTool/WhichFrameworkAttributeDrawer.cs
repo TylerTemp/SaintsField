@@ -33,7 +33,7 @@ namespace SaintsField.Editor.Drawers.DebugTool
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             return ImGuiHelpBox.Draw(position, ImGuiContent, MessageType.Warning);
         }

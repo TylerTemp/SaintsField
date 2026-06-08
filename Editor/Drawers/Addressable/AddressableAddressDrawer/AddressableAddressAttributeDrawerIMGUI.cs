@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
@@ -97,7 +97,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent) =>
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent) =>
             _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
     }
 }

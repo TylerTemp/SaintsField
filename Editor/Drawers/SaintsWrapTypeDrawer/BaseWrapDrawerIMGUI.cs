@@ -17,8 +17,9 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             return EditorGUI.GetPropertyHeight(realProp, GUIContent.none, true);
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             (SerializedProperty realProp, FieldInfo _) = GetBasicInfo(property, info);
             EditorGUI.PropertyField(position, realProp, GUIContent.none, true);

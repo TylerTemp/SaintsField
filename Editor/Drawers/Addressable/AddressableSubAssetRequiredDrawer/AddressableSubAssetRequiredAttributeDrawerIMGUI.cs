@@ -65,7 +65,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSubAssetRequiredDraw
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             string error = GetErrorImGui(property, saintsAttribute, info, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED

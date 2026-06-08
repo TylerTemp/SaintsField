@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             ImGuiEnsureDispose(property.serializedObject.targetObject);
@@ -146,7 +146,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 if (hasChange)
                 {
                     property.vector2Value = sliderValue;
-                    onGUIPayload.SetValue(sliderValue);
+                    TriggerChangedIMGUI(property, sliderValue);
                     property.serializedObject.ApplyModifiedProperties();
                 }
 
@@ -224,7 +224,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
                 if (hasChange)
                 {
                     property.vector2IntValue = new Vector2Int((int)sliderValue.x, (int)sliderValue.y);
-                    onGUIPayload.SetValue(sliderValue);
+                    TriggerChangedIMGUI(property, sliderValue);
                     property.serializedObject.ApplyModifiedProperties();
                 }
 
@@ -269,7 +269,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) =>
+            FieldInfo info, object parent) =>
             _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
     }

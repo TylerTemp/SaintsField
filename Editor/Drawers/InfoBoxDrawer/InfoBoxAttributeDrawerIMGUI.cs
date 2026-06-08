@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             FieldInfoBoxAttribute infoboxAttribute = (FieldInfoBoxAttribute)saintsAttribute;
             MetaInfo metaInfo = GetMetaInfo(property, infoboxAttribute, info, parent);
@@ -112,7 +112,7 @@ namespace SaintsField.Editor.Drawers.InfoBoxDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             FieldInfoBoxAttribute infoboxAttribute = (FieldInfoBoxAttribute)saintsAttribute;
             MetaInfo metaInfo = GetMetaInfo(property, infoboxAttribute, info, parent);

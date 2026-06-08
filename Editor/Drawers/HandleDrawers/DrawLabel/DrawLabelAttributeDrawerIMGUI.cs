@@ -75,7 +75,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.DrawLabel
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             string error = EnsureKey((DrawLabelAttribute)saintsAttribute, property, info, parent).Error;
             return error == ""? position: ImGuiHelpBox.Draw(position, error, MessageType.Error);

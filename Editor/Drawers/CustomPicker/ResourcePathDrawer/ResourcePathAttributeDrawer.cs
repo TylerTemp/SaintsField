@@ -145,23 +145,46 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
         }
 
         #region IMGUI
-        private string _previousValue;
+        private class InfoIMGUI
+        {
+            public string Error = "";
+            public bool FirstChecked;
+            public string PreviousValue;
+        }
+
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
+
+        private static InfoIMGUI EnsureResourceInfo(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI infoCache))
+            {
+                return infoCache;
+            }
+
+            InfoCacheIMGUI[key] = infoCache = new InfoIMGUI();
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
+            {
+                InfoCacheIMGUI.Remove(key);
+            });
+            return infoCache;
+        }
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            _previousValue = property.stringValue;
+            EnsureResourceInfo(property).PreviousValue = property.stringValue;
             return -1;
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
             {
                 DefaultDrawer(position, property, label, info);
-                _error = $"Expecting string, got {property.propertyType}";
+                EnsureResourceInfo(property).Error = $"Expecting string, got {property.propertyType}";
                 return;
             }
 
@@ -185,16 +208,17 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
                             resourcePathAttribute.RequiredTypes);
                     if(validateError != "")
                     {
-                        if (!ImGuiFirstChecked || resourcePathAttribute.FreeSign)
+                        InfoIMGUI cacheInfo = EnsureResourceInfo(property);
+                        if (!cacheInfo.FirstChecked || resourcePathAttribute.FreeSign)
                         {
                             // Debug.Log($"isFirstCheck={isFirstCheck}/freeSign={fieldInterfaceAttribute.FreeSign}");
-                            _error = validateError;
+                            cacheInfo.Error = validateError;
                         }
                         else  // it's not freeSign, and you've already got a correct answer. So revert to the old value.
                         {
-                            RestorePreviousValue(property, info, parent);
-                            onGUIPayload.SetValue(GetPreviousValue());
-                            Debug.LogWarning($"{validateError} Change reverted to {(_previousValue==null? "null": _previousValue)}.");
+                            RestorePreviousValue(property, info, parent, cacheInfo.PreviousValue);
+                            TriggerChangedIMGUI(property, GetPreviousValue(cacheInfo.PreviousValue));
+                            Debug.LogWarning($"{validateError} Change reverted to {(cacheInfo.PreviousValue==null? "null": cacheInfo.PreviousValue)}.");
                         }
                     }
                     else
@@ -205,7 +229,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
                         // has issue on null, need to use reflection
                         // nah... not work... still get an empty string if it's null
                         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, result);
-                        onGUIPayload.SetValue(result);
+                        TriggerChangedIMGUI(property, result);
                         property.serializedObject.ApplyModifiedProperties();
                         // Debug.Log($"set value to {result}");
                     }
@@ -213,13 +237,14 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
             }
         }
 
-        protected override void RestorePreviousValue(SerializedProperty property, FieldInfo info, object parent)
+        protected override void RestorePreviousValue(SerializedProperty property, FieldInfo info, object parent, object previousValue)
         {
-            property.stringValue = _previousValue;
-            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, _previousValue);
+            string previousStringValue = (string)previousValue;
+            property.stringValue = previousStringValue;
+            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, previousStringValue);
         }
 
-        protected override object GetPreviousValue() => _previousValue;
+        protected override object GetPreviousValue(object previousValue) => previousValue;
 
         protected override Object GetCurFieldValue(SerializedProperty property, RequireTypeAttribute requireTypeAttribute)
         {

@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using SaintsField.DropdownBase;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -12,14 +10,34 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
     public partial class AdvancedDropdownAttributeDrawer
     {
+        private class InfoIMGUI
+        {
+            public string Error = "";
+        }
 
-        private string _error = "";
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
 
         private readonly Dictionary<string, Texture2D> _iconCache = new Dictionary<string, Texture2D>();
 
         ~AdvancedDropdownAttributeDrawer()
         {
             _iconCache.Clear();
+        }
+
+        private static InfoIMGUI EnsureKey(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI infoCache))
+            {
+                return infoCache;
+            }
+
+            InfoCacheIMGUI[key] = infoCache = new InfoIMGUI();
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
+            {
+                InfoCacheIMGUI.Remove(key);
+            });
+            return infoCache;
         }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
@@ -31,24 +49,14 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             return EditorGUIUtility.singleLineHeight;
         }
 
-        private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
-
-        private static readonly Dictionary<string, object> AsyncChangedCache = new Dictionary<string, object>();
-
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            string key = GetKey(property);
-            if (AsyncChangedCache.TryGetValue(key, out object changedValue))
-            {
-                onGUIPayload.SetValue(changedValue);
-                AsyncChangedCache.Remove(key);
-            }
-
+            InfoIMGUI cachedInfo = EnsureKey(property);
             AdvancedDropdownAttribute advancedDropdownAttribute = (AdvancedDropdownAttribute)saintsAttribute;
             AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property, advancedDropdownAttribute, info, parent, true);
-            _error = metaInfo.Error;
+            cachedInfo.Error = metaInfo.Error;
 
             #region Dropdown
 
@@ -98,7 +106,10 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, curItem);
                         Util.SignPropertyValue(property, info, parent, curItem);
                         property.serializedObject.ApplyModifiedProperties();
-                        AsyncChangedCache[key] = curItem;
+
+                        TriggerChangedIMGUI(property, curItem);
+
+                        // AsyncChangedCache[key] = curItem;
                         // Debug.Log($"Advanced Changed: {AsyncChangedCache[key].changed}/{AsyncChangedCache[key].GetHashCode()}");
                         // if(ExpandableIMGUIScoop.IsInScoop)
                         // {
@@ -111,48 +122,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
 
             #endregion
-        }
-
-        private static int GetValueItemCounts(IAdvancedDropdownList dropdownList)
-        {
-            if (dropdownList.isSeparator)
-            {
-                return 0;
-            }
-
-            if(dropdownList.ChildCount() == 0)
-            {
-                return 1;
-            }
-
-            int count = 0;
-            foreach (IAdvancedDropdownList child in dropdownList.children)
-            {
-                count += GetValueItemCounts(child);
-            }
-
-            return count;
-
-            // if(dropdownList.ChildCount() == 0)
-            // {
-            //     Debug.Log(1);
-            //     yield return 1;
-            //     yield break;
-            // }
-            //
-            // // Debug.Log(dropdownList.ChildCount());
-            // // yield return dropdownList.children.Count(each => each.ChildCount() == 0);
-            // foreach (IAdvancedDropdownList eachChild in dropdownList.children)
-            // {
-            //     foreach (int subChildCount in GetChildCounts(eachChild))
-            //     {
-            //         if(subChildCount > 0)
-            //         {
-            //             Debug.Log(subChildCount);
-            //             yield return subChildCount;
-            //         }
-            //     }
-            // }
         }
 
         private Texture2D GetIcon(string icon)
@@ -179,15 +148,22 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
-            object parent) => _error != "";
+            object parent) => EnsureKey(property).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        {
+            InfoIMGUI cachedInfo = EnsureKey(property);
+            return cachedInfo.Error == "" ? 0 : ImGuiHelpBox.GetHeight(cachedInfo.Error, width, MessageType.Error);
+        }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
-
+            FieldInfo info, object parent)
+        {
+            InfoIMGUI cachedInfo = EnsureKey(property);
+            return cachedInfo.Error == "" ? position : ImGuiHelpBox.Draw(position, cachedInfo.Error, MessageType.Error);
+        }
     }
 }

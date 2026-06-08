@@ -11,8 +11,9 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 {
     public partial class LocalizedStringPickerAttributeDrawer
     {
-        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            int index, FieldInfo info, object parent)
         {
             return EditorGUIUtility.singleLineHeight;
         }
@@ -46,8 +47,9 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 
         private static readonly Dictionary<string, CachedImGui> AsyncChangedCache = new Dictionary<string, CachedImGui>();
 
-        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info,
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
             if (!_iconDown)
@@ -67,7 +69,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 
             if (cachedValue.Changed)
             {
-                onGUIPayload.SetValue(cachedValue.Value);
+                TriggerChangedIMGUI(property, cachedValue.Value);
                 cachedValue.Changed = false;
             }
 
@@ -136,8 +138,9 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
             return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             string error = MismatchError(property);
             return error == ""? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);

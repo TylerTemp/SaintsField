@@ -20,7 +20,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
@@ -37,10 +37,10 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Integer:
-                    DrawPropertyForInt(position, property, label, metaInfo, onGUIPayload);
+                    DrawPropertyForInt(position, property, label, metaInfo);
                     break;
                 case SerializedPropertyType.String:
-                    DrawPropertyForString(position, property, label, metaInfo, onGUIPayload);
+                    DrawPropertyForString(position, property, label, metaInfo);
                     break;
                 default:
                     _error = $"Invalid property type: expect integer or string, get {property.propertyType}";
@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
         }
 
         private static void DrawPropertyForInt(Rect position, SerializedProperty property, GUIContent label,
-            MetaInfo metaInfo, OnGUIPayload onGUIPayload)
+            MetaInfo metaInfo)
         {
             int paramNameHash = property.intValue;
             int index = -1;
@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     {
                         int newValue = metaInfo.AnimatorParameters[newIndex].nameHash;
                         property.intValue = newValue;
-                        onGUIPayload.SetValue(newValue);
+                        TriggerChangedIMGUI(property, newValue);
                         if (ExpandableIMGUIScoop.IsInScoop)
                         {
                             property.serializedObject.ApplyModifiedProperties();
@@ -101,7 +101,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
         }
 
         private static void DrawPropertyForString(Rect position, SerializedProperty property, GUIContent label,
-            MetaInfo metaInfo, OnGUIPayload onGUIPayload)
+            MetaInfo metaInfo)
         {
             string paramName = property.stringValue;
             int index = metaInfo.AnimatorParameters
@@ -130,7 +130,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     {
                         string newValue = metaInfo.AnimatorParameters[newIndex].name;
                         property.stringValue = newValue;
-                        onGUIPayload.SetValue(newValue);
+                        TriggerChangedIMGUI(property, newValue);
                         if (ExpandableIMGUIScoop.IsInScoop)
                         {
                             property.serializedObject.ApplyModifiedProperties();
@@ -162,7 +162,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) =>
+            FieldInfo info, object parent) =>
             ImGuiHelpBox.Draw(position, _error, MessageType.Error);
 
     }

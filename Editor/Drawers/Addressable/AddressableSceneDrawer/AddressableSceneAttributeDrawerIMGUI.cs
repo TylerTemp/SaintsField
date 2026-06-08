@@ -45,7 +45,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             AddressableSceneAttribute addressableSceneAttribute = (AddressableSceneAttribute)saintsAttribute;
@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             InfoIMGUI cachedInfo = EnsureInfo(property, SerializedUtils.GetUniqueId(property));
             if (cachedInfo.Changed)
             {
-                onGUIPayload.SetValue(cachedInfo.ChangedValue);
+                TriggerChangedIMGUI(property, cachedInfo.ChangedValue);
                 cachedInfo.Changed = false;
             }
 
@@ -78,14 +78,14 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                     {
                         cachedInfo.Error = "";
                         property.stringValue = newSceneEntry.address;
-                        onGUIPayload.SetValue(newSceneEntry.address);
+                        TriggerChangedIMGUI(property, newSceneEntry.address);
                     }
                 }
             }
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return SingleLineHeight;
         }
@@ -105,8 +105,9 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
         private static GUIStyle _buttonStyle;
 
-        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info,
+        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
+            GUIContent label,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -174,8 +175,9 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             return cachedInfo.Error == "" ? 0 : ImGuiHelpBox.GetHeight(cachedInfo.Error, width, MessageType.Error);
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             InfoIMGUI cachedInfo = EnsureInfo(property, SerializedUtils.GetUniqueId(property));
             return cachedInfo.Error == ""

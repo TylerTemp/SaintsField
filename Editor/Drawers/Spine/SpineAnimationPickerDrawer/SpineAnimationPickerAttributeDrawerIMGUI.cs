@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return EditorGUIUtility.singleLineHeight;
         }
@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             if(!CachedInfoIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out CachedInfo cachedInfo))
             {
@@ -88,7 +88,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 
             if (cachedInfo.Changed)
             {
-                onGUIPayload.SetValue(cachedInfo.ChangedValue);
+                TriggerChangedIMGUI(property, cachedInfo.ChangedValue);
                 cachedInfo.Changed = false;
             }
 
@@ -185,7 +185,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAnimationPickerDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             if(!CachedInfoIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out CachedInfo cachedInfo) || cachedInfo.Error == "")
             {

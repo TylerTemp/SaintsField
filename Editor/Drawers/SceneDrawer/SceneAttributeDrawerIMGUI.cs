@@ -24,7 +24,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             string[] scenes = SceneUtils.GetTrimedScenePath(((SceneAttribute)saintsAttribute).FullPath).ToArray();
@@ -204,7 +204,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) =>
+            FieldInfo info, object parent) =>
             _error == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, _error, MessageType.Error);

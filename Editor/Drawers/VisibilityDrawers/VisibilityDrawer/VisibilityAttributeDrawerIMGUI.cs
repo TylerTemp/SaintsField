@@ -31,7 +31,7 @@ namespace SaintsField.Editor.Drawers.VisibilityDrawers.VisibilityDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             if (_error == "")
             {

@@ -22,8 +22,9 @@ namespace SaintsField.Editor.Drawers.DefaultExpandDrawer
             return 0f;
         }
 
-        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            FieldInfo info, object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
             if (WatchedProp.Contains(key))

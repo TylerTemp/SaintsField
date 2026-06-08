@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -59,7 +59,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         // private static readonly Dictionary<UnityEngine.Object, HashSet<string>> InspectingTargets = new Dictionary<UnityEngine.Object, HashSet<string>>();
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             // return 0;
             if (EditorApplication.isPlayingOrWillChangePlaymode)
@@ -179,7 +179,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             ISaintsAttribute saintsAttribute,
             int index,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
@@ -258,7 +258,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
             {
                 // Debug.Log("return");
                 return DrawPicker(genericCache.GetByXPathAttributes[0], genericCache, position, property,
-                    genericCache.IndexToPropertyCache[propertyIndex], onGUIPayload, info);
+                    genericCache.IndexToPropertyCache[propertyIndex], info);
             }
 
             // if (genericCache.UpdateResourceAfterTime > 0)
@@ -310,7 +310,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         if(DoSignPropertyCache(propertyCache, false))
                         {
                             propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                            onGUIPayload.SetValue(propertyCache.TargetValue);
+                            TriggerChangedIMGUI(property, propertyCache.TargetValue);
                         }
                     }
                 }
@@ -326,7 +326,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         if(DoSignPropertyCache(propertyCache, false))
                         {
                             propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                            onGUIPayload.SetValue(null);
+                            TriggerChangedIMGUI(property, null);
                         }
                     }
                 }
@@ -347,7 +347,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                             if(DoSignPropertyCache(propertyCache, false))
                             {
                                 propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                                onGUIPayload.SetValue(newValue);
+                                TriggerChangedIMGUI(property, newValue);
                             }
                             else
                             {
@@ -361,7 +361,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         }
 
         private bool DrawPicker(GetByXPathAttribute firstAttr, GetByXPathGenericCache genericCache, Rect leftRect, SerializedProperty property,
-            PropertyCache propertyCache, OnGUIPayload onGUIPayload, FieldInfo info)
+            PropertyCache propertyCache, FieldInfo info)
         {
             if (!firstAttr.UsePickerButton)
             {
@@ -379,7 +379,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                         if(DoSignPropertyCache(propertyCache, false))
                         {
                             propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                            onGUIPayload.SetValue(newValue);
+                            TriggerChangedIMGUI(property, newValue);
                         }
                         else
                         {
@@ -417,7 +417,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload,
+            IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             string content = GetBelowMessage(property, saintsAttribute);

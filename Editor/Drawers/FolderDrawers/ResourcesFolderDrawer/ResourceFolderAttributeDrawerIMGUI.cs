@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
         private static readonly Dictionary<Object, HashSet<string>> InspectingTargets = new Dictionary<Object, HashSet<string>>();
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return property.propertyType == SerializedPropertyType.String
                 ? SingleLineHeight
@@ -39,7 +39,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
@@ -81,23 +81,10 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
             }
             keySet.Add(key);
 
-            if (onGUIPayload.changed)
+            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo) && cacheInfo.ChangedValue != null)
             {
-                if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
-                {
-                    cacheInfo.Error = "";
-                }
-            }
-            else
-            {
-                if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
-                {
-                    if(cacheInfo.ChangedValue != null)
-                    {
-                        onGUIPayload.SetValue(cacheInfo.ChangedValue);
-                        AsyncCacheInfo.Remove(key);
-                    }
-                }
+                TriggerChangedIMGUI(property, cacheInfo.ChangedValue);
+                AsyncCacheInfo.Remove(key);
             }
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -123,7 +110,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
                     {
                         property.stringValue = actualFolder;
                         property.serializedObject.ApplyModifiedProperties();
-                        // onGUIPayload.SetValue(actualFolder);
+                        // TriggerChangedIMGUI(property, actualFolder);
                         AsyncCacheInfo[key] = new CacheInfo { ChangedValue = actualFolder };
                     }
                 }
@@ -176,7 +163,7 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
             {

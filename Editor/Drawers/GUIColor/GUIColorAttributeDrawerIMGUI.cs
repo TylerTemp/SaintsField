@@ -18,8 +18,9 @@ namespace SaintsField.Editor.Drawers.GUIColor
             return true;
         }
 
-        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            FieldInfo info, object parent)
         {
             GUIColorAttribute guiColorAttribute = (GUIColorAttribute)saintsAttribute;
             (string error, Color color) = GetColor(guiColorAttribute, property, info, parent);
@@ -41,7 +42,8 @@ namespace SaintsField.Editor.Drawers.GUIColor
             return position;
         }
 
-        protected override void OnPropertyEndImGui(SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, int saintsIndex, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        protected override void OnPropertyEndImGui(SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute, int saintsIndex, FieldInfo info, object parent)
         {
             string key = GetKey(property);
             if (_idToOriginalColor.TryGetValue(key, out Color color))

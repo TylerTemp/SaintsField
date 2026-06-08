@@ -18,7 +18,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
@@ -78,7 +78,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                         Object result = OnSelectWindowSelected(fieldResult, fieldType);
                         property.objectReferenceValue = result;
                         property.serializedObject.ApplyModifiedProperties();
-                        onGUIPayload.SetValue(result);
+                        TriggerChangedIMGUI(property, result);
                     });
                 }
             }
@@ -119,6 +119,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, _error, MessageType.Error);
     }
 }

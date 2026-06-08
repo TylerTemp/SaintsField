@@ -68,7 +68,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.RotationHandleDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             string error = EnsureKey(property, (RotationHandleAttribute) saintsAttribute, index, info, parent).Error;
             return error == ""

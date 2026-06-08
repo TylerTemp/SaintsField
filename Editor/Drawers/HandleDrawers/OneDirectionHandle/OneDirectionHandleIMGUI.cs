@@ -84,7 +84,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.OneDirectionHandle
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             string error = EnsureKey((OneDirectionBaseAttribute)saintsAttribute, property, info, parent).Error;
             return error == ""

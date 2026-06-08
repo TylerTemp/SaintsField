@@ -50,14 +50,15 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             return EditorGUIUtility.singleLineHeight;
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             CachedImGui cache = EnsureCache(property);
             if (cache.Changed)
             {
                 cache.Changed = false;
-                onGUIPayload.SetValue(cache.ChangedValue);
+                TriggerChangedIMGUI(property, cache.ChangedValue);
             }
 
             TypeReferenceAttribute typeReferenceAttribute = GetTypeReferenceAttribute(allAttributes);
@@ -127,8 +128,9 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                 : ImGuiHelpBox.GetHeight(cache.Error, width, EMessageType.Error);
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             CachedImGui cache = EnsureCache(property);
             return string.IsNullOrEmpty(cache.Error)

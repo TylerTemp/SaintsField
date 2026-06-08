@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
             ISaintsAttribute saintsAttribute,
             int index,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             object managedReferenceValue = property.managedReferenceValue;
 
@@ -79,7 +79,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
                             : Activator.CreateInstance((Type)curItem);
                         property.managedReferenceValue = instance;
                         property.serializedObject.ApplyModifiedProperties();
-                        onGUIPayload.SetValue(instance);
+                        TriggerChangedIMGUI(property, instance);
                     },
                     _ => null);
                 dropdown.Show(position);
@@ -90,7 +90,7 @@ namespace SaintsField.Editor.Drawers.ReferencePicker
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return ImGuiButtonWidth;
         }

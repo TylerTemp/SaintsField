@@ -41,7 +41,7 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             InfoImGui cachedInfo = EnsureKey(property);
@@ -100,7 +100,7 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             string error = EnsureKey(property).Error;
             return error == "" ? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);

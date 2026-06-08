@@ -214,7 +214,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
             NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
@@ -229,7 +229,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
             InfoIMGUI cacheInfo = EnsureInfo(key, property, info);
@@ -274,7 +274,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
             if (settings == null)
@@ -299,7 +299,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 if (loadObj != null)
                 {
                     currentObj = loadObj;
-                    if (cacheInfo.CurObject == null || onGuiPayload.changed)
+                    if (cacheInfo.CurObject == null)
                     {
                         cacheInfo.CurObject = currentObj;
                     }
@@ -322,7 +322,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 inspectingTarget =
                     EditorGUI.ObjectField(resourceRow, new GUIContent("Resource"), inspectingTarget, cacheInfo.IsSprite ? typeof(Sprite) : typeof(Object), false);
                 entry = settings.FindAssetEntry(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(inspectingTarget)));
-                if (changed.changed || onGuiPayload.changed)
+                if (changed.changed)
                 {
                     cacheInfo.CurObject = inspectingTarget;
                     cacheInfo.GroupName = entry == null ? "" : entry.parentGroup.Name;
@@ -496,7 +496,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     }
 
                     property.serializedObject.ApplyModifiedProperties();
-                    onGuiPayload.SetValue(cacheInfo.CurObject);
+                    TriggerChangedIMGUI(property, cacheInfo.CurObject);
 
                     cacheInfo.Expanded = false;
                 }

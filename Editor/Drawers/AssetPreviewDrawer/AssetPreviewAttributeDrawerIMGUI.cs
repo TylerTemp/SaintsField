@@ -97,7 +97,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             string error = MismatchError(property, info, parent);
             if (error != null)
@@ -139,7 +139,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             string error = MismatchError(property, info, parent);
             if (error != null)

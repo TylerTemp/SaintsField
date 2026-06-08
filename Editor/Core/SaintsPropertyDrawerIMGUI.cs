@@ -6,6 +6,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SaintsField.Editor.Core
 {
@@ -370,22 +371,59 @@ namespace SaintsField.Editor.Core
         #endregion
 
 
-        protected class OnGUIPayload
-        {
-            public bool changed;
-            public object newValue;
+        // protected class OnGUIPayload
+        // {
+        //     public bool changed;
+        //     public object newValue;
+        //
+        //     public void SetValue(object value)
+        //     {
+        //         changed = true;
+        //         newValue = value;
+        //     }
+        // }
 
-            public void SetValue(object value)
+        // private static readonly Dictionary<string, UnityEvent<object>> OnValueChangedRecords = new Dictionary<string, UnityEvent<object>>();
+        // private static readonly Dictionary<string, UnityAction<object>> OnValueChangedIdToAction = new Dictionary<string, UnityAction<object>>();
+        private static readonly Dictionary<UnityAction<object>, (string path, bool listenSub)> OnValueChangedIdToAction = new Dictionary<UnityAction<object>, (string path, bool listenSub)>();
+
+        public static void TriggerChangedIMGUI(SerializedProperty property, object newValue)
+        {
+            string id = SerializedUtils.GetUniqueId(property);
+            foreach ((UnityAction<object> caller, (string path, bool listenSub))  in OnValueChangedIdToAction)
             {
-                changed = true;
-                newValue = value;
+                bool matched;
+                if (listenSub)
+                {
+                    matched = path == id || id.StartsWith(path + ".");
+                }
+                else
+                {
+                    matched = path == id;
+                }
+
+                if (matched)
+                {
+                    caller.Invoke(newValue);
+                }
             }
+        }
+
+        public static void WatchChangedIMGUI(SerializedProperty property, UnityAction<object> caller, bool listenSub)
+        {
+            string id = SerializedUtils.GetUniqueId(property);
+            OnValueChangedIdToAction[caller] = (id, listenSub);
+        }
+
+        public static void RemoveChangedIMGUI(UnityAction<object> caller)
+        {
+            OnValueChangedIdToAction.Remove(caller);
         }
 
         private class LabelDrawerInfo
         {
-            public SaintsPropertyDrawer labelDrawerInstance;
-            public Rect rect;
+            public SaintsPropertyDrawer LabelDrawerInstance;
+            public Rect Rect;
         }
 
         protected virtual bool UseCreateFieldIMGUI => false;
@@ -410,8 +448,6 @@ namespace SaintsField.Editor.Core
                 UnityDraw(position, property, label, fieldInfo, GetPreferredLabel(property));
                 return;
             }
-
-            OnGUIPayload onGUIPayload = new OnGUIPayload();
 
             (PropertyAttribute[] allAttributes, object parent) =
                 SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
@@ -510,8 +546,7 @@ namespace SaintsField.Editor.Core
                         foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfos)
                         {
                             Rect newAboveRect =
-                                drawerInstance.DrawAboveImGui(aboveRect, property, bugFixCopyLabel, eachAttribute,
-                                    onGUIPayload, fieldInfo, parent);
+                                drawerInstance.DrawAboveImGui(aboveRect, property, bugFixCopyLabel, eachAttribute, fieldInfo, parent);
                             aboveUsedHeight = newAboveRect.y - aboveInitY;
                             aboveRect = newAboveRect;
                         }
@@ -530,8 +565,7 @@ namespace SaintsField.Editor.Core
                                 width = eachWidth,
                             };
                             Rect leftRect =
-                                drawerInstance.DrawAboveImGui(eachRect, property, bugFixCopyLabel, eachAttribute,
-                                    onGUIPayload, fieldInfo, parent);
+                                drawerInstance.DrawAboveImGui(eachRect, property, bugFixCopyLabel, eachAttribute, fieldInfo, parent);
                             height = Mathf.Max(height, leftRect.y - eachRect.y);
                             // Debug.Log($"height={height}");
                         }
@@ -670,8 +704,8 @@ namespace SaintsField.Editor.Core
 
                         labelDrawerInfo = new LabelDrawerInfo
                         {
-                            labelDrawerInstance = labelDrawerInstance,
-                            rect = new Rect(fieldUseRectWithPost)
+                            LabelDrawerInstance = labelDrawerInstance,
+                            Rect = new Rect(fieldUseRectWithPost)
                             {
                                 x = useX,
                                 width = useWidth,
@@ -713,7 +747,7 @@ namespace SaintsField.Editor.Core
                         : GetOrCreateSaintsDrawer(property, eachAttributeWithIndex, GetPreferredLabel(property));
                     float curWidth =
                         drawerInstance.GetPostFieldWidth(fieldUseRectWithPost, property, GUIContent.none,
-                            eachAttributeWithIndex.SaintsAttribute, eachAttributeWithIndex.Index, onGUIPayload,
+                            eachAttributeWithIndex.SaintsAttribute, eachAttributeWithIndex.Index,
                             fieldInfo, parent);
                     postFieldWidth += curWidth;
                     postFieldInfoList.Add((
@@ -738,10 +772,12 @@ namespace SaintsField.Editor.Core
                 using (new ResetIndentScoop())
                 using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
+                    bool drawFieldBySaints = false;
                     if (UseCreateFieldIMGUI && fieldDrawer == null)
                     {
                         DrawField(fieldUseRectNoPost, property, useGuiContent,
-                            null, allAttributes, onGUIPayload, fieldInfo, parent);
+                            null, allAttributes, fieldInfo, parent);
+                        drawFieldBySaints = true;
                     }
                     else if (fieldDrawer == null)
                     {
@@ -754,7 +790,8 @@ namespace SaintsField.Editor.Core
                         // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
                         // GUI.SetNextControlName(_fieldControlName);
                         fieldDrawerInstance.DrawField(fieldUseRectNoPost, property, useGuiContent,
-                            fieldAttributeWithIndex.SaintsAttribute, allAttributes, onGUIPayload, fieldInfo, parent);
+                            fieldAttributeWithIndex.SaintsAttribute, allAttributes, fieldInfo, parent);
+                        drawFieldBySaints = true;
                         // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
                         // UsedAttributesTryAdd(fieldAttributeWithIndex, fieldDrawerInstance);
@@ -762,15 +799,18 @@ namespace SaintsField.Editor.Core
 
                     // if (changed.changed && fieldDrawer == null)
                     // Debug.Log($"changed.changed={changed.changed}");
-                    if (changed.changed && !onGUIPayload.changed)
+                    if (changed.changed)
                     {
                         property.serializedObject.ApplyModifiedProperties();
 
-                        (string error, int _, object value) = Util.GetValue(property, fieldInfo, parent);
-
-                        if (error == "")
+                        if(!drawFieldBySaints)
                         {
-                            onGUIPayload.SetValue(value);
+                            (string error, int _, object value) = Util.GetValue(property, fieldInfo, parent);
+
+                            if (error == "")
+                            {
+                                TriggerChangedIMGUI(property, value);
+                            }
                         }
                     }
                 }
@@ -798,7 +838,6 @@ namespace SaintsField.Editor.Core
                         attributeWithIndex.SaintsAttribute,
                         attributeWithIndex.Index,
                         allAttributes,
-                        onGUIPayload,
                         fieldInfo,
                         parent);
                     // ReSharper disable once InvertIf
@@ -829,7 +868,7 @@ namespace SaintsField.Editor.Core
 
                 if (labelDrawerInfo != null)
                 {
-                    labelDrawerInfo.labelDrawerInstance.DrawLabel(labelDrawerInfo.rect, property, bugFixCopyLabel,
+                    labelDrawerInfo.LabelDrawerInstance.DrawLabel(labelDrawerInfo.Rect, property, bugFixCopyLabel,
                         labelAttributeWithIndex.SaintsAttribute, fieldInfo, parent);
                 }
 
@@ -907,7 +946,7 @@ namespace SaintsField.Editor.Core
                         foreach ((SaintsPropertyDrawer drawerInstance, SaintsWithIndex saintsWithIndex) in drawerInfo)
                         {
                             belowRect = drawerInstance.DrawBelow(belowRect, property, bugFixCopyLabel,
-                                saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, allAttributes, onGUIPayload,
+                                saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, allAttributes,
                                 fieldInfo, parent);
                         }
                     }
@@ -926,7 +965,7 @@ namespace SaintsField.Editor.Core
                             };
                             Rect leftRect =
                                 drawerInstance.DrawBelow(eachRect, property, bugFixCopyLabel,
-                                    saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, allAttributes, onGUIPayload,
+                                    saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, allAttributes,
                                     fieldInfo, parent);
                             height = Mathf.Max(height, leftRect.y - eachRect.y);
                         }
@@ -955,7 +994,7 @@ namespace SaintsField.Editor.Core
                     ? this
                     : GetOrCreateSaintsDrawer(property, saintsWithIndex, GetPreferredLabel(property));
                 drawer.OnPropertyEndImGui(property, label,
-                    saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, onGUIPayload, fieldInfo, parent);
+                    saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, fieldInfo, parent);
             }
         }
 
@@ -971,7 +1010,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual Rect DrawAboveImGui(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info,
+            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info,
             object parent)
         {
             return position;
@@ -986,7 +1025,7 @@ namespace SaintsField.Editor.Core
 
 
         protected virtual float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             return 0;
         }
@@ -994,7 +1033,7 @@ namespace SaintsField.Editor.Core
         protected virtual bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             return false;
         }
@@ -1013,7 +1052,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
         }
@@ -1036,13 +1075,13 @@ namespace SaintsField.Editor.Core
 
         protected virtual Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             return position;
         }
 
         protected virtual void OnPropertyEndImGui(SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int saintsIndex, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int saintsIndex, FieldInfo info, object parent)
         {
         }
 
@@ -1064,67 +1103,67 @@ namespace SaintsField.Editor.Core
             }
         }
 
-#if UNITY_2022_1_OR_NEWER
-        private static bool ImGuiRemoveDecDraw(Rect position, SerializedProperty property, GUIContent label)
-        {
-            Assembly assembly = _unityEditorAssemble;
-            if (assembly == null)
-            {
-                return false;
-            }
-
-            Type scriptAttributeUtilityType = assembly.GetType("UnityEditor.ScriptAttributeUtility");
-            if (scriptAttributeUtilityType == null)
-            {
-                return false;
-            }
-            MethodInfo getHandlerMethod =
-                scriptAttributeUtilityType.GetMethod("GetHandler", BindingFlags.Static | BindingFlags.NonPublic);
-            if (getHandlerMethod == null)
-            {
-                return false;
-            }
-
-            // Debug.Log(getHandlerMethod);
-            object[] parameters = { property };
-            object handler = getHandlerMethod.Invoke(null, parameters);
-            if (handler == null)
-            {
-                return false;
-            }
-
-            Type handlerType = assembly.GetType("UnityEditor.PropertyHandler");
-            if (handlerType == null)
-            {
-                return false;
-            }
-            FieldInfo decoratorDrawersField =
-                handlerType.GetField("m_DecoratorDrawers", BindingFlags.NonPublic | BindingFlags.Instance);
-            if (decoratorDrawersField == null)
-            {
-                return false;
-            }
-
-            decoratorDrawersField.SetValue(handler, null);
-
-            object[] methodArgs = {
-                position,  // position
-                property, // property
-                label, // label
-                true, // includeChildren
-            };
-            MethodInfo methodInfo = handlerType.GetMethod("OnGUI");
-            if (methodInfo == null)
-            {
-                return false;
-            }
-            // bool result = (bool)methodInfo.Invoke(handler, methodArgs);
-            // Debug.Log(result);
-            methodInfo.Invoke(handler, methodArgs);
-
-            return true;
-        }
-#endif
+// #if UNITY_2022_1_OR_NEWER
+//         private static bool ImGuiRemoveDecDraw(Rect position, SerializedProperty property, GUIContent label)
+//         {
+//             Assembly assembly = _unityEditorAssemble;
+//             if (assembly == null)
+//             {
+//                 return false;
+//             }
+//
+//             Type scriptAttributeUtilityType = assembly.GetType("UnityEditor.ScriptAttributeUtility");
+//             if (scriptAttributeUtilityType == null)
+//             {
+//                 return false;
+//             }
+//             MethodInfo getHandlerMethod =
+//                 scriptAttributeUtilityType.GetMethod("GetHandler", BindingFlags.Static | BindingFlags.NonPublic);
+//             if (getHandlerMethod == null)
+//             {
+//                 return false;
+//             }
+//
+//             // Debug.Log(getHandlerMethod);
+//             object[] parameters = { property };
+//             object handler = getHandlerMethod.Invoke(null, parameters);
+//             if (handler == null)
+//             {
+//                 return false;
+//             }
+//
+//             Type handlerType = assembly.GetType("UnityEditor.PropertyHandler");
+//             if (handlerType == null)
+//             {
+//                 return false;
+//             }
+//             FieldInfo decoratorDrawersField =
+//                 handlerType.GetField("m_DecoratorDrawers", BindingFlags.NonPublic | BindingFlags.Instance);
+//             if (decoratorDrawersField == null)
+//             {
+//                 return false;
+//             }
+//
+//             decoratorDrawersField.SetValue(handler, null);
+//
+//             object[] methodArgs = {
+//                 position,  // position
+//                 property, // property
+//                 label, // label
+//                 true, // includeChildren
+//             };
+//             MethodInfo methodInfo = handlerType.GetMethod("OnGUI");
+//             if (methodInfo == null)
+//             {
+//                 return false;
+//             }
+//             // bool result = (bool)methodInfo.Invoke(handler, methodArgs);
+//             // Debug.Log(result);
+//             methodInfo.Invoke(handler, methodArgs);
+//
+//             return true;
+//         }
+// #endif
         protected void DefaultDrawer(Rect position, SerializedProperty property, GUIContent label, FieldInfo info)
         {
             // // this works nice

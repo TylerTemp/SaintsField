@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             MetaInfo metaInfo = GetMetaInfo(property, (saintsAttribute as AnimatorStateAttribute)?.AnimFieldName, info, parent);
@@ -82,7 +82,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                     {
                         // Debug.Log($"IMGUI init changed");
                         // ReSharper disable once RedundantCast
-                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String
+                        TriggerChangedIMGUI(property, property.propertyType == SerializedPropertyType.String
                             ? (object)metaInfo.AnimatorStates[curIndex].state.name
                             : metaInfo.AnimatorStates[curIndex]);
                         if (ExpandableIMGUIScoop.IsInScoop)
@@ -121,7 +121,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                     {
                         SetPropValue(property, metaInfo.AnimatorStates[newIndex]);
                         // ReSharper disable once RedundantCast
-                        onGUIPayload.SetValue(property.propertyType == SerializedPropertyType.String
+                        TriggerChangedIMGUI(property, property.propertyType == SerializedPropertyType.String
                             ? (object)metaInfo.AnimatorStates[newIndex].state.name
                             : metaInfo.AnimatorStates[newIndex]);
                         if (ExpandableIMGUIScoop.IsInScoop)
@@ -218,7 +218,7 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index1,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             // Debug.Log(_targetIsString);
             if (property.propertyType == SerializedPropertyType.String || !property.isExpanded)

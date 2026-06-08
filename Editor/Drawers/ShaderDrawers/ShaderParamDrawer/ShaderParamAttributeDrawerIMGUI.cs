@@ -48,7 +48,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderParamInfoIMGUI infoIMGUI))
             {
@@ -64,7 +64,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
             if (infoIMGUI.Changed)
             {
-                onGUIPayload.SetValue(infoIMGUI.ChangedValue);
+                TriggerChangedIMGUI(property, infoIMGUI.ChangedValue);
                 infoIMGUI.Changed = false;
             }
 
@@ -151,8 +151,9 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             return ImGuiHelpBox.GetHeight(infoIMGUI.Error, width, MessageType.Error);
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             string error = GetTypeMismatchError(property);
             if (error != "")

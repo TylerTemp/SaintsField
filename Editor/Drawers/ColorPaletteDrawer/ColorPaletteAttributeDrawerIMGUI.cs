@@ -44,7 +44,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
         private static readonly Dictionary<string, PaletteSelectorInfoImGui> ImGuiCache = new Dictionary<string, PaletteSelectorInfoImGui>();
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             if (!EnsureColorPaletteArray())
             {
@@ -80,7 +80,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             if (!EnsureColorPaletteArray())
             {
@@ -196,7 +196,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             if (!EnsureColorPaletteArray())
             {
@@ -283,7 +283,7 @@ namespace SaintsField.Editor.Drawers.ColorPaletteDrawer
                     }, GUIStyle.none))
                 {
                     property.colorValue = displayColorEntry.ColorEntry.color;
-                    onGuiPayload.SetValue(property.colorValue);
+                    TriggerChangedIMGUI(property, property.colorValue);
                 }
             }
 

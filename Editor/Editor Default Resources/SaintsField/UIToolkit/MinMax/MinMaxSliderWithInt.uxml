@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/today.comes.saintsfield/Editor/Editor Default Resources/SaintsField/UIToolkit/MinMax/MinMaxSliderStyle.uss?fileID=7433441132597879392&amp;guid=e14e7c1ad0bba9246801b4e54a4495a0&amp;type=3#MinMaxSliderStyle"/>
+    <ui:IntegerField name="minInput" class="input"/>
+    <ui:MinMaxSlider name="minMaxSlider" class="minMaxSlider"/>
+    <ui:IntegerField name="maxInput" class="input"/>
+</ui:UXML>

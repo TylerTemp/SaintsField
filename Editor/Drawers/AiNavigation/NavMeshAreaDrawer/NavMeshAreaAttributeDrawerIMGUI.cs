@@ -18,7 +18,6 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload,
             FieldInfo info, object parent)
         {
             AiNavigationUtils.NavMeshArea[] areas = AiNavigationUtils.GetNavMeshAreas().ToArray();

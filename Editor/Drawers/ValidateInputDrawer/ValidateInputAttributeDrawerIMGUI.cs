@@ -14,7 +14,7 @@ namespace SaintsField.Editor.Drawers.ValidateInputDrawer
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             // if (!valueChanged)
             // {
@@ -26,11 +26,7 @@ namespace SaintsField.Editor.Drawers.ValidateInputDrawer
 
             // _againRender = true;
 
-            if (onGUIPayload.changed)
-            {
-                property.serializedObject.ApplyModifiedProperties();
-            }
-            // Debug.Log($"call on {property.intValue}");
+                        // Debug.Log($"call on {property.intValue}");
 
             string callback = ((ValidateInputAttribute)saintsAttribute).Callback;
             string labelText = label.text;
@@ -57,7 +53,7 @@ namespace SaintsField.Editor.Drawers.ValidateInputDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) =>
+            FieldInfo info, object parent) =>
             _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
     }
 }

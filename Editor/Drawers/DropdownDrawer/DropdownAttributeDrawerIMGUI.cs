@@ -22,13 +22,13 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             string key = GetKey(property);
             if (AsyncChangedCache.TryGetValue(key, out object changedValue))
             {
-                onGUIPayload.SetValue(changedValue);
+                TriggerChangedIMGUI(property, changedValue);
                 AsyncChangedCache.Remove(key);
             }
 
@@ -102,6 +102,6 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
     }
 }

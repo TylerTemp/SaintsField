@@ -26,7 +26,6 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload,
             FieldInfo info,
             object parent)
         {
@@ -132,12 +131,12 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                     if (isInt)
                     {
                         property.intValue = (int)boundValue;
-                        onGUIPayload.SetValue((int)boundValue);
+                        TriggerChangedIMGUI(property, (int)boundValue);
                     }
                     else
                     {
                         property.floatValue = boundValue;
-                        onGUIPayload.SetValue(boundValue);
+                        TriggerChangedIMGUI(property, boundValue);
                     }
 
                     if (ExpandableIMGUIScoop.IsInScoop)

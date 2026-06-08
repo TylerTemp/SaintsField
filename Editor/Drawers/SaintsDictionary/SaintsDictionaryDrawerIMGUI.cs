@@ -487,8 +487,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         private static Texture2D _rightIcon;
         private static GUIStyle _iconButtonStyle;
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             ImGuiHelpBox.DeprecatedDraw(position);
 

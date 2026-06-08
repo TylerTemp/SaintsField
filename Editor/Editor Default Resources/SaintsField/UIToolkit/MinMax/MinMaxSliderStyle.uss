@@ -1,0 +1,14 @@
+:root {
+    flex-direction: row;
+}
+
+.minMaxSlider {
+    flex-shrink: 1;
+    flex-grow: 1;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.input{
+    width: 50px;
+}

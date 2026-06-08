@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.TagDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
@@ -52,7 +52,7 @@ namespace SaintsField.Editor.Drawers.TagDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent) => ImGuiHelpBox.Draw(position,
+            FieldInfo info, object parent) => ImGuiHelpBox.Draw(position,
             $"Expect string, get {property.propertyType}", MessageType.Error);
     }
 }

@@ -1,3 +1,4 @@
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using SaintsField.Editor.Drawers.PropRangeDrawer;
 using SaintsField.Editor.Utils;
@@ -6,8 +7,16 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 {
-    public class MinMaxSliderElementInt: BindableElement, INotifyValueChanged<Vector2Int>
+#if UNITY_6000_0_OR_NEWER
+    [UxmlElement]
+#endif
+    public partial class MinMaxSliderElementInt: BindableElement, INotifyValueChanged<Vector2Int>
     {
+#if !UNITY_6000_0_OR_NEWER
+        public new class UxmlTraits : VisualElement.UxmlTraits { }
+        public new class UxmlFactory : UxmlFactory<MinMaxSliderElementInt, UxmlTraits> { }
+#endif
+
         private const int InputWidth = 50;
 
         private Vector2Int _cachedValue;
@@ -18,42 +27,22 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
         private readonly AdaptAttribute _adaptAttribute;
 
+        private static VisualTreeAsset _template;
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public MinMaxSliderElementInt(): this(null){}
+
         public MinMaxSliderElementInt(AdaptAttribute adaptAttribute)
         {
+            _template ??= Util.LoadResource<VisualTreeAsset>("UIToolkit/MinMax/MinMaxSliderWithInt.uxml");
+            TemplateContainer root = _template.CloneTree();
+            hierarchy.Add(root);
+
             _adaptAttribute = adaptAttribute;
 
-            style.flexDirection = FlexDirection.Row;
-
-            Add(_minIntegerField = new IntegerField
-            {
-                isDelayed = true,
-                style =
-                {
-                    flexGrow = 0,
-                    flexShrink = 0,
-                    width = InputWidth,
-                },
-            });
-            Add(_minMaxSlider = new MinMaxSlider
-            {
-                style =
-                {
-                    flexGrow = 1,
-                    flexShrink = 1,
-                    paddingLeft = 5,
-                    paddingRight = 5,
-                },
-            });
-            Add(_maxIntegerField = new IntegerField
-            {
-                isDelayed = true,
-                style =
-                {
-                    flexGrow = 0,
-                    flexShrink = 0,
-                    width = InputWidth,
-                },
-            });
+            _minIntegerField = root.Q<IntegerField>("minInput");
+            _minMaxSlider = root.Q<MinMaxSlider>("minMaxSlider");
+            _maxIntegerField = root.Q<IntegerField>("maxInput");
 
             _minMaxSlider.RegisterValueChangedCallback(evt =>
             {
@@ -365,3 +354,4 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
         }
     }
 }
+#endif

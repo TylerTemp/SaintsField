@@ -61,7 +61,7 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
             FullWidthRichLabelAttribute fullWidthRichLabelAttribute = (FullWidthRichLabelAttribute)saintsAttribute;
             if (!fullWidthRichLabelAttribute.Above)
@@ -159,7 +159,7 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             // EditorGUI.DrawRect(position, Color.green);
             Rect useRect = position;

@@ -57,18 +57,18 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGUIPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             MinValueAttribute minValueAttribute = (MinValueAttribute)saintsAttribute;
             InfoImGui cachedInfo = EnsureKey(property, index);
-            if (!cachedInfo.CheckNow && !onGUIPayload.changed)
+            if (!cachedInfo.CheckNow)
             {
                 return true;
             }
             cachedInfo.CheckNow = false;
 
             (IReadOnlyList<string> errors, IReadOnlyList<(string message, Action fix)> checkerResults) =
-                CheckPropertyValue(property, minValueAttribute, onGUIPayload.SetValue, info, parent);
+                CheckPropertyValue(property, minValueAttribute, newValue => TriggerChangedIMGUI(property, newValue), info, parent);
             cachedInfo.Error = string.Join("\n", errors);
             foreach ((string _, Action fix)  in checkerResults)
             {
@@ -94,7 +94,7 @@ namespace SaintsField.Editor.Drawers.MinValueDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             string error = EnsureKey(property, index).Error;
             return error == "" ? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);

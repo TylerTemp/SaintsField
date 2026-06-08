@@ -100,7 +100,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             ImGuiLoadResources();
@@ -151,7 +151,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                         if (GUI.Button(toggleAllButtonRect, _checkboxCheckedTexture2D, _iconButtonStyle))
                         {
                             property.intValue = (int)metaInfo.AllCheckedLong;
-                            onGUIPayload.SetValue(metaInfo.AllCheckedLong);
+                            TriggerChangedIMGUI(property, metaInfo.AllCheckedLong);
                         }
                     }
 
@@ -163,7 +163,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                         if (GUI.Button(emptyButtonRect, _checkboxEmptyTexture2D, _iconButtonStyle))
                         {
                             property.intValue = 0;
-                            onGUIPayload.SetValue(0);
+                            TriggerChangedIMGUI(property, 0);
                         }
                     }
                 }
@@ -211,12 +211,12 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                     if (curValue == 0)
                     {
                         property.intValue = (int)metaInfo.AllCheckedLong;
-                        onGUIPayload.SetValue(metaInfo.AllCheckedLong);
+                        TriggerChangedIMGUI(property, metaInfo.AllCheckedLong);
                     }
                     else
                     {
                         property.intValue = 0;
-                        onGUIPayload.SetValue(0);
+                        TriggerChangedIMGUI(property, 0);
                     }
                 }
             }
@@ -258,7 +258,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             if (newValue != curValue)
                             {
                                 property.intValue = (int)newValue;
-                                onGUIPayload.SetValue(newValue);
+                                TriggerChangedIMGUI(property, newValue);
                             }
                         }
                     }
@@ -298,7 +298,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             {
                                 // Debug.Log($"{curValue} -> {newValue}");
                                 property.intValue = (int)newValue;
-                                onGUIPayload.SetValue(newValue);
+                                TriggerChangedIMGUI(property, newValue);
                             }
                         }
                     }
@@ -347,8 +347,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 .Max() + EditorGUIUtility.singleLineHeight;
         }
 
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
+            ISaintsAttribute saintsAttribute,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             // return position;
             // Debug.Log(position.width);
@@ -395,7 +396,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                         if (newValue != curValue)
                         {
                             property.intValue = newValue;
-                            onGuiPayload.SetValue(newValue);
+                            TriggerChangedIMGUI(property, newValue);
                         }
                     }
 

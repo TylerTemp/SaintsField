@@ -69,7 +69,7 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            OnGUIPayload onGuiPayload, FieldInfo info, object parent)
+            FieldInfo info, object parent)
         {
             return _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
         }

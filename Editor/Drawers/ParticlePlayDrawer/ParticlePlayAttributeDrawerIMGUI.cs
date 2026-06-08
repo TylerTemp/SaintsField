@@ -88,7 +88,6 @@ namespace SaintsField.Editor.Drawers.ParticlePlayDrawer
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index,
-            OnGUIPayload onGuiPayload,
             FieldInfo info, object parent)
         {
             InfoIMGUI cachedInfo = EnsureKey(property);
@@ -99,7 +98,7 @@ namespace SaintsField.Editor.Drawers.ParticlePlayDrawer
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, OnGUIPayload onGUIPayload, FieldInfo info,
+            int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
             InfoIMGUI cachedInfo = EnsureKey(property);
@@ -148,7 +147,7 @@ namespace SaintsField.Editor.Drawers.ParticlePlayDrawer
             bool particleNotEnabled = !particleSystem.gameObject.activeInHierarchy;
             bool needStop = particleNotEnabled && cachedInfo.Playing != PlayState.None;
 
-            if (onGUIPayload.changed || needStop)
+            if (needStop)
             {
                 // Debug.Log($"Stop current");
                 cachedInfo.StartTime = cachedInfo.PausedTime = 0;

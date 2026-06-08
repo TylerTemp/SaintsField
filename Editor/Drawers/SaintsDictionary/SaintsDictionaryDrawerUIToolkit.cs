@@ -1241,7 +1241,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                         GetFieldHeight(property, label, Screen.width, saintsAttribute, info, true, parent);
                     Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
 
-                    DrawField(rect, property, label, saintsAttribute, allAttributes, new OnGUIPayload(), info, parent);
+                    DrawField(rect, property, label, saintsAttribute, allAttributes, info, parent);
                     // ReSharper disable once InvertIf
                     // if (changed.changed)
                     // {
