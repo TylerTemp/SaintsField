@@ -18,11 +18,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
         private string _cachedCallbackLabelIMGUI;
         private IReadOnlyList<RichTextDrawer.RichTextChunk> _cachedRichTextChunksIMGUI;
 
-        private void OnDestroyIMGUI()
-        {
-            _richTextDrawer?.Dispose();
-        }
-
         private IReadOnlyList<RichTextDrawer.RichTextChunk> GetRichIMGUI(ButtonAttribute buttonAttribute, MethodInfo methodInfo)
         {
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -33,29 +28,20 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
             if (string.IsNullOrEmpty(buttonAttribute.Label))
             {
-                return new[] {new RichTextDrawer.RichTextChunk(content: ObjectNames.NicifyVariableName(methodInfo.Name)),
-                // {
-                //     Content = ObjectNames.NicifyVariableName(methodInfo.Name),
-                // }
-                };
+                return new[] { new RichTextDrawer.RichTextChunk(content: ObjectNames.NicifyVariableName(methodInfo.Name)) };
             }
 
             if (!buttonAttribute.IsCallback)
             {
                 if (string.IsNullOrEmpty(buttonAttribute.Label))
                 {
-                    return new[] {new RichTextDrawer.RichTextChunk(content: ObjectNames.NicifyVariableName(methodInfo.Name))
-                    // {
-                    //     Content = ObjectNames.NicifyVariableName(methodInfo.Name),
-                    // }
-                    };
+                    return new[] { new RichTextDrawer.RichTextChunk(content: ObjectNames.NicifyVariableName(methodInfo.Name)) };
                 }
 
                 // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
                 if (_cachedRichTextChunksIMGUI == null)
                 {
-                    _cachedRichTextChunksIMGUI = RichTextDrawer.ParseRichXml(buttonAttribute.Label,
-                        FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]).ToArray();
+                    _cachedRichTextChunksIMGUI = RichTextDrawer.ParseRichXmlWithProvider(buttonAttribute.Label, this).ToArray();
                 }
 
                 return _cachedRichTextChunksIMGUI;
@@ -69,11 +55,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 Debug.LogError(error);
 #endif
 
-                return new[] {new RichTextDrawer.RichTextChunk(content: ObjectNames.NicifyVariableName(methodInfo.Name)),
-                    // {
-                    //     Content = ObjectNames.NicifyVariableName(methodInfo.Name),
-                    // }
-                };
+                return new[] { new RichTextDrawer.RichTextChunk(content: ObjectNames.NicifyVariableName(methodInfo.Name)) };
             }
 
             if (result == _cachedCallbackLabelIMGUI)
@@ -81,8 +63,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 return _cachedRichTextChunksIMGUI;
             }
 
-            IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXml(result,
-                FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
+            IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(result, this);
             _cachedCallbackLabelIMGUI = result;
             _cachedRichTextChunksIMGUI = chunks.ToArray();
 
@@ -196,7 +177,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                     ? lastRect
                     // center it
                     : new Rect(lastRect.x + (lastRect.width - drawNeedWidth) / 2, lastRect.y, drawNeedWidth, lastRect.height);
-                _richTextDrawer.DrawChunks(drawRect, oldLabel, richTextChunks);
+                _richTextDrawer.DrawChunks(drawRect, richTextChunks);
             }
         }
     }

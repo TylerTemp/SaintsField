@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -64,12 +65,6 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
 
         // ReSharper disable once InconsistentNaming
         protected readonly RichTextDrawer RichTextDrawer = new RichTextDrawer();
-
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            RichTextDrawer.Dispose();
-        }
 
         protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info, object target)
         {
@@ -154,16 +149,12 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 buttonLabelXml = ObjectNames.NicifyVariableName(decButtonAttribute.FuncName);
                 richChunks = new[]
                 {
-                    new RichTextDrawer.RichTextChunk(isIcon: false, content: buttonLabelXml),
-                    // {
-                    //     IsIcon = false,
-                    //     Content = buttonLabelXml,
-                    // },
+                    new RichTextDrawer.RichTextChunk(content: buttonLabelXml),
                 };
             }
             else
             {
-                richChunks = RichTextDrawer.ParseRichXml(buttonLabelXml, label.text, property, info, target).ToArray();
+                richChunks = RichTextDrawer.ParseRichXmlWithProvider(buttonLabelXml, this).ToArray();
             }
 
             // GetWidth
@@ -178,8 +169,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.DecButtonDrawer
                 // EditorGUI.DrawRect(labelRect, Color.yellow);
             }
 
-            ImGuiEnsureDispose(property.serializedObject.targetObject);
-            RichTextDrawer.DrawChunks(labelRect, label, richChunks);
+            RichTextDrawer.DrawChunks(labelRect, richChunks);
 
             return leftRect;
 

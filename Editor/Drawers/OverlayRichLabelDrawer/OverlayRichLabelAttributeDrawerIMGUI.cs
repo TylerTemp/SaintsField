@@ -5,6 +5,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,12 +38,6 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
 
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
 
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            _richTextDrawer.Dispose();
-        }
-
         protected override bool DrawOverlay(Rect position, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute, bool hasLabel, FieldInfo info, object parent)
@@ -71,7 +66,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
             float labelWidth = hasLabel ? EditorGUIUtility.labelWidth : 0;
 
             RichTextDrawer.RichTextChunk[] payloads =
-                RichTextDrawer.ParseRichXml(labelXml, label.text, property, info, parent).ToArray();
+                RichTextDrawer.ParseRichXmlWithProvider(labelXml, this).ToArray();
             float overlayWidth = _richTextDrawer.GetWidth(label, position.height, payloads);
 
             float leftWidth = position.width - labelWidth - contentWidth;
@@ -87,8 +82,7 @@ namespace SaintsField.Editor.Drawers.OverlayRichLabelDrawer
                 width = useWidth,
             };
 
-            ImGuiEnsureDispose(property.serializedObject.targetObject);
-            _richTextDrawer.DrawChunks(overlayRect, label, payloads);
+            _richTextDrawer.DrawChunks(overlayRect, payloads);
 
             return true;
         }

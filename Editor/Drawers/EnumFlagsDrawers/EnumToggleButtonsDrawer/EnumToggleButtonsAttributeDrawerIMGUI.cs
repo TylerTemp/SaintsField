@@ -4,6 +4,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -41,11 +42,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
             {
                 // ReSharper disable once InvertIf
-                if (InspectingIds.TryGetValue(key, out ImGuiInfo info))
-                {
-                    info.RichTextDrawer.Dispose();
-                    InspectingIds.Remove(key);
-                }
+                InspectingIds.Remove(key);
             });
 
             return InspectingIds[key] = new ImGuiInfo
@@ -234,7 +231,9 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 EnumFlagsUtil.EnumDisplayInfo displayInfo = kv.Value;
                 if (displayInfo.HasRichName)
                 {
-                    RichTextDrawer.RichTextChunk[] richChunks = RichTextDrawer.ParseRichXml(displayInfo.RichName, displayInfo.Name, property, info, parent).ToArray();
+                    RichTextDrawer.RichTextChunk[] richChunks = RichTextDrawer
+                        .ParseRichXmlWithProvider(displayInfo.RichName, this)
+                        .ToArray();
                     float useWidth = cachedInfo.RichTextDrawer.GetWidth(label, position.height, richChunks);
                     Rect drawRichRect;
                     bool breakOut = false;
@@ -262,7 +261,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                             }
                         }
                     }
-                    cachedInfo.RichTextDrawer.DrawChunks(drawRichRect, label, richChunks);
+                    cachedInfo.RichTextDrawer.DrawChunks(drawRichRect, richChunks);
 
                     if (breakOut)
                     {
@@ -402,7 +401,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
                     if (flexButton.IsRichText)
                     {
-                        cachedInfo.RichTextDrawer.DrawChunks(buttonRect, label, flexButton.RichTextChunks);
+                        cachedInfo.RichTextDrawer.DrawChunks(buttonRect, flexButton.RichTextChunks);
                     }
                 }
             }
@@ -439,7 +438,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 
                 if (displayInfo.HasRichName)
                 {
-                    chunks = RichTextDrawer.ParseRichXml(displayInfo.RichName, displayInfo.Name, property, info, parent).ToArray();
+                    chunks = RichTextDrawer.ParseRichXmlWithProvider(displayInfo.RichName, this).ToArray();
                     useWidth = cachedInfo.RichTextDrawer.GetWidth(guiContent, EditorGUIUtility.singleLineHeight, chunks);
                 }
                 else

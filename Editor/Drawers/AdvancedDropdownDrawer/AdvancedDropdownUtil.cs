@@ -52,6 +52,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
                 if (Util.GetIsEqual(curValue, item.value))
                 {
+                    // Debug.Log($"return with value named {item.displayName}");
                     return (thisLoopResult.ToArray(), item.displayName);
                 }
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN

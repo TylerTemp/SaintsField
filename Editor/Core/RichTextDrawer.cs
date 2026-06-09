@@ -9,6 +9,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 #if UNITY_2021_3_OR_NEWER
 using UnityEngine.UIElements;
 #endif
@@ -51,16 +52,16 @@ namespace SaintsField.Editor.Core
             }
         }
 
-        private readonly Dictionary<TextureCacheKey, Texture2D> _textureCache = new Dictionary<TextureCacheKey, Texture2D>();
-
-        public void Dispose()
-        {
-            foreach (Texture2D cacheValue in _textureCache.Values)
-            {
-                UnityEngine.Object.DestroyImmediate(cacheValue);
-            }
-            _textureCache.Clear();
-        }
+        // private readonly Dictionary<TextureCacheKey, Texture2D> _textureCache = new Dictionary<TextureCacheKey, Texture2D>();
+        //
+        // public void Dispose()
+        // {
+        //     foreach (Texture2D cacheValue in _textureCache.Values)
+        //     {
+        //         UnityEngine.Object.DestroyImmediate(cacheValue);
+        //     }
+        //     _textureCache.Clear();
+        // }
 
         public static (string error, string xml) GetLabelXml(SerializedProperty property, string richTextXml, bool isCallback, FieldInfo fieldInfo, object target)
         {
@@ -130,7 +131,7 @@ namespace SaintsField.Editor.Core
 
         // NOTE: Unity rich text is NOT xml; This is not Unity rich text as
         // Unity will treat invalid rich text as plain text. This will try to fix the broken xml
-        // TODO: use RuntimeUil.ParseRichXml parser
+        // TODO: use RuntimeUtil.ParseRichXml parser
         public static IEnumerable<RichTextChunk> ParseRichXml(string richXml, string labelText, SerializedProperty property, MemberInfo fieldInfo, object parent)
         {
             List<string> colors = new List<string>();
@@ -398,9 +399,11 @@ namespace SaintsField.Editor.Core
             List<RuntimeUtil.RichTextParsedChunk> openTag = new List<RuntimeUtil.RichTextParsedChunk>();
             // List<RuntimeUtil.RichTextParsedChunk> acc = new List<RuntimeUtil.RichTextParsedChunk>();
             StringBuilder richText = new StringBuilder();
+            // Debug.Log($"ParseRichXmlWithProvider `{richXml}`");
             foreach (RuntimeUtil.RichTextParsedChunk richTextParsedChunk in RuntimeUtil.ParseRichXml(richXml))
             {
                 // Debug.Log($"get parsed chunk {richTextParsedChunk}");
+                // continue;
                 switch (richTextParsedChunk.ChunkType)
                 {
                     case RuntimeUtil.ChunkType.NormalTag:
@@ -649,12 +652,8 @@ namespace SaintsField.Editor.Core
 
             float totalWidth = 0;
 
-            foreach(RichTextChunk curChunk in payloads)
+            foreach (RichTextChunk curChunk in payloads)
             {
-                // RichTextChunk curChunk = parsedChunk[0];
-                // parsedChunk.RemoveAt(0);
-
-                // Debug.Log($"parsedChunk={curChunk}");
                 if (curChunk.IsIcon)
                 {
                     TextureCacheKey cacheKey = new TextureCacheKey
@@ -662,19 +661,22 @@ namespace SaintsField.Editor.Core
                         ColorPresent = curChunk.IconColor,
                         IconPath = curChunk.Content,
                     };
-                    Texture texture = GetTexture2D(cacheKey, curChunk, height);
-                    float curWidth = texture.height > 0
-                        ? texture.width
-                        : height;
+                    Texture texture = GetTexture2DNoTransform(cacheKey, curChunk.Content);
+                    if (texture == null)
+                    {
+                        continue;
+                    }
+                    // float curWidth = texture.height > 0
+                    //     ? texture.width
+                    //     : height;
 
-                    totalWidth += curWidth;
+                    totalWidth += height;
                 }
                 else
                 {
-                    GUIContent curGUIContent = new GUIContent(oldLabel)
+                    GUIContent curGUIContent = new GUIContent
                     {
                         text = curChunk.Content,
-                        image = null,
                     };
                     totalWidth += textStyle.CalcSize(curGUIContent).x;
                 }
@@ -682,74 +684,142 @@ namespace SaintsField.Editor.Core
             return totalWidth;
         }
 
-        public void DrawChunks(Rect position, GUIContent oldLabel, IEnumerable<RichTextChunk> payloads)
+        private struct GUIGroupScoop : IDisposable
         {
-            Rect labelRect = position;
-            // List<RichTextChunk> parsedChunk = payloads.ToList();
-
-            // Debug.Log($"parsedChunk.Count={parsedChunk.Count}");
-
-            GUIStyle textStyle = new GUIStyle(EditorStyles.label)
+            public GUIGroupScoop(Rect position)
             {
-                richText = true,
-            };
-
-            foreach(RichTextChunk curChunk in payloads)
-            {
-                // RichTextChunk curChunk = parsedChunk[0];
-                // parsedChunk.RemoveAt(0);
-
-                // Debug.Log($"parsedChunk={curChunk}");
-                GUIContent curGUIContent;
-                float curWidth;
-                if (curChunk.IsIcon)
-                {
-                    TextureCacheKey cacheKey = new TextureCacheKey
-                    {
-                        ColorPresent = curChunk.IconColor,
-                        IconPath = curChunk.Content,
-                    };
-                    if (!_textureCache.TryGetValue(cacheKey, out Texture2D texture) || texture == null)
-                    {
-                        texture = Tex.TextureTo(
-                            Util.LoadResource<Texture2D>(curChunk.Content),
-                            Colors.GetColorByStringPresent(curChunk.IconColor),
-                            -1,
-                            Mathf.FloorToInt(position.height)
-                        );
-                        if (texture.width != 1 && texture.height != 1)
-                        {
-                            _textureCache[cacheKey] = texture;
-                        }
-                    }
-
-                    curGUIContent = new GUIContent(oldLabel)
-                    {
-                        text = null,
-                        image = texture,
-                    };
-                    curWidth = texture.width;
-                }
-                else
-                {
-                    curGUIContent = new GUIContent(oldLabel)
-                    {
-                        text = curChunk.Content,
-                        image = null,
-                    };
-                    curWidth = textStyle.CalcSize(curGUIContent).x;
-                }
-
-                (Rect textRect, Rect leftRect) = RectUtils.SplitWidthRect(labelRect, curWidth);
-                // GUI.Label(textRect, curGUIContent, textStyle);
-                EditorGUI.LabelField(textRect, curGUIContent, textStyle);
-                if (leftRect.width <= 0)
-                {
-                    return;
-                }
-
-                labelRect = leftRect;
+                GUI.BeginGroup(position);
             }
+
+
+            public void Dispose()
+            {
+                GUI.EndGroup();
+            }
+        }
+
+        public void DrawChunks(Rect position, IEnumerable<RichTextChunk> payloads)
+        {
+            using (new GUIGroupScoop(position))
+            {
+                Rect leftOutRect = new Rect(position)
+                {
+                    x = 0,
+                    y = 0,
+                };
+
+
+                // Debug.Log($"DrawChunks at {leftOutRect}({leftOutRect.width}x{leftOutRect.height})");
+
+                GUIStyle textStyle = new GUIStyle(EditorStyles.label)
+                {
+                    richText = true,
+                };
+
+                foreach (RichTextChunk curChunk in payloads)
+                {
+                    // Debug.Log($"draw {curChunk} with left {leftOutRect}({leftOutRect.width}x{leftOutRect.height})");
+                    if (curChunk.IsIcon)
+                    {
+                        TextureCacheKey cacheKey = new TextureCacheKey
+                        {
+                            ColorPresent = curChunk.IconColor,
+                            IconPath = curChunk.Content,
+                        };
+
+                        Texture2D texture = GetTexture2DNoTransform(cacheKey, curChunk.Content);
+                        if (texture == null)
+                        {
+                            continue;
+                        }
+
+                        // if (_textureCache.TryGetValue(cacheKey, out Texture2D texture) && texture != null)
+                        // {
+                        //     continue;
+                        // }
+                        //
+                        // Texture2D loadTex = Util.LoadResource<Texture2D>(curChunk.Content);
+                        // if (loadTex == null || loadTex.width <= 1 || loadTex.height <= 1)
+                        // {
+                        //     continue;
+                        // }
+                        // _textureCache[cacheKey] = loadTex;
+                        // Debug.Log($"COLOR!={Colors.GetColorByStringPresent(curChunk.IconColor)}/{curChunk.IconColor}");
+
+                        // texture = Tex.TextureTo(
+                        //     loadTex,
+                        //     Colors.GetColorByStringPresent(curChunk.IconColor),
+                        //     -1,
+                        //     -1
+                        // );
+                        // texture = Tex.ApplyTextureColor(loadTex, Colors.GetColorByStringPresent(curChunk.IconColor));
+                        // texture = loadTex;
+                        // Debug.Log(texture);
+                        // Debug.Log(texture == null);
+                        // Debug.Log(texture.width);
+                        // Debug.Log(texture.height);
+                        // _textureCache[cacheKey] = texture;
+                        // if (texture.width != 1 && texture.height != 1)
+                        // {
+                        //     _textureCache[cacheKey] = texture;
+                        // }
+                        // Texture2D texture = GetTexture2D(cacheKey, curChunk.Content, curChunk.IconColor, position.height);
+                        // float curWidth = texture.width;
+
+                        if (leftOutRect.width < position.height)
+                        {
+                            leftOutRect.width = position.height;
+                        }
+
+                        (Rect texRect, Rect leftRect) = RectUtils.SplitWidthRect(leftOutRect, position.height);
+                        // Debug.Log($"draw icon {texture} at {textRect}({position})");
+
+
+                        using(new GUIColorScoop(Colors.GetColorByStringPresent(curChunk.IconColor)))
+                        {
+                            GUI.DrawTexture(texRect, texture, ScaleMode.ScaleToFit, true);
+                        }
+                        // EditorGUI.DrawRect(position, Color.green);
+                        // EditorGUI.LabelField(textRect, "ok", textStyle);
+                        // if (leftRect.width <= 0)
+                        // {
+                        //     Debug.Log($"No space after icon `{curChunk.Content}, skip");
+                        //     return;
+                        // }
+
+                        leftOutRect = leftRect;
+                        // break;
+                    }
+                    else
+                    {
+                        GUIContent curGUIContent = new GUIContent
+                        {
+                            text = curChunk.Content,
+                        };
+                        float curWidth = textStyle.CalcSize(curGUIContent).x;
+                        if (leftOutRect.width < curWidth)
+                        {
+                            leftOutRect.width = curWidth;
+                        }
+
+                        (Rect textRect, Rect leftRect) = RectUtils.SplitWidthRect(leftOutRect, curWidth);
+                        // EditorGUI.DrawRect(textRect, Color.brown);
+                        // Debug.Log($"leftRect={leftRect}");
+                        EditorGUI.LabelField(textRect, curGUIContent, textStyle);
+                        // if (leftRect.width <= 0)
+                        // {
+                        //     Debug.Log($"No space after text `{curChunk.Content}` ({leftOutRect.width}->{curWidth}), skip");
+                        //     return;
+                        // }
+
+                        leftOutRect = leftRect;
+                    }
+                }
+
+            }
+
+
+
         }
 
         public const float ImageWidth = SaintsPropertyDrawer.SingleLineHeight;
@@ -784,12 +854,12 @@ namespace SaintsField.Editor.Core
                         IconPath = curChunk.Content,
                     };
 
-                    if (!_textureCache.TryGetValue(cacheKey, out Texture2D texture) || texture == null)
+                    if (!_textureCacheOrigin.TryGetValue(cacheKey, out Texture2D texture) || texture == null)
                     {
                         texture = Util.LoadResource<Texture2D>(curChunk.Content);
                         if (texture != null && texture.width != 1 && texture.height != 1)
                         {
-                            _textureCache[cacheKey] = texture;
+                            _textureCacheOrigin[cacheKey] = texture;
                         }
                     }
 
@@ -850,26 +920,50 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private Texture2D GetTexture2D(TextureCacheKey cacheKey, RichTextChunk curChunk, float height)
+        private readonly Dictionary<TextureCacheKey, Texture2D> _textureCacheOrigin = new Dictionary<TextureCacheKey, Texture2D>();
+
+        private Texture2D GetTexture2DNoTransform(TextureCacheKey cacheKey, string iconPath)
         {
-            if (_textureCache.TryGetValue(cacheKey, out Texture2D texture) && texture != null)
+            if (_textureCacheOrigin.TryGetValue(cacheKey, out Texture2D texture) && texture != null)
             {
                 return texture;
             }
 
-            texture = Tex.TextureTo(
-                Util.LoadResource<Texture2D>(curChunk.Content),
-                Colors.GetColorByStringPresent(curChunk.IconColor),
-                -1,
-                Mathf.FloorToInt(height)
-            );
-            if (texture.width != 1 && texture.height != 1)
+            Texture2D loadTex = Util.LoadResource<Texture2D>(iconPath);
+            if (loadTex == null)
             {
-                _textureCache[cacheKey] = texture;
+                return null;
             }
 
-            return texture;
+            return _textureCacheOrigin[cacheKey] = loadTex;
         }
+
+        // private Texture2D GetTexture2D(TextureCacheKey cacheKey, string iconPath, string iconColor, float height)
+        // {
+        //     if (_textureCache.TryGetValue(cacheKey, out Texture2D texture) && texture != null)
+        //     {
+        //         return texture;
+        //     }
+        //
+        //     Texture2D loadTex = Util.LoadResource<Texture2D>(iconPath);
+        //     if (loadTex == null || loadTex.width <= 1 || loadTex.height <= 1)
+        //     {
+        //         return null;
+        //     }
+        //
+        //     texture = Tex.TextureTo(
+        //         loadTex,
+        //         Colors.GetColorByStringPresent(iconColor),
+        //         -1,
+        //         Mathf.FloorToInt(height)
+        //     );
+        //     if (texture.width != 1 && texture.height != 1)
+        //     {
+        //         _textureCache[cacheKey] = texture;
+        //     }
+        //
+        //     return texture;
+        // }
 
 // #if UNITY_2021_3_OR_NEWER
 //         public static float TextLengthUIToolkit(TextElement calculator, string origin)

@@ -389,7 +389,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     // bool curSelect = _metaInfo.SelectStacks.Count > 0 && _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, value)) ;
                     bool curSelect = _metaInfo.CurValues.Any(each => Util.GetIsEqual(each, matchedValueOption.value)) ;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-                    Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}, value={value}");
+                    Debug.Log($"curSelect={curSelect}, _metaInfo.SelectStacks.Count={_metaInfo.SelectStacks.Count}, _metaInfo.CurValue={_metaInfo.CurValues}");
 #endif
 
                     Image itemIconImage = itemContainer.Q<Image>("item-icon-image");
@@ -416,9 +416,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                         if (curSelect && !_allowUnSelect)
                         {
                             itemContainer.RemoveFromClassList("saintsfield-advanced-dropdown-item-active");
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-                            Debug.Log($"cur selected: {value}");
-#endif
                             itemContainer.clicked += editorWindow.Close;
                             _displayPage.Add(new DisplayPageItem(itemContainer, null, editorWindow.Close));
                         }

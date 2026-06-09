@@ -4,6 +4,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,16 +31,12 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
                 labelXml = ObjectNames.NicifyVariableName(decButtonAttribute.FuncName);
                 richChunks = new[]
                 {
-                    new RichTextDrawer.RichTextChunk(isIcon: false, content: labelXml),
-                    // {
-                    //     IsIcon = false,
-                    //     Content = labelXml,
-                    // },
+                    new RichTextDrawer.RichTextChunk(content: labelXml),
                 };
             }
             else
             {
-                richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, property, info, parent).ToArray();
+                richChunks = RichTextDrawer.ParseRichXmlWithProvider(labelXml, this).ToArray();
             }
 
             return PaddingWidth * 2 + Mathf.Min(position.width,

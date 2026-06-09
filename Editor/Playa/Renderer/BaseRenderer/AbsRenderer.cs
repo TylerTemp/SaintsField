@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Drawers.GUIColor;
 using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
@@ -20,7 +21,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
-    public abstract partial class AbsRenderer: ISaintsRenderer
+    public abstract partial class AbsRenderer: ISaintsRenderer, IRichTextTagProvider
     {
         public bool InAnyHorizontalLayout { get; set; }
         public bool InDirectHorizontalLayout { get; set; }
@@ -502,6 +503,224 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             return false;
+        }
+
+        public string GetLabel()
+        {
+            switch (FieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                case SaintsRenderType.InjectedSerializedField:
+                {
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if (SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return FieldWithInfo.SerializedProperty.displayName;
+                    }
+
+                    return "";
+                }
+                case SaintsRenderType.NonSerializedField:
+                {
+                    if (FieldWithInfo.FieldInfo != null)
+                    {
+                        return ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name);
+                    }
+
+                    return "";
+                }
+                case SaintsRenderType.Method:
+                    return ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name);
+                case SaintsRenderType.NativeProperty:
+                    return ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name);
+                case SaintsRenderType.ClassStruct:
+                    return ObjectNames.NicifyVariableName(FieldWithInfo.ClassStructType.Name);
+                case SaintsRenderType.Other:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
+        }
+
+        public string GetContainerType()
+        {
+            return GetTargetType().Name;
+        }
+
+        private Type GetTargetType()
+        {
+            return  FieldWithInfo.ClassStructType ?? FieldWithInfo.Targets[0].GetType();
+        }
+
+        public string GetContainerTypeBaseType()
+        {
+            return GetTargetType().BaseType?.Name ?? "";
+        }
+
+        public string GetIndex(string formatter)
+        {
+            switch (FieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                case SaintsRenderType.InjectedSerializedField:
+                {
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if (!SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return "";
+                    }
+
+                    int propPath = SerializedUtils.PropertyPathIndex(FieldWithInfo.SerializedProperty.propertyPath);
+                    return propPath < 0 ? "" : propPath.ToString();
+                }
+                case SaintsRenderType.NonSerializedField:
+                case SaintsRenderType.Method:
+                case SaintsRenderType.NativeProperty:
+                case SaintsRenderType.ClassStruct:
+                case SaintsRenderType.Other:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
+        }
+
+        public string GetField(string rawContent, string tagName, string tagValue)
+        {
+            switch (FieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                case SaintsRenderType.InjectedSerializedField:
+                {
+                    if (!SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return "";
+                    }
+
+                    // string error = "";
+
+                    (string error, int index, object value) result = Util.GetValue(FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
+                    // (string error, int index, object value) accResult = result;
+                    if (result.error != "")
+                    {
+                        // error = result.error;
+                    }
+                    else
+                    {
+                        if (tagName == "field")
+                        {
+                        }
+                        else
+                        {
+                            string revName = tagName["field.".Length..];
+
+                            (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName, null,
+                                FieldWithInfo.SerializedProperty,
+                                FieldWithInfo.FieldInfo, result.value, null);
+
+                            result = (getOfValue.error, result.index, getOfValue.result);
+                        }
+                    }
+
+                    // ReSharper disable once InvertIf
+                    if (result.error != "")
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(result.error);
+#endif
+                        return rawContent;
+                    }
+
+                    return RichTextDrawer.TagStringFormatter(result.value, tagValue);
+                }
+                case SaintsRenderType.NonSerializedField:
+                {
+                    FieldInfo memberInfo = FieldWithInfo.FieldInfo;
+                    object value;
+                    try
+                    {
+                        value = memberInfo.GetValue(FieldWithInfo.Targets[0]);
+                    }
+#pragma warning disable CS0168 // Variable is declared but never used
+                    catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(e);
+#endif
+                        return "";
+                    }
+
+                    if (tagName == "field")
+                    {
+                    }
+                    else
+                    {
+                        string revName = tagName["field.".Length..];
+
+                        (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName, null,
+                            null,
+                            memberInfo, value, null);
+                        if (!string.IsNullOrEmpty(getOfValue.error))
+                        {
+#if SAINTSFIELD_DEBUG
+                            Debug.LogWarning(getOfValue.error);
+#endif
+                            return "";
+                        }
+
+                        value = getOfValue.result;
+                    }
+
+                    return RichTextDrawer.TagStringFormatter(value, tagValue);
+                }
+                case SaintsRenderType.NativeProperty:
+                {
+                    PropertyInfo memberInfo = FieldWithInfo.PropertyInfo;
+                    object value;
+                    try
+                    {
+                        value = memberInfo.GetValue(FieldWithInfo.Targets[0]);
+                    }
+#pragma warning disable CS0168 // Variable is declared but never used
+                    catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(e);
+#endif
+                        return "";
+                    }
+
+                    if (tagName == "field")
+                    {
+                    }
+                    else
+                    {
+                        string revName = tagName["field.".Length..];
+
+                        (string error, MemberInfo _, object result) getOfValue = Util.GetOf<object>(revName, null,
+                            null,
+                            memberInfo, value, null);
+                        if (!string.IsNullOrEmpty(getOfValue.error))
+                        {
+#if SAINTSFIELD_DEBUG
+                            Debug.LogWarning(getOfValue.error);
+#endif
+                            return "";
+                        }
+
+                        value = getOfValue.result;
+                    }
+
+                    return RichTextDrawer.TagStringFormatter(value, tagValue);
+                }
+                case SaintsRenderType.Method:
+                case SaintsRenderType.ClassStruct:
+                case SaintsRenderType.Other:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
         }
     }
 }

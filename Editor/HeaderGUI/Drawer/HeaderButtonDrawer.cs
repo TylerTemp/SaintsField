@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.ComponentHeader;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -50,13 +51,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
             {
                 titleChunks = new[]
                 {
-                    new RichTextDrawer.RichTextChunk(content: friendlyName, iconColor: null, isIcon: false, rawContent: friendlyName),
-                    // {
-                    //     Content = friendlyName,
-                    //     IconColor =  null,
-                    //     IsIcon = false,
-                    //     RawContent = friendlyName,
-                    // },
+                    new RichTextDrawer.RichTextChunk(content: friendlyName),
                 };
             }
             else
@@ -85,7 +80,6 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
 
                 if(rawTitle.Contains("<field") || !CacheAndUtil.ParsedXmlCache.TryGetValue(rawTitle, out titleChunks))
                 {
-                    // RichTextDrawer richTextDrawer = CacheAndUtil.GetCachedRichTextDrawer();
                     CacheAndUtil.ParsedXmlCache[rawTitle] = titleChunks =
                         RichTextDrawer.ParseRichXml(rawTitle, method.Name, null, method, target).ToArray();
                 }
@@ -156,7 +150,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                 }
             }
 
-            richTextDrawer.DrawChunks(labelRect, oldLabel, titleChunks);
+            richTextDrawer.DrawChunks(labelRect, titleChunks);
 
             return (true, new HeaderUsed(usedRect));
         }

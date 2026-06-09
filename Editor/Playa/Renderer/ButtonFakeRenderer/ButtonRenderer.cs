@@ -225,14 +225,13 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
         protected override bool AllowGuiColor => true;
 
-        public override void OnDestroy()
-        {
-            OnDestroyIMGUI();
-        }
-
 #if UNITY_2021_3_OR_NEWER
         private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
 #endif
+
+        public override void OnDestroy()
+        {
+        }
 
         public override void OnSearchField(string searchString)
         {

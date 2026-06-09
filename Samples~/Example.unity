@@ -26298,13 +26298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf65efdf8d51be24984a027285bdccc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bookName: 
   percent: 1
-  selectIt: 0
-  strTyp:
-    selectIt: 0
-  listEnum: 
-  flags: 0
 --- !u!4 &1338113063
 Transform:
   m_ObjectHideFlags: 0

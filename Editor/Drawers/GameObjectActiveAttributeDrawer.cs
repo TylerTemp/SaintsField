@@ -4,6 +4,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 #if UNITY_2021_3_OR_NEWER
@@ -33,7 +34,8 @@ namespace SaintsField.Editor.Drawers
             }
             // object target = property.serializedObject.targetObject;
             // string labelXml = GetButtonLabelXml((DecButtonAttribute)saintsAttribute, target, target.GetType());
-            float xmlWidth = RichTextDrawer.GetWidth(label, position.height, RichTextDrawer.ParseRichXml(UnSeeXml, "", property, info, parent));
+            float xmlWidth = RichTextDrawer.GetWidth(label, position.height,
+                RichTextDrawer.ParseRichXmlWithProvider(UnSeeXml, this));
             if (xmlWidth > 0)
             {
                 return _width = xmlWidth;

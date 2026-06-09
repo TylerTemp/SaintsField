@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,12 +16,6 @@ namespace SaintsField.Editor.Drawers
 
         // ReSharper disable once InconsistentNaming
         protected readonly RichTextDrawer RichTextDrawer = new RichTextDrawer();
-
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            RichTextDrawer.Dispose();
-        }
 
         protected Rect Draw(Rect position, SerializedProperty property, GUIContent label, string labelXml, bool isActive, Action<bool> activeCallback, FieldInfo info, object target)
         {
@@ -40,7 +35,8 @@ namespace SaintsField.Editor.Drawers
                 }
             }
 
-            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks = RichTextDrawer.ParseRichXml(labelXml, label.text, property, info, target).ToArray();
+            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks =
+                RichTextDrawer.ParseRichXmlWithProvider(labelXml, this).ToArray();
             float textWidth = RichTextDrawer.GetWidth(label, buttonRect.height, richChunks);
             Rect labelRect = buttonRect;
             if (textWidth < labelRect.width)
@@ -49,8 +45,7 @@ namespace SaintsField.Editor.Drawers
                 labelRect.x += space;
             }
 
-            ImGuiEnsureDispose(property.serializedObject.targetObject);
-            RichTextDrawer.DrawChunks(labelRect, label, richChunks);
+            RichTextDrawer.DrawChunks(labelRect, richChunks);
 
             return leftRect;
         }

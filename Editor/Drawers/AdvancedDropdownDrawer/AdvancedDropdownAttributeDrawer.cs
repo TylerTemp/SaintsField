@@ -494,10 +494,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 
             #region Get Cur Value
 
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_ADVANCED_DROPDOWN
-            Debug.Log($"get cur value {curValue}, {parentObj}->{field}");
-#endif
-
             // process the unique options
             // This won't work for ShowInInspector because we can not find siblings
             // (string uniqueError, IDropdown dropdownListValueUnique) =

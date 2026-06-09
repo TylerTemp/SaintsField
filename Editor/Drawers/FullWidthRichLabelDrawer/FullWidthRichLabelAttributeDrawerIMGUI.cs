@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,12 +14,6 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
     {
         private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
         private string _error = "";
-
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            _richTextDrawer.Dispose();
-        }
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info,
@@ -93,14 +89,7 @@ namespace SaintsField.Editor.Drawers.FullWidthRichLabelDrawer
 
             (Rect curRect, Rect leftRect) = RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight);
 
-            string labelText = label.text;
-#if SAINTSFIELD_NAUGHYTATTRIBUTES
-            labelText = property.displayName;
-#endif
-
-            ImGuiEnsureDispose(property.serializedObject.targetObject);
-            _richTextDrawer.DrawChunks(curRect, label,
-                RichTextDrawer.ParseRichXml(xml, labelText, property, info, parent));
+            _richTextDrawer.DrawChunks(curRect, RichTextDrawer.ParseRichXmlWithProvider(xml, this));
             return leftRect;
         }
 

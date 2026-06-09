@@ -173,7 +173,7 @@ namespace SaintsField.Editor.HeaderGUI.Drawer
                 width = usedRect.width - 4,
             };
 
-            richTextDrawer.DrawChunks(labelRect, oldLabel, labelChunks);
+            richTextDrawer.DrawChunks(labelRect, labelChunks);
 
             return (true, new HeaderUsed(usedRect));
         }

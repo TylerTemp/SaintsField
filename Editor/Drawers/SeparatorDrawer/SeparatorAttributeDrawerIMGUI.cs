@@ -11,19 +11,34 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
 {
     public partial class SeparatorAttributeDrawer
     {
-
-        private string _error = "";
-
-        protected override void ImGuiOnDispose()
+        private class InfoImGui
         {
-            base.ImGuiOnDispose();
-            _richTextDrawer.Dispose();
+            public string Error = "";
+        }
+
+        private static readonly Dictionary<string, InfoImGui> InfoImGuiCache = new Dictionary<string, InfoImGui>();
+
+        private static InfoImGui EnsureKey(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoImGuiCache.TryGetValue(key, out InfoImGui infoImGui))
+            {
+                return infoImGui;
+            }
+
+            infoImGui = new InfoImGui();
+            InfoImGuiCache[key] = infoImGui;
+
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoImGuiCache.Remove(key));
+            return infoImGui;
         }
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info,
             object parent)
         {
+            InfoImGui cachedInfo = EnsureKey(property);
+            cachedInfo.Error = "";
             FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (separatorAttribute.Below)
             {
@@ -42,7 +57,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                         parent);
                 if (error != "")
                 {
-                    _error = error;
+                    cachedInfo.Error = error;
                     return false;
                 }
 
@@ -94,9 +109,10 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             object parent)
         {
             FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
+            InfoImGui cachedInfo = EnsureKey(property);
             if (!separatorAttribute.Below)
             {
-                return _error != "";
+                return cachedInfo.Error != "";
             }
 
             if (separatorAttribute.Space > 0)
@@ -111,7 +127,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                         parent);
                 if (error != "")
                 {
-                    _error = error;
+                    cachedInfo.Error = error;
                     return false;
                 }
 
@@ -131,13 +147,17 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
-            float errorHeight = _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
             if (!separatorAttribute.Below)
             {
+                string error = EnsureKey(property).Error;
+                float errorHeight = error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
                 return errorHeight;
             }
 
-            return GetExtraHeight(property, separatorAttribute, info, parent) + errorHeight;
+            float extraHeight = GetExtraHeight(property, separatorAttribute, info, parent);
+            string belowError = EnsureKey(property).Error;
+            float errorHeightBelow = belowError == "" ? 0 : ImGuiHelpBox.GetHeight(belowError, width, MessageType.Error);
+            return extraHeight + errorHeightBelow;
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
@@ -147,10 +167,12 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (!separatorAttribute.Below)
             {
-                return _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+                string error = EnsureKey(property).Error;
+                return error == "" ? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);
             }
 
             Rect afterContentPosition = DrawImGui(position, property, label, separatorAttribute, info, parent);
+            string errorBelow = EnsureKey(property).Error;
 
             if (separatorAttribute.Space > 0)
             {
@@ -158,14 +180,15 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                     RectUtils.SplitHeightRect(afterContentPosition, separatorAttribute.Space).leftRect;
             }
 
-            return _error == ""
+            return errorBelow == ""
                 ? afterContentPosition
-                : ImGuiHelpBox.Draw(afterContentPosition, _error, MessageType.Error);
+                : ImGuiHelpBox.Draw(afterContentPosition, errorBelow, MessageType.Error);
         }
 
         private Rect DrawImGui(Rect position, SerializedProperty property, GUIContent label,
             FieldSeparatorAttribute separatorAttribute, FieldInfo info, object parent)
         {
+            InfoImGui cachedInfo = EnsureKey(property);
             if (separatorAttribute.Title == null)
             {
                 (Rect singleSepPosition, Rect singleLeftPosition) = RectUtils.SplitHeightRect(position, 7);
@@ -188,7 +211,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                     parent);
             if (error != "")
             {
-                _error = error;
+                cachedInfo.Error = error;
                 return position;
             }
 
@@ -204,9 +227,8 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
             labelText = property.displayName;
 #endif
 
-            ImGuiEnsureDispose(property.serializedObject.targetObject);
-            RichTextDrawer.RichTextChunk[] chunks = RichTextDrawer.ParseRichXml(xml, labelText, property, info, parent)
-                .ToArray();
+            RichTextDrawer.RichTextChunk[] chunks =
+                RichTextDrawer.ParseRichXmlWithProvider(xml, this).ToArray();
             float textWidth = _richTextDrawer.GetWidth(new GUIContent(label) { text = labelText },
                 EditorGUIUtility.singleLineHeight, chunks);
 
@@ -280,20 +302,18 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
                 EditorGUI.DrawRect(sepRect, separatorAttribute.Color);
             }
 
-            _richTextDrawer.DrawChunks(titleRect, label, chunks);
+            _richTextDrawer.DrawChunks(titleRect, chunks);
             return leftRect;
         }
 
         private float GetExtraHeight(SerializedProperty property,
             FieldSeparatorAttribute separatorAttribute, FieldInfo info, object parent)
         {
+            InfoImGui cachedInfo = EnsureKey(property);
             (string error, string xml) =
                 RichTextDrawer.GetLabelXml(property, separatorAttribute.Title, separatorAttribute.IsCallback, info,
                     parent);
-            if (error != "")
-            {
-                _error = error;
-            }
+            cachedInfo.Error = error;
 
             float barHeight = string.IsNullOrEmpty(xml) ? 7 : EditorGUIUtility.singleLineHeight;
             float spaceHeight = Mathf.Max(0, separatorAttribute.Space);

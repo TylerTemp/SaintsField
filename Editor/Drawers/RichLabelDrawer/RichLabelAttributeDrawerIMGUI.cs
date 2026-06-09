@@ -4,6 +4,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -13,12 +14,6 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
     {
 
         private string _error = "";
-
-        protected override void ImGuiOnDispose()
-        {
-            base.ImGuiOnDispose();
-            _richTextDrawer.Dispose();
-        }
 
         protected override bool WillDrawLabel(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info,
@@ -39,7 +34,6 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
         {
             FieldLabelTextAttribute targetAttribute = (FieldLabelTextAttribute)saintsAttribute;
 
-            ImGuiEnsureDispose(property.serializedObject.targetObject);
             (string error, string labelXml) = RichTextDrawer.GetLabelXml(property, targetAttribute.RichTextXml,
                 targetAttribute.IsCallback, info, parent);
             _error = error;
@@ -55,9 +49,9 @@ namespace SaintsField.Editor.Drawers.RichLabelDrawer
 #endif
 
             RichTextDrawer.RichTextChunk[] parsedXmlNode =
-                RichTextDrawer.ParseRichXml(labelXml, labelText, property, info, parent).ToArray();
+                RichTextDrawer.ParseRichXmlWithProvider(labelXml, this).ToArray();
 
-            _richTextDrawer.DrawChunks(position, label, parsedXmlNode);
+            _richTextDrawer.DrawChunks(position, parsedXmlNode);
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,

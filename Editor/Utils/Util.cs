@@ -54,6 +54,7 @@ namespace SaintsField.Editor.Utils
                     Texture2D r = EditorGUIUtility.IconContent(resourcePath).image as Texture2D;
                     if (r)
                     {
+                        // Debug.Log($"load {resourcePath} as IconContent: {r}");
                         result = r as T;
                     }
                 }

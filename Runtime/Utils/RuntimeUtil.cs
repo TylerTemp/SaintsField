@@ -76,9 +76,6 @@ namespace SaintsField.Utils
             List<RichTextParsedChunk> acc = new List<RichTextParsedChunk>();
             foreach (RichTextParsedChunk richTextParsedChunk in ParseRichXml(path))
             {
-
-                // Debug.Log($"richTextParsedChunk={richTextParsedChunk}");
-
                 if (richTextParsedChunk.ChunkType == ChunkType.NormalTag)
                 {
                     if (richTextParsedChunk.TagType == TagType.StartTag)
@@ -242,7 +239,7 @@ namespace SaintsField.Utils
 
         public static IEnumerable<RichTextParsedChunk> ParseRichXml(string richXml)
         {
-            // Debug.Log($"get rich xml: {richXml}");
+            // Debug.Log($"get rich xml: `{richXml}`");
             List<string> colors = new List<string>();
 
             // Define a regular expression pattern to match the tags
@@ -255,13 +252,24 @@ namespace SaintsField.Utils
             // List<string> colorPresent = new List<string>();
             // List<string> stringPresent = new List<string>();
             List<(string tagName, string tagValueOrNull, string rawContent)> openTags = new List<(string tagName, string tagValueOrNull, string rawContent)>();
+            List<(string tagName, string tagValueOrNull, string rawContent)> needReopenTags = new List<(string tagName, string tagValueOrNull, string rawContent)>();
             StringBuilder richText = new StringBuilder();
             // List<RichTextChunk> richTextChunks = new List<RichTextChunk>();
             foreach (string part in splitByTags.Where(each => each != ""))
             {
-                (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
 
-                // Debug.Log($"parse: {part}({part == ""}) -> partType={parsedResult.partType}, content={parsedResult.content}, value={parsedResult.value}, isSelfClose={parsedResult.isSelfClose}");
+                foreach ((string tagName, string tagValueOrNull, string rawContent) reOpenTag in needReopenTags)
+                {
+                    yield return new RichTextParsedChunk(
+                        reOpenTag.rawContent,
+                        ChunkType.NormalTag,
+                        tagType: TagType.StartTag,
+                        tagName: reOpenTag.tagName,
+                        tagValue: reOpenTag.tagValueOrNull);
+                }
+                needReopenTags.Clear();
+
+                (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
 
                 // ReSharper disable once MergeIntoPattern
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
@@ -285,6 +293,7 @@ namespace SaintsField.Utils
                     // ReSharper disable once MergeIntoPattern
                     if (parsedResult.content == "color" && parsedResult.value != null)
                     {
+                        // Debug.Log($"add color {parsedResult.value}");
                         colors.Add(parsedResult.value);
                     }
 
@@ -320,34 +329,26 @@ namespace SaintsField.Utils
 
                         // Debug.Log("processing richText");
                         richText = new StringBuilder();
-                        (string tagName, string tagValueOrNull, string rawContent)[] openTagsCopy = openTags.ToArray();
+                        List<(string tagName, string tagValueOrNull, string rawContent)> openTagsCopy = openTags.ToList();
 
-                        for (int index = 0; index < openTagsCopy.Length; index++)
+                        for (int index = 0; index < openTagsCopy.Count; index++)
                         {
-                            (string tagName, string tagValueOrNull, string rawContent) closeTag = openTagsCopy[openTagsCopy.Length - index - 1];
+                            (string tagName, string tagValueOrNull, string rawContent) closeTag = openTagsCopy[openTagsCopy.Count - index - 1];
                             yield return new RichTextParsedChunk($"</{closeTag.tagName}>", ChunkType.NormalTag,
                                 tagType: TagType.EndTag, tagName: closeTag.tagName, tagValue: closeTag.tagValueOrNull);
                         }
 
+                        var color = colors.Count > 0 ? colors[colors.Count - 1] : null;
                         RichTextParsedChunk iconTag = new RichTextParsedChunk(part,
                             ChunkType.IconTag,
                             tagValue: parsedResult.value,
                             // ReSharper disable once UseIndexFromEndExpression
-                            iconColor: colors.Count > 0 ? colors[colors.Count - 1] : null);
+                            iconColor: color);
                         // Debug.Log($"yield raw iconTag {iconTag}");
-                        // Debug.Log($"yield iconTag={iconTag}");
+                        // Debug.Log($"yield iconTag={iconTag}(color={color})");
 
                         yield return iconTag;
-
-                        foreach ((string tagName, string tagValueOrNull, string rawContent) reOpenTag in openTagsCopy)
-                        {
-                            yield return new RichTextParsedChunk(
-                                reOpenTag.rawContent,
-                                ChunkType.NormalTag,
-                                tagType: TagType.StartTag,
-                                tagName: reOpenTag.tagName,
-                                tagValue: reOpenTag.tagValueOrNull);
-                        }
+                        needReopenTags.AddRange(openTagsCopy);
                     }
                     else
                     {

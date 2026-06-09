@@ -9,6 +9,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
     [CustomPropertyDrawer(typeof(DropdownAttribute), true)]
     public partial class TreeDropdownAttributeDrawer: SaintsPropertyDrawer
     {
-
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
     }
 }

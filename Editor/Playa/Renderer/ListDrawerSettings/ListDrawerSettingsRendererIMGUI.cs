@@ -5,6 +5,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -22,8 +23,6 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
         public override void OnDestroy()
         {
-            _richTextDrawer?.Dispose();
-            _richTextDrawer = null;
         }
 
         private class UnsetGuiStyleFixedHeight : IDisposable
@@ -325,13 +324,13 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 {
                     _curXmlChunks =
                         RichTextDrawer
-                            .ParseRichXml(preCheckResult.RichLabelXml, FieldWithInfo.SerializedProperty.displayName, FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0])
+                            .ParseRichXmlWithProvider(preCheckResult.RichLabelXml, this)
                             .ToArray();
                 }
 
                 _curXml = preCheckResult.RichLabelXml;
 
-                _richTextDrawer.DrawChunks(titleButtonRect, new GUIContent(FieldWithInfo.SerializedProperty.displayName), _curXmlChunks);
+                _richTextDrawer.DrawChunks(titleButtonRect, _curXmlChunks);
             }
             else
             {

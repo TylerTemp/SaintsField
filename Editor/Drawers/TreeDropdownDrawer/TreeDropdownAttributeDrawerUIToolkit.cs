@@ -57,8 +57,6 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
             return helpBox;
         }
 
-        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
-
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
