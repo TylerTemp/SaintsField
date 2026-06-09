@@ -653,8 +653,6 @@ namespace SaintsField.Editor.Core
         {
             (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property, allAttributes);
 
-            // Debug.Log($"{GetType().Name}: attrOrNull={attrOrNull}; drawerType={drawerType}; allAttribute={string.Join(", ", allAttributes)}");
-
             if (drawerType == null)
             {
                 // return PropertyFieldFallbackUIToolkit(property);
@@ -678,8 +676,19 @@ namespace SaintsField.Editor.Core
 
             VisualElement element = DrawUsingDrawerInstance(passedPreferredLabel, drawerType, typeDrawer, property, info,
                 saintsPropertyDrawers, containerElement);
-            // // ReSharper disable once InvertIf
-            element?.Bind(property.serializedObject);
+
+            if(element != null)
+            {
+                if (InHorizontalLayout && UIToolkitUtils.IsBaseFieldOfAnyType(element))
+                {
+                    element.style.flexDirection = FlexDirection.Column;
+                    element.style.alignItems = Align.FlexStart;
+                    element.RemoveFromClassList("unity-base-field__aligned");
+                    element.RemoveFromClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
+                }
+                element.Bind(property.serializedObject);
+
+            }
             // UIToolkitUtils.PropertyDrawerElementDirtyFix(property, typeDrawer, element);
 
             return element;

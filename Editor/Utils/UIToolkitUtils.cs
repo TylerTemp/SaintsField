@@ -618,6 +618,13 @@ namespace SaintsField.Editor.Utils
                 VisualElement r = propertyDrawer.CreatePropertyGUI(property);
                 if (r != null)
                 {
+                    if (inHorizontalLayout && IsBaseFieldOfAnyType(r))
+                    {
+                        r.style.flexDirection = FlexDirection.Column;
+                        r.style.alignItems = Align.FlexStart;
+                        r.RemoveFromClassList("unity-base-field__aligned");
+                        r.RemoveFromClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
+                    }
                     r.Bind(property.serializedObject);
                     // PropertyDrawerElementDirtyFix(property, propertyDrawer, r);
                     return mergeDec? UIToolkitCache.MergeWithDec(r, allAttributes.OfType<PropertyAttribute>().ToArray()): r;
@@ -676,6 +683,19 @@ namespace SaintsField.Editor.Utils
             // imGuiContainer.AddToClassList(IMGUILabelHelper.ClassName);
             //
             // return (imGuiContainer, false);
+        }
+
+        public static bool IsBaseFieldOfAnyType(VisualElement element)
+        {
+            for (Type t = element.GetType(); t != null; t = t.BaseType)
+            {
+                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(BaseField<>))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // This is now fixed using Bind(serializedObject)
