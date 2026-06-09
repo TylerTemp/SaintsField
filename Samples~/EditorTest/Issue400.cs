@@ -1,6 +1,7 @@
 using System;
 using SaintsField.Editor;
 using SaintsField.Playa;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,7 +9,9 @@ namespace SaintsField.Samples.EditorTest
 {
     public class Issue400 : SaintsEditorWindow
     {
-        [MenuItem("Saints Field/Issue 400")]
+#if SAINTSFIELD_DEBUG
+        [MenuItem(RuntimeUtil.MenuRoot + "Debug Issue 400")]
+#endif
         public static void OpenWindow()
         {
             EditorWindow window = GetWindow<Issue400>(false, "My Panel");
@@ -29,28 +32,35 @@ namespace SaintsField.Samples.EditorTest
             Second,
         }
 
-        [LayoutStart("H", ELayout.Horizontal)]
-        [EnumButtons]
-        public ApplyType applyType;
+        // [LayoutStart("H", ELayout.Horizontal)]
+        // [EnumButtons]
+        // public ApplyType applyType;
 
-        // [Serializable]
-        // public class Effect
-        // {
-        //     public string name;
-        //     public Type type;
-        //
-        //     [ShowIf(nameof(type), Type.AddToResult)] [EnumButtons]
-        //     public ApplyType applyType;
-        //
-        //     public float value;
-        // }
-        //
-        // [Serializable]
-        // public class TabledInfo
-        // {
-        //     public Effect effect;
-        // }
-        //
-        // [Table] public TabledInfo[] tabledInfo;
+        [Serializable]
+        public class Effect
+        {
+            public string name;
+            public Type type;
+
+            [ShowIf(nameof(type), Type.AddToResult)] [EnumButtons]
+            public ApplyType applyType;
+
+            public float value;
+        }
+
+        [Serializable]
+        public class Conditions
+        {
+            public string myCondition;
+        }
+
+        [Serializable]
+        public class TabledInfo
+        {
+            public Effect effect;
+            public Conditions conditions;
+        }
+
+        [Table] public TabledInfo[] tabledInfo;
     }
 }
