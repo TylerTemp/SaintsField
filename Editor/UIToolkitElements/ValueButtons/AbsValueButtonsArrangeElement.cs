@@ -16,6 +16,7 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
         private readonly AbsValueButtonsCalcElement _valueButtonsCalcElement;
         private readonly AbsValueButtonsRow<T> _mainRow;
         private readonly List<AbsValueButtonsRow<T>> _subRows = new List<AbsValueButtonsRow<T>>();
+        private bool _greedy = true;
         public readonly UnityEvent<object> OnButtonClicked = new UnityEvent<object>();
 
         protected abstract AbsValueButtonsRow<T> MakeValueButtonsRow();
@@ -158,6 +159,18 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             // }
         }
 
+        public void SetGreedy(bool greedy)
+        {
+            if (_greedy == greedy)
+            {
+                return;
+            }
+
+            _greedy = greedy;
+            _rearrangeDone = false;
+            DoReArrange();
+        }
+
         // private bool _pending;
 
         // private void CheckArrange()
@@ -260,7 +273,9 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
                 buttonWidths.Add(resultWidth);
             }
 
-            List<List<ValueButtonRawInfo>> splitRowInfos = SplitRowsBalanced(buttonInfos, buttonWidths);
+            List<List<ValueButtonRawInfo>> splitRowInfos = _greedy
+                ? SplitRowsGreedy(buttonInfos, buttonWidths)
+                : SplitRowsBalanced(buttonInfos, buttonWidths);
 
             int processedIndex = 0;
             // bool hasSubRows = false;

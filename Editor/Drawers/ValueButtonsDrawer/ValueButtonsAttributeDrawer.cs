@@ -151,6 +151,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             LeftExpandButton leftExpandButton = container.Q<LeftExpandButton>(name: NameExpand(property));
 
             valueButtonsArrangeElement.BindSubContainer(subPanel);
+            valueButtonsArrangeElement.SetGreedy(!noFold && !leftExpandButton.value);
 
             PathedDropdownAttribute valueButtonsAttribute = (PathedDropdownAttribute)saintsAttribute;
 
@@ -166,6 +167,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             bool autoFold = !noFold;
             if (noFold)
             {
+                valueButtonsArrangeElement.SetGreedy(false);
                 subPanel.style.display = DisplayStyle.Flex;
                 leftExpandButton.style.display = DisplayStyle.None;
             }
@@ -175,7 +177,10 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 if(autoFold)
                 {
                     leftExpandButton.RegisterValueChangedCallback(evt =>
-                        subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                    {
+                        valueButtonsArrangeElement.SetGreedy(!evt.newValue);
+                        subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                    });
                 }
 
                 valueButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>

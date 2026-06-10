@@ -83,10 +83,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 Add(SubPanel);
 
                 FlagButtonsArrangeElement.BindSubContainer(SubPanel);
+                FlagButtonsArrangeElement.SetGreedy(!LeftExpandButton.value);
 
                 // LeftExpandButton leftExpandButton = container.Q<LeftExpandButton>(name: NameExpand(property));
                 LeftExpandButton.RegisterValueChangedCallback(evt =>
-                    FlagButtonFullToggleGroupElement.ToFullToggles(evt.newValue));
+                {
+                    FlagButtonsArrangeElement.SetGreedy(!evt.newValue);
+                    FlagButtonFullToggleGroupElement.ToFullToggles(evt.newValue);
+                });
                 FlagButtonFullToggleGroupElement.ToFullToggles(LeftExpandButton.value);
 
                 List<ValueButtonRawInfo> rawInfos = new List<ValueButtonRawInfo>();
@@ -158,7 +162,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             wrapper.FlagButtonsArrangeElement.schedule.Execute(() =>
             {
                 wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
-                    wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                {
+                    wrapper.FlagButtonsArrangeElement.SetGreedy(!evt.newValue);
+                    wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                });
                 wrapper.FlagButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>
                 {
                     // Debug.Log("DONE CALC");

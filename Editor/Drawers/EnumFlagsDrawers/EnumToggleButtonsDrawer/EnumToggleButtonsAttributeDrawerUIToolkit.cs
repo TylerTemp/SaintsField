@@ -187,10 +187,14 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             VisualElement subPanel = container.Q<VisualElement>(name: ValueButtonsAttributeDrawer.NameSubPanel(property));
             LeftExpandButton leftExpandButton = container.Q<LeftExpandButton>(name: NameExpand(property));
             leftExpandButton.RegisterValueChangedCallback(evt =>
-                flagButtonFullToggleGroupElement.ToFullToggles(evt.newValue));
+            {
+                flagButtonsArrangeElement.SetGreedy(!evt.newValue);
+                flagButtonFullToggleGroupElement.ToFullToggles(evt.newValue);
+            });
             flagButtonFullToggleGroupElement.ToFullToggles(leftExpandButton.value);
 
             flagButtonsArrangeElement.BindSubContainer(subPanel);
+            flagButtonsArrangeElement.SetGreedy(!noFold && !leftExpandButton.value);
 
             flagButtonsArrangeElement.UpdateButtons(
                 rawInfos
@@ -200,6 +204,7 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
             bool autoFold = !noFold;
             if (noFold)
             {
+                flagButtonsArrangeElement.SetGreedy(false);
                 flagButtonFullToggleGroupElement.ToFullToggles(true);
                 subPanel.style.display = DisplayStyle.Flex;
                 leftExpandButton.style.display = DisplayStyle.None;
@@ -211,7 +216,10 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
                 if(autoFold)
                 {
                     leftExpandButton.RegisterValueChangedCallback(evt =>
-                        subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                    {
+                        flagButtonsArrangeElement.SetGreedy(!evt.newValue);
+                        subPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                    });
                 }
 
                 flagButtonsArrangeElement.OnCalcArrangeDoneAddListener(hasSubRow =>

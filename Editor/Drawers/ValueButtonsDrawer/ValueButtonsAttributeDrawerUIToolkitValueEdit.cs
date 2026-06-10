@@ -81,6 +81,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
                 Add(SubPanel);
 
                 ValueButtonsArrangeElement.BindSubContainer(SubPanel);
+                ValueButtonsArrangeElement.SetGreedy(!LeftExpandButton.value);
             }
         }
 
@@ -115,7 +116,10 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
             wrapper.ValueButtonsArrangeElement.schedule.Execute(() =>
             {
                 wrapper.LeftExpandButton.RegisterValueChangedCallback(evt =>
-                    wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None);
+                {
+                    wrapper.ValueButtonsArrangeElement.SetGreedy(!evt.newValue);
+                    wrapper.SubPanel.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
+                });
                 wrapper.ValueButtonsArrangeElement.OnCalcArrangeDoneAddListener(b =>
                 {
                     wrapper.SubPanel.style.display =
