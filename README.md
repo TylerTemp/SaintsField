@@ -110,15 +110,9 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.18.3**
+**5.18.4**
 
-1.  Rename: Rename dropdown related types to easier remember. The old names can still be used.
-2.  Change: Handles context menu changed to `shift`+`right click` in scene view to avoid conflict with Unity's default context menu
-
-New Name | Old Name                 | Used By
----------|--------------------------|----------
-`Dropdown<>` | `AdvancedDropdownList<>` | `Dropdown`, `AdvancedDropdown`, `TreeDropdown`
-`MenuDropdown<>` | `DropdownList<>` | `MenuDropdown`
+Improve: When in Horizental layout, if the target drawer is not from SaintsField, and it does return a `BaseField<>` type, the drawer will be break into 2 rows. This effects horizental layout, `SaintsDictionary`, `Table`. [#400](https://github.com/TylerTemp/SaintsField/issues/400)
 
 ## Usage ##
 
