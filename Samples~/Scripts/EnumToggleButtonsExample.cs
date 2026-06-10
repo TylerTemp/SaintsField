@@ -28,8 +28,8 @@ namespace SaintsField.Samples.Scripts
         [EnumToggleButtons, OnValueChanged(":Debug.Log")]
         public BitMask myMask;
 
-        [EnumToggleButtons(noFold: true), OnValueChanged(":Debug.Log")]
-        public BitMask myMaskNoFold;
+        // [EnumToggleButtons(noFold: true), OnValueChanged(":Debug.Log")]
+        // public BitMask myMaskNoFold;
 
         // [EnumToggleButtons, FieldLabelText(null), OnValueChanged(nameof(ValueChanged))] public BitMask myMask2;
         // private void ValueChanged() => Debug.Log(myMask2);

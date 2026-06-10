@@ -76,14 +76,23 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
             style.backgroundColor = new Color(gray, gray, gray, 1f);
             Color borderColor = new Color(grayBorder, 0.6f, grayBorder, 1f);
             style.borderTopColor = style.borderBottomColor = borderColor;
+
+            StyleColor leftColor = StyleKeyword.Null;
+            StyleColor rightColor = StyleKeyword.Null;
+            // style.borderLeftColor = style.borderRightColor = StyleKeyword.Null;
             if (isFirst)
             {
-                style.borderLeftColor = borderColor;
+                leftColor = borderColor;
+                // style.borderLeftColor = borderColor;
             }
             else if (isLast)
             {
-                style.borderRightColor = borderColor;
+                rightColor = borderColor;
+                // style.borderRightColor = borderColor;
             }
+
+            style.borderLeftColor = leftColor;
+            style.borderRightColor = rightColor;
 
             style.borderLeftWidth = 1;
         }
@@ -92,7 +101,12 @@ namespace SaintsField.Editor.UIToolkitElements.ValueButtons
         {
             style.backgroundColor = StyleKeyword.Null;
             style.borderTopColor = style.borderBottomColor = style.borderLeftColor = style.borderRightColor = StyleKeyword.Null;
-            if(!isFirst)
+
+            if (isFirst)
+            {
+                style.borderLeftWidth = StyleKeyword.Null;
+            }
+            else
             {
                 style.borderLeftWidth = 0;
             }
