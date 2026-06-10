@@ -112,7 +112,8 @@ namespace: `SaintsField`
 
 **5.18.4**
 
-Improve: When in Horizental layout, if the target drawer is not from SaintsField, and it does return a `BaseField<>` type, the drawer will be break into 2 rows. This effects horizental layout, `SaintsDictionary`, `Table`. [#400](https://github.com/TylerTemp/SaintsField/issues/400)
+1.  Improve: When in Horizental layout, if the target drawer is not from SaintsField, and it does return a `BaseField<>` type, the drawer will be break into 2 rows. This effects horizental layout, `SaintsDictionary`, `Table`. [#400](https://github.com/TylerTemp/SaintsField/issues/400)
+2.  Fix: `OnEvent`/`OnButtonClick` now work with search function
 
 ## Usage ##
 
