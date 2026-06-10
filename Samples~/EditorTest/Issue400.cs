@@ -1,3 +1,4 @@
+#if UNITY_6000_3_OR_NEWER
 using System;
 using SaintsField.Editor;
 using SaintsField.Playa;
@@ -10,7 +11,7 @@ namespace SaintsField.Samples.EditorTest
     public class Issue400 : SaintsEditorWindow
     {
 #if SAINTSFIELD_DEBUG
-        [MenuItem(RuntimeUtil.MenuRoot + "Debug Issue 400")]
+        [MenuItem(RuntimeUtil.MenuRoot + "DEBUG Issue 400")]
 #endif
         public static void OpenWindow()
         {
@@ -64,3 +65,4 @@ namespace SaintsField.Samples.EditorTest
         [Table] public TabledInfo[] tabledInfo;
     }
 }
+#endif
