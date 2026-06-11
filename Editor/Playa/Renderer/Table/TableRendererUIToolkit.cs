@@ -116,6 +116,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             TableContentElement tableContentElement = new TableContentElement(FieldWithInfo);
             foldout.Add(tableContentElement);
+            // tableContentElement.AddToClassList("unity-collection-view--with-border");
 
             arraySizeField.RegisterValueChangedCallback(evt =>
             {
@@ -189,6 +190,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             if (tableAttribute.HideAddButton && tableAttribute.HideRemoveButton)
             {
                 arraySizeField.SetEnabled(false);
+                listViewFooter.style.display = DisplayStyle.None;
             }
 
             // controls.Add(toolbar);

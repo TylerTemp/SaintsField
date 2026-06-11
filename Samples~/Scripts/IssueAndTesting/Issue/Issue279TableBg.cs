@@ -35,6 +35,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         public struct CrowdAttackScheduler
         {
             public BalancedUnit[] balancedUnits;
+            public string fixedFocus;
             // public BalancedUnit balancedUnits;
         }
 

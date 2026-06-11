@@ -25,6 +25,16 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
         ]
         public MyData[] myDataArr;
 
+        // [Table] public MyData[] myDataArrTable;
+
+        public MyData[] myDataArrDefault;
+
+        [ShowInInspector]
+        public MyData[] MyDataArrShow {
+            get => myDataArr;
+            set => myDataArr = value;
+        }
+
         // public string below;
         //
         //
