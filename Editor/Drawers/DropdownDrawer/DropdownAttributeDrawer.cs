@@ -268,7 +268,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
 
         private static void AddDeprecatedDropdownChildren(MenuDropdown<object> result, IDropdown parent, string parentPath)
         {
-            foreach (IAdvancedDropdownList child in parent.children)
+            foreach (IDropdown child in parent.children)
             {
                 string displayName = EscapeSlashInsideTags(child.displayName ?? "");
                 string itemPath = string.IsNullOrEmpty(parentPath) ? displayName : $"{parentPath}/{displayName}";

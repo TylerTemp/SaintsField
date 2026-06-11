@@ -103,7 +103,7 @@ namespace SaintsField.Editor.Drawers.ValueButtonsDrawer
 
             RichTextDrawer.EmptyRichTextTagProvider emptyRichTextTagProvider = new RichTextDrawer.EmptyRichTextTagProvider();
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (IAdvancedDropdownList info in metaInfo.DropdownListValue)
+            foreach (IDropdown info in metaInfo.DropdownListValue)
             {
                 IReadOnlyList<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(
                     info.displayName, emptyRichTextTagProvider).ToArray();
