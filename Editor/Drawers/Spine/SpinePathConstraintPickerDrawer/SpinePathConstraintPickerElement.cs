@@ -1,4 +1,5 @@
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -33,12 +34,11 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
             };
             options.AddSeparator();
 
-            for (int i = 0; i < _skeletonData.PathConstraints.Count; i++)
+            foreach (PathConstraintData pathConstraintData in GetPathConstraintData(_skeletonData))
             {
-                PathConstraintData pathConstraints = _skeletonData.PathConstraints.Items[i];
-                string ikConstraintName = pathConstraints.Name;
-                string iconName = $"<icon={IconPath}/>{ikConstraintName}";
-                options.Add(iconName, ikConstraintName);
+                string pathConstraintName = pathConstraintData.Name;
+                string iconName = $"<icon={IconPath}/>{pathConstraintName}";
+                options.Add(iconName, pathConstraintName);
             }
 
             AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
@@ -66,6 +66,19 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
             // editorWindow.Show();
 
             UnityEditor.PopupWindow.Show(worldBound, sa);
+        }
+
+        private static IEnumerable<PathConstraintData> GetPathConstraintData(SkeletonData skeletonData)
+        {
+#if SAINTSFIELD_SPINE_UNITY_4_3_0_OR_NEWER
+            return SpineUtils.GetConstraintData<PathConstraintData>(skeletonData);
+#else
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            for (int i = 0; i < skeletonData.PathConstraints.Count; i++)
+            {
+                yield return skeletonData.PathConstraints.Items[i];
+            }
+#endif
         }
 
         private SkeletonData _skeletonData;
@@ -110,10 +123,10 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
                 return;
             }
 
-            for (int i = 0; i < _skeletonData.PathConstraints.Count; i++)
+            foreach (PathConstraintData pathConstraints in GetPathConstraintData(_skeletonData))
             {
-                PathConstraintData pathConstraints = _skeletonData.PathConstraints.Items[i];
                 string pathConstraintsName = pathConstraints.Name;
+                // ReSharper disable once InvertIf
                 if (pathConstraintsName == value)
                 {
                     UIToolkitUtils.SetLabel(Label, new []

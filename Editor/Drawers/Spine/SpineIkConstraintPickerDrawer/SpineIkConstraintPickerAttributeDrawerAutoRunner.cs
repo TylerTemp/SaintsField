@@ -46,9 +46,9 @@ namespace SaintsField.Editor.Drawers.Spine.SpineIkConstraintPickerDrawer
             }
 
             HashSet<string> foundNames = new HashSet<string>();
-            for (int i = 0; i < skeletonData.IkConstraints.Count; i++)
+
+            foreach (IkConstraintData ikConstraint in GetIkConstraintData(skeletonData))
             {
-                IkConstraintData ikConstraint = skeletonData.IkConstraints.Items[i];
                 string ikConstraintName = ikConstraint.Name;
                 if (ikConstraintName == property.stringValue)
                 {
@@ -64,6 +64,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpineIkConstraintPickerDrawer
                 ExecError = "",
                 Error = $"{property.stringValue} not found. Options are: {string.Join(", ", foundNames)}",
             };
+        }
+
+        private static IEnumerable<IkConstraintData> GetIkConstraintData(SkeletonData skeletonData)
+        {
+#if SAINTSFIELD_SPINE_UNITY_4_3_0_OR_NEWER
+            return SpineUtils.GetConstraintData<IkConstraintData>(skeletonData);
+#else
+            for (int i = 0; i < skeletonData.IkConstraints.Count; i++)
+            {
+                yield return skeletonData.IkConstraints.Items[i];
+            }
+#endif
         }
     }
 }

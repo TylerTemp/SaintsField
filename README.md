@@ -110,10 +110,13 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.18.4**
+**5.18.5**
 
-1.  Improve: When in Horizental layout, if the target drawer is not from SaintsField, and it does return a `BaseField<>` type, the drawer will be break into 2 rows. This effects horizental layout, `SaintsDictionary`, `Table`. [#400](https://github.com/TylerTemp/SaintsField/issues/400)
-2.  Fix: `OnEvent`/`OnButtonClick` now work with search function
+1.  Unity Fix: When nested list view, only one element will be styled as focused, fix [#279](https://github.com/TylerTemp/SaintsField/issues/279)
+2.  Fix: `Table` with all footer buttons hidden, there was an empty container at the footer
+3.  Improve: `ListDrawerSettings` now always have the border with a total number field, just like Unity's default list drawer.
+4.  Improve: `Table` content now styles the same way as Unity's default list drawer
+5.  Add: Support Spine 4.3 [#403](https://github.com/TylerTemp/SaintsField/issues/403)
 
 ## Usage ##
 

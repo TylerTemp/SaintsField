@@ -46,9 +46,9 @@ namespace SaintsField.Editor.Drawers.Spine.SpineTransformConstraintPickerDrawer
             }
 
             HashSet<string> foundNames = new HashSet<string>();
-            for (int i = 0; i < skeletonData.TransformConstraints.Count; i++)
+
+            foreach (TransformConstraintData transformConstraints in GetTransformConstraintData(skeletonData))
             {
-                TransformConstraintData transformConstraints = skeletonData.TransformConstraints.Items[i];
                 string ikConstraintName = transformConstraints.Name;
                 if (ikConstraintName == property.stringValue)
                 {
@@ -64,6 +64,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpineTransformConstraintPickerDrawer
                 ExecError = "",
                 Error = $"{property.stringValue} not found. Options are: {string.Join(", ", foundNames)}",
             };
+        }
+
+        private static IEnumerable<TransformConstraintData> GetTransformConstraintData(SkeletonData skeletonData)
+        {
+#if SAINTSFIELD_SPINE_UNITY_4_3_0_OR_NEWER
+            return SpineUtils.GetConstraintData<TransformConstraintData>(skeletonData);
+#else
+            for (int i = 0; i < skeletonData.TransformConstraints.Count; i++)
+            {
+                yield return skeletonData.TransformConstraints.Items[i];
+            }
+#endif
         }
     }
 }

@@ -1,3 +1,8 @@
+// ReSharper disable RedundantUsingDirective
+using System.Collections.Generic;
+using System.Linq;
+using Spine;
+// ReSharper restore RedundantUsingDirective
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
@@ -72,5 +77,22 @@ namespace SaintsField.Editor.Drawers.Spine
             }
             return ("", skeletonRenderer.skeletonDataAsset);
         }
+
+#if SAINTSFIELD_SPINE_UNITY_4_3_0_OR_NEWER
+        public static IEnumerable<T> GetConstraintData<T>(SkeletonData skeletonData)
+        {
+
+            IConstraintData[] constraints = skeletonData.Constraints.Items;
+            for (int i = 0; i < skeletonData.Constraints.Count; i++)
+            {
+                if (constraints[i] is not T result)
+                {
+                    continue;
+                }
+
+                yield return result;
+            }
+        }
+#endif
     }
 }

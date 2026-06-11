@@ -1,4 +1,5 @@
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -33,9 +34,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineIkConstraintPickerDrawer
             };
             options.AddSeparator();
 
-            for (int i = 0; i < _skeletonData.IkConstraints.Count; i++)
+            foreach (IkConstraintData ikConstraint in GetIkConstraintData(_skeletonData))
             {
-                IkConstraintData ikConstraint = _skeletonData.IkConstraints.Items[i];
                 string ikConstraintName = ikConstraint.Name;
                 string iconName = $"<icon={IconPath}/>{ikConstraintName}";
                 options.Add(iconName, ikConstraintName);
@@ -66,6 +66,19 @@ namespace SaintsField.Editor.Drawers.Spine.SpineIkConstraintPickerDrawer
             // editorWindow.Show();
 
             UnityEditor.PopupWindow.Show(worldBound, sa);
+        }
+
+        private static IEnumerable<IkConstraintData> GetIkConstraintData(SkeletonData skeletonData)
+        {
+#if SAINTSFIELD_SPINE_UNITY_4_3_0_OR_NEWER
+            return SpineUtils.GetConstraintData<IkConstraintData>(skeletonData);
+#else
+            for (int i = 0; i < skeletonData.IkConstraints.Count; i++)
+            {
+                yield return skeletonData.IkConstraints.Items[i];
+
+            }
+#endif
         }
 
         private SkeletonData _skeletonData;
@@ -110,9 +123,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineIkConstraintPickerDrawer
                 return;
             }
 
-            for (int i = 0; i < _skeletonData.IkConstraints.Count; i++)
+            foreach (IkConstraintData ikConstraint in GetIkConstraintData(_skeletonData))
             {
-                IkConstraintData ikConstraint = _skeletonData.IkConstraints.Items[i];
                 string ikConstraintName = ikConstraint.Name;
                 if (ikConstraintName == value)
                 {

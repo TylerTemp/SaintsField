@@ -1,4 +1,5 @@
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
+using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -33,9 +34,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineTransformConstraintPickerDrawer
             };
             options.AddSeparator();
 
-            for (int i = 0; i < _skeletonData.TransformConstraints.Count; i++)
+            foreach (TransformConstraintData transformConstraints in GetTransformConstraintData(_skeletonData))
             {
-                TransformConstraintData transformConstraints = _skeletonData.TransformConstraints.Items[i];
                 string ikConstraintName = transformConstraints.Name;
                 string iconName = $"<icon={IconPath}/>{ikConstraintName}";
                 options.Add(iconName, ikConstraintName);
@@ -66,6 +66,19 @@ namespace SaintsField.Editor.Drawers.Spine.SpineTransformConstraintPickerDrawer
             // editorWindow.Show();
 
             UnityEditor.PopupWindow.Show(worldBound, sa);
+        }
+
+        private static IEnumerable<TransformConstraintData> GetTransformConstraintData(SkeletonData skeletonData)
+        {
+#if SAINTSFIELD_SPINE_UNITY_4_3_0_OR_NEWER
+            return SpineUtils.GetConstraintData<TransformConstraintData>(skeletonData);
+#else
+            for (int i = 0; i < skeletonData.TransformConstraints.Count; i++)
+            {
+                yield return skeletonData.TransformConstraints.Items[i];
+
+            }
+#endif
         }
 
         private SkeletonData _skeletonData;
@@ -110,9 +123,8 @@ namespace SaintsField.Editor.Drawers.Spine.SpineTransformConstraintPickerDrawer
                 return;
             }
 
-            for (int i = 0; i < _skeletonData.TransformConstraints.Count; i++)
+            foreach (TransformConstraintData transformConstraints in GetTransformConstraintData(_skeletonData))
             {
-                TransformConstraintData transformConstraints = _skeletonData.TransformConstraints.Items[i];
                 string ikConstraintName = transformConstraints.Name;
                 if (ikConstraintName == value)
                 {

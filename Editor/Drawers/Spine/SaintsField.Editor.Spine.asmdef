@@ -33,6 +33,11 @@
             "name": "com.esotericsoftware.spine.spine-unity",
             "expression": "",
             "define": "SAINTSFIELD_SPINE_UNITY"
+        },
+        {
+            "name": "com.esotericsoftware.spine.spine-unity",
+            "expression": "4.3.0",
+            "define": "SAINTSFIELD_SPINE_UNITY_4_3_0_OR_NEWER"
         }
     ],
     "noEngineReferences": false

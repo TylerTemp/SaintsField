@@ -46,9 +46,9 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
             }
 
             HashSet<string> foundNames = new HashSet<string>();
-            for (int i = 0; i < skeletonData.PathConstraints.Count; i++)
+
+            foreach (PathConstraintData pathConstraints in GetPathConstraintData(skeletonData))
             {
-                PathConstraintData pathConstraints = skeletonData.PathConstraints.Items[i];
                 string pathConstraintsName = pathConstraints.Name;
                 if (pathConstraintsName == property.stringValue)
                 {
@@ -64,6 +64,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
                 ExecError = "",
                 Error = $"{property.stringValue} not found. Options are: {string.Join(", ", foundNames)}",
             };
+        }
+
+        private static IEnumerable<PathConstraintData> GetPathConstraintData(SkeletonData skeletonData)
+        {
+#if SAINTSFIELD_SPINE_UNITY_4_3_0_OR_NEWER
+            return SpineUtils.GetConstraintData<PathConstraintData>(skeletonData);
+#else
+            for (int i = 0; i < skeletonData.PathConstraints.Count; i++)
+            {
+                yield return skeletonData.PathConstraints.Items[i];
+            }
+#endif
         }
     }
 }

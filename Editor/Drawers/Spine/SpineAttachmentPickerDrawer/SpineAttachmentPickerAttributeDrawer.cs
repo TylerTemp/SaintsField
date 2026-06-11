@@ -187,25 +187,13 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
 
                     List<Skin.SkinEntry> skinEntries = new List<Skin.SkinEntry>();
                     skin.GetAttachments(slotIndex, skinEntries);
-                    attachmentNames.AddRange(skinEntries.Select(entry => new AttachInfo
-                    {
-                        Name = entry.Name,
-                        Attachment = entry.Attachment,
-                    }));
+                    attachmentNames.AddRange(skinEntries.Select(SkinEntityToAttachInfo));
 
                     if (skin != defaultSkin) {
-                        placeholderNames.AddRange(skinEntries.Select(entry => new AttachInfo
-                        {
-                            Name = entry.Name,
-                            Attachment = entry.Attachment,
-                        }));
+                        placeholderNames.AddRange(skinEntries.Select(SkinEntityToAttachInfo));
                         skinEntries.Clear();
                         defaultSkin.GetAttachments(slotIndex, skinEntries);
-                        attachmentNames.AddRange(skinEntries.Select(entry => new AttachInfo
-                        {
-                            Name = entry.Name,
-                            Attachment = entry.Attachment,
-                        }));
+                        attachmentNames.AddRange(skinEntries.Select(SkinEntityToAttachInfo));
                     }
 
                     foreach (AttachInfo attachInfo in attachmentNames)
@@ -235,6 +223,18 @@ namespace SaintsField.Editor.Drawers.Spine.SpineAttachmentPickerDrawer
 
             return new SpineAttachmentUtils.AttachmentsResult(error, targetName, attachmentInfos);
         }
+
+        private static AttachInfo SkinEntityToAttachInfo(Skin.SkinEntry entry) => new AttachInfo
+        {
+            Name = entry.
+#if SAINTSFIELD_SPINE_UNITY_4_3_0_OR_NEWER
+                Placeholder
+#else
+                Name
+#endif
+            ,
+            Attachment = entry.Attachment,
+        };
 
         private static string GetIconPathFromAttachment(Attachment attachment)
         {
