@@ -416,6 +416,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             // int numberOfItemsPerPage = 0;
 
+            ListView listView = null;
+
             VisualElement MakeItem()
             {
                 // PropertyField propertyField = new PropertyField();
@@ -439,6 +441,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 {
                     return;
                 }
+
+                MarkElementTreeRowIndex(listView, element, index);
 
                 SerializedProperty prop = property.GetArrayElementAtIndex(propIndex);
                 VisualElement resultField = UIToolkitUtils.CreateOrUpdateFieldProperty(
@@ -499,7 +503,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 }
             }
 
-            ListView listView = new ListView(Enumerable.Range(0, property.arraySize).ToList())
+            listView = new ListView(Enumerable.Range(0, property.arraySize).ToList())
             {
                 makeItem = MakeItem,
                 bindItem = BindItem,
@@ -520,6 +524,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 viewDataKey = property.propertyPath,
                 // bindingPath = property.propertyPath,
             };
+            listView.selectedIndicesChanged += _ => ClearNestedSelectionAndFocusOutsideSelection(listView);
 
             Foldout foldoutElement = listView.Q<Foldout>();
             foldoutElement.viewDataKey = property.propertyPath;
@@ -1163,6 +1168,75 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             _removeButton.SetEnabled(!canNotRemoveMore);
 
             return result;
+        }
+
+        private static void MarkElementTreeRowIndex(ListView owner, VisualElement element, int rowIndex)
+        {
+            element.userData = new RowFocusData(owner, rowIndex);
+        }
+
+        private static void ClearNestedSelectionAndFocusOutsideSelection(ListView listView)
+        {
+            foreach (ListView nestedListView in listView.Query<ListView>().Build().Where(each => !ReferenceEquals(each, listView)))
+            {
+                if (!TryGetRowIndex(listView, nestedListView, out int nestedRowIndex))
+                {
+                    continue;
+                }
+
+                if (listView.selectedIndices.Contains(nestedRowIndex))
+                {
+                    continue;
+                }
+
+                nestedListView.ClearSelection();
+            }
+
+            Focusable focused = listView.panel?.focusController?.focusedElement;
+            if (!(focused is VisualElement focusedElement) || !listView.Contains(focusedElement))
+            {
+                return;
+            }
+
+            if (!TryGetRowIndex(listView, focusedElement, out int focusedRowIndex))
+            {
+                return;
+            }
+
+            if (listView.selectedIndices.Contains(focusedRowIndex))
+            {
+                return;
+            }
+
+            focusedElement.Blur();
+            listView.Focus();
+        }
+
+        private static bool TryGetRowIndex(ListView owner, VisualElement element, out int rowIndex)
+        {
+            for (VisualElement current = element; current != null; current = current.parent)
+            {
+                if (current.userData is RowFocusData rowData && ReferenceEquals(rowData.Owner, owner))
+                {
+                    rowIndex = rowData.RowIndex;
+                    return true;
+                }
+            }
+
+            rowIndex = -1;
+            return false;
+        }
+
+        private readonly struct RowFocusData
+        {
+            public readonly ListView Owner;
+            public readonly int RowIndex;
+
+            public RowFocusData(ListView owner, int rowIndex)
+            {
+                Owner = owner;
+                RowIndex = rowIndex;
+            }
         }
 
     }

@@ -5361,7 +5361,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2d4d477b98611394aa0d17dc2814a712, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue279TableBg
   crowdAttackSchedulers:
   - balancedUnits:
     - amount:
@@ -5369,22 +5369,13 @@ MonoBehaviour:
         - name: 
           conditions:
           - 
-          - 
-        - name: 
-          conditions:
-          - 
-          - 
-          - 
+      name: 
   - balancedUnits:
     - amount:
         rules:
         - name: 
-          conditions:
-          - 
-          - 
-          - 
-        - name: 
           conditions: []
+      name: 
 --- !u!1 &528893599
 GameObject:
   m_ObjectHideFlags: 0
@@ -22191,6 +22182,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myMask: 14
   myMaskNoFold: 0
+  myMask2: 0
+  myStruct:
+    myMask: 0
+  myMaskDisabled: 0
+  myMaskDisabledLabel: 0
+  enumNormal: 0
+  enumExpand: 0
+  labelField: 0
 --- !u!4 &1036765201
 Transform:
   m_ObjectHideFlags: 0
@@ -26298,7 +26297,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf65efdf8d51be24984a027285bdccc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bookName: 
   percent: 1
+  selectIt: 0
+  strTyp:
+    selectIt: 0
+  listEnum: 
+  flags: 0
 --- !u!4 &1338113063
 Transform:
   m_ObjectHideFlags: 0

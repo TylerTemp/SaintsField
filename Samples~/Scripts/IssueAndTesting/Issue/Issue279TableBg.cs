@@ -1,15 +1,16 @@
 using System;
-using SaintsField.Samples.Scripts.SaintsEditor;
+using SaintsField.Playa;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 {
-    public class Issue279TableBg : MonoBehaviour
+    public class Issue279TableBg : SaintsMonoBehaviour
     {
         [Serializable]
         public struct Rule
         {
             public string name;
+            [ListDrawerSettings]
             public string[] conditions;
         }
 
@@ -19,6 +20,7 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         public struct Amount
         {
             // [Table]
+            [ListDrawerSettings]
             public Rule[] rules;
         }
 
@@ -26,14 +28,16 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
         public struct BalancedUnit
         {
             public Amount amount;
+            public string name;
         }
 
         [Serializable]
         public struct CrowdAttackScheduler
         {
             public BalancedUnit[] balancedUnits;
+            // public BalancedUnit balancedUnits;
         }
 
-        public CrowdAttackScheduler[] crowdAttackSchedulers;
+        [Table] public CrowdAttackScheduler[] crowdAttackSchedulers;
     }
 }

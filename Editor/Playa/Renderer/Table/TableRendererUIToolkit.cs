@@ -39,6 +39,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
             result.RegisterCallback<DetachFromPanelEvent>(_ => OnSearchFieldUIToolkit.RemoveListener(Search));
             result.AddToClassList(SaintsPropertyDrawer.ClassLabelFieldUIToolkit);
 
+
             return (result, true);
 
             void Search(string search)

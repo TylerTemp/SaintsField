@@ -185,6 +185,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 //                 sortingEnabled = true,
 // #endif
                 };
+                multiColumnListView.selectedIndicesChanged += _ => ClearNestedSelectionAndFocusOutsideSelection(multiColumnListView);
 
                 SerializedProperty firstProp = arrayProp.GetArrayElementAtIndex(0);
                 bool itemIsObject = firstProp.propertyType == SerializedPropertyType.ObjectReference;
@@ -305,6 +306,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                             },
                             bindCell = (element, index) =>
                             {
+                                MarkElementTreeRowIndex(multiColumnListView, element, index);
                                 SerializedProperty targetProp = ((SerializedProperty)multiColumnListView.itemsSource[index]).Copy();
                                 targetProp.isExpanded = true;
 
@@ -476,6 +478,7 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
                         curColumn.bindCell = (element, index) =>
                         {
+                            MarkElementTreeRowIndex(multiColumnListView, element, index);
                             // Debug.Log($"id={id}/index={index}");
                             SerializedProperty targetProp = (SerializedProperty)multiColumnListView.itemsSource[index];
                             targetProp.isExpanded = true;
@@ -637,6 +640,91 @@ namespace SaintsField.Editor.Playa.Renderer.Table
         {
             return Enumerable.Range(0, arrayProp.arraySize)
                 .Select(arrayProp.GetArrayElementAtIndex).ToList();
+        }
+
+        private static void MarkElementTreeRowIndex(VisualElement owner, VisualElement element, int rowIndex)
+        {
+            element.userData = new RowFocusData(owner, rowIndex);
+        }
+
+        private static void ClearNestedSelectionAndFocusOutsideSelection(MultiColumnListView multiColumnListView)
+        {
+            foreach (ListView nestedListView in multiColumnListView.Query<ListView>().Build())
+            {
+                if (!TryGetRowIndex(multiColumnListView, nestedListView, out int nestedRowIndex))
+                {
+                    continue;
+                }
+
+                if (multiColumnListView.selectedIndices.Contains(nestedRowIndex))
+                {
+                    continue;
+                }
+
+                nestedListView.ClearSelection();
+            }
+
+            foreach (MultiColumnListView nestedMultiColumnListView in multiColumnListView.Query<MultiColumnListView>().Build()
+                         .Where(each => !ReferenceEquals(each, multiColumnListView)))
+            {
+                if (!TryGetRowIndex(multiColumnListView, nestedMultiColumnListView, out int nestedRowIndex))
+                {
+                    continue;
+                }
+
+                if (multiColumnListView.selectedIndices.Contains(nestedRowIndex))
+                {
+                    continue;
+                }
+
+                nestedMultiColumnListView.ClearSelection();
+            }
+
+            Focusable focused = multiColumnListView.panel?.focusController?.focusedElement;
+            if (!(focused is VisualElement focusedElement) || !multiColumnListView.Contains(focusedElement))
+            {
+                return;
+            }
+
+            if (!TryGetRowIndex(multiColumnListView, focusedElement, out int focusedRowIndex))
+            {
+                return;
+            }
+
+            if (multiColumnListView.selectedIndices.Contains(focusedRowIndex))
+            {
+                return;
+            }
+
+            focusedElement.Blur();
+            multiColumnListView.Focus();
+        }
+
+        private static bool TryGetRowIndex(VisualElement owner, VisualElement element, out int rowIndex)
+        {
+            for (VisualElement current = element; current != null; current = current.parent)
+            {
+                if (current.userData is RowFocusData rowData && ReferenceEquals(rowData.Owner, owner))
+                {
+                    rowIndex = rowData.RowIndex;
+                    return true;
+                }
+            }
+
+            rowIndex = -1;
+            return false;
+        }
+
+        private readonly struct RowFocusData
+        {
+            public readonly VisualElement Owner;
+            public readonly int RowIndex;
+
+            public RowFocusData(VisualElement owner, int rowIndex)
+            {
+                Owner = owner;
+                RowIndex = rowIndex;
+            }
         }
 
         private readonly struct SaintsFieldInfoName
