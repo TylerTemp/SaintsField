@@ -1,12 +1,13 @@
 # Changelog
 
-## 5.18.5 ##
+## 5.18.6 ##
 
 1.  Unity Fix: When nested list view, only one element will be styled as focused, fix [#279](https://github.com/TylerTemp/SaintsField/issues/279)
 2.  Fix: `Table` with all footer buttons hidden, there was an empty container at the footer
 3.  Improve: `ListDrawerSettings` now always have the border with a total number field, just like Unity's default list drawer.
 4.  Improve: `Table` content now styles the same way as Unity's default list drawer
 5.  Add: Support Spine 4.3 [#403](https://github.com/TylerTemp/SaintsField/issues/403)
+6.  Fix: Dropdown broken due to last refactory
 
 ## 5.18.4 ##
 
