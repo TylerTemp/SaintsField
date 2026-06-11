@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: a1dedb76280a48a9920830c1014b8fdc
+timeCreated: 1739243352
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Spine/SpineIkConstraintPickerDrawer/SpineIkConstraintPickerAttributeDrawerIMGUI.cs
+  uploadId: 802314

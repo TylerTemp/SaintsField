@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: d65d59499beb4f8cbcfd950f9c063ffb
+timeCreated: 1739243352
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Spine/SpineEventPickerDrawer/SpineEventPickerAttributeDrawerIMGUI.cs
+  uploadId: 802314

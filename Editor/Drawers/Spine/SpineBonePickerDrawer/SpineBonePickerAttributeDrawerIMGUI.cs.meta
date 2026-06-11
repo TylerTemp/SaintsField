@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 1b27a7c82f0e4d89b5991aae3ce4db46
+timeCreated: 1739243352
+AssetOrigin:
+  serializedVersion: 1
+  productId: 269741
+  packageName: Saints Field
+  packageVersion: 4.32.7
+  assetPath: Assets/SaintsField/Editor/Drawers/Spine/SpineBonePickerDrawer/SpineBonePickerAttributeDrawerIMGUI.cs
+  uploadId: 802314
