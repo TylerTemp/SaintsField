@@ -2497,6 +2497,135 @@ MonoBehaviour:
   UpdateSpring: 0
   safetyDetectionOffset: {x: 0, y: 0, z: 0}
   safetyDetectionRadius: 0.5
+--- !u!1 &530795992
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 530795993}
+  - component: {fileID: 530795994}
+  m_Layer: 0
+  m_Name: IMGUIDrawLikePropField
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &530795993
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530795992}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1175289511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &530795994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530795992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5129d6c57d9ad46b39db2ea9d4d355, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsEditor.Testing.IMGUIDrawLikePropField
+  v2: {x: 0, y: 0}
+  gradient:
+    serializedVersion: 2
+    key0: {r: 0.6603774, g: 0.33953366, b: 0.33953366, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  curve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hash128Value:
+    serializedVersion: 2
+    Hash: 01000000020000000300000004000000
+  boolV: 0
+  byteV: 12
+  sbyteV: 14
+  shortV: -12
+  ushortV: 9
+  longV: 9223372030412324863
+  uLongV: 13
+  floatV: 1.6234
+  doubleV: 0.1234
+  stringV: Hi
+  charV: 99
+  vector2V: {x: 1, y: 1}
+  vector3V: {x: 1, y: 1, z: 1}
+  vector4V: {x: 1, y: 1, z: 1, w: 1}
+  vector2VInt: {x: 1, y: 1}
+  vector3VInt: {x: 1, y: 1, z: 1}
+  colorV: {r: 1, g: 0, b: 0, a: 1}
+  boundsV:
+    m_Center: {x: 1, y: 1, z: 1}
+    m_Extent: {x: 0, y: 0.5, z: 0}
+  rectV:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  rectIntV:
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  myEnum: 0
+  go: {fileID: 0}
+  trans: {fileID: 0}
+  so: {fileID: 0}
+  myClass:
+    myString: 
+    myObj: {fileID: 0}
+    myEnum: 0
+  myStruct:
+    myString: 
+  colors:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
 --- !u!1 &562576874
 GameObject:
   m_ObjectHideFlags: 0
@@ -5912,6 +6041,7 @@ Transform:
   - {fileID: 5531047}
   - {fileID: 1112836783}
   - {fileID: 1073980063}
+  - {fileID: 530795993}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1196999815
@@ -6553,7 +6683,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1312160703}
   - component: {fileID: 1312160704}
-  - component: {fileID: 1312160705}
   m_Layer: 0
   m_Name: Issue404AnimCrash
   m_TagString: Untagged
@@ -6588,30 +6717,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c2ef1fbdb46ab478cd1c2e5f9e73fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue404AnimCrash
-  animator: {fileID: 1312160705}
+  animator: {fileID: 0}
   stateName: SubNewState
---- !u!95 &1312160705
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1312160702}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 891dfeda31f941d4cae65b39a9339bc3, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1353093772
 GameObject:
   m_ObjectHideFlags: 0

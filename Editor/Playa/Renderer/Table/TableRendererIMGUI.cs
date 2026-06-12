@@ -26,7 +26,8 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 : EditorGUIUtility.singleLineHeight;
         }
 
-        protected override void SerializedFieldRenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+        // protected override void SerializedFieldRenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
 
             bool needIndent = SaintsRendererGroup.IMGUINeedIndentFix && (FieldWithInfo.SerializedProperty.isArray ||

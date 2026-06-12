@@ -620,7 +620,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             return height;
         }
 
-        protected override void SerializedFieldRenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+        // protected override void SerializedFieldRenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
         {
             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
             {

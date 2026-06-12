@@ -87,45 +87,45 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
 
-        protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
-        {
-            bool isArray = FieldWithInfo.SerializedProperty.isArray;
-#pragma warning disable CS0618 // Type or member is obsolete
-            OnArraySizeChangedAttribute onArraySizeChangedAttribute =
-                FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
-#pragma warning restore CS0618 // Type or member is obsolete
-            int arraySize = -1;
-            if (isArray && onArraySizeChangedAttribute != null)
-            {
-                arraySize = FieldWithInfo.SerializedProperty.arraySize;
-            }
-
-            bool arraySizeChanged = CheckArraySizeAttribute(preCheckResult);
-            if (arraySizeChanged)
-            {
-                FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
-            }
-
-            using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
-            using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
-                Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
-#endif
-
-                SerializedFieldRenderPositionTargetIMGUI(position, preCheckResult);
-
-                if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
-                   (arraySizeChanged || arraySize != FieldWithInfo.SerializedProperty.arraySize))
-                {
-                    FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                    InvokeArraySizeCallback(onArraySizeChangedAttribute.Callback,
-                        FieldWithInfo.SerializedProperty,
-                        (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
-                }
-            }
-        }
-
-        protected abstract void SerializedFieldRenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult);
+//         protected override void RenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult)
+//         {
+//             bool isArray = FieldWithInfo.SerializedProperty.isArray;
+// #pragma warning disable CS0618 // Type or member is obsolete
+//             OnArraySizeChangedAttribute onArraySizeChangedAttribute =
+//                 FieldWithInfo.PlayaAttributes.OfType<OnArraySizeChangedAttribute>().FirstOrDefault();
+// #pragma warning restore CS0618 // Type or member is obsolete
+//             int arraySize = -1;
+//             if (isArray && onArraySizeChangedAttribute != null)
+//             {
+//                 arraySize = FieldWithInfo.SerializedProperty.arraySize;
+//             }
+//
+//             bool arraySizeChanged = CheckArraySizeAttribute(preCheckResult);
+//             if (arraySizeChanged)
+//             {
+//                 FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+//             }
+//
+//             using (new EditorGUI.DisabledScope(preCheckResult.IsDisabled))
+//             using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+//             {
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_SERIALIZED_FIELD_RENDERER
+//                 Debug.Log($"SerField: {FieldWithInfo.SerializedProperty.displayName}->{FieldWithInfo.SerializedProperty.propertyPath}; arraySize={preCheckResult.ArraySize}");
+// #endif
+//
+//                 SerializedFieldRenderPositionTargetIMGUI(position, preCheckResult);
+//
+//                 if(changed.changed && isArray && onArraySizeChangedAttribute != null &&
+//                    (arraySizeChanged || arraySize != FieldWithInfo.SerializedProperty.arraySize))
+//                 {
+//                     FieldWithInfo.SerializedProperty.serializedObject.ApplyModifiedProperties();
+//                     InvokeArraySizeCallback(onArraySizeChangedAttribute.Callback,
+//                         FieldWithInfo.SerializedProperty,
+//                         (MemberInfo)FieldWithInfo.FieldInfo ?? FieldWithInfo.PropertyInfo);
+//                 }
+//             }
+//         }
+//
+//         protected abstract void SerializedFieldRenderPositionTargetIMGUI(Rect position, PreCheckResult preCheckResult);
     }
 }

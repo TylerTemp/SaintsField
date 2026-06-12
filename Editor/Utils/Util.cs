@@ -5,8 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using SaintsField.Condition;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Interfaces;
 using SaintsField.Playa;
 using SaintsField.SaintsSerialization;
 using SaintsField.Utils;
@@ -3038,12 +3040,48 @@ namespace SaintsField.Editor.Utils
             return matrix4x4;
         }
 
-        internal static Color realHandleColor
+        internal static Color realHandleColor => Handles.color * new Color(1f, 1f, 1f, 0.5f) + (Handles.lighting ? new Color(0.0f, 0.0f, 0.0f, 0.5f) : new Color(0.0f, 0.0f, 0.0f, 0.0f));
+
+        public static (Type drawerType, Attribute drawerAttribute) GetDrawerAndAttribute(
+            SerializedProperty property,
+            IReadOnlyList<Attribute> allAttributes,
+            FieldInfo fieldInfo)
         {
-            get
+
+            Type useDrawerType = null;
+            Attribute useAttribute = null;
+            bool isArray = property.propertyType == SerializedPropertyType.Generic
+                           && property.isArray;
+
+            if(!isArray)
             {
-                return Handles.color * new Color(1f, 1f, 1f, 0.5f) + (Handles.lighting ? new Color(0.0f, 0.0f, 0.0f, 0.5f) : new Color(0.0f, 0.0f, 0.0f, 0.0f));
+                ISaintsAttribute saintsAttr = allAttributes
+                    .OfType<ISaintsAttribute>()
+                    .FirstOrDefault();
+
+                useAttribute = saintsAttr as Attribute;
+                if (saintsAttr != null)
+                {
+                    useDrawerType = SaintsPropertyDrawer.GetFirstSaintsDrawerType(saintsAttr.GetType());
+                }
+                else
+                {
+                    if (fieldInfo.FieldType == typeof(Vector4))
+                    {
+                        // let it be null. WTF why Unity you have this issue...
+                    }
+                    else
+                    {
+                        (Attribute attrOrNull, Type drawerType) =
+                            SaintsPropertyDrawer.GetFallbackDrawerType(fieldInfo,
+                                property, allAttributes);
+                        useAttribute = attrOrNull;
+                        useDrawerType = drawerType;
+                    }
+                }
             }
+
+            return (useDrawerType, useAttribute);
         }
     }
 }

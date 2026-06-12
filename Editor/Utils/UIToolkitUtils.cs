@@ -1,11 +1,10 @@
+#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System.Collections;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.Renderer.SaintsCell;
 using SaintsField.Interfaces;
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
-using UnityEditor.UIElements;
 using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using UnityEditor;
@@ -20,12 +19,11 @@ using SaintsField.Editor.Playa;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEngine;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-#endif
 
 namespace SaintsField.Editor.Utils
 {
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
     public static class UIToolkitUtils
     {
 
@@ -462,100 +460,7 @@ namespace SaintsField.Editor.Utils
             bool mergeDec,
             object parent)
         {
-            // PropertyField result = new PropertyField(FieldWithInfo.SerializedProperty)
-            // {
-            //     style =
-            //     {
-            //         flexGrow = 1,
-            //     },
-            //     name = FieldWithInfo.SerializedProperty.propertyPath,
-            // };
-            // result.Bind(FieldWithInfo.SerializedProperty.serializedObject);
-            // return (result, false);
-
-
-            // About letting SaintsPropertyDrawer fallback:
-            // SaintsPropertyDrawer relays on PropertyField to fallback. Directly hi-jacking the drawer with SaintsPropertyDrawer
-            // the workflow will still get into the PropertyField flow, then SaintsField will fail to decide when the
-            // fallback should stop.
-
-            Type useDrawerType = null;
-            Attribute useAttribute = null;
-            bool isArray = property.propertyType == SerializedPropertyType.Generic
-                           && property.isArray;
-
-            // bool useFallbackSaintsRow = false;
-            // Debug.Log($"rendering {property.propertyPath}/{property.propertyType}/isArray={isArray}/hor={inHorizontalLayout}/allAttributes={string.Join(",", allAttributes)}");
-            if(!isArray)
-            {
-                ISaintsAttribute saintsAttr = allAttributes
-                    .OfType<ISaintsAttribute>()
-                    .FirstOrDefault();
-
-                useAttribute = saintsAttr as Attribute;
-                if (saintsAttr != null)
-                {
-                    useDrawerType = SaintsPropertyDrawer.GetFirstSaintsDrawerType(saintsAttr.GetType());
-                }
-                else
-                {
-                    (Attribute attrOrNull, Type drawerType) =
-                        SaintsPropertyDrawer.GetFallbackDrawerType(fieldInfo,
-                            property, allAttributes);
-                    // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
-                    useAttribute = attrOrNull;
-                    useDrawerType = drawerType;
-
-                    // if (useDrawerType == null &&
-                    //     property.propertyType == SerializedPropertyType.Generic)
-                    // {
-                    //     // useFallbackSaintsRow = true;
-                    //     // useDrawerType = typeof(SaintsRowAttributeDrawer);
-                    // }
-                }
-
-                // Debug.Log($"{property.propertyPath}: drawer={useDrawerType}; label={label}");
-            }
-
-            // List<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> appendSaintsAttributeDrawer = null;
-            //
-            // if (!isArray && InHorizentalLayout)
-            // {
-            //     appendSaintsAttributeDrawer = new List<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)>();
-            //     NoLabelAttribute noLabelAttribute = new NoLabelAttribute();
-            //     RichLabelAttributeDrawer noLabelDrawer = (RichLabelAttributeDrawer)
-            //         SaintsPropertyDrawer.MakePropertyDrawer(typeof(RichLabelAttributeDrawer),
-            //             FieldWithInfo.FieldInfo, useAttribute, FieldWithInfo.SerializedProperty.displayName);
-            //
-            //     appendSaintsAttributeDrawer.Add((noLabelAttribute, noLabelDrawer));
-            //
-            //     // // ReSharper disable once RedundantArgumentDefaultValue
-            //     // AboveRichLabelAttribute aboveRichLabelAttribute = new AboveRichLabelAttribute("<label />");
-            //     // FullWidthRichLabelAttributeDrawer aboveRichLabelDrawer = (FullWidthRichLabelAttributeDrawer)
-            //     //     SaintsPropertyDrawer.MakePropertyDrawer(typeof(FullWidthRichLabelAttributeDrawer),
-            //     //         FieldWithInfo.FieldInfo, aboveRichLabelAttribute, FieldWithInfo.SerializedProperty.displayName);
-            //     //
-            //     // appendSaintsAttributeDrawer.Add((aboveRichLabelAttribute, aboveRichLabelDrawer));
-            // }
-
-
-
-            // if (!isArray && useDrawerType == null && inHorizontalLayout)
-            // {
-            //     useFallbackSaintsRow = true;
-            //     useDrawerType = typeof(SaintsPropertyDrawer);
-            // }
-
-            // Debug.Log($"rendering {property.propertyPath}/useAttribute={useAttribute}/useDrawerType={useDrawerType}");
-
-            // fallback to SaintsRow cuz: not custom drawer (attr drawer or type drawer), is generic, and is not array
-            // if (useDrawerType != null && property.propertyType == SerializedPropertyType.Generic
-            //                           && !property.isArray)
-            // {
-            //     SaintsRowAttributeDrawer saintsRowDrawer = (SaintsRowAttributeDrawer)SaintsPropertyDrawer.MakePropertyDrawer(typeof(SaintsRowAttributeDrawer), fieldInfo, useAttribute, label);
-            //     saintsRowDrawer.InHorizontalLayout = inHorizontalLayout;
-            //     return saintsRowDrawer.CreatePropertyGUI(property);
-            // }
+            (Type useDrawerType, Attribute useAttribute) = Util.GetDrawerAndAttribute(property, allAttributes, fieldInfo);
 
             if (useDrawerType == null)
             {
@@ -3121,5 +3026,5 @@ namespace SaintsField.Editor.Utils
             }
         }
     }
-#endif
 }
+#endif

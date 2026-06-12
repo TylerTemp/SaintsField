@@ -6,6 +6,7 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 using SaintsField.Utils;
@@ -16,6 +17,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
     public abstract partial class AbsRenderer
     {
+        // public bool IMGUIUseHorizontalStyle() => InAnyHorizontalLayout || !IMGUIUtils.UseWideMode();
+
         public void RenderIMGUI(float width)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo, true);
