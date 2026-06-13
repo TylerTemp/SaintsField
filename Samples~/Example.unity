@@ -1525,7 +1525,7 @@ MonoBehaviour:
   _audioGroup:
     name: Audio Clip 2
   HasNoAudioGroup: 0
-  _audioClip: {fileID: 0}
+  _audioClip: {fileID: 1369335424}
   _goOptions:
   - {fileID: 1369335424}
 --- !u!1 &153662391
