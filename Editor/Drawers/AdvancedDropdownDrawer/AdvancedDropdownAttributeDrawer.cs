@@ -197,6 +197,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     getOfDropdownListValue.SelfCompact();
                     dropdownListValue = getOfDropdownListValue;
                 }
+                else if (obj is IMenuDropdown md)
+                {
+                    Debug.LogWarning($"{obj.GetType()} is deprecated. Use `Dropdown<>` instead");
+                    dropdownListValue = ConvertDeprecatedMenuDropdown(md, isImGui);
+                }
                 else if (obj is IEnumerable ieObj)
                 {
                     Dropdown<object> list = new Dropdown<object>(isImGui? "Pick an item": "");
@@ -458,6 +463,11 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                     getOfDropdownListValue.SelfCompact();
                     dropdownListValue = getOfDropdownListValue;
                 }
+                else if (obj is IMenuDropdown md)
+                {
+                    Debug.LogWarning($"{obj.GetType()} is deprecated. Use `Dropdown<>` instead");
+                    dropdownListValue = ConvertDeprecatedMenuDropdown(md, isImGui);
+                }
                 else if (obj is IEnumerable ieObj)
                 {
                     Dropdown<object> list = new Dropdown<object>(isImGui? "Pick an item": "");
@@ -675,6 +685,24 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
 
             return newChildren;
+        }
+
+        private static Dropdown<object> ConvertDeprecatedMenuDropdown(IMenuDropdown menuDropdown, bool isImGui)
+        {
+            Dropdown<object> dropdown = new Dropdown<object>(isImGui ? "Pick an item" : "");
+            foreach ((string displayName, object value, bool disabled, bool isSeparator) in menuDropdown)
+            {
+                if (isSeparator)
+                {
+                    dropdown.Add(displayName ?? "");
+                }
+                else
+                {
+                    dropdown.Add(displayName ?? "", value, disabled);
+                }
+            }
+
+            return dropdown;
         }
 
         public static string GetMetaStackDisplay(AdvancedDropdownMetaInfo metaInfo)
