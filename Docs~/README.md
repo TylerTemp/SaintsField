@@ -4381,12 +4381,9 @@ private string SelectItemWithButton([Dropdown(nameof(GetItems))] string item)
 
 Like `Dropdown`, but allows you to quickly set some const expression value
 
-> [!WARNING]
-> UI Toolkit only.
-
 ```csharp
 use SaintsField;
-
+W
 [OptionsDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
 public string[] treeOpt;
 ```
