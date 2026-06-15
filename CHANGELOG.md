@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.18.7 ##
+
+1.  Fix: `AnimatorState` error if the target is a unity object null
+2.  Fix: `Dropdown` now support the old data type and gave an deprecation warning
+
 ## 5.18.6 ##
 
 1.  Unity Fix: When nested list view, only one element will be styled as focused, fix [#279](https://github.com/TylerTemp/SaintsField/issues/279)
