@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
@@ -24,7 +23,8 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
             public GameObject Value1;
         }
 
-        [SerializeReference, ReferencePicker] public List<IReferenceData> Data;
+        [SerializeReference, ReferencePicker] public List<IReferenceData> data;
+        [SerializeReference, ReferencePicker] public IReferenceData dataSingle;
 #endif
     }
 }

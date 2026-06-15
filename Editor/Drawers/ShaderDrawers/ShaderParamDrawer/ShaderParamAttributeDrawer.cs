@@ -58,7 +58,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 
             foreach (ShaderParamUtils.ShaderCustomInfo shaderInfo in shaderInfos)
             {
-                dropdownListValue.Add(shaderInfo.ToString(), shaderInfo);
+                dropdownListValue.Add(shaderInfo.GetString(true), shaderInfo, false, shaderInfo.GetIcon());
             }
 
             IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> curSelected;

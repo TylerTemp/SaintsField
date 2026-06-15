@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Utils;
@@ -14,6 +16,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 {
     public partial class ListDrawerSettingsRenderer
     {
+        private IMGUILoading _imguiLoading = new IMGUILoading();
         private RichTextDrawer _richTextDrawer;
 
         ~ListDrawerSettingsRenderer()
@@ -23,6 +26,11 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
         public override void OnDestroy()
         {
+            if (_asyncSearchItems?.SourceGenerator != null)
+            {
+                _asyncSearchItems.SourceGenerator.Dispose();
+                _asyncSearchItems.SourceGenerator = null;
+            }
         }
 
         private class UnsetGuiStyleFixedHeight : IDisposable
@@ -70,7 +78,369 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         private string _curXml;
         private RichTextDrawer.RichTextChunk[] _curXmlChunks;
 
-        private void DrawListDrawerSettingsField(SerializedProperty property, Rect position, ArraySizeAttribute arraySizeAttribute, bool delayed)
+        private IEnumerable<IReadOnlyList<int>> SearchCallback(SerializedProperty arrayProperty, string search,
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        {
+            const int batchLimit = 10;
+
+            Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
+            string extraSearchCallback = listDrawerSettingsAttribute.ExtraSearch;
+            string overrideSearchCallback = listDrawerSettingsAttribute.OverrideSearch;
+
+            (MethodInfo methodInfo, ParamType paramType) extraSearchMethod = default;
+            (MethodInfo methodInfo, ParamType paramType) overrideSearchMethod = default;
+
+            if (!string.IsNullOrEmpty(extraSearchCallback))
+            {
+                extraSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, extraSearchCallback);
+            }
+
+            if (!string.IsNullOrEmpty(overrideSearchCallback))
+            {
+                overrideSearchMethod = GetSearchMethodInfo(FieldWithInfo.Targets[0].GetType(), elementType, overrideSearchCallback);
+            }
+
+            IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(search).ToList();
+            IEnumerable rawValueList = (IEnumerable)(FieldWithInfo.FieldInfo != null
+                ? FieldWithInfo.FieldInfo.GetValue(FieldWithInfo.Targets[0])
+                : FieldWithInfo.PropertyInfo.GetValue(FieldWithInfo.Targets[0]));
+
+            if (overrideSearchMethod.methodInfo != null)
+            {
+                if (overrideSearchMethod.paramType == ParamType.Index)
+                {
+                    List<int> batchResults = new List<int>();
+                    int batchCount = 0;
+                    foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
+                    {
+                        if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0],
+                                new object[] { fullIndex, searchTokens }))
+                        {
+                            batchResults.Add(fullIndex);
+                        }
+
+                        batchCount++;
+                        if (batchCount / batchLimit >= 1)
+                        {
+                            yield return batchResults.ToArray();
+                            batchCount = 0;
+                            batchResults.Clear();
+                        }
+                    }
+
+                    if (batchResults.Count > 0)
+                    {
+                        yield return batchResults;
+                    }
+
+                    yield break;
+                }
+
+                {
+                    int curIndex = 0;
+                    List<int> batchResults = new List<int>();
+                    int batchCount = 0;
+
+                    foreach (object rawValue in rawValueList)
+                    {
+                        object[] methodParams = overrideSearchMethod.paramType == ParamType.Target
+                            ? new[] { rawValue, searchTokens }
+                            : new[] { rawValue, curIndex, searchTokens };
+
+                        if ((bool)overrideSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0], methodParams))
+                        {
+                            batchResults.Add(curIndex);
+                        }
+
+                        curIndex++;
+                        batchCount++;
+                        if (batchCount / batchLimit >= 1)
+                        {
+                            yield return batchResults.ToArray();
+                            batchCount = 0;
+                            batchResults.Clear();
+                        }
+                    }
+
+                    if (batchResults.Count > 0)
+                    {
+                        yield return batchResults;
+                    }
+
+                    yield break;
+                }
+            }
+
+            if (extraSearchMethod.methodInfo != null)
+            {
+                if (extraSearchMethod.paramType == ParamType.Index)
+                {
+                    List<int> batchResults = new List<int>();
+                    int batchCount = 0;
+
+                    foreach (int fullIndex in Enumerable.Range(0, arrayProperty.arraySize))
+                    {
+                        if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0],
+                                new object[] { fullIndex, searchTokens }))
+                        {
+                            batchResults.Add(fullIndex);
+                        }
+                        else
+                        {
+                            SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(fullIndex);
+                            HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                                .Select(_ => new HashSet<object>())
+                                .ToArray();
+                            bool all = true;
+                            for (int index = 0; index < searchTokens.Count; index++)
+                            {
+                                ListSearchToken token = searchTokens[index];
+                                HashSet<object> searchedObject = searchedObjectsArray[index];
+                                if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObject))
+                                {
+                                    all = false;
+                                    break;
+                                }
+                            }
+
+                            if (all)
+                            {
+                                batchResults.Add(fullIndex);
+                            }
+                        }
+
+                        batchCount++;
+                        if (batchCount / batchLimit >= 1)
+                        {
+                            yield return batchResults.ToArray();
+                            batchCount = 0;
+                            batchResults.Clear();
+                        }
+                    }
+
+                    if (batchResults.Count > 0)
+                    {
+                        yield return batchResults;
+                    }
+
+                    yield break;
+                }
+
+                {
+                    int curIndex = 0;
+                    List<int> batchResults = new List<int>();
+                    int batchCount = 0;
+                    foreach (object rawValue in rawValueList)
+                    {
+                        object[] methodParams = extraSearchMethod.paramType == ParamType.Target
+                            ? new[] { rawValue, searchTokens }
+                            : new[] { rawValue, curIndex, searchTokens };
+
+                        if ((bool)extraSearchMethod.methodInfo.Invoke(FieldWithInfo.Targets[0], methodParams))
+                        {
+                            batchResults.Add(curIndex);
+                        }
+                        else
+                        {
+                            SerializedProperty itemProp = arrayProperty.GetArrayElementAtIndex(curIndex);
+                            HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                                .Select(_ => new HashSet<object>())
+                                .ToArray();
+
+                            bool all = true;
+                            for (int index = 0; index < searchTokens.Count; index++)
+                            {
+                                ListSearchToken token = searchTokens[index];
+                                HashSet<object> searchedObjects = searchedObjectsArray[index];
+                                if (!SerializedUtils.SearchProp(itemProp, token.Token, searchedObjects))
+                                {
+                                    all = false;
+                                    break;
+                                }
+                            }
+
+                            if (all)
+                            {
+                                batchResults.Add(curIndex);
+                            }
+                        }
+
+                        curIndex++;
+                        batchCount++;
+                        if (batchCount / batchLimit >= 1)
+                        {
+                            yield return batchResults.ToArray();
+                            batchCount = 0;
+                            batchResults.Clear();
+                        }
+                    }
+
+                    if (batchResults.Count > 0)
+                    {
+                        yield return batchResults;
+                    }
+
+                    yield break;
+                }
+            }
+
+            List<int> defaultBatchResults = new List<int>();
+            int defaultBatchCount = 0;
+            foreach (int i in SerializedUtils.SearchArrayProperty(arrayProperty, search))
+            {
+                if (i != -1)
+                {
+                    defaultBatchResults.Add(i);
+                }
+
+                defaultBatchCount++;
+                if (defaultBatchCount / batchLimit >= 1)
+                {
+                    yield return defaultBatchResults.ToArray();
+                    defaultBatchCount = 0;
+                    defaultBatchResults.Clear();
+                }
+            }
+
+            if (defaultBatchResults.Count > 0)
+            {
+                yield return defaultBatchResults;
+            }
+        }
+
+        private void UpdatePage(SerializedProperty property, int newPageIndex, int numberOfItemsPerPage,
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        {
+            string searchText = _imGuiListInfo.SearchText;
+            List<int> resultIndexes;
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                resultIndexes = Enumerable.Range(0, property.arraySize).ToList();
+                _asyncSearchItems.Started = true;
+                _asyncSearchItems.Finished = true;
+                _asyncSearchItems.CachedFullSources = new List<int>(resultIndexes);
+                _asyncSearchItems.FullSources = new List<int>(resultIndexes);
+                _asyncSearchItems.SearchText = "";
+                if (_asyncSearchItems.SourceGenerator != null)
+                {
+                    _asyncSearchItems.SourceGenerator.Dispose();
+                    _asyncSearchItems.SourceGenerator = null;
+                }
+            }
+            else if (_asyncSearchItems.SearchText == searchText)
+            {
+                resultIndexes = !_asyncSearchItems.Started && !_asyncSearchItems.Finished
+                    ? _asyncSearchItems.CachedFullSources
+                    : _asyncSearchItems.FullSources;
+            }
+            else
+            {
+                _asyncSearchItems.SearchText = searchText;
+                _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup + 0.6f;
+                _asyncSearchItems.Started = false;
+                _asyncSearchItems.Finished = false;
+                _asyncSearchItems.FullSources.Clear();
+                if (_asyncSearchItems.SourceGenerator != null)
+                {
+                    _asyncSearchItems.SourceGenerator.Dispose();
+                    _asyncSearchItems.SourceGenerator = null;
+                }
+
+                _asyncSearchItems.SourceGenerator = SearchCallback(property, searchText, listDrawerSettingsAttribute).GetEnumerator();
+                resultIndexes = _asyncSearchItems.CachedFullSources;
+            }
+
+            PagingInfo newPagingInfo = GetPagingInfo(newPageIndex, resultIndexes, numberOfItemsPerPage);
+            if (_imGuiReorderableList != null && !newPagingInfo.IndexesCurPage.SequenceEqual(_imGuiListInfo.PagingInfo.IndexesCurPage))
+            {
+                _imGuiReorderableList = null;
+            }
+
+            _imGuiListInfo.PagingInfo = newPagingInfo;
+            _imGuiListInfo.PageIndex = newPagingInfo.CurPageIndex;
+            _imGuiListInfo.NumberOfItemsPrePage = Mathf.Max(numberOfItemsPerPage, 0);
+            _asyncSearchItems.CurPageIndex = newPagingInfo.CurPageIndex;
+            _asyncSearchItems.ItemIndexToPropertyIndex.Clear();
+            _asyncSearchItems.ItemIndexToPropertyIndex.AddRange(newPagingInfo.IndexesCurPage);
+        }
+
+        private void TickAsyncSearch(SerializedProperty property, ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        {
+            if (_asyncSearchItems == null)
+            {
+                return;
+            }
+
+            if (Event.current == null || Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
+            if (!_asyncSearchItems.Started && _asyncSearchItems.SourceGenerator != null &&
+                EditorApplication.timeSinceStartup > _asyncSearchItems.DebounceSearchTime)
+            {
+                _asyncSearchItems.Started = true;
+                UpdatePage(property, _imGuiListInfo.PageIndex, _imGuiListInfo.NumberOfItemsPrePage, listDrawerSettingsAttribute);
+            }
+
+            if (_asyncSearchItems.Started && !_asyncSearchItems.Finished && _asyncSearchItems.SourceGenerator != null)
+            {
+                if (_asyncSearchItems.SourceGenerator.MoveNext())
+                {
+                    IReadOnlyList<int> currentValue = _asyncSearchItems.SourceGenerator.Current;
+                    if (currentValue != null && currentValue.Count > 0)
+                    {
+                        _asyncSearchItems.FullSources.AddRange(currentValue);
+                        UpdatePage(property, _imGuiListInfo.PageIndex, _imGuiListInfo.NumberOfItemsPrePage, listDrawerSettingsAttribute);
+                    }
+                }
+                else
+                {
+                    _asyncSearchItems.Finished = true;
+                    _asyncSearchItems.SourceGenerator.Dispose();
+                    _asyncSearchItems.SourceGenerator = null;
+                }
+            }
+        }
+
+        private void SetArraySize(SerializedProperty property, int newSize, ArraySizeAttribute arraySizeAttribute,
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute)
+        {
+            int min = -1;
+            int max = -1;
+            if (arraySizeAttribute != null)
+            {
+                (string error, bool _, int minValue, int maxValue) = ArraySizeAttributeDrawer.GetMinMax(arraySizeAttribute,
+                    FieldWithInfo.SerializedProperty,
+                    FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
+
+                if (error == "")
+                {
+                    min = minValue;
+                    max = maxValue;
+                }
+            }
+
+            if (min > 0 && newSize < min)
+            {
+                newSize = min;
+            }
+            else if (max > 0 && newSize > max)
+            {
+                newSize = max;
+            }
+
+            if (property.arraySize != newSize)
+            {
+                property.arraySize = newSize;
+                property.serializedObject.ApplyModifiedProperties();
+            }
+
+            UpdatePage(property, _imGuiListInfo.PageIndex, _imGuiListInfo.NumberOfItemsPrePage, listDrawerSettingsAttribute);
+        }
+
+        private void DrawListDrawerSettingsField(SerializedProperty property, Rect position, ArraySizeAttribute arraySizeAttribute,
+            ListDrawerSettingsAttribute listDrawerSettingsAttribute)
         {
             int min = -1;
             int max = -1;
@@ -116,27 +486,12 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
                 Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
 
-                DrawListDrawerHeader(paddingTitle, delayed, elementType, property, arraySizeAttribute);
+                DrawListDrawerHeader(paddingTitle, elementType, property, arraySizeAttribute, listDrawerSettingsAttribute);
                 return;
             }
 
-            IReadOnlyList<int> fullIndexResults;
-            if (string.IsNullOrEmpty(_imGuiListInfo.SearchText))
-            {
-                fullIndexResults = Enumerable.Range(0, property.arraySize).ToList();
-            }
-            else
-            {
-                fullIndexResults = SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText)
-                    .Where(each => each != -1).ToList();
-            }
-            PagingInfo newPagingInfo = GetPagingInfo(_imGuiListInfo.PageIndex, fullIndexResults, _imGuiListInfo.NumberOfItemsPrePage);
-            if (!newPagingInfo.IndexesCurPage.SequenceEqual(_imGuiListInfo.PagingInfo.IndexesCurPage))
-            {
-                _imGuiReorderableList = null;
-            }
-
-            _imGuiListInfo.PagingInfo = newPagingInfo;
+            TickAsyncSearch(property, listDrawerSettingsAttribute);
+            UpdatePage(property, _imGuiListInfo.PageIndex, _imGuiListInfo.NumberOfItemsPrePage, listDrawerSettingsAttribute);
 
             if (_imGuiReorderableList == null)
             {
@@ -146,7 +501,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     };
 
                 Type elementType = ReflectUtils.GetElementType(FieldWithInfo.FieldInfo?.FieldType ?? FieldWithInfo.PropertyInfo.PropertyType);
-                _imGuiReorderableList.drawHeaderCallback += v => DrawListDrawerHeader(v, delayed, elementType, property, arraySizeAttribute);
+                _imGuiReorderableList.drawHeaderCallback += v => DrawListDrawerHeader(v, elementType, property,
+                    arraySizeAttribute, listDrawerSettingsAttribute);
                 _imGuiReorderableList.elementHeightCallback += DrawListDrawerItemHeight;
                 _imGuiReorderableList.drawElementCallback += DrawListDrawerItem;
 
@@ -228,7 +584,8 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
         private Texture2D _iconLeft;
         private Texture2D _iconRight;
 
-        private void DrawListDrawerHeader(Rect rect, bool delayed, Type elementType, SerializedProperty property, ArraySizeAttribute arraySizeAttribute)
+        private void DrawListDrawerHeader(Rect rect, Type elementType, SerializedProperty property,
+            ArraySizeAttribute arraySizeAttribute, ListDrawerSettingsAttribute listDrawerSettingsAttribute)
         {
             int min = -1;
             int max = -1;
@@ -274,30 +631,12 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
                 using(new EditorGUI.DisabledScope(min > 0 && min == max))
                 using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                {
-                    int newCount = EditorGUI.DelayedIntField(titleItemTotalRect, GUIContent.none,
-                        _imGuiListInfo.PagingInfo.IndexesAfterSearch.Count);
+                    {
+                    int newCount = EditorGUI.DelayedIntField(titleItemTotalRect, GUIContent.none, property.arraySize);
                     if (changed.changed)
                     {
-                        if(min > 0 && newCount < min)
-                        {
-                            newCount = min;
-                        }
-                        else if(max > 0 && newCount > max)
-                        {
-                            newCount = max;
-                        }
-                        if(_imGuiListInfo.Property.arraySize != newCount)
-                        {
-                            _imGuiListInfo.Property.arraySize = newCount;
-                            _imGuiListInfo.Property.serializedObject.ApplyModifiedProperties();
-                            IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(_imGuiListInfo.SearchText)
-                                ? Enumerable.Range(0, property.arraySize).ToList()
-                                : SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText).Where(each => each != -1).ToList();
-                            _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.PageIndex,
-                                fullIndexResults, _imGuiListInfo.NumberOfItemsPrePage);
-                            return;
-                        }
+                        SetArraySize(property, newCount, arraySizeAttribute, listDrawerSettingsAttribute);
+                        return;
                     }
                 }
 
@@ -361,20 +700,40 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 
             if(_imGuiListInfo.HasSearch)
             {
-                if(delayed)
+                string searchControlName = $"ListDrawerSettingsSearch_{property.propertyPath}";
+                string oldSearchText = _imGuiListInfo.SearchText;
+                Rect searchFieldRect = new Rect(searchRect)
                 {
-                    _imGuiListInfo.SearchText = EditorGUI.DelayedTextField(new Rect(searchRect)
-                    {
-                        width = searchRect.width - gap,
-                    }, GUIContent.none, _imGuiListInfo.SearchText);
-                }
-                else
+                    width = searchRect.width - gap,
+                };
+                if (_asyncSearchItems.Started && !_asyncSearchItems.Finished)
                 {
-                    _imGuiListInfo.SearchText = EditorGUI.TextField(new Rect(searchRect)
+                    Rect loadingRect = new Rect(searchFieldRect)
                     {
-                        width = searchRect.width - gap,
-                    }, GUIContent.none, _imGuiListInfo.SearchText);
+                        x = searchFieldRect.xMax - 14f,
+                        width = 12f,
+                    };
+                    _imguiLoading?.Draw(loadingRect);
+                    searchFieldRect.xMax -= 16f;
                 }
+
+                GUI.SetNextControlName(searchControlName);
+                _imGuiListInfo.SearchText = EditorGUI.TextField(searchFieldRect, GUIContent.none, _imGuiListInfo.SearchText);
+                if (oldSearchText != _imGuiListInfo.SearchText)
+                {
+                    UpdatePage(property, 0, _imGuiListInfo.NumberOfItemsPrePage, listDrawerSettingsAttribute);
+                }
+
+                if (Event.current.type == EventType.KeyDown
+                    && Event.current.keyCode == KeyCode.Return
+                    && GUI.GetNameOfFocusedControl() == searchControlName
+                    && !_asyncSearchItems.Started
+                    && _asyncSearchItems.SourceGenerator != null
+                    && _asyncSearchItems.DebounceSearchTime > EditorApplication.timeSinceStartup)
+                {
+                    _asyncSearchItems.DebounceSearchTime = EditorApplication.timeSinceStartup - 1;
+                }
+
                 if (string.IsNullOrEmpty(_imGuiListInfo.SearchText))
                 {
                     EditorGUI.LabelField(new Rect(searchRect)
@@ -393,8 +752,15 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 {
                     width = inputWidth,
                 };
-                _imGuiListInfo.NumberOfItemsPrePage = EditorGUI.IntField(numberOfItemsPerPageRect, GUIContent.none,
-                    _imGuiListInfo.NumberOfItemsPrePage);
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    int newNumberOfItemsPerPage = EditorGUI.DelayedIntField(numberOfItemsPerPageRect, GUIContent.none,
+                        _imGuiListInfo.NumberOfItemsPrePage);
+                    if (changed.changed)
+                    {
+                        UpdatePage(property, _imGuiListInfo.PageIndex, Mathf.Max(newNumberOfItemsPerPage, 0), listDrawerSettingsAttribute);
+                    }
+                }
 
                 Rect numberOfItemsSepRect = new Rect(numberOfItemsPerPageRect)
                 {
@@ -410,17 +776,10 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 };
                 using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                 {
-                    int newCount = EditorGUI.DelayedIntField(numberOfItemsTotalRect, GUIContent.none,
-                        _imGuiListInfo.PagingInfo.IndexesAfterSearch.Count);
+                    int newCount = EditorGUI.DelayedIntField(numberOfItemsTotalRect, GUIContent.none, property.arraySize);
                     if (changed.changed)
                     {
-                        _imGuiListInfo.Property.arraySize = newCount;
-                        _imGuiListInfo.Property.serializedObject.ApplyModifiedProperties();
-                        IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(_imGuiListInfo.SearchText)
-                            ? Enumerable.Range(0, property.arraySize).ToList()
-                            : SerializedUtils.SearchArrayProperty(property, _imGuiListInfo.SearchText).Where(each => each != -1).ToList();
-                        _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.PageIndex,
-                            fullIndexResults, _imGuiListInfo.NumberOfItemsPrePage);
+                        SetArraySize(property, newCount, arraySizeAttribute, listDrawerSettingsAttribute);
                         return;
                     }
                 }
@@ -456,8 +815,14 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                     x = prePageRect.x + prePageRect.width,
                     width = inputWidth,
                 };
-                _imGuiListInfo.PageIndex =
-                    EditorGUI.IntField(pageRect, GUIContent.none, _imGuiListInfo.PageIndex + 1) - 1;
+                using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+                {
+                    int newPageIndex = EditorGUI.DelayedIntField(pageRect, GUIContent.none, _imGuiListInfo.PageIndex + 1) - 1;
+                    if (changed.changed)
+                    {
+                        UpdatePage(property, newPageIndex, _imGuiListInfo.NumberOfItemsPrePage, listDrawerSettingsAttribute);
+                    }
+                }
                 Rect totalPageRect = new Rect(pageRect)
                 {
                     x = pageRect.x + pageRect.width,
@@ -512,6 +877,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             }
 
             SerializedProperty property = _imGuiListInfo.Property.GetArrayElementAtIndex(index);
+            int displayIndex = _imGuiListInfo.PagingInfo.IndexesCurPage.IndexOf(index);
 
             Rect useRect = property.propertyType == SerializedPropertyType.Generic
                 ? new Rect(rect)
@@ -521,7 +887,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 }
                 : rect;
 
-            EditorGUI.PropertyField(useRect, property, new GUIContent($"Element {index}"), true);
+            EditorGUI.PropertyField(useRect, property, new GUIContent($"Element {(displayIndex >= 0 ? displayIndex : index)}"), true);
         }
 
 
@@ -582,27 +948,36 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
             if (_imGuiListInfo == null)
             {
                 int numberOfItemsPrePage = listDrawerSettingsAttribute.NumberOfItemsPerPage;
+                List<int> fullList = Enumerable.Range(0, FieldWithInfo.SerializedProperty.arraySize).ToList();
                 _imGuiListInfo = new ImGuiListInfo
                 {
                     Property = FieldWithInfo.SerializedProperty,
                     PreCheckResult = preCheckResult,
                     HasSearch = hasSearch,
                     HasPaging = hasPaging,
-                    PagingInfo = GetPagingInfo(0, Enumerable.Range(0, FieldWithInfo.SerializedProperty.arraySize).ToArray(), numberOfItemsPrePage),
+                    PagingInfo = GetPagingInfo(0, fullList, numberOfItemsPrePage),
                     NumberOfItemsPrePage = numberOfItemsPrePage,
                     PageIndex = 0,
                     SearchText = "",
                 };
+                _asyncSearchItems = new AsyncSearchItems
+                {
+                    Started = true,
+                    Finished = true,
+                    SourceGenerator = Enumerable.Empty<IReadOnlyList<int>>().GetEnumerator(),
+                    FullSources = fullList,
+                    CachedFullSources = new List<int>(fullList),
+                    SearchText = "",
+                    DebounceSearchTime = double.MaxValue,
+                    ItemIndexToPropertyIndex = fullList.ToList(),
+                    CurPageIndex = 0,
+                };
                 FieldWithInfo.SerializedProperty.isExpanded = true;
             }
-            else
-            {
-                IReadOnlyList<int> fullIndexResults = string.IsNullOrEmpty(_imGuiListInfo.SearchText)
-                    ? Enumerable.Range(0, FieldWithInfo.SerializedProperty.arraySize).ToList()
-                    : SerializedUtils.SearchArrayProperty(FieldWithInfo.SerializedProperty, _imGuiListInfo.SearchText).Where(each => each != -1).ToList();
-                _imGuiListInfo.PagingInfo = GetPagingInfo(_imGuiListInfo.PageIndex,
-                    fullIndexResults, _imGuiListInfo.NumberOfItemsPrePage);
-            }
+
+            TickAsyncSearch(FieldWithInfo.SerializedProperty, listDrawerSettingsAttribute);
+            UpdatePage(FieldWithInfo.SerializedProperty, _imGuiListInfo.PageIndex, _imGuiListInfo.NumberOfItemsPrePage,
+                listDrawerSettingsAttribute);
 
             if (!FieldWithInfo.SerializedProperty.isExpanded)
             {
@@ -634,7 +1009,7 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 {
                     _imGuiListInfo.PreCheckResult = preCheckResult;
                     ArraySizeAttribute arraySizeAttribute = FieldWithInfo.PlayaAttributes.OfType<ArraySizeAttribute>().FirstOrDefault();
-                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute, listDrawerSettingsAttribute.Delayed);
+                    DrawListDrawerSettingsField(FieldWithInfo.SerializedProperty, position, arraySizeAttribute, listDrawerSettingsAttribute);
                 }
             }
         }

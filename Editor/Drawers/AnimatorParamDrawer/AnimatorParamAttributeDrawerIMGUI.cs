@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Drawers.ExpandableDrawer;
-using SaintsField.Editor.Linq;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -12,6 +14,65 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 {
     public partial class AnimatorParamAttributeDrawer
     {
+        private sealed class InfoIMGUI
+        {
+            public string Error = "";
+            public Animator Animator;
+            public IReadOnlyList<AnimatorControllerParameter> AnimatorParameters = Array.Empty<AnimatorControllerParameter>();
+            public bool FoundParameter;
+            public AnimatorControllerParameter SelectedParameter;
+        }
+
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
+        private static string _brownColor;
+
+        private static InfoIMGUI EnsureKey(SerializedProperty property, AnimatorParamAttribute animatorParamAttribute, FieldInfo info, object parent)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI cache))
+            {
+                RefreshCache(cache, property, animatorParamAttribute, info, parent);
+                return cache;
+            }
+
+            cache = new InfoIMGUI();
+            InfoCacheIMGUI[key] = cache;
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
+            RefreshCache(cache, property, animatorParamAttribute, info, parent);
+            return cache;
+        }
+
+        private static void RefreshCache(InfoIMGUI cache, SerializedProperty property, AnimatorParamAttribute animatorParamAttribute, FieldInfo info, object parent)
+        {
+            if (property.propertyType is not (SerializedPropertyType.String or SerializedPropertyType.Integer))
+            {
+                cache.Error = $"Invalid property type: expect integer or string, get {property.propertyType}";
+                cache.Animator = null;
+                cache.AnimatorParameters = Array.Empty<AnimatorControllerParameter>();
+                cache.FoundParameter = false;
+                cache.SelectedParameter = default;
+                return;
+            }
+
+            MetaInfo metaInfo = GetMetaInfo(property, animatorParamAttribute, info, parent);
+            cache.Error = metaInfo.Error;
+            cache.Animator = metaInfo.Animator;
+            cache.AnimatorParameters = metaInfo.AnimatorParameters ?? Array.Empty<AnimatorControllerParameter>();
+            if (metaInfo.Error != "")
+            {
+                cache.FoundParameter = false;
+                cache.SelectedParameter = default;
+                return;
+            }
+
+            cache.SelectedParameter = cache.AnimatorParameters.FirstOrDefault(each =>
+                property.propertyType == SerializedPropertyType.String
+                    ? each.name == property.stringValue
+                    : each.nameHash == property.intValue);
+            cache.FoundParameter = cache.SelectedParameter != null;
+        }
+
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
@@ -23,147 +84,168 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
-            if (metaInfo.Error != "")
+            AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
+            InfoIMGUI cache = EnsureKey(property, animatorParamAttribute, info, parent);
+
+            if (property.propertyType is not (SerializedPropertyType.String or SerializedPropertyType.Integer) ||
+                cache.Error != "")
             {
-                _error = metaInfo.Error;
                 DefaultDrawer(position, property, label, info);
                 return;
             }
 
-            _error = "";
-
-            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-            switch (property.propertyType)
-            {
-                case SerializedPropertyType.Integer:
-                    DrawPropertyForInt(position, property, label, metaInfo);
-                    break;
-                case SerializedPropertyType.String:
-                    DrawPropertyForString(position, property, label, metaInfo);
-                    break;
-                default:
-                    _error = $"Invalid property type: expect integer or string, get {property.propertyType}";
-                    DefaultDrawer(position, property, label, info);
-                    break;
-            }
+            DrawDropdown(position, property, label, cache, animatorParamAttribute, info, parent);
         }
 
-        private static void DrawPropertyForInt(Rect position, SerializedProperty property, GUIContent label,
-            MetaInfo metaInfo)
+        private void DrawDropdown(Rect position, SerializedProperty property, GUIContent label, InfoIMGUI cache,
+            AnimatorParamAttribute animatorParamAttribute, FieldInfo info, object parent)
         {
-            int paramNameHash = property.intValue;
-            int index = -1;
+            Rect fieldRect = EditorGUI.PrefixLabel(position, label);
 
-            foreach ((AnimatorControllerParameter value, int eachIndex) in metaInfo.AnimatorParameters.WithIndex())
+            GUI.SetNextControlName(FieldControlName);
+            if (GUI.Button(fieldRect, GUIContent.none, EditorStyles.popup))
             {
-                if (value.nameHash == paramNameHash)
-                {
-                    index = eachIndex;
-                    break;
-                }
-            }
-
-            IEnumerable<string> displayOptions = GetDisplayOptions(metaInfo.AnimatorParameters);
-
-            GUIContent[] contents = displayOptions
-                .Select(each => new GUIContent(each))
-                .Concat(new[]
-                {
-                    GUIContent.none,
-                    new GUIContent($"Edit {metaInfo.Animator.runtimeAnimatorController.name}...")
-                })
-                .ToArray();
-
-            // ReSharper disable once ConvertToUsingDeclaration
-            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-            {
-                int newIndex = EditorGUI.Popup(position, label, index, contents);
-                // ReSharper disable once InvertIf
-                if (changed.changed)
-                {
-                    if (newIndex < metaInfo.AnimatorParameters.Count)
+                PopupWindow.Show(fieldRect, new SaintsTreeDropdownIMGUI(
+                    GetDropdownMetaInfo(property, cache),
+                    fieldRect.width,
+                    320f,
+                    false,
+                    (curItem, _) =>
                     {
-                        int newValue = metaInfo.AnimatorParameters[newIndex].nameHash;
-                        property.intValue = newValue;
-                        TriggerChangedIMGUI(property, newValue);
-                        if (ExpandableIMGUIScoop.IsInScoop)
+                        AnimatorControllerParameter newParam = (AnimatorControllerParameter)curItem;
+                        if (newParam == null)
                         {
-                            property.serializedObject.ApplyModifiedProperties();
+                            AnimatorParamUtils.OpenAnimator(cache.Animator);
+                            return null;
                         }
-                    }
-                    else
-                    {
-                        AnimatorParamUtils.OpenAnimator(metaInfo.Animator.runtimeAnimatorController);
-                    }
-                }
+
+                        object changedValue;
+                        if (property.propertyType == SerializedPropertyType.String)
+                        {
+                            property.stringValue = newParam.name;
+                            changedValue = newParam.name;
+                        }
+                        else
+                        {
+                            property.intValue = newParam.nameHash;
+                            changedValue = newParam.nameHash;
+                        }
+
+                        property.serializedObject.ApplyModifiedProperties();
+                        RefreshCache(cache, property, animatorParamAttribute, info, parent);
+                        TriggerChangedIMGUI(property, changedValue);
+                        return null;
+                    }));
             }
+
+            Rect drawRect = new Rect(fieldRect)
+            {
+                xMin = fieldRect.xMin + 6f,
+                xMax = fieldRect.xMax - 18f,
+            };
+            _richTextDrawer.DrawChunks(drawRect, GetDisplayChunks(property, cache));
         }
 
-        private static void DrawPropertyForString(Rect position, SerializedProperty property, GUIContent label,
-            MetaInfo metaInfo)
+        private static AdvancedDropdownMetaInfo GetDropdownMetaInfo(SerializedProperty property, InfoIMGUI cache)
         {
-            string paramName = property.stringValue;
-            int index = metaInfo.AnimatorParameters
-                .Select((value, valueIndex) => new { value, index = valueIndex })
-                .FirstOrDefault(each => each.value.name == paramName)?.index ?? -1;
+            _brownColor ??= $"#{ColorUtility.ToHtmlStringRGB(EColor.Brown.GetColor())}";
 
-            IEnumerable<string> displayOptions = GetDisplayOptions(metaInfo.AnimatorParameters);
+            AdvancedDropdownList<AnimatorControllerParameter> dropdown =
+                new AdvancedDropdownList<AnimatorControllerParameter>();
 
-            // ReSharper disable once ConvertToUsingDeclaration
-            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            foreach (AnimatorControllerParameter animatorParameter in cache.AnimatorParameters)
             {
-                GUIContent[] contents = displayOptions
-                    .Select(each => new GUIContent(each))
-                    .Concat(new[]
-                    {
-                        GUIContent.none,
-                        new GUIContent($"Edit {metaInfo.Animator.runtimeAnimatorController.name}..."),
-                    })
-                    .ToArray();
-
-                int newIndex = EditorGUI.Popup(position, label, index, contents);
-                // ReSharper disable once InvertIf
-                if (changed.changed)
-                {
-                    if (newIndex < metaInfo.AnimatorParameters.Count)
-                    {
-                        string newValue = metaInfo.AnimatorParameters[newIndex].name;
-                        property.stringValue = newValue;
-                        TriggerChangedIMGUI(property, newValue);
-                        if (ExpandableIMGUIScoop.IsInScoop)
-                        {
-                            property.serializedObject.ApplyModifiedProperties();
-                        }
-                    }
-                    else
-                    {
-                        AnimatorParamUtils.OpenAnimator(metaInfo.Animator.runtimeAnimatorController);
-                    }
-                }
+                dropdown.Add(
+                    $"{animatorParameter.name} <color={_brownColor}>{animatorParameter.type}</color> <color=#808080>({animatorParameter.nameHash})</color>",
+                    animatorParameter,
+                    false,
+                    AnimatorParamUtils.GetIcon(animatorParameter.type));
             }
+
+            if (cache.Animator != null)
+            {
+                if (cache.AnimatorParameters.Count > 0)
+                {
+                    dropdown.AddSeparator();
+                }
+
+                dropdown.Add("Edit Animator...", null);
+            }
+
+            dropdown.SelfCompact();
+
+            return new AdvancedDropdownMetaInfo
+            {
+                CurDisplay = GetPlainDisplay(property, cache),
+                CurValues = cache.FoundParameter ? new object[] { cache.SelectedParameter } : Array.Empty<object>(),
+                DropdownListValue = dropdown,
+                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+            };
         }
 
-        private static IReadOnlyList<string>
-            GetDisplayOptions(IEnumerable<AnimatorControllerParameter> animatorParams) =>
-            animatorParams.Select(each => $"{each.name} [{each.type}]").ToList();
+        private IEnumerable<RichTextDrawer.RichTextChunk> GetDisplayChunks(SerializedProperty property, InfoIMGUI cache)
+        {
+            if (cache.FoundParameter)
+            {
+                AnimatorControllerParameter selected = cache.SelectedParameter;
+                string label = property.propertyType == SerializedPropertyType.String
+                    ? $"{selected.name} <color=#808080>({selected.type})</color>"
+                    : $"{selected.name} <color=#808080>({selected.type}, {selected.nameHash})</color>";
+
+                List<RichTextDrawer.RichTextChunk> chunks = new List<RichTextDrawer.RichTextChunk>
+                {
+                    new RichTextDrawer.RichTextChunk(label, false, label),
+                };
+
+                string icon = AnimatorParamUtils.GetIcon(selected.type);
+                if (icon != null)
+                {
+                    chunks.Insert(0, new RichTextDrawer.RichTextChunk($"<icon={icon}/>", true, icon));
+                }
+
+                return chunks;
+            }
+
+            string missingValue = property.propertyType == SerializedPropertyType.String
+                ? property.stringValue
+                : property.intValue.ToString();
+            string wrongLabel = string.IsNullOrEmpty(missingValue) ? "" : $"<color=red>?</color> ({missingValue})";
+            return RichTextDrawer.ParseRichXmlWithProvider(wrongLabel, this);
+        }
+
+        private static string GetPlainDisplay(SerializedProperty property, InfoIMGUI cache)
+        {
+            if (cache.FoundParameter)
+            {
+                AnimatorControllerParameter selected = cache.SelectedParameter;
+                return property.propertyType == SerializedPropertyType.String
+                    ? $"{selected.name} ({selected.type})"
+                    : $"{selected.name} ({selected.type}, {selected.nameHash})";
+            }
+
+            return property.propertyType == SerializedPropertyType.String
+                ? property.stringValue
+                : property.intValue.ToString();
+        }
 
         protected override bool WillDrawBelow(SerializedProperty property,
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
-            object parent) => _error != "";
+            object parent) => EnsureKey(property, (AnimatorParamAttribute)saintsAttribute, info, parent).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == ""
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => EnsureKey(property, (AnimatorParamAttribute)saintsAttribute, info, parent).Error == ""
             ? 0
-            : ImGuiHelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth, MessageType.Error);
+            : ImGuiHelpBox.GetHeight(EnsureKey(property, (AnimatorParamAttribute)saintsAttribute, info, parent).Error, width, MessageType.Error);
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent) =>
-            ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            EnsureKey(property, (AnimatorParamAttribute)saintsAttribute, info, parent).Error == ""
+                ? position
+                : ImGuiHelpBox.Draw(position, EnsureKey(property, (AnimatorParamAttribute)saintsAttribute, info, parent).Error, MessageType.Error);
 
     }
 }

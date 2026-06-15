@@ -30,9 +30,12 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
             Dropdown<string> dropdownListValue =
                 new Dropdown<string>(isImGui? "Shader Keywords": "");
 
+            dropdownListValue.Add("[Empty String]", string.Empty);
+            dropdownListValue.AddSeparator();
+
             IReadOnlyList<object> curValues = selectedIndex >= 0
                 ? new[] { (object)shaderKeywords[selectedIndex] }
-                : Array.Empty<object>();
+                : new object[] { string.Empty };
 
             foreach (string shaderKeyword in shaderKeywords)
             {

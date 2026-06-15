@@ -1,172 +1,185 @@
 #if UNITY_2021_2_OR_NEWER
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
     public partial class ShaderParamAttributeDrawer
     {
-        private class ShaderParamInfoIMGUI
+        private sealed class ShaderParamInfoIMGUI
         {
-            public string Error;
-            public bool Changed;
-            public object ChangedValue;
+            public string Error = "";
+            public Shader Shader;
+            public ShaderParamUtils.ShaderCustomInfo[] ShaderInfos = Array.Empty<ShaderParamUtils.ShaderCustomInfo>();
+            public bool FoundShaderInfo;
+            public ShaderParamUtils.ShaderCustomInfo SelectedShaderInfo;
         }
 
         private static readonly Dictionary<string, ShaderParamInfoIMGUI> CachedIMGUI = new Dictionary<string, ShaderParamInfoIMGUI>();
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
+
+        private static ShaderParamInfoIMGUI EnsureKey(SerializedProperty property, ShaderParamAttribute shaderParamAttribute, FieldInfo info, object parent)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (CachedIMGUI.TryGetValue(key, out ShaderParamInfoIMGUI cache))
+            {
+                RefreshCache(cache, property, shaderParamAttribute, info, parent);
+                return cache;
+            }
+
+            cache = new ShaderParamInfoIMGUI();
+            CachedIMGUI[key] = cache;
+
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshOnEvent);
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshOnEvent);
+                CachedIMGUI.Remove(key);
+            });
+
+            RefreshCache(cache, property, shaderParamAttribute, info, parent);
+            return cache;
+
+            void RefreshOnEvent()
+            {
+                RefreshCache(cache, property, shaderParamAttribute, info, parent);
+            }
+        }
+
+        private static void RefreshCache(ShaderParamInfoIMGUI cache, SerializedProperty property, ShaderParamAttribute shaderParamAttribute, FieldInfo info, object parent)
+        {
+            string mismatchError = GetTypeMismatchError(property);
+            if (mismatchError != "")
+            {
+                cache.Error = mismatchError;
+                cache.Shader = null;
+                cache.ShaderInfos = Array.Empty<ShaderParamUtils.ShaderCustomInfo>();
+                cache.FoundShaderInfo = false;
+                cache.SelectedShaderInfo = default;
+                return;
+            }
+
+            (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
+            cache.Error = error;
+            cache.Shader = shader;
+            if (error != "")
+            {
+                cache.ShaderInfos = Array.Empty<ShaderParamUtils.ShaderCustomInfo>();
+                cache.FoundShaderInfo = false;
+                cache.SelectedShaderInfo = default;
+                return;
+            }
+
+            cache.ShaderInfos = ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
+            (bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo selectedShaderInfo) = GetSelectedShaderInfo(property, cache.ShaderInfos);
+            cache.FoundShaderInfo = foundShaderInfo;
+            cache.SelectedShaderInfo = selectedShaderInfo;
+        }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
             ISaintsAttribute saintsAttribute,
             FieldInfo info,
-            bool hasLabelWidth, object parent)
-        {
-            string key = SerializedUtils.GetUniqueId(property);
-            if (!CachedIMGUI.ContainsKey(key))
-            {
-                CachedIMGUI[key] = new ShaderParamInfoIMGUI
-                {
-                    Error = "",
-                };
-
-                NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
-                {
-                    CachedIMGUI.Remove(key);
-                });
-            }
-
-            return EditorGUIUtility.singleLineHeight;
-        }
+            bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderParamInfoIMGUI infoIMGUI))
-            {
-                return;
-            }
+            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+            ShaderParamInfoIMGUI cache = EnsureKey(property, shaderParamAttribute, info, parent);
 
-            if(property.propertyType != SerializedPropertyType.String &&
-               property.propertyType != SerializedPropertyType.Integer)
+            if (property.propertyType != SerializedPropertyType.String &&
+                property.propertyType != SerializedPropertyType.Integer)
             {
                 DefaultDrawer(position, property, label, info);
                 return;
             }
 
-            if (infoIMGUI.Changed)
-            {
-                TriggerChangedIMGUI(property, infoIMGUI.ChangedValue);
-                infoIMGUI.Changed = false;
-            }
-
-            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute) saintsAttribute;
-            (string error, Shader shader) = ShaderUtils.GetShader(shaderParamAttribute.TargetName, shaderParamAttribute.Index, property, info, parent);
-            infoIMGUI.Error = error;
-            if (error != "")
+            if (cache.Error != "")
             {
                 DefaultDrawer(position, property, label, info);
                 return;
             }
 
-            ShaderParamUtils.ShaderCustomInfo[] shaderInfos = ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType).ToArray();
-            (bool foundShaderInfo, ShaderParamUtils.ShaderCustomInfo selectedShaderInfo) = GetSelectedShaderInfo(property, ShaderParamUtils.GetShaderInfo(shader, shaderParamAttribute.PropertyType));
+            Rect fieldRect = EditorGUI.PrefixLabel(position, label);
+            string display = cache.FoundShaderInfo ? cache.SelectedShaderInfo.ToString() : "-";
 
-            Rect dropdownButtonRect = EditorGUI.PrefixLabel(position, label);
-            if(EditorGUI.DropdownButton(dropdownButtonRect, new GUIContent(foundShaderInfo? selectedShaderInfo.ToString(): "-"), FocusType.Keyboard))
+            GUI.SetNextControlName(FieldControlName);
+            if (GUI.Button(fieldRect, GUIContent.none, EditorStyles.popup))
             {
-                AdvancedDropdownMetaInfo dropdownMetaInfo = GetMetaInfo(foundShaderInfo, selectedShaderInfo, shaderInfos, true);
-                Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(dropdownMetaInfo.DropdownListValue, position.width);
-                SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
-                    dropdownMetaInfo.DropdownListValue,
-                    size,
-                    position,
-                    new AdvancedDropdownState(),
-                    curItem =>
+                PopupWindow.Show(fieldRect, new SaintsTreeDropdownIMGUI(
+                    GetMetaInfo(cache.FoundShaderInfo, cache.SelectedShaderInfo, cache.ShaderInfos, true),
+                    fieldRect.width,
+                    320f,
+                    false,
+                    (curItem, _) =>
                     {
-                        ShaderParamUtils.ShaderCustomInfo shaderInfo = (ShaderParamUtils.ShaderCustomInfo) curItem;
-                        // ReSharper disable once ConvertIfStatementToSwitchStatement
+                        ShaderParamUtils.ShaderCustomInfo shaderInfo = (ShaderParamUtils.ShaderCustomInfo)curItem;
+                        object changedValue;
                         if (property.propertyType == SerializedPropertyType.String)
                         {
                             property.stringValue = shaderInfo.PropertyName;
-                            property.serializedObject.ApplyModifiedProperties();
-                            infoIMGUI.Changed = true;
-                            infoIMGUI.ChangedValue = shaderInfo.PropertyName;
+                            changedValue = shaderInfo.PropertyName;
                         }
-                        else if (property.propertyType == SerializedPropertyType.Integer)
+                        else
                         {
                             property.intValue = shaderInfo.PropertyID;
-                            property.serializedObject.ApplyModifiedProperties();
-                            infoIMGUI.Changed = true;
-                            infoIMGUI.ChangedValue = shaderInfo.PropertyID;
+                            changedValue = shaderInfo.PropertyID;
                         }
-                    },
-                    _ => null);
-                dropdown.Show(position);
-                dropdown.BindWindowPosition();
+
+                        property.serializedObject.ApplyModifiedProperties();
+                        RefreshCache(cache, property, shaderParamAttribute, info, parent);
+                        TriggerChangedIMGUI(property, changedValue);
+                        return new[] { curItem };
+                    }));
             }
+
+            Rect drawRect = new Rect(fieldRect)
+            {
+                xMin = fieldRect.xMin + 6f,
+                xMax = fieldRect.xMax - 18f,
+            };
+            _richTextDrawer.DrawChunks(drawRect, cache.FoundShaderInfo
+                ? cache.SelectedShaderInfo.GetDisplayChunks(true)
+                : RichTextDrawer.ParseRichXmlWithProvider(display, new RichTextDrawer.EmptyRichTextTagProvider()));
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
-            string mismatch = GetTypeMismatchError(property);
-            if (mismatch != "")
-            {
-                return true;
-            }
-
-            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderParamInfoIMGUI infoIMGUI))
-            {
-                return false;
-            }
-
-            return infoIMGUI.Error != "";
+            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+            ShaderParamInfoIMGUI cache = EnsureKey(property, shaderParamAttribute, info, parent);
+            return cache.Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
-            string error = GetTypeMismatchError(property);
-            if (error != "")
-            {
-                return ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
-            }
-
-            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderParamInfoIMGUI infoIMGUI) || infoIMGUI.Error == "")
-            {
-                return 0;
-            }
-
-            return ImGuiHelpBox.GetHeight(infoIMGUI.Error, width, MessageType.Error);
+            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+            string error = EnsureKey(property, shaderParamAttribute, info, parent).Error;
+            return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            string error = GetTypeMismatchError(property);
-            if (error != "")
-            {
-                return ImGuiHelpBox.Draw(position, error, MessageType.Error);
-            }
-
-            if(!CachedIMGUI.TryGetValue(SerializedUtils.GetUniqueId(property), out ShaderParamInfoIMGUI infoIMGUI) || infoIMGUI.Error == "")
-            {
-                return position;
-            }
-
-            return ImGuiHelpBox.Draw(position, infoIMGUI.Error, MessageType.Error);
+            ShaderParamAttribute shaderParamAttribute = (ShaderParamAttribute)saintsAttribute;
+            string error = EnsureKey(property, shaderParamAttribute, info, parent).Error;
+            return error == "" ? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);
         }
     }
 }

@@ -3083,5 +3083,23 @@ namespace SaintsField.Editor.Utils
 
             return (useDrawerType, useAttribute);
         }
+
+        public static string GetReferencePropertyLabel(SerializedProperty property)
+        {
+            if (!SerializedUtils.IsOk(property))
+            {
+                return "";
+            }
+
+            object v = property.managedReferenceValue;
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (v == null)
+            {
+                return "-";
+            }
+
+            Type type = v.GetType();
+            return $"{type.Name} <color=#{ColorUtility.ToHtmlStringRGB(Color.gray)}>{type.Namespace}</color>";
+        }
     }
 }

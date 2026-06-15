@@ -22,10 +22,6 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
     [CustomPropertyDrawer(typeof(AnimatorState), true)]
     public partial class AnimatorStateAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
-        private bool _onEnableChecked;
-        private string _errorMsg = "";
-        // private bool _targetIsString = true;
-
         private struct MetaInfo
         {
             public RuntimeAnimatorController RuntimeAnimatorController;

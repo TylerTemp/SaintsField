@@ -21,9 +21,6 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
     [CustomPropertyDrawer(typeof(AnimatorParamAttribute), true)]
     public partial class AnimatorParamAttributeDrawer : SaintsPropertyDrawer, IAutoRunnerFixDrawer
     {
-        // private const string InvalidAnimatorControllerWarningMessage = "Target animator controller is null";
-        private string _error = "";
-
         private struct MetaInfo
         {
             // ReSharper disable InconsistentNaming

@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
 
         private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
 
-        private static InfoIMGUI EnsureKey(SerializedProperty property, OnValueChangedAttribute attribute, object parent)
+        private static InfoIMGUI EnsureKey(SerializedProperty property, OnValueChangedAttribute attribute, FieldInfo info, object parent)
         {
             string key = SerializedUtils.GetUniqueId(property);
             if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI infoCache))
@@ -30,8 +30,23 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
 
             UnityAction<object> caller = newValue =>
             {
-                string error = InvokeCallback(attribute.Callback, newValue,
-                    arrayIndex, parent);
+                object useParent = parent;
+                if (parent != null && parent.GetType().IsValueType)
+                {
+                    (SerializedUtils.FieldOrProp _, object refreshedParent) =
+                        SerializedUtils.GetFieldInfoAndDirectParent(property);
+                    if (refreshedParent != null)
+                    {
+                        useParent = refreshedParent;
+                    }
+                }
+
+                IReadOnlyList<object> overrideParams = arrayIndex < 0
+                    ? new[] { newValue }
+                    : new[] { newValue, arrayIndex };
+
+                (string error, MemberInfo _, object _) = Util.GetOf<object>(attribute.Callback, null, property, info,
+                    useParent, overrideParams);
                 infoCache.Error = error;
             };
 
@@ -53,7 +68,7 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
             FieldInfo info, object parent)
         {
-            InfoIMGUI _ = EnsureKey(property, (OnValueChangedAttribute) saintsAttribute, parent);
+            InfoIMGUI _ = EnsureKey(property, (OnValueChangedAttribute) saintsAttribute, info, parent);
             return position;
         }
 
@@ -61,13 +76,13 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
-            object parent) => EnsureKey(property, (OnValueChangedAttribute) saintsAttribute, parent).Error != "";
+            object parent) => EnsureKey(property, (OnValueChangedAttribute) saintsAttribute, info, parent).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            InfoIMGUI cachedInfo = EnsureKey(property, (OnValueChangedAttribute) saintsAttribute, parent);
+            InfoIMGUI cachedInfo = EnsureKey(property, (OnValueChangedAttribute) saintsAttribute, info, parent);
             return cachedInfo.Error == "" ? 0 : ImGuiHelpBox.GetHeight(cachedInfo.Error, width, MessageType.Error);
         }
 
@@ -75,7 +90,7 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            InfoIMGUI cachedInfo = EnsureKey(property, (OnValueChangedAttribute) saintsAttribute, parent);
+            InfoIMGUI cachedInfo = EnsureKey(property, (OnValueChangedAttribute) saintsAttribute, info, parent);
             return cachedInfo.Error == "" ? position : ImGuiHelpBox.Draw(position, cachedInfo.Error, MessageType.Error);
         }
     }

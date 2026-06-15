@@ -10,7 +10,26 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
 {
     public partial class ProgressBarAttributeDrawer
     {
-        private string _imGuiError = "";
+        private class ImGuiStatus
+        {
+            public string Error = "";
+            public bool InArrayMousePressed;
+        }
+
+        private static readonly Dictionary<string, ImGuiStatus> ImGuiStatusCache =
+            new Dictionary<string, ImGuiStatus>();
+
+        private static ImGuiStatus EnsureKey(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (ImGuiStatusCache.TryGetValue(key, out ImGuiStatus status))
+            {
+                return status;
+            }
+
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => ImGuiStatusCache.Remove(key));
+            return ImGuiStatusCache[key] = new ImGuiStatus();
+        }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
@@ -21,20 +40,14 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             return EditorGUIUtility.singleLineHeight;
         }
 
-        private readonly Dictionary<string, bool> _inArrayMousePressed = new Dictionary<string, bool>();
-
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info,
             object parent)
         {
-            string arrayKey = SerializedUtils.GetUniqueIdArray(property);
-            // ReSharper disable once CanSimplifyDictionaryLookupWithTryAdd
-            if (!_inArrayMousePressed.ContainsKey(arrayKey))
-            {
-                _inArrayMousePressed[arrayKey] = false;
-            }
+            ImGuiStatus status = EnsureKey(property);
+            status.Error = "";
 
             ProgressBarAttribute progressBarAttribute = (ProgressBarAttribute)saintsAttribute;
 
@@ -48,7 +61,7 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             // EditorGUI.DrawRect(position, Color.yellow);
 
             MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
-            _imGuiError = metaInfo.Error;
+            status.Error = metaInfo.Error;
 
             EditorGUI.DrawRect(fieldRect, metaInfo.BackgroundColor);
 
@@ -85,39 +98,39 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
             {
                 // GUIUtility.hotControl = 0;
                 // Debug.Log($"UP!");
-                _inArrayMousePressed[arrayKey] = false;
+                status.InArrayMousePressed = false;
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
-                Debug.Log($"mouse up {property.propertyPath}: {inArrayMousePressed[arrayKey]}");
+                Debug.Log($"mouse up {property.propertyPath}: {status.InArrayMousePressed}");
 #endif
             }
 
             if (e.type == EventType.MouseDown && e.button == 0)
             {
                 // arrayMousePressed[arrayIndex] = position.Contains(e.mousePosition);
-                _inArrayMousePressed[arrayKey] = position.Contains(e.mousePosition);
+                status.InArrayMousePressed = position.Contains(e.mousePosition);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
-                Debug.Log($"mouse down {position}: {inArrayMousePressed[arrayKey]}/{property.propertyPath}");
+                Debug.Log($"mouse down {position}: {status.InArrayMousePressed}/{property.propertyPath}");
 #endif
             }
 
             (string titleError, string title) = GetTitle(property, progressBarAttribute.TitleCallback,
                 progressBarAttribute.Step, curValue, metaInfo.Min, metaInfo.Max, parent);
-            if (_imGuiError == "")
+            if (status.Error == "")
             {
-                _imGuiError = titleError;
+                status.Error = titleError;
             }
 
             // string title = null;
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
-            Debug.Log($"{property.propertyPath}/{inArrayMousePressed[arrayKey]}/{GetHashCode()}");
+            Debug.Log($"{property.propertyPath}/{status.InArrayMousePressed}/{GetHashCode()}");
 #endif
 
             if (GUI.enabled && (e.type == EventType.MouseDown || e.type == EventType.MouseDrag) &&
-                _inArrayMousePressed[arrayKey])
+                status.InArrayMousePressed)
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_PROGRESS_BAR
-                Debug.Log($"{property.propertyPath}/{inArrayMousePressed[arrayKey]}");
+                Debug.Log($"{property.propertyPath}/{status.InArrayMousePressed}");
 #endif
                 float newPercent = (e.mousePosition.x - fieldRect.x) / fieldRect.width;
                 float newValue = Mathf.Lerp(metaInfo.Min, metaInfo.Max, newPercent);
@@ -139,17 +152,14 @@ namespace SaintsField.Editor.Drawers.ProgressBarDrawer
                         TriggerChangedIMGUI(property, boundValue);
                     }
 
-                    if (ExpandableIMGUIScoop.IsInScoop)
-                    {
-                        property.serializedObject.ApplyModifiedProperties();
-                    }
+                    property.serializedObject.ApplyModifiedProperties();
 
                     (string titleError, string title) changedTitle = GetTitle(property,
                         progressBarAttribute.TitleCallback, progressBarAttribute.Step, boundValue, metaInfo.Min,
                         metaInfo.Max, parent);
-                    if (_imGuiError == "")
+                    if (status.Error == "")
                     {
-                        _imGuiError = changedTitle.titleError;
+                        status.Error = changedTitle.titleError;
                     }
 
                     title = changedTitle.title;

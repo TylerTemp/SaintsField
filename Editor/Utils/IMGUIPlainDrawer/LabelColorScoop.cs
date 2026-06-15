@@ -19,7 +19,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             }
 
             _prevColor = EditorStyles.label.normal.textColor;
-            EditorStyles.label.normal.textColor = IMGUIUtils.LabelGrayColor;
+            EditorStyles.label.normal.textColor = IMGUIRawDraw.LabelGrayColor;
         }
 
 

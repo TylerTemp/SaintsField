@@ -123,8 +123,8 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             }
         }
 
-#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        public static void MakeDropdown<T>(T curValue, Shader shader, ShaderPropertyType? shaderPropertyType, VisualElement root, Action<T> onValueChangedCallback)
+        public static AdvancedDropdownMetaInfo MakeDropdownListMetaInfo<T>(T curValue, Shader shader, ShaderPropertyType? shaderPropertyType,
+            VisualElement root, Action<T> onValueChangedCallback)
         {
             bool isString = typeof(T) == typeof(string);
 
@@ -150,12 +150,20 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 }
             }
 
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            return new AdvancedDropdownMetaInfo
             {
                 CurValues = selected ? new object[] { selectedInfo } : Array.Empty<object>(),
                 DropdownListValue = dropdown,
                 SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
             };
+        }
+
+#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+        public static void MakeDropdown<T>(T curValue, Shader shader, ShaderPropertyType? shaderPropertyType, VisualElement root, Action<T> onValueChangedCallback)
+        {
+            AdvancedDropdownMetaInfo metaInfo = MakeDropdownListMetaInfo(curValue, shader, shaderPropertyType, root, onValueChangedCallback);
+
+            bool isString = typeof(T) == typeof(string);
 
             (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 

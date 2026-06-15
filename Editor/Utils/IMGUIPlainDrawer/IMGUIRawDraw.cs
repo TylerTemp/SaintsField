@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.ReferencePicker;
+using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using UnityEditor;
 using UnityEngine;
 
 namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
 {
-    public static class IMGUIUtils
+    public static class IMGUIRawDraw
     {
         public static readonly Color LabelGrayColor = EColor.EditorSeparator.GetColor();
 
@@ -74,6 +74,25 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             return imguiDrawer;
         }
 
+        private static PropertyDrawer GetAndCacheSaintsRowDrawer(SerializedProperty property, FieldInfo fieldInfo, string label,
+            bool inHorizontalLayout)
+        {
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 1);
+            if (!IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer imguiDrawer))
+            {
+                imguiDrawer = SaintsPropertyDrawer.MakePropertyDrawer(typeof(SaintsRowAttributeDrawer), fieldInfo,
+                    new SaintsRowAttribute(), label);
+                IMGUIDrawerCache.CachedDrawers[drawerKey] = imguiDrawer;
+            }
+
+            if (imguiDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
+            {
+                saintsPropertyDrawer.InHorizontalLayout = inHorizontalLayout;
+            }
+
+            return imguiDrawer;
+        }
+
         public static float GetPropertyHeight(
             PropertyDrawer imguiDrawer,
             GUIContent useGUIContent,
@@ -108,45 +127,12 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     // Debug.Log($"generic/managed process {property.propertyPath}/{property.isArray} allAttributes={string.Join(", ", allAttributes)}");
                     if (property.isArray)
                     {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DOWNPOUR
-                        Debug.Log($"array process {property.propertyPath} allAttributes={string.Join(", ", allAttributes)}");
-#endif
-                        int arraySize = property.arraySize;
-                        if (arraySize == 0)
-                        {
-                            return SaintsPropertyDrawer.SingleLineHeight * 3;
-                        }
-
-                        float accHeight = SaintsPropertyDrawer.SingleLineHeight * 2;
-                        Type itemType = ReflectUtils.GetElementType(rawType);
-                        PropertyAttribute[] itemAttributes = allAttributes.OfType<PropertyAttribute>().ToArray();
-                        for (int index = 0; index < arraySize; index++)
-                        {
-                            SerializedProperty itemProp = property.GetArrayElementAtIndex(index);
-                            string itemLabel = $"Element {index}";
-                            PropertyDrawer itemDrawer = GetAndCacheDrawer(itemProp, itemAttributes, fieldInfo, itemLabel);
-                            float thisHeight = GetPropertyHeight(itemDrawer, new GUIContent(itemLabel), itemProp, itemAttributes, itemType, fieldInfo, inHorizontalLayout);
-                            accHeight += thisHeight;
-                        }
-
-                        return accHeight;
+                        return IMGUIList.GetHeight(property, allAttributes, rawType, label, fieldInfo,
+                            inHorizontalLayout, false);
                     }
 
-                    if (propertyType == SerializedPropertyType.ManagedReference && allAttributes.All(each => each is not ReferencePickerAttribute))
-                    {
-                        ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
-                        ReferencePickerAttributeDrawer referencePickerAttributeDrawer = (ReferencePickerAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(ReferencePickerAttributeDrawer), fieldInfo, referencePickerAttribute, label.text);
-                        // referencePickerAttributeDrawer.OverrideAttributes = new PropertyAttribute[]
-                        // {
-                        //     referencePickerAttribute,
-                        //     new SaintsRowAttribute(),
-                        // };
-                        referencePickerAttributeDrawer.InHorizontalLayout = inHorizontalLayout;
-                        return referencePickerAttributeDrawer.GetPropertyHeight(property, label);
-                    }
-                    // return SaintsRowAttributeDrawer.IMGUIGetHeight(property, label, fieldInfo, inHorizontalLayout,
-                    //     null, makeRenderer, doTweenPlayRecorder, parent, new RichTextDrawer.EmptyRichTextTagProvider());
-                    return 0;
+                    return GetAndCacheSaintsRowDrawer(property, fieldInfo, label.text, inHorizontalLayout)
+                        .GetPropertyHeight(property, label);
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:
@@ -231,6 +217,14 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 case SerializedPropertyType.Generic:
                 case SerializedPropertyType.ManagedReference:
                 {
+                    if (property.isArray)
+                    {
+                        IMGUIList.DrawField(position, property, allAttributes, rawType, label, fieldInfo,
+                            inHorizontalLayout, labelGrayColor);
+                        return;
+                    }
+                    GetAndCacheSaintsRowDrawer(property, fieldInfo, label.text, inHorizontalLayout)
+                        .OnGUI(position, property, label);
                     return;
                 }
                 case SerializedPropertyType.Vector2:

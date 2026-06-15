@@ -6,42 +6,24 @@ using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.RateDrawer
 {
     public partial class RateAttributeDrawer
     {
-        private void ImGuiEnsureResources(SerializedProperty property)
+        private static Texture2D Star => _star ??= Util.LoadResource<Texture2D>("star.png");
+
+        private static Texture2D StarSlash => _starSlash ??= Util.LoadResource<Texture2D>("star-slash.png");
+
+        private static GUIStyle NormalFramed
         {
-            if (_star == null)
+            get
             {
-                ImGuiEnsureDispose(property.serializedObject.targetObject);
-                _star = Util.LoadResource<Texture2D>("star.png");
+                if (_normalFramed != null)
+                {
+                    return _normalFramed;
+                }
 
-                _starActive = Tex.ApplyTextureColor(_star, RateUtils.ActiveColor);
-                _starIncrease = Tex.ApplyTextureColor(_star, RateUtils.WillActiveColor);
-                _starDecrease = Tex.ApplyTextureColor(_star, RateUtils.WillInactiveColor);
-                _starInactive = Tex.ApplyTextureColor(_star, RateUtils.InactiveColor);
-
-                _starSlash = Util.LoadResource<Texture2D>("star-slash.png");
-                _starSlashActive = Tex.ApplyTextureColor(_starSlash, Color.red);
-                _starSlashInactive = Tex.ApplyTextureColor(_starSlash, Color.grey);
-
-                _guiContentSlash = new GUIContent(_starSlashActive);
-                _guiContentSlashInactive = new GUIContent(_starSlashInactive);
-                _guiContentActive = new GUIContent(_starActive);
-                _guiContentIncrease = new GUIContent(_starIncrease);
-                _guiContentDecrease = new GUIContent(_starDecrease);
-                _guiContentInactive = new GUIContent(_starInactive);
-
-                // _clear = MakePixel(Color.clear);
-                Debug.Assert(_starActive.width != 1);
-            }
-
-            // ReSharper disable once InvertIf
-            if (_normalFramed == null)
-            {
                 _normalFramed = new GUIStyle(GUI.skin.button)
                 {
                     margin = new RectOffset(0, 0, 0, 0),
@@ -51,43 +33,11 @@ namespace SaintsField.Editor.Drawers.RateDrawer
                     contentOffset = new Vector2(0, 0),
                     alignment = TextAnchor.MiddleCenter,
                 };
-
-                // _normalClear = new GUIStyle(_normalFramed)
-                // {
-                //     normal =
-                //     {
-                //         background = _clear,
-                //     },
-                // };
-                // _normalClear = new GUIStyle(GUI.skin.label)
-                // {
-                //     // normal =
-                //     // {
-                //     //     background = _clear,
-                //     // },
-                // };
-                _normalClear = EditorStyles.label;
+                return _normalFramed;
             }
         }
 
-        protected override void ImGuiOnDispose()
-        {
-            foreach (Texture2D texture2D in new[]
-                     {
-                         _starActive, _starIncrease, _starDecrease, _starInactive, _starSlashActive, _starSlashInactive,
-                         // _clear,
-                     })
-            {
-                if (texture2D)
-                {
-                    Object.DestroyImmediate(texture2D);
-                }
-            }
-
-            _star = _starSlash = _starActive = _starInactive =
-                _starDecrease = _starInactive = _starSlashActive = _starSlashInactive = null;
-            base.ImGuiOnDispose();
-        }
+        private static GUIStyle NormalClear => _normalClear ??= EditorStyles.label;
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
@@ -100,7 +50,12 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            ImGuiEnsureResources(property);
+            Texture2D star = Star;
+            Texture2D starSlash = StarSlash;
+            if (star == null || starSlash == null)
+            {
+                return;
+            }
 
             RateAttribute rateAttribute = (RateAttribute)saintsAttribute;
             int min = rateAttribute.Min;
@@ -124,7 +79,6 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             // }
 
             float eachWidth = starsRect.height + 4;
-            // Debug.Log(_starActive.width);
             // Debug.Log(eachWidth);
             // Debug.Log(eachWidth);
             if (eachWidth * options.Count > starsRect.width)
@@ -173,23 +127,27 @@ namespace SaintsField.Editor.Drawers.RateDrawer
             for (int index = 0; index < options.Count; index++)
             {
                 int curValue = options[index];
-                // bool belowMix = curValue < min;
-                GUIContent iconContent;
+                Texture2D iconTexture;
+                Color iconColor;
                 if (curValue > useValue && curValue > hoverValue)
                 {
-                    iconContent = _guiContentInactive;
+                    iconTexture = star;
+                    iconColor = RateUtils.InactiveColor;
                 }
                 else if (curValue <= useValue && curValue <= hoverValue)
                 {
-                    iconContent = _guiContentActive;
+                    iconTexture = star;
+                    iconColor = RateUtils.ActiveColor;
                 }
                 else if (curValue > useValue && curValue <= hoverValue)
                 {
-                    iconContent = _guiContentIncrease;
+                    iconTexture = star;
+                    iconColor = RateUtils.WillActiveColor;
                 }
                 else if (curValue <= useValue && curValue > hoverValue)
                 {
-                    iconContent = curValue <= min ? _guiContentActive : _guiContentDecrease;
+                    iconTexture = star;
+                    iconColor = curValue <= min ? RateUtils.ActiveColor : RateUtils.WillInactiveColor;
                 }
                 else
                 {
@@ -198,7 +156,12 @@ namespace SaintsField.Editor.Drawers.RateDrawer
 
                 if (curValue == 0)
                 {
-                    iconContent = useValue == 0 ? _guiContentSlash : _guiContentSlashInactive;
+                    iconTexture = starSlash;
+                    iconColor = hoverValue == 0
+                        ? new Color(1f, 0f, 0f, useValue == 0 ? 1f : 0.4f)
+                        : useValue == 0
+                            ? Color.red
+                            : Color.grey;
                 }
 
                 bool frozenStar = curValue != 0 && curValue <= min;
@@ -208,13 +171,19 @@ namespace SaintsField.Editor.Drawers.RateDrawer
                 }
 
                 GUIStyle style = frozenStar
-                    ? _normalFramed
-                    : _normalClear;
+                    ? NormalFramed
+                    : NormalClear;
 
-                if (GUI.Button(startRects[index], iconContent, style))
+                Rect texRect = startRects[index];
+                if (GUI.Button(texRect, GUIContent.none, style))
                 {
                     property.intValue = Mathf.Clamp(curValue, min, max);
                     info.SetValue(parent, property.intValue);
+                }
+
+                using (new GUIColorScoop(iconColor))
+                {
+                    GUI.DrawTexture(texRect, iconTexture, ScaleMode.ScaleToFit, true);
                 }
             }
         }

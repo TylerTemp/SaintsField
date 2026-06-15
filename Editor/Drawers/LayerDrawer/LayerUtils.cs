@@ -57,8 +57,8 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
             return resultList;
         }
 
-#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public static string LayerInfoLabelUIToolkit(LayerInfo layerInfo) => $"{layerInfo.Name} <color=#808080>({layerInfo.Value})</color>";
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
         public static void MakeDropdown(bool allowEmpty, int curMask, VisualElement root, Action<LayerInfo> onValueChangedCallback)
         {

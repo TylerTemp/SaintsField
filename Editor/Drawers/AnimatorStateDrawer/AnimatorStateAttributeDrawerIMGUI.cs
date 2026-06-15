@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Drawers.ExpandableDrawer;
+using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -12,126 +15,289 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
 {
     public partial class AnimatorStateAttributeDrawer
     {
+        private sealed class InfoIMGUI
+        {
+            public string Error = "";
+            public RuntimeAnimatorController RuntimeAnimatorController;
+            public IReadOnlyList<AnimatorStateChanged> AnimatorStates = Array.Empty<AnimatorStateChanged>();
+            public int CurrentIndex = -1;
+            public bool InitializedSelection;
+        }
+
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
+        private readonly RichTextDrawer _richTextDrawer = new RichTextDrawer();
+
+        private static InfoIMGUI EnsureKey(SerializedProperty property, AnimatorStateAttribute animatorStateAttribute,
+            FieldInfo info, object parent)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI cache))
+            {
+                RefreshCache(cache, property, animatorStateAttribute?.AnimFieldName, info, parent);
+                return cache;
+            }
+
+            cache = new InfoIMGUI();
+            InfoCacheIMGUI[key] = cache;
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
+            RefreshCache(cache, property, animatorStateAttribute?.AnimFieldName, info, parent);
+            return cache;
+        }
+
+        private static void RefreshCache(InfoIMGUI cache, SerializedProperty property, string animFieldName,
+            FieldInfo info, object parent)
+        {
+            if (property.propertyType is not (SerializedPropertyType.String or SerializedPropertyType.Generic))
+            {
+                cache.Error = $"Expect string/AnimatorState, get {property.propertyType}";
+                cache.RuntimeAnimatorController = null;
+                cache.AnimatorStates = Array.Empty<AnimatorStateChanged>();
+                cache.CurrentIndex = -1;
+                cache.InitializedSelection = false;
+                return;
+            }
+
+            MetaInfo metaInfo = GetMetaInfo(property, animFieldName, info, parent);
+            cache.Error = metaInfo.Error;
+            cache.RuntimeAnimatorController = metaInfo.RuntimeAnimatorController;
+            cache.AnimatorStates = metaInfo.AnimatorStates ?? Array.Empty<AnimatorStateChanged>();
+            if (metaInfo.Error != "")
+            {
+                cache.CurrentIndex = -1;
+            }
+            else if (property.propertyType == SerializedPropertyType.String)
+            {
+                cache.CurrentIndex = Util.ListIndexOfAction(cache.AnimatorStates,
+                    eachInfo => eachInfo.state.name == property.stringValue);
+            }
+            else
+            {
+                cache.CurrentIndex = Util.ListIndexOfAction(cache.AnimatorStates,
+                    eachStateInfo => EqualAnimatorState(eachStateInfo, property));
+            }
+        }
+
         protected override bool UseCreateFieldIMGUI => true;
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            if (property.propertyType == SerializedPropertyType.String)
+            if (property.propertyType != SerializedPropertyType.Generic)
             {
                 return -1;
             }
 
-            bool curExpanded = property.isExpanded;
-            // ReSharper disable once ConvertToUsingDeclaration
-            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            Rect foldoutRect = new Rect(position)
             {
-                using (new GUIEnabledScoop(true))
-                {
-                    bool newExpanded = EditorGUI.Foldout(position, curExpanded,
-                        new GUIContent(new string(' ', property.displayName.Length)), true);
-                    if (changed.changed)
-                    {
-                        property.isExpanded = newExpanded;
-                    }
-                }
+                width = 12f,
+            };
+
+            bool newExpanded = GUI.Toggle(foldoutRect, property.isExpanded, GUIContent.none, EditorStyles.foldout);
+            if (newExpanded != property.isExpanded)
+            {
+                property.isExpanded = newExpanded;
             }
 
-            return 13;
+            return 14f;
         }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
-            return EditorStyles.popup.CalcHeight(new GUIContent("M"), EditorGUIUtility.currentViewWidth);
+            return EditorGUIUtility.singleLineHeight;
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(property, (saintsAttribute as AnimatorStateAttribute)?.AnimFieldName, info, parent);
-            _errorMsg = metaInfo.Error;
+            AnimatorStateAttribute animatorStateAttribute = saintsAttribute as AnimatorStateAttribute;
+            InfoIMGUI cache = EnsureKey(property, animatorStateAttribute, info, parent);
 
-            if (_errorMsg != "")
+            if (cache.Error != "")
             {
                 RenderErrorFallback(position, label, property);
                 return;
             }
 
-            GUIContent[] optionContents = metaInfo.AnimatorStates
-                .Select(each => new GUIContent(FormatStateLabel(each, " > "))).ToArray();
-
-            int curIndex = property.propertyType == SerializedPropertyType.String
-                ? Util.ListIndexOfAction(metaInfo.AnimatorStates,
-                    eachInfo => eachInfo.state.name == property.stringValue)
-                : Util.ListIndexOfAction(metaInfo.AnimatorStates,
-                    eachStateInfo => EqualAnimatorState(eachStateInfo, property));
-
-            // Debug.Log($"curIndex={curIndex}");
-
-            if (!_onEnableChecked) // check whether external source changed, to avoid caching an old value
+            if (!cache.InitializedSelection)
             {
-                _onEnableChecked = true;
-                if (curIndex != -1 && property.propertyType != SerializedPropertyType.String)
+                cache.InitializedSelection = true;
+                if (cache.CurrentIndex != -1 && property.propertyType == SerializedPropertyType.Generic)
                 {
-                    // if some attribute changed, we need to update them
-                    // var curSelected = metaInfo.AnimatorStates[curIndex];
-                    if (SetPropValue(property, metaInfo.AnimatorStates[curIndex]))
+                    if (SetPropValue(property, cache.AnimatorStates[cache.CurrentIndex]))
                     {
-                        // Debug.Log($"IMGUI init changed");
-                        // ReSharper disable once RedundantCast
-                        TriggerChangedIMGUI(property, property.propertyType == SerializedPropertyType.String
-                            ? (object)metaInfo.AnimatorStates[curIndex].state.name
-                            : metaInfo.AnimatorStates[curIndex]);
-                        if (ExpandableIMGUIScoop.IsInScoop)
-                        {
-                            property.serializedObject.ApplyModifiedProperties();
-                        }
+                        property.serializedObject.ApplyModifiedProperties();
+                        TriggerChangedIMGUI(property, cache.AnimatorStates[cache.CurrentIndex]);
+                        RefreshCache(cache, property, animatorStateAttribute?.AnimFieldName, info, parent);
                     }
                 }
             }
 
-            // (Rect popupRect, Rect popupLeftRect) = RectUtils.SplitHeightRect(position, GetLabelFieldHeight(property, label, saintsAttribute));
-            // ReSharper disable once ConvertToUsingDeclaration
-            using (EditorGUI.ChangeCheckScope popupChanged = new EditorGUI.ChangeCheckScope())
+            Rect lineRect = new Rect(position)
             {
-                int newIndex = EditorGUI.Popup(
-                    position,
-                    label,
-                    curIndex,
-                    optionContents.Concat(new[]
-                    {
-                        GUIContent.none,
-                        new GUIContent($"Edit {metaInfo.RuntimeAnimatorController.name}..."),
-                    }).ToArray(),
-                    EditorStyles.popup);
+                height = EditorGUIUtility.singleLineHeight,
+            };
 
-                // ReSharper disable once InvertIf
-                if (popupChanged.changed)
+            Rect labelRect = new Rect();
+            if (property.propertyType == SerializedPropertyType.Generic)
+            {
+                lineRect.xMin += 14f;
+            }
+
+            Rect fieldRect;
+            if (label.text == "")
+            {
+                fieldRect = lineRect;
+            }
+            else
+            {
+                labelRect = new Rect(lineRect)
                 {
-                    if (newIndex >= optionContents.Length)
-                    {
-                        // Selection.activeObject = metaInfo.Animator.runtimeAnimatorController;
-                        // EditorApplication.ExecuteMenuItem("Window/Animation/Animator");
-                        AnimatorStateUtil.OpenAnimator(metaInfo.RuntimeAnimatorController);
-                    }
-                    else
-                    {
-                        SetPropValue(property, metaInfo.AnimatorStates[newIndex]);
-                        // ReSharper disable once RedundantCast
-                        TriggerChangedIMGUI(property, property.propertyType == SerializedPropertyType.String
-                            ? (object)metaInfo.AnimatorStates[newIndex].state.name
-                            : metaInfo.AnimatorStates[newIndex]);
-                        if (ExpandableIMGUIScoop.IsInScoop)
-                        {
-                            property.serializedObject.ApplyModifiedProperties();
-                        }
-                    }
+                    width = Mathf.Min(EditorGUIUtility.labelWidth, lineRect.width),
+                };
+                fieldRect = new Rect(lineRect)
+                {
+                    xMin = labelRect.xMax,
+                };
+            }
+
+            if (label.text != "")
+            {
+                if (property.propertyType == SerializedPropertyType.Generic &&
+                    GUI.Button(labelRect, label, EditorStyles.label))
+                {
+                    property.isExpanded = !property.isExpanded;
+                }
+                else
+                {
+                    EditorGUI.LabelField(labelRect, label);
                 }
             }
-            // RenderSubRow(popupLeftRect, property);
+
+            GUI.SetNextControlName(FieldControlName);
+            if (GUI.Button(fieldRect, GUIContent.none, EditorStyles.popup))
+            {
+                PopupWindow.Show(fieldRect, new SaintsTreeDropdownIMGUI(
+                    GetDropdownMetaInfo(cache),
+                    Mathf.Max(fieldRect.width, 220f),
+                    320f,
+                    false,
+                    (curItem, _) =>
+                    {
+                        AnimatorStateChanged newState = (AnimatorStateChanged)curItem;
+                        if (newState == null)
+                        {
+                            AnimatorStateUtil.OpenAnimator(cache.RuntimeAnimatorController);
+                            return null;
+                        }
+
+                        object changedValue = property.propertyType == SerializedPropertyType.String
+                            ? (object)newState.state.name
+                            : newState;
+
+                        SetPropValue(property, newState);
+                        property.serializedObject.ApplyModifiedProperties();
+                        TriggerChangedIMGUI(property, changedValue);
+                        RefreshCache(cache, property, animatorStateAttribute?.AnimFieldName, info, parent);
+                        return null;
+                    }));
+            }
+
+            Rect drawRect = new Rect(fieldRect)
+            {
+                xMin = fieldRect.xMin + 6f,
+                xMax = fieldRect.xMax - 18f,
+            };
+            _richTextDrawer.DrawChunks(drawRect, GetDisplayChunks(property, cache));
+        }
+
+        private static AdvancedDropdownMetaInfo GetDropdownMetaInfo(InfoIMGUI cache)
+        {
+            AdvancedDropdownList<AnimatorStateChanged> dropdown =
+                new AdvancedDropdownList<AnimatorStateChanged>();
+
+            foreach (AnimatorStateChanged animatorState in cache.AnimatorStates)
+            {
+                dropdown.Add(GetTreeItemLabel(animatorState), animatorState);
+            }
+
+            if (cache.RuntimeAnimatorController != null)
+            {
+                if (cache.AnimatorStates.Count > 0)
+                {
+                    dropdown.AddSeparator();
+                }
+
+                dropdown.Add($"Edit {cache.RuntimeAnimatorController.name}...", null);
+            }
+
+            dropdown.SelfCompact();
+
+            return new AdvancedDropdownMetaInfo
+            {
+                CurDisplay = cache.CurrentIndex >= 0 ? FormatStateLabel(cache.AnimatorStates[cache.CurrentIndex], "/") : "-",
+                CurValues = cache.CurrentIndex >= 0 ? new object[] { cache.AnimatorStates[cache.CurrentIndex] } : Array.Empty<object>(),
+                DropdownListValue = dropdown,
+                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+            };
+        }
+
+        private static string GetTreeItemLabel(AnimatorStateChanged animatorStateInfo)
+        {
+            string preText = animatorStateInfo.subStateMachineNameChain.Count == 0
+                ? ""
+                : $"{string.Join('/', animatorStateInfo.subStateMachineNameChain)}/";
+            string clipText;
+            string iconText = "";
+            if (animatorStateInfo.animationClip == null)
+            {
+                clipText = "";
+            }
+            else
+            {
+                clipText = $" <color=gray>({animatorStateInfo.animationClip.name})</color>";
+                iconText = "<icon=d_AnimationClip Icon/>";
+            }
+
+            return preText + iconText + animatorStateInfo.state.name + clipText + ": " + animatorStateInfo.layer.name;
+        }
+
+        private IEnumerable<RichTextDrawer.RichTextChunk> GetDisplayChunks(SerializedProperty property, InfoIMGUI cache)
+        {
+            if (cache.CurrentIndex >= 0)
+            {
+                AnimatorStateChanged animatorState = cache.AnimatorStates[cache.CurrentIndex];
+                List<RichTextDrawer.RichTextChunk> chunks = new List<RichTextDrawer.RichTextChunk>();
+                if (animatorState.animationClip != null)
+                {
+                    chunks.Add(new RichTextDrawer.RichTextChunk("<icon=d_AnimationClip Icon/>", true, "d_AnimationClip Icon"));
+                }
+
+                string content =
+                    $"{animatorState.state.name}" +
+                    $"<color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>" +
+                    (animatorState.animationClip == null ? "" : $" ({animatorState.animationClip.name})") +
+                    ": " +
+                    animatorState.layer.name +
+                    (animatorState.subStateMachineNameChain.Count == 0 ? "" : $"/{string.Join('/', animatorState.subStateMachineNameChain)}") +
+                    "</color>";
+                chunks.Add(new RichTextDrawer.RichTextChunk(content, false, content));
+                return chunks;
+            }
+
+            if (property.propertyType == SerializedPropertyType.String)
+            {
+                string wrongLabel = property.stringValue == ""
+                    ? ""
+                    : $"<color=red>?</color> {property.stringValue}";
+                return RichTextDrawer.ParseRichXmlWithProvider(wrongLabel, new RichTextDrawer.EmptyRichTextTagProvider());
+            }
+
+            string stateName = FindPropertyRelative(property, "stateName")?.stringValue;
+            string fallback = string.IsNullOrEmpty(stateName) ? "<color=red>?</color>" : $"<color=red>?</color> {stateName}";
+            return RichTextDrawer.ParseRichXmlWithProvider(fallback, new RichTextDrawer.EmptyRichTextTagProvider());
         }
 
         private static bool EqualAnimatorState(AnimatorStateChanged eachStateInfo, SerializedProperty property)
@@ -178,7 +344,8 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             FieldInfo info,
             object parent)
         {
-            return _errorMsg != "" || property.isExpanded;
+            return EnsureKey(property, saintsAttribute as AnimatorStateAttribute ?? new AnimatorStateAttribute(), info, parent).Error != ""
+                   || property.isExpanded;
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
@@ -186,7 +353,8 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            float errorHeight = _errorMsg == "" ? 0 : ImGuiHelpBox.GetHeight(_errorMsg, width, MessageType.Error);
+            string error = EnsureKey(property, saintsAttribute as AnimatorStateAttribute ?? new AnimatorStateAttribute(), info, parent).Error;
+            float errorHeight = error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
 
             if (!property.isExpanded)
             {
@@ -220,10 +388,11 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
             GUIContent label, ISaintsAttribute saintsAttribute, int index1,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
+            string error = EnsureKey(property, saintsAttribute as AnimatorStateAttribute ?? new AnimatorStateAttribute(), info, parent).Error;
             // Debug.Log(_targetIsString);
             if (property.propertyType == SerializedPropertyType.String || !property.isExpanded)
             {
-                return _errorMsg == "" ? position : ImGuiHelpBox.Draw(position, _errorMsg, MessageType.Error);
+                return error == "" ? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);
             }
 
             IReadOnlyList<SerializedProperty> renders = new[]
@@ -295,9 +464,9 @@ namespace SaintsField.Editor.Drawers.AnimatorStateDrawer
                 y = position.y + EditorGUIUtility.singleLineHeight *
                     (renders.Count + (subStateMachineNameChainProp == null ? 0 : 1)),
             };
-            return _errorMsg == ""
+            return error == ""
                 ? leftRectForError
-                : ImGuiHelpBox.Draw(leftRectForError, _errorMsg, MessageType.Error);
+                : ImGuiHelpBox.Draw(leftRectForError, error, MessageType.Error);
         }
     }
 }

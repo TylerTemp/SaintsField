@@ -218,48 +218,6 @@ namespace SaintsField.Editor.Playa.Renderer.Table
 
             foldout.Add(listViewFooter);
         }
-
-        private static int ChangeArraySize(int newValue, SerializedProperty arrayProp)
-        {
-            int oldValue = arrayProp.arraySize;
-            if (newValue == oldValue)
-            {
-                return oldValue;
-            }
-
-            arrayProp.arraySize = newValue;
-
-            if (newValue > oldValue)  // add
-            {
-                if (arrayProp.GetArrayElementAtIndex(0).propertyType == SerializedPropertyType.ObjectReference)
-
-                {
-                    foreach (int index in Enumerable.Range(oldValue, newValue - oldValue))
-                    {
-                        arrayProp.GetArrayElementAtIndex(index).objectReferenceValue = null;
-                    }
-                }
-            }
-
-            arrayProp.serializedObject.ApplyModifiedProperties();
-            return newValue;
-        }
-
-        private static void DeleteArrayElement(SerializedProperty arrayProp, IEnumerable<int> selectedIndices)
-        {
-            List<int> indexes = selectedIndices.OrderByDescending(each => each).Where(each => each < arrayProp.arraySize).ToList();
-            if (indexes.Count == 0)
-            {
-                indexes.Add(arrayProp.arraySize - 1);
-            }
-
-            foreach (int index in indexes)
-            {
-                arrayProp.DeleteArrayElementAtIndex(index);
-            }
-
-            arrayProp.serializedObject.ApplyModifiedProperties();
-        }
     }
 }
 #endif

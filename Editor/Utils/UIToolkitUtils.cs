@@ -2763,7 +2763,7 @@ namespace SaintsField.Editor.Utils
         {
             DropdownButtonField dropdownBtn = MakeDropdownButtonUIToolkit(label);
 
-            dropdownBtn.ButtonLabelElement.text = GetReferencePropertyLabel(property);
+            dropdownBtn.ButtonLabelElement.text = Util.GetReferencePropertyLabel(property);
 
             dropdownBtn.ButtonElement.clicked += () =>
             {
@@ -2835,27 +2835,9 @@ namespace SaintsField.Editor.Utils
                 ));
             };
 
-            dropdownBtn.TrackPropertyValue(property, _ => dropdownBtn.ButtonLabelElement.text = GetReferencePropertyLabel(property));
+            dropdownBtn.TrackPropertyValue(property, _ => dropdownBtn.ButtonLabelElement.text = Util.GetReferencePropertyLabel(property));
 
             return dropdownBtn;
-        }
-
-        public static string GetReferencePropertyLabel(SerializedProperty property)
-        {
-            if (!SerializedUtils.IsOk(property))
-            {
-                return "";
-            }
-
-            object v = property.managedReferenceValue;
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (v == null)
-            {
-                return "-";
-            }
-
-            Type type = v.GetType();
-            return $"{type.Name} <color=#{ColorUtility.ToHtmlStringRGB(Color.gray)}>{type.Namespace}</color>";
         }
 
         public static void UIToolkitValueEditAfterProcess<T>(

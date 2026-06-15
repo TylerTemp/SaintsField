@@ -7,7 +7,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
     public static class IMGUIVector2
     {
         public static float GetHeight(bool inHorizontalLayout) =>
-            SaintsPropertyDrawer.SingleLineHeight * ((inHorizontalLayout || !IMGUIUtils.UseWideMode()) ? 2 : 1);
+            SaintsPropertyDrawer.SingleLineHeight * ((inHorizontalLayout || !IMGUIRawDraw.UseWideMode()) ? 2 : 1);
 
         public static Vector2 DrawField(Rect position, string label, Vector2 value, bool inHorizontalLayout, bool labelGrayColor)
         {

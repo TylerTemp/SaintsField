@@ -22,9 +22,11 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         {
             if (!inHorizontalLayout)
             {
-                return IMGUIShared.WithLabelColor(labelGrayColor, () => EditorGUI.FloatField(position, label, value));
+                Rect contentRect = IMGUIShared.GetContentRect(position);
+                return IMGUIShared.WithLabelColor(labelGrayColor, () => EditorGUI.FloatField(contentRect, label, value));
             }
 
+            Rect contentRectForStack = IMGUIShared.GetContentRect(position);
             (Rect labelRect, Rect fieldRect) = IMGUIShared.GetStackedRects(position);
             int id = GUIUtility.GetControlID(FloatDragHash, FocusType.Passive, labelRect);
 
@@ -35,7 +37,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 GUI.changed = true;
             }
 
-            IMGUIShared.WithLabelColor(labelGrayColor, () => EditorGUI.HandlePrefixLabel(position, labelRect, label, id));
+            IMGUIShared.WithLabelColor(labelGrayColor, () => EditorGUI.HandlePrefixLabel(contentRectForStack, labelRect, label, id));
             return EditorGUI.FloatField(fieldRect, value);
         }
 
@@ -43,9 +45,11 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         {
             if (!inHorizontalLayout)
             {
-                return IMGUIShared.WithLabelColor(labelGrayColor, () => EditorGUI.DoubleField(position, label, value));
+                Rect contentRect = IMGUIShared.GetContentRect(position);
+                return IMGUIShared.WithLabelColor(labelGrayColor, () => EditorGUI.DoubleField(contentRect, label, value));
             }
 
+            Rect contentRectForStack = IMGUIShared.GetContentRect(position);
             (Rect labelRect, Rect fieldRect) = IMGUIShared.GetStackedRects(position);
             int id = GUIUtility.GetControlID(DoubleDragHash, FocusType.Passive, labelRect);
 
@@ -56,7 +60,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 GUI.changed = true;
             }
 
-            IMGUIShared.WithLabelColor(labelGrayColor, () => EditorGUI.HandlePrefixLabel(position, labelRect, label, id));
+            IMGUIShared.WithLabelColor(labelGrayColor, () => EditorGUI.HandlePrefixLabel(contentRectForStack, labelRect, label, id));
             return EditorGUI.DoubleField(fieldRect, value);
         }
 
