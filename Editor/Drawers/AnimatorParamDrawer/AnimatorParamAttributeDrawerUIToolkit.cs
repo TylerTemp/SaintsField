@@ -49,7 +49,13 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     {
                         bindingPath = property.propertyPath,
                     };
-                    AnimatorParamIntField field = new AnimatorParamIntField(GetPreferredLabel(property), bindableElement);
+                    AnimatorParamIntField field = new AnimatorParamIntField(GetPreferredLabel(property), bindableElement)
+                    {
+                        style =
+                        {
+                            flexShrink = 1,
+                        },
+                    };
                     field.AddToClassList(ClassAllowDisable);
                     field.AddToClassList(AnimatorParamIntField.alignedFieldUssClassName);
                     return field;
