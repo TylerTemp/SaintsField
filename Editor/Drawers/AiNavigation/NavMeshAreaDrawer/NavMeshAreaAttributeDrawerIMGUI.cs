@@ -16,6 +16,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaDrawer
         #region IMGUI
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            int index,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)

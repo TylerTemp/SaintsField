@@ -9,14 +9,9 @@ namespace SaintsField.Editor.Utils
         private const float DegreesPerSecond = -360f;
 
         private Texture2D _icon;
+        private bool _lastDrawTimeInit;
         private double _lastDrawTime;
         private float _rotation;
-
-        // ReSharper disable once ConvertConstructorToMemberInitializers
-        public IMGUILoading()
-        {
-            _lastDrawTime = EditorApplication.timeSinceStartup;
-        }
 
         private Texture2D GetIcon()
         {
@@ -30,6 +25,12 @@ namespace SaintsField.Editor.Utils
 
         public void Draw(Rect position)
         {
+            if (!_lastDrawTimeInit)
+            {
+                _lastDrawTime = EditorApplication.timeSinceStartup;
+                return;
+            }
+
             if (Event.current == null || Event.current.type != EventType.Repaint)
             {
                 return;

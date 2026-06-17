@@ -9,12 +9,22 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 {
-    public abstract class SaintsObjectPickerWindowIMGUI: EditorWindow
+    public class SaintsObjectPickerWindowIMGUI: EditorWindow
     {
-        protected abstract bool AllowScene { get; }
-        protected abstract bool AllowAssets { get; }
+        public bool ConfigAllowScene;
+        public bool ConfigAllowAssets = true;
+        public string ErrorMessage = "";
+        public Func<ItemInfo, Object, bool> IsEqualCallback;
+        public Action<ItemInfo> OnSelectCallback;
+        public Func<ItemInfo, bool> FetchAllSceneObjectFilterCallback;
+        public Func<ItemInfo, bool> FetchAllAssetsFilterCallback;
+        public Func<IEnumerable<ItemInfo>> FetchAllSceneObjectCallback;
+        public Func<IEnumerable<ItemInfo>> FetchAllAssetsCallback;
 
-        protected abstract string Error { get; }
+        protected virtual bool AllowScene => ConfigAllowScene;
+        protected virtual bool AllowAssets => ConfigAllowAssets;
+
+        protected virtual string Error => ErrorMessage;
 
         private class GUIBackgroundScoop : IDisposable
         {
@@ -46,10 +56,12 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         private Vector2 _scrollPos;
         private static float _scale;
+        private readonly IMGUILoading _imguiLoading = new IMGUILoading();
 
         private static readonly Vector2 WidthScale = new Vector2(30f, 100f);
+        private const int LoadBatchCount = 50;
 
-        protected class ItemInfo
+        public class ItemInfo
         {
             // ReSharper disable InconsistentNaming
             public Object Object;
@@ -62,6 +74,8 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 #endif
             public string Label;
             public GUIContent GuiLabel;
+            public string TypeName;
+            public string Path;
             // ReSharper enable InconsistentNaming
             public Texture2D preview;
             // public bool triedFirstLoad;
@@ -80,6 +94,8 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             Object = null,
             preview = null,
             GuiLabel = new GUIContent("None"),
+            TypeName = "",
+            Path = "",
             failedCount = int.MaxValue - 1,
         };
 
@@ -95,8 +111,11 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
         //     thisWindow.Show();
         // }
 
-        private IReadOnlyList<ItemInfo> _sceneItems;
-        private IReadOnlyList<ItemInfo> _assetItems;
+        private List<ItemInfo> _sceneItems;
+        private List<ItemInfo> _assetItems;
+        private IEnumerator<ItemInfo> _sceneItemsEnumerator;
+        private IEnumerator<ItemInfo> _assetItemsEnumerator;
+        private Object _defaultActiveTarget;
         private int _sceneItemSelectedIndex = -1;
         private int _assetItemSelectedIndex = -1;
 
@@ -137,10 +156,23 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             {
                 _tabSelected = 0;
             }
+
+            if (AllowAssets)
+            {
+                EnsureAssetItems();
+            }
+
+            if (AllowScene)
+            {
+                EnsureSceneItems();
+            }
         }
 
         private void OnDestroy()
         {
+            DisposeEnumerator(ref _sceneItemsEnumerator);
+            DisposeEnumerator(ref _assetItemsEnumerator);
+
             IEnumerable<ItemInfo> allItems = Array.Empty<ItemInfo>();
             if(_sceneItems != null)
             {
@@ -159,9 +191,10 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         private GUIStyle _buttonStyle;
 
-        protected void SetDefaultActive(Object target)
+        public void SetDefaultActive(Object target)
         {
             EnsureInit();
+            _defaultActiveTarget = target;
 
             if (target == null)
             {
@@ -169,43 +202,32 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 return;
             }
 
-            if (AllowAssets)
-            {
-                foreach ((ItemInfo itemInfo, int index) in EnsureAssetItems().WithIndex().Skip(1))
-                {
-                    if (IsEqual(itemInfo, target))
-                    {
-                        _assetItemSelectedIndex = index;
-                        _tabSelected = Array.IndexOf(tabs, "Assets");
-                        _sceneItemSelectedIndex = -1;
-                        return;
-                    }
-                }
-            }
-
-            if (AllowScene)
-            {
-                foreach ((ItemInfo itemInfo, int index) in EnsureSceneItems().WithIndex().Skip(1))
-                {
-                    if (IsEqual(itemInfo, target))
-                    {
-                        _sceneItemSelectedIndex = index;
-                        _tabSelected = Array.IndexOf(tabs, "Scene");
-                        _assetItemSelectedIndex = -1;
-                        return;
-                    }
-                }
-            }
+            TryApplyDefaultSelection();
         }
 
         // target is not null
-        protected abstract bool IsEqual(ItemInfo itemInfo, Object target);
+        protected virtual bool IsEqual(ItemInfo itemInfo, Object target)
+        {
+            return IsEqualCallback?.Invoke(itemInfo, target) ?? ReferenceEquals(itemInfo.Object, target);
+        }
 
         private GUIStyle _labelCenterStyle;
+
+        private void Update()
+        {
+            EnsureInit();
+
+            bool changed = TickItems();
+            if (changed || IsLoadingCurrentTab())
+            {
+                Repaint();
+            }
+        }
 
         private void OnGUI()
         {
             EnsureInit();
+            bool needsRepaint = false;
 
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -220,6 +242,13 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                     GUI.FocusControl(controlName);  // this won't work with keyboardControl=0. The focus does NOT work here...
                     GUIUtility.keyboardControl = 0;
                     return;
+                }
+
+                if (IsLoadingCurrentTab())
+                {
+                    Rect loadingRect = GUILayoutUtility.GetRect(16f, 16f, GUILayout.Width(16f), GUILayout.Height(16f));
+                    _imguiLoading.Draw(loadingRect);
+                    needsRepaint = true;
                 }
             }
 
@@ -401,12 +430,17 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                             // let's bypass Unity's life cycle null check
                             if(!previewTexture)
                             {
-                                previewTexture = itemInfo.Icon;
+                                previewTexture = GetIcon(itemInfo);
                             }
 
                             if (previewTexture)
                             {
                                 GUI.DrawTexture(previewRect, previewTexture, ScaleMode.ScaleToFit);
+                            }
+                            else if (itemInfo.Object && itemInfo.failedCount <= 5)
+                            {
+                                _imguiLoading.Draw(previewRect);
+                                needsRepaint = true;
                             }
                             // {
                             //     GUI.DrawTexture(previewRect, previewTexture, ScaleMode.ScaleToFit);
@@ -454,7 +488,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                         using(new GUIBackgroundScoop(!mouseOver && !selected, Color.clear))
                         using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
                         {
-                            bool active = GUI.Toggle(rect, selected, new GUIContent(itemInfo.Label, itemInfo.Icon), _buttonStyle);
+                            bool active = GUI.Toggle(rect, selected, new GUIContent(itemInfo.Label, GetIcon(itemInfo)), _buttonStyle);
                             // ReSharper disable once InvertIf
                             if (changed.changed)
                             {
@@ -493,17 +527,21 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 ItemInfo itemInfo = isAssets ? _assetItems[curSelectedIndex] : _sceneItems[curSelectedIndex];
                 if(isAssets)
                 {
-                    itemInfo.failedCount = 0;
                     Texture2D previewTexture = GetPreview(itemInfo);
                     // let's bypass Unity's life cycle null check
                     if (!previewTexture)
                     {
-                        previewTexture = itemInfo.Icon;
+                        previewTexture = GetIcon(itemInfo);
                     }
 
                     if (previewTexture)
                     {
                         GUI.DrawTexture(selectPreviewRect, previewTexture, ScaleMode.ScaleToFit);
+                    }
+                    else if (itemInfo.Object && itemInfo.failedCount <= 5)
+                    {
+                        _imguiLoading.Draw(selectPreviewRect);
+                        needsRepaint = true;
                     }
                 }
 
@@ -518,11 +556,21 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                     y = selectNameRect.y + selectNameRect.height,
                     height = EditorGUIUtility.singleLineHeight,
                 };
-                EditorGUI.LabelField(selectTypeRect, itemInfo.Object?.GetType().Name ?? "");
+                EditorGUI.LabelField(selectTypeRect, itemInfo.TypeName ?? itemInfo.Object?.GetType().Name ?? "");
+                Rect selectPathRect = new Rect(selectInfoRect)
+                {
+                    y = selectTypeRect.y + selectTypeRect.height,
+                    height = EditorGUIUtility.singleLineHeight,
+                };
+                EditorGUI.LabelField(selectPathRect, itemInfo.Path ?? "");
             }
 
 
             // EditorGUI.DrawRect(searchRect, Color.blue);
+            if (needsRepaint && Event.current.type == EventType.Repaint)
+            {
+                Repaint();
+            }
         }
 
         private double lastActiveClickTime = double.MinValue;
@@ -559,12 +607,13 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             }
         }
 
-        private IReadOnlyList<ItemInfo> EnsureAssetItems()
+        private List<ItemInfo> EnsureAssetItems()
         {
             if(_assetItems == null)
             {
-                // ReSharper disable once UseNegatedPatternInIsExpression
-                _assetItems = FetchAllAssets().Where(FetchAllAssetsFilter).Prepend(NullItemInfo).ToArray();
+                _assetItems = new List<ItemInfo> { NullItemInfo };
+                _assetItemsEnumerator = FetchAllAssets().GetEnumerator();
+                TryApplyDefaultSelection();
             }
 
             return _assetItems;
@@ -572,15 +621,16 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         protected virtual IEnumerable<ItemInfo> FetchAllAssets()
         {
-            return HelperFetchAllAssets();
+            return FetchAllAssetsCallback?.Invoke() ?? HelperFetchAllAssets();
         }
 
-        private IReadOnlyList<ItemInfo> EnsureSceneItems()
+        private List<ItemInfo> EnsureSceneItems()
         {
             if (_sceneItems == null)
             {
-                // ReSharper disable once UseNegatedPatternInIsExpression
-                _sceneItems = FetchAllSceneObject().Where(FetchAllSceneObjectFilter).Prepend(NullItemInfo).ToArray();
+                _sceneItems = new List<ItemInfo> { NullItemInfo };
+                _sceneItemsEnumerator = FetchAllSceneObject().GetEnumerator();
+                TryApplyDefaultSelection();
             }
 
             return _sceneItems;
@@ -588,10 +638,32 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 
         protected virtual IEnumerable<ItemInfo> FetchAllSceneObject()
         {
-            return HelperFetchAllSceneObject();
+            return FetchAllSceneObjectCallback?.Invoke() ?? HelperFetchAllSceneObject();
         }
 
-        protected abstract void OnSelect(ItemInfo itemInfo);
+        protected virtual void OnSelect(ItemInfo itemInfo)
+        {
+            OnSelectCallback?.Invoke(itemInfo);
+        }
+
+        private static Texture2D GetIcon(ItemInfo itemInfo)
+        {
+            if (itemInfo == null || !itemInfo.Object)
+            {
+                return itemInfo?.Icon;
+            }
+
+            if (itemInfo.Icon)
+            {
+                return itemInfo.Icon;
+            }
+
+            Object iconTarget = itemInfo.Object is Component comp
+                ? (Object)comp.gameObject
+                : itemInfo.Object;
+            itemInfo.Icon = AssetPreview.GetMiniThumbnail(iconTarget);
+            return itemInfo.Icon;
+        }
 
         private static Texture2D GetPreview(ItemInfo itemInfo)
         {
@@ -607,7 +679,17 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 return itemInfo.preview;
             }
 
-            if(AssetPreview.IsLoadingAssetPreview(itemInfo.InstanceID))
+            Object previewTarget = itemInfo.Object is Component comp
+                ? (Object)comp.gameObject
+                : itemInfo.Object;
+
+#if UNITY_6000_4_OR_NEWER
+            EntityId previewInstanceId = previewTarget.GetEntityId();
+#else
+            int previewInstanceId = previewTarget.GetInstanceID();
+#endif
+
+            if(AssetPreview.IsLoadingAssetPreview(previewInstanceId))
             {
                 // Debug.Log($"loading preview {itemInfo.Label}");
                 return null;
@@ -624,7 +706,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
             Texture2D result;
             try
             {
-                result = AssetPreview.GetAssetPreview(itemInfo.Object);
+                result = AssetPreview.GetAssetPreview(previewTarget);
             }
             catch (AssertionException)  // Unity: Assertion failed on expression: 'i->previewArtifactID == found->second.previewArtifactID'
             {
@@ -648,6 +730,144 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
                 .Select((x, i) => new { Index = i, Value = x })
                 .GroupBy(x => x.Index / chunkSize)
                 .Select(x => x.Select(v => v.Value).ToList());
+        }
+
+        private bool TickItems()
+        {
+            bool changed = false;
+
+            if (_assetItemsEnumerator != null)
+            {
+                EnsureAssetItems();
+                changed |= TickItemsOne(ref _assetItemsEnumerator, _assetItems, FetchAllAssetsFilter, true);
+            }
+
+            if (_sceneItemsEnumerator != null)
+            {
+                EnsureSceneItems();
+                changed |= TickItemsOne(ref _sceneItemsEnumerator, _sceneItems, FetchAllSceneObjectFilter, false);
+            }
+
+            return changed;
+        }
+
+        private bool TickItemsOne(ref IEnumerator<ItemInfo> enumerator, ICollection<ItemInfo> targetItems,
+            Func<ItemInfo, bool> filter, bool isAssets)
+        {
+            bool changed = false;
+
+            for (int index = 0; index < LoadBatchCount; index++)
+            {
+                bool hasNext;
+                try
+                {
+                    hasNext = enumerator.MoveNext();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    hasNext = false;
+                }
+
+                if (!hasNext)
+                {
+                    DisposeEnumerator(ref enumerator);
+                    break;
+                }
+
+                ItemInfo itemInfo = enumerator.Current;
+                if (itemInfo == null || !filter(itemInfo))
+                {
+                    continue;
+                }
+
+                if (itemInfo.GuiLabel == null)
+                {
+                    itemInfo.GuiLabel = new GUIContent(itemInfo.Label);
+                }
+
+                targetItems.Add(itemInfo);
+                changed = true;
+                TryApplyDefaultSelection(itemInfo, targetItems.Count - 1, isAssets);
+            }
+
+            return changed;
+        }
+
+        private static void DisposeEnumerator<T>(ref IEnumerator<T> enumerator)
+        {
+            (enumerator as IDisposable)?.Dispose();
+            enumerator = null;
+        }
+
+        private bool IsLoadingCurrentTab()
+        {
+            if (tabs == null || tabs.Length == 0)
+            {
+                return false;
+            }
+
+            return tabs[_tabSelected] == "Assets"
+                ? _assetItemsEnumerator != null
+                : _sceneItemsEnumerator != null;
+        }
+
+        private void TryApplyDefaultSelection()
+        {
+            Object defaultTarget = _defaultActiveTarget;
+            if (!defaultTarget)
+            {
+                return;
+            }
+
+            if (AllowAssets && _assetItems != null)
+            {
+                foreach ((ItemInfo itemInfo, int index) in _assetItems.WithIndex().Skip(1))
+                {
+                    if (TryApplyDefaultSelection(itemInfo, index, true))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            if (!AllowScene || _sceneItems == null)
+            {
+                return;
+            }
+
+            foreach ((ItemInfo itemInfo, int index) in _sceneItems.WithIndex().Skip(1))
+            {
+                if (TryApplyDefaultSelection(itemInfo, index, false))
+                {
+                    return;
+                }
+            }
+        }
+
+        private bool TryApplyDefaultSelection(ItemInfo itemInfo, int index, bool isAssets)
+        {
+            Object defaultTarget = _defaultActiveTarget;
+            if (!defaultTarget || !IsEqual(itemInfo, defaultTarget))
+            {
+                return false;
+            }
+
+            if (isAssets)
+            {
+                _assetItemSelectedIndex = index;
+                _sceneItemSelectedIndex = -1;
+                _tabSelected = Array.IndexOf(tabs, "Assets");
+            }
+            else
+            {
+                _sceneItemSelectedIndex = index;
+                _assetItemSelectedIndex = -1;
+                _tabSelected = Array.IndexOf(tabs, "Scene");
+            }
+
+            _defaultActiveTarget = null;
+            return true;
         }
 
         private static IEnumerable<ItemInfo> HelperFetchAllSceneObject()
@@ -678,7 +898,7 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 #else
             instanceID
 #endif
-                    , Label = property.name, GuiLabel = new GUIContent(property.name)};
+                    , Label = property.name, GuiLabel = new GUIContent(property.name), TypeName = go.GetType().Name, Path = go.scene.path};
             }
         }
 
@@ -727,13 +947,20 @@ namespace SaintsField.Editor.Utils.SaintsObjectPickerWindow
 #else
             instanceID
 #endif
-                    , Label = property.name, GuiLabel = new GUIContent(property.name)};
+                    , Label = property.name, GuiLabel = new GUIContent(property.name), TypeName = go.GetType().Name, Path = AssetDatabase.GetAssetPath(go)};
             }
         }
 
         // protected bool PreFilter()
 
-        protected abstract bool FetchAllSceneObjectFilter(ItemInfo itemInfo);
-        protected abstract bool FetchAllAssetsFilter(ItemInfo itemInfo);
+        protected virtual bool FetchAllSceneObjectFilter(ItemInfo itemInfo)
+        {
+            return FetchAllSceneObjectFilterCallback?.Invoke(itemInfo) ?? true;
+        }
+
+        protected virtual bool FetchAllAssetsFilter(ItemInfo itemInfo)
+        {
+            return FetchAllAssetsFilterCallback?.Invoke(itemInfo) ?? true;
+        }
     }
 }

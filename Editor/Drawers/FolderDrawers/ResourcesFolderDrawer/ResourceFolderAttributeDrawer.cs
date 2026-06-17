@@ -168,5 +168,22 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 
             return $"{value} not in any resources folder:\n{string.Join("\n", foundFolders)}";
         }
+
+        private static IEnumerable<string> CanDrop(IEnumerable<UnityEngine.Object> objRefs)
+        {
+            foreach (UnityEngine.Object objRef in objRefs)
+            {
+                string path = AssetDatabase.GetAssetPath(objRef);
+                if (!Directory.Exists(path))
+                {
+                    continue;
+                }
+                (string error, string actualFolder) = ValidateAssetFolder(path);
+                if (error == "")
+                {
+                    yield return actualFolder;
+                }
+            }
+        }
     }
 }

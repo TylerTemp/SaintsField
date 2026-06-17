@@ -34,7 +34,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
                     return null;
             }
         }
-#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
         public static void ShowDropdown(bool isString, object curValue, IReadOnlyList<AnimatorControllerParameter> animatorControllerParams, Animator _cachedAnimator, Rect rootWorldBound, Action<AnimatorControllerParameter> setValue)
         {
             _brownColor ??= $"#{ColorUtility.ToHtmlStringRGB(EColor.Brown.GetColor())}";

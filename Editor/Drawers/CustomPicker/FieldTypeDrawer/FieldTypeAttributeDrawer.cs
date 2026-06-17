@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Linq;
+using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using UnityEditor;
 using UnityEngine;
@@ -21,14 +24,17 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             private Type _swappedType;
             private Action<Object> _onSelected;
             private EPick _editorPick;
+            private IReadOnlyList<GameObject> _rootGameObjects = Array.Empty<GameObject>();
 
-            public static void Open(Object curValue, EPick editorPick, Type originType, Type swappedType, Action<Object> onSelected)
+            public static void Open(Object curValue, EPick editorPick, Type originType, Type swappedType,
+                IReadOnlyList<GameObject> rootGameObjects, Action<Object> onSelected)
             {
                 FieldTypeSelectWindow thisWindow = CreateInstance<FieldTypeSelectWindow>();
                 thisWindow.titleContent = new GUIContent($"Select {swappedType.Name}");
                 // thisWindow._expectedTypes = expectedTypes;
                 thisWindow._originType = originType;
                 thisWindow._swappedType = swappedType;
+                thisWindow._rootGameObjects = rootGameObjects ?? Array.Empty<GameObject>();
                 thisWindow._onSelected = onSelected;
                 thisWindow._editorPick = editorPick;
                 thisWindow.SetDefaultActive(curValue);
@@ -105,6 +111,52 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                 _onSelected(obj);
             }
 
+            protected override IEnumerable<ItemInfo> FetchAllSceneObject()
+            {
+                foreach (GameObject rootGameObject in _rootGameObjects)
+                {
+                    IEnumerable<(GameObject go, string path)> allGo =
+                        Util.GetSubGoWithPath(rootGameObject, null).Prepend((rootGameObject, rootGameObject.name));
+                    foreach ((GameObject eachSubGo, string eachSubPath) in allGo)
+                    {
+                        if (eachSubGo.GetComponent(_swappedType) == null)
+                        {
+                            continue;
+                        }
+
+                        IReadOnlyList<Object> targets = GetTargets(eachSubGo).ToArray();
+                        foreach ((Object fieldTarget, int index) in targets.WithIndex())
+                        {
+                            yield return MakeItemInfo(fieldTarget,
+                                $"{eachSubPath}{(targets.Count > 1 ? $"[{index}]" : "")}");
+                        }
+                    }
+                }
+            }
+
+            protected override IEnumerable<ItemInfo> FetchAllAssets()
+            {
+                if (!typeof(Component).IsAssignableFrom(_swappedType))
+                {
+                    yield break;
+                }
+
+                foreach (string prefabGuid in AssetDatabase.FindAssets("t:prefab"))
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(prefabGuid);
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                    if (prefab == null || prefab.GetComponent(_swappedType) == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (Object fieldTarget in GetTargets(prefab))
+                    {
+                        yield return MakeItemInfo(fieldTarget, path);
+                    }
+                }
+            }
+
             protected override bool FetchAllSceneObjectFilter(ItemInfo itemInfo) => FetchFilter(itemInfo);
 
             protected override bool FetchAllAssetsFilter(ItemInfo itemInfo) => FetchFilter(itemInfo);
@@ -120,6 +172,34 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
                     : new[] {_originType, _swappedType};
                 // return  || _expectedTypes.All(each => CanSign(itemInfo.Object, each));
                 return expectedTypes.All(each => CanSign(itemInfo.Object, each));
+            }
+
+            private IEnumerable<Object> GetTargets(GameObject gameObject)
+            {
+                if (typeof(Component).IsAssignableFrom(_originType))
+                {
+                    return gameObject.GetComponents(_originType).Cast<Object>();
+                }
+
+                return new Object[] { gameObject };
+            }
+
+            private static ItemInfo MakeItemInfo(Object target, string path)
+            {
+                return new ItemInfo
+                {
+                    Object = target,
+                    Icon = null,
+#if UNITY_6000_4_OR_NEWER
+                    InstanceID = target.GetEntityId(),
+#else
+                    InstanceID = target.GetInstanceID(),
+#endif
+                    Label = target.name,
+                    GuiLabel = new GUIContent(target.name),
+                    TypeName = target.GetType().Name,
+                    Path = path,
+                };
             }
         }
 

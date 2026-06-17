@@ -1,7 +1,6 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
@@ -75,8 +74,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             // _dropdownIcon = Util.LoadResource<Texture2D>("classic-dropdown.png");
             // _dropdownRightIcon = Util.LoadResource<Texture2D>("classic-dropdown-right.png");
-            bool expand = allAttributes.Any(each => each is DefaultExpandAttribute)
-                          || _vRef.isExpanded;
+            bool expand = SaintsInterfaceDrawer.ShouldReferenceStartExpanded(allAttributes, _vRef);
 
             ExpandButtonElement referenceExpandButton = new ExpandButtonElement
             {
@@ -85,7 +83,8 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             referenceExpandButton.SetViewDataKey(_vRef.propertyPath);
             referenceHContainer.Add(referenceExpandButton);
 
-            UIToolkitUtils.DropdownButtonField dropdownBtn = UIToolkitUtils.ReferenceDropdownButtonField("", _vRef, this, () => GetTypesImplementingInterface(interfaceType));
+            UIToolkitUtils.DropdownButtonField dropdownBtn = UIToolkitUtils.ReferenceDropdownButtonField("",
+                _vRef, this, () => SaintsInterfaceDrawer.GetTypesImplementingInterface(interfaceType));
             referenceHContainer.Add(dropdownBtn);
             dropdownBtn.style.marginLeft = 0;
             dropdownBtn.ButtonElement.style.borderTopLeftRadius = 0;
@@ -125,34 +124,14 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             {
                 _objectContainer.style.display = DisplayStyle.None;
                 _referenceContainer.style.display = DisplayStyle.Flex;
-                if (_valueProp.objectReferenceValue != null)  // Don't keep a reference
-                {
-                    _valueProp.objectReferenceValue = null;
-                    _valueProp.serializedObject.ApplyModifiedProperties();
-                }
+                SaintsInterfaceDrawer.SyncInterfaceModeSideEffects(_valueProp, _vRef, true);
             }
             else
             {
                 _objectContainer.style.display = DisplayStyle.Flex;
                 _referenceContainer.style.display = DisplayStyle.None;
-                if (_vRef.managedReferenceValue != null)
-                {
-                    _vRef.managedReferenceValue = null;
-                    _vRef.serializedObject.ApplyModifiedProperties();
-                }
+                SaintsInterfaceDrawer.SyncInterfaceModeSideEffects(_valueProp, _vRef, false);
             }
-        }
-
-        private IReadOnlyList<Type> _cachedTypesImplementingInterface;
-
-        private IReadOnlyList<Type> GetTypesImplementingInterface(Type interfaceType)
-        {
-            return _cachedTypesImplementingInterface ??= AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => !type.IsAbstract
-                               &&!typeof(Object).IsAssignableFrom(type)
-                               && interfaceType.IsAssignableFrom(type))
-                .ToArray();
         }
 
         private void UpdateExpand(bool isExpanded)

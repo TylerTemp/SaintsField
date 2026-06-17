@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Drawers.OnValueChangedDrawer
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
-            FieldInfo info, object parent)
+            int index, FieldInfo info, object parent)
         {
             InfoIMGUI _ = EnsureKey(property, (OnValueChangedAttribute) saintsAttribute, info, parent);
             return position;

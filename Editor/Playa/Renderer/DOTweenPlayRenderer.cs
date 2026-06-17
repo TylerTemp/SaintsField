@@ -35,7 +35,7 @@ namespace SaintsField.Editor.Playa.Renderer
         {
         }
 
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot, VisualElement container)
         {
             return (null, false);

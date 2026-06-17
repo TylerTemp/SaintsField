@@ -1,4 +1,4 @@
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1184,7 +1184,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
         }
     }
 }
-#elif !SAINTSFIELD_UI_TOOLKIT_DISABLE && (UNITY_2021_3_OR_NEWER || SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK)
+#elif UNITY_2021_3_OR_NEWER || SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;

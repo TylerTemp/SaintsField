@@ -12,12 +12,13 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 {
     public partial class RequireTypeAttributeDrawer
     {
-        #region IMGUI
+        private static Texture2D _pickIcon;
 
-        private class InfoIMGUI
+        private sealed class InfoIMGUI
         {
             public string Error = "";
-            public bool FirstChecked;
+            public bool HasCorrectValue;
+            public object CorrectValue;
             public object PreviousValue;
         }
 
@@ -32,18 +33,18 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             }
 
             InfoCacheIMGUI[key] = infoCache = new InfoIMGUI();
-            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
-            {
-                InfoCacheIMGUI.Remove(key);
-            });
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
             return infoCache;
         }
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
             ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
         {
-            EnsureInfo(property).PreviousValue = property.objectReferenceValue;
-            return base.DrawPreLabelImGui(position, property, saintsAttribute, info, parent);
+            if(property.propertyType ==  SerializedPropertyType.ObjectReference)
+            {
+                EnsureInfo(property).PreviousValue = property.objectReferenceValue;
+            }
+            return -1;
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
@@ -64,68 +65,71 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             IReadOnlyList<Type> requiredTypes = requireTypeAttribute.RequiredTypes;
 
             bool customPicker = requireTypeAttribute.CustomPicker;
-            if(customPicker)
+            if (customPicker)
             {
-                // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
                 if (_imGuiButtonStyle == null)
                 {
                     _imGuiButtonStyle = new GUIStyle(GUI.skin.button)
                     {
-                        // margin = new RectOffset(0, 0, 0, 0),
                         padding = new RectOffset(0, 0, 0, 0),
                     };
                 }
 
-                if (GUI.Button(position, "●", _imGuiButtonStyle))
+                _pickIcon ??= Util.LoadResource<Texture2D>("d_pick");
+                if (GUI.Button(position, new GUIContent(_pickIcon), _imGuiButtonStyle))
                 {
-                    OpenSelectorWindowIMGUI(property, requireTypeAttribute, info, newValue => TriggerChangedIMGUI(property, newValue), parent);
+                    OpenSelectorWindowIMGUI(property, requireTypeAttribute, info,
+                        newValue => TriggerChangedIMGUI(property, newValue), parent);
                 }
             }
 
             InfoIMGUI cacheInfo = EnsureInfo(property);
-            if (!cacheInfo.FirstChecked)
+            cacheInfo.Error = "";
+
+            Object curValue = GetCurFieldValue(property, requireTypeAttribute);
+            IReadOnlyList<string> missingTypeNames = curValue == null
+                ? Array.Empty<string>()
+                : GetMissingTypeNames(curValue, requiredTypes);
+
+            if (missingTypeNames.Count == 0)
             {
-                // Debug.Log($"onGUIPayload.changed={onGUIPayload.changed}/_imGuiFirstChecked={_imGuiFirstChecked}");
-                cacheInfo.Error = "";
-                // bool isFirstCheck = !_imGuiFirstChecked;
-                // Debug.Log($"_imGuiFirstChecked={_imGuiFirstChecked}/freeSign={fieldInterfaceAttribute.FreeSign}");
-
-
-                Object curValue = GetCurFieldValue(property, requireTypeAttribute);
-                if (curValue is null)
+                cacheInfo.HasCorrectValue = true;
+                if (TryGetCurrentSerializedValue(property, info, parent, out object currentValue))
                 {
-                    return customPicker;
+                    cacheInfo.CorrectValue = currentValue;
                 }
-
-                IReadOnlyList<string> missingTypeNames = GetMissingTypeNames(curValue, requiredTypes);
-
-                // Debug.Log($"missingTypeNames={string.Join(",", missingTypeNames)}, _imGuiFirstChecked={_imGuiFirstChecked}");
-
-                if (missingTypeNames.Count > 0)  // if has errors
+            }
+            else
+            {
+                string errorMessage = $"{curValue} has no component{(missingTypeNames.Count > 1 ? "s" : "")} {string.Join(", ", missingTypeNames)}.";
+                if (requireTypeAttribute.FreeSign || !cacheInfo.HasCorrectValue)
                 {
-                    string errorMessage = $"{curValue} has no component{(missingTypeNames.Count > 1? "s": "")} {string.Join(", ", missingTypeNames)}.";
-                    // freeSign will always give error information
-                    // but if you never passed the first check, then sign as you want and it'll always just show error
-                    if (!cacheInfo.FirstChecked || requireTypeAttribute.FreeSign)
-                    {
-                        // Debug.Log($"isFirstCheck={isFirstCheck}/freeSign={fieldInterfaceAttribute.FreeSign}");
-                        cacheInfo.Error = errorMessage;
-                    }
-                    else  // it's not freeSign, and you've already got a correct answer. So revert to the old value.
-                    {
-                        // property.objectReferenceValue = _previousValue;
-                        RestorePreviousValue(property, info, parent, cacheInfo.PreviousValue);
-                        TriggerChangedIMGUI(property, GetPreviousValue(cacheInfo.PreviousValue));
-                        Debug.LogWarning($"{errorMessage} Change reverted to {(cacheInfo.PreviousValue==null? "null": cacheInfo.PreviousValue.ToString())}.");
-                    }
+                    cacheInfo.Error = errorMessage;
                 }
                 else
                 {
-                    cacheInfo.FirstChecked = true;
+                    RestorePreviousValue(property, info, parent, cacheInfo.CorrectValue);
+                    property.serializedObject.ApplyModifiedProperties();
+                    TriggerChangedIMGUI(property, GetPreviousValue(cacheInfo.CorrectValue));
+                    Debug.LogWarning($"{errorMessage} Change reverted to {(cacheInfo.CorrectValue == null ? "null" : cacheInfo.CorrectValue.ToString())}.");
                 }
             }
 
             return customPicker;
+        }
+
+        private static bool TryGetCurrentSerializedValue(SerializedProperty property, FieldInfo info, object parent,
+            out object value)
+        {
+            (string error, int _, object currentValue) = Util.GetValue(property, info, parent);
+            if (error != "")
+            {
+                value = null;
+                return false;
+            }
+
+            value = currentValue;
+            return true;
         }
 
         protected virtual Object GetCurFieldValue(SerializedProperty property, RequireTypeAttribute _) => property.objectReferenceValue;
@@ -138,14 +142,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
         protected virtual object GetPreviousValue(object previousValue) => previousValue;
 
-
         private static IEnumerable<Object> GetQualifiedInterfaces(IReadOnlyList<Object> toCheckTargets,
             IReadOnlyList<Type> interfaceTypes)
         {
-            // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (Object target in toCheckTargets)
             {
-                // Debug.Log($"{target} -> {string.Join(",", interfaceTypes)}");
                 if(interfaceTypes.All(each => each.IsAssignableFrom(target.GetType())))
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
@@ -169,7 +170,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                         List<Type> toCheckComponents = new List<Type>();
                         foreach (Type normalType in normalTypes)
                         {
-                            // ScriptableObject can not be on a GameObject
                             if (typeof(ScriptableObject).IsAssignableFrom(normalType))
                             {
                                 incapable = true;
@@ -178,10 +178,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 
                             if (!typeof(GameObject).IsAssignableFrom(normalType))
                             {
-                                continue;  // skip GameObject
+                                continue;
                             }
 
-                            if (!typeof(Component).IsAssignableFrom(normalType))  // only Component can be on a gameObject
+                            if (!typeof(Component).IsAssignableFrom(normalType))
                             {
                                 incapable = true;
                                 break;
@@ -202,14 +202,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
 #endif
                             yield return go;
                         }
-
-//                         foreach (Component comp in toCheckComponents.Select(eachCompType => go.GetComponent(eachCompType)).Where(each => each != null))
-//                         {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRE_TYPE
-//                             Debug.Log($"GetQualifiedComp: {comp}");
-// #endif
-//                             yield return comp;
-//                         }
                     }
                         break;
                     case ScriptableObject so:
@@ -255,7 +247,6 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
                         Debug.Log($"IsQualifiedComp: {comp}");
 #endif
                         yield return comp;
-
                     }
                         break;
                 }
@@ -273,12 +264,11 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string error = EnsureInfo(property).Error;
-            return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, EditorGUIUtility.currentViewWidth, MessageType.Error);
+            return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, EnsureInfo(property).Error, MessageType.Error);
-        #endregion
     }
 }

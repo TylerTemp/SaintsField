@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using UnityEditor;
 using UnityEditorInternal;
 
@@ -35,6 +36,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         }
 
         public static Dictionary<DrawerId, PropertyDrawer> CachedDrawers = new Dictionary<DrawerId, PropertyDrawer>();
+        public static Dictionary<DrawerId, SaintsRowAttributeDrawer> CachedSaintsRowDrawers = new Dictionary<DrawerId, SaintsRowAttributeDrawer>();
         public static Dictionary<DrawerId, ReorderableList> CachedReorderableList = new Dictionary<DrawerId, ReorderableList>();
     }
 }

@@ -74,23 +74,19 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             return imguiDrawer;
         }
 
-        private static PropertyDrawer GetAndCacheSaintsRowDrawer(SerializedProperty property, FieldInfo fieldInfo, string label,
+        private static SaintsRowAttributeDrawer GetAndCacheSaintsRowDrawer(SerializedProperty property, FieldInfo fieldInfo, string label,
             bool inHorizontalLayout)
         {
             IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 1);
-            if (!IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer imguiDrawer))
+            if (IMGUIDrawerCache.CachedSaintsRowDrawers.TryGetValue(drawerKey, out SaintsRowAttributeDrawer saintsRowDrawer))
             {
-                imguiDrawer = SaintsPropertyDrawer.MakePropertyDrawer(typeof(SaintsRowAttributeDrawer), fieldInfo,
-                    new SaintsRowAttribute(), label);
-                IMGUIDrawerCache.CachedDrawers[drawerKey] = imguiDrawer;
+                return saintsRowDrawer;
             }
 
-            if (imguiDrawer is SaintsPropertyDrawer saintsPropertyDrawer)
-            {
-                saintsPropertyDrawer.InHorizontalLayout = inHorizontalLayout;
-            }
-
-            return imguiDrawer;
+            saintsRowDrawer = (SaintsRowAttributeDrawer)SaintsPropertyDrawer.MakePropertyDrawer(typeof(SaintsRowAttributeDrawer), fieldInfo,
+                new SaintsRowAttribute(), label);
+            saintsRowDrawer.InHorizontalLayout = inHorizontalLayout;
+            return IMGUIDrawerCache.CachedSaintsRowDrawers[drawerKey] = saintsRowDrawer;
         }
 
         public static float GetPropertyHeight(
@@ -132,7 +128,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     }
 
                     return GetAndCacheSaintsRowDrawer(property, fieldInfo, label.text, inHorizontalLayout)
-                        .GetPropertyHeight(property, label);
+                        .GetRowFieldHeight(property, label, fieldInfo);
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:
@@ -224,7 +220,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                         return;
                     }
                     GetAndCacheSaintsRowDrawer(property, fieldInfo, label.text, inHorizontalLayout)
-                        .OnGUI(position, property, label);
+                        .DrawRowField(position, property, label, fieldInfo);
                     return;
                 }
                 case SerializedPropertyType.Vector2:
@@ -237,7 +233,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.vector2Value = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -277,7 +273,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                         {
                             property.longValue = result;
                         }
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -290,7 +286,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.boolValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -312,7 +308,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                         {
                             property.floatValue = (float)result;
                         }
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -325,7 +321,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.stringValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -338,7 +334,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.colorValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -354,7 +350,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.objectReferenceValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -369,7 +365,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.intValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -383,7 +379,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.enumValueIndex = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -415,7 +411,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.vector3Value = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -447,7 +443,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.vector4Value = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -460,7 +456,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.rectValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -473,7 +469,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.intValue = Math.Max(0, result);
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -487,7 +483,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.intValue = string.IsNullOrEmpty(result) ? 0 : result[0];
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -500,7 +496,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.animationCurveValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -513,7 +509,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.boundsValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -526,7 +522,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.gradientValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -559,7 +555,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.quaternionValue = new Quaternion(result.x, result.y, result.z, result.w);
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -575,7 +571,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.exposedReferenceValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -616,7 +612,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.vector2IntValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -648,7 +644,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.vector3IntValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -661,7 +657,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.rectIntValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -674,7 +670,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                     if (changed.changed)
                     {
                         property.boundsIntValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
+                        ApplyModifiedPropertiesAndNotify(property);
                     }
 
                     return;
@@ -689,7 +685,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                         try
                         {
                             property.hash128Value = Hash128.Parse(result);
-                            property.serializedObject.ApplyModifiedProperties();
+                            ApplyModifiedPropertiesAndNotify(property);
                         }
                         catch (FormatException)
                         {
@@ -701,6 +697,12 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 default:
                     return;
             }
+        }
+
+        private static void ApplyModifiedPropertiesAndNotify(SerializedProperty property)
+        {
+            property.serializedObject.ApplyModifiedProperties();
+            SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke();
         }
     }
 }

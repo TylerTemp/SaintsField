@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
 {
@@ -14,169 +13,185 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.ResourcesFolderDrawer
     {
         private static Texture2D _folderIcon;
 
-        private static string GetKey(SerializedProperty property) => SerializedUtils.GetUniqueId(property);
-
-        private class CacheInfo
+        private sealed class InfoIMGUI
         {
-            public string ChangedValue;
             public string Error = "";
-            // public string OldValue;
+            public bool FreezeError;
+            public string FrozenValue;
+            public bool Initialized;
+            public bool NeedRefresh = true;
+            public UnityEngine.Events.UnityAction OnEditorChanged;
         }
 
-        private static readonly Dictionary<string, CacheInfo> AsyncCacheInfo = new Dictionary<string, CacheInfo>();
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
 
-        // private static readonly HashSet<Object> InspectingTargets = new HashSet<Object>();
-        private static readonly Dictionary<Object, HashSet<string>> InspectingTargets = new Dictionary<Object, HashSet<string>>();
+        private static InfoIMGUI EnsureKey(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI infoCache))
+            {
+                return infoCache;
+            }
+
+            InfoCacheIMGUI[key] = infoCache = new InfoIMGUI();
+            infoCache.OnEditorChanged = () => infoCache.NeedRefresh = true;
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(infoCache.OnEditorChanged);
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(infoCache.OnEditorChanged);
+                InfoCacheIMGUI.Remove(key);
+            });
+            return infoCache;
+        }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
-        {
-            return property.propertyType == SerializedPropertyType.String
-                ? SingleLineHeight
-                : 0;
-        }
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => SingleLineHeight;
 
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
-            GUIContent label,
-            ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
-            object parent)
+            GUIContent label, ISaintsAttribute saintsAttribute, int index,
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            if (property.propertyType != SerializedPropertyType.String)
+            InfoIMGUI cache = EnsureKey(property);
+            UpdateStatus(cache, property);
+
+            _folderIcon ??= Util.LoadResource<Texture2D>("resources-folder.png");
+            Rect buttonRect = new Rect(position)
             {
-                return false;
-            }
+                x = position.x + 1,
+                width = position.width - 2,
+            };
 
-            string key = GetKey(property);
-
-            Object curHash = property.serializedObject.targetObject;
-            // Debug.Log($"keys={string.Join(", ", AsyncCacheInfo.Keys)}");
-
-            if (!InspectingTargets.TryGetValue(curHash, out HashSet<string> keySet))
+            if (property.propertyType == SerializedPropertyType.String)
             {
-                InspectingTargets[curHash] = keySet = new HashSet<string>();
-
-                void OnSelectionChangedIMGUI()
+                ResourceFolderAttribute folderAttribute = (ResourceFolderAttribute)saintsAttribute;
+                if (GUI.Button(buttonRect, _folderIcon, GUIStyle.none))
                 {
-                    bool stillSelected = Array.IndexOf(Selection.objects, curHash) != -1;
-                    // Debug.Log($"{stillSelected}/{string.Join(", ", Selection.objects.Cast<Object>())}");
-                    if (stillSelected)
+                    (string error, string actualFolder) = OnClick(property, folderAttribute);
+                    if (error == "")
                     {
-                        return;
-                    }
-
-                    Selection.selectionChanged -= OnSelectionChangedIMGUI;
-                    if (InspectingTargets.TryGetValue(curHash, out HashSet<string> set))
-                    {
-                        foreach (string removeKey in set)
+                        if (actualFolder != "")
                         {
-                            // Debug.Log($"remove key {removeKey}");
-                            AsyncCacheInfo.Remove(removeKey);
+                            cache.Error = "";
+                            cache.FreezeError = false;
+                            cache.Initialized = true;
+                            cache.NeedRefresh = false;
+                            property.stringValue = actualFolder;
+                            property.serializedObject.ApplyModifiedProperties();
+                            TriggerChangedIMGUI(property, actualFolder);
                         }
                     }
-                    InspectingTargets.Remove(curHash);
-                }
-
-                Selection.selectionChanged += OnSelectionChangedIMGUI;
-            }
-            keySet.Add(key);
-
-            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo) && cacheInfo.ChangedValue != null)
-            {
-                TriggerChangedIMGUI(property, cacheInfo.ChangedValue);
-                AsyncCacheInfo.Remove(key);
-            }
-
-            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if (_folderIcon is null)
-            {
-                _folderIcon = Util.LoadResource<Texture2D>("resources-folder.png");
-            }
-
-            ResourceFolderAttribute folderAttribute = (ResourceFolderAttribute)saintsAttribute;
-
-            // ReSharper disable once InvertIf
-            if(GUI.Button(new Rect(position)
-               {
-                   x = position.x + 1,
-                   width = position.width - 2,
-               }, _folderIcon, GUIStyle.none))
-            {
-                (string error, string actualFolder) = OnClick(property, folderAttribute);
-                if(error == "")
-                {
-                    // ReSharper disable once InvertIf
-                    if(actualFolder != "")
+                    else
                     {
-                        property.stringValue = actualFolder;
-                        property.serializedObject.ApplyModifiedProperties();
-                        // TriggerChangedIMGUI(property, actualFolder);
-                        AsyncCacheInfo[key] = new CacheInfo { ChangedValue = actualFolder };
+                        cache.Error = error;
+                        cache.FreezeError = true;
+                        cache.FrozenValue = property.stringValue;
                     }
                 }
-                else
+
+                HandleDragAndDrop(fullRect, property, cache);
+            }
+            else
+            {
+                using (new EditorGUI.DisabledScope(true))
                 {
-                    // Debug.Log($"add error key {key} = {error}");
-                    AsyncCacheInfo[key] = new CacheInfo { Error = error };
+                    GUI.Button(buttonRect, _folderIcon, GUIStyle.none);
                 }
             }
 
             return true;
         }
 
+        private static void HandleDragAndDrop(Rect fullRect, SerializedProperty property, InfoIMGUI cache)
+        {
+            Event evt = Event.current;
+            if (evt.type != EventType.DragUpdated && evt.type != EventType.DragPerform)
+            {
+                return;
+            }
+
+            if (!fullRect.Contains(evt.mousePosition))
+            {
+                return;
+            }
+
+            string fineFolder = CanDrop(DragAndDrop.objectReferences).FirstOrDefault();
+            if (evt.type == EventType.DragPerform)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.None;
+                if (string.IsNullOrEmpty(fineFolder))
+                {
+                    return;
+                }
+
+                DragAndDrop.AcceptDrag();
+                cache.Error = "";
+                cache.FreezeError = false;
+                cache.Initialized = true;
+                cache.NeedRefresh = false;
+                property.stringValue = fineFolder;
+                property.serializedObject.ApplyModifiedProperties();
+                TriggerChangedIMGUI(property, fineFolder);
+            }
+            else
+            {
+                DragAndDrop.visualMode = string.IsNullOrEmpty(fineFolder)
+                    ? DragAndDropVisualMode.Rejected
+                    : DragAndDropVisualMode.Copy;
+            }
+
+            evt.Use();
+        }
+
         protected override bool WillDrawBelow(SerializedProperty property,
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
-            if (property.propertyType != SerializedPropertyType.String)
-            {
-                return true;
-            }
-            string key = GetKey(property);
-            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
-            {
-                return cacheInfo.Error != "";
-            }
-
-            return false;
+            InfoIMGUI cache = EnsureKey(property);
+            UpdateStatus(cache, property);
+            return cache.Error != "";
         }
 
-        private static string GetMismatchError(SerializedProperty property) => $"target {property.propertyPath} is not a string: {property.propertyType}";
-
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
+            object parent)
         {
-            if (property.propertyType != SerializedPropertyType.String)
-            {
-                return ImGuiHelpBox.GetHeight(GetMismatchError(property), width, MessageType.Error);
-            }
-
-            string key = GetKey(property);
-            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo) && cacheInfo.Error != "")
-            {
-                return ImGuiHelpBox.GetHeight(cacheInfo.Error, width, MessageType.Error);
-            }
-
-            return 0;
+            InfoIMGUI cache = EnsureKey(property);
+            UpdateStatus(cache, property);
+            return cache.Error == "" ? 0 : ImGuiHelpBox.GetHeight(cache.Error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
+            InfoIMGUI cache = EnsureKey(property);
+            UpdateStatus(cache, property);
+            return cache.Error == "" ? position : ImGuiHelpBox.Draw(position, cache.Error, MessageType.Error);
+        }
+
+        private static void UpdateStatus(InfoIMGUI cache, SerializedProperty property)
+        {
             if (property.propertyType != SerializedPropertyType.String)
             {
-                return ImGuiHelpBox.Draw(position, GetMismatchError(property), MessageType.Error);
+                cache.FreezeError = false;
+                cache.Error = $"Target is not a string: {property.propertyType}";
+                return;
             }
 
-            string key = GetKey(property);
-            if (AsyncCacheInfo.TryGetValue(key, out CacheInfo cacheInfo))
+            if (cache.FreezeError && cache.FrozenValue == property.stringValue)
             {
-                return ImGuiHelpBox.Draw(position, cacheInfo.Error, MessageType.Error);
+                return;
             }
 
-            return position;
+            if (cache.Initialized && !cache.NeedRefresh)
+            {
+                return;
+            }
+
+            cache.FreezeError = false;
+            cache.Initialized = true;
+            cache.NeedRefresh = false;
+            cache.Error = CheckFolder(property.stringValue);
         }
     }
 }

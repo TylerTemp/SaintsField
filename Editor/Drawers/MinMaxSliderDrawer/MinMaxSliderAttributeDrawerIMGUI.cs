@@ -36,12 +36,14 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
+            int index,
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
             return EditorGUIUtility.singleLineHeight;
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {

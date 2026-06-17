@@ -11,7 +11,26 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
 {
     public partial class RequiredIfAttributeDrawer
     {
-        private static string GetErrorImGui(SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
+        private static string GetRequiredErrorMessage(SerializedProperty property, RequiredAttribute requiredAttribute,
+            FieldInfo info)
+        {
+            string errorMessage = requiredAttribute?.ErrorMessage ?? "";
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                return errorMessage;
+            }
+
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            string propertyName = property.displayName;
+            if (arrayIndex != -1)
+            {
+                propertyName = $"{ObjectNames.NicifyVariableName(info.Name)}[{arrayIndex}]";
+            }
+
+            return $"{propertyName} is required";
+        }
+
+        private static string GetErrorImGui(SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
             Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) < 0
@@ -49,7 +68,7 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
             }
 
             RequiredAttribute requiredAttribute = allAttributes.OfType<RequiredAttribute>().FirstOrDefault();
-            return requiredAttribute?.ErrorMessage ?? $"{property.displayName} is required";
+            return GetRequiredErrorMessage(property, requiredAttribute, info);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
@@ -64,7 +83,7 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
                 return false;
             }
 
-            string error = GetErrorImGui(property, allAttributes, saintsAttribute, info, parent);
+            string error = GetErrorImGui(property, allAttributes, info, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"WillDrawBelow error=`{error}`");
 #endif
@@ -75,8 +94,10 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            string error = GetErrorImGui(property, allAttributes, saintsAttribute, info, parent);
-            float belowHeight = error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
+            string error = GetErrorImGui(property, allAttributes, info, parent);
+            RequiredAttribute requiredAttribute = allAttributes.OfType<RequiredAttribute>().FirstOrDefault();
+            MessageType messageType = requiredAttribute?.MessageType.GetMessageType() ?? MessageType.Error;
+            float belowHeight = error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, messageType);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"belowHeight={belowHeight}/{MessageType.Error}; width={width}");
@@ -95,7 +116,7 @@ namespace SaintsField.Editor.Drawers.RequiredIfDrawer
                 return position;
             }
 
-            string error = GetErrorImGui(property, allAttributes, saintsAttribute, info, parent);
+            string error = GetErrorImGui(property, allAttributes, info, parent);
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"belowHeight has={position.height}/width={position.width}");
 #endif

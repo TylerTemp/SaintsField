@@ -21,6 +21,42 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
 
         private static IReadOnlyList<Assembly> _allAssemblies;
 
+        internal readonly struct TypeReferenceContext
+        {
+            public readonly string Error;
+            public readonly SerializedProperty TypeNameAndAssemblyProp;
+            public readonly SerializedProperty MonoScriptGuidProp;
+
+            public TypeReferenceContext(string error, SerializedProperty typeNameAndAssemblyProp,
+                SerializedProperty monoScriptGuidProp)
+            {
+                Error = error;
+                TypeNameAndAssemblyProp = typeNameAndAssemblyProp;
+                MonoScriptGuidProp = monoScriptGuidProp;
+            }
+        }
+
+        internal static (string error, TypeReferenceContext context) GetTypeReferenceContext(
+            SerializedProperty property)
+        {
+            SerializedProperty typeNameAndAssemblyProp =
+                property.FindPropertyRelative(PropNameTypeNameAndAssembly);
+            if (typeNameAndAssemblyProp == null)
+            {
+                string error = $"{PropNameTypeNameAndAssembly} not found in {property.propertyPath}";
+                return (error, new TypeReferenceContext(error, null, null));
+            }
+
+            SerializedProperty monoScriptGuidProp = property.FindPropertyRelative(PropNameMonoScriptGuid);
+            if (monoScriptGuidProp == null)
+            {
+                string error = $"{PropNameMonoScriptGuid} not found in {property.propertyPath}";
+                return (error, new TypeReferenceContext(error, typeNameAndAssemblyProp, null));
+            }
+
+            return ("", new TypeReferenceContext("", typeNameAndAssemblyProp, monoScriptGuidProp));
+        }
+
         public static IEnumerable<Assembly> GetAssemblyOfName(IReadOnlyList<string> names)
         {
             // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
@@ -299,10 +335,15 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             return $"{name}:{nameSpace}({ass})";
         }
 
-        private static (string error, Type type) GetSelectedType(SerializedProperty property)
+        private static (string error, Type type) GetSelectedType(TypeReferenceContext context)
         {
-            string typeNameAndAssembly = property.FindPropertyRelative(PropNameTypeNameAndAssembly).stringValue;
-            string monoScriptGuid = property.FindPropertyRelative(PropNameMonoScriptGuid).stringValue;
+            if (context.Error != "")
+            {
+                return (context.Error, null);
+            }
+
+            string typeNameAndAssembly = context.TypeNameAndAssemblyProp.stringValue;
+            string monoScriptGuid = context.MonoScriptGuidProp.stringValue;
 
             if (string.IsNullOrEmpty(typeNameAndAssembly))
             {
@@ -325,22 +366,32 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             return ("", loadedType);
         }
 
-        private static TypeReference SetValue(SerializedProperty property, Type curType)
+        private static (string error, Type type) GetSelectedType(SerializedProperty property)
         {
-            SerializedProperty typeNameAndAssemblyProp = property.FindPropertyRelative(PropNameTypeNameAndAssembly);
-            SerializedProperty monoScriptGuidProp = property.FindPropertyRelative(PropNameMonoScriptGuid);
+            (string error, TypeReferenceContext context) = GetTypeReferenceContext(property);
+            return error == "" ? GetSelectedType(context) : (error, null);
+        }
+
+        private static TypeReference SetValue(TypeReferenceContext context, Type curType)
+        {
             if (curType == null)
             {
-                typeNameAndAssemblyProp.stringValue = "";
-                monoScriptGuidProp.stringValue = "";
-                property.serializedObject.ApplyModifiedProperties();
+                context.TypeNameAndAssemblyProp.stringValue = "";
+                context.MonoScriptGuidProp.stringValue = "";
+                context.TypeNameAndAssemblyProp.serializedObject.ApplyModifiedProperties();
                 return new TypeReference();
             }
 
-            typeNameAndAssemblyProp.stringValue = TypeReference.GetTypeNameAndAssembly(curType);
-            monoScriptGuidProp.stringValue = TypeReference.EditorGetMonoGuid(curType);
-            property.serializedObject.ApplyModifiedProperties();
+            context.TypeNameAndAssemblyProp.stringValue = TypeReference.GetTypeNameAndAssembly(curType);
+            context.MonoScriptGuidProp.stringValue = TypeReference.EditorGetMonoGuid(curType);
+            context.TypeNameAndAssemblyProp.serializedObject.ApplyModifiedProperties();
             return new TypeReference(curType);
+        }
+
+        private static TypeReference SetValue(SerializedProperty property, Type curType)
+        {
+            (string error, TypeReferenceContext context) = GetTypeReferenceContext(property);
+            return error == "" ? SetValue(context, curType) : new TypeReference();
         }
 
         private static TypeReferenceAttribute GetTypeReferenceAttribute(IEnumerable<PropertyAttribute> allAttributes)

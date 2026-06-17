@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
@@ -152,8 +153,11 @@ namespace SaintsField.Editor.Core
                 return GetPropertyHeightFallback(property, label, fieldInfo, GetPreferredLabel(property));
             }
 
-            (PropertyAttribute[] allAttributes, object parent) =
+            (PropertyAttribute[] allAttributesRaw, object parent) =
                 SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+            PropertyAttribute[] allAttributes = (OverrideAttributes ?? allAttributesRaw)
+                .OfType<PropertyAttribute>()
+                .ToArray();
 
             if (parent == null)
             {
@@ -171,15 +175,15 @@ namespace SaintsField.Editor.Core
             Dictionary<SaintsWithIndex, SaintsPropertyDrawer> usedAttributes = saintsAttributeWithIndexes
                 .ToDictionary(each => each, each => GetOrCreateSaintsDrawer(property, each, GetPreferredLabel(property)));
 
-            (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer)[] filedOrLabel = usedAttributes
+            (SaintsWithIndex attributeWithIndex, ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer)[] filedOrLabel = usedAttributes
                 .Where(each =>
                     each.Key.SaintsAttribute.AttributeType == SaintsAttributeType.Field
                     // ReSharper disable once MergeIntoLogicalPattern
                     || each.Key.SaintsAttribute.AttributeType == SaintsAttributeType.Label)
-                .Select(each => (IsaintsAttribute: each.Key.SaintsAttribute, each.Value))
+                .Select(each => (each.Key, each.Key.SaintsAttribute, each.Value))
                 .ToArray();
 
-            (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer) fieldFound =
+            (SaintsWithIndex attributeWithIndex, ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer) fieldFound =
                 filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute.AttributeType == SaintsAttributeType.Field);
 
 
@@ -227,7 +231,7 @@ namespace SaintsField.Editor.Core
             // SaintsPropertyDrawer[] usedDrawerInfos = _usedDrawerTypes.Select(each => _cachedDrawer[each]).ToArray();
             // SaintsPropertyDrawer[] fieldInfos = usedDrawerInfos.Where(each => each.AttributeType is SaintsAttributeType.Field or SaintsAttributeType.Label).ToArray();
 
-            (ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer) labelFound =
+            (SaintsWithIndex attributeWithIndex, ISaintsAttribute iSaintsAttribute, SaintsPropertyDrawer drawer) labelFound =
                 filedOrLabel.FirstOrDefault(each => each.iSaintsAttribute?.AttributeType == SaintsAttributeType.Label);
 
             // Debug.Log($"labelFound.iSaintsAttribute={labelFound.iSaintsAttribute}");
@@ -254,13 +258,18 @@ namespace SaintsField.Editor.Core
             if (hasSaintsField)
             {
                 SaintsPropertyDrawer drawer = fieldFound.drawer ?? this;
-                fieldBasicHeight = drawer.GetFieldHeight(property, label, fullWidth, fieldFound.iSaintsAttribute,
-                    fieldInfo,
+                fieldBasicHeight = drawer.GetFieldHeight(property, label, fullWidth,
+                    0, fieldFound.iSaintsAttribute, fieldInfo,
                     !disabledLabelField, parent);
+            }
+            else if (fieldFound.drawer != null)
+            {
+                fieldBasicHeight = fieldFound.drawer.GetPropertyHeight(property, label);
             }
             else
             {
-                fieldBasicHeight = GetPropertyHeightFallback(property, label, fieldInfo, GetPreferredLabel(property));
+                // fieldBasicHeight = GetPropertyHeightFallback(property, label, fieldInfo, GetPreferredLabel(property));
+                fieldBasicHeight = IMGUIRawDraw.GetPropertyHeightRawFallback(property, allAttributes, fieldInfo.FieldType, label, fieldInfo, InHorizontalLayout);
             }
 
             // Debug.Log($"hasSaintsField={hasSaintsField}, labelBasicHeight={labelBasicHeight}, fieldBasicHeight={fieldBasicHeight}");
@@ -343,6 +352,7 @@ namespace SaintsField.Editor.Core
 
         protected virtual float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
+            int index,
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
             return 0;
@@ -447,12 +457,15 @@ namespace SaintsField.Editor.Core
             {
                 // Debug.Log($"capture sub drawer `{property.displayName}`:{property.propertyPath}@{insideCount}");
                 // EditorGUI.PropertyField(position, property, label, true);
-                UnityDraw(position, property, label, fieldInfo, GetPreferredLabel(property));
+                UnityDraw(position, property, label, fieldInfo, GetPreferredLabel(property), InHorizontalLayout);
                 return;
             }
 
-            (PropertyAttribute[] allAttributes, object parent) =
+            (PropertyAttribute[] allAttributesRaw, object parent) =
                 SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
+            PropertyAttribute[] allAttributes = (OverrideAttributes ?? allAttributesRaw)
+                .OfType<PropertyAttribute>()
+                .ToArray();
             ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
 
             if (parent == null)
@@ -496,6 +509,8 @@ namespace SaintsField.Editor.Core
 
             // _usedAttributes.Clear();
 
+            Rect labelFieldRowRect = default;
+
             using (new EditorGUI.PropertyScope(position, label, property))
             {
                 // propertyScope.Dispose();
@@ -508,9 +523,9 @@ namespace SaintsField.Editor.Core
 
                 Rect aboveRect = EditorGUI.IndentedRect(position);
 
-                Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>
+                Dictionary<string, List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)>>
                     groupedAboveDrawers =
-                        new Dictionary<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>();
+                        new Dictionary<string, List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)>>();
                 foreach (SaintsWithIndex eachAttributeWithIndex in allSaintsAttributes)
                 {
                     SaintsPropertyDrawer drawerInstance = eachAttributeWithIndex.SaintsAttribute is null
@@ -522,13 +537,13 @@ namespace SaintsField.Editor.Core
                             parent))
                     {
                         if (!groupedAboveDrawers.TryGetValue(eachAttributeWithIndex.SaintsAttribute.GroupBy,
-                                out List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> currentGroup))
+                                out List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)> currentGroup))
                         {
-                            currentGroup = new List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>();
+                            currentGroup = new List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)>();
                             groupedAboveDrawers[eachAttributeWithIndex.SaintsAttribute.GroupBy] = currentGroup;
                         }
 
-                        currentGroup.Add((drawerInstance, eachAttributeWithIndex.SaintsAttribute));
+                        currentGroup.Add((drawerInstance, eachAttributeWithIndex));
                         // _usedDrawerTypes.Add(eachDrawer[0]);
                         // UsedAttributesTryAdd(eachAttributeWithIndex, drawerInstance);
                     }
@@ -537,18 +552,19 @@ namespace SaintsField.Editor.Core
                 float aboveUsedHeight = 0;
                 float aboveInitY = aboveRect.y;
 
-                foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)>>
+                foreach (KeyValuePair<string, List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)>>
                              drawerInfoKv in groupedAboveDrawers)
                 {
                     string groupBy = drawerInfoKv.Key;
-                    List<(SaintsPropertyDrawer drawer, ISaintsAttribute iAttribute)> drawerInfos = drawerInfoKv.Value;
+                    List<(SaintsPropertyDrawer drawer, SaintsWithIndex saintsWithIndex)> drawerInfos = drawerInfoKv.Value;
 
                     if (groupBy == "")
                     {
-                        foreach ((SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) in drawerInfos)
+                        foreach ((SaintsPropertyDrawer drawerInstance, SaintsWithIndex saintsWithIndex) in drawerInfos)
                         {
                             Rect newAboveRect =
-                                drawerInstance.DrawAboveImGui(aboveRect, property, bugFixCopyLabel, eachAttribute, fieldInfo, parent);
+                                drawerInstance.DrawAboveImGui(aboveRect, property, bugFixCopyLabel,
+                                    saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, fieldInfo, parent);
                             aboveUsedHeight = newAboveRect.y - aboveInitY;
                             aboveRect = newAboveRect;
                         }
@@ -560,14 +576,15 @@ namespace SaintsField.Editor.Core
                         float height = 0;
                         for (int index = 0; index < drawerInfos.Count; index++)
                         {
-                            (SaintsPropertyDrawer drawerInstance, ISaintsAttribute eachAttribute) = drawerInfos[index];
+                            (SaintsPropertyDrawer drawerInstance, SaintsWithIndex saintsWithIndex) = drawerInfos[index];
                             Rect eachRect = new Rect(aboveRect)
                             {
                                 x = aboveRect.x + eachWidth * index,
                                 width = eachWidth,
                             };
                             Rect leftRect =
-                                drawerInstance.DrawAboveImGui(eachRect, property, bugFixCopyLabel, eachAttribute, fieldInfo, parent);
+                                drawerInstance.DrawAboveImGui(eachRect, property, bugFixCopyLabel,
+                                    saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, fieldInfo, parent);
                             height = Mathf.Max(height, leftRect.y - eachRect.y);
                             // Debug.Log($"height={height}");
                         }
@@ -593,7 +610,7 @@ namespace SaintsField.Editor.Core
 
                 #endregion
 
-                Rect labelFieldRowRect = EditorGUI.IndentedRect(new Rect(position)
+                labelFieldRowRect = EditorGUI.IndentedRect(new Rect(position)
                 {
                     // y = aboveRect.y + (groupedAboveDrawers.Count == 0? 0: aboveRect.height),
                     y = position.y + aboveUsedHeight,
@@ -778,7 +795,7 @@ namespace SaintsField.Editor.Core
                     if (UseCreateFieldIMGUI && fieldDrawer == null)
                     {
                         DrawField(fieldUseRectNoPost, property, useGuiContent,
-                            null, allAttributes, fieldInfo, parent);
+                            fieldAttributeWithIndex.Index, null, allAttributes, fieldInfo, parent);
                         drawFieldBySaints = true;
                     }
                     else if (fieldDrawer == null)
@@ -792,7 +809,8 @@ namespace SaintsField.Editor.Core
                         // _fieldDrawer ??= (SaintsPropertyDrawer) Activator.CreateInstance(fieldDrawer, false);
                         // GUI.SetNextControlName(_fieldControlName);
                         fieldDrawerInstance.DrawField(fieldUseRectNoPost, property, useGuiContent,
-                            fieldAttributeWithIndex.SaintsAttribute, allAttributes, fieldInfo, parent);
+                            fieldAttributeWithIndex.Index, fieldAttributeWithIndex.SaintsAttribute, allAttributes,
+                            fieldInfo, parent);
                         drawFieldBySaints = true;
                         // _fieldDrawer.DrawField(fieldRect, property, newLabel, fieldAttribute);
 
@@ -995,7 +1013,7 @@ namespace SaintsField.Editor.Core
                 SaintsPropertyDrawer drawer = saintsWithIndex.SaintsAttribute is null
                     ? this
                     : GetOrCreateSaintsDrawer(property, saintsWithIndex, GetPreferredLabel(property));
-                drawer.OnPropertyEndImGui(property, label,
+                drawer.OnPropertyEndImGui(labelFieldRowRect, property, label,
                     saintsWithIndex.SaintsAttribute, saintsWithIndex.Index, fieldInfo, parent);
             }
         }
@@ -1012,7 +1030,7 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual Rect DrawAboveImGui(Rect position, SerializedProperty property,
-            GUIContent label, ISaintsAttribute saintsAttribute, FieldInfo info,
+            GUIContent label, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
             return position;
@@ -1054,6 +1072,14 @@ namespace SaintsField.Editor.Core
         }
 
         protected virtual void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            int index,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
+            FieldInfo info, object parent)
+        {
+            DrawField(position, property, label, saintsAttribute, allAttributes, info, parent);
+        }
+
+        protected virtual void DrawField(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
@@ -1082,7 +1108,7 @@ namespace SaintsField.Editor.Core
             return position;
         }
 
-        protected virtual void OnPropertyEndImGui(SerializedProperty property, GUIContent label,
+        protected virtual void OnPropertyEndImGui(Rect labelFieldRect, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int saintsIndex, FieldInfo info, object parent)
         {
         }
@@ -1243,7 +1269,7 @@ namespace SaintsField.Editor.Core
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
             Debug.Log($"use unity draw: {property.propertyType}");
 #endif
-            UnityDraw(position, property, label, info, GetPreferredLabel(property));
+            UnityDraw(position, property, label, info, GetPreferredLabel(property), InHorizontalLayout);
 
             // EditorGUI.PropertyField(position, property, GUIContent.none, true);
             // if (property.propertyType == SerializedPropertyType.Generic)
@@ -1256,7 +1282,7 @@ namespace SaintsField.Editor.Core
             // }
         }
 
-        private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label, FieldInfo fieldInfo, string preferredLabel)
+        private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label, FieldInfo fieldInfo, string preferredLabel, bool inHorizontalLayout)
         {
             // Wait... it works now?
             (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(ReflectCache.GetCustomAttributes(fieldInfo));
@@ -1287,51 +1313,62 @@ namespace SaintsField.Editor.Core
                 }
             }
 
-            InsideSaintsFieldScoop.PropertyKey key = InsideSaintsFieldScoop.MakeKey(property);
-            using (new InsideSaintsFieldScoop(SubDrawCounter, key))
-            {
-                // this is no longer needed for no good reason. Need more investigation and testing
-                // this code is used to prevent the decorator to be drawn everytime a fallback happens
-                // the marco is not added by default
-#if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
-                Type dec = ReflectCache.GetCustomAttributes<PropertyAttribute>(fieldInfo)
-                    .Select(propertyAttribute =>
-                    {
-                        // Debug.Log(propertyAttribute.GetType());
-                        Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
-                            out IReadOnlyList<PropertyDrawerInfo> eachDrawers)
-                            ? eachDrawers[0].DrawerType
-                            : null;
+            IMGUIRawDraw.OnGUIRawFallback(
+                position,
+                property,
+                ReflectCache.GetCustomAttributes<Attribute>(fieldInfo),
+                fieldInfo.FieldType,
+                label,
+                fieldInfo,
+                inHorizontalLayout,
+                false
+            );
 
-                        // Debug.Log($"Found {results}");
-
-                        return results;
-                    })
-                    .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-                Debug.Log($"get dec {dec} for {property.propertyPath}");
-#endif
-
-                ImGuiRemoveDecDraw(position, property, label);
-                if (dec != null && ImGuiRemoveDecDraw(position, property, label))
-                {
-                    return;
-                }
-#endif
-
-                try
-                {
-                    // this somehow not work...
-                    EditorGUI.PropertyField(position, property, label, true);
-                }
-                catch (InvalidOperationException e)
-                {
-                    Debug.LogError(e);
-                }
-                // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
-            }
-            // Debug.Log($"UnityDraw exit, isSub={isSubDrawer}");
+//             InsideSaintsFieldScoop.PropertyKey key = InsideSaintsFieldScoop.MakeKey(property);
+//             using (new InsideSaintsFieldScoop(SubDrawCounter, key))
+//             {
+//                 // this is no longer needed for no good reason. Need more investigation and testing
+//                 // this code is used to prevent the decorator to be drawn everytime a fallback happens
+//                 // the marco is not added by default
+// #if UNITY_2022_1_OR_NEWER && SAINTSFIELD_IMGUI_DUPLICATE_DECORATOR_FIX
+//                 Type dec = ReflectCache.GetCustomAttributes<PropertyAttribute>(fieldInfo)
+//                     .Select(propertyAttribute =>
+//                     {
+//                         // Debug.Log(propertyAttribute.GetType());
+//                         Type results = _propertyAttributeToDecoratorDrawers.TryGetValue(propertyAttribute.GetType(),
+//                             out IReadOnlyList<PropertyDrawerInfo> eachDrawers)
+//                             ? eachDrawers[0].DrawerType
+//                             : null;
+//
+//                         // Debug.Log($"Found {results}");
+//
+//                         return results;
+//                     })
+//                     .FirstOrDefault(each => each?.IsSubclassOf(typeof(DecoratorDrawer)) ?? false);
+//
+// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
+//                 Debug.Log($"get dec {dec} for {property.propertyPath}");
+// #endif
+//
+//                 ImGuiRemoveDecDraw(position, property, label);
+//                 if (dec != null && ImGuiRemoveDecDraw(position, property, label))
+//                 {
+//                     return;
+//                 }
+// #endif
+//
+//                 try
+//                 {
+//                     // this somehow not work...
+//                     EditorGUI.PropertyField(position, property, label, true);
+//                 }
+//                 catch (InvalidOperationException e)
+//                 {
+//                     Debug.LogError(e);
+//                 }
+//                 // Debug.Log($"UnityDraw done, isSub={isSubDrawer}");
+//             }
+//             // Debug.Log($"UnityDraw exit, isSub={isSubDrawer}");
         }
     }
 }

@@ -13,7 +13,9 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
 {
     public partial class ShowImageAttributeDrawer
     {
-        public class ShowImageField : BaseField<string>
+        private readonly Dictionary<Sprite, Texture2D> _cachedSpriteToTexture2D = new Dictionary<Sprite, Texture2D>();
+
+        private sealed class ShowImageField : BaseField<string>
         {
             public readonly VisualElement ImageContainerElement;
             public readonly Image ImageElement;
@@ -40,7 +42,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 return null;
             }
 
-            return CreateUIToolkitElement(property, index, null, showImageAttribute);
+            return CreateUIToolkitElement(property, index, showImageAttribute);
         }
 
         protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
@@ -69,7 +71,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                     flexGrow = 1,
                 },
             };
-            root.Add(CreateUIToolkitElement(property, index, null, showImageAttribute));
+            root.Add(CreateUIToolkitElement(property, index, showImageAttribute));
             root.Add(helpBox);
 
             root.AddToClassList(ClassAllowDisable);
@@ -77,13 +79,10 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             return root;
         }
 
-        private struct Payload
+        private struct ImageState
         {
-            // ReSharper disable InconsistentNaming
-            public Texture2D Image;
-
+            public Texture2D Preview;
             public float ProcessedWidth;
-            // ReSharper enable InconsistentNaming
         }
 
         protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
@@ -94,10 +93,10 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
 
             object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            (string error, Texture2D preview) = GetImage(property, showImageAttribute.ImageCallback, info, parent);
+            (string error, object imageSource) = GetImageSource(property, showImageAttribute.ImageCallback, info, parent);
+            Texture2D preview = error == "" ? GetPreviewTextureForUIToolkit(imageSource) : null;
 
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
-            // ReSharper disable once InvertIf
             if (helpBox.text != error)
             {
                 helpBox.text = error;
@@ -122,12 +121,8 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 image.style.display = imageDisplay;
             }
 
-            Payload payload = (Payload)image.userData;
-            // ReSharper disable once Unity.NoNullPropagation
-            // int curInstanceId = property.objectReferenceValue?.GetInstanceID() ?? 0;
-
-            // Debug.Log($"cur={curInstanceId}, pre={preInstanceId}");
-            if (ReferenceEquals(payload.Image, preview))
+            ImageState imageState = (ImageState)image.userData;
+            if (ReferenceEquals(imageState.Preview, preview))
             {
                 return;
             }
@@ -136,25 +131,24 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
 
             if (preview == null)
             {
-                image.userData = new Payload
+                image.userData = new ImageState
                 {
-                    Image = null,
-                    ProcessedWidth = payload.ProcessedWidth,
+                    Preview = null,
+                    ProcessedWidth = imageState.ProcessedWidth,
                 };
                 return;
             }
 
-            // UpdateImage(image, preview, (AssetPreviewAttribute)saintsAttribute);
-            if (preview != null)
+            SetImage(root, preview);
+            image.userData = new ImageState
             {
-                SetImage(root, preview);
-                OnRootGeoChanged(
-                    root,
-                    showImageAttribute.MaxWidth, showImageAttribute.MaxHeight);
-            }
+                Preview = preview,
+                ProcessedWidth = 0,
+            };
+            OnRootGeoChanged(root, showImageAttribute.MaxWidth, showImageAttribute.MaxHeight);
         }
 
-        private static VisualElement CreateUIToolkitElement(SerializedProperty property, int index, Texture2D preview,
+        private static VisualElement CreateUIToolkitElement(SerializedProperty property, int index,
             ShowImageAttribute showImageAttribute)
         {
             Image image = new Image
@@ -201,29 +195,12 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                         null);
             }
 
-            // UpdateImage(image, preview, assetPreviewAttribute);
-
-            // image.AddToClassList(NameImage(property, index));
-
-            SetImage(showImageField, preview);
-            if (preview == null)
+            SetImage(showImageField, null);
+            image.userData = new ImageState
             {
-                image.userData = new Payload
-                {
-                    Image = null,
-                    ProcessedWidth = 0,
-                };
-            }
-            else
-            {
-                image.style.width = preview.width;
-                image.style.height = preview.height;
-                image.userData = new Payload
-                {
-                    Image = preview,
-                    ProcessedWidth = 0,
-                };
-            }
+                Preview = null,
+                ProcessedWidth = 0,
+            };
 
             showImageField.AddToClassList(ClassAllowDisable);
 
@@ -235,6 +212,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
 
         private static void SetImage(ShowImageField root, Texture2D preview)
         {
+            root.ImageElement.image = preview;
             if (preview == null)
             {
                 root.style.display = DisplayStyle.None;
@@ -242,7 +220,6 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             }
 
             root.style.display = DisplayStyle.Flex;
-            root.ImageElement.image = preview;
         }
 
         private static void OnRootGeoChanged(ShowImageField root, int widthConfig, int heightConfig)
@@ -273,17 +250,16 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 return;
             }
 
-            Payload payload = (Payload)image.userData;
+            ImageState imageState = (ImageState)image.userData;
 
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (payload.ProcessedWidth == rootWidth)
+            if (Mathf.Abs(imageState.ProcessedWidth - rootWidth) < 0.5f)
             {
                 return;
             }
 
-            image.userData = new Payload
+            image.userData = new ImageState
             {
-                Image = payload.Image,
+                Preview = imageState.Preview,
                 ProcessedWidth = rootWidth,
             };
 
@@ -311,6 +287,54 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 image.style.width = Mathf.Max(width, 0);
                 image.style.height = Mathf.Max(height, 0);
             });
+        }
+
+        private Texture2D GetPreviewTextureForUIToolkit(object imageSource)
+        {
+            switch (imageSource)
+            {
+                case Sprite sprite:
+                    if (_cachedSpriteToTexture2D.TryGetValue(sprite, out Texture2D cachedImage) && cachedImage != null)
+                    {
+                        return cachedImage;
+                    }
+
+                    if (IsPartOfMultipleSprite(sprite))
+                    {
+                        return _cachedSpriteToTexture2D[sprite] = GetPartOfTheSprite(sprite);
+                    }
+
+                    return _cachedSpriteToTexture2D[sprite] = sprite.texture;
+                case Texture2D texture2D:
+                    return texture2D;
+                default:
+                    return null;
+            }
+        }
+
+        private static bool IsPartOfMultipleSprite(Sprite sprite)
+        {
+            string path = AssetDatabase.GetAssetPath(sprite.texture);
+            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            return importer != null && importer.spriteImportMode == SpriteImportMode.Multiple;
+        }
+
+        private static Texture2D GetPartOfTheSprite(Sprite sprite)
+        {
+            Texture2D originalTexture = sprite.texture;
+            Texture2D readWriteTexture = Tex.ConvertToCompatibleFormat(originalTexture);
+            Rect textureRect = sprite.textureRect;
+
+            Texture2D croppedTexture = new Texture2D((int)textureRect.width, (int)textureRect.height);
+            Color[] pixels = readWriteTexture.GetPixels(
+                (int)textureRect.x,
+                (int)textureRect.y,
+                (int)textureRect.width,
+                (int)textureRect.height);
+
+            croppedTexture.SetPixels(pixels);
+            croppedTexture.Apply();
+            return croppedTexture;
         }
     }
 }

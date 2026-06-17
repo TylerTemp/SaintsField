@@ -11,9 +11,28 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
 {
     public partial class RequiredAttributeDrawer
     {
+        private static string GetRequiredErrorMessage(SerializedProperty property, RequiredAttribute requiredAttribute,
+            FieldInfo info)
+        {
+            if (requiredAttribute.ErrorMessage != null)
+            {
+                return requiredAttribute.ErrorMessage;
+            }
+
+            int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+            string propertyName = property.displayName;
+            if (arrayIndex != -1)
+            {
+                propertyName = $"{ObjectNames.NicifyVariableName(info.Name)}[{arrayIndex}]";
+            }
+
+            return $"{propertyName} is required";
+        }
+
         private static string GetErrorImGui(SerializedProperty property, ISaintsAttribute saintsAttribute,
             FieldInfo info, object parent)
         {
+            RequiredAttribute requiredAttribute = (RequiredAttribute)saintsAttribute;
             Type rawType = SerializedUtils.PropertyPathIndex(property.propertyPath) < 0
                 ? info.FieldType
                 : ReflectUtils.GetElementType(info.FieldType);
@@ -48,8 +67,7 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
                 return "";
             }
 
-            string errorMessage = ((RequiredAttribute)saintsAttribute).ErrorMessage;
-            return errorMessage ?? $"{property.displayName} is required";
+            return GetRequiredErrorMessage(property, requiredAttribute, info);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
@@ -74,7 +92,8 @@ namespace SaintsField.Editor.Drawers.RequiredDrawer
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string error = GetErrorImGui(property, saintsAttribute, info, parent);
-            float belowHeight = error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
+            MessageType messageType = ((RequiredAttribute)saintsAttribute).MessageType.GetMessageType();
+            float belowHeight = error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, messageType);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_REQUIRED
             Debug.Log($"belowHeight={belowHeight}/{MessageType.Error}; width={width}");

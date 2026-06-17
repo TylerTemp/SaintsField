@@ -8,7 +8,7 @@ namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class ContextMenuExample : SaintsMonoBehaviour
     {
-        [CustomContextMenu(nameof(MyCallback))]  // use default name
+        [FieldCustomContextMenu(nameof(MyCallback))]  // use default name
         [CustomContextMenu(nameof(Func1), "Custom/Debug")]  // use sub item
         [CustomContextMenu(nameof(Func2), "Custom/Set")]  // use sub item
         [CustomContextMenu(":Debug.Log", "$" + nameof(DynamicMenuCallback))]

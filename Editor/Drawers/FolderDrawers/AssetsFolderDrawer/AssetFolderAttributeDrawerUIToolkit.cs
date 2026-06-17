@@ -140,13 +140,6 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
             });
         }
 
-        private static IEnumerable<string> CanDrop(IEnumerable<Object> objRefs)
-        {
-            return objRefs
-                .Select(AssetDatabase.GetAssetPath)
-                .Where(Directory.Exists);
-        }
-
         private static void CheckHelpBox(string value, HelpBox helpBox)
         {
             string error = "";

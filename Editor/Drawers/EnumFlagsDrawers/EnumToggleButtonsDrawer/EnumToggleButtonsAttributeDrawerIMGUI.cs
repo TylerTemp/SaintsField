@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,530 +15,342 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 {
     public partial class EnumToggleButtonsAttributeDrawer
     {
-        private static readonly Color ToggleGreenColor = new Color(0, 1, 40/255f, 0.65f);
+        private sealed class ImGuiInfo
+        {
+            public string Error = "";
+            public readonly RichTextDrawer RichTextDrawer = new RichTextDrawer();
+        }
 
-        private bool _forceUnfold;
+        private static readonly Dictionary<string, ImGuiInfo> InfoCacheIMGUI =
+            new Dictionary<string, ImGuiInfo>();
 
         private GUIStyle _iconButtonStyle;
-        private GUIStyle _miniButtonStyle;
 
-        private Texture2D _classicDropdownLeftGrayTexture2D;
-        private Texture2D _classicDropdownGrayTexture2D;
-
-        private bool _initExpandState;
-
-        private struct ImGuiInfo
-        {
-            public RichTextDrawer RichTextDrawer;
-        }
-
-        private static readonly Dictionary<string, ImGuiInfo> InspectingIds = new Dictionary<string, ImGuiInfo>();
-
-        private static ImGuiInfo EnsureKey(SerializedProperty property, EnumToggleButtonsAttribute enumToggleButtonsAttribute)
+        private static ImGuiInfo EnsureKey(SerializedProperty property)
         {
             string key = SerializedUtils.GetUniqueId(property);
-            if (InspectingIds.TryGetValue(key, out ImGuiInfo found))
+            if (InfoCacheIMGUI.TryGetValue(key, out ImGuiInfo cache))
             {
-                return found;
+                return cache;
             }
 
-            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
-            {
-                // ReSharper disable once InvertIf
-                InspectingIds.Remove(key);
-            });
-
-            return InspectingIds[key] = new ImGuiInfo
-            {
-                RichTextDrawer = new RichTextDrawer(),
-            };
+            InfoCacheIMGUI[key] = cache = new ImGuiInfo();
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
+            return cache;
         }
 
-        private bool EnsureImageResourcesLoaded()
+        private void EnsureImGuiResources()
         {
-            if (_checkboxCheckedTexture2D != null)
+            if (_checkboxCheckedTexture2D == null)
             {
-                return true;
+                LoadIcons();
             }
 
-            LoadIcons();
-            _classicDropdownLeftGrayTexture2D = Util.LoadResource<Texture2D>("classic-dropdown-left-gray.png");
-            _classicDropdownGrayTexture2D = Util.LoadResource<Texture2D>("classic-dropdown-gray.png");
-
-            return false;
-        }
-
-        private void ImGuiLoadResources()
-        {
-            if (EnsureImageResourcesLoaded())
+            if (_iconButtonStyle != null)
             {
                 return;
             }
 
-            // ImGuiEnsureDispose(property.serializedObject.targetObject);
-
             const int padding = 2;
-
             _iconButtonStyle = new GUIStyle(EditorStyles.miniButton)
             {
                 padding = new RectOffset(padding, padding, padding, padding),
-                richText = true,
-            };
-            _miniButtonStyle = new GUIStyle(EditorStyles.miniButton)
-            {
-                richText = true,
             };
         }
 
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
-            float width,
-            ISaintsAttribute saintsAttribute,
-            FieldInfo info,
-            bool hasLabelWidth, object parent)
+        private AdvancedDropdownMetaInfo UpdateNonFlagsStatus(SerializedProperty property,
+            EnumToggleButtonsAttribute enumToggleButtonsAttribute, MemberInfo info, object parent, out ImGuiInfo cache,
+            out ValueButtonRawInfo[] rawInfos)
         {
-            return EditorGUIUtility.singleLineHeight;
+            cache = EnsureKey(property);
+            AdvancedDropdownMetaInfo metaInfo = AdvancedDropdownAttributeDrawer.GetMetaInfo(property,
+                enumToggleButtonsAttribute, info, parent, true, true);
+            cache.Error = metaInfo.Error;
+            rawInfos = ValueButtonsAttributeDrawer.UtilMakeButtonRawInfos(metaInfo, this);
+            return metaInfo;
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent)
+        private static ValueButtonRawInfo[] GetFlagRawInfos(EnumMetaInfo metaInfo,
+            IRichTextTagProvider richTextTagProvider)
         {
-            ImGuiLoadResources();
+            return metaInfo.EnumValues
+                .Select(each => new ValueButtonRawInfo(
+                    RichTextDrawer.ParseRichXmlWithProvider(each.Label, richTextTagProvider).ToArray(),
+                    false,
+                    each.Value))
+                .ToArray();
+        }
 
-            EnumToggleButtonsAttribute enumToggleButtonsAttribute = (EnumToggleButtonsAttribute)saintsAttribute;
-            ImGuiInfo cachedInfo = EnsureKey(property, enumToggleButtonsAttribute);
+        private static void SetFlagValue(SerializedProperty property, MemberInfo info, object parent,
+            EnumMetaInfo metaInfo, long newValue)
+        {
+            EnumFlagsUtil.SetSerializedPropertyEnumValue(metaInfo.EnumType, property, newValue);
+            property.serializedObject.ApplyModifiedProperties();
 
-            bool isExpanded = property.isExpanded;
+            object changedValue = Enum.ToObject(metaInfo.EnumType, newValue);
+            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent,
+                changedValue);
+            TriggerChangedIMGUI(property, changedValue);
+        }
 
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
+        private static bool IsEverything(long curValue, EnumMetaInfo metaInfo)
+        {
+            object currentEnum = Enum.ToObject(metaInfo.EnumType, curValue);
+            return currentEnum.Equals(metaInfo.EverythingBit);
+        }
 
-            Rect drawRect = position;
-            if (!string.IsNullOrEmpty(label.text))
+        private void DrawFlagToggleGroup(Rect position, SerializedProperty property, MemberInfo info, object parent,
+            EnumMetaInfo metaInfo, bool showFullToggles)
+        {
+            long curValue = EnumFlagsUtil.GetSerializedPropertyEnumValue(metaInfo.EnumType, property);
+
+            if (showFullToggles)
             {
-                Rect afterLabelRect = EditorGUI.PrefixLabel(drawRect, label);
-                Rect labelRect = new Rect(drawRect)
+                (Rect checkAllRect, Rect afterCheckAllRect) =
+                    RectUtils.SplitWidthRect(position, EditorGUIUtility.singleLineHeight);
+                using (new EditorGUI.DisabledScope(IsEverything(curValue, metaInfo)))
                 {
-                    width = afterLabelRect.x - drawRect.x,
-                };
-
-                // EditorGUI.DrawRect(labelRect, Color.red);
-                if(Event.current.type == EventType.MouseDown && labelRect.Contains(Event.current.mousePosition))
-                {
-                    property.isExpanded = !property.isExpanded;
-                }
-
-                drawRect = afterLabelRect;
-
-            }
-
-            (Rect preFouldoutRect, Rect foldoutRect) = RectUtils.SplitWidthRect(drawRect, drawRect.width - EditorGUIUtility.singleLineHeight);
-            drawRect = preFouldoutRect;
-
-            int curValue = property.intValue;
-
-            if (isExpanded)  // just draw the toggle all/none buttons
-            {
-                GUI.DrawTexture(foldoutRect, _classicDropdownGrayTexture2D);
-
-                Rect spaceClickUnExpandRect = drawRect;
-
-                if(metaInfo.HasFlags)
-                {
-                    (Rect toggleAllButtonRect, Rect afterToggleAllButtonRect) =
-                        RectUtils.SplitWidthRect(drawRect, EditorGUIUtility.singleLineHeight);
-                    using (new EditorGUI.DisabledScope(EnumFlagsUtil.IsOn(curValue, metaInfo.AllCheckedLong)))
+                    if (GUI.Button(checkAllRect, _checkboxCheckedTexture2D, _iconButtonStyle))
                     {
-                        if (GUI.Button(toggleAllButtonRect, _checkboxCheckedTexture2D, _iconButtonStyle))
-                        {
-                            property.intValue = (int)metaInfo.AllCheckedLong;
-                            TriggerChangedIMGUI(property, metaInfo.AllCheckedLong);
-                        }
-                    }
-
-                    (Rect emptyButtonRect, Rect afterEmptyButtonRect) =
-                        RectUtils.SplitWidthRect(afterToggleAllButtonRect, EditorGUIUtility.singleLineHeight);
-                    spaceClickUnExpandRect = afterEmptyButtonRect;
-                    using (new EditorGUI.DisabledScope(curValue == 0))
-                    {
-                        if (GUI.Button(emptyButtonRect, _checkboxEmptyTexture2D, _iconButtonStyle))
-                        {
-                            property.intValue = 0;
-                            TriggerChangedIMGUI(property, 0);
-                        }
+                        SetFlagValue(property, info, parent, metaInfo, Convert.ToInt64(metaInfo.EverythingBit));
                     }
                 }
 
-                if (GUI.Button(new Rect(spaceClickUnExpandRect)
-                    {
-                        width = spaceClickUnExpandRect.width + EditorGUIUtility.singleLineHeight,
-                    }, GUIContent.none, GUIStyle.none))
+                (Rect emptyRect, _) = RectUtils.SplitWidthRect(afterCheckAllRect, EditorGUIUtility.singleLineHeight);
+                using (new EditorGUI.DisabledScope(curValue == 0))
                 {
-                    property.isExpanded = !property.isExpanded;
+                    if (GUI.Button(emptyRect, _checkboxEmptyTexture2D, _iconButtonStyle))
+                    {
+                        SetFlagValue(property, info, parent, metaInfo, 0L);
+                    }
                 }
 
                 return;
             }
 
-            if (GUI.Button(foldoutRect, _classicDropdownLeftGrayTexture2D, GUIStyle.none))
+            Texture2D toggleTexture;
+            long targetValue;
+            if (curValue == 0)
             {
-                property.isExpanded = !property.isExpanded;
+                toggleTexture = _checkboxEmptyTexture2D;
+                targetValue = Convert.ToInt64(metaInfo.EverythingBit);
+            }
+            else if (IsEverything(curValue, metaInfo))
+            {
+                toggleTexture = _checkboxCheckedTexture2D;
+                targetValue = 0L;
+            }
+            else
+            {
+                toggleTexture = _checkboxIndeterminateTexture2D;
+                targetValue = Convert.ToInt64(metaInfo.EverythingBit);
             }
 
-            Rect afterToggleButtonRect = drawRect;
-
-            if(metaInfo.HasFlags)
+            if (GUI.Button(position, toggleTexture, _iconButtonStyle))
             {
-                (Rect toggleButtonRect, Rect afterRect) = RectUtils.SplitWidthRect(drawRect, EditorGUIUtility.singleLineHeight);
-                afterToggleButtonRect = afterRect;
+                SetFlagValue(property, info, parent, metaInfo, targetValue);
+            }
+        }
 
-                Texture2D toggleTexture;
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width,
+            int index,
+            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent) =>
+            EditorGUIUtility.singleLineHeight;
 
-                if (curValue == 0)
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            int index,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
+            object parent)
+        {
+            EnsureImGuiResources();
+
+            EnumToggleButtonsAttribute enumToggleButtonsAttribute = (EnumToggleButtonsAttribute)saintsAttribute;
+            EnumFlagsMetaInfo flagsMetaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
+            if (!flagsMetaInfo.HasFlags)
+            {
+                AdvancedDropdownMetaInfo metaInfo = UpdateNonFlagsStatus(property, enumToggleButtonsAttribute, info,
+                    parent, out ImGuiInfo cache, out ValueButtonRawInfo[] rawInfos);
+
+                Rect fieldRect = EditorGUI.PrefixLabel(position, label);
+                ValueButtonsAttributeDrawer.ImGuiButtonLayout layout =
+                    ValueButtonsAttributeDrawer.UtilGetButtonLayout(fieldRect.width, fieldRect.width,
+                        !enumToggleButtonsAttribute.NoFold && !property.isExpanded, rawInfos, cache.RichTextDrawer);
+
+                Rect buttonsRect = fieldRect;
+                if (!enumToggleButtonsAttribute.NoFold && layout.HasSubRow)
                 {
-                    toggleTexture = _checkboxEmptyTexture2D;
-                }
-                else if (EnumFlagsUtil.IsOn(curValue, metaInfo.AllCheckedLong))
-                {
-                    toggleTexture = _checkboxCheckedTexture2D;
-                }
-                else
-                {
-                    toggleTexture = _checkboxIndeterminateTexture2D;
+                    buttonsRect = ValueButtonsAttributeDrawer.UtilDrawFoldout(buttonsRect, property);
                 }
 
-                if (GUI.Button(toggleButtonRect, toggleTexture, _iconButtonStyle))
+                if (layout.Rows.Count == 0)
                 {
-                    if (curValue == 0)
+                    return;
+                }
+
+                ValueButtonsAttributeDrawer.UtilDrawButtonRow(buttonsRect, layout.Rows[0], layout.MainAvailableWidth,
+                    cache.RichTextDrawer,
+                    buttonInfo => metaInfo.CurValues.Any(each => Util.GetIsEqual(each, buttonInfo.Value)),
+                    buttonInfo =>
                     {
-                        property.intValue = (int)metaInfo.AllCheckedLong;
-                        TriggerChangedIMGUI(property, metaInfo.AllCheckedLong);
-                    }
-                    else
-                    {
-                        property.intValue = 0;
-                        TriggerChangedIMGUI(property, 0);
-                    }
-                }
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
+                            parent, buttonInfo.Value);
+                        Util.SignPropertyValue(property, info, parent, buttonInfo.Value);
+                        property.serializedObject.ApplyModifiedProperties();
+                        TriggerChangedIMGUI(property, buttonInfo.Value);
+                    });
+                return;
             }
 
-            // EditorGUI.DrawRect(afterToggleButtonRect, Color.cyan);
+            ImGuiInfo flagsCache = EnsureKey(property);
+            flagsCache.Error = "";
 
-            Rect accToggleBitFieldButtonRect = afterToggleButtonRect;
-            // ReSharper disable once UseDeconstruction
-            foreach (KeyValuePair<long, EnumFlagsUtil.EnumDisplayInfo> kv in GetDisplayBit(metaInfo))
+            EnumMetaInfo metaInfoFlags = EnumFlagsUtil.GetEnumMetaInfo(flagsMetaInfo.EnumType);
+            ValueButtonRawInfo[] flagRawInfos = GetFlagRawInfos(metaInfoFlags, this);
+
+            Rect flagsFieldRect = EditorGUI.PrefixLabel(position, label);
+            bool showFullToggles = enumToggleButtonsAttribute.NoFold || property.isExpanded;
+            float fullToggleWidth = EditorGUIUtility.singleLineHeight * (showFullToggles ? 2f : 1f);
+
+            ValueButtonsAttributeDrawer.ImGuiButtonLayout flagLayout =
+                ValueButtonsAttributeDrawer.UtilGetButtonLayout(
+                    Mathf.Max(1f, flagsFieldRect.width - fullToggleWidth),
+                    flagsFieldRect.width,
+                    !showFullToggles,
+                    flagRawInfos,
+                    flagsCache.RichTextDrawer);
+
+            Rect controlRect = flagsFieldRect;
+            if (!enumToggleButtonsAttribute.NoFold && flagLayout.HasSubRow)
             {
-                long bit = kv.Key;
-
-                bool isOn = metaInfo.HasFlags? EnumFlagsUtil.IsOn(curValue, bit): curValue == bit;
-
-                EnumFlagsUtil.EnumDisplayInfo displayInfo = kv.Value;
-                if (displayInfo.HasRichName)
-                {
-                    RichTextDrawer.RichTextChunk[] richChunks = RichTextDrawer
-                        .ParseRichXmlWithProvider(displayInfo.RichName, this)
-                        .ToArray();
-                    float useWidth = cachedInfo.RichTextDrawer.GetWidth(label, position.height, richChunks);
-                    Rect drawRichRect;
-                    bool breakOut = false;
-                    if (useWidth >= accToggleBitFieldButtonRect.width)
-                    {
-                        drawRichRect = accToggleBitFieldButtonRect;
-                        breakOut = true;
-                    }
-                    else
-                    {
-                        (Rect thisUseRichRect, Rect leftAccRect) = RectUtils.SplitWidthRect(accToggleBitFieldButtonRect, useWidth);
-                        drawRichRect = thisUseRichRect;
-                        accToggleBitFieldButtonRect = leftAccRect;
-                    }
-
-                    using (EditorGUIBackgroundColor.ToggleButton(isOn, ToggleGreenColor))
-                    {
-                        if (GUI.Button(drawRichRect, GUIContent.none, _miniButtonStyle))
-                        {
-                            long newValue = metaInfo.HasFlags? EnumFlagsUtil.ToggleBit(curValue, bit):  bit;
-                            if (newValue != curValue)
-                            {
-                                property.intValue = (int)newValue;
-                                TriggerChangedIMGUI(property, newValue);
-                            }
-                        }
-                    }
-                    cachedInfo.RichTextDrawer.DrawChunks(drawRichRect, richChunks);
-
-                    if (breakOut)
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    string bitButtonText = displayInfo.Name;
-                    float useWidth = _miniButtonStyle.CalcSize(new GUIContent(bitButtonText)).x;
-                    Rect drawBitRect;
-                    bool breakOut = false;
-                    if (useWidth >= accToggleBitFieldButtonRect.width)
-                    {
-                        drawBitRect = accToggleBitFieldButtonRect;
-                        breakOut = true;
-                    }
-                    else
-                    {
-                        (Rect thisUseBitRect, Rect leftAccRect) = RectUtils.SplitWidthRect(accToggleBitFieldButtonRect, useWidth);
-                        drawBitRect = thisUseBitRect;
-                        accToggleBitFieldButtonRect = leftAccRect;
-                    }
-
-                    // Debug.Log($"{bit}/{curValue}: {isOn}");
-
-                    using (EditorGUIBackgroundColor.ToggleButton(isOn, ToggleGreenColor))
-                    {
-                        if (GUI.Button(drawBitRect, bitButtonText, _miniButtonStyle))
-                        {
-                            long newValue = metaInfo.HasFlags? EnumFlagsUtil.ToggleBit(curValue, bit): bit;
-                            if (newValue != curValue)
-                            {
-                                // Debug.Log($"{curValue} -> {newValue}");
-                                property.intValue = (int)newValue;
-                                TriggerChangedIMGUI(property, newValue);
-                            }
-                        }
-                    }
-
-                    // Debug.Log($"{bitButtonText}: {breakOut}");
-                    if (breakOut)
-                    {
-                        break;
-                    }
-                }
+                controlRect = ValueButtonsAttributeDrawer.UtilDrawFoldout(controlRect, property);
             }
+
+            (Rect toggleGroupRect, Rect buttonRect) = RectUtils.SplitWidthRect(controlRect, fullToggleWidth);
+            DrawFlagToggleGroup(toggleGroupRect, property, info, parent, metaInfoFlags, showFullToggles);
+
+            if (flagLayout.Rows.Count == 0)
+            {
+                return;
+            }
+
+            ValueButtonsAttributeDrawer.UtilDrawButtonRow(buttonRect, flagLayout.Rows[0], flagLayout.MainAvailableWidth,
+                flagsCache.RichTextDrawer,
+                buttonInfo => EnumFlagsUtil.IsOn(property.intValue, Convert.ToInt64(buttonInfo.Value)),
+                buttonInfo =>
+                {
+                    long toggle = Convert.ToInt64(buttonInfo.Value);
+                    long newValue = EnumFlagsUtil.ToggleBit(property.intValue, toggle);
+                    SetFlagValue(property, info, parent, metaInfoFlags, newValue);
+                });
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
-            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
-            object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index,
+            FieldInfo info, object parent)
         {
-            return property.isExpanded;
+            EnumToggleButtonsAttribute enumToggleButtonsAttribute = (EnumToggleButtonsAttribute)saintsAttribute;
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
+            if (!metaInfo.HasFlags)
+            {
+                UpdateNonFlagsStatus(property, enumToggleButtonsAttribute, info, parent, out _, out _);
+                return EnsureKey(property).Error != "" || enumToggleButtonsAttribute.NoFold || property.isExpanded;
+            }
+
+            return enumToggleButtonsAttribute.NoFold || property.isExpanded;
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
-            int index, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index,
+            FieldInfo info, object parent)
         {
-            // Debug.Log($"Calc width {width}");
-            if (!property.isExpanded)
+            EnumToggleButtonsAttribute enumToggleButtonsAttribute = (EnumToggleButtonsAttribute)saintsAttribute;
+            EnumFlagsMetaInfo flagsMetaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
+            if (!flagsMetaInfo.HasFlags)
             {
-                return 0;
+                AdvancedDropdownMetaInfo metaInfo = UpdateNonFlagsStatus(property, enumToggleButtonsAttribute, info,
+                    parent, out ImGuiInfo cache, out ValueButtonRawInfo[] rawInfos);
+                float inputWidth = ValueButtonsAttributeDrawer.UtilGetFieldInputWidth(width, label);
+                ValueButtonsAttributeDrawer.ImGuiButtonLayout layout =
+                    ValueButtonsAttributeDrawer.UtilGetButtonLayout(inputWidth, width,
+                        !enumToggleButtonsAttribute.NoFold && !property.isExpanded, rawInfos, cache.RichTextDrawer);
+
+                return ValueButtonsAttributeDrawer.UtilGetBelowHeight(width,
+                    enumToggleButtonsAttribute.NoFold || property.isExpanded, metaInfo.Error, layout);
             }
 
-            if(width - 1 <= Mathf.Epsilon)
-            {
-                return EditorGUIUtility.singleLineHeight;
-            }
+            ImGuiInfo flagsCache = EnsureKey(property);
+            flagsCache.Error = "";
 
-            // return EditorGUIUtility.singleLineHeight * 4;
+            EnumMetaInfo metaInfoFlags = EnumFlagsUtil.GetEnumMetaInfo(flagsMetaInfo.EnumType);
+            ValueButtonRawInfo[] rawInfosFlags = GetFlagRawInfos(metaInfoFlags, this);
+            float flagsInputWidth = ValueButtonsAttributeDrawer.UtilGetFieldInputWidth(width, label);
+            bool showFullToggles = enumToggleButtonsAttribute.NoFold || property.isExpanded;
+            float fullToggleWidth = EditorGUIUtility.singleLineHeight * (showFullToggles ? 2f : 1f);
+            ValueButtonsAttributeDrawer.ImGuiButtonLayout flagsLayout =
+                ValueButtonsAttributeDrawer.UtilGetButtonLayout(
+                    Mathf.Max(1f, flagsInputWidth - fullToggleWidth),
+                    width,
+                    !showFullToggles,
+                    rawInfosFlags,
+                    flagsCache.RichTextDrawer);
 
-
-            ImGuiLoadResources();
-            ImGuiInfo cachedInfo = EnsureKey(property, (EnumToggleButtonsAttribute)saintsAttribute);
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
-            // Debug.Log("CALC START ----------");
-            return GetFlexButtons(width, metaInfo, label, cachedInfo, property.displayName, property, info, parent)
-                .Select(each => each.YOffset)
-                .DefaultIfEmpty(0)
-                .Max() + EditorGUIUtility.singleLineHeight;
+            return ValueButtonsAttributeDrawer.UtilGetBelowHeight(width, showFullToggles, "", flagsLayout);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute,
-            int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
+            FieldInfo info, object parent)
         {
-            // return position;
-            // Debug.Log(position.width);
-            if (position.width - 1 <= Mathf.Epsilon)
+            EnumToggleButtonsAttribute enumToggleButtonsAttribute = (EnumToggleButtonsAttribute)saintsAttribute;
+            EnumFlagsMetaInfo flagsMetaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
+            if (!flagsMetaInfo.HasFlags)
             {
-                return RectUtils.SplitHeightRect(position, EditorGUIUtility.singleLineHeight).leftRect;
+                AdvancedDropdownMetaInfo metaInfo = UpdateNonFlagsStatus(property, enumToggleButtonsAttribute, info,
+                    parent, out ImGuiInfo cache, out ValueButtonRawInfo[] rawInfos);
+                float inputWidth = ValueButtonsAttributeDrawer.UtilGetFieldInputWidth(position.width, label);
+                ValueButtonsAttributeDrawer.ImGuiButtonLayout layout =
+                    ValueButtonsAttributeDrawer.UtilGetButtonLayout(inputWidth, position.width,
+                        !enumToggleButtonsAttribute.NoFold && !property.isExpanded, rawInfos, cache.RichTextDrawer);
+
+                return ValueButtonsAttributeDrawer.UtilDrawBelow(position,
+                    enumToggleButtonsAttribute.NoFold || property.isExpanded, metaInfo.Error, layout,
+                    cache.RichTextDrawer,
+                    buttonInfo => metaInfo.CurValues.Any(each => Util.GetIsEqual(each, buttonInfo.Value)),
+                    buttonInfo =>
+                    {
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info,
+                            parent, buttonInfo.Value);
+                        Util.SignPropertyValue(property, info, parent, buttonInfo.Value);
+                        property.serializedObject.ApplyModifiedProperties();
+                        TriggerChangedIMGUI(property, buttonInfo.Value);
+                    });
             }
 
-            // Debug.Log($"Draw width={position.width}");
+            ImGuiInfo flagsCache = EnsureKey(property);
+            flagsCache.Error = "";
 
-            ImGuiLoadResources();
+            EnumMetaInfo metaInfoFlags = EnumFlagsUtil.GetEnumMetaInfo(flagsMetaInfo.EnumType);
+            ValueButtonRawInfo[] rawInfosFlags = GetFlagRawInfos(metaInfoFlags, this);
+            float flagsInputWidth = ValueButtonsAttributeDrawer.UtilGetFieldInputWidth(position.width, label);
+            bool showFullToggles = enumToggleButtonsAttribute.NoFold || property.isExpanded;
+            float fullToggleWidth = EditorGUIUtility.singleLineHeight * (showFullToggles ? 2f : 1f);
+            ValueButtonsAttributeDrawer.ImGuiButtonLayout flagsLayout =
+                ValueButtonsAttributeDrawer.UtilGetButtonLayout(
+                    Mathf.Max(1f, flagsInputWidth - fullToggleWidth),
+                    position.width,
+                    !showFullToggles,
+                    rawInfosFlags,
+                    flagsCache.RichTextDrawer);
 
-            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
-            ImGuiInfo cachedInfo = EnsureKey(property, (EnumToggleButtonsAttribute)saintsAttribute);
-
-            int curValue = property.intValue;
-
-            float yAcc = 0;
-
-            // Debug.Log("DRAW START ----------");
-
-            foreach (FlexButton flexButton in GetFlexButtons(position.width, metaInfo, label, cachedInfo, property.displayName, property, info, parent))
-            {
-                yAcc = flexButton.YOffset;
-
-                int curBit = flexButton.Bit;
-                bool isOn = metaInfo.HasFlags? EnumFlagsUtil.IsOn(curValue, curBit): curValue == curBit;
-                Rect buttonRect = new Rect
+            return ValueButtonsAttributeDrawer.UtilDrawBelow(position, showFullToggles, "", flagsLayout,
+                flagsCache.RichTextDrawer,
+                buttonInfo => EnumFlagsUtil.IsOn(property.intValue, Convert.ToInt64(buttonInfo.Value)),
+                buttonInfo =>
                 {
-                    x = position.x + flexButton.X,
-                    y = position.y + flexButton.YOffset,
-                    width = flexButton.Width,
-                    height = EditorGUIUtility.singleLineHeight,
-                };
-
-                // Debug.Log($"draw {flexButton.NonRichText} @ {flexButton.X}, {flexButton.YOffset} at {buttonRect}/{position}");
-                // EditorGUI.DrawRect(buttonRect, Color.blue);
-
-                using (EditorGUIBackgroundColor.ToggleButton(isOn, ToggleGreenColor))
-                {
-                    if (GUI.Button(buttonRect, flexButton.IsRichText? GUIContent.none: new GUIContent(flexButton.NonRichText), _miniButtonStyle))
-                    {
-                        int newValue = metaInfo.HasFlags? EnumFlagsUtil.ToggleBit(curValue, curBit): curBit;
-                        if (newValue != curValue)
-                        {
-                            property.intValue = newValue;
-                            TriggerChangedIMGUI(property, newValue);
-                        }
-                    }
-
-                    if (flexButton.IsRichText)
-                    {
-                        cachedInfo.RichTextDrawer.DrawChunks(buttonRect, flexButton.RichTextChunks);
-                    }
-                }
-            }
-
-            // Debug.Log("DRAW END ----------");
-
-            return RectUtils.SplitHeightRect(position, yAcc + EditorGUIUtility.singleLineHeight).leftRect;
+                    long toggle = Convert.ToInt64(buttonInfo.Value);
+                    long newValue = EnumFlagsUtil.ToggleBit(property.intValue, toggle);
+                    SetFlagValue(property, info, parent, metaInfoFlags, newValue);
+                });
         }
-
-        private struct FlexButton
-        {
-            public int Bit;
-            public float X;
-            public float YOffset;
-            public float Width;
-            public bool IsRichText;
-            public IReadOnlyList<RichTextDrawer.RichTextChunk> RichTextChunks;
-            public string NonRichText;
-            // public Action OnClick;
-        }
-
-        private IEnumerable<FlexButton> GetFlexButtons(float width, EnumFlagsMetaInfo metaInfo, GUIContent guiContent, ImGuiInfo cachedInfo, string displayName, SerializedProperty property, FieldInfo info, object parent)
-        {
-            float xOffset = 0;
-            float yOffset = 0;
-            // ReSharper disable once UseDeconstruction
-            foreach (KeyValuePair<long, EnumFlagsUtil.EnumDisplayInfo> kv in GetDisplayBit(metaInfo))
-            {
-                long bit = kv.Key;
-                EnumFlagsUtil.EnumDisplayInfo displayInfo = kv.Value;
-
-                float useWidth;
-                RichTextDrawer.RichTextChunk[] chunks = null;
-
-                if (displayInfo.HasRichName)
-                {
-                    chunks = RichTextDrawer.ParseRichXmlWithProvider(displayInfo.RichName, this).ToArray();
-                    useWidth = cachedInfo.RichTextDrawer.GetWidth(guiContent, EditorGUIUtility.singleLineHeight, chunks);
-                }
-                else
-                {
-                    useWidth = _miniButtonStyle.CalcSize(new GUIContent(displayInfo.Name)).x;
-                }
-
-                float leftWidth = width - xOffset;
-                if (leftWidth < useWidth)  // new line
-                {
-                    // Debug.Log($"N {displayInfo.Name} width={width}, xOffset={xOffset}, useWidth={useWidth}, leftWidth={leftWidth}");
-                    xOffset = useWidth;
-                    yOffset += EditorGUIUtility.singleLineHeight;
-                    yield return new FlexButton
-                    {
-                        Bit = (int)bit,
-                        X = 0,
-                        YOffset = yOffset,
-                        Width = useWidth,
-                        IsRichText = displayInfo.HasRichName,
-                        RichTextChunks = chunks,
-                        NonRichText = displayInfo.Name,
-                    };
-                }
-                else
-                {
-                    // Debug.Log($"K {displayInfo.Name} width={width}, xOffset={xOffset}, useWidth={useWidth}, leftWidth={leftWidth}");
-                    yield return new FlexButton
-                    {
-                        Bit = (int)bit,
-                        X = xOffset,
-                        YOffset = yOffset,
-                        Width = useWidth,
-                        IsRichText = displayInfo.HasRichName,
-                        RichTextChunks = chunks,
-                        NonRichText = displayInfo.Name,
-                    };
-                    xOffset += useWidth;
-                }
-            }
-        }
-
-        // private void CheckAutoExpand(float positionWidth, SerializedProperty property, FieldInfo info, EnumFlagsAttribute enumFlagsAttribute)
-        // {
-        //     if (positionWidth - 1 <= Mathf.Epsilon)  // layout event will give this to negative... wait for repaint to do correct calculate
-        //     {
-        //         return;
-        //     }
-        //
-        //     _forceUnfold = false;
-        //
-        //     if (property.isExpanded)
-        //     {
-        //         return;
-        //     }
-        //
-        //     if (!enumFlagsAttribute.AutoExpand)
-        //     {
-        //         return;
-        //     }
-        //
-        //     (int, string)[] allValues = Enum.GetValues(info.FieldType)
-        //         .Cast<object>()
-        //         .Select(each => ((int)each, each.ToString())).ToArray();
-        //
-        //     int allCheckedInt = allValues.Select(each => each.Item1).Aggregate(0, (acc, value) => acc | value);
-        //     IEnumerable<string> stringValues = allValues
-        //         .Where(each => each.Item1 != 0 && each.Item1 != allCheckedInt)
-        //         .Select(each => each.Item2);
-        //
-        //     float totalBtnWidth = EditorGUIUtility.singleLineHeight + stringValues.Sum(each => _miniButtonStyle.CalcSize(new GUIContent(each)).x);
-        //
-        //     _forceUnfold = totalBtnWidth > positionWidth;
-        //     // Debug.Log($"totalBtnWidth = {totalBtnWidth}, positionWidth = {positionWidth}, _forceUnfold = {_forceUnfold}, event={Event.current.type}");
-        // }
-        //
-        // private static void BtnRender(Rect position, IReadOnlyList<BtnInfo> btnInfos)
-        // {
-        //     float eachX = position.x;
-        //     foreach (BtnInfo btnInfo in btnInfos)
-        //     {
-        //         Rect btnRect = new Rect(position)
-        //         {
-        //             x = eachX,
-        //             width = btnInfo.LabelWidth,
-        //         };
-        //         using(new EditorGUI.DisabledScope(btnInfo.Disabled))
-        //         using (EditorGUIBackgroundColor.ToggleButton(btnInfo.Toggled))
-        //         {
-        //             if (GUI.Button(btnRect, btnInfo.Label, btnInfo.LabelStyle))
-        //             {
-        //                 btnInfo.Action.Invoke();
-        //             }
-        //         }
-        //
-        //         eachX += btnInfo.LabelWidth;
-        //     }
-        // }
     }
 }

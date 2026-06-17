@@ -1,9 +1,6 @@
 using System;
 using System.Linq;
 using SaintsField.Editor.Core;
-#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
-using SaintsField.Editor.Drawers.SaintsArrayTypeDrawer;
-#endif
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
@@ -47,13 +44,12 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
         {
         }
 
-#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot, VisualElement container)
         {
             throw new NotSupportedException("Should not be called");
             // return (_resultElement, false);
         }
-
 
         private VisualElement _container;
 
@@ -99,6 +95,7 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
             public bool TableHasSize;
         }
 
+#if UNITY_2021_3_OR_NEWER
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
@@ -163,6 +160,8 @@ namespace SaintsField.Editor.Playa.Renderer.SaintsCell
 
             return preCheckResult;
         }
+#endif
+
 #endif
     }
 }

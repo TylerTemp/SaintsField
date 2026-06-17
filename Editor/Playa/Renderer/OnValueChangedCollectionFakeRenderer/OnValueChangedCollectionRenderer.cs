@@ -47,7 +47,7 @@ namespace SaintsField.Editor.Playa.Renderer.OnValueChangedCollectionFakeRenderer
         private int _curLength;
         private HelpBox _helpBox;
 
-#if  !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if  UNITY_2021_3_OR_NEWER
         protected override (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement inspectorRoot,
             VisualElement container)
         {

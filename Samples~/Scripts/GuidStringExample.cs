@@ -10,16 +10,16 @@ namespace SaintsField.Samples.Scripts
         // [ShowInInspector] public static Guid guid = Guid.NewGuid();
         // [ShowInInspector] public static string guidString => guid.ToString();
 
-        [OnValueChanged(nameof(OnValueChanged))]
+        [OnValueChanged(":Debug.Log")]
         [Guid] public string guidString;
 
-        [ShowInInspector, Guid]
-        public string ShowGuidString
-        {
-            get => guidString;
-            set => guidString = value;
-        }
-
-        private void OnValueChanged(string v) => Debug.Log(v);
+        // [ShowInInspector, Guid]
+        // public string ShowGuidString
+        // {
+        //     get => guidString;
+        //     set => guidString = value;
+        // }
+        //
+        // private void OnValueChanged(string v) => Debug.Log(v);
     }
 }

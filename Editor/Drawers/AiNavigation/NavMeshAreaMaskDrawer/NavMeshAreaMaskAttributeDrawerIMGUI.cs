@@ -11,6 +11,7 @@ namespace SaintsField.Editor.Drawers.AiNavigation.NavMeshAreaMaskDrawer
     public partial class NavMeshAreaMaskAttributeDrawer
     {
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            int index,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)

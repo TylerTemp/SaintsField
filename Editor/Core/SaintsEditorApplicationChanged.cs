@@ -30,10 +30,5 @@ namespace SaintsField.Editor.Core
         }
 
         public static readonly UnityEvent OnSaintsFieldChangedEvent = new UnityEvent();
-        // private static void OnProjectChanged()
-        // {
-        //     OnProjectChangedEvent.Invoke();
-        //     OnAnyEvent.Invoke();
-        // }
     }
 }

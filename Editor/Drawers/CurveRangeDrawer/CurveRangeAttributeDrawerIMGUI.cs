@@ -33,6 +33,7 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
+            int index,
             ISaintsAttribute saintsAttribute,
             FieldInfo info,
             bool hasLabelWidth, object parent)
@@ -41,6 +42,7 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {

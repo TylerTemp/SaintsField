@@ -7,6 +7,7 @@ using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.SaintsCell;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.IMGUIPlainDrawer;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 using SaintsField.Utils;
@@ -19,6 +20,29 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
 {
     public static class SaintsWrapUtils
     {
+        public readonly struct CellInfoIMGUI
+        {
+            public readonly FieldInfo Info;
+            public readonly SerializedProperty Property;
+            public readonly Type RawType;
+            public readonly IReadOnlyList<Attribute> Attributes;
+            public readonly PropertyDrawer Drawer;
+            public readonly bool ShouldIndent;
+
+            public CellInfoIMGUI(FieldInfo info, SerializedProperty property, Type rawType,
+                IReadOnlyList<Attribute> attributes, PropertyDrawer drawer, bool shouldIndent)
+            {
+                Info = info;
+                Property = property;
+                RawType = rawType;
+                Attributes = attributes;
+                Drawer = drawer;
+                ShouldIndent = shouldIndent;
+            }
+
+            public bool IsValid => Info != null && Property != null;
+        }
+
         private static WrapType GetWrapType(FieldInfo listFieldInfo, bool hasSerializeReference)
         {
             Type wrapInstanceType = listFieldInfo.FieldType.GetGenericArguments()[0];
@@ -88,7 +112,173 @@ namespace SaintsField.Editor.Drawers.SaintsWrapTypeDrawer
             return wrapType;
         }
 
-#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
+        public static CellInfoIMGUI GetCellInfoIMGUI(WrapType saintsWrapType, FieldInfo info, Type rawType,
+            SerializedProperty serializedProperty, IReadOnlyList<Attribute> allCustomAttributes,
+            bool hasSerializeReference, bool inHorizontalLayout, string label)
+        {
+            SerializedProperty wrapTypeProp = serializedProperty.FindPropertyRelative("wrapType");
+            Debug.Assert(wrapTypeProp != null);
+            if (wrapTypeProp.intValue != (int)saintsWrapType)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.Log($"set wrap from {(WrapType)wrapTypeProp.intValue} to {WrapType.Array} for {info.FieldType}/{rawType}");
+#endif
+                wrapTypeProp.intValue = (int)saintsWrapType;
+                serializedProperty.serializedObject.ApplyModifiedProperties();
+            }
+
+            List<Attribute> allAttributes = allCustomAttributes.ToList();
+            PropertyAttribute[] allPropertyAttributes = allAttributes
+                .OfType<PropertyAttribute>()
+                .ToArray();
+
+            Type useDrawerType = null;
+            Attribute useAttribute = null;
+
+            Type wrapInstanceType = info.FieldType.GetGenericArguments()[0];
+            Type underType = wrapInstanceType.GetGenericArguments()[0];
+
+            bool needUseRef;
+            bool targetIsArrayOrList = false;
+            if (underType.IsArray)
+            {
+                targetIsArrayOrList = true;
+                needUseRef = !RuntimeUtil.IsSubFieldUnitySerializable(underType.GetElementType());
+            }
+            else if (underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                targetIsArrayOrList = true;
+                needUseRef = !RuntimeUtil.IsSubFieldUnitySerializable(underType.GetGenericArguments()[0]);
+            }
+            else
+            {
+                needUseRef = hasSerializeReference || !RuntimeUtil.IsSubFieldUnitySerializable(underType);
+            }
+
+            if (!needUseRef)
+            {
+                if (underType.IsArray)
+                {
+                    Type arrayElement = underType.GetElementType();
+                    Debug.Assert(arrayElement != null);
+                    needUseRef = arrayElement.IsInterface || arrayElement.IsAbstract;
+                }
+                else if (underType.IsGenericType && underType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    Type listElement = underType.GetGenericArguments()[0];
+                    needUseRef = listElement.IsInterface || listElement.IsAbstract;
+                }
+            }
+
+            string wrapName;
+            switch (saintsWrapType)
+            {
+                case WrapType.Array:
+                    wrapName = "valueArray";
+                    break;
+                case WrapType.List:
+                    wrapName = "valueList";
+                    break;
+                case WrapType.Field:
+                    wrapName = "valueField";
+                    break;
+                case WrapType.T:
+                case WrapType.Undefined:
+                default:
+                    wrapName = "value";
+                    break;
+            }
+
+            Type wrapType = ReflectUtils.GetIWrapPropType(rawType, wrapName);
+            FieldInfo wrapInfo = (FieldInfo)ReflectUtils.GetProp(rawType, wrapName).fieldOrMethodInfo;
+            SerializedProperty serializedBaseProperty = serializedProperty.FindPropertyRelative(wrapName) ??
+                                                        SerializedUtils.FindPropertyByAutoPropertyName(
+                                                            serializedProperty, wrapName);
+
+            SerializedProperty targetProperty = serializedBaseProperty;
+            FieldInfo targetInfo = wrapInfo;
+            Type targetRawType = wrapType;
+            bool shouldIndent = serializedBaseProperty != null &&
+                                serializedBaseProperty.propertyType == SerializedPropertyType.Generic;
+
+            if (!needUseRef)
+            {
+                if (!targetIsArrayOrList)
+                {
+                    ISaintsAttribute saintsAttr = allPropertyAttributes
+                        .OfType<ISaintsAttribute>()
+                        .FirstOrDefault();
+
+                    useAttribute = saintsAttr as Attribute;
+                    if (saintsAttr != null)
+                    {
+                        useDrawerType = SaintsPropertyDrawer.GetFirstSaintsDrawerType(saintsAttr.GetType());
+                    }
+                    else
+                    {
+                        (Attribute attrOrNull, Type drawerType) =
+                            SaintsPropertyDrawer.GetFallbackDrawerType(wrapInfo, serializedBaseProperty,
+                                allCustomAttributes);
+                        useAttribute = attrOrNull;
+                        useDrawerType = drawerType;
+
+                        if (useDrawerType == null &&
+                            serializedBaseProperty != null &&
+                            serializedBaseProperty.propertyType == SerializedPropertyType.Generic)
+                        {
+                            PropertyAttribute prop = new SaintsRowAttribute(inline: true);
+                            useAttribute = prop;
+                            useDrawerType = typeof(SaintsRowAttributeDrawer);
+                            allAttributes.Insert(0, prop);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                useDrawerType = typeof(BaseWrapDrawer);
+                targetProperty = serializedProperty;
+                targetInfo = info;
+                targetRawType = rawType;
+                shouldIndent = false;
+            }
+
+            if (targetInfo == null || targetProperty == null)
+            {
+                return default;
+            }
+
+            PropertyDrawer propertyDrawer = GetOrCreateCachedDrawer(targetProperty, useDrawerType, targetInfo,
+                useDrawerType == typeof(BaseWrapDrawer) ? null : useAttribute, label, allAttributes,
+                inHorizontalLayout);
+            return new CellInfoIMGUI(targetInfo, targetProperty, targetRawType, allAttributes, propertyDrawer,
+                shouldIndent);
+        }
+
+        private static PropertyDrawer GetOrCreateCachedDrawer(SerializedProperty property, Type drawerType,
+            FieldInfo fieldInfo, Attribute attribute, string label, IReadOnlyList<Attribute> allAttributes,
+            bool inHorizontalLayout)
+        {
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 0);
+            if (!IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer drawer) ||
+                drawer == null)
+            {
+                drawer = drawerType == null
+                    ? null
+                    : SaintsPropertyDrawer.MakePropertyDrawer(drawerType, fieldInfo, attribute, label);
+                IMGUIDrawerCache.CachedDrawers[drawerKey] = drawer;
+            }
+
+            if (drawer is SaintsPropertyDrawer saintsPropertyDrawer)
+            {
+                saintsPropertyDrawer.InHorizontalLayout = inHorizontalLayout;
+                saintsPropertyDrawer.OverrideAttributes = allAttributes;
+            }
+
+            return drawer;
+        }
+
+#if UNITY_2021_3_OR_NEWER
         public static VisualElement CreateCellElement(WrapType saintsWrapType, FieldInfo info, Type rawType, SerializedProperty serializedProperty, IReadOnlyList<Attribute> allCustomAttributes, IReadOnlyList<InjectAttributeBase> injectedAttributes, bool hasSerializeReference, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder, object parent)
         {
             SerializedProperty wrapTypeProp = serializedProperty.FindPropertyRelative("wrapType");

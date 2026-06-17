@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.AutoRunner;
 using UnityEditor;
@@ -21,6 +22,13 @@ namespace SaintsField.Editor.Drawers.FolderDrawers.AssetsFolderDrawer
         protected override string WrapFolderToOpen(string folder)
         {
             return folder;
+        }
+
+        private static IEnumerable<string> CanDrop(IEnumerable<Object> objRefs)
+        {
+            return objRefs
+                .Select(AssetDatabase.GetAssetPath)
+                .Where(Directory.Exists);
         }
 
         public AutoRunnerFixerResult AutoRunFix(PropertyAttribute propertyAttribute, IReadOnlyList<PropertyAttribute> allAttributes,

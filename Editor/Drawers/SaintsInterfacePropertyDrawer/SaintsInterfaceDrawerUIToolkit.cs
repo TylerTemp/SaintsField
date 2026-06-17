@@ -1,10 +1,8 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
-using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
@@ -24,29 +22,20 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             }
         }
 
-        private SaintsObjectPickerWindowUIToolkit _objectPickerWindowUIToolkit;
-
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
         {
-            (string error, IWrapProp saintsInterfaceProp, int curInArrayIndex, object _) =
-                GetSerName(property, info);
-            if (error != "")
+            InterfaceFieldInfo fInfo = GetInterfaceFieldInfo(property, info);
+            if (fInfo.Error != "")
             {
-                return new HelpBox(error, HelpBoxMessageType.Error);
+                return new HelpBox(fInfo.Error, HelpBoxMessageType.Error);
             }
 
-            (Type valueType, Type interfaceType) = GetTypes(property, info);
-            SerializedProperty valueProp =
-                property.FindPropertyRelative(ReflectUtils.GetIWrapPropName(saintsInterfaceProp.GetType())) ??
-                SerializedUtils.FindPropertyByAutoPropertyName(property,
-                    ReflectUtils.GetIWrapPropName(saintsInterfaceProp.GetType()));
-
             SaintsInterfaceElement saintsInterfaceElement = new SaintsInterfaceElement(
-                valueType,
-                interfaceType,
+                fInfo.ValueType,
+                fInfo.InterfaceType,
                 property,
-                valueProp,
+                fInfo.ValueProp,
                 allAttributes,
                 info,
                 this,
@@ -54,7 +43,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
                 parent
             );
 
-            string displayLabel = curInArrayIndex == -1 ? property.displayName : $"Element {curInArrayIndex}";
+            string displayLabel = fInfo.ArrayIndex == -1 ? property.displayName : $"Element {fInfo.ArrayIndex}";
             SaintsInterfaceField saintsInterfaceField = new SaintsInterfaceField(displayLabel, saintsInterfaceElement)
             {
                 style =
@@ -65,21 +54,15 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
             };
             saintsInterfaceField.AddToClassList(ClassAllowDisable);
             saintsInterfaceField.AddToClassList(SaintsInterfaceField.alignedFieldUssClassName);
-            saintsInterfaceField.SetValueWithoutNotify(valueProp.objectReferenceValue);
+            saintsInterfaceField.SetValueWithoutNotify(fInfo.ValueProp.objectReferenceValue);
 
-            Debug.Assert(valueType != null);
-            Debug.Assert(interfaceType != null);
+            Debug.Assert(fInfo.ValueType != null);
+            Debug.Assert(fInfo.InterfaceType != null);
 
             UIToolkitUtils.AddContextualMenuManipulator(saintsInterfaceField, property, () => {});
 
             return saintsInterfaceField;
         }
-
-        private IReadOnlyList<Type> _cachedTypesImplementingInterface;
-
-        private bool _useCache;
-        private IEnumerator _enumeratorAssets;
-        private IEnumerator _enumeratorScene;
     }
 }
 #endif

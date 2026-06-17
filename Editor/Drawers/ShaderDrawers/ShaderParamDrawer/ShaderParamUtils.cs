@@ -158,7 +158,7 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             };
         }
 
-#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_2_OR_NEWER
         public static void MakeDropdown<T>(T curValue, Shader shader, ShaderPropertyType? shaderPropertyType, VisualElement root, Action<T> onValueChangedCallback)
         {
             AdvancedDropdownMetaInfo metaInfo = MakeDropdownListMetaInfo(curValue, shader, shaderPropertyType, root, onValueChangedCallback);

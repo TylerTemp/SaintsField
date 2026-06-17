@@ -11,16 +11,39 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 {
     public partial class FieldTypeAttributeDrawer
     {
-        private string _error = "";
+        private static Texture2D _pickIcon;
+
+        private sealed class InfoIMGUI
+        {
+            public string Error = "";
+        }
+
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
+
+        private static InfoIMGUI EnsureKey(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI cache))
+            {
+                return cache;
+            }
+
+            InfoCacheIMGUI[key] = cache = new InfoIMGUI();
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
+            return cache;
+        }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
+            int index,
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
+            InfoIMGUI cache = EnsureKey(property);
             FieldTypeAttribute fieldTypeAttribute = (FieldTypeAttribute)saintsAttribute;
             Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             Type requiredComp = fieldTypeAttribute.CompType ?? fieldType;
@@ -32,15 +55,18 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             catch (Exception e)
             {
                 Debug.LogException(e);
-                _error = e.Message;
+                cache.Error = e.Message;
                 DefaultDrawer(position, property, label, info);
                 return;
             }
 
+            cache.Error = property.objectReferenceValue != null && requiredValue == null
+                ? $"{property.objectReferenceValue} has no component {fieldType}"
+                : "";
+
             EPick editorPick = fieldTypeAttribute.EditorPick;
             bool customPicker = fieldTypeAttribute.CustomPicker;
 
-            // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 Rect fieldRect = customPicker
@@ -52,73 +78,59 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 
                 Object fieldResult =
                     EditorGUI.ObjectField(fieldRect, label, requiredValue, requiredComp, editorPick.HasFlagFast(EPick.Scene));
-                // ReSharper disable once InvertIf
                 if (changed.changed)
                 {
                     Object result = GetNewValue(fieldResult, fieldType, requiredComp);
                     property.objectReferenceValue = result;
+                    property.serializedObject.ApplyModifiedProperties();
+                    TriggerChangedIMGUI(property, result);
 
-                    if (fieldResult != null && result == null)
-                    {
-                        _error = $"{fieldResult} has no component {fieldType}";
-                    }
+                    cache.Error = fieldResult != null && result == null
+                        ? $"{fieldResult} has no component {fieldType}"
+                        : "";
                 }
             }
 
-            if(customPicker)
+            if (customPicker)
             {
                 Rect overrideButtonRect = new Rect(position.x + position.width - 21, position.y, 21, position.height);
-                if (GUI.Button(overrideButtonRect, "●"))
+                _pickIcon ??= Util.LoadResource<Texture2D>("d_pick");
+                if (GUI.Button(overrideButtonRect, new GUIContent(_pickIcon)))
                 {
-                    // Type[] types = requiredComp  == fieldType
-                    //     ? new []{requiredComp}
-                    //     : new []{requiredComp, fieldType};
-                    FieldTypeSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredComp, fieldResult =>
+                    IReadOnlyList<GameObject> rootGameObjects = Array.Empty<GameObject>();
+                    if (property.serializedObject.targetObject is Component component)
                     {
-                        Object result = OnSelectWindowSelected(fieldResult, fieldType);
-                        property.objectReferenceValue = result;
-                        property.serializedObject.ApplyModifiedProperties();
-                        TriggerChangedIMGUI(property, result);
-                    });
+                        rootGameObjects = Util.SceneRootGameObjectsOf(component.gameObject) ?? Array.Empty<GameObject>();
+                    }
+
+                    FieldTypeSelectWindow.Open(property.objectReferenceValue, editorPick, fieldType, requiredComp,
+                        rootGameObjects, fieldResult =>
+                        {
+                            property.objectReferenceValue = fieldResult;
+                            property.serializedObject.ApplyModifiedProperties();
+                            cache.Error = "";
+                            TriggerChangedIMGUI(property, fieldResult);
+                        });
                 }
             }
-        }
-
-        private static Object OnSelectWindowSelected(Object fieldResult, Type fieldType)
-        {
-            return Util.GetTypeFromObj(fieldResult, fieldType);
-            // Object result = null;
-            // switch (fieldResult)
-            // {
-            //     case null:
-            //         // property.objectReferenceValue = null;
-            //         break;
-            //     case GameObject go:
-            //         result = fieldType == typeof(GameObject) ? (Object)go : go.GetComponent(fieldType);
-            //         // Debug.Log($"isGo={fieldType == typeof(GameObject)},  fieldResult={fieldResult.GetType()} result={result.GetType()}");
-            //         break;
-            //     case Component comp:
-            //         result = fieldType == typeof(GameObject)
-            //             ? (Object)comp.gameObject
-            //             : comp.GetComponent(fieldType);
-            //         break;
-            // }
-            //
-            // return result;
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
-            object parent) => _error != "";
+            object parent) => EnsureKey(property).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, EditorGUIUtility.currentViewWidth, MessageType.Error);
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        {
+            string error = EnsureKey(property).Error;
+            return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
+        }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            FieldInfo info, object parent) => ImGuiHelpBox.Draw(position, EnsureKey(property).Error, MessageType.Error);
     }
 }

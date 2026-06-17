@@ -16,13 +16,15 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
 
         private static string GetErrorMessage(SerializedProperty p) => $"{p.displayName}: {ErrorMessage}";
 
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute,
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width, int index,
+            ISaintsAttribute saintsAttribute,
             FieldInfo info, bool hasLabelWidth, object parent)
         {
             return ImGuiHelpBox.GetHeight(GetErrorMessage(property), width, EMessageType.Error);
         }
 
-        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, ISaintsAttribute saintsAttribute,
+        protected override void DrawField(Rect position, SerializedProperty property, GUIContent label, int index,
+            ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
             ImGuiHelpBox.Draw(position, GetErrorMessage(property), EMessageType.Error);

@@ -20,6 +20,35 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
     [CustomPropertyDrawer(typeof(SaintsInterface<>), true)]
     public partial class SaintsInterfaceDrawer: SaintsPropertyDrawer
     {
+        internal readonly struct InterfaceFieldInfo
+        {
+            public readonly string Error;
+            public readonly int ArrayIndex;
+            public readonly Type ValueType;
+            public readonly Type InterfaceType;
+            public readonly SerializedProperty ValueProp;
+            public readonly SerializedProperty IsVRefProp;
+            public readonly SerializedProperty VRefProp;
+            public readonly MemberInfo VRefMemberInfo;
+
+            public InterfaceFieldInfo(string error, int arrayIndex, Type valueType, Type interfaceType,
+                SerializedProperty valueProp, SerializedProperty isVRefProp, SerializedProperty vRefProp,
+                MemberInfo vRefMemberInfo)
+            {
+                Error = error;
+                ArrayIndex = arrayIndex;
+                ValueType = valueType;
+                InterfaceType = interfaceType;
+                ValueProp = valueProp;
+                IsVRefProp = isVRefProp;
+                VRefProp = vRefProp;
+                VRefMemberInfo = vRefMemberInfo;
+            }
+        }
+
+        private static readonly Dictionary<Type, IReadOnlyList<Type>> TypesImplementingInterfaceCache =
+            new Dictionary<Type, IReadOnlyList<Type>>();
+
         public static (Type valueType, Type interfaceType) GetTypes(SerializedProperty property, FieldInfo info)
         {
             Type interfaceContainer = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
@@ -39,6 +68,151 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             // throw new ArgumentException($"Failed to obtain generic arguments from {interfaceContainer}");
             return (null, null);
+        }
+
+        internal static InterfaceFieldInfo GetInterfaceFieldInfo(SerializedProperty property, FieldInfo info)
+        {
+            (string error, IWrapProp saintsInterfaceProp, int arrayIndex, object _) = GetSerName(property, info);
+            if (error != "")
+            {
+                return new InterfaceFieldInfo(error, arrayIndex, null, null, null, null, null, null);
+            }
+
+            string wrapPropName = ReflectUtils.GetIWrapPropName(saintsInterfaceProp.GetType());
+            SerializedProperty valueProp = property.FindPropertyRelative(wrapPropName) ??
+                                           SerializedUtils.FindPropertyByAutoPropertyName(property, wrapPropName);
+            if (valueProp == null)
+            {
+                return new InterfaceFieldInfo($"{wrapPropName} not found in {property.propertyPath}", arrayIndex,
+                    null, null, null, null, null, null);
+            }
+
+            SerializedProperty isVRefProp = property.FindPropertyRelative("IsVRef") ??
+                                            SerializedUtils.FindPropertyByAutoPropertyName(property, "IsVRef");
+            if (isVRefProp == null)
+            {
+                return new InterfaceFieldInfo($"IsVRef not found in {property.propertyPath}", arrayIndex, null,
+                    null, valueProp, null, null, null);
+            }
+
+            SerializedProperty vRefProp = property.FindPropertyRelative("VRef") ??
+                                          SerializedUtils.FindPropertyByAutoPropertyName(property, "VRef");
+            if (vRefProp == null)
+            {
+                return new InterfaceFieldInfo($"VRef not found in {property.propertyPath}", arrayIndex, null, null,
+                    valueProp, isVRefProp, null, null);
+            }
+
+            (Type valueType, Type interfaceType) = GetTypes(property, info);
+            if (valueType == null || interfaceType == null)
+            {
+                return new InterfaceFieldInfo($"Failed to resolve interface types for {property.propertyPath}",
+                    arrayIndex, valueType, interfaceType, valueProp, isVRefProp, vRefProp, null);
+            }
+
+            Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                ? ReflectUtils.GetElementType(info.FieldType)
+                : info.FieldType;
+            MemberInfo vRefMemberInfo =
+                (MemberInfo)fieldType.GetField("VRef", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance) ??
+                fieldType.GetProperty("VRef", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            if (vRefMemberInfo == null)
+            {
+                return new InterfaceFieldInfo($"VRef member not found in {fieldType}", arrayIndex, valueType,
+                    interfaceType, valueProp, isVRefProp, vRefProp, null);
+            }
+
+            return new InterfaceFieldInfo("", arrayIndex, valueType, interfaceType, valueProp, isVRefProp, vRefProp,
+                vRefMemberInfo);
+        }
+
+        internal static bool TryGetMatchedInterfaceValue(Object candidate, Type valueType, Type interfaceType,
+            out Object matchedValue)
+        {
+            if (!candidate)
+            {
+                matchedValue = null;
+                return true;
+            }
+
+            if (interfaceType.IsInstanceOfType(candidate))
+            {
+                matchedValue = candidate;
+                return true;
+            }
+
+            (bool isMatch, Object result) = GetSerializedObject(candidate, valueType, interfaceType);
+            matchedValue = result;
+            return isMatch;
+        }
+
+        internal static bool SyncInterfaceModeSideEffectsWithoutApply(SerializedProperty valueProp,
+            SerializedProperty vRefProp, bool isVRef)
+        {
+            bool changed = false;
+            if (isVRef)
+            {
+                if (valueProp.objectReferenceValue != null)
+                {
+                    valueProp.objectReferenceValue = null;
+                    changed = true;
+                }
+            }
+            else if (vRefProp.managedReferenceValue != null)
+            {
+                vRefProp.managedReferenceValue = null;
+                changed = true;
+            }
+
+            return changed;
+        }
+
+        internal static bool SyncInterfaceModeSideEffects(SerializedProperty valueProp, SerializedProperty vRefProp,
+            bool isVRef)
+        {
+            bool changed = SyncInterfaceModeSideEffectsWithoutApply(valueProp, vRefProp, isVRef);
+            if (changed)
+            {
+                valueProp.serializedObject.ApplyModifiedProperties();
+            }
+
+            return changed;
+        }
+
+        internal static bool ShouldReferenceStartExpanded(IEnumerable<Attribute> allAttributes,
+            SerializedProperty vRefProp) =>
+            allAttributes.Any(each => each is DefaultExpandAttribute) || vRefProp.isExpanded;
+
+        internal static IReadOnlyList<Type> GetTypesImplementingInterface(Type interfaceType)
+        {
+            if (TypesImplementingInterfaceCache.TryGetValue(interfaceType, out IReadOnlyList<Type> cachedTypes))
+            {
+                return cachedTypes;
+            }
+
+            List<Type> results = new List<Type>();
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                IEnumerable<Type> assemblyTypes;
+                try
+                {
+                    assemblyTypes = assembly.GetTypes();
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    assemblyTypes = e.Types.Where(each => each != null);
+                }
+
+                results.AddRange(assemblyTypes.Where(type =>
+                    type != null
+                    && !type.IsAbstract
+                    && !type.ContainsGenericParameters
+                    && !typeof(Object).IsAssignableFrom(type)
+                    && (!type.IsClass || type.GetConstructor(Type.EmptyTypes) != null)
+                    && interfaceType.IsAssignableFrom(type)));
+            }
+
+            return TypesImplementingInterfaceCache[interfaceType] = results;
         }
 
         private class FieldInterfaceSelectWindow : SaintsObjectPickerWindowIMGUI
@@ -160,15 +334,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             private bool FetchFilter(ItemInfo itemInfo)  // gameObject, Sprite, Texture2D, ...
             {
-                if (!itemInfo.Object)
-                {
-                    return true;
-                }
-
-                Type itemType = itemInfo.Object.GetType();
-
-                return _fieldType.IsAssignableFrom(itemType) && _interfaceType.IsAssignableFrom(itemType);
-                // return GetSerializedObject(itemInfo.Object, _fieldType, _interfaceType).isMatch;
+                return TryGetMatchedInterfaceValue(itemInfo.Object, _fieldType, _interfaceType, out _);
             }
         }
 

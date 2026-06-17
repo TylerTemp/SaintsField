@@ -32,9 +32,13 @@ namespace SaintsField.Editor.Drawers.Addressable
             }
 
             // AddressableAssetGroup[] targetGroups;
-            IReadOnlyList<AddressableAssetGroup> assetGroups = string.IsNullOrEmpty(group)
-                ? settings.groups.ToArray()
-                : settings.groups.Where(each => each.name == group).ToArray();
+            IReadOnlyList<AddressableAssetGroup> assetGroups = (
+                    string.IsNullOrEmpty(group)
+                        ? settings.groups
+                        : settings.groups.Where(each => each.name == group)
+                )
+                .Where(each => each.name != "Built In Data")
+                .ToArray();
 
             // string[][] labelFilters = addressableAddressAttribute.LabelFilters;
 

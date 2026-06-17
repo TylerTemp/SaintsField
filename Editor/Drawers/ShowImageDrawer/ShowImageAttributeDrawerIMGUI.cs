@@ -10,52 +10,108 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
 {
     public partial class ShowImageAttributeDrawer
     {
-        private Texture2D _originTexture;
-        private string _error = "";
-
-        private (Texture2D, float preferredWidth, float preferredHeight) GetPreview(SerializedProperty property,
-            int maxWidth, int maxHeight, float viewWidth, string name, FieldInfo info, object parent)
+        private sealed class InfoIMGUI
         {
-            // Debug.Log($"viewWidth={viewWidth}");
-            if (viewWidth - 1f < Mathf.Epsilon)
+            public string Error = "";
+            public object ImageSource;
+            public Texture2D Image;
+            public Rect TexCoords;
+            public float SourceWidth;
+            public float SourceHeight;
+            public float PreferredWidth;
+            public float PreferredHeight;
+            public float LastViewWidth = -1f;
+            public int LastUpdateFrame = -1;
+        }
+
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
+
+        private static InfoIMGUI EnsureKey(SerializedProperty property, int index)
+        {
+            string key = $"{SerializedUtils.GetUniqueId(property)}[{index}]";
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI infoCache))
             {
-                return (null, maxWidth, maxWidth);
+                return infoCache;
             }
 
-            (string error, Texture2D image) = GetImage(property, name, info, parent);
-            _error = error;
+            InfoCacheIMGUI[key] = infoCache = new InfoIMGUI();
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
+            return infoCache;
+        }
 
-            if (_error != "")
+        private void RefreshCache(InfoIMGUI cache, SerializedProperty property, ShowImageAttribute showImageAttribute,
+            float viewWidth, FieldInfo info, object parent)
+        {
+            float normalizedWidth = Mathf.Max(viewWidth, 0f);
+            if (cache.LastUpdateFrame == Time.frameCount && Mathf.Abs(cache.LastViewWidth - normalizedWidth) < 0.5f)
             {
-                return (null, 0, 0);
+                return;
             }
 
-            _originTexture = image;
+            cache.LastUpdateFrame = Time.frameCount;
+            cache.LastViewWidth = normalizedWidth;
+            cache.Error = "";
+            cache.ImageSource = null;
+            cache.Image = null;
+            cache.TexCoords = new Rect(0f, 0f, 1f, 1f);
+            cache.SourceWidth = 0f;
+            cache.SourceHeight = 0f;
+            cache.PreferredWidth = 0f;
+            cache.PreferredHeight = 0f;
 
-            if (_originTexture == null)
+            if (normalizedWidth < Mathf.Epsilon)
             {
-                return (null, 0, 0);
+                return;
             }
 
-            bool widthOk = maxWidth == -1
-                ? _originTexture.width <= viewWidth
-                : _originTexture.width <= maxWidth;
-            bool heightOk = maxHeight == -1 || _originTexture.height <= maxHeight;
+            (string error, object imageSource) = GetImageSource(property, showImageAttribute.ImageCallback, info, parent);
+            cache.Error = error;
+            cache.ImageSource = imageSource;
+            cache.Image = error == "" && imageSource != null ? GetImageTextureFromSource(imageSource) : null;
+            cache.TexCoords = GetTexCoords(imageSource);
+            (cache.SourceWidth, cache.SourceHeight) = GetSourceSize(imageSource, cache.Image);
 
-            if (widthOk && heightOk) // original width & smaller than view width
+            if (error != "" || cache.Image == null)
             {
-                return (_originTexture, _originTexture.width, _originTexture.height);
+                return;
             }
 
-            // fixed width / overflow height
-            (int scaleWidth, int scaleHeight) = Tex.GetProperScaleRect(Mathf.FloorToInt(viewWidth), maxWidth, maxHeight,
-                _originTexture.width, _originTexture.height);
-            return (_originTexture, scaleWidth, scaleHeight);
+            float availableWidth = normalizedWidth;
+            if (showImageAttribute.Align == EAlign.FieldStart)
+            {
+                availableWidth -= EditorGUIUtility.labelWidth;
+            }
+
+            availableWidth = Mathf.Max(availableWidth, 0f);
+            if (availableWidth < Mathf.Epsilon)
+            {
+                return;
+            }
+
+            bool widthOk = showImageAttribute.MaxWidth == -1
+                ? cache.SourceWidth <= availableWidth
+                : cache.SourceWidth <= showImageAttribute.MaxWidth;
+            bool heightOk = showImageAttribute.MaxHeight == -1 || cache.SourceHeight <= showImageAttribute.MaxHeight;
+
+            if (widthOk && heightOk)
+            {
+                cache.PreferredWidth = cache.SourceWidth;
+                cache.PreferredHeight = cache.SourceHeight;
+                return;
+            }
+
+            (int scaleWidth, int scaleHeight) = Tex.GetProperScaleRect(
+                Mathf.FloorToInt(availableWidth),
+                showImageAttribute.MaxWidth,
+                showImageAttribute.MaxHeight,
+                Mathf.RoundToInt(cache.SourceWidth),
+                Mathf.RoundToInt(cache.SourceHeight));
+            cache.PreferredWidth = scaleWidth;
+            cache.PreferredHeight = scaleHeight;
         }
 
         protected override bool WillDrawAbove(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            FieldInfo info,
-            object parent)
+            FieldInfo info, object parent)
         {
             return ((ShowImageAttribute)saintsAttribute).Above;
         }
@@ -63,170 +119,150 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
         protected override float GetAboveExtraHeight(SerializedProperty property, GUIContent label, float width,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            if (_error != "")
+            ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
+            InfoIMGUI cache = EnsureKey(property, index);
+            RefreshCache(cache, property, showImageAttribute, width, info, parent);
+
+            if (cache.Error != "")
             {
                 return 0;
             }
 
-            return ((ShowImageAttribute)saintsAttribute).Above
-                ? GetImageHeight(property, width, saintsAttribute, info, parent)
-                : 0;
+            return showImageAttribute.Above ? cache.PreferredHeight : 0;
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            if (_error != "")
+            ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
+            InfoIMGUI cache = EnsureKey(property, index);
+            RefreshCache(cache, property, showImageAttribute, position.width, info, parent);
+
+            if (cache.Error != "")
             {
                 return position;
             }
 
-            return Draw(position, property, saintsAttribute, info, parent);
+            return Draw(position, showImageAttribute, cache);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
-            int index,
-            FieldInfo info,
-            object parent)
+            int index, FieldInfo info, object parent)
         {
-            // Debug.Log($"{((ShowImageAttribute)saintsAttribute).Above}/{_error}");
-            bool willDrawBelow = !((ShowImageAttribute)saintsAttribute).Above || _error != "";
-            // Debug.Log($"WillDrawBelow={willDrawBelow}");
-            return willDrawBelow;
+            ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
+            InfoIMGUI cache = EnsureKey(property, index);
+            RefreshCache(cache, property, showImageAttribute, EditorGUIUtility.currentViewWidth, info, parent);
+            return !showImageAttribute.Above || cache.Error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
+            object parent)
         {
-            // Debug.Log($"draw below view width: {width}");
+            ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
+            InfoIMGUI cache = EnsureKey(property, index);
+            RefreshCache(cache, property, showImageAttribute, width, info, parent);
 
-            if (_error != "")
+            if (cache.Error != "")
             {
-                return ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+                return ImGuiHelpBox.GetHeight(cache.Error, width, MessageType.Error);
             }
 
-            float height = ((ShowImageAttribute)saintsAttribute).Above
-                ? 0
-                : GetImageHeight(property, width, saintsAttribute, info, parent);
-            // Debug.Log($"GetBlowExtraHeight={height}");
-            return height;
+            return showImageAttribute.Above ? 0 : cache.PreferredHeight;
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent)
-        {
-            if (_error != "")
-            {
-                return ImGuiHelpBox.Draw(position, _error, MessageType.Error);
-            }
-
-            // EditorGUI.DrawRect(position, Color.blue);
-            // Debug.Log($"DrawBelow height: {position.height}");
-
-            return Draw(position, property, saintsAttribute, info, parent);
-        }
-
-        private float GetImageHeight(SerializedProperty property, float width, ISaintsAttribute saintsAttribute,
-            FieldInfo info, object parent)
-        {
-            ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
-            int maxWidth = showImageAttribute.MaxWidth;
-            // int viewWidth = Mathf.FloorToInt(width);
-            // int useWidth = maxWidth == -1? viewWidth: Mathf.Min(maxWidth, viewWidth);
-            int maxHeight = showImageAttribute.MaxHeight;
-
-            (Texture2D _, float _, float preferredHeight) = GetPreview(property, maxWidth, maxHeight, width,
-                showImageAttribute.ImageCallback, info, parent);
-
-            // Debug.Log($"GetImageHeight viewWidth={width} -> {preferredHeight}");
-            // if (previewTexture)
-            // {
-            //     Debug.Log($"get preview {previewTexture.width}x{previewTexture.height}");
-            // }
-            // else
-            // {
-            //     Debug.Log($"get no preview");
-            // }
-            // ReSharper disable once Unity.NoNullPropagation
-            return preferredHeight;
-        }
-
-        private Rect Draw(Rect position, SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info,
+            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
-            // Debug.Log($"Draw height: {position.height}");
-
-            if (position.height <= 0)
-            {
-                // Debug.Log($"height<0: {position.height}");
-                return position;
-            }
-
             ShowImageAttribute showImageAttribute = (ShowImageAttribute)saintsAttribute;
-            int maxWidth = showImageAttribute.MaxWidth;
-            // int useWidth = maxWidth == -1? Mathf.FloorToInt(position.width): Mathf.Min(maxWidth, Mathf.FloorToInt(position.width));
-            // int maxHeight = Mathf.Min(assetPreviewAttribute.MaxHeight, Mathf.FloorToInt(position.height));
-            int maxHeight = showImageAttribute.MaxHeight;
+            InfoIMGUI cache = EnsureKey(property, index);
+            RefreshCache(cache, property, showImageAttribute, position.width, info, parent);
 
-            // Debug.Log($"Draw height={position.height}");
+            if (cache.Error != "")
+            {
+                return ImGuiHelpBox.Draw(position, cache.Error, MessageType.Error);
+            }
 
-            (Texture2D previewTexture, float preferredWidth, float preferredHeight) = GetPreview(property, maxWidth,
-                maxHeight, position.width, showImageAttribute.ImageCallback, info, parent);
+            return Draw(position, showImageAttribute, cache);
+        }
 
-            // Debug.Log($"preview to {preferredWidth}x{preferredHeight}");
-            // if (previewTexture)
-            // {
-            //     Debug.Log($"draw get preview {previewTexture.width}x{previewTexture.height}");
-            // }
-            // else
-            // {
-            //     Debug.Log($"draw get no preview");
-            // }
-
-            if (previewTexture == null)
+        private static Rect Draw(Rect position, ShowImageAttribute showImageAttribute, InfoIMGUI cache)
+        {
+            if (position.height <= 0 || cache.Image == null || cache.PreferredHeight <= 0 || cache.PreferredWidth <= 0)
             {
                 return position;
             }
 
-            EAlign align = showImageAttribute.Align;
             float xOffset;
-            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
-            switch (align)
+            switch (showImageAttribute.Align)
             {
                 case EAlign.Start:
                     xOffset = 0;
                     break;
                 case EAlign.Center:
-                    xOffset = (position.width - preferredWidth) / 2;
+                    xOffset = (position.width - cache.PreferredWidth) / 2f;
                     break;
                 case EAlign.End:
-                    xOffset = position.width - preferredWidth;
+                    xOffset = position.width - cache.PreferredWidth;
                     break;
                 case EAlign.FieldStart:
                     xOffset = EditorGUIUtility.labelWidth;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(align), align, null);
+                    throw new ArgumentOutOfRangeException(nameof(showImageAttribute.Align), showImageAttribute.Align, null);
             }
 
             Rect previewRect = new Rect(position)
             {
                 x = position.x + xOffset,
-                height = preferredHeight,
-                width = preferredWidth,
+                width = cache.PreferredWidth,
+                height = cache.PreferredHeight,
             };
 
-            // EditorGUI.DrawRect(previewRect, Color.blue);
+            GUI.DrawTextureWithTexCoords(previewRect, cache.Image, cache.TexCoords);
+            return RectUtils.SplitHeightRect(position, cache.PreferredHeight).leftRect;
+        }
 
-            GUI.DrawTexture(previewRect, previewTexture, ScaleMode.ScaleToFit);
+        private static Rect GetTexCoords(object imageSource)
+        {
+            if (imageSource is not Sprite sprite || sprite.texture == null)
+            {
+                return new Rect(0f, 0f, 1f, 1f);
+            }
 
-            // GUI.Label(previewRect, previewTexture);
-            // GUI.Label(previewRect, new GUIContent(previewTexture));
+            Rect textureRect = sprite.textureRect;
+            Texture2D texture = sprite.texture;
+            return new Rect(
+                textureRect.x / texture.width,
+                textureRect.y / texture.height,
+                textureRect.width / texture.width,
+                textureRect.height / texture.height);
+        }
 
-            return RectUtils.SplitHeightRect(position, preferredHeight).leftRect;
+        private static (float width, float height) GetSourceSize(object imageSource, Texture2D texture)
+        {
+            if (imageSource is Sprite sprite)
+            {
+                Rect textureRect = sprite.textureRect;
+                return (textureRect.width, textureRect.height);
+            }
+
+            return texture == null ? (0f, 0f) : (texture.width, texture.height);
+        }
+
+        private static Texture2D GetImageTextureFromSource(object imageSource)
+        {
+            switch (imageSource)
+            {
+                case Sprite sprite:
+                    return sprite.texture;
+                case Texture2D texture2D:
+                    return texture2D;
+                default:
+                    return null;
+            }
         }
     }
 }

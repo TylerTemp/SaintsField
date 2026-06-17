@@ -123,11 +123,14 @@ namespace SaintsField.Editor.Drawers.Spine.SpinePathConstraintPickerDrawer
         }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width,
+            int index,
             ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent) =>
             EditorGUIUtility.singleLineHeight;
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
+            int index,
+            ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
+            object parent)
         {
             InfoIMGUI cache = EnsureKey(property, (SpinePathConstraintPickerAttribute)saintsAttribute, info, parent);
             if (property.propertyType != SerializedPropertyType.String)

@@ -1,4 +1,4 @@
-#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_2_OR_NEWER
 using SaintsField.SaintsSerialization;
 using UnityEditor;
 

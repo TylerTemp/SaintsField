@@ -154,13 +154,6 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     return cacheInfo;
                 }
 
-                if (cacheInfo.BodyInfo.ManagedReferenceId != managedReferenceId)
-                {
-                    RemoveCache(key);
-                    cacheInfo = EnsureKey(info, property);
-                    cacheInfo.BodyInfo.ManagedReferenceId = managedReferenceId;
-                }
-
                 object managedReferenceValue = property.managedReferenceValue;
                 cacheInfo.Value = managedReferenceValue;
                 if (managedReferenceValue == null)
@@ -219,14 +212,19 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             return cacheInfo;
         }
 
-        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width, ISaintsAttribute saintsAttribute,
+        protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width, int index,
+            ISaintsAttribute saintsAttribute,
             FieldInfo info, bool hasLabelWidth, object parent)
+            => GetRowFieldHeight(property, label, info, (SaintsRowAttribute)saintsAttribute);
+
+        public float GetRowFieldHeight(SerializedProperty property, GUIContent label, FieldInfo info,
+            SaintsRowAttribute saintsRowAttribute = null)
         {
             float fullWidth = _filedWidthCache <= 0
                 ? EditorGUIUtility.currentViewWidth - EditorGUI.indentLevel * 15
                 : _filedWidthCache;
 
-            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)saintsAttribute;
+            saintsRowAttribute ??= new SaintsRowAttribute();
             float baseLineHeight = saintsRowAttribute.Inline ? 0 : SingleLineHeight;
             float fieldHeight = 0f;
             ImGuiCacheInfo cacheInfo = EnsureKey(info, property);
@@ -247,10 +245,15 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            int index,
             ISaintsAttribute saintsAttribute,
             IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
+            => DrawRowField(position, property, label, info, (SaintsRowAttribute)saintsAttribute);
+
+        public void DrawRowField(Rect position, SerializedProperty property, GUIContent label, FieldInfo info,
+            SaintsRowAttribute saintsRowAttribute = null)
         {
-            SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)saintsAttribute;
+            saintsRowAttribute ??= new SaintsRowAttribute();
 
             if (!saintsRowAttribute.Inline)
             {
@@ -275,6 +278,11 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     height = position.height - SaintsPropertyDrawer.SingleLineHeight,
                     width = position.width - SaintsPropertyDrawer.IndentWidth,
                 };
+
+            if (leftRect.width - 1 > Mathf.Epsilon && Event.current.type == EventType.Repaint)
+            {
+                _filedWidthCache = leftRect.width;
+            }
 
             ImGuiCacheInfo cacheInfo = EnsureKey(info, property);
             if (cacheInfo.Error != "")

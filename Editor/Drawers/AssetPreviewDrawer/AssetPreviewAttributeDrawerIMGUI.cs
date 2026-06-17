@@ -97,7 +97,7 @@ namespace SaintsField.Editor.Drawers.AssetPreviewDrawer
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             string error = MismatchError(property, info, parent);
             if (error != null)

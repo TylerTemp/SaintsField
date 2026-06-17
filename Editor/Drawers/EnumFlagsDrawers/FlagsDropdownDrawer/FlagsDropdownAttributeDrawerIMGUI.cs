@@ -4,27 +4,57 @@ using System.Reflection;
 using SaintsField.DropdownBase;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.ExpandableDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
 {
     public partial class FlagsDropdownAttributeDrawer
     {
-        private string _error = "";
-
-        private readonly Dictionary<string, Texture2D> _iconCache = new Dictionary<string, Texture2D>();
-
-        ~FlagsDropdownAttributeDrawer()
+        private sealed class InfoIMGUI
         {
-            _iconCache.Clear();
+            public string Error = "";
+        }
+
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
+
+        private static InfoIMGUI EnsureKey(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI cache))
+            {
+                return cache;
+            }
+
+            InfoCacheIMGUI[key] = cache = new InfoIMGUI();
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
+            return cache;
+        }
+
+        private static InfoIMGUI UpdateStatus(SerializedProperty property, FieldInfo info)
+        {
+            InfoIMGUI cache = EnsureKey(property);
+            if (property.propertyType != SerializedPropertyType.Enum)
+            {
+                cache.Error = $"Type {property.propertyType} is not a enum type";
+                return cache;
+            }
+
+            EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
+            AdvancedDropdownMetaInfo dropdownMetaInfo = EnumFlagsUtil.GetDropdownMetaInfo(
+                property.intValue,
+                metaInfo.AllCheckedLong,
+                metaInfo.BitValueToName);
+            cache.Error = dropdownMetaInfo.Error;
+            return cache;
         }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
+            int index,
             ISaintsAttribute saintsAttribute,
             FieldInfo info,
             bool hasLabelWidth, object parent)
@@ -33,15 +63,23 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
+            int index,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
+            InfoIMGUI cache = UpdateStatus(property, info);
+            if (property.propertyType != SerializedPropertyType.Enum)
+            {
+                EditorGUI.LabelField(position, label, GUIContent.none);
+                return;
+            }
+
             EnumFlagsMetaInfo metaInfo = EnumFlagsUtil.GetMetaInfo(property, info);
             AdvancedDropdownMetaInfo dropdownMetaInfo = EnumFlagsUtil.GetDropdownMetaInfo(
-                EnumFlagsUtil.GetSerializedPropertyEnumValue(metaInfo.EnumType, property),
+                property.intValue,
                 metaInfo.AllCheckedLong,
                 metaInfo.BitValueToName);
-            _error = dropdownMetaInfo.Error;
+            cache.Error = dropdownMetaInfo.Error;
 
             #region Dropdown
 
@@ -53,54 +91,30 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(leftRect, new GUIContent(display), FocusType.Keyboard))
             {
-                float minHeight = AdvancedDropdownAttribute.MinHeight;
-                float itemHeight = EditorGUIUtility.singleLineHeight;
-                float titleHeight = AdvancedDropdownAttribute.TitleHeight;
-                Vector2 size;
-                if (minHeight < 0)
-                {
-                    // if(AdvancedDropdownAttribute.UseTotalItemCount)
-                    // {
-                    float totalItemCount = GetValueItemCounts(dropdownMetaInfo.DropdownListValue);
-                    // Debug.Log(totalItemCount);
-                    size = new Vector2(position.width, totalItemCount * itemHeight + titleHeight);
-                    // }
-                    // else
-                    // {
-                    //     float maxChildCount = GetDropdownPageHeight(metaInfo.DropdownListValue, itemHeight, advancedDropdownAttribute.SepHeight).Max();
-                    //     size = new Vector2(position.width, maxChildCount + titleHeight);
-                    // }
-                }
-                else
-                {
-                    size = new Vector2(position.width, minHeight);
-                }
-
-                // Vector2 size = new Vector2(position.width, maxChildCount * EditorGUIUtility.singleLineHeight + 31f);
-                SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
-                    dropdownMetaInfo.DropdownListValue,
-                    size,
-                    position,
-                    new AdvancedDropdownState(),
-                    curItem =>
+                PopupWindow.Show(leftRect, new SaintsTreeDropdownIMGUI(
+                    dropdownMetaInfo,
+                    leftRect.width,
+                    320f,
+                    true,
+                    (curItem, _) =>
                     {
-                        int selectedValue = (int)curItem;
-                        int newMask = selectedValue == 0
+                        long selectedValue = (long)curItem;
+                        long currentMask = EnumFlagsUtil.GetSerializedPropertyEnumValue(metaInfo.EnumType, property);
+                        long newMask = selectedValue == 0
                             ? 0
-                            : EnumFlagsUtil.ToggleBit(property.intValue, selectedValue);
+                            : EnumFlagsUtil.ToggleBit(currentMask, selectedValue);
 
-                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newMask);
-                        Util.SignPropertyValue(property, info, parent, newMask);
+                        EnumFlagsUtil.SetSerializedPropertyEnumValue(metaInfo.EnumType, property, newMask);
                         property.serializedObject.ApplyModifiedProperties();
                         TriggerChangedIMGUI(property, newMask);
+                        ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent,
+                            System.Enum.ToObject(metaInfo.EnumType, newMask));
                         if(ExpandableIMGUIScoop.IsInScoop)
                         {
                             property.serializedObject.ApplyModifiedProperties();
                         }
-                    },
-                    GetIcon);
-                dropdown.Show(position);
-                dropdown.BindWindowPosition();
+                        return EnumFlagsUtil.GetDropdownMetaInfo(newMask, metaInfo.AllCheckedLong, metaInfo.BitValueToName).CurValues;
+                    }));
             }
 
             #endregion
@@ -121,39 +135,27 @@ namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer
             return dropdownList.children.Sum(child => GetValueItemCounts(child));
         }
 
-        private Texture2D GetIcon(string icon)
-        {
-            if (_iconCache.TryGetValue(icon, out Texture2D result))
-            {
-                return result;
-            }
-
-            result = Util.LoadResource<Texture2D>(icon);
-            if (result == null)
-            {
-                return null;
-            }
-            if (result.width == 1 && result.height == 1)
-            {
-                return null;
-            }
-            _iconCache[icon] = result;
-            return result;
-        }
-
         protected override bool WillDrawBelow(SerializedProperty property,
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index,
             FieldInfo info,
-            object parent) => _error != "";
+            object parent) => UpdateStatus(property, info).Error != "";
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
+        {
+            string error = EnsureKey(property).Error;
+            return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
+        }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent) => _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            FieldInfo info, object parent)
+        {
+            string error = EnsureKey(property).Error;
+            return error == "" ? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);
+        }
 
     }
 }

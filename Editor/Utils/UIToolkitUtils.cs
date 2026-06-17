@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System.Collections;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
@@ -2048,7 +2048,6 @@ namespace SaintsField.Editor.Utils
         // ReSharper disable once UnusedParameter.Global
         public static void Unbind(VisualElement element)
         {
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
             try
             {
                 element.Unbind();
@@ -2061,86 +2060,6 @@ namespace SaintsField.Editor.Utils
             {
                 // ignore
             }
-#else
-            // not working atm
-            if (_fallbackUnbindReflectionFailed)
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.Log("Unbind skip: already failed");
-#endif
-                return;
-            }
-
-            // get internal binder type
-            _serializedObjectBindingContextType ??= Type.GetType("UnityEditor.UIElements.Bindings.SerializedObjectBindingContext, UnityEditor.UIElementsModule", throwOnError: false);
-
-            if (_serializedObjectBindingContextType == null)
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning("Unbind skip: failed to find SerializedObjectBindingContext type");
-#endif
-                _fallbackUnbindReflectionFailed = true;
-                return;
-            }
-
-            // get the find method
-            _serializedObjectBindingContextFindMethod ??= _serializedObjectBindingContextType.GetMethod("FindBindingContext", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-
-            if (_serializedObjectBindingContextFindMethod == null)
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning("Unbind skip: failed to find FindBindingContext method in SerializedObjectBindingContext");
-#endif
-                _fallbackUnbindReflectionFailed = true;
-                return;
-            }
-
-            // get curveField context (if possible)
-            object elementContext = _serializedObjectBindingContextFindMethod.Invoke(null, new object[] { element, serializedObject });
-
-            if (elementContext == null)
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"Unbind skip: failed to find binding context for element {element}");
-#endif
-                return;
-            }
-
-            // get the binding updater (.Add method will always return it)
-            MethodInfo bindingUpdaterAddMethod = elementContext.GetType().GetMethod("AddBindingUpdater", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-
-            if (bindingUpdaterAddMethod == null)
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"Unbind skip: failed to find AddBindingUpdater method in {elementContext.GetType()}");
-#endif
-                return;
-            }
-
-            object bindingUpdater = bindingUpdaterAddMethod.Invoke(elementContext, new object[] { element });
-
-            if (bindingUpdater == null)
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"Unbind skip: failed to get binding updater for element {element}");
-#endif
-                return;
-            }
-            // and call .Unbind() for a blanket removal
-            MethodInfo unbindMethod = bindingUpdater.GetType().GetMethod("Unbind", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-
-            if (unbindMethod == null)
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogWarning($"Unbind skip: failed to find Unbind method in {bindingUpdater.GetType()}");
-#endif
-                _fallbackUnbindReflectionFailed = true;
-                return;
-            }
-
-            unbindMethod.Invoke(bindingUpdater, Array.Empty<object>());
-            // Debug.Log("unbindMethod!");
-#endif
         }
 
         #region ContextMenu

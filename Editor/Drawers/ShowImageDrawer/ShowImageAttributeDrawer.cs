@@ -1,4 +1,3 @@
-﻿using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -20,26 +19,23 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
     [CustomPropertyDrawer(typeof(BelowImageAttribute), true)]
     public partial class ShowImageAttributeDrawer : SaintsPropertyDrawer
     {
-        private (string error, Texture2D image) GetImage(SerializedProperty property, string name, FieldInfo info,
-            object target)
+        private (string error, object imageSource) GetImageSource(SerializedProperty property, string name,
+            FieldInfo info, object target)
         {
             if (string.IsNullOrEmpty(name))
             {
-                // ReSharper disable once ConvertIfStatementToReturnStatement
                 if (property.propertyType == SerializedPropertyType.Generic)
                 {
                     (string _, MemberInfo _, object propValue) =
                         Util.GetOf<object>(property.name, null, property, info, target, null);
                     if (propValue is IWrapProp wrapProp)
                     {
-                        object actualValue = Util.GetWrapValue(wrapProp);
-                        // Debug.Log(actualValue);
-                        return GetImageFromTarget(actualValue);
+                        return GetImageSourceFromTarget(Util.GetWrapValue(wrapProp));
                     }
 #if SAINTSFIELD_ADDRESSABLE && !SAINTSFIELD_ADDRESSABLE_DISABLE
                     if (propValue is AssetReference ar)
                     {
-                        return GetImageFromTarget(ar.editorAsset);
+                        return GetImageSourceFromTarget(ar.editorAsset);
                     }
 #endif
                     return ($"property {property.propertyPath} is not supported.", null);
@@ -50,7 +46,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                     return ($"Expect ObjectReference for `{property.propertyPath}`, get {property.propertyType}", null);
                 }
 
-                return GetImageFromTarget(GetCurObject(property, info, target));
+                return GetImageSourceFromTarget(GetCurObject(property, info, target));
             }
 
             bool useFieldHierarchy = name.StartsWith("./");
@@ -59,7 +55,7 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
             {
                 GameObject startingGo;
                 string hierarchyPath;
-                if (useFieldHierarchy) // get field
+                if (useFieldHierarchy)
                 {
                     (string curError, int _, object curValue) = Util.GetValue(property, info, target);
                     if (curError != "")
@@ -84,10 +80,9 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                             return ($"Field value {curValue} is not GameObject or Component", null);
                     }
 
-                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     hierarchyPath = name.Substring(2);
                 }
-                else // using current object
+                else
                 {
                     switch (target)
                     {
@@ -101,22 +96,20 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                             return ($"Target object {target} is not GameObject or Component", null);
                     }
 
-                    // ReSharper disable once ReplaceSubstringWithRangeIndexer
                     hierarchyPath = name.Substring(1);
                 }
 
                 Transform findChild = startingGo.transform.Find(hierarchyPath);
-                // ReSharper disable once ConvertIfStatementToReturnStatement
                 if (!findChild)
                 {
                     return ($"Fail to find child `{hierarchyPath}` under `{startingGo.name}`", null);
                 }
 
-                return GetImageFromTarget(findChild.gameObject);
+                return GetImageSourceFromTarget(findChild.gameObject);
             }
 
-            // search parent first
-            (string reflectError, MemberInfo _, object fieldValue) = Util.GetOf<object>(name, null, property, info, target, null);
+            (string reflectError, MemberInfo _, object fieldValue) =
+                Util.GetOf<object>(name, null, property, info, target, null);
             if (reflectError == "")
             {
                 if (fieldValue is IWrapProp wrapProp)
@@ -130,147 +123,66 @@ namespace SaintsField.Editor.Drawers.ShowImageDrawer
                 }
 #endif
 
-                return GetImageFromTarget(fieldValue);
+                return GetImageSourceFromTarget(fieldValue);
             }
-
-            // SerializedProperty prop = property.serializedObject.FindProperty(name) ?? SerializedUtils.FindPropertyByAutoPropertyName(property.serializedObject, name);
-            // if (prop != null)
-            // {
-            //     // ReSharper disable once ConvertIfStatementToReturnStatement
-            //     if (prop.propertyType == SerializedPropertyType.Generic)
-            //     {
-            //         GetCurObject(prop, info, parent);
-            //     }
-            //     else if(prop.propertyType != SerializedPropertyType.ObjectReference)
-            //     {
-            //         return ($"Expect ObjectReference for `{name}`, get {prop.propertyType}", null);
-            //     }
-            //
-            //     return GetImageFromTarget(prop.objectReferenceValue);
-            // }
 
             return ($"not found `{name}` on `{target}`", null);
         }
 
         private static Object GetCurObject(SerializedProperty property, FieldInfo info, object parent)
         {
-            // Object curObject = null;
             if (property.propertyType != SerializedPropertyType.Generic)
             {
                 return property.objectReferenceValue;
             }
 
             (string error, int _, object propertyValue) = Util.GetValue(property, info, parent);
-
-            if (error == "" && propertyValue is IWrapProp wrapProp)
-            {
-                return Util.GetWrapValue(wrapProp) as Object;
-            }
-
-            return null;
+            return error == "" && propertyValue is IWrapProp wrapProp
+                ? Util.GetWrapValue(wrapProp) as Object
+                : null;
         }
 
-        private (string error, Texture2D image) GetImageFromTarget(object result)
+        private static (string error, object imageSource) GetImageSourceFromTarget(object result)
         {
             if (RuntimeUtil.IsNull(result))
             {
                 return ("", null);
             }
 
-            // ReSharper disable once ConvertSwitchStatementToSwitchExpression
             switch (result)
             {
                 case Sprite sprite:
-                    return ("", GetSpriteTexture(sprite));
+                    return ("", sprite);
                 case Texture2D texture2D:
                     return ("", texture2D);
-                // case Texture texture:
-                //     targetChanged = !ReferenceEquals(_originTexture, texture);
-                //     _originTexture = texture as Texture2D;
-                //     break;
                 case SpriteRenderer spriteRenderer:
-                    return ("", spriteRenderer.sprite == null? null: spriteRenderer.sprite.texture);
+                    return ("", spriteRenderer.sprite);
                 case Image image:
-                    return ("", image.sprite == null? null: image.sprite.texture);
+                    return ("", image.sprite);
                 case RawImage image:
                     return ("", image.texture as Texture2D);
                 case Button button:
-                    // targetChanged = !ReferenceEquals(_originTexture, button.targetGraphic.mainTexture);
-                    return button.targetGraphic?
-                        ("", button.targetGraphic.mainTexture as Texture2D):
-                        ("", null);
+                    return button.targetGraphic switch
+                    {
+                        Image targetImage => ("", targetImage.sprite),
+                        RawImage targetRawImage => ("", targetRawImage.texture as Texture2D),
+                        _ => button.targetGraphic
+                            ? ("", button.targetGraphic.mainTexture as Texture2D)
+                            : ("", null),
+                    };
                 case GameObject _:
                 case Component _:
                 {
                     Object obj = (Object)result;
                     Object actualObj = Util.GetTypeFromObj(obj, typeof(SpriteRenderer))
-                                                   ?? Util.GetTypeFromObj(obj, typeof(Image))
-                                                   ?? Util.GetTypeFromObj(obj, typeof(RawImage))
-                                                   ?? Util.GetTypeFromObj(obj, typeof(Button))
-                                                   ;
-                    // Debug.Log($"obj={obj} actual={actualObj}, renderer={((Component)foundObj).GetComponent<Renderer>()}");
-                    // ReSharper disable once TailRecursiveCall
-                    return GetImageFromTarget(
-                        actualObj
-                    );
+                                       ?? Util.GetTypeFromObj(obj, typeof(Image))
+                                       ?? Util.GetTypeFromObj(obj, typeof(RawImage))
+                                       ?? Util.GetTypeFromObj(obj, typeof(Button));
+                    return GetImageSourceFromTarget(actualObj);
                 }
                 default:
-                    return (
-                        $"Unable to find image on {result.GetType()}",
-                        null);
+                    return ($"Unable to find image on {result.GetType()}", null);
             }
-        }
-
-        private readonly Dictionary<Sprite, Texture2D> _cachedSpriteToTexture2D = new Dictionary<Sprite, Texture2D>();
-        private Texture2D GetSpriteTexture(Sprite sprite)
-        {
-            if (_cachedSpriteToTexture2D.TryGetValue(sprite, out Texture2D cachedImage) && cachedImage != null)
-            {
-                return cachedImage;
-            }
-
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (IsPartOfMultipleSprite(sprite))
-            {
-                return _cachedSpriteToTexture2D[sprite] = GetPartOfTheSprite(sprite);
-            }
-
-            return _cachedSpriteToTexture2D[sprite] = sprite.texture;
-        }
-
-        private static bool IsPartOfMultipleSprite(Sprite sprite)
-        {
-            string path = AssetDatabase.GetAssetPath(sprite.texture);
-
-            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
-
-            if (importer != null)
-            {
-                // Check if the sprite mode is set to Multiple
-                return importer.spriteImportMode == SpriteImportMode.Multiple;
-            }
-
-            return false;
-        }
-
-        private static Texture2D GetPartOfTheSprite(Sprite sprite)
-        {
-            Texture2D originalTexture = sprite.texture;
-            Texture2D readWriteTexture = Tex.ConvertToCompatibleFormat(originalTexture);
-
-            Texture2D croppedTexture = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height);
-
-            Color[] pixels = readWriteTexture.GetPixels(
-                (int)sprite.textureRect.x,
-                (int)sprite.textureRect.y,
-                (int)sprite.textureRect.width,
-                (int)sprite.textureRect.height
-            );
-
-            croppedTexture.SetPixels(pixels);
-            croppedTexture.Apply();
-
-            return croppedTexture;
         }
     }
 }

@@ -2006,8 +2006,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.DateTimeExample
   dt: 639011511442060000
-  d1: 0
-  l: 0
 --- !u!1 &206032195
 GameObject:
   m_ObjectHideFlags: 0
@@ -19935,9 +19933,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.TimeSpanExample
   dt: 38450000000
-  expanded: 0
-  d1: 0
-  l: 0
 --- !u!1 &847311490
 GameObject:
   m_ObjectHideFlags: 0
@@ -21514,47 +21509,13 @@ MonoBehaviour:
     _saintsSerializedVersion: 2
     _wrapType: 4
   gameObjects4: []
-  _arrSize:
-    _saintsList:
-    - value: 0
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 0
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _saintsSerializedVersion: 2
-    _wrapType: 4
   pagging:
     _saintsList: []
     _saintsSerializedVersion: 2
     _wrapType: 4
   references:
     version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    RefIds: []
 --- !u!1 &965251183
 GameObject:
   m_ObjectHideFlags: 0
@@ -21992,10 +21953,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e27e407be47be4ebcf71d13ce7ecec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Data: []
+  data: []
+  dataSingle:
+    rid: -2
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &994092473
 GameObject:
   m_ObjectHideFlags: 0
@@ -23832,7 +23797,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flags: 12
-  tree: 15
 --- !u!4 &1157478913
 Transform:
   m_ObjectHideFlags: 0
@@ -36404,83 +36368,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36e5c620db1deb141bc544e0bbc22a73, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: SaintsField.Samples::SaintsField.Samples.Scripts.SaintsDictExamples.SaintsDictExample
   genDict:
-    _saintsKeys: []
-    _wrapTypeKey: 4
-    _saintsValues: []
-    _wrapTypeValue: 4
-    saintsSerializedVersion: 2
-    _keys: []
-    _values: []
-  dict:
     _saintsKeys:
-    - value: 0
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _wrapTypeKey: 4
-    _saintsValues:
-    - value:
-        myStringField: 
-        myIntField: 
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _wrapTypeValue: 4
-    saintsSerializedVersion: 2
-    _keys: 
-    _values: []
-  genDictValueArray:
-    _saintsKeys: []
-    _wrapTypeKey: 4
-    _saintsValues: []
-    _wrapTypeValue: 4
-    saintsSerializedVersion: 2
-    _keys: []
-  genDictValueList:
-    _saintsKeys: []
-    _wrapTypeKey: 4
-    _saintsValues: []
-    _wrapTypeValue: 4
-    saintsSerializedVersion: 2
-    _keys: []
-  kvPagin10:
-    _saintsKeys:
-    - value: 0
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
     - value: 1
       valueField:
         propertyType: 0
@@ -36565,51 +36455,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 7
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 8
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 9
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
     _wrapTypeKey: 4
     _saintsValues:
-    - value: 0
+    - value: {fileID: 0}
       valueField:
         propertyType: 0
         longValue: 0
@@ -36623,7 +36471,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 1
+    - value: {fileID: 2009324526}
       valueField:
         propertyType: 0
         longValue: 0
@@ -36637,7 +36485,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 2
+    - value: {fileID: 0}
       valueField:
         propertyType: 0
         longValue: 0
@@ -36651,7 +36499,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 3
+    - value: {fileID: 0}
       valueField:
         propertyType: 0
         longValue: 0
@@ -36665,7 +36513,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 4
+    - value: {fileID: 0}
       valueField:
         propertyType: 0
         longValue: 0
@@ -36679,63 +36527,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    - value: 5
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 6
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 7
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 8
-      valueField:
-        propertyType: 0
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        intValues: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: 9
+    - value: {fileID: 0}
       valueField:
         propertyType: 0
         longValue: 0
@@ -36751,23 +36543,7 @@ MonoBehaviour:
       wrapType: 4
     _wrapTypeValue: 4
     saintsSerializedVersion: 2
-    _keys: 
-    _values: []
-  keyWidthControl:
-    _saintsKeys: []
-    _wrapTypeKey: 4
-    _saintsValues: []
-    _wrapTypeValue: 4
-    saintsSerializedVersion: 2
-    _keys: 
-    _values: []
-  valueWidthControl:
-    _saintsKeys: []
-    _wrapTypeKey: 4
-    _saintsValues: []
-    _wrapTypeValue: 4
-    saintsSerializedVersion: 2
-    _keys: 
+    _keys: []
     _values: []
   references:
     version: 2
@@ -38608,8 +38384,16 @@ PrefabInstance:
       value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: myInter1.<V>k__BackingField
+      value: 
+      objectReference: {fileID: 867320294}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: myInter1.<VRef>k__BackingField
       value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: myInter1.<IsVRef>k__BackingField
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: myInter2.<IsVRef>k__BackingField
@@ -38752,6 +38536,10 @@ PrefabInstance:
       value: today.comes.saintsfield.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: 'managedReferences[7000927377819697239]'
+      value: SaintsField.Samples SaintsField.Samples.Scripts.Interface.InterfaceExample/NorStructInterface1
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: managedReferences[6921583294834278585].handle
       value: 
       objectReference: {fileID: 0}
@@ -38884,6 +38672,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[7000927377819697239].common
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: managedReferences[6921583294834278591].classString
       value: 
       objectReference: {fileID: 0}
@@ -39005,6 +38797,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
       propertyPath: managedReferences[6921583314869157974].structString
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 430658589056123247, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}
+      propertyPath: managedReferences[7000927377819697239].structString
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 936262743411558942, guid: 69ce9f56857d7e24d82bd89fa1ee71ee, type: 3}

@@ -12,7 +12,9 @@ namespace SaintsField.Samples.Scripts.SaintsArrayExamples
         // it can be used with array, but ensure the `[]` is always at the end.
         public SaintsArray<SaintsArray<SaintsArray<GameObject>>>[] gameObjects4;
 
-        [ArraySize(2)] public SaintsArray<int> _arrSize;
+        // TODO: broken in IMGUI
+        // [ArraySize(2)]
+        // public SaintsArray<int> _arrSize;
 
         [SaintsArray(numberOfItemsPerPage: 5)] public SaintsArray<int[]> pagging;
 

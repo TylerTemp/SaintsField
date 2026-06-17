@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +62,13 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
 
             dropdown.ButtonElement.clicked += () =>
             {
-                (string error, Type type) = GetSelectedType(property);
+                (string contextError, TypeReferenceContext context) = GetTypeReferenceContext(property);
+                if (contextError != "")
+                {
+                    return;
+                }
+
+                (string error, Type type) = GetSelectedType(context);
                 if (error != "")
                 {
                     return;
@@ -83,7 +89,7 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
                     false,
                     (curItem, _) =>
                     {
-                        TypeReference r = SetValue(property, curItem as Type);
+                        TypeReference r = SetValue(context, curItem as Type);
                         onValueChangedCallback.Invoke(r);
                         return null;
                     }
@@ -133,7 +139,10 @@ namespace SaintsField.Editor.Drawers.TypeReferenceTypeDrawer
             UIToolkitUtils.DropdownButtonField dropdown = container.Q<UIToolkitUtils.DropdownButtonField>(NameTypeReferenceField(property));
             HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
 
-            (string error, Type type) = GetSelectedType(property);
+            (string contextError, TypeReferenceContext context) = GetTypeReferenceContext(property);
+            (string error, Type type) = contextError == ""
+                ? GetSelectedType(context)
+                : (contextError, null);
             SetHelpBox(helpBox, error);
             string dropdownLabel = type == null
                 ? "null"

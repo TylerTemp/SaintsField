@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -18,113 +18,9 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(GuidAttribute), true)]
-    public partial class GuidAttributeDrawer: SaintsPropertyDrawer
+    public partial class GuidAttributeDrawer : SaintsPropertyDrawer
     {
-        protected override bool UseCreateFieldUIToolKit => true;
 
-        protected override VisualElement CreateFieldUIToolKit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, FieldInfo info, object parent)
-        {
-            VisualElement field = MakeElement(property, GetPreferredLabel(property));
-            field.AddToClassList(GuidStringField.alignedFieldUssClassName);
-            return field;
-        }
-
-        protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
-        {
-            GuidStringField field = container.Q<GuidStringField>();
-            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => onValueChangedCallback(property.stringValue));
-            field.TrackPropertyValue(property, p => onValueChangedCallback(p.stringValue));
-        }
-
-        private static VisualElement MakeElement(SerializedProperty property, string label)
-        {
-            GuidStringElement timeSpanElement = new GuidStringElement
-            {
-                bindingPath = property.propertyPath,
-            };
-            timeSpanElement.BindProp(property);
-            timeSpanElement.Bind(property.serializedObject);
-
-            GuidStringField element = new GuidStringField(label, timeSpanElement);
-
-            element.AddToClassList(ClassAllowDisable);
-
-            return element;
-        }
-
-        public static VisualElement UIToolkitValueEditGuid(VisualElement oldElement, string label, Guid value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
-        {
-            if (oldElement is GuidStringField gsf)
-            {
-                gsf.SetValueWithoutNotify(value.ToString());
-                return null;
-            }
-
-            GuidStringElement guidStringElement = new GuidStringElement
-            {
-                value = value.ToString(),
-            };
-            GuidStringField element =
-                new GuidStringField(label, guidStringElement)
-                {
-                    value = value.ToString(),
-                };
-
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
-                labelGrayColor, inHorizontalLayout);
-
-            if (setterOrNull != null)
-            {
-                guidStringElement.RegisterValueChangedCallback(evt =>
-                {
-                    // ReSharper disable once InvertIf
-                    if (Guid.TryParse(evt.newValue, out Guid guid))
-                    {
-                        beforeSet?.Invoke(value);
-                        setterOrNull(guid);
-                    }
-                });
-            }
-            return element;
-        }
-
-        public static VisualElement UIToolkitValueEditString(VisualElement oldElement, GuidAttribute guidAttribute, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes)
-        {
-            if (oldElement is GuidStringField gsf)
-            {
-                gsf.SetValueWithoutNotify(value);
-                return null;
-            }
-
-            GuidStringElement guidStringElement = new GuidStringElement
-            {
-                value = value,
-            };
-            GuidStringField element =
-                new GuidStringField(label, guidStringElement)
-                {
-                    value = value,
-                };
-
-            UIToolkitUtils.UIToolkitValueEditAfterProcess(element, setterOrNull != null,
-                labelGrayColor, inHorizontalLayout);
-
-            if (setterOrNull != null)
-            {
-                guidStringElement.RegisterValueChangedCallback(evt =>
-                {
-                    // ReSharper disable once InvertIf
-                    if (Guid.TryParse(evt.newValue, out Guid guid))
-                    {
-                        beforeSet?.Invoke(value);
-                        setterOrNull(guid.ToString());
-                    }
-                });
-            }
-            return element;
-        }
     }
 }
 #endif

@@ -1,4 +1,4 @@
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -284,52 +284,6 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
             return root;
         }
 
-        private static (FieldInfo targetInfo, object targetParent) GetTargetInfo(string propNameCompact, Type type, object saintsSerValue)
-        {
-
-            // object keysIterTarget = info.GetValue(parent);
-            object keysIterTarget = saintsSerValue;
-            List<object> keysParents = new List<object>(3)
-            {
-                saintsSerValue,
-            };
-            Type keysParentType = type;
-            FieldInfo keysField = null;
-            // Debug.Log($"propKeysNameCompact={propNameCompact}");
-            foreach (string propKeysName in propNameCompact.Split('.'))
-            {
-                // Debug.Log($"propKeysName={propKeysName}");
-
-                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                foreach (Type each in ReflectUtils.GetSelfAndBaseTypesFromType(keysParentType))
-                {
-                    FieldInfo field = each.GetField(propKeysName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-                    if (field == null)
-                    {
-                        continue;
-                    }
-
-                    // Debug.Log($"field={field}; keysField={keysField}");
-
-                    keysField = field;
-                    keysParentType = keysField.FieldType;
-                    keysIterTarget = keysField.GetValue(keysIterTarget);
-                    keysParents.Add(keysIterTarget);
-                    // Debug.Log($"Prop {propKeysName} Add parents = {keysIterTarget}/{keysIterTarget.GetType()}");
-                    // Debug.Log($"set keysField={keysField}/keysParentType={keysParentType}/keysIterTarget={keysIterTarget}");
-                    break;
-                }
-
-                Debug.Assert(keysField != null, $"Failed to get key {propKeysName} from {keysIterTarget}");
-            }
-
-            int keysParentsCount = keysParents.Count;
-
-            object keysParent = keysParentsCount >= 2? keysParents[keysParentsCount - 2]: keysParents[0];
-
-            return (keysField, keysParent);
-        }
-
         private class AsyncSearchItems
         {
             public bool Started;
@@ -351,20 +305,12 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
         private AsyncSearchItems _asyncSearchItems;
 
-        private const float DebounceTime = 0.6f;
-
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            SerializedProperty propVersion = property.FindPropertyRelative("_saintsSerializedVersion");
-            if (propVersion.intValue != 1)
-            {
-                propVersion.intValue = 1;
-                propVersion.serializedObject.ApplyModifiedProperties();
-            }
+            EnsureSerializedVersion(property);
 
             SaintsHashSetAttribute saintsHashSetAttribute = saintsAttribute as SaintsHashSetAttribute;
-
             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
             bool insideArray = arrayIndex != -1;
 
@@ -649,9 +595,8 @@ namespace SaintsField.Editor.Drawers.SaintsHashSetTypeDrawer
 
             listView.makeItem = () => new VisualElement();
 
-            bool needUseRef = typeof(ReferenceHashSet<>).IsAssignableFrom(rawType.GetGenericTypeDefinition());
             List<InjectAttributeBase> injectAttributes = new List<InjectAttributeBase>();
-            bool hasSerializeReference = needUseRef;
+            bool hasSerializeReference = UsesReferenceWrap(rawType);
             foreach (InjectAttributeBase injectAttribute in ReflectCache.GetCustomAttributes<InjectAttributeBase>(info))
             {
                 if (injectAttribute.Decorator == typeof(SerializeReference))

@@ -13,26 +13,26 @@ namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 
         private void OnValueChanged(long dt) => Debug.Log(dt);
 
-        [ShowInInspector] private long v => dt;
-
-        [Space]
-        [TimeSpan, DefaultExpand]  // default use expand mode
-        public long expanded;
-
-        [ShowInInspector]
-        private TimeSpan _showTs;
-
-        [ShowInInspector, TimeSpan]
-        private long ShowTsLong
-        {
-            get => dt;
-            set => dt = value;
-        }
-
-        [LayoutStart("H", ELayout.Horizontal | ELayout.TitleBox)]
-        [TimeSpan]
-        public long d1;
-        [TimeSpan]
-        public long l;
+        // [ShowInInspector] private long v => dt;
+        //
+        // [Space]
+        // [TimeSpan, DefaultExpand]  // default use expand mode
+        // public long expanded;
+        //
+        // [ShowInInspector]
+        // private TimeSpan _showTs;
+        //
+        // [ShowInInspector, TimeSpan]
+        // private long ShowTsLong
+        // {
+        //     get => dt;
+        //     set => dt = value;
+        // }
+        //
+        // [LayoutStart("H", ELayout.Horizontal | ELayout.TitleBox)]
+        // [TimeSpan]
+        // public long d1;
+        // [TimeSpan]
+        // public long l;
     }
 }

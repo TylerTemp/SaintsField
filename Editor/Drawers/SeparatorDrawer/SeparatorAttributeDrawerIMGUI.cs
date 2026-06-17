@@ -85,7 +85,7 @@ namespace SaintsField.Editor.Drawers.SeparatorDrawer
         }
 
         protected override Rect DrawAboveImGui(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             FieldSeparatorAttribute separatorAttribute = (FieldSeparatorAttribute)saintsAttribute;
             if (separatorAttribute.Below)

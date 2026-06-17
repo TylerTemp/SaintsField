@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
@@ -8,36 +7,17 @@ using UnityEditor;
 using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
-#if UNITY_2021_3_OR_NEWER
-using UnityEngine.UIElements;
-#endif
 using Button = UnityEngine.UI.Button;
 using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Drawers
+namespace SaintsField.Editor.Drawers.ButtonAddOnClickDrawer
 {
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(ButtonAddOnClickAttribute), true)]
-    public class ButtonAddOnClickAttributeDrawer: SaintsPropertyDrawer
+    public partial class ButtonAddOnClickAttributeDrawer: SaintsPropertyDrawer
     {
-        private string _error = "";
-
-        protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => 0;
-
-        protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
-            GUIContent label,
-            ISaintsAttribute saintsAttribute,
-            int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent)
-        {
-            _error = BindButtonEvent(property, saintsAttribute, info, parent);
-            return true;
-        }
-
         private static string BindButtonEvent(SerializedProperty property, ISaintsAttribute saintsAttribute, FieldInfo info, object objTarget)
         {
             ButtonAddOnClickAttribute buttonAddOnClickAttribute = (ButtonAddOnClickAttribute) saintsAttribute;
@@ -155,65 +135,5 @@ namespace SaintsField.Editor.Drawers
                     return null;
             }
         }
-
-        protected override bool WillDrawBelow(SerializedProperty property,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error != "";
-
-        protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent) => _error == ""? 0: ImGuiHelpBox.GetHeight(_error, width, EMessageType.Error);
-        protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
-            ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
-            FieldInfo info, object parent) => _error == ""? position: ImGuiHelpBox.Draw(position, _error, EMessageType.Error);
-
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        #region UIToolkit
-
-        private static string NameHelpBox(SerializedProperty property, int index) => $"{property.propertyPath}_{index}__ButtonAddOnClick";
-
-        protected override VisualElement CreateBelowUIToolkit(SerializedProperty property,
-            ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, FieldInfo info, object parent)
-        {
-            HelpBox helpBox = new HelpBox
-            {
-                text = "",
-                messageType = HelpBoxMessageType.Error,
-                style =
-                {
-                    display = DisplayStyle.None,
-                },
-                name = NameHelpBox(property, index),
-            };
-            helpBox.AddToClassList(ClassAllowDisable);
-            return helpBox;
-        }
-
-        protected override void OnUpdateUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
-            int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, Action<object> onValueChanged, FieldInfo info)
-        {
-            object parent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-            if (parent == null)
-            {
-                Debug.LogWarning($"{property.propertyPath} parent disposed unexpectedly");
-                return;
-            }
-
-            string error = BindButtonEvent(property, saintsAttribute, info, parent);
-            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property, index));
-            // ReSharper disable once InvertIf
-            if (error != helpBox.text)
-            {
-                helpBox.style.display = error == ""? DisplayStyle.None: DisplayStyle.Flex;
-                helpBox.text = error;
-            }
-        }
-
-        #endregion
-#endif
     }
 }

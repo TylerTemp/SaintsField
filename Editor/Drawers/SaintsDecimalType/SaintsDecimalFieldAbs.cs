@@ -1,4 +1,4 @@
-#if UNITY_2021_2_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_2_OR_NEWER
 using System;
 using SaintsField.Editor.Utils;
 using UnityEditor;
@@ -29,11 +29,11 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
 
         private void WriteBackValue(decimal d)
         {
-            int[] bits = decimal.GetBits(value);
-            bool up0 = UpdateIntValue(_loProp, bits[0]);
-            bool up1 = UpdateIntValue(_midProp, bits[1]);
-            bool up2 = UpdateIntValue(_hiProp, bits[2]);
-            bool up3 = UpdateIntValue(_flagsProp, bits[3]);
+            int[] bits = decimal.GetBits(d);
+            bool up0 = SaintsDecimalDrawer.UpdateIntValue(_loProp, bits[0]);
+            bool up1 = SaintsDecimalDrawer.UpdateIntValue(_midProp, bits[1]);
+            bool up2 = SaintsDecimalDrawer.UpdateIntValue(_hiProp, bits[2]);
+            bool up3 = SaintsDecimalDrawer.UpdateIntValue(_flagsProp, bits[3]);
 
             // ReSharper disable once InvertIf
             if(up0 || up1 || up2 || up3)
@@ -41,17 +41,6 @@ namespace SaintsField.Editor.Drawers.SaintsDecimalType
                 _flagsProp.serializedObject.ApplyModifiedProperties();
                 _propUpdated(d);
             }
-        }
-
-        private static bool UpdateIntValue(SerializedProperty property, int newValue)
-        {
-            if (property.intValue == newValue)
-            {
-                return false;
-            }
-
-            property.intValue = newValue;
-            return true;
         }
 
         private void WriteBackValue(SaintsDecimal d) => WriteBackValue(d.GetValue());
