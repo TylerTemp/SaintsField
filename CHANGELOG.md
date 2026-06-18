@@ -2,6 +2,7 @@
 
 ## 5.18.9 ##
 
+1.  Add: Support for Unity 6000.5
 1.  Fix: Deprecated error on Unity 6k.5 [#409](https://github.com/TylerTemp/SaintsField/issues/409)
 2.  Fix: Compile error if `SaintsEvent` not enabled
 3.  Fix: `<field=control/>` tag where `control` is not correctly parsed
