@@ -14,9 +14,20 @@ namespace SaintsField.Samples.Scripts.ScriptableRenderer
         [SerializeField, LabelText("<color=OrangeRed><icon=star.png/><label/>")] public AnimationCurve animationCurve;
 
 #if UNITY_EDITOR
-        internal class CreateSaintsUniversalRendererAsset : EndNameEditAction
+        internal class CreateSaintsUniversalRendererAsset :
+#if UNITY_6000_5_OR_NEWER
+            AssetCreationEndAction
+#else
+            EndNameEditAction
+#endif
         {
-            public override void Action(int instanceId, string pathName, string resourceFile)
+            public override void Action(
+#if UNITY_6000_5_OR_NEWER
+                EntityId
+#else
+                int
+#endif
+                    instanceId, string pathName, string resourceFile)
             {
                 MyUniversalRendererData rendererData = CreateInstance<MyUniversalRendererData>();
                 // rendererData.postProcessData = PostProcessData.GetDefaultPostProcessData();

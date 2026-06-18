@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 19300, guid: 0000000000000000e000000000000000, type: 0}
+  m_Script: {fileID: 19301, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: Physics LowLevel Settings 2D
-  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.LowLevelPhysics2D.PhysicsLowLevelSettings2D
+  m_EditorClassIdentifier: UnityEngine.dll::Unity.U2D.Physics.PhysicsCoreSettings2D
+  m_UsePhysicsLayers: 0
   m_PhysicsLayerNames:
     m_Names:
     - Default
@@ -78,15 +79,19 @@ MonoBehaviour:
     - 
     - 
     - 
-  m_UseFullLayers: 0
   m_PhysicsWorldDefinition:
     m_Gravity: {x: 0, y: -9.81}
     m_SimulationType: 0
     m_SimulationSubSteps: 4
     m_SimulationWorkers: 64
     m_TransformWriteMode: 1
+    m_TransformTweenMode: 1
     m_TransformPlane: 0
-    m_TransformTweening: 1
+    m_TransformPlaneCustom:
+      m_Translate: {x: 0, y: 0, z: 0}
+      m_Rotate: {x: 0, y: 0, z: 0}
+      m_Scale: 0
+    m_SyncInterpolation: 0
     m_SleepingAllowed: 1
     m_ContinuousAllowed: 1
     m_ContactFilterCallbacks: 0
@@ -100,15 +105,17 @@ MonoBehaviour:
     m_ContactFrequency: 30
     m_ContactDamping: 10
     m_ContactSpeed: 3
+    m_ContactRecycleDistance: 0
     m_MaximumLinearSpeed: 400
     m_DrawOptions: 4256
     m_DrawFillOptions: 7
+    m_DrawContactType: 0
+    m_DrawFilter: 0
     m_DrawThickness: 2
     m_DrawFillAlpha: 0.1
     m_DrawPointScale: 1
     m_DrawNormalScale: 1
-    m_DrawImpulseScale: 1
-    m_DrawCapacity: 0
+    m_DrawForceScale: 1
     m_DrawColors:
       transformAxisX: {r: 0, g: 1, b: 1, a: 1}
       transformAxisY: {r: 0, g: 0.5019608, b: 0, a: 1}
@@ -131,6 +138,12 @@ MonoBehaviour:
       contactImpulse: {r: 1, g: 0, b: 1, a: 1}
       contactFriction: {r: 1, g: 1, b: 0, a: 1}
       solverIsland: {r: 0.18431373, g: 0.30980393, b: 0.30980393, a: 1}
+    m_Capacity:
+      m_StaticShapeCount: 0
+      m_DynamicShapeCount: 0
+      m_StaticBodyCount: 0
+      m_DynamicBodyCount: 0
+      m_ContactCount: 0
   m_PhysicsBodyDefinition:
     m_BodyType: 2
     m_BodyConstraints: 0
@@ -144,12 +157,21 @@ MonoBehaviour:
     m_AngularDamping: 0
     m_GravityScale: 1
     m_SleepThreshold: 0.05
-    m_FastRotationAllowed: 0
+    m_CollisionThreshold: 0
     m_FastCollisionsAllowed: 0
+    m_FastRotationAllowed: 0
+    m_ContactRecyclingAllowed: 0
     m_SleepingAllowed: 1
     m_Awake: 1
     m_Enabled: 1
+    m_WorldDrawing: 1
   m_PhysicsShapeDefinition:
+    contactFilter:
+      m_Categories:
+        bitMask: 1
+      m_Contacts:
+        bitMask: 18446744073709551615
+      m_GroupIndex: 0
     surfaceMaterial:
       m_Friction: 0.6
       m_Bounciness: 0
@@ -162,12 +184,6 @@ MonoBehaviour:
       m_CustomColor:
         serializedVersion: 2
         rgba: 0
-    contactFilter:
-      m_Categories:
-        bitMask: 1
-      m_Contacts:
-        bitMask: 18446744073709551615
-      m_GroupIndex: 0
     m_Density: 1
     m_IsTrigger: 0
     m_TriggerEvents: 0
@@ -177,6 +193,10 @@ MonoBehaviour:
     m_PreSolveCallbacks: 0
     m_StartStaticContacts: 1
     m_StartMassUpdate: 1
+    m_WorldDrawing: 1
+    moverData:
+      m_PushLimit: 0
+      m_ClipVelocity: 0
   m_PhysicsChainDefinition:
     m_SurfaceMaterial:
       m_Friction: 0.6
@@ -224,6 +244,7 @@ MonoBehaviour:
     m_TuningFrequency: 60
     m_TuningDamping: 2
     m_DrawScale: 1
+    m_WorldDrawing: 1
     m_CollideConnected: 0
   m_PhysicsFixedJointDefinition:
     m_LocalAnchorA:
@@ -243,6 +264,7 @@ MonoBehaviour:
     m_TuningFrequency: 60
     m_TuningDamping: 2
     m_DrawScale: 1
+    m_WorldDrawing: 1
     m_CollideConnected: 0
   m_PhysicsHingeJointDefinition:
     m_LocalAnchorA:
@@ -253,6 +275,7 @@ MonoBehaviour:
       position: {x: 0, y: 0}
       rotation:
         direction: {x: 1, y: 0}
+    m_EnableUnpinned: 0
     m_EnableSpring: 0
     m_SpringTargetAngle: 0
     m_SpringFrequency: 0
@@ -268,6 +291,7 @@ MonoBehaviour:
     m_TuningFrequency: 60
     m_TuningDamping: 2
     m_DrawScale: 1
+    m_WorldDrawing: 1
     m_CollideConnected: 0
   m_PhysicsRelativeJointDefinition:
     m_LocalAnchorA:
@@ -293,6 +317,7 @@ MonoBehaviour:
     m_TuningFrequency: 60
     m_TuningDamping: 2
     m_DrawScale: 1
+    m_WorldDrawing: 1
     m_CollideConnected: 0
   m_PhysicsSliderJointDefinition:
     m_LocalAnchorA:
@@ -318,6 +343,7 @@ MonoBehaviour:
     m_TuningFrequency: 60
     m_TuningDamping: 2
     m_DrawScale: 1
+    m_WorldDrawing: 1
     m_CollideConnected: 0
   m_PhysicsWheelJointDefinition:
     m_LocalAnchorA:
@@ -342,8 +368,14 @@ MonoBehaviour:
     m_TuningFrequency: 60
     m_TuningDamping: 2
     m_DrawScale: 1
+    m_WorldDrawing: 1
     m_CollideConnected: 0
+  m_TransformChangeMode: 2
+  m_ContactFilterMode: 0
+  m_ContactFilterGroupMode: 0
+  m_MaximumWorlds: 128
   m_ConcurrentSimulations: 2
   m_LengthUnitsPerMeter: 1
-  m_DrawInBuild: 0
-  m_BypassLowLevel: 0
+  m_RenderingMode: 0
+  m_DisableSimulation: 0
+  m_AlwaysDrawWorlds: 0
