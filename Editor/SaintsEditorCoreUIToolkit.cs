@@ -14,25 +14,11 @@ namespace SaintsField.Editor
 {
     public partial class SaintsEditorCore
     {
-        private readonly UnityEditor.Editor _editor;
         private UnityEngine.Object Target => _editor.target;
-        private UnityEngine.Object[] Targets => _editor.targets;
-        private SerializedObject SerializedObject => _editor.serializedObject;
-        private readonly bool _editorShowMonoScript;
-        private readonly IMakeRenderer _makeRenderer;
 
         private ToolbarSearchField _toolbarSearchField;
         private IReadOnlyList<ISaintsRenderer> _hasElementRenderersUIToolkit = Array.Empty<ISaintsRenderer>();
         public IReadOnlyList<ISaintsRenderer> AllRenderersUIToolkit { get; private set; } = Array.Empty<ISaintsRenderer>();
-
-        public SaintsEditorCore(UnityEditor.Editor editor, bool editorShowMonoScript, IMakeRenderer makeRenderer=null)
-        {
-            _editor = editor;
-            _editorShowMonoScript = editorShowMonoScript;
-            _makeRenderer = makeRenderer;
-        }
-
-        private IMakeRenderer GetMakeRender() => _makeRenderer ?? this;
 #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public VisualElement CreateInspectorGUI()
         {

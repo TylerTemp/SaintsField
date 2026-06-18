@@ -110,10 +110,11 @@ namespace: `SaintsField`
 
 ## Change Log ##
 
-**5.18.7**
+**5.18.9**
 
-1.  Fix: `AnimatorState` error if the target is a unity object null
-2.  Fix: `Dropdown` now support the old data type and gave an deprecation warning
+1.  Fix: Deprecated error on Unity 6k.5 [#409](https://github.com/TylerTemp/SaintsField/issues/409)
+2.  Fix: Compile error if `SaintsEvent` not enabled
+3.  Fix: `<field=control/>` tag where `control` is not correctly parsed
 
 ## Usage ##
 

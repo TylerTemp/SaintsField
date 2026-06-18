@@ -136,7 +136,7 @@ namespace SaintsField.Editor.Utils
 
 #if UNITY_6000_0_OR_NEWER && !SAINTSFIELD_SAINTS_EDITOR_APPLY
         [Separator(5)]
-        [InfoBox("<size+1>If you're using <b>custom \"Build Profile\"</b> with custom \"Player Settings\", please add `SAINTSFIELD_SAINTS_EDITOR_APPLY` in \"Scripting Define Symbols\" manually", EMessageType.Warning)]
+        [InfoBox("<size=+1>If you're using <b>custom \"Build Profile\"</b> with custom \"Player Settings\", please add `SAINTSFIELD_SAINTS_EDITOR_APPLY` in \"Scripting Define Symbols\" manually", EMessageType.Warning)]
 #endif
 
         [InfoBox("Loading, please wait...", show: nameof(_loadingSaintsEditor))]
@@ -270,10 +270,13 @@ namespace SaintsField.Editor.Utils
 #if SAINTSFIELD_DEBUG
 
         [LayoutStart("Debug", ELayout.FoldoutBox)]
+#if !SAINTSFIELD_UNITY_MATHEMATICS
         [Button("Install com.unity.mathematics")]
         private IEnumerator InstallComUnityMathematics() => DebugInstall("com.unity.mathematics");
+#else
         [Button("Remove com.unity.mathematics")]
         private IEnumerator RemoveComUnityMathematics() => DebugRemove("com.unity.mathematics");
+#endif
 
 #if !SAINTSFIELD_ADDRESSABLE
         [Button("Install com.unity.addressables")]
@@ -281,6 +284,14 @@ namespace SaintsField.Editor.Utils
 #else
         [Button("Remove com.unity.addressables")]
         private IEnumerator RemoveComAddressables() => DebugRemove("com.unity.addressables");
+#endif
+
+#if !SAINTSFIELD_NETCODE_GAMEOBJECTS
+        [Button("Install com.unity.netcode.gameobjects")]
+        private IEnumerator InstallComNetCode() => DebugInstall("com.unity.netcode.gameobjects");
+#else
+        [Button("Remove com.unity.netcode.gameobjects")]
+        private IEnumerator RemoveComNetcode() => DebugRemove("com.unity.netcode.gameobjects");
 #endif
 
         private static IEnumerator DebugInstall(string packageName)

@@ -669,9 +669,9 @@ namespace SaintsField.Editor.Utils
                     {
                         return revType.GetElementType();
                     }
-                    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+                    if (revType.IsGenericType && revType.GetGenericTypeDefinition() == typeof(List<>))
                     {
-                        return type.GetGenericArguments()[0];
+                        return revType.GetGenericArguments()[0];
                     }
 
                     return revType;

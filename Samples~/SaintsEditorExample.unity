@@ -11021,6 +11021,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6adb0840e394e454491be08357b862fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.FieldFormat
+  id: 100
 --- !u!1 &2103412845
 GameObject:
   m_ObjectHideFlags: 0

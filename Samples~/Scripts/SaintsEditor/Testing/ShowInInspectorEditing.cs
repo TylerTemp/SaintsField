@@ -124,180 +124,180 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Testing
 
         [ShowInInspector] private MyClass[] _myClasses;
 
-        [ShowInInspector] private Dictionary<string, Color> _dictColors = new Dictionary<string, Color>
-        {
-            { "Red", Color.red },
-            { "Green", Color.green },
-            { "Blue", Color.blue },
-        };
-
-        private interface Inter
-        {
-            int MyInt { get; set; }
-        }
-
-        public class InterClass : Inter
-        {
-            public int MyInt { get; set; }
-            public string InterClassField;
-        }
-
-        public struct InterStruct : Inter
-        {
-            public string InterStructField;
-            public int MyInt { get; set; }
-        }
-
-        [ShowInInspector] private static Inter _inter;
-
-        public class GeneralDummyClass: IDummy
-        {
-            public string GetComment()
-            {
-                return "DummyClass";
-            }
-
-            public int MyInt { get; set; }
-            public int GenDumInt;
-            public string GenDumString;
-        }
-
-        [ShowInInspector] private static IDummy _dummy;
-
-        [Button]
-        private void DebugDummy() => Debug.Log(_dummy);
-
-#if UNITY_EDITOR
-        [InitializeOnLoadMethod]
-        private static void Initialize()
-        {
-            string g = AssetDatabase.FindAssets("t:Scriptable").FirstOrDefault();
-            if (!string.IsNullOrEmpty(g))
-            {
-                _dummy = AssetDatabase.LoadAssetAtPath<Scriptable>(AssetDatabase.GUIDToAssetPath(g));
-            }
-        }
-#endif
-
-        public struct NullSwap
-        {
-            public int Number;
-        }
-
-        [NonSerialized, ShowInInspector] public NullSwap _nullSwap;
-
-        [ShowInInspector]
-        private IEnumerable<int> _ie = Enumerable.Range(0, 3);
-
-        private class MyList : IReadOnlyList<int>
-        {
-            public int[] Lis;
-
-            public IEnumerator<int> GetEnumerator()
-            {
-                if (Lis == null)
-                {
-                    yield break;
-                }
-
-                foreach (int i in Lis)
-                {
-                    yield return i;
-                }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-            public int Count => Lis?.Length ?? 0;
-
-            public int this[int index] => Lis[index];
-        }
-
-        [ShowInInspector] private MyList _myListNull;
-        [ShowInInspector] private MyList _myListSome = new MyList { Lis = new[] { 1, 2 } };
-
-        [Button]
-        private void DictExternalAdd()
-        {
-            _myDictionaryNull["External"] = 1;
-        }
-        [ShowInInspector] private Dictionary<string, int> _myDictionaryNull;
-
-
-        [ShowInInspector] public Dictionary<MyEnum, int> MyDictionary = new Dictionary<MyEnum, int>
-        {
-            {MyEnum.One, 1},
-        };
-
-        [ShowInInspector]
-        private IReadOnlyDictionary<int, string> _readOnlyDict =
-            new Dictionary<int, string>
-            {
-                {1, "One"},
-                {2, "Two"},
-            };
-
-        [ShowInInspector] public Dictionary<int, int[]> _intToInts = new Dictionary<int, int[]>();
-
-        public struct KeyStruct: IEquatable<KeyStruct>
-        {
-            public int Key;
-
-            public bool Equals(KeyStruct other)
-            {
-                return Key == other.Key;
-            }
-
-            public override bool Equals(object obj)
-            {
-                // ReSharper disable once Unity.BurstLoadingManagedType
-                return obj is KeyStruct other && Equals(other);
-            }
-
-            public override int GetHashCode()
-            {
-                return Key;
-            }
-
-            public override string ToString()
-            {
-                return $"<KeyStruct Key={Key}/>";
-            }
-        }
-
-        [ShowInInspector] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
-
-        [ShowInInspector, InfoBox("If getter gives error, we display an error box")]
-        private int WrongGetter => throw new NotSupportedException("Expected Exception");
-
-        [ShowInInspector, InfoBox("We don't handle if setter gives error")]
-        private int WrongSetter  // this will just give errors to console, we won't handle it.
-        {
-            get => 20;
-            set => throw new NotSupportedException("Expected Exception");
-        }
-
-        [ShowInInspector, InfoBox("nested field can be error handled too")]
-        // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        private IEnumerator _ienumerator = new []{1, 2, 3}.GetEnumerator();
-
-        [LayoutStart("IEnumerator", ELayout.Horizontal)]
-        [Button] private void MoveIt() => _ienumerator.MoveNext();
-        [LayoutTerminateHere]
-        [Button] private void ReCreateIt() => _ienumerator = new []{1, 2, 3}.GetEnumerator();
-
-        private class NestChange
-        {
-            public int NestedValue;
-        }
-
-        // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        [ShowInInspector] private NestChange _nestChange = new NestChange();
-
-        [Button]
-        private void ChangeNestedValue()
-        {
-            _nestChange.NestedValue = (_nestChange.NestedValue + 1) % 3;
-        }
+//         [ShowInInspector] private Dictionary<string, Color> _dictColors = new Dictionary<string, Color>
+//         {
+//             { "Red", Color.red },
+//             { "Green", Color.green },
+//             { "Blue", Color.blue },
+//         };
+//
+//         private interface Inter
+//         {
+//             int MyInt { get; set; }
+//         }
+//
+//         public class InterClass : Inter
+//         {
+//             public int MyInt { get; set; }
+//             public string InterClassField;
+//         }
+//
+//         public struct InterStruct : Inter
+//         {
+//             public string InterStructField;
+//             public int MyInt { get; set; }
+//         }
+//
+//         [ShowInInspector] private static Inter _inter;
+//
+//         public class GeneralDummyClass: IDummy
+//         {
+//             public string GetComment()
+//             {
+//                 return "DummyClass";
+//             }
+//
+//             public int MyInt { get; set; }
+//             public int GenDumInt;
+//             public string GenDumString;
+//         }
+//
+//         [ShowInInspector] private static IDummy _dummy;
+//
+//         [Button]
+//         private void DebugDummy() => Debug.Log(_dummy);
+//
+// #if UNITY_EDITOR
+//         [InitializeOnLoadMethod]
+//         private static void Initialize()
+//         {
+//             string g = AssetDatabase.FindAssets("t:Scriptable").FirstOrDefault();
+//             if (!string.IsNullOrEmpty(g))
+//             {
+//                 _dummy = AssetDatabase.LoadAssetAtPath<Scriptable>(AssetDatabase.GUIDToAssetPath(g));
+//             }
+//         }
+// #endif
+//
+//         public struct NullSwap
+//         {
+//             public int Number;
+//         }
+//
+//         [NonSerialized, ShowInInspector] public NullSwap _nullSwap;
+//
+//         [ShowInInspector]
+//         private IEnumerable<int> _ie = Enumerable.Range(0, 3);
+//
+//         private class MyList : IReadOnlyList<int>
+//         {
+//             public int[] Lis;
+//
+//             public IEnumerator<int> GetEnumerator()
+//             {
+//                 if (Lis == null)
+//                 {
+//                     yield break;
+//                 }
+//
+//                 foreach (int i in Lis)
+//                 {
+//                     yield return i;
+//                 }
+//             }
+//
+//             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+//
+//             public int Count => Lis?.Length ?? 0;
+//
+//             public int this[int index] => Lis[index];
+//         }
+//
+//         [ShowInInspector] private MyList _myListNull;
+//         [ShowInInspector] private MyList _myListSome = new MyList { Lis = new[] { 1, 2 } };
+//
+//         [Button]
+//         private void DictExternalAdd()
+//         {
+//             _myDictionaryNull["External"] = 1;
+//         }
+//         [ShowInInspector] private Dictionary<string, int> _myDictionaryNull;
+//
+//
+//         [ShowInInspector] public Dictionary<MyEnum, int> MyDictionary = new Dictionary<MyEnum, int>
+//         {
+//             {MyEnum.One, 1},
+//         };
+//
+//         [ShowInInspector]
+//         private IReadOnlyDictionary<int, string> _readOnlyDict =
+//             new Dictionary<int, string>
+//             {
+//                 {1, "One"},
+//                 {2, "Two"},
+//             };
+//
+//         [ShowInInspector] public Dictionary<int, int[]> _intToInts = new Dictionary<int, int[]>();
+//
+//         public struct KeyStruct: IEquatable<KeyStruct>
+//         {
+//             public int Key;
+//
+//             public bool Equals(KeyStruct other)
+//             {
+//                 return Key == other.Key;
+//             }
+//
+//             public override bool Equals(object obj)
+//             {
+//                 // ReSharper disable once Unity.BurstLoadingManagedType
+//                 return obj is KeyStruct other && Equals(other);
+//             }
+//
+//             public override int GetHashCode()
+//             {
+//                 return Key;
+//             }
+//
+//             public override string ToString()
+//             {
+//                 return $"<KeyStruct Key={Key}/>";
+//             }
+//         }
+//
+//         [ShowInInspector] private Dictionary<KeyStruct, int> _keyStructDict = new Dictionary<KeyStruct, int>();
+//
+//         [ShowInInspector, InfoBox("If getter gives error, we display an error box")]
+//         private int WrongGetter => throw new NotSupportedException("Expected Exception");
+//
+//         [ShowInInspector, InfoBox("We don't handle if setter gives error")]
+//         private int WrongSetter  // this will just give errors to console, we won't handle it.
+//         {
+//             get => 20;
+//             set => throw new NotSupportedException("Expected Exception");
+//         }
+//
+//         [ShowInInspector, InfoBox("nested field can be error handled too")]
+//         // ReSharper disable once FieldCanBeMadeReadOnly.Local
+//         private IEnumerator _ienumerator = new []{1, 2, 3}.GetEnumerator();
+//
+//         [LayoutStart("IEnumerator", ELayout.Horizontal)]
+//         [Button] private void MoveIt() => _ienumerator.MoveNext();
+//         [LayoutTerminateHere]
+//         [Button] private void ReCreateIt() => _ienumerator = new []{1, 2, 3}.GetEnumerator();
+//
+//         private class NestChange
+//         {
+//             public int NestedValue;
+//         }
+//
+//         // ReSharper disable once FieldCanBeMadeReadOnly.Local
+//         [ShowInInspector] private NestChange _nestChange = new NestChange();
+//
+//         [Button]
+//         private void ChangeNestedValue()
+//         {
+//             _nestChange.NestedValue = (_nestChange.NestedValue + 1) % 3;
+//         }
     }
 }

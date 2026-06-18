@@ -1,10 +1,18 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
+using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
 using SaintsField.Editor.Drawers.SaintsDecimalType;
+using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.SaintsSerialization;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,65 +22,248 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
     {
         protected override bool UseCreateFieldIMGUI => true;
 
+        private EnumToggleButtonsAttributeDrawer _enumToggleButtonsAttributeDrawer;
+        private TreeDropdownAttributeDrawer _treeDropdownAttributeDrawer;
+        private SaintsInterfaceDrawer _saintsInterfaceDrawer;
+
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label, float width,
             int index, ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
         {
-            if (DateTimeAttributeDrawer.IsSerializedActualDateTime(property))
+            GUIContent actualLabel = GetActualLabel(property, label);
+            SaintsSerializedActualAttribute saintsSerializedActual = GetSerializedActualAttribute(info);
+            if (saintsSerializedActual == null)
             {
-                return DateTimeAttributeDrawer.GetSerializedActualFieldHeight(property, label);
+                return ErrorHeight($"{nameof(SaintsSerializedActualAttribute)} not found", width);
             }
 
-            if (TimeSpanAttributeDrawer.IsSerializedActualTimeSpan(property))
-            {
-                return TimeSpanAttributeDrawer.GetSerializedActualFieldHeight(property, label, index, info);
-            }
-
-            if (GuidAttributeDrawer.IsSerializedActualGuid(property))
-            {
-                return GuidAttributeDrawer.GetSerializedActualFieldHeight(property, label);
-            }
-
-            if (SaintsDecimalDrawer.IsSerializedActualDecimal(property))
-            {
-                return SaintsDecimalDrawer.GetSerializedActualFieldHeight(property, label);
-            }
-
-            return EditorGUI.GetPropertyHeight(property, label, true);
+            return GetSerializedActualFieldHeight(saintsSerializedActual, property, actualLabel, width, index, info,
+                parent);
         }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             int index, ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            if (DateTimeAttributeDrawer.IsSerializedActualDateTime(property) &&
-                DateTimeAttributeDrawer.DrawSerializedActualField(position, property, label,
-                    newValue => TriggerChangedIMGUI(property, newValue)))
+            GUIContent actualLabel = GetActualLabel(property, label);
+            SaintsSerializedActualAttribute saintsSerializedActual = GetSerializedActualAttribute(info);
+            if (saintsSerializedActual == null)
             {
+                DrawError(position, $"{nameof(SaintsSerializedActualAttribute)} not found");
                 return;
             }
 
-            if (TimeSpanAttributeDrawer.IsSerializedActualTimeSpan(property) &&
-                TimeSpanAttributeDrawer.DrawSerializedActualField(position, property, label, index, info,
-                    newValue => TriggerChangedIMGUI(property, newValue)))
+            DrawSerializedActualField(position, saintsSerializedActual, property, actualLabel, index, info, parent);
+        }
+
+        private float GetSerializedActualFieldHeight(SaintsSerializedActualAttribute saintsSerializedActual,
+            SerializedProperty property, GUIContent label, float width, int index, FieldInfo info, object parent)
+        {
+            (string error, SaintsPropertyType propertyType) = GetPropertyType(property);
+            if (error != "")
             {
+                return ErrorHeight(error, width);
+            }
+
+            Attribute[] attributes = ReflectCache.GetCustomAttributes(info);
+            (EnumToggleButtonsAttribute enumToggle, FlagsTreeDropdownAttribute flagsTreeDropdownAttribute,
+                FlagsDropdownAttribute flagsDropdownAttribute) = GetAttributeSpecificDrawers(attributes);
+
+            switch (propertyType)
+            {
+                case SaintsPropertyType.EnumLong:
+#if UNITY_2022_1_OR_NEWER
+                case SaintsPropertyType.EnumULong:
+#endif
+                    if (enumToggle != null)
+                    {
+                        return GetEnumToggleButtonsDrawer(info, enumToggle, label.text)
+                            .GetSerializedActualFieldHeight(saintsSerializedActual, enumToggle, property, label, width,
+                                parent, this);
+                    }
+
+                    return GetTreeDropdownDrawer(info,
+                            (Attribute)flagsTreeDropdownAttribute ?? flagsDropdownAttribute, label.text)
+                        .GetSerializedActualFieldHeight(saintsSerializedActual, property, label, width, parent);
+                case SaintsPropertyType.Interface:
+                    return GetSaintsInterfaceDrawer(info, label.text)
+                        .GetSerializedActualFieldHeight(saintsSerializedActual, property, label, width, info, parent);
+                case SaintsPropertyType.DateTime:
+                    return DateTimeAttributeDrawer.GetSerializedActualFieldHeight(property, label);
+                case SaintsPropertyType.TimeSpan:
+                    return TimeSpanAttributeDrawer.GetSerializedActualFieldHeight(property, label, index, info);
+                case SaintsPropertyType.Guid:
+                    return GuidAttributeDrawer.GetSerializedActualFieldHeight(property, label);
+                case SaintsPropertyType.Decimal:
+                    return SaintsDecimalDrawer.GetSerializedActualFieldHeight(property, label);
+                default:
+                    return ErrorHeight($"{propertyType} is not supported", width);
+            }
+        }
+
+        private void DrawSerializedActualField(Rect position, SaintsSerializedActualAttribute saintsSerializedActual,
+            SerializedProperty property, GUIContent label, int index, FieldInfo info, object parent)
+        {
+            (string error, SaintsPropertyType propertyType) = GetPropertyType(property);
+            if (error != "")
+            {
+                DrawError(position, error);
                 return;
             }
 
-            if (GuidAttributeDrawer.IsSerializedActualGuid(property) &&
-                GuidAttributeDrawer.DrawSerializedActualField(position, property, label, index,
-                    newValue => TriggerChangedIMGUI(property, newValue)))
+            Attribute[] attributes = ReflectCache.GetCustomAttributes(info);
+            (EnumToggleButtonsAttribute enumToggle, FlagsTreeDropdownAttribute flagsTreeDropdownAttribute,
+                FlagsDropdownAttribute flagsDropdownAttribute) = GetAttributeSpecificDrawers(attributes);
+
+            switch (propertyType)
             {
-                return;
+                case SaintsPropertyType.EnumLong:
+#if UNITY_2022_1_OR_NEWER
+                case SaintsPropertyType.EnumULong:
+#endif
+                    if (enumToggle != null)
+                    {
+                        GetEnumToggleButtonsDrawer(info, enumToggle, label.text)
+                            .DrawSerializedActualField(position, saintsSerializedActual, enumToggle, property, label,
+                                parent, this, newValue => TriggerChangedIMGUI(property, newValue));
+                        return;
+                    }
+
+                    GetTreeDropdownDrawer(info,
+                            (Attribute)flagsTreeDropdownAttribute ?? flagsDropdownAttribute, label.text)
+                        .DrawSerializedActualField(position, saintsSerializedActual, property, label, parent, this,
+                            newValue => TriggerChangedIMGUI(property, newValue));
+                    return;
+                case SaintsPropertyType.Interface:
+                    GetSaintsInterfaceDrawer(info, label.text)
+                        .DrawSerializedActualField(position, saintsSerializedActual, property, label, info, parent);
+                    return;
+                case SaintsPropertyType.DateTime:
+                    if (DateTimeAttributeDrawer.DrawSerializedActualField(position, property, label,
+                            newValue => TriggerChangedIMGUI(property, newValue)))
+                    {
+                        return;
+                    }
+
+                    break;
+                case SaintsPropertyType.TimeSpan:
+                    if (TimeSpanAttributeDrawer.DrawSerializedActualField(position, property, label, index, info,
+                            newValue => TriggerChangedIMGUI(property, newValue)))
+                    {
+                        return;
+                    }
+
+                    break;
+                case SaintsPropertyType.Guid:
+                    if (GuidAttributeDrawer.DrawSerializedActualField(position, property, label, index,
+                            newValue => TriggerChangedIMGUI(property, newValue)))
+                    {
+                        return;
+                    }
+
+                    break;
+                case SaintsPropertyType.Decimal:
+                    if (SaintsDecimalDrawer.DrawSerializedActualField(position, property, label,
+                            newValue => TriggerChangedIMGUI(property, newValue)))
+                    {
+                        return;
+                    }
+
+                    break;
+                default:
+                    DrawError(position, $"{propertyType} is not supported");
+                    return;
             }
 
-            if (SaintsDecimalDrawer.IsSerializedActualDecimal(property) &&
-                SaintsDecimalDrawer.DrawSerializedActualField(position, property, label,
-                    newValue => TriggerChangedIMGUI(property, newValue)))
+            DrawError(position, $"{propertyType} serialized actual value is invalid");
+        }
+
+        private static SaintsSerializedActualAttribute GetSerializedActualAttribute(FieldInfo info) =>
+            ReflectCache.GetCustomAttributes<SaintsSerializedActualAttribute>(info).FirstOrDefault();
+
+        private GUIContent GetActualLabel(SerializedProperty property, GUIContent label)
+        {
+            string actualLabel = GetPreferredLabel(property);
+            if (string.IsNullOrEmpty(actualLabel))
             {
-                return;
+                actualLabel = label?.text ?? "";
             }
 
-            RawDefaultDrawer(position, property, allAttributes, label, info);
+            if (!string.IsNullOrEmpty(actualLabel) && actualLabel.EndsWith(Util.SaintsSerializedLabelSuffix))
+            {
+                actualLabel = actualLabel[..^Util.SaintsSerializedLabelSuffix.Length];
+            }
+
+            return new GUIContent(label)
+            {
+                text = actualLabel,
+            };
+        }
+
+        private static (string error, SaintsPropertyType propertyType) GetPropertyType(SerializedProperty property)
+        {
+            SerializedProperty propertyTypeProperty =
+                property.FindPropertyRelative(nameof(SaintsSerializedProperty.propertyType));
+            if (propertyTypeProperty == null)
+            {
+                return ($"propertyType not found in {property.propertyPath}", SaintsPropertyType.Undefined);
+            }
+
+            return ("", (SaintsPropertyType)propertyTypeProperty.intValue);
+        }
+
+        private static (EnumToggleButtonsAttribute enumToggle, FlagsTreeDropdownAttribute flagsTreeDropdownAttribute,
+            FlagsDropdownAttribute flagsDropdownAttribute) GetAttributeSpecificDrawers(
+                IReadOnlyList<Attribute> attributes)
+        {
+            EnumToggleButtonsAttribute enumToggle = null;
+            FlagsTreeDropdownAttribute flagsTreeDropdownAttribute = null;
+            FlagsDropdownAttribute flagsDropdownAttribute = null;
+            foreach (Attribute attr in attributes)
+            {
+                switch (attr)
+                {
+                    case EnumToggleButtonsAttribute et:
+                        enumToggle = et;
+                        break;
+                    case FlagsTreeDropdownAttribute ftd:
+                        flagsTreeDropdownAttribute = ftd;
+                        break;
+                    case FlagsDropdownAttribute fd:
+                        flagsDropdownAttribute = fd;
+                        break;
+                }
+            }
+
+            return (enumToggle, flagsTreeDropdownAttribute, flagsDropdownAttribute);
+        }
+
+        private EnumToggleButtonsAttributeDrawer GetEnumToggleButtonsDrawer(FieldInfo info,
+            EnumToggleButtonsAttribute enumToggleButtonsAttribute, string label)
+        {
+            return _enumToggleButtonsAttributeDrawer ??=
+                (EnumToggleButtonsAttributeDrawer)MakePropertyDrawer(typeof(EnumToggleButtonsAttributeDrawer), info,
+                    enumToggleButtonsAttribute, label);
+        }
+
+        private TreeDropdownAttributeDrawer GetTreeDropdownDrawer(FieldInfo info, Attribute attribute, string label)
+        {
+            return _treeDropdownAttributeDrawer ??=
+                (TreeDropdownAttributeDrawer)MakePropertyDrawer(typeof(TreeDropdownAttributeDrawer), info, attribute,
+                    label);
+        }
+
+        private SaintsInterfaceDrawer GetSaintsInterfaceDrawer(FieldInfo info, string label)
+        {
+            return _saintsInterfaceDrawer ??=
+                (SaintsInterfaceDrawer)MakePropertyDrawer(typeof(SaintsInterfaceDrawer), info, null, label);
+        }
+
+        private static float ErrorHeight(string error, float width) =>
+            ImGuiHelpBox.GetHeight(error, Mathf.Max(1f, width), MessageType.Error);
+
+        private static void DrawError(Rect position, string error)
+        {
+            ImGuiHelpBox.Draw(position, error, MessageType.Error);
         }
     }
 }

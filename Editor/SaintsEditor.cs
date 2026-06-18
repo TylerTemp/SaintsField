@@ -43,6 +43,7 @@ namespace SaintsField.Editor
     public partial class SaintsEditor: UnityEditor.Editor, IDOTweenPlayRecorder, IMakeRenderer, ISearchable
     {
         private static bool _saintsEditorIMGUI = true;
+        private SaintsEditorCore _coreEditor;
 
         // private MonoScript _monoScript;
         // private List<SaintsFieldWithInfo> _fieldWithInfos = new List<SaintsFieldWithInfo>();

@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.18.9 ##
+
+1.  Fix: Deprecated error on Unity 6k.5 [#409](https://github.com/TylerTemp/SaintsField/issues/409)
+2.  Fix: Compile error if `SaintsEvent` not enabled
+3.  Fix: `<field=control/>` tag where `control` is not correctly parsed
+
 ## 5.18.7 ##
 
 1.  Fix: `AnimatorState` error if the target is a unity object null

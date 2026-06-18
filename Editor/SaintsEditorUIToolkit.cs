@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using SaintsField.Editor.Playa;
@@ -26,7 +26,7 @@ namespace SaintsField.Editor
 
         private ToolbarSearchField _toolbarSearchField;
 
-        private SaintsEditorCore _coreEditor;
+#if !SAINTSFIELD_UI_TOOLKIT_DISABLE
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -144,6 +144,7 @@ namespace SaintsField.Editor
 
             return root;
         }
+#endif
 
         private static string GetPrefabAssetPathIfAsset(GameObject go)
         {
