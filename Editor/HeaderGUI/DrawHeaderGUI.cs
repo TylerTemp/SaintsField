@@ -355,10 +355,40 @@ namespace SaintsField.Editor.HeaderGUI
 
         // Per-target check animation state
         private const double CheckAnimDuration = 1.0; // seconds total before reverting to save icon
-        private static readonly Dictionary<int, double> SaveCheckAnimEndTime = new Dictionary<int, double>();
-        private static readonly Dictionary<int, RuntimeSaveAnimIcon> RuntimeSaveAnimIcons = new Dictionary<int, RuntimeSaveAnimIcon>();
+        private static readonly Dictionary<
+#if UNITY_6000_4_OR_NEWER
+            EntityId
+#else
+                int
+#endif
+            , double> SaveCheckAnimEndTime = new Dictionary<
+#if UNITY_6000_4_OR_NEWER
+            EntityId
+#else
+                int
+#endif
+            , double>();
+        private static readonly Dictionary<
+#if UNITY_6000_4_OR_NEWER
+            EntityId
+#else
+                int
+#endif
+            , RuntimeSaveAnimIcon> RuntimeSaveAnimIcons = new Dictionary<
+#if UNITY_6000_4_OR_NEWER
+            EntityId
+#else
+                int
+#endif
+            , RuntimeSaveAnimIcon>();
 
-        private static void SaveRuntimeComponents(Object[] targets, int targetKey)
+        private static void SaveRuntimeComponents(Object[] targets,
+#if UNITY_6000_4_OR_NEWER
+            EntityId
+#else
+                int
+#endif
+            targetKey)
         {
             foreach (Object target in targets)
             {
@@ -371,14 +401,26 @@ namespace SaintsField.Editor.HeaderGUI
             AnimateRuntimeSaveIcon(targetKey, RuntimeSaveAnimIcon.Check);
         }
 
-        private static void AnimateRuntimeSaveIcon(int targetKey, RuntimeSaveAnimIcon icon)
+        private static void AnimateRuntimeSaveIcon(
+#if UNITY_6000_4_OR_NEWER
+            EntityId
+#else
+                int
+#endif
+            targetKey, RuntimeSaveAnimIcon icon)
         {
             SaveCheckAnimEndTime[targetKey] = EditorApplication.timeSinceStartup + CheckAnimDuration;
             RuntimeSaveAnimIcons[targetKey] = icon;
             InternalEditorUtility.RepaintAllViews();
         }
 
-        private static void ShowRuntimeSaveContextMenu(Object[] targets, int targetKey)
+        private static void ShowRuntimeSaveContextMenu(Object[] targets,
+#if UNITY_6000_4_OR_NEWER
+            EntityId
+#else
+                int
+#endif
+            targetKey)
         {
             GenericMenu menu = new GenericMenu();
             menu.AddItem(new GUIContent("Remove Saved Values"), false, () =>
@@ -501,7 +543,19 @@ namespace SaintsField.Editor.HeaderGUI
                 _saveIconTexture ??= Util.LoadResource<Texture2D>("save.png");
 
                 // Determine if we are currently in the "saved/check" animation phase for this target
-                int targetKey = firstTarget.GetInstanceID();
+
+#if UNITY_6000_4_OR_NEWER
+                EntityId
+#else
+                int
+#endif
+                    targetKey = firstTarget.
+#if UNITY_6000_4_OR_NEWER
+                        GetEntityId
+#else
+                        GetInstanceID
+#endif
+                    ();
                 double now = EditorApplication.timeSinceStartup;
                 bool isAnimating = SaveCheckAnimEndTime.TryGetValue(targetKey, out double animEnd) && now < animEnd;
                 Event currentEvent = Event.current;
@@ -532,6 +586,7 @@ namespace SaintsField.Editor.HeaderGUI
                     iconRect.y += pad;
                     iconRect.width -= pad * 2;
                     iconRect.height -= pad * 2;
+                    // ReSharper disable once CanSimplifyDictionaryTryGetValueWithGetValueOrDefault
                     RuntimeSaveAnimIcon animIcon = RuntimeSaveAnimIcons.TryGetValue(targetKey, out RuntimeSaveAnimIcon currentAnimIcon)
                         ? currentAnimIcon
                         : RuntimeSaveAnimIcon.Check;
