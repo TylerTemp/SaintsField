@@ -159,7 +159,7 @@ namespace SaintsField.Editor.Drawers.SaintsArrayTypeDrawer
                 saintsAttribute as SaintsArrayAttribute ?? new SaintsArrayAttribute(searchable: false, numberOfItemsPerPage: 0);
             if (!TryBuildElementContext(property, label, info, parent, out ElementContext context))
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

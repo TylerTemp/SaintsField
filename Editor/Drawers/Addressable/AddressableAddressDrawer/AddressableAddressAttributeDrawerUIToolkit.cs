@@ -1,17 +1,16 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Addressable;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -61,7 +60,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
 
             if (AddressableAssetSettingsDefaultObject.Settings == null)
             {
-                return new HelpBox("Addressable Settings not created.", HelpBoxMessageType.Error)
+                return new HelpBox(ErrorAddressableSettingsNotCreated, HelpBoxMessageType.Error)
                 {
                     style =
                     {
@@ -77,20 +76,22 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute,
             int index,
-            IReadOnlyList<PropertyAttribute> allAttributes,
-            VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+            IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
+            Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             if (property.propertyType != SerializedPropertyType.String)
             {
                 return;
             }
+
             StringDropdownField field = container.Q<StringDropdownField>(NameDropdownField(property));
 
-            UIToolkitUtils.AddContextualMenuManipulator(field, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
+            UIToolkitUtils.AddContextualMenuManipulator(field, property,
+                () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
 
-            field.Button.clicked += () => ShowDropdown(property, field, (AddressableAddressAttribute)saintsAttribute, onValueChangedCallback, info, parent);
+            field.Button.clicked += () => ShowDropdown(property, field,
+                (AddressableAddressAttribute)saintsAttribute, onValueChangedCallback, info, parent);
 
-            // ReSharper disable once InvertIf
             if (AddressableAssetSettingsDefaultObject.Settings == null)
             {
                 HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
@@ -104,78 +105,30 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
                 }
 
                 SaintsEditorApplicationChanged.OnAnyEvent.AddListener(CheckHelpBoxDisplay);
-                field.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CheckHelpBoxDisplay));
+                field.RegisterCallback<DetachFromPanelEvent>(_ =>
+                    SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CheckHelpBoxDisplay));
             }
         }
 
-        private static void ShowDropdown(SerializedProperty property, VisualElement root, AddressableAddressAttribute addressableAddressAttribute, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        private static void ShowDropdown(SerializedProperty property, VisualElement root,
+            AddressableAddressAttribute addressableAddressAttribute, Action<object> onValueChangedCallback,
+            FieldInfo info, object parent)
         {
-            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-            Dropdown<string> dropdown = new Dropdown<string>();
-
-            string selected = null;
-            if (settings == null)
-            {
-                dropdown.Add("Create Addressable Settings...", null);
-            }
-            else
-            {
-                (string _, IEnumerable<AddressableAssetEntry> entries) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
-                string[] keys = entries.Select(each => each.address).ToArray();
-
-                foreach (string key in keys)
-                {
-                    dropdown.Add(new Dropdown<string>(key, key));
-                    if (property.stringValue == key)
-                    {
-                        selected = key;
-                    }
-                }
-
-                if (keys.Length > 0)
-                {
-                    dropdown.AddSeparator();
-                }
-
-                dropdown.Add("Edit Addresses...", null, false, "d_editicon.sml");
-            }
-
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
-            {
-                CurValues = selected is null
-                    ? Array.Empty<object>()
-                    : new object[] { selected },
-                DropdownListValue = dropdown,
-                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
-            };
+            (string _, AddressableAddressDropdownInfo dropdownInfo) =
+                GetAddressableAddressDropdownInfo(property, addressableAddressAttribute, false);
 
             (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 
-            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
-                metaInfo,
+            SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
+                dropdownInfo.MetaInfo,
                 root.worldBound.width,
                 maxHeight,
                 false,
-                (_, curItem) =>
+                (curItem, _) =>
                 {
-                    string newValue = (string)curItem;
-                    if (newValue is null)
-                    {
-                        if (settings == null)
-                        {
-                            AddressableAssetSettingsDefaultObject.GetSettings(true);
-                        }
-                        else
-                        {
-                            AddressableUtil.OpenGroupEditor();
-                        }
-                        return;
-                    }
-
-                    property.stringValue = newValue;
-                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newValue);
-                    property.serializedObject.ApplyModifiedProperties();
-                    onValueChangedCallback.Invoke(newValue);
+                    ApplyAddressableAddressSelection(property, info, parent, dropdownInfo.Settings, (string)curItem,
+                        newValue => onValueChangedCallback.Invoke(newValue));
+                    return null;
                 }
             );
 

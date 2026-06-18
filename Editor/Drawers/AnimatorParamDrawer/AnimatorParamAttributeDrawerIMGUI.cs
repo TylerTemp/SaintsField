@@ -92,7 +92,7 @@ namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
             if (property.propertyType is not (SerializedPropertyType.String or SerializedPropertyType.Integer) ||
                 cache.Error != "")
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

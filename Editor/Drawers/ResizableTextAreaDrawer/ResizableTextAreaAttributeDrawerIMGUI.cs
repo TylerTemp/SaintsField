@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer
             if (property.propertyType != SerializedPropertyType.String)
             {
                 _error = $"expect string, get {property.propertyType}";
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

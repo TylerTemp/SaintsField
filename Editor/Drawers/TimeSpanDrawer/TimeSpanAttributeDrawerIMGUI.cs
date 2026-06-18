@@ -80,7 +80,7 @@ namespace SaintsField.Editor.Drawers.TimeSpanDrawer
             SerializedProperty ticksProperty = TryGetTicksProperty(property);
             if (ticksProperty == null)
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

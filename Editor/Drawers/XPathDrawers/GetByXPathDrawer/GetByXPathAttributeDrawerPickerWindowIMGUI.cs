@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using UnityEditor;
 using UnityEngine;
@@ -13,92 +12,18 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 {
     public partial class GetByXPathAttributeDrawer
     {
-        private class GetByPickerWindow : SaintsObjectPickerWindowIMGUI
+        private void OpenPicker(SerializedProperty property, FieldInfo info,
+            IReadOnlyList<GetByXPathAttribute> getByXPathAttributes, Type expectedType, Type interfaceType,
+            Action<object> onValueChanged, object updatedParent)
         {
-            private Action<Object> _onSelected;
-            private EPick _editorPick;
+            (string getValueError, object curValue) = GetCurValue(property, info, updatedParent);
 
-            private IReadOnlyList<Object> _assetObjects;
-            private IReadOnlyList<Object> _sceneObjects;
-
-            public static void Open(Object curValue, EPick editorPick, IReadOnlyList<Object> assetObjects, IReadOnlyList<Object> sceneObjects, Action<Object> onSelected)
+            if (getValueError != "")
             {
-                GetByPickerWindow thisWindow = CreateInstance<GetByPickerWindow>();
-                thisWindow.titleContent = new GUIContent("Select");
-                // thisWindow._expectedTypes = expectedTypes;
-                thisWindow._assetObjects = assetObjects;
-                thisWindow._sceneObjects = sceneObjects;
-                thisWindow._onSelected = onSelected;
-                thisWindow._editorPick = editorPick;
-                thisWindow.SetDefaultActive(curValue);
-                // Debug.Log($"call show selector window");
-                thisWindow.ShowAuxWindow();
+                Debug.LogError(getValueError);
+                return;
             }
 
-            protected override bool AllowScene =>
-                // Debug.Log(_editorPick);
-                _editorPick.HasFlagFast(EPick.Scene);
-
-            protected override bool AllowAssets =>
-                // Debug.Log(_editorPick);
-                _editorPick.HasFlagFast(EPick.Assets);
-
-            protected override IEnumerable<ItemInfo> FetchAllAssets()
-            {
-                // HierarchyProperty property = new HierarchyProperty(HierarchyType.Assets, false);
-                return _assetObjects.Select(each => new ItemInfo
-                {
-                    Object = each,
-                    Label = each.name,
-                    // Icon = property.icon,
-#if UNITY_6000_4_OR_NEWER
-                    InstanceID = each.GetEntityId(),
-#else
-                    InstanceID = each.GetInstanceID(),
-#endif
-                    GuiLabel = new GUIContent(each.name),
-                });
-            }
-
-            protected override IEnumerable<ItemInfo> FetchAllSceneObject()
-            {
-                // HierarchyProperty property = new HierarchyProperty(HierarchyType.GameObjects, false);
-                return _sceneObjects.Select(each => new ItemInfo
-                {
-                    Object = each,
-                    Label = each.name,
-                    // Icon = property.icon,
-#if UNITY_6000_4_OR_NEWER
-                    InstanceID = each.GetEntityId(),
-#else
-                    InstanceID = each.GetInstanceID(),
-#endif
-                    GuiLabel = new GUIContent(each.name),
-                });
-            }
-
-            protected override string Error => "";
-
-            protected override bool IsEqual(ItemInfo itemInfo, Object target)
-            {
-                return ReferenceEquals(itemInfo.Object, target);
-            }
-
-            protected override void OnSelect(ItemInfo itemInfo)
-            {
-                _onSelected(itemInfo.Object);
-            }
-
-            protected override bool FetchAllSceneObjectFilter(ItemInfo itemInfo) => true;
-
-            protected override bool FetchAllAssetsFilter(ItemInfo itemInfo) => true;
-        }
-
-        private static void OpenPicker(SerializedProperty property, FieldInfo info, IReadOnlyList<GetByXPathAttribute> getByXPathAttributes, Type expectedType, Type interfaceType, Action<object> onValueChanged, object updatedParent)
-        {
-            (string getValueError, int _, object curValue) = Util.GetValue(property, info, updatedParent);
-
-            // ReSharper disable once UseNegatedPatternInIsExpression
             if (!(curValue is Object) && curValue != null)
             {
                 Debug.LogError($"targetValue is not Object: {curValue}");
@@ -107,13 +32,7 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 
             Object curValueObj = (Object)curValue;
 
-            if (getValueError != "")
-            {
-                Debug.LogError(getValueError);
-                return;
-            }
-
-            GetXPathValuesResult r = CalcXPathValues(getByXPathAttributes
+            GetXPathValuesResult result = GetXPathValues(getByXPathAttributes
                     .Select(xPathAttribute => new XPathResourceInfo
                     {
                         OptimizationPayload = xPathAttribute.OptimizationPayload,
@@ -121,28 +40,76 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     })
                     .ToArray(),
                 expectedType, interfaceType, property, info, updatedParent);
-            if (r.XPathError != "")
+            if (result.XPathError != "")
             {
-                Debug.LogError(r.XPathError);
+                Debug.LogError(result.XPathError);
                 return;
             }
 
-            Object[] objResults = r.Results.OfType<Object>().ToArray();
-            List<Object> assetObj = new List<Object>();
-            List<Object> sceneObj = new List<Object>();
-            foreach (Object objResult in objResults)
+            IReadOnlyList<SaintsObjectPickerWindowIMGUI.ItemInfo> assetItems;
+            IReadOnlyList<SaintsObjectPickerWindowIMGUI.ItemInfo> sceneItems;
+            SplitObjectResults(result.Results.OfType<Object>(), out assetItems, out sceneItems);
+
+            SaintsObjectPickerWindowIMGUI pickerWindow =
+                ScriptableObject.CreateInstance<SaintsObjectPickerWindowIMGUI>();
+            pickerWindow.ConfigAllowAssets = true;
+            pickerWindow.ConfigAllowScene = true;
+            pickerWindow.titleContent = new GUIContent(
+                $"Select {expectedType}" + (interfaceType == null ? "" : $"({interfaceType})"));
+            pickerWindow.FetchAllAssetsCallback = () => assetItems;
+            pickerWindow.FetchAllSceneObjectCallback = () => sceneItems;
+            pickerWindow.IsEqualCallback = (itemInfo, target) => ReferenceEquals(itemInfo.Object, target);
+            pickerWindow.OnSelectCallback = itemInfo =>
             {
-                if (AssetDatabase.GetAssetPath(objResult) != "")
+                pickerWindow.ErrorMessage = "";
+                onValueChanged.Invoke(itemInfo.Object);
+            };
+            pickerWindow.SetDefaultActive(curValueObj);
+            pickerWindow.ShowAuxWindow();
+        }
+
+        private static void SplitObjectResults(IEnumerable<Object> results,
+            out IReadOnlyList<SaintsObjectPickerWindowIMGUI.ItemInfo> assetItems,
+            out IReadOnlyList<SaintsObjectPickerWindowIMGUI.ItemInfo> sceneItems)
+        {
+            List<SaintsObjectPickerWindowIMGUI.ItemInfo> assets =
+                new List<SaintsObjectPickerWindowIMGUI.ItemInfo>();
+            List<SaintsObjectPickerWindowIMGUI.ItemInfo> scenes =
+                new List<SaintsObjectPickerWindowIMGUI.ItemInfo>();
+
+            foreach (Object objResult in results)
+            {
+                string assetPath = AssetDatabase.GetAssetPath(objResult);
+                SaintsObjectPickerWindowIMGUI.ItemInfo itemInfo = MakePickerItemInfo(objResult, assetPath);
+                if (assetPath != "")
                 {
-                    assetObj.Add(objResult);
+                    assets.Add(itemInfo);
                 }
                 else
                 {
-                    sceneObj.Add(objResult);
+                    scenes.Add(itemInfo);
                 }
             }
 
-            GetByPickerWindow.Open(curValueObj, EPick.Assets | EPick.Scene, assetObj, sceneObj, onValueChanged.Invoke);
+            assetItems = assets;
+            sceneItems = scenes;
+        }
+
+        private static SaintsObjectPickerWindowIMGUI.ItemInfo MakePickerItemInfo(Object objResult, string assetPath)
+        {
+            return new SaintsObjectPickerWindowIMGUI.ItemInfo
+            {
+                Object = objResult,
+                Label = objResult.name,
+                GuiLabel = new GUIContent(objResult.name),
+                TypeName = objResult.GetType().Name,
+                Path = assetPath,
+#if UNITY_6000_4_OR_NEWER
+                InstanceID = objResult.GetEntityId(),
+#else
+                InstanceID = objResult.GetInstanceID(),
+#endif
+            };
         }
 
     }

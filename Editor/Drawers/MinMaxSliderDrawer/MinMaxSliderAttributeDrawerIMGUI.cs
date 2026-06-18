@@ -60,7 +60,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_IMGUI
                 Debug.LogError(cacheInfo.Error);
 #endif
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 
@@ -117,7 +117,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_IMGUI
                     Debug.LogError(preMinValue.error);
 #endif
-                    DefaultDrawer(position, property, label, info);
+                    RawDefaultDrawer(position, property, allAttributes, label, info);
                     return;
                 }
 
@@ -155,7 +155,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_IMGUI
                     Debug.LogError(preMaxValue.error);
 #endif
-                    DefaultDrawer(position, property, label, info);
+                    RawDefaultDrawer(position, property, allAttributes, label, info);
                     return;
                 }
 
@@ -215,7 +215,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_IMGUI
                     Debug.LogError(preMinValue.error);
 #endif
-                    DefaultDrawer(position, property, label, info);
+                    RawDefaultDrawer(position, property, allAttributes, label, info);
                     return;
                 }
 
@@ -253,7 +253,7 @@ namespace SaintsField.Editor.Drawers.MinMaxSliderDrawer
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_MIN_MAX_IMGUI
                     Debug.LogError(preMaxValue.error);
 #endif
-                    DefaultDrawer(position, property, label, info);
+                    RawDefaultDrawer(position, property, allAttributes, label, info);
                     return;
                 }
 

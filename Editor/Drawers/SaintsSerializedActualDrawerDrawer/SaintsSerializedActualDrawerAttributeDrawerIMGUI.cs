@@ -72,7 +72,7 @@ namespace SaintsField.Editor.Drawers.SaintsSerializedActualDrawerDrawer
                 return;
             }
 
-            DefaultDrawer(position, property, label, info);
+            RawDefaultDrawer(position, property, allAttributes, label, info);
         }
     }
 }

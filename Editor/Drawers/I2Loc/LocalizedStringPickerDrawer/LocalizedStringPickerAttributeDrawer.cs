@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using I2.Loc;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Utils;
 using SaintsField.I2Loc;
 using SaintsField.Utils;
 using UnityEditor;
@@ -30,7 +32,6 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                 : "";
         }
 
-        // private static Dropdown<string> _dropdownListCache;
         private static readonly Regex SizeReg = new Regex("</?size(?:=[^>]*)?>");
 
         private static AdvancedDropdownMetaInfo GetMetaInfo(string curValue, bool isImGui)
@@ -59,7 +60,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                 }
                 else
                 {
-                    string noBrTrans = trans.Replace("\r\n", "↵").Replace("\n", "↵").Replace("<br>", "↵");
+                    string noBrTrans = trans.Replace("\r\n", " / ").Replace("\n", " / ").Replace("<br>", " / ");
                     string pureResult = SizeReg.Replace(
                         noBrTrans,
                         string.Empty
@@ -70,7 +71,6 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                     extraDisplay = pureLength > 15 ? pureResult[..15] + "..." : pureResult;
                     extraSearches = new[] { pureResult };
                 }
-                // string trans = "";
 
                 List<string> sep = RuntimeUtil.SeparatePath(term).ToList();
                 if(hasExtra)
@@ -79,8 +79,6 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                     sep[^1] = $"{last} <color=gray>{extraDisplay}</color>";
                 }
 
-                // string displayName = $"{term} <color=gray>{noBrTrans}</color>";
-                // Dropdown.Add(displayName, term);
                 Dropdown<string>.AddByNames(dropdown, new Queue<string>(sep), term, extraSearches: extraSearches);
             }
 
@@ -93,32 +91,85 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
             }
             else
             {
-                (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stack, string _) = AdvancedDropdownUtil.GetSelected(curValue, Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), dropdown);
+                (IReadOnlyList<AdvancedDropdownAttributeDrawer.SelectStack> stack, string _) =
+                    AdvancedDropdownUtil.GetSelected(curValue,
+                        Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(), dropdown);
                 curStack = stack;
             }
 
             return new AdvancedDropdownMetaInfo
             {
                 Error = "",
-                // FieldInfo = field,
-                // CurDisplay = display,
                 CurValues = new []{curValue},
                 DropdownListValue = dropdown,
                 SelectStacks = curStack,
             };
         }
 
-        private static void SetValue(SerializedProperty property, string newValue)
+        private static string GetCurrentValue(SerializedProperty property)
         {
             if (property.propertyType == SerializedPropertyType.String)
             {
+                return property.stringValue;
+            }
+
+            return property.FindPropertyRelative("mTerm")?.stringValue ?? "";
+        }
+
+        private static bool SetValue(SerializedProperty property, string newValue)
+        {
+            if (property.propertyType == SerializedPropertyType.String)
+            {
+                if (property.stringValue == newValue)
+                {
+                    return false;
+                }
+
                 property.stringValue = newValue;
                 property.serializedObject.ApplyModifiedProperties();
+                return true;
             }
 
             SerializedProperty mTermProp = property.FindPropertyRelative("mTerm");
+            if (mTermProp == null || mTermProp.stringValue == newValue)
+            {
+                return false;
+            }
+
             mTermProp.stringValue = newValue;
             property.serializedObject.ApplyModifiedProperties();
+            return true;
+        }
+
+        private static void ApplySelection(SerializedProperty property, FieldInfo info, string newValue,
+            Action<object> onValueChangedCallback)
+        {
+            if (!SetValue(property, newValue))
+            {
+                return;
+            }
+
+            if(property.propertyType == SerializedPropertyType.String)
+            {
+                onValueChangedCallback.Invoke(newValue);
+                return;
+            }
+
+            object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
+            if (noCacheParent == null)
+            {
+                Debug.LogWarning("Property disposed unexpectedly, skip onChange callback.");
+                return;
+            }
+
+            (string error, int _, object reflectedValue) = Util.GetValue(property, info, noCacheParent);
+            if (error != "")
+            {
+                Debug.LogError(error);
+                return;
+            }
+
+            onValueChangedCallback.Invoke(reflectedValue);
         }
     }
 }

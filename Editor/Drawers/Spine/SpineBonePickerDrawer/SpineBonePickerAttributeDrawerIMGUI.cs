@@ -148,7 +148,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineBonePickerDrawer
             InfoIMGUI cache = EnsureKey(property, (SpineBonePickerAttribute)saintsAttribute, info, parent);
             if (property.propertyType != SerializedPropertyType.String)
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

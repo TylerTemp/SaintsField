@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEngine.AddressableAssets;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
@@ -18,169 +18,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
 {
     public partial class AddressableResourceAttributeDrawer
     {
-        private class LabelPopupWindow: PopupWindowContent
-        {
-            private readonly IReadOnlyList<string> _options;
-            private readonly Action<IReadOnlyList<string>> _onOk;
-
-            private List<string> _curSelected;
-
-            public LabelPopupWindow(IReadOnlyList<string> curSelected, IReadOnlyList<string> options, Action<IReadOnlyList<string>> onOk)
-            {
-                _options = options;
-                _onOk = onOk;
-                _curSelected = curSelected.ToList();
-            }
-
-            public override Vector2 GetWindowSize()
-            {
-                int optionCount = _options.Count;
-                return new Vector2(
-                    250,
-                    (_options.Count + 1) * SingleLineHeight
-                    + (optionCount > 0? 15: 0)
-                    + 10f
-                );
-            }
-
-            public override void OnGUI(Rect rect)
-            {
-                bool isAllSelected = _curSelected.Count == _options.Count;
-                using(EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
-                {
-                    bool toggleAll = EditorGUILayout.ToggleLeft("All", isAllSelected);
-                    if (changed.changed)
-                    {
-                        if (toggleAll)
-                        {
-                            _curSelected = _options.ToList();
-                        }
-                        else
-                        {
-                            _curSelected.Clear();
-                        }
-                    }
-                }
-
-                if (_options.Count > 0)
-                {
-                    Rect line = EditorGUILayout.GetControlRect(false, 1);
-                    EditorGUI.DrawRect(line, EColor.EditorSeparator.GetColor());
-                }
-
-                foreach (string option in _options)
-                {
-                    bool curSelected = _curSelected.Contains(option);
-                    bool newSelected = EditorGUILayout.ToggleLeft(option, curSelected);
-                    if (newSelected != curSelected)
-                    {
-                        if (newSelected)
-                        {
-                            _curSelected.Add(option);
-                        }
-                        else
-                        {
-                            _curSelected.Remove(option);
-                        }
-                    }
-                }
-
-                if (GUILayout.Button("OK"))
-                {
-                    _onOk(_curSelected);
-                    editorWindow.Close();
-                }
-            }
-        }
-
-        private static Texture2D _editIcon;
-        private static Texture2D EditIcon
-        {
-            get
-            {
-                if (_editIcon == null)
-                {
-                    _editIcon = Util.LoadResource<Texture2D>("pencil.png");
-                }
-
-                return _editIcon;
-            }
-        }
-
-        private static Texture2D _saveIcon;
-        private static Texture2D SaveIcon
-        {
-            get
-            {
-                if (_saveIcon == null)
-                {
-                    _saveIcon = Util.LoadResource<Texture2D>("save.png");
-                }
-
-                return _saveIcon;
-            }
-        }
-
-        private static Texture2D _trashIcon;
-        private static Texture2D TrashIcon
-        {
-            get
-            {
-                if (_trashIcon == null)
-                {
-                    _trashIcon = Util.LoadResource<Texture2D>("trash.png");
-                }
-
-                return _trashIcon;
-            }
-        }
-
-        private static Texture2D _checkIcon;
-        private static Texture2D CheckIcon
-        {
-            get
-            {
-                if (_checkIcon == null)
-                {
-                    _checkIcon = Util.LoadResource<Texture2D>("check.png");
-                }
-
-                return _checkIcon;
-            }
-        }
-
-        private static Texture2D _closeIcon;
-        private static Texture2D CloseIcon
-        {
-            get
-            {
-                if (_closeIcon == null)
-                {
-                    _closeIcon = Util.LoadResource<Texture2D>("close.png");
-                }
-
-                return _closeIcon;
-            }
-        }
-
-        private static GUIStyle _buttonStyle;
-        private static GUIStyle ButtonStyle
-        {
-            get
-            {
-                // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-                if (_buttonStyle == null)
-                {
-                    _buttonStyle = new GUIStyle(EditorStyles.miniButton)
-                    {
-                        padding = new RectOffset(3, 3, 3, 3),
-                    };
-                }
-
-                return _buttonStyle;
-            }
-        }
-
         private class InfoIMGUI
         {
             public bool Expanded;
@@ -192,13 +29,21 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             public string Name = "";
 
             public Object CurObject;
+
+            public Texture2D EditIcon;
+            public Texture2D SaveIcon;
+            public Texture2D TrashIcon;
+            public Texture2D CheckIcon;
+            public Texture2D CloseIcon;
+            public GUIStyle ButtonStyle;
         }
 
-        private static readonly Dictionary<string, InfoIMGUI> InfoCacheImGui = new Dictionary<string, InfoIMGUI>();
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
 
-        private static InfoIMGUI EnsureInfo(string key, SerializedProperty property, FieldInfo info)
+        private static InfoIMGUI EnsureKey(SerializedProperty property, FieldInfo info)
         {
-            if (InfoCacheImGui.TryGetValue(key, out InfoIMGUI ensureInfo))
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI ensureInfo))
             {
                 return ensureInfo;
             }
@@ -206,23 +51,27 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             Type fieldType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(info.FieldType): info.FieldType;
             bool isSprite = typeof(AssetReferenceSprite).IsAssignableFrom(fieldType);
 
-            return InfoCacheImGui[key] = new InfoIMGUI
+            InfoCacheIMGUI[key] = ensureInfo = new InfoIMGUI
             {
                 IsSprite = isSprite,
                 Labels = Array.Empty<string>(),
+            };
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
+            return ensureInfo;
+        }
+
+        private static GUIStyle GetButtonStyle(InfoIMGUI cache)
+        {
+            return cache.ButtonStyle ??= new GUIStyle(EditorStyles.miniButton)
+            {
+                padding = new RectOffset(3, 3, 3, 3),
             };
         }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            string key = SerializedUtils.GetUniqueId(property);
-            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
-            {
-                InfoCacheImGui.Remove(key);
-            });
-            // EnsureInfo(key);
-
+            EnsureKey(property, info);
             return SingleLineHeight;
         }
 
@@ -231,9 +80,9 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            string key = SerializedUtils.GetUniqueId(property);
-            InfoIMGUI cacheInfo = EnsureInfo(key, property, info);
-            if (GUI.Button(position, EditIcon))
+            InfoIMGUI cacheInfo = EnsureKey(property, info);
+            cacheInfo.EditIcon ??= Util.LoadResource<Texture2D>("pencil.png");
+            if (GUI.Button(position, cacheInfo.EditIcon))
             {
                 cacheInfo.Expanded = !cacheInfo.Expanded;
             }
@@ -259,8 +108,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 return ImGuiHelpBox.GetHeight(AddressableUtil.ErrorNoSettings, width, MessageType.Error);
             }
 
-            string key = SerializedUtils.GetUniqueId(property);
-            InfoIMGUI cacheInfo = EnsureInfo(key, property, info);
+            InfoIMGUI cacheInfo = EnsureKey(property, info);
             if (!cacheInfo.Expanded)
             {
                 return 0;
@@ -282,8 +130,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 return ImGuiHelpBox.Draw(position, AddressableUtil.ErrorNoSettings, MessageType.Error);
             }
 
-            string key = SerializedUtils.GetUniqueId(property);
-            InfoIMGUI cacheInfo = EnsureInfo(key, property, info);
+            InfoIMGUI cacheInfo = EnsureKey(property, info);
             if (!cacheInfo.Expanded)
             {
                 return position;
@@ -363,19 +210,26 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     }
                 }
 
-                SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
-                    dropdownListValue,
-                    AdvancedDropdownUtil.GetSizeIMGUI(dropdownListValue, groupRow.width),
-                    position,
-                    new AdvancedDropdownState(),
-                    curItem =>
+                AdvancedDropdownMetaInfo groupMetaInfo = new AdvancedDropdownMetaInfo
+                {
+                    Error = "",
+                    CurValues = string.IsNullOrEmpty(cacheInfo.GroupName)
+                        ? Array.Empty<object>()
+                        : new object[] { cacheInfo.GroupName },
+                    DropdownListValue = dropdownListValue,
+                    SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                };
+
+                PopupWindow.Show(groupRowButton, new SaintsTreeDropdownIMGUI(
+                    groupMetaInfo,
+                    Mathf.Max(groupRowButton.width, 220f),
+                    320f,
+                    false,
+                    (curItem, _) =>
                     {
                         cacheInfo.GroupName = (string)curItem;
-                    },
-                    _ => null);
-
-                dropdown.Show(groupRow);
-                dropdown.BindWindowPosition();
+                        return null;
+                    }));
             }
 
             // label
@@ -389,12 +243,33 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             // ReSharper disable once InvertIf
             if (EditorGUI.DropdownButton(labelRowButton, new GUIContent(string.Join(",", cacheInfo.Labels)), FocusType.Keyboard))
             {
-                LabelPopupWindow labelPopupWindow = new LabelPopupWindow(cacheInfo.Labels, settings.GetLabels(), newLabels =>
+                Dropdown<string> labelDropdown = new Dropdown<string>("Select Labels");
+                foreach (string eachLabel in settings.GetLabels())
                 {
-                    // Debug.Log($"labels: {string.Join(", ", newLabels)}");
-                    cacheInfo.Labels = newLabels.ToArray();
-                });
-                PopupWindow.Show(labelRowButton, labelPopupWindow);
+                    labelDropdown.Add(eachLabel, eachLabel);
+                }
+
+                AdvancedDropdownMetaInfo labelMetaInfo = new AdvancedDropdownMetaInfo
+                {
+                    Error = "",
+                    CurValues = cacheInfo.Labels.Cast<object>().ToArray(),
+                    DropdownListValue = labelDropdown,
+                    SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                };
+
+                PopupWindow.Show(labelRowButton, new SaintsTreeDropdownIMGUI(
+                    labelMetaInfo,
+                    Mathf.Max(labelRowButton.width, 220f),
+                    320f,
+                    true,
+                    (curItem, isOn) =>
+                    {
+                        string selectedLabel = (string)curItem;
+                        cacheInfo.Labels = isOn
+                            ? cacheInfo.Labels.Append(selectedLabel).Distinct().ToArray()
+                            : cacheInfo.Labels.Where(each => each != selectedLabel).ToArray();
+                        return cacheInfo.Labels.Cast<object>().ToArray();
+                    }));
             }
 
             // file name
@@ -434,7 +309,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             };
             using(new EditorGUI.DisabledScope(cacheInfo.CurObject == null || string.IsNullOrEmpty(cacheInfo.GroupName)))
             {
-                if (GUI.Button(saveButton, SaveIcon, ButtonStyle))
+                cacheInfo.SaveIcon ??= Util.LoadResource<Texture2D>("save.png");
+                if (GUI.Button(saveButton, cacheInfo.SaveIcon, GetButtonStyle(cacheInfo)))
                 {
                     if (cacheInfo.CurObject != null)
                     {
@@ -460,7 +336,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             };
             using (new EditorGUI.DisabledScope(entry == null))
             {
-                if(GUI.Button(deleteButton, TrashIcon, ButtonStyle))
+                cacheInfo.TrashIcon ??= Util.LoadResource<Texture2D>("trash.png");
+                if(GUI.Button(deleteButton, cacheInfo.TrashIcon, GetButtonStyle(cacheInfo)))
                 {
                     settings.RemoveAssetEntry(entry.guid);
                 }
@@ -474,7 +351,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
             (Rect okButton, Rect closeButton) = RectUtils.SplitWidthRect(last2ButtonsRect, SingleLineHeight);
             using(new EditorGUI.DisabledScope(cacheInfo.CurObject == null || string.IsNullOrEmpty(cacheInfo.GroupName)))
             {
-                if (GUI.Button(okButton, CheckIcon, ButtonStyle))
+                cacheInfo.CheckIcon ??= Util.LoadResource<Texture2D>("check.png");
+                if (GUI.Button(okButton, cacheInfo.CheckIcon, GetButtonStyle(cacheInfo)))
                 {
                     string groupName = cacheInfo.GroupName;
                     AddressableAssetGroup group = settings.groups.FirstOrDefault(each => each.Name == groupName);
@@ -502,7 +380,8 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                 }
             }
 
-            if (GUI.Button(closeButton, CloseIcon, ButtonStyle))
+            cacheInfo.CloseIcon ??= Util.LoadResource<Texture2D>("close.png");
+            if (GUI.Button(closeButton, cacheInfo.CloseIcon, GetButtonStyle(cacheInfo)))
             {
                 cacheInfo.Expanded = false;
             }

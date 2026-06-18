@@ -104,13 +104,13 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
             if (property.propertyType != SerializedPropertyType.String &&
                 property.propertyType != SerializedPropertyType.Integer)
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 
             if (cache.Error != "")
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

@@ -20,17 +20,12 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
         {
             CachedValue = newValue;
 
-            (string _, IEnumerable<AddressableAssetEntry> entries) = AddressableUtil.GetAllEntries(_addressableAddressAttribute.Group, _addressableAddressAttribute.LabelFilters);
+            (string _, IEnumerable<AddressableAssetEntry> entries) =
+                AddressableUtil.GetAllEntries(_addressableAddressAttribute.Group,
+                    _addressableAddressAttribute.LabelFilters);
             string[] keys = entries.Select(each => each.address).ToArray();
 
-            if (keys.Contains(CachedValue))
-            {
-                Label.text = CachedValue;
-            }
-            else
-            {
-                Label.text = string.IsNullOrEmpty(CachedValue)? "": $"<color=red>?</color> ({CachedValue})";
-            }
+            Label.text = AddressableAddressAttributeDrawer.GetAddressableAddressDisplay(CachedValue, keys, true);
         }
     }
 }

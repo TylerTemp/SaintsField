@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
             InfoIMGUI cache = EnsureKey(property);
             if (property.propertyType != SerializedPropertyType.String)
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 cache.Error = $"Expecting string, got {property.propertyType}";
                 return;
             }

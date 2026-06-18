@@ -53,7 +53,7 @@ namespace SaintsField.Editor.Drawers.LayerDrawer
                 property.propertyType != SerializedPropertyType.String &&
                 property.propertyType != SerializedPropertyType.LayerMask)
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

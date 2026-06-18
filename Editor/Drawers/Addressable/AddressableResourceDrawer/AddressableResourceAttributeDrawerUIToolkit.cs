@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -367,26 +368,28 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableResourceDrawer
                     maxHeight = 100;
                 }
 
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsTreeDropdownUIToolkit(
                     dropdownMetaInfo,
                     labelDown.worldBound.width,
                     maxHeight,
                     true,
-                    (_, curItem) =>
+                    (curItem, isOn) =>
                     {
                         string selectedValue = (string)curItem;
+                        string[] currentData = (string[])labelDown.userData;
                         if (selectedValue == "")
                         {
                             AddressableUtil.OpenLabelEditor();
-                            return;
+                            return currentData.Cast<object>().ToArray();
                         }
 
-                        string[] newData = Array.IndexOf(curValues, selectedValue) == -1
-                            ? curValues.Append(selectedValue).ToArray()
-                            : curValues.Where(each => each != selectedValue).ToArray();
+                        string[] newData = isOn
+                            ? currentData.Append(selectedValue).Distinct().ToArray()
+                            : currentData.Where(each => each != selectedValue).ToArray();
 
                         labelDown.userData = newData;
                         labelDown.ButtonLabelElement.text = newData.Length == 0 ? "" : string.Join(",", newData);
+                        return newData.Cast<object>().ToArray();
                     }
                 ));
             };

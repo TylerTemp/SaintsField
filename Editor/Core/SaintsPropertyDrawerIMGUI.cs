@@ -1192,6 +1192,20 @@ namespace SaintsField.Editor.Core
 //             return true;
 //         }
 // #endif
+        protected void RawDefaultDrawer(Rect position, SerializedProperty property,
+            IReadOnlyList<PropertyAttribute> allAttributes, GUIContent label, FieldInfo info)
+        {
+            IMGUIRawDraw.OnGUIRawFallback(
+                position,
+                property,
+                allAttributes,
+                info.FieldType,
+                label,
+                info,
+                InHorizontalLayout,
+                false);
+        }
+
         protected void DefaultDrawer(Rect position, SerializedProperty property, GUIContent label, FieldInfo info)
         {
             // // this works nice

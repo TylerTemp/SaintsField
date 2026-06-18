@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Drawers.DateTimeDrawer
             SerializedProperty ticksProperty = TryGetTicksProperty(property);
             if (ticksProperty == null)
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

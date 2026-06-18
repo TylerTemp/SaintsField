@@ -140,7 +140,7 @@ namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer
 
             if (cache.Error != "")
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

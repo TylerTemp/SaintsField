@@ -94,7 +94,7 @@ namespace SaintsField.Editor.Drawers.SortingLayerDrawer
             if (property.propertyType != SerializedPropertyType.Integer &&
                 property.propertyType != SerializedPropertyType.String)
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

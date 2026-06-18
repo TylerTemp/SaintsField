@@ -1,8 +1,7 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using I2.Loc;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
@@ -24,7 +23,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
         {
             Button selectorButton = new Button
             {
-                // text = "â—?,
+                // text = "ï¿½?,
                 style =
                 {
                     backgroundImage = Util.LoadResource<Texture2D>("classic-dropdown.png"),
@@ -85,10 +84,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 
             selectorButton.clickable.clicked += () =>
             {
-                string curValue = property.propertyType == SerializedPropertyType.String
-                    ? property.stringValue
-                    : property.FindPropertyRelative("mTerm").stringValue;
-                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(curValue, false);
+                AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(GetCurrentValue(property), false);
 
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(objectField.worldBound);
 
@@ -99,30 +95,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                     false,
                     (curItem, _) =>
                     {
-                        string newValue = (string)curItem;
-                        SetValue(property, newValue);
-                        property.serializedObject.ApplyModifiedProperties();
-                        if(property.propertyType == SerializedPropertyType.String)
-                        {
-                            onValueChangedCallback.Invoke(newValue);
-                            return null;
-                        }
-
-                        object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
-                        if (noCacheParent == null)
-                        {
-                            Debug.LogWarning("Property disposed unexpectedly, skip onChange callback.");
-                            return null;
-                        }
-
-                        (string error, int _, object reflectedValue) = Util.GetValue(property, info, noCacheParent);
-                        if (error != "")
-                        {
-                            Debug.LogError(error);
-                            return null;
-                        }
-
-                        onValueChangedCallback.Invoke(reflectedValue);
+                        ApplySelection(property, info, (string)curItem, onValueChangedCallback);
                         return null;
                     }
                 ));

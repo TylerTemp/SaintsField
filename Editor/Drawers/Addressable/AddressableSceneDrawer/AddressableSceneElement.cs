@@ -1,4 +1,4 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 using System.Collections.Generic;
 using SaintsField.Addressable;
 using SaintsField.Editor.Core;
@@ -46,6 +46,13 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         private void OnSceneFieldChanged(ChangeEvent<Object> evt)
         {
             SceneAsset sceneAsset = (SceneAsset)evt.newValue;
+            if (sceneAsset == null)
+            {
+                ErrorEvent.Invoke(Error = "");
+                SceneFieldDropChanged.Invoke("");
+                return;
+            }
+
             (string error, IEnumerable<AddressableAssetEntry> assetGroups) = AddressableUtil.GetAllEntries(_addressableSceneAttribute.Group, _addressableSceneAttribute.LabelFilters);
             if (error != "")
             {
@@ -74,6 +81,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
             if (string.IsNullOrEmpty(newValue))
             {
+                _sceneField.SetValueWithoutNotify(null);
                 ErrorEvent.Invoke(Error = "");
                 return;
             }
@@ -84,7 +92,6 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             {
                 if (assetEntry.address == newValue)
                 {
-                    Debug.Log($"{assetEntry.MainAsset}");
                     _sceneField.SetValueWithoutNotify(assetEntry.MainAsset);
                     ErrorEvent.Invoke(Error = "");
                     return;

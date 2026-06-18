@@ -29,6 +29,39 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
     [CustomPropertyDrawer(typeof(FindComponentAttribute), true)]
     public partial class GetByXPathAttributeDrawer: SaintsPropertyDrawer
     {
+        public class PropertyCache
+        {
+            public string Error;
+            public bool MisMatch;
+            public object OriginalValue;
+            public object TargetValue;
+            public bool TargetIsNull;
+
+            public MemberInfo MemberInfo;
+            public object Parent;
+            public SerializedProperty SerializedProperty;
+        }
+
+        public class GetByXPathGenericCache
+        {
+            public double UpdateResourceAfterTime;
+            public string Error;
+
+            public object Parent;
+            public Type ExpectedType;
+            public Type ExpectedInterface;
+
+            public IReadOnlyList<GetByXPathAttribute> GetByXPathAttributes;
+            public IReadOnlyList<object> CachedResults;
+
+            public SerializedProperty ArrayProperty;
+
+            public readonly Dictionary<int, PropertyCache> IndexToPropertyCache = new Dictionary<int, PropertyCache>();
+        }
+
+        public static readonly Dictionary<string, GetByXPathGenericCache> SharedCache =
+            new Dictionary<string, GetByXPathGenericCache>();
+
         private static (bool hasRoot, GameObject prefabRoot) GetPrefabRoot()
         {
 #if UNITY_2021_3_OR_NEWER

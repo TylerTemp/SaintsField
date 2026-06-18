@@ -6,6 +6,7 @@ using SaintsField.Addressable;
 using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
@@ -53,6 +54,10 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                 return (AddressableUtil.ErrorNoSettings, null);
             }
             SceneAsset sceneAsset = (SceneAsset)newObj;
+            if (sceneAsset == null)
+            {
+                return ("", null);
+            }
 
             (string error, IEnumerable<AddressableAssetEntry> assetGroups) = AddressableUtil.GetAllEntries(addressableSceneAttribute.Group, addressableSceneAttribute.LabelFilters);
             if (error != "")
@@ -62,6 +67,16 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
 
             AddressableAssetEntry assetEntry = assetGroups.FirstOrDefault(each => ReferenceEquals(each.MainAsset, sceneAsset));
             return assetEntry == null ? ($"Scene `{sceneAsset.name}` is not in target Addressable group.", null) : ("", assetEntry);
+        }
+
+        private static bool ApplyAddressableSceneSelection(SerializedProperty property, FieldInfo info,
+            object parent, string newValue, Action<string> onValueChanged)
+        {
+            property.stringValue = newValue;
+            ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newValue);
+            property.serializedObject.ApplyModifiedProperties();
+            onValueChanged?.Invoke(newValue);
+            return true;
         }
 
         private static AdvancedDropdownMetaInfo GetMetaInfo(string key, IEnumerable<AddressableAssetEntry> assetEntries, bool sepAsSub, bool isImGui)

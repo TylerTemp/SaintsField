@@ -5,173 +5,113 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
 {
     public partial class GetByXPathAttributeDrawer
     {
-        private Texture2D _refreshIcon;
-        private Texture2D _removeIcon;
-
-        public class PropertyCache
+        private sealed class GetByXPathStatusIMGUI
         {
-            public string Error;
-            public bool MisMatch;
-            public object OriginalValue;
-            public object TargetValue;
-            public bool TargetIsNull;
-
-            public MemberInfo MemberInfo;
-            public object Parent;
-            public SerializedProperty SerializedProperty;
+            public UnityAction ProjectChangedHandler;
         }
 
-        public class GetByXPathGenericCache
+        private static readonly Dictionary<string, GetByXPathStatusIMGUI> InfoCacheIMGUI =
+            new Dictionary<string, GetByXPathStatusIMGUI>();
+
+        private static GUIStyle _imageButtonStyle;
+        private static Texture2D _refreshIcon;
+        private static Texture2D _removeIcon;
+        private static Texture2D _pickerIcon;
+        private static GUIContent _refreshContent;
+        private static GUIContent _removeContent;
+        private static GUIContent _pickerContent;
+
+        private static GUIStyle ImageButtonStyle => _imageButtonStyle ??= new GUIStyle(GUI.skin.button)
         {
-            // public int ImGuiRenderCount;  // IMGUI fix
-            // public double ImGuiResourcesLastTime;  // IMGUI fix
+            padding = new RectOffset(2, 2, 2, 2),
+            imagePosition = ImagePosition.ImageOnly,
+            alignment = TextAnchor.MiddleCenter,
+        };
 
-            public double UpdateResourceAfterTime;
-
-            // public double UpdatedLastTime;
-            public string Error;
-
-            // public Texture2D RefreshIcon;
-            // public Texture2D RemoveIcon;
-            public object Parent;
-            public Type ExpectedType;
-            public Type ExpectedInterface;
-
-            public IReadOnlyList<GetByXPathAttribute> GetByXPathAttributes;
-            public IReadOnlyList<object> CachedResults;
-
-            public SerializedProperty ArrayProperty;
-            // public bool IsArray;
-
-            public readonly Dictionary<int, PropertyCache> IndexToPropertyCache = new Dictionary<int, PropertyCache>();
+        private static GUIContent RefreshContent
+        {
+            get
+            {
+                _refreshIcon ??= Util.LoadResource<Texture2D>("refresh.png");
+                return _refreshContent ??= new GUIContent(_refreshIcon, "Sign XPath value");
+            }
         }
 
-        public static readonly Dictionary<string, GetByXPathGenericCache> SharedCache = new Dictionary<string, GetByXPathGenericCache>();
+        private static GUIContent RemoveContent
+        {
+            get
+            {
+                _removeIcon ??= Util.LoadResource<Texture2D>("close.png");
+                return _removeContent ??= new GUIContent(_removeIcon, "Sign null");
+            }
+        }
 
-        // private static readonly Dictionary<UnityEngine.Object, HashSet<string>> InspectingTargets = new Dictionary<UnityEngine.Object, HashSet<string>>();
+        private static GUIContent PickerContent
+        {
+            get
+            {
+                _pickerIcon ??= EditorGUIUtility.IconContent("d_pick_uielements").image as Texture2D;
+                return _pickerContent ??= new GUIContent(_pickerIcon, "Select");
+            }
+        }
 
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            // return 0;
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            if (EditorApplication.isPlayingOrWillChangePlaymode ||
+                !(saintsAttribute is GetByXPathAttribute getByXPathAttribute))
             {
                 return 0;
             }
 
-            string arrayRemovedKey;
-
-            try
-            {
-                arrayRemovedKey = SerializedUtils.GetUniqueIdArray(property);
-            }
-#pragma warning disable CS0168
-            catch (ObjectDisposedException e)
-#pragma warning restore CS0168
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogException(e);
-#endif
-
-                return 0;
-            }
-#pragma warning disable CS0168
-            catch (NullReferenceException e)
-#pragma warning restore CS0168
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.LogException(e);
-#endif
-
-                return 0;
-            }
-
-//             UnityEngine.Object curInspectingTarget = property.serializedObject.targetObject;
-//             if (!InspectingTargets.TryGetValue(curInspectingTarget, out HashSet<string> keySet))
-//             {
-//                 InspectingTargets[curInspectingTarget] = keySet = new HashSet<string>();
-//
-//                 void OnSelectionChangedIMGUI()
-//                 {
-//                     bool stillSelected = Array.IndexOf(Selection.objects, curInspectingTarget) != -1;
-//                     // Debug.Log($"{stillSelected}/{string.Join(", ", Selection.objects.Cast<Object>())}");
-//                     if (stillSelected)
-//                     {
-//                         return;
-//                     }
-//
-//                     Selection.selectionChanged -= OnSelectionChangedIMGUI;
-//                     if (InspectingTargets.TryGetValue(curInspectingTarget, out HashSet<string> set))
-//                     {
-//                         foreach (string removeKey in set)
-//                         {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_GET_BY_XPATH
-//                             Debug.Log($"#GetByXPath# CleanUp {removeKey}");
-// #endif
-//                             SharedCache.Remove(removeKey);
-//                         }
-//                     }
-//                     InspectingTargets.Remove(curInspectingTarget);
-//                 }
-//
-//                 Selection.selectionChanged += OnSelectionChangedIMGUI;
-//             }
-//             keySet.Add(arrayRemovedKey);
-
-            bool configExists = SharedCache.TryGetValue(arrayRemovedKey, out GetByXPathGenericCache genericCache);
-            if (!configExists)
+            float pickerWidth = getByXPathAttribute.UsePickerButton ? SingleLineHeight : 0;
+            if (!TryGetKey(property, out string key))
             {
                 return 0;
             }
 
-            if (!ReferenceEquals(genericCache.GetByXPathAttributes[0], saintsAttribute))
+            if (!SharedCache.TryGetValue(key, out GetByXPathGenericCache genericCache))
+            {
+                return pickerWidth;
+            }
+
+            if (!IsFirstAttribute(genericCache, saintsAttribute))
             {
                 return 0;
             }
 
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            if(!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
+            if (NothingSigner(getByXPathAttribute))
             {
-                return 0;
-            }
-            // update information for this property
-            GetByXPathAttribute firstAttribute = genericCache.GetByXPathAttributes[0];
-
-            if (NothingSigner(genericCache.GetByXPathAttributes[0]))
-            {
-                return firstAttribute.UsePickerButton ? SingleLineHeight : 0;
+                return pickerWidth;
             }
 
-            float useWidth = firstAttribute.UsePickerButton ? SingleLineHeight : 0;
             if (genericCache.Error != "")
             {
-                return useWidth;
+                return pickerWidth;
             }
 
-            if (propertyCache.Error != "")
+            if (!TryGetPropertyIndex(property, out int propertyIndex) ||
+                !genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
             {
-                return useWidth;
+                return pickerWidth;
             }
 
-            if (!propertyCache.MisMatch)
+            if (propertyCache.Error != "" || !propertyCache.MisMatch || !getByXPathAttribute.UseResignButton)
             {
-                return useWidth;
+                return pickerWidth;
             }
 
-            if (!firstAttribute.UseResignButton)
-            {
-                return useWidth;
-            }
-
-            return useWidth + SingleLineHeight;
+            return pickerWidth + SingleLineHeight;
         }
 
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
@@ -186,22 +126,116 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return false;
             }
 
-            string key;
-            try
-            {
-                key = SerializedUtils.GetUniqueIdArray(property);
-            }
-            catch (ObjectDisposedException)
-            {
-                return false;
-            }
-            catch (NullReferenceException)
+            (string keyError, bool cacheCreated, GetByXPathGenericCache genericCache) =
+                EnsureKey(property, allAttributes);
+            if (keyError != "" || genericCache == null)
             {
                 return false;
             }
 
-            bool configExists = SharedCache.TryGetValue(key, out GetByXPathGenericCache genericCache);
-            if (!configExists)
+            if (!IsFirstAttribute(genericCache, saintsAttribute))
+            {
+                return false;
+            }
+
+            if (!TryGetPropertyIndex(property, out int propertyIndex))
+            {
+                return false;
+            }
+
+            bool needsRefresh = cacheCreated ||
+                                !genericCache.IndexToPropertyCache.ContainsKey(propertyIndex) ||
+                                genericCache.UpdateResourceAfterTime > EditorApplication.timeSinceStartup;
+            if (needsRefresh)
+            {
+                RefreshSharedCache(genericCache, property, info, cacheCreated);
+            }
+
+            if (genericCache.Error != "" ||
+                !genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache) ||
+                propertyCache.Error != "")
+            {
+                return false;
+            }
+
+            GetByXPathAttribute firstAttr = genericCache.GetByXPathAttributes[0];
+            Rect pickerRect = position;
+            bool willDraw = false;
+
+            if (!NothingSigner(firstAttr) && propertyCache.MisMatch && firstAttr.UseResignButton)
+            {
+                willDraw = true;
+                (Rect actionButtonRect, Rect remainingRect) = RectUtils.SplitWidthRect(position, SingleLineHeight);
+                pickerRect = remainingRect;
+                if (GUI.Button(actionButtonRect,
+                        propertyCache.TargetIsNull ? RemoveContent : RefreshContent,
+                        ImageButtonStyle))
+                {
+                    SignPropertyAndNotify(property, propertyCache);
+                }
+            }
+
+            if (DrawPicker(firstAttr, genericCache, pickerRect, property, propertyCache, info))
+            {
+                willDraw = true;
+            }
+
+            return willDraw;
+        }
+
+        private static bool TryGetKey(SerializedProperty property, out string key)
+        {
+            try
+            {
+                key = SerializedUtils.GetUniqueIdArray(property);
+                return true;
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (NullReferenceException)
+            {
+            }
+
+            key = "";
+            return false;
+        }
+
+        private static bool TryGetPropertyIndex(SerializedProperty property, out int propertyIndex)
+        {
+            try
+            {
+                propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
+                return true;
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (NullReferenceException)
+            {
+            }
+
+            propertyIndex = -1;
+            return false;
+        }
+
+        private static bool IsFirstAttribute(GetByXPathGenericCache cache, ISaintsAttribute saintsAttribute)
+        {
+            return cache.GetByXPathAttributes != null &&
+                   cache.GetByXPathAttributes.Count > 0 &&
+                   ReferenceEquals(cache.GetByXPathAttributes[0], saintsAttribute);
+        }
+
+        private static (string error, bool created, GetByXPathGenericCache cache) EnsureKey(
+            SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes)
+        {
+            if (!TryGetKey(property, out string key))
+            {
+                return ("Property is disposed", false, null);
+            }
+
+            bool created = false;
+            if (!SharedCache.TryGetValue(key, out GetByXPathGenericCache genericCache))
             {
                 SharedCache[key] = genericCache = new GetByXPathGenericCache
                 {
@@ -209,187 +243,114 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                     GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray(),
                     UpdateResourceAfterTime = double.MinValue,
                 };
-
-                void ProjectChangedHandler()
-                {
-                    // Debug.Log($"ProjectChangedHandler {key}");
-                    if(SharedCache.TryGetValue(key, out GetByXPathGenericCache cache))
-                    {
-                        double curTime = EditorApplication.timeSinceStartup;
-                        // Debug.Log($"update {key} {curTime} {cache.UpdateResourceAfterTime}");
-                        if (cache.UpdateResourceAfterTime <= curTime)
-                        {
-                            // update resources after 0.5s
-                            cache.UpdateResourceAfterTime = EditorApplication.timeSinceStartup + 0.5;
-                            // Debug.Log($"Update in {cache.UpdateResourceAfterTime}");
-                        }
-
-                    }
-                }
-
-                SaintsEditorApplicationChanged.OnAnyEvent.AddListener(ProjectChangedHandler);
-
-                NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
-                {
-                    // Debug.Log($"remove key watch {key}");
-                    SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(ProjectChangedHandler);
-                    SharedCache.Remove(key);
-                });
+                created = true;
             }
-
-            if (genericCache.Error != "")
+            else if (genericCache.GetByXPathAttributes == null || genericCache.GetByXPathAttributes.Count == 0)
             {
-#if SAINTSFIELD_DEBUG
-                Debug.Log(genericCache.Error);
-#endif
-                return false;
+                genericCache.GetByXPathAttributes = allAttributes.OfType<GetByXPathAttribute>().ToArray();
             }
 
-            if (!genericCache.GetByXPathAttributes[0].Equals(saintsAttribute))
-            {
-                // Debug.Log($"{genericCache.GetByXPathAttributes[0]}/{saintsAttribute}");
-                // Debug.Log("return");
-                return false;
-            }
-
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-
-            if (NothingSigner(genericCache.GetByXPathAttributes[0]))
-            {
-                // Debug.Log("return");
-                return DrawPicker(genericCache.GetByXPathAttributes[0], genericCache, position, property,
-                    genericCache.IndexToPropertyCache[propertyIndex], info);
-            }
-
-            // if (genericCache.UpdateResourceAfterTime > 0)
-            // {
-            //     Debug.Log($"{genericCache.UpdateResourceAfterTime} {EditorApplication.timeSinceStartup}");
-            // }
-
-            if(!configExists || !genericCache.IndexToPropertyCache.ContainsKey(propertyIndex) || genericCache.UpdateResourceAfterTime > EditorApplication.timeSinceStartup)
-            {
-                UpdateSharedCacheBase(genericCache, property, info);
-                genericCache.UpdateResourceAfterTime = double.MinValue;
-                UpdateSharedCacheSource(genericCache, property, info);
-                UpdateSharedCacheSetValue(genericCache, !configExists, property);
-            }
-
-            if(!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
-            {
-                return false;
-            }
-
-            if (propertyCache.Error != "")
-            {
-                return false;
-            }
-
-            if (!configExists)
-            {
-                return false;
-            }
-
-            Rect leftRect = position;
-            bool willDraw = false;
-
-            GetByXPathAttribute firstAttr = genericCache.GetByXPathAttributes[0];
-            if (propertyCache.MisMatch && firstAttr.UseResignButton)
-            {
-                willDraw = true;
-                (Rect actionButtonRect, Rect lRect) = RectUtils.SplitWidthRect(position, SingleLineHeight);
-                leftRect = lRect;
-                if (propertyCache.TargetIsNull)
-                {
-                    if (_removeIcon == null)
-                    {
-                        _removeIcon = Util.LoadResource<Texture2D>("close.png");
-                    }
-
-                    if (GUI.Button(actionButtonRect, _removeIcon))
-                    {
-                        if(DoSignPropertyCache(propertyCache, false))
-                        {
-                            propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                            TriggerChangedIMGUI(property, propertyCache.TargetValue);
-                        }
-                    }
-                }
-                else
-                {
-                    if (_refreshIcon == null)
-                    {
-                        _refreshIcon = Util.LoadResource<Texture2D>("refresh.png");
-                    }
-
-                    if (GUI.Button(actionButtonRect, _refreshIcon))
-                    {
-                        if(DoSignPropertyCache(propertyCache, false))
-                        {
-                            propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                            TriggerChangedIMGUI(property, null);
-                        }
-                    }
-                }
-            }
-
-            // ReSharper disable once InvertIf
-            if (firstAttr.UsePickerButton)
-            {
-                willDraw = true;
-                if (GUI.Button(leftRect, "●"))
-                {
-                    OpenPicker(property, info, genericCache.GetByXPathAttributes,
-                        genericCache.ExpectedType, genericCache.ExpectedInterface,
-                        newValue =>
-                        {
-                            object oldValue = propertyCache.TargetValue;
-                            propertyCache.TargetValue = newValue;
-                            if(DoSignPropertyCache(propertyCache, false))
-                            {
-                                propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                                TriggerChangedIMGUI(property, newValue);
-                            }
-                            else
-                            {
-                                propertyCache.TargetValue = oldValue;
-                            }
-                        }, propertyCache.Parent);
-                }
-            }
-
-            return willDraw;
+            EnsureWatcher(property, key);
+            return ("", created, genericCache);
         }
 
-        private bool DrawPicker(GetByXPathAttribute firstAttr, GetByXPathGenericCache genericCache, Rect leftRect, SerializedProperty property,
-            PropertyCache propertyCache, FieldInfo info)
+        private static void EnsureWatcher(SerializedProperty property, string key)
+        {
+            if (InfoCacheIMGUI.ContainsKey(key))
+            {
+                return;
+            }
+
+            GetByXPathStatusIMGUI status = new GetByXPathStatusIMGUI();
+            void ProjectChangedHandler()
+            {
+                if (!SharedCache.TryGetValue(key, out GetByXPathGenericCache cache))
+                {
+                    return;
+                }
+
+                double curTime = EditorApplication.timeSinceStartup;
+                if (cache.UpdateResourceAfterTime <= curTime)
+                {
+                    cache.UpdateResourceAfterTime = EditorApplication.timeSinceStartup + 0.5;
+                }
+            }
+
+            status.ProjectChangedHandler = ProjectChangedHandler;
+            InfoCacheIMGUI[key] = status;
+            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(ProjectChangedHandler);
+
+            NoLongerInspectingWatch(property.serializedObject.targetObject, $"{key}__GetByXPath_IMGUI", () =>
+            {
+                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(status.ProjectChangedHandler);
+                InfoCacheIMGUI.Remove(key);
+                SharedCache.Remove(key);
+            });
+        }
+
+        private void RefreshSharedCache(GetByXPathGenericCache genericCache, SerializedProperty property,
+            FieldInfo info, bool isFirstTime)
+        {
+            UpdateSharedCacheBase(genericCache, property, info);
+            genericCache.UpdateResourceAfterTime = double.MinValue;
+            if (genericCache.Error != "")
+            {
+                return;
+            }
+
+            UpdateSharedCacheSource(genericCache, property, info);
+            UpdateSharedCacheSetValue(genericCache, isFirstTime, property);
+        }
+
+        private bool DrawPicker(GetByXPathAttribute firstAttr, GetByXPathGenericCache genericCache, Rect position,
+            SerializedProperty property, PropertyCache propertyCache, FieldInfo info)
         {
             if (!firstAttr.UsePickerButton)
             {
                 return false;
             }
 
-            if (GUI.Button(leftRect, "●"))
+            if (GUI.Button(position, PickerContent, ImageButtonStyle))
             {
                 OpenPicker(property, info, genericCache.GetByXPathAttributes,
                     genericCache.ExpectedType, genericCache.ExpectedInterface,
-                    newValue =>
-                    {
-                        object oldValue = propertyCache.TargetValue;
-                        propertyCache.TargetValue = newValue;
-                        if(DoSignPropertyCache(propertyCache, false))
-                        {
-                            propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
-                            TriggerChangedIMGUI(property, newValue);
-                        }
-                        else
-                        {
-                            propertyCache.TargetValue = oldValue;
-                        }
-                    }, propertyCache.Parent);
+                    newValue => SignPickedValue(property, propertyCache, newValue),
+                    propertyCache.Parent);
             }
 
             return true;
+        }
 
+        private void SignPickedValue(SerializedProperty property, PropertyCache propertyCache, object newValue)
+        {
+            object oldValue = propertyCache.TargetValue;
+            if (Util.GetIsEqual(oldValue, newValue))
+            {
+                return;
+            }
+
+            propertyCache.TargetValue = newValue;
+            propertyCache.TargetIsNull = RuntimeUtil.IsNull(newValue);
+            if (DoSignPropertyCache(propertyCache, false))
+            {
+                propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+                TriggerChangedIMGUI(property, newValue);
+                return;
+            }
+
+            propertyCache.TargetValue = oldValue;
+            propertyCache.TargetIsNull = RuntimeUtil.IsNull(oldValue);
+        }
+
+        private void SignPropertyAndNotify(SerializedProperty property, PropertyCache propertyCache)
+        {
+            if (!DoSignPropertyCache(propertyCache, false))
+            {
+                return;
+            }
+
+            propertyCache.SerializedProperty.serializedObject.ApplyModifiedProperties();
+            TriggerChangedIMGUI(property, propertyCache.TargetValue);
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
@@ -434,21 +395,8 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return "";
             }
 
-            string key;
-            try
-            {
-                key = SerializedUtils.GetUniqueIdArray(property);
-            }
-            catch (ObjectDisposedException)
-            {
-                return "";
-            }
-            catch (NullReferenceException)
-            {
-                return "";
-            }
-
-            if(!SharedCache.TryGetValue(key, out GetByXPathGenericCache genericCache))
+            if (!TryGetKey(property, out string key) ||
+                !SharedCache.TryGetValue(key, out GetByXPathGenericCache genericCache))
             {
                 return "";
             }
@@ -458,13 +406,9 @@ namespace SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer
                 return genericCache.Error;
             }
 
-            if (!ReferenceEquals(genericCache.GetByXPathAttributes[0], saintsAttribute))
-            {
-                return "";
-            }
-
-            int propertyIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            if(!genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
+            if (!IsFirstAttribute(genericCache, saintsAttribute) ||
+                !TryGetPropertyIndex(property, out int propertyIndex) ||
+                !genericCache.IndexToPropertyCache.TryGetValue(propertyIndex, out PropertyCache propertyCache))
             {
                 return "";
             }

@@ -3,11 +3,11 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Addressable;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.AddressableAssets.Settings;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -18,32 +18,42 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
         private class InfoIMGUI
         {
             public string Error = "";
-
-            public bool Changed;
-            public string ChangedValue;
+            public Texture2D DropdownIconGray;
+            public GUIStyle ButtonStyle;
         }
 
-        private static readonly Dictionary<string, InfoIMGUI> InfoCacheImGui = new Dictionary<string, InfoIMGUI>();
+        private static readonly Dictionary<string, InfoIMGUI> InfoCacheIMGUI = new Dictionary<string, InfoIMGUI>();
 
-        private static InfoIMGUI EnsureInfo(SerializedProperty property, string key)
+        private static InfoIMGUI EnsureKey(SerializedProperty property)
         {
-            if (InfoCacheImGui.TryGetValue(key, out InfoIMGUI ensureInfo))
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out InfoIMGUI ensureInfo))
             {
                 return ensureInfo;
             }
 
-            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () =>
-            {
-                InfoCacheImGui.Remove(key);
-            });
+            InfoCacheIMGUI[key] = ensureInfo = new InfoIMGUI();
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
+            return ensureInfo;
+        }
 
-            return InfoCacheImGui[key] = new InfoIMGUI();
+        private static (string error, AddressableAssetEntry sceneEntry) UpdateStatus(
+            SerializedProperty property, AddressableSceneAttribute addressableSceneAttribute, out InfoIMGUI cache)
+        {
+            cache = EnsureKey(property);
+            (string error, AddressableAssetEntry sceneEntry) = GetSceneEntry(property.stringValue, addressableSceneAttribute);
+            cache.Error = error;
+            return (error, sceneEntry);
         }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
             int index,
-            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent) => EditorGUIUtility.singleLineHeight;
+            ISaintsAttribute saintsAttribute, FieldInfo info, bool hasLabelWidth, object parent)
+        {
+            UpdateStatus(property, (AddressableSceneAttribute)saintsAttribute, out _);
+            return SingleLineHeight;
+        }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             int index,
@@ -51,23 +61,14 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             FieldInfo info, object parent)
         {
             AddressableSceneAttribute addressableSceneAttribute = (AddressableSceneAttribute)saintsAttribute;
-            (string error, AddressableAssetEntry sceneEntry) = GetSceneEntry(property.stringValue, addressableSceneAttribute);
-            InfoIMGUI cachedInfo = EnsureInfo(property, SerializedUtils.GetUniqueId(property));
-            if (cachedInfo.Changed)
-            {
-                TriggerChangedIMGUI(property, cachedInfo.ChangedValue);
-                cachedInfo.Changed = false;
-            }
-
-            if (error != "")
-            {
-                cachedInfo.Error = error;
-            }
+            (string _, AddressableAssetEntry sceneEntry) =
+                UpdateStatus(property, addressableSceneAttribute, out InfoIMGUI cachedInfo);
 
             // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                Object newObj = EditorGUI.ObjectField(position, label, sceneEntry.MainAsset as SceneAsset, typeof(SceneAsset), false);
+                Object newObj = EditorGUI.ObjectField(position, label, sceneEntry?.MainAsset as SceneAsset,
+                    typeof(SceneAsset), false);
                 // ReSharper disable once InvertIf
                 if (changed.changed)
                 {
@@ -79,8 +80,9 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                     else
                     {
                         cachedInfo.Error = "";
-                        property.stringValue = newSceneEntry.address;
-                        TriggerChangedIMGUI(property, newSceneEntry.address);
+                        string newValue = newSceneEntry?.address ?? "";
+                        ApplyAddressableSceneSelection(property, info, parent, newValue,
+                            changedValue => TriggerChangedIMGUI(property, changedValue));
                     }
                 }
             }
@@ -92,41 +94,22 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             return SingleLineHeight;
         }
 
-        private static Texture2D _dropdownIconGray;
-        private static Texture2D DropdownIconGray {
-            get
-            {
-                if (_dropdownIconGray == null)
-                {
-                    _dropdownIconGray = Util.LoadResource<Texture2D>("classic-dropdown-gray.png");
-                }
-
-                return _dropdownIconGray;
-            }
-        }
-
-        private static GUIStyle _buttonStyle;
-
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
             GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info,
             object parent)
         {
-            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if (_buttonStyle is null)
+            InfoIMGUI cachedInfo = EnsureKey(property);
+            cachedInfo.ButtonStyle ??= new GUIStyle(EditorStyles.miniButton)
             {
-                _buttonStyle = new GUIStyle(EditorStyles.miniButton)
-                {
-                    padding = new RectOffset(2, 2, 2, 2),
-                };
-            }
+                padding = new RectOffset(2, 2, 2, 2),
+            };
+            cachedInfo.DropdownIconGray ??= Util.LoadResource<Texture2D>("classic-dropdown-gray.png");
 
             // ReSharper disable once InvertIf
-            if (GUI.Button(position, DropdownIconGray, _buttonStyle))
+            if (GUI.Button(position, cachedInfo.DropdownIconGray, cachedInfo.ButtonStyle))
             {
                 AddressableSceneAttribute addressableSceneAttribute = (AddressableSceneAttribute)saintsAttribute;
-
-                InfoIMGUI cachedInfo = EnsureInfo(property, SerializedUtils.GetUniqueId(property));
 
                 (string error, IEnumerable<AddressableAssetEntry> assetGroups) = AddressableUtil.GetAllEntries(addressableSceneAttribute.Group, addressableSceneAttribute.LabelFilters);
                 if (error != "")
@@ -136,26 +119,20 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
                 }
 
                 AdvancedDropdownMetaInfo metaInfo = GetMetaInfo(property.stringValue, assetGroups.Where(each => each.MainAsset is SceneAsset), addressableSceneAttribute.SepAsSub, true);
-                Vector2 size = AdvancedDropdownUtil.GetSizeIMGUI(metaInfo.DropdownListValue, fullRect.width);
-                SaintsAdvancedDropdownIMGUI dropdown = new SaintsAdvancedDropdownIMGUI(
-                    metaInfo.DropdownListValue,
-                    size,
-                    fullRect,
-                    new AdvancedDropdownState(),
-                    curItem =>
+                PopupWindow.Show(position, new SaintsTreeDropdownIMGUI(
+                    metaInfo,
+                    Mathf.Max(fullRect.width, 220f),
+                    320f,
+                    false,
+                    (curItem, _) =>
                     {
                         AddressableAssetEntry entry = (AddressableAssetEntry)curItem;
                         string newValue = entry?.address ?? "";
-                        property.stringValue = newValue;
-                        property.serializedObject.ApplyModifiedProperties();
-
                         cachedInfo.Error = "";
-                        cachedInfo.Changed = true;
-                        cachedInfo.ChangedValue = newValue;
-                    },
-                    _ => null);
-                dropdown.Show(position);
-                dropdown.BindWindowPosition();
+                        ApplyAddressableSceneSelection(property, info, parent, newValue,
+                            changedValue => TriggerChangedIMGUI(property, changedValue));
+                        return null;
+                    }));
 
             }
             return true;
@@ -165,15 +142,15 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute, int index, FieldInfo info,
             object parent)
         {
-            InfoIMGUI cachedInfo = EnsureInfo(property, SerializedUtils.GetUniqueId(property));
-            return cachedInfo.Error != "";
+            AddressableSceneAttribute addressableSceneAttribute = (AddressableSceneAttribute)saintsAttribute;
+            return UpdateStatus(property, addressableSceneAttribute, out _).error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes, ISaintsAttribute saintsAttribute,
             int index, FieldInfo info, object parent)
         {
-            InfoIMGUI cachedInfo = EnsureInfo(property, SerializedUtils.GetUniqueId(property));
+            InfoIMGUI cachedInfo = EnsureKey(property);
             return cachedInfo.Error == "" ? 0 : ImGuiHelpBox.GetHeight(cachedInfo.Error, width, MessageType.Error);
         }
 
@@ -181,7 +158,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableSceneDrawer
             ISaintsAttribute saintsAttribute,
             int index, IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
         {
-            InfoIMGUI cachedInfo = EnsureInfo(property, SerializedUtils.GetUniqueId(property));
+            InfoIMGUI cachedInfo = EnsureKey(property);
             return cachedInfo.Error == ""
                 ? position
                 : ImGuiHelpBox.Draw(position, cachedInfo.Error, MessageType.Error);

@@ -332,8 +332,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeReference:
-    _typeNameAndAssembly: 
-    _monoScriptGuid: 
+    _typeNameAndAssembly: SaintsField.Samples.Scripts.AnimSubStateMachineExample,
+      SaintsField.Samples
+    _monoScriptGuid: 1b27e5bf5a78bf440aecf873429a7d1a
   typeReference2:
     _typeNameAndAssembly: 
     _monoScriptGuid: 
@@ -341,7 +342,8 @@ MonoBehaviour:
     _typeNameAndAssembly: 
     _monoScriptGuid: 
   typeReferenceOf:
-    _typeNameAndAssembly: 
+    _typeNameAndAssembly: SaintsField.Samples.Scripts.TypeReferenceExamples.TypeReferenceSimple+MyTypeStruct,
+      SaintsField.Samples
     _monoScriptGuid: 
 --- !u!1 &17333201
 GameObject:
@@ -544,6 +546,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5afe7bad4e2fc54da011f2631b9e6e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkAudioListener
+  isDefaultListener: 1
+  bOverrideScalingFactor: 0
+  scalingFactor: -1
+  listenerId: 0
 --- !u!114 &29054852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -556,6 +562,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa955cffcc8f37f4bb626f60ca9f8a30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 1
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!114 &29054853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12822,7 +12840,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SaintsField.Samples::SaintsField.I2PickerExample
   ls1:
-    mTerm: 
+    mTerm: ' '
     mRTL_IgnoreArabicFix: 0
     mRTL_MaxLineLength: 0
     mRTL_ConvertNumbers: 0
@@ -25857,7 +25875,7 @@ MonoBehaviour:
         intValues: 
         V: {fileID: 0}
         VRef:
-          rid: 3614753745556471929
+          rid: 7000927378469814363
         IsVRef: 1
       valueArray: []
       valueList: []
@@ -25874,7 +25892,7 @@ MonoBehaviour:
       data:
         common: 0
         structString: 
-    - rid: 3614753745556471929
+    - rid: 7000927378469814363
       type: {class: SaintsDictReference/Sub1, ns: SaintsField.Samples.Scripts.SaintsDictExamples, asm: SaintsField.Samples}
       data:
         absC: 

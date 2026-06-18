@@ -80,7 +80,7 @@ namespace SaintsField.Editor.Drawers.SceneDrawer
                     break;
                 default:
                     cache.Error = $"{property.name} must be an int or a string, get {property.propertyType}";
-                    DefaultDrawer(position, property, label, info);
+                    RawDefaultDrawer(position, property, allAttributes, label, info);
                     break;
             }
         }

@@ -56,7 +56,7 @@ namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
             {
                 Debug.LogException(e);
                 cache.Error = e.Message;
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

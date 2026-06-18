@@ -122,37 +122,6 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
 
         private static readonly Dictionary<Guid, WwiseBasicInfo> GuidToPath = new Dictionary<Guid, WwiseBasicInfo>();
 
- #if !SAINTSFIELD_UI_TOOLKIT_DISABLE
-        protected override SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo MakeObjectBaseInfo(UnityEngine.Object objResult,
-            string assetPath)
-        {
-            if (objResult is WwiseObjectReference wwiseObjectReference)
-            {
-                string path = "";
-                string type = "";
-                // ReSharper disable once InvertIf
-                if (GuidToPath.TryGetValue(wwiseObjectReference.Guid, out WwiseBasicInfo value))
-                {
-                    path = string.Join("/", value.BasicPathSegments);
-                    type = value.WwiseObjectType.ToString();
-                }
-                return new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
-                    wwiseObjectReference,
-                    wwiseObjectReference.ObjectName,
-                    type,
-                    path
-                );
-            }
-
-            if (!objResult)
-            {
-                return SaintsObjectPickerWindowUIToolkit.NoneObjectInfo;
-            }
-
-            throw new ArgumentException($"Unsupported args {objResult}", nameof(objResult));
-        }
- #endif
-
         private static (bool hasResults, IEnumerable<WwiseObjectReference> results) GetMatchedWwiseObject(WwiseObjectType wwiseObjectType, IReadOnlyList<WwiseBasicInfo> akInfos, IReadOnlyList<XPathStep> xPathSteps)
         {
             // List<Processing> allInfoFlatten =

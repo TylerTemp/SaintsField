@@ -51,7 +51,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             if (metaInfo.Error != "")
             {
                 cacheInfo.Error = metaInfo.Error;
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 
@@ -66,7 +66,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 if (curValueInfo.error != "")
                 {
                     metaInfo.Error = curValueInfo.error;
-                    DefaultDrawer(position, property, label, info);
+                    RawDefaultDrawer(position, property, allAttributes, label, info);
                     return;
                 }
                 float curValue = (float)curValueInfo.value;
@@ -77,7 +77,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 if (minValueInfo.error != "")
                 {
                     metaInfo.Error = minValueInfo.error;
-                    DefaultDrawer(position, property, label, info);
+                    RawDefaultDrawer(position, property, allAttributes, label, info);
                     return;
                 }
                 float minValue = (float)minValueInfo.value;
@@ -86,7 +86,7 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 if (maxValueInfo.error != "")
                 {
                     metaInfo.Error = maxValueInfo.error;
-                    DefaultDrawer(position, property, label, info);
+                    RawDefaultDrawer(position, property, allAttributes, label, info);
                     return;
                 }
                 float maxValue = (float)maxValueInfo.value;

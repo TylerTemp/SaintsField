@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Utils;
+using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
@@ -100,6 +101,35 @@ namespace SaintsField.Editor.Drawers.Wwise.GetWwiseDrawer
             }
 
             base.OnAwakeUIToolkit(property, saintsAttribute, index, allAttributes, container, onValueChangedCallback, info, parent);
+        }
+
+        protected override SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo MakeObjectBaseInfo(UnityEngine.Object objResult,
+            string assetPath)
+        {
+            if (objResult is WwiseObjectReference wwiseObjectReference)
+            {
+                string path = "";
+                string type = "";
+                // ReSharper disable once InvertIf
+                if (GuidToPath.TryGetValue(wwiseObjectReference.Guid, out WwiseBasicInfo value))
+                {
+                    path = string.Join("/", value.BasicPathSegments);
+                    type = value.WwiseObjectType.ToString();
+                }
+                return new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                    wwiseObjectReference,
+                    wwiseObjectReference.ObjectName,
+                    type,
+                    path
+                );
+            }
+
+            if (!objResult)
+            {
+                return SaintsObjectPickerWindowUIToolkit.NoneObjectInfo;
+            }
+
+            throw new ArgumentException($"Unsupported args {objResult}", nameof(objResult));
         }
     }
 }

@@ -50,7 +50,7 @@ namespace SaintsField.Editor.Drawers.CurveRangeDrawer
             cachedInfo.Error = CheckHasError(property);
             if (cachedInfo.Error != "")
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

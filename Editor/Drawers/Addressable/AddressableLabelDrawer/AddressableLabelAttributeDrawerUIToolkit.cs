@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -57,7 +57,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
 
             if (AddressableAssetSettingsDefaultObject.Settings == null)
             {
-                return new HelpBox($"Addressable Settings not created.", HelpBoxMessageType.Error)
+                return new HelpBox(ErrorAddressableSettingsNotCreated, HelpBoxMessageType.Error)
                 {
                     style =
                     {
@@ -106,71 +106,21 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableLabelDrawer
 
         private static void ShowDropdown(SerializedProperty property, VisualElement root, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-            Dropdown<string> dropdown = new Dropdown<string>();
-
-            string selected = null;
-            if (settings == null)
-            {
-                dropdown.Add("Create Addressable Settings...", null);
-            }
-            else
-            {
-                List<string> labels = settings.GetLabels();
-
-                foreach (string label in labels)
-                {
-                    dropdown.Add(new Dropdown<string>(label, label));
-                    if (property.stringValue == label)
-                    {
-                        selected = label;
-                    }
-                }
-
-                if (labels.Count > 0)
-                {
-                    dropdown.AddSeparator();
-                }
-
-                dropdown.Add("Edit Labels...", null, false, "d_editicon.sml");
-            }
-
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
-            {
-                CurValues = selected is null
-                    ? Array.Empty<object>()
-                    : new object[] { selected },
-                DropdownListValue = dropdown,
-                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
-            };
+            (string _, AddressableLabelDropdownInfo dropdownInfo) =
+                GetAddressableLabelDropdownInfo(property, false);
 
             (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
 
-            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
-                metaInfo,
+            SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
+                dropdownInfo.MetaInfo,
                 root.worldBound.width,
                 maxHeight,
                 false,
-                (_, curItem) =>
+                (curItem, _) =>
                 {
-                    string newValue = (string)curItem;
-                    if (newValue is null)
-                    {
-                        if (settings == null)
-                        {
-                            AddressableAssetSettingsDefaultObject.GetSettings(true);
-                        }
-                        else
-                        {
-                            AddressableUtil.OpenLabelEditor();
-                        }
-                        return;
-                    }
-
-                    property.stringValue = newValue;
-                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newValue);
-                    property.serializedObject.ApplyModifiedProperties();
-                    onValueChangedCallback.Invoke(newValue);
+                    ApplyAddressableLabelSelection(property, info, parent, dropdownInfo.Settings, (string)curItem,
+                        newValue => onValueChangedCallback.Invoke(newValue));
+                    return null;
                 }
             );
 

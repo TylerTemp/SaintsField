@@ -1,28 +1,60 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Addressable;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
-using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
 {
     public partial class AddressableAddressAttributeDrawer
     {
-        private string _error = "";
+        private sealed class AddressableAddressStatusIMGUI
+        {
+            public string Error = "";
+            public AddressableAddressDropdownInfo DropdownInfo;
+        }
+
+        private static readonly Dictionary<string, AddressableAddressStatusIMGUI> InfoCacheIMGUI =
+            new Dictionary<string, AddressableAddressStatusIMGUI>();
+
+        private static AddressableAddressStatusIMGUI EnsureKey(SerializedProperty property)
+        {
+            string key = SerializedUtils.GetUniqueId(property);
+            if (InfoCacheIMGUI.TryGetValue(key, out AddressableAddressStatusIMGUI cache))
+            {
+                return cache;
+            }
+
+            InfoCacheIMGUI[key] = cache = new AddressableAddressStatusIMGUI();
+            NoLongerInspectingWatch(property.serializedObject.targetObject, key, () => InfoCacheIMGUI.Remove(key));
+            return cache;
+        }
+
+        private static (string error, AddressableAddressDropdownInfo dropdownInfo) UpdateStatus(
+            SerializedProperty property, AddressableAddressAttribute addressableAddressAttribute,
+            out AddressableAddressStatusIMGUI cache)
+        {
+            cache = EnsureKey(property);
+            (string error, AddressableAddressDropdownInfo dropdownInfo) =
+                GetAddressableAddressDropdownInfo(property, addressableAddressAttribute, true);
+            cache.Error = error;
+            cache.DropdownInfo = dropdownInfo;
+            return (error, dropdownInfo);
+        }
 
         protected override float GetFieldHeight(SerializedProperty property, GUIContent label,
             float width,
             int index,
             ISaintsAttribute saintsAttribute,
             FieldInfo info,
-            bool hasLabelWidth, object parent) =>
-            EditorGUIUtility.singleLineHeight;
+            bool hasLabelWidth, object parent)
+        {
+            UpdateStatus(property, (AddressableAddressAttribute)saintsAttribute, out _);
+            return SingleLineHeight;
+        }
 
         protected override void DrawField(Rect position, SerializedProperty property, GUIContent label,
             int index1,
@@ -30,47 +62,43 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             FieldInfo info, object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
+            (string _, AddressableAddressDropdownInfo dropdownInfo) =
+                UpdateStatus(property, addressableAddressAttribute, out AddressableAddressStatusIMGUI cache);
 
-            (string error, IEnumerable<AddressableAssetEntry> entries) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
-
-            _error = error;
-            // _targetKeys = keys;
-            if (_error != "")
+            Rect fieldRect = EditorGUI.PrefixLabel(position, label);
+            if (!dropdownInfo.IsString)
             {
-                DefaultDrawer(position, property, label, info);
+                GUI.Label(fieldRect, GUIContent.none);
                 return;
             }
 
-            string[] keys = entries.Select(each => each.address).ToArray();
-
-            int index = Util.ListIndexOfAction(keys, each => each == property.stringValue);
-
-            GUIContent[] contents = keys
-                .Select(each => new GUIContent(each.Replace('/', '\u2215').Replace('&', '＆')))
-                .Concat(new[]
-                {
-                    GUIContent.none,
-                    new GUIContent("Edit Addressable Group..."),
-                })
-                .ToArray();
-
-            // ReSharper disable once ConvertToUsingDeclaration
-            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
+            GUI.SetNextControlName(FieldControlName);
+            string display = GetAddressableAddressDisplay(property.stringValue, dropdownInfo.Addresses, false);
+            if (!EditorGUI.DropdownButton(fieldRect, new GUIContent(display), FocusType.Keyboard))
             {
-                int newIndex = EditorGUI.Popup(position, label, index, contents);
-                // ReSharper disable once InvertIf
-                if (changed.changed)
-                {
-                    if (newIndex < keys.Length)
-                    {
-                        property.stringValue = keys[newIndex];
-                    }
-                    else
-                    {
-                        AddressableUtil.OpenGroupEditor();
-                    }
-                }
+                return;
             }
+
+            if (dropdownInfo.MetaInfo.DropdownListValue == null)
+            {
+                return;
+            }
+
+            PopupWindow.Show(fieldRect, new SaintsTreeDropdownIMGUI(
+                dropdownInfo.MetaInfo,
+                Mathf.Max(fieldRect.width, 220f),
+                320f,
+                false,
+                (curItem, _) =>
+                {
+                    bool changed = ApplyAddressableAddressSelection(property, info, parent, dropdownInfo.Settings,
+                        (string)curItem, newValue => TriggerChangedIMGUI(property, newValue));
+                    if (changed)
+                    {
+                        cache.Error = "";
+                    }
+                    return null;
+                }));
         }
 
         protected override bool WillDrawBelow(SerializedProperty property,
@@ -80,9 +108,7 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
-            (string error, IEnumerable<AddressableAssetEntry> _) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
-            _error = error;
-            return _error != "";
+            return UpdateStatus(property, addressableAddressAttribute, out _).error != "";
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label,
@@ -91,15 +117,17 @@ namespace SaintsField.Editor.Drawers.Addressable.AddressableAddressDrawer
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
             AddressableAddressAttribute addressableAddressAttribute = (AddressableAddressAttribute)saintsAttribute;
-            (string error, IEnumerable<AddressableAssetEntry> _) = AddressableUtil.GetAllEntries(addressableAddressAttribute.Group, addressableAddressAttribute.LabelFilters);
-            _error = error;
+            (string error, AddressableAddressDropdownInfo _) = UpdateStatus(property, addressableAddressAttribute, out _);
 
-            return _error == "" ? 0 : ImGuiHelpBox.GetHeight(_error, width, MessageType.Error);
+            return error == "" ? 0 : ImGuiHelpBox.GetHeight(error, width, MessageType.Error);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property,
             GUIContent label, ISaintsAttribute saintsAttribute, int index,
-            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent) =>
-            _error == "" ? position : ImGuiHelpBox.Draw(position, _error, MessageType.Error);
+            IReadOnlyList<PropertyAttribute> allAttributes, FieldInfo info, object parent)
+        {
+            string error = EnsureKey(property).Error;
+            return error == "" ? position : ImGuiHelpBox.Draw(position, error, MessageType.Error);
+        }
     }
 }

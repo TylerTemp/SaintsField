@@ -147,7 +147,7 @@ namespace SaintsField.Editor.Drawers.Spine.SpineTransformConstraintPickerDrawer
             InfoIMGUI cache = EnsureKey(property, (SpineTransformConstraintPickerAttribute)saintsAttribute, info, parent);
             if (property.propertyType != SerializedPropertyType.String)
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 

@@ -73,7 +73,7 @@ namespace SaintsField.Editor.Drawers.GuidDrawer
             SerializedProperty stringProperty = TryGetStringProperty(property);
             if (stringProperty == null)
             {
-                DefaultDrawer(position, property, label, info);
+                RawDefaultDrawer(position, property, allAttributes, label, info);
                 return;
             }
 
