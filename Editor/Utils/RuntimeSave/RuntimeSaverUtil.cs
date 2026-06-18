@@ -167,7 +167,14 @@ namespace SaintsField.Editor.Utils.RuntimeSave
                 case SerializedPropertyType.ObjectReference:
                     pathSaver.objectReferenceValue = property.objectReferenceValue;
                     pathSaver.objectReferenceValueIsNull = property.objectReferenceValue == null;
-                    pathSaver.objectReferenceInstanceIDValue = property.objectReferenceInstanceIDValue;
+                    // pathSaver.objectReferenceInstanceIDValue = property.objectReferenceInstanceIDValue;
+                    pathSaver.objectReferenceIDValue = property.
+#if UNITY_6000_4_OR_NEWER
+                            objectReferenceEntityIdValue
+#else
+                            objectReferenceInstanceIDValue
+#endif
+                        ;
                     break;
                 case SerializedPropertyType.Enum:
                     pathSaver.enumValueIndex = property.enumValueIndex;
@@ -694,7 +701,7 @@ namespace SaintsField.Editor.Utils.RuntimeSave
 #else
                                     InstanceIDToObject(
 #endif
-                                        pathSaver.objectReferenceInstanceIDValue)
+                                        pathSaver.objectReferenceIDValue)
                                 ;
                         }
                     }
