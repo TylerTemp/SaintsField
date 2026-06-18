@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
-using SaintsField.Editor.Drawers.GUIColor;
 using SaintsField.Editor.Drawers.XPathDrawers.GetByXPathDrawer;
 using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
@@ -17,7 +16,6 @@ using SaintsField.Wwise;
 #endif
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {

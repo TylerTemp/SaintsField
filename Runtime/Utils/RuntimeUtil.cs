@@ -271,6 +271,8 @@ namespace SaintsField.Utils
 
                 (RichPartType partType, string content, string value, bool isSelfClose) parsedResult = ParsePart(part);
 
+                // Debug.Log($"{parsedResult.partType}: {parsedResult.content}/{parsedResult.value}/{parsedResult.isSelfClose}");
+
                 // ReSharper disable once MergeIntoPattern
                 // ReSharper disable once ConvertIfStatementToSwitchStatement
                 if (parsedResult.partType == RichPartType.Content && parsedResult.value == null && !parsedResult.isSelfClose)
@@ -375,7 +377,7 @@ namespace SaintsField.Utils
                         richText = new StringBuilder();
 
                         yield return new RichTextParsedChunk(part, ChunkType.NormalTag,
-                            tagType: TagType.EndTag, tagName: parsedResult.content);
+                            tagType: TagType.EndTag, tagName: parsedResult.content, tagValue: parsedResult.value);
                     }
                 }
                 else
