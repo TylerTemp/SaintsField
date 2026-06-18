@@ -31,7 +31,13 @@ namespace SaintsField.Editor.Utils.RuntimeSave
         public Color colorValue;
         public UnityEngine.Object objectReferenceValue;
         public bool objectReferenceValueIsNull;
-        public int objectReferenceInstanceIDValue;
+        public
+#if UNITY_6000_4_OR_NEWER
+            EntityId
+#else
+                int
+#endif
+            objectReferenceIDValue;
         public int enumValueIndex;
         public int enumValueFlag;
         public Vector2 vector2Value;
