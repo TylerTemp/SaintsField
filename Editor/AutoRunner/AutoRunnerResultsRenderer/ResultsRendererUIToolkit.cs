@@ -1,9 +1,8 @@
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE && !SAINTSFIELD_UI_TOOLKIT_DISABLE
+#if UNITY_2021_3_OR_NEWER
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.Editor.Linq;
 using UnityEditor;
 using Object = UnityEngine.Object;
 using UnityEditor.UIElements;
@@ -50,45 +49,15 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                 return preCheckResult;
             }
 
-            (AutoRunnerResult value, int index)[] canFixWithIndex = _autoRunner.Results
-                .WithIndex()
-                .Where(each => each.value.FixerResult?.CanFix ?? false)
-                .Reverse()
-                .ToArray();
+            (AutoRunnerResult value, int index)[] canFixWithIndex =
+                GetFixableResultsWithIndex(_autoRunner.Results);
             if (canFixWithIndex.Length > 0)
             {
                 _root.Add(new Button(() =>
                 {
-                    List<int> toRemoveIndex = new List<int>();
-                    foreach ((AutoRunnerResult autoRunnerResult, int index) in canFixWithIndex)
-                    {
-                        bool errorFixed = false;
-                        try
-                        {
-                            autoRunnerResult.FixerResult.Callback();
-                            errorFixed = true;
-                        }
-                        catch (Exception e)
-                        {
-                            autoRunnerResult.FixerResult.ExecError = e.Message;
-                        }
-
-                        if (errorFixed)
-                        {
-                            toRemoveIndex.Add(index);
-                        }
-                    }
-
-                    // ReSharper disable once InvertIf
-                    if(toRemoveIndex.Count > 0)
-                    {
-                        foreach (int index in toRemoveIndex)
-                        {
-                            _autoRunner.Results.RemoveAt(index);
-                        }
-
-                        OnUpdateUIToolKit(root);
-                    }
+                    RunFixAllAndRemove(canFixWithIndex);
+                    _results = Array.Empty<AutoRunnerResult>();
+                    OnUpdateUIToolKit(root);
                 })
                 {
                     text = "Fix All",
@@ -168,12 +137,12 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                         // serializedPropertyLabel.SetEnabled(false);
                         subGroupElementGroupElement.Add(serializedPropertyLabel);
 
-                        if (autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError != "")
+                        if (!string.IsNullOrEmpty(autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError))
                         {
                             subGroupElementGroupElement.Add(new HelpBox(autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError, HelpBoxMessageType.Warning));
                         }
 
-                        if (autoRunnerResultInfo.AutoRunnerResult.FixerResult.Error != "")
+                        if (!string.IsNullOrEmpty(autoRunnerResultInfo.AutoRunnerResult.FixerResult.Error))
                         {
                             subGroupElementGroupElement.Add(new HelpBox(autoRunnerResultInfo.AutoRunnerResult.FixerResult.Error, HelpBoxMessageType.Error));
                         }
@@ -182,18 +151,8 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
                         {
                             subGroupElementGroupElement.Add(new Button(() =>
                             {
-                                try
-                                {
-                                    autoRunnerResultInfo.AutoRunnerResult.FixerResult.Callback();
-                                }
-                                catch (Exception e)
-                                {
-                                    autoRunnerResultInfo.AutoRunnerResult.FixerResult.ExecError = e.Message;
-                                    OnUpdateUIToolKit(root);
-                                    return;
-                                }
-
-                                _autoRunner.Results.RemoveAt(autoRunnerResultInfo.Index);
+                                RunFixAndRemove(autoRunnerResultInfo);
+                                _results = Array.Empty<AutoRunnerResult>();
                                 OnUpdateUIToolKit(root);
                             })
                             {

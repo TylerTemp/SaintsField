@@ -1013,12 +1013,5 @@ namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
                 }
             }
         }
-
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            float height = GetFieldHeightIMGUI(width, preCheckResult);
-            Rect position = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
-            RenderPositionTargetIMGUI(position, preCheckResult);
-        }
     }
 }

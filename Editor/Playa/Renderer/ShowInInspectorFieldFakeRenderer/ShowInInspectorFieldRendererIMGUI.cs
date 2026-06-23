@@ -141,23 +141,6 @@ namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
             return helpBoxRect;
         }
 
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            if (!RenderField)
-            {
-                return;
-            }
-
-            float height = GetFieldHeightIMGUI(width, preCheckResult);
-            if (height < Mathf.Epsilon)
-            {
-                return;
-            }
-
-            Rect position = EditorGUILayout.GetControlRect(false, height);
-            RenderPositionTargetIMGUI(position, preCheckResult);
-        }
-
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement

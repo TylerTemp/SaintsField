@@ -22,6 +22,8 @@ namespace SaintsField.Editor.Playa.Renderer.Table
         private const float FooterHeightIMGUI = 22f;
         private const float ControlGapIMGUI = 4f;
         private const float TablePaddingIMGUI = 2f;
+        private const float MinColumnWidthIMGUI = 80f;
+        private const float DefaultColumnWidthIMGUI = 120f;
         private const float NonEmptyTableHeightPaddingIMGUI = 18f;
 
         private TableTreeViewIMGUI _tableIMGUI;
@@ -108,6 +110,33 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                 _itemCount = itemCount;
                 Reload();
                 _loaded = true;
+            }
+
+            public new void OnGUI(Rect rect)
+            {
+                base.OnGUI(rect);
+                DrawSyncedHeaderIMGUI(rect);
+            }
+
+            private void DrawSyncedHeaderIMGUI(Rect rect)
+            {
+                if (Event.current.type != EventType.Repaint || state.scrollPos.x <= 0f)
+                {
+                    return;
+                }
+
+                Rect headerRect = new Rect(rect.x, rect.y, rect.width, multiColumnHeader.height);
+                float headerContentWidth = Mathf.Max(rect.width,
+                    multiColumnHeader.state.widthOfAllVisibleColumns + GUI.skin.verticalScrollbar.fixedWidth);
+                Rect headerContentRect = new Rect(
+                    -state.scrollPos.x,
+                    0f,
+                    headerContentWidth,
+                    multiColumnHeader.height);
+
+                GUI.BeginGroup(headerRect);
+                multiColumnHeader.OnGUI(headerContentRect, 0f);
+                GUI.EndGroup();
             }
 
             protected override
@@ -253,19 +282,6 @@ namespace SaintsField.Editor.Playa.Renderer.Table
         {
             base.OnSearchField(searchString);
             _searchStringIMGUI = searchString ?? "";
-        }
-
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            EnsureApplicationChangedListenerIMGUI();
-            float height = GetFieldHeightIMGUI(width, preCheckResult);
-            if (height <= Mathf.Epsilon)
-            {
-                return;
-            }
-
-            Rect rect = EditorGUILayout.GetControlRect(false, height, GUILayout.ExpandWidth(true));
-            RenderPositionTargetIMGUI(rect, preCheckResult);
         }
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
@@ -764,11 +780,12 @@ namespace SaintsField.Editor.Playa.Renderer.Table
                     .Select(column => new MultiColumnHeaderState.Column
                     {
                         headerContent = new GUIContent(column.Title),
-                        autoResize = true,
+                        autoResize = false,
                         canSort = false,
                         allowToggleVisibility = true,
-                        minWidth = 40f,
-                        width = Mathf.Max(40f, width / Mathf.Max(1, context.Columns.Count)),
+                        minWidth = MinColumnWidthIMGUI,
+                        width = Mathf.Max(DefaultColumnWidthIMGUI,
+                            width / Mathf.Max(1, context.Columns.Count)),
                     })
                     .ToArray();
 

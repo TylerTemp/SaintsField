@@ -99,16 +99,5 @@ namespace SaintsField.Editor.Playa.Renderer
                 InAnyHorizontalLayout,
                 false);
         }
-
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            float height = GetFieldHeightIMGUI(width, preCheckResult);
-            if (height <= Mathf.Epsilon)
-            {
-                return;
-            }
-            Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
-            RenderPositionTargetIMGUI(rect, preCheckResult);
-        }
     }
 }

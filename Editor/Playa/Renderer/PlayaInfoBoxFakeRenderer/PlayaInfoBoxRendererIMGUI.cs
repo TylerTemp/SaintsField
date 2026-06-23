@@ -8,16 +8,6 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 {
     public partial class PlayaInfoBoxRenderer
     {
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            float height = GetHeightIMGUI(width);
-            if (height <= Mathf.Epsilon)
-            {
-                return;
-            }
-            Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
-            RenderPositionTargetIMGUI(rect, preCheckResult);
-        }
 
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {

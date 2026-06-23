@@ -25,17 +25,6 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer
             return _richTextDrawer;
         }
 
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            float height = GetHeightIMGUI(width);
-            if (height <= Mathf.Epsilon)
-            {
-                return;
-            }
-            Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
-            RenderPositionTargetIMGUI(rect, preCheckResult);
-        }
-
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             if (!preCheckResult.IsShown)

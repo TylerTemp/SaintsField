@@ -11,67 +11,37 @@ namespace SaintsField.Editor.Playa.NetCode
 {
     public partial class SaintsNetworkBehaviourEditor
     {
-        public virtual void OnEnable()
+        private void OnEnableIMGUI()
         {
-            // This can be null and throw an exception when running test runner in the editor
-            if (target == null)
+            if (!_saintsEditorIMGUI)
             {
                 return;
             }
-            // When we first add a NetworkBehaviour this editor will be enabled
-            // so we go ahead and check for an already existing NetworkObject here
-            // ReSharper disable once PossibleNullReferenceException
-            CheckForNetworkObject((target as NetworkBehaviour).gameObject);
 
-            try
-            {
-                _renderers = SaintsEditor.Setup(IMGUIGetNetCodeVariableNames(), serializedObject, this, targets);
-            }
-            catch (Exception)
-            {
-                _renderers = null;  // just... let IMGUI renderer to deal with it...
-            }
+            _coreEditor ??= new SaintsEditorCore(this, true, this);
+
+            _coreEditor.OnEnableIMGUI();
         }
 
         public override void OnInspectorGUI()
         {
-            EditorGUI.BeginChangeCheck();
             serializedObject.Update();
 
-            RenderNetCodeIMGUI();
-
-            MonoScript monoScript = SaintsEditor.GetMonoScript(target);
-            if (monoScript)
+            using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
-                using (new EditorGUI.DisabledScope(true))
+                RenderNetCodeIMGUI();
+                if (changed.changed)
                 {
-                    try
-                    {
-                        EditorGUILayout.ObjectField("Script", monoScript, GetType(), false);
-                    }
-                    catch (NullReferenceException)
-                    {
-                        // ignored
-                    }
+                    serializedObject.ApplyModifiedProperties();
                 }
             }
 
-            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if(_renderers == null)
-            {
-                _renderers = SaintsEditor.Setup(IMGUIGetNetCodeVariableNames(), serializedObject, this, targets);
-            }
-            foreach (ISaintsRenderer renderer in _renderers)
-            {
-                renderer.RenderIMGUI(Screen.width);
-            }
-
-            serializedObject.ApplyModifiedProperties();
-            EditorGUI.EndChangeCheck();
+            _coreEditor ??= new SaintsEditorCore(this, true, this);
+            _coreEditor.OnInspectorGUI();
         }
 
-        private ICollection<string> IMGUIGetNetCodeVariableNames() => GetNetCodeVariableFields().Values
-            .Where(each => each != null).Select(each => each.Name).ToArray();
+        // private ICollection<string> IMGUIGetNetCodeVariableNames() => GetNetCodeVariableFields().Values
+        //     .Where(each => each != null).Select(each => each.Name).ToArray();
 
         private void RenderNetCodeIMGUI()
         {

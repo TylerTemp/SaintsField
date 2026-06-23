@@ -16,6 +16,10 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
         private static string NameDropdownButtonField(SerializedProperty property) => $"{property.propertyPath}__Dropdown_Button";
         private static string NameHelpBox(SerializedProperty property) => $"{property.propertyPath}__Dropdown_HelpBox";
 
+        private const BindingFlags BindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
+                                              BindingFlags.Public | BindingFlags.DeclaredOnly;
+
+
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
             FieldInfo info, object parent)

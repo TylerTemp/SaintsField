@@ -64,16 +64,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return groupWithAttributes;
         }
 
-        protected virtual void RenderAboveIMGUI()
-        {
-        }
-
-        protected abstract void RenderTargetIMGUI(float width, PreCheckResult preCheckResult);
-
-        protected virtual void RenderBelowIMGUI()
-        {
-        }
-
         public virtual float GetHeightIMGUI(float width)
         {
             PreCheckResult preCheckResult = GetPreCheckResult(FieldWithInfo, true);
@@ -82,64 +72,11 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return 0;
             }
 
-            return GetAboveHeightIMGUI(width) + GetFieldHeightIMGUI(width, preCheckResult) + GetBelowHeightIMGUI(width);
+            return GetFieldHeightIMGUI(width, preCheckResult);
         }
-
-        protected virtual float GetAboveHeightIMGUI(float width)
-        {
-            // float totalHeight = 0f;
-            // foreach ((string _, List<IPlayaAttribute> attributes) in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
-            // {
-            //     float maxHeight = 0f;
-            //     float useWidth = attributes.Count == 1? width: width / attributes.Count;
-            //     foreach (IPlayaAttribute playaAttribute in attributes)
-            //     {
-            //         switch (playaAttribute)
-            //         {
-            //             case PlayaInfoBoxAttribute infoBoxAttribute:
-            //                 if(!infoBoxAttribute.Below)
-            //                 {
-            //                     maxHeight = Mathf.Max(maxHeight, GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
-            //                 }
-            //                 break;
-            //         }
-            //     }
-            //
-            //     totalHeight += maxHeight;
-            // }
-            // return totalHeight;
-            return 0;
-        }
-
 
 
         protected abstract float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult);
-
-        protected virtual float GetBelowHeightIMGUI(float width)
-        {
-            // float totalHeight = 0f;
-            // foreach ((string _, List<IPlayaAttribute> attributes) in GroupAttributesIMGUI(FieldWithInfo.PlayaAttributes))
-            // {
-            //     List<float> accHeight = new List<float>();
-            //     float useWidth = attributes.Count == 1? width: width / attributes.Count;
-            //     foreach (IPlayaAttribute playaAttribute in attributes)
-            //     {
-            //         switch (playaAttribute)
-            //         {
-            //             case PlayaInfoBoxAttribute infoBoxAttribute:
-            //                 if(infoBoxAttribute.Below)
-            //                 {
-            //                     accHeight.Add(GetInfoBoxHeightIMGUI(useWidth, infoBoxAttribute));
-            //                 }
-            //                 break;
-            //         }
-            //     }
-            //
-            //     totalHeight += accHeight.DefaultIfEmpty(0).Max();
-            // }
-            // return totalHeight;
-            return 0;
-        }
 
         public void RenderPositionIMGUI(Rect position)
         {

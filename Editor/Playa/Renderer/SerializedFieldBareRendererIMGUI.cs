@@ -14,11 +14,5 @@ namespace SaintsField.Editor.Playa.Renderer
         {
             EditorGUI.PropertyField(position, FieldWithInfo.SerializedProperty, new GUIContent(FieldWithInfo.SerializedProperty.displayName), true);
         }
-
-
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            EditorGUILayout.PropertyField(FieldWithInfo.SerializedProperty, new GUIContent(FieldWithInfo.SerializedProperty.displayName), true);
-        }
     }
 }

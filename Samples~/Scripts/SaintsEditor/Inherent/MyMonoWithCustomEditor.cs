@@ -50,11 +50,6 @@ namespace SaintsField.Samples.Scripts.SaintsEditor.Inherent
         {
         }
 
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            // IMGUI renderer, if you want IMGUI you can write here
-        }
-
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             // IMGUI renderer, if you want IMGUI you can write here

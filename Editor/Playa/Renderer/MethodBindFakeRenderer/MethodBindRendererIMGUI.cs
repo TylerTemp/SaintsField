@@ -41,19 +41,6 @@ namespace SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer
             SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(OnApplicationChanged);
         }
 
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-            EnsureAddListener();
-            float height = GetFieldHeightIMGUI(width, preCheckResult);
-            if (height <= Mathf.Epsilon)
-            {
-                return;
-            }
-
-            Rect rect = EditorGUILayout.GetControlRect(false, height, GUILayout.ExpandWidth(true));
-            RenderPositionTargetIMGUI(rect, preCheckResult);
-        }
-
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             EnsureAddListener();

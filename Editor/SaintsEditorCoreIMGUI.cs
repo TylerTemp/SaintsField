@@ -78,12 +78,16 @@ namespace SaintsField.Editor
 
             SerializedObject.Update();
 
+            using EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope();
             foreach (ISaintsRenderer renderer in _renderersIMGUI)
             {
                 renderer.RenderIMGUI(UnityEngine.Screen.width);
             }
 
-            SerializedObject.ApplyModifiedProperties();
+            if (changed.changed)
+            {
+                SerializedObject.ApplyModifiedProperties();
+            }
         }
     }
 }

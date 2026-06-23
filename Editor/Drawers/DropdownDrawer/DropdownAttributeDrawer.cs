@@ -18,10 +18,7 @@ namespace SaintsField.Editor.Drawers.DropdownDrawer
     [CustomPropertyDrawer(typeof(MenuDropdownAttribute), true)]
     public partial class DropdownAttributeDrawer: SaintsPropertyDrawer
     {
-        private string _error = "";
         private static readonly HashSet<string> DeprecatedDropdownWarningKeys = new HashSet<string>();
-        private const BindingFlags BindAttr = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic |
-                                      BindingFlags.Public | BindingFlags.DeclaredOnly;
 
         private static void ShowGenericMenu(MetaInfo metaInfo, string curDisplay, Rect fieldRect, Action<string, object> onSelect, bool hackSlashNoSub)
         {

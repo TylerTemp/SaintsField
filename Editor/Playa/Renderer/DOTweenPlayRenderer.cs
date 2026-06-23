@@ -22,10 +22,6 @@ namespace SaintsField.Editor.Playa.Renderer
         {
         }
 
-        protected override void RenderTargetIMGUI(float width, PreCheckResult preCheckResult)
-        {
-        }
-
         protected override float GetFieldHeightIMGUI(float width, PreCheckResult preCheckResult)
         {
             return 0f;
