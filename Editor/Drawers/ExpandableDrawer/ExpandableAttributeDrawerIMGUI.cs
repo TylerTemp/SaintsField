@@ -40,6 +40,10 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             // public HashSet<Object> TargetObjects;
             public SerializedObject SerializedObject;
             public IReadOnlyList<ISaintsRenderer> Renderers;
+            public UnityEditor.Editor Editor;
+            public bool UseEditorIMGUI;
+            public float EditorHeight = EditorGUIUtility.singleLineHeight;
+            public float EditorWidth;
         }
 
         private static readonly Dictionary<string, ExpandableInfo> IdToInfo = new Dictionary<string, ExpandableInfo>();
@@ -59,13 +63,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                     // ReSharper disable once InvertIf
                     if (IdToInfo.TryGetValue(key, out ExpandableInfo value))
                     {
-                        // ReSharper disable once UseNullPropagation
-                        if (value.SerializedObject != null)
-                        {
-                            // Debug.Log($"dispose {key}");
-                            value.SerializedObject.Dispose();
-                        }
-
+                        DisposeInfo(value);
                         IdToInfo.Remove(key);
                     }
                 });
@@ -73,6 +71,8 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
 
             if (hasKey && EqualSerObject(serializedObject, expandableInfo.SerializedObject))
             {
+                // GetSerObject creates a fresh wrapper. Keep the cached one and release this probe.
+                serializedObject?.Dispose();
                 return expandableInfo;
             }
 
@@ -83,6 +83,12 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 //     property.isExpanded = false;
                 // }
 
+                if (hasKey)
+                {
+                    DisposeInfo(expandableInfo);
+                    IdToInfo.Remove(key);
+                }
+
                 return new ExpandableInfo
                 {
                     Error = "",
@@ -91,31 +97,130 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 };
             }
 
-            if(hasKey && expandableInfo.SerializedObject != null)
+            if(hasKey)
             {
-                // Debug.Log($"dispose {key}");
-                try
-                {
-                    expandableInfo.SerializedObject.Dispose();
-                }
-                catch (Exception)
-                {
-                    // do nothing
-                }
+                DisposeInfo(expandableInfo);
+                IdToInfo.Remove(key);
             }
 
-            IReadOnlyList<ISaintsRenderer> renderers = SaintsEditor.Setup(Array.Empty<string>(), serializedObject, makeRenderer, serializedObject.targetObjects);
+            ExpandableInfo newInfo;
+            try
+            {
+                newInfo = MakeExpandableInfo(makeRenderer, serializedObject);
+            }
+            catch (Exception)
+            {
+                serializedObject.Dispose();
+                throw;
+            }
 
             // Debug.Log(serObject);
 
             // Debug.Log($"create {key}");
 
-            return IdToInfo[key] = new ExpandableInfo
+            return IdToInfo[key] = newInfo;
+        }
+
+        private static ExpandableInfo MakeExpandableInfo(IMakeRenderer makeRenderer, SerializedObject serializedObject)
+        {
+            UnityEditor.Editor editor = CreateTargetEditor(serializedObject.targetObjects);
+
+            if (editor is IMakeRenderer editorMakeRenderer)
+            {
+                IReadOnlyList<ISaintsRenderer> renderers;
+                try
+                {
+                    renderers = SaintsEditor.Setup(Array.Empty<string>(), serializedObject, editorMakeRenderer,
+                        serializedObject.targetObjects);
+                }
+                catch (Exception)
+                {
+                    Object.DestroyImmediate(editor);
+                    throw;
+                }
+
+                return new ExpandableInfo
+                {
+                    Error = "",
+                    SerializedObject = serializedObject,
+                    Renderers = renderers,
+                    Editor = editor,
+                    UseEditorIMGUI = false,
+                };
+            }
+
+            if (editor != null)
+            {
+                return new ExpandableInfo
+                {
+                    Error = "",
+                    SerializedObject = serializedObject,
+                    Renderers = Array.Empty<ISaintsRenderer>(),
+                    Editor = editor,
+                    UseEditorIMGUI = true,
+                };
+            }
+
+            return new ExpandableInfo
             {
                 Error = "",
                 SerializedObject = serializedObject,
-                Renderers = renderers,
+                Renderers = SaintsEditor.Setup(Array.Empty<string>(), serializedObject, makeRenderer, serializedObject.targetObjects),
             };
+        }
+
+        private static UnityEditor.Editor CreateTargetEditor(Object[] targets)
+        {
+            try
+            {
+                return UnityEditor.Editor.CreateEditor(targets);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static void DisposeInfo(ExpandableInfo info)
+        {
+            if (info == null)
+            {
+                return;
+            }
+
+            if (info.Renderers != null)
+            {
+                foreach (ISaintsRenderer renderer in info.Renderers)
+                {
+                    try
+                    {
+                        renderer.OnDestroy();
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                }
+            }
+
+            if (info.SerializedObject != null)
+            {
+                // Debug.Log($"dispose {key}");
+                try
+                {
+                    info.SerializedObject.Dispose();
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+
+            if (info.Editor != null)
+            {
+                Object.DestroyImmediate(info.Editor);
+                info.Editor = null;
+            }
         }
 
         protected override float DrawPreLabelImGui(Rect position, SerializedProperty property,
@@ -171,6 +276,11 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             }
 
             serInfo.SerializedObject.UpdateIfRequiredOrScript();
+
+            if (serInfo.UseEditorIMGUI)
+            {
+                return basicHeight + Mathf.Max(EditorGUIUtility.singleLineHeight, serInfo.EditorHeight);
+            }
 
             // float expandedHeight = SerializedUtils.GetAllField(serInfo.SerializedObject)
             //     .Select(childProperty => EditorGUI.GetPropertyHeight(childProperty, true) + 2)
@@ -229,6 +339,14 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             using (new ResetIndentScoop())
             using (new ExpandableIMGUIScoop())
             {
+                if (serInfo.UseEditorIMGUI)
+                {
+                    float childHeight = Mathf.Max(EditorGUIUtility.singleLineHeight, serInfo.EditorHeight);
+                    (Rect childRect, Rect leftOutRect) = RectUtils.SplitHeightRect(expandabledRect, childHeight);
+                    DrawEditorIMGUI(childRect, serInfo, property);
+                    return leftOutRect;
+                }
+
                 // foreach (SerializedProperty iterator in SerializedUtils.GetAllField(serInfo.SerializedObject))
                 // {
                 //     float childHeight = EditorGUI.GetPropertyHeight(iterator, true) + 2;
@@ -294,6 +412,106 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
             return expandabledRect;
         }
 
+        private static void DrawEditorIMGUI(Rect position, ExpandableInfo serInfo, SerializedProperty property)
+        {
+            if (serInfo.Editor == null)
+            {
+                return;
+            }
+
+            const float MaxMeasuredEditorHeight = 100000f;
+            Rect hostRect = position;
+            float fallbackWidth = EditorGUIUtility.currentViewWidth > hostRect.x
+                ? EditorGUIUtility.currentViewWidth - hostRect.x - 4f
+                : 0f;
+            float hostWidth = Mathf.Max(1f, hostRect.width, fallbackWidth);
+            hostRect.width = hostWidth;
+            Rect localArea = new Rect(0, 0, hostWidth, MaxMeasuredEditorHeight);
+            GUILayoutOption[] fixedWidthOptions =
+            {
+                GUILayout.Width(hostWidth),
+                GUILayout.MinWidth(hostWidth),
+                GUILayout.MaxWidth(hostWidth),
+            };
+
+            bool groupStarted = false;
+            bool areaStarted = false;
+            bool verticalStarted = false;
+
+            float oldLabelWidth = EditorGUIUtility.labelWidth;
+            bool oldWideMode = EditorGUIUtility.wideMode;
+
+            try
+            {
+                GUI.BeginGroup(hostRect);
+                groupStarted = true;
+
+                GUILayout.BeginArea(localArea, GUIContent.none, GUIStyle.none);
+                areaStarted = true;
+
+                GUILayout.BeginVertical(GUIStyle.none, fixedWidthOptions);
+                verticalStarted = true;
+
+                EditorGUIUtility.wideMode = hostWidth > 330f;
+                EditorGUIUtility.labelWidth = Mathf.Min(oldLabelWidth, Mathf.Max(120f, hostWidth * 0.45f));
+
+                serInfo.Editor.OnInspectorGUI();
+
+                Rect lastRect = Event.current.type == EventType.Repaint
+                    ? GUILayoutUtility.GetLastRect()
+                    : default;
+
+                GUILayout.EndVertical();
+                verticalStarted = false;
+
+                if (Event.current.type == EventType.Repaint)
+                {
+                    float newHeight = Mathf.Max(EditorGUIUtility.singleLineHeight, Mathf.Ceil(lastRect.yMax));
+                    bool heightChanged = Mathf.Abs(serInfo.EditorHeight - newHeight) > 0.5f;
+                    bool widthChanged = Mathf.Abs(serInfo.EditorWidth - position.width) > 0.5f;
+
+                    if (heightChanged || widthChanged)
+                    {
+                        serInfo.EditorHeight = newHeight;
+                        serInfo.EditorWidth = position.width;
+                        UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+                    }
+                }
+            }
+            catch (ArgumentException)
+            {
+                // Some built-in editors assume they own the inspector layout. Keep the drawer alive.
+            }
+            catch (NullReferenceException)
+            {
+                CleanAndRemove(property);
+            }
+            catch (ObjectDisposedException)
+            {
+                CleanAndRemove(property);
+            }
+            finally
+            {
+                EditorGUIUtility.labelWidth = oldLabelWidth;
+                EditorGUIUtility.wideMode = oldWideMode;
+
+                if (verticalStarted)
+                {
+                    GUILayout.EndVertical();
+                }
+
+                if (areaStarted)
+                {
+                    GUILayout.EndArea();
+                }
+
+                if (groupStarted)
+                {
+                    GUI.EndGroup();
+                }
+            }
+        }
+
         private static void CleanAndRemove(SerializedProperty property)
         {
             string key = SerializedUtils.GetUniqueId(property);
@@ -302,19 +520,7 @@ namespace SaintsField.Editor.Drawers.ExpandableDrawer
                 return;
             }
 
-            if (info.SerializedObject != null)
-            {
-                // Debug.Log($"Disposed on error {key}");
-                try
-                {
-                    info.SerializedObject.Dispose();
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
-            }
-
+            DisposeInfo(info);
             IdToInfo.Remove(key);
         }
     }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SaintsField.Samples.Scripts
 {
@@ -17,5 +18,8 @@ namespace SaintsField.Samples.Scripts
         //
         // [Expandable]
         // public Scriptable[] _scriptables;
+
+        [Expandable]
+        public Button[] buttons;
     }
 }
