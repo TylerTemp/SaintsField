@@ -9,8 +9,7 @@ namespace SaintsField.Editor.Utils
         private const float DegreesPerSecond = -360f;
 
         private Texture2D _icon;
-        private bool _lastDrawTimeInit;
-        private double _lastDrawTime;
+        private double _lastDrawTime = -1d;
         private float _rotation;
 
         private Texture2D GetIcon()
@@ -25,12 +24,6 @@ namespace SaintsField.Editor.Utils
 
         public void Draw(Rect position)
         {
-            if (!_lastDrawTimeInit)
-            {
-                _lastDrawTime = EditorApplication.timeSinceStartup;
-                return;
-            }
-
             if (Event.current == null || Event.current.type != EventType.Repaint)
             {
                 return;
@@ -43,7 +36,11 @@ namespace SaintsField.Editor.Utils
             }
 
             double now = EditorApplication.timeSinceStartup;
-            _rotation = Mathf.Repeat(_rotation + (float)((now - _lastDrawTime) * DegreesPerSecond), 360f);
+            if (_lastDrawTime >= 0d)
+            {
+                _rotation = Mathf.Repeat(_rotation + (float)((now - _lastDrawTime) * DegreesPerSecond), 360f);
+            }
+
             _lastDrawTime = now;
 
             Matrix4x4 oldMatrix = GUI.matrix;

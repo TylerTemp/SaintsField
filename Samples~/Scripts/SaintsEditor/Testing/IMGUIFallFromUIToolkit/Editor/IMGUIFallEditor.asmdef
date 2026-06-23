@@ -1,0 +1,20 @@
+{
+    "name": "IMGUIFallEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:226bfeee49f64b54aa9d649c82eb4ec7"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_EDITOR"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -42,6 +42,8 @@ namespace SaintsField.Editor
 {
     public partial class SaintsEditor: UnityEditor.Editor, IDOTweenPlayRecorder, IMakeRenderer, ISearchable
     {
+        // ReSharper disable once FieldCanBeMadeReadOnly.Local
+        // ReSharper disable once ConvertToConstant.Local
         private static bool _saintsEditorIMGUI = true;
         private SaintsEditorCore _coreEditor;
 

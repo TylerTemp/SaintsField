@@ -28,7 +28,6 @@ MonoBehaviour:
   - {fileID: 2381348526136899176}
   - {fileID: 2575624296576687229}
   m_RendererFeatureMap: 6836ca1ade3f0c217d9c51c8a674be23
-  m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 0}
   m_AssetVersion: 3
@@ -56,6 +55,7 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+  m_TileOnlyMode: 0
   animationCurve:
     serializedVersion: 2
     m_Curve: []
@@ -64,7 +64,7 @@ MonoBehaviour:
     m_RotationOrder: 4
 --- !u!114 &2381348526136899176
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -90,7 +90,7 @@ MonoBehaviour:
     SampleCount: -1
 --- !u!114 &2575624296576687229
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}

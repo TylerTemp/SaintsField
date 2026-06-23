@@ -1,10 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,35 +8,10 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
 {
     public partial class PostFieldButtonAttributeDrawer
     {
-        private const float PaddingWidth = 3f;
-
         protected override float GetPostFieldWidth(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            DecButtonAttribute decButtonAttribute = (DecButtonAttribute)saintsAttribute;
-
-            object target = property.serializedObject.targetObject;
-            (string xmlError, string labelXml) = RichTextDrawer.GetLabelXml(property, decButtonAttribute.ButtonLabel,
-                decButtonAttribute.IsCallback, info, target);
-            GetOrCreateButtonInfo(property).Error = xmlError;
-
-            IReadOnlyList<RichTextDrawer.RichTextChunk> richChunks;
-            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if (labelXml is null)
-            {
-                labelXml = ObjectNames.NicifyVariableName(decButtonAttribute.FuncName);
-                richChunks = new[]
-                {
-                    new RichTextDrawer.RichTextChunk(content: labelXml),
-                };
-            }
-            else
-            {
-                richChunks = RichTextDrawer.ParseRichXmlWithProvider(labelXml, this).ToArray();
-            }
-
-            return PaddingWidth * 2 + Mathf.Min(position.width,
-                Mathf.Max(10, RichTextDrawer.GetWidth(label, position.height, richChunks)));
+            return GetButtonWidthIMGUI(position, property, label, saintsAttribute, index, info, parent);
         }
 
         protected override bool DrawPostFieldImGui(Rect position, Rect fullRect, SerializedProperty property,
@@ -48,11 +19,7 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            // Debug.Log($"draw below {position}");
-            // return Draw(position, property, label, saintsAttribute);
-            // float width = GetPostFieldWidth(position, property, label, saintsAttribute);
-            // (Rect useRect, Rect leftRect) = RectUtils.SplitWidthRect(position, width);
-            Draw(position, property, label, saintsAttribute, info, parent);
+            Draw(position, property, label, saintsAttribute, index, info, parent);
             return true;
         }
 
@@ -62,25 +29,23 @@ namespace SaintsField.Editor.Drawers.ButtonDrawers.PostFieldButtonDrawer
             FieldInfo info,
             object parent)
         {
-            return GetDisplayError(property) != "";
+            UpdateButtonLabelIMGUI(property, saintsAttribute, index, info, parent);
+            return HasResultIMGUI(property, index);
         }
 
         protected override float GetBelowExtraHeight(SerializedProperty property, GUIContent label, float width,
             IReadOnlyList<PropertyAttribute> allAttributes,
             ISaintsAttribute saintsAttribute, int index, FieldInfo info, object parent)
         {
-            string displayError = GetDisplayError(property);
-            return displayError == "" ? 0 : ImGuiHelpBox.GetHeight(displayError, width, MessageType.Error);
+            UpdateButtonLabelIMGUI(property, saintsAttribute, index, info, parent);
+            return GetResultHeightIMGUI(property, index, width);
         }
 
         protected override Rect DrawBelow(Rect position, SerializedProperty property, GUIContent label,
             ISaintsAttribute saintsAttribute, int index, IReadOnlyList<PropertyAttribute> allAttributes,
             FieldInfo info, object parent)
         {
-            string displayError = GetDisplayError(property);
-            return displayError == ""
-                ? position
-                : ImGuiHelpBox.Draw(position, displayError, MessageType.Error);
+            return DrawResultIMGUI(position, property, index);
         }
     }
 }

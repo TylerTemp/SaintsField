@@ -437,14 +437,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
         {
             PreCheckResult baseResult = base.OnUpdateUIToolKit(root);
 
-            foreach (IPlayaMethodBindAttribute playaMethodBindAttribute in FieldWithInfo.PlayaAttributes.OfType<IPlayaMethodBindAttribute>())
-            {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
-                Debug.Log($"button click {playaMethodBindAttribute}");
-#endif
-                CheckMethodBind(playaMethodBindAttribute, FieldWithInfo);
-            }
-
             FancyButton fancyButton;
             try
             {

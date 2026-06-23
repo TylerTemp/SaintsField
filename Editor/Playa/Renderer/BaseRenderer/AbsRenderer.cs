@@ -488,6 +488,76 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return (rawMemberValue, useTarget);
         }
 
+        protected void BackWriteCallback(object rawMemberValue, object useTarget)
+        {
+            bool isStruct = ReflectUtils.TypeIsStruct(FieldWithInfo.Targets[0].GetType());
+            if (isStruct && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
+            {
+                // Debug.Log($"write back {FieldWithInfo.TargetParent}:{FieldWithInfo.TargetMemberInfo.Name}");
+                switch (FieldWithInfo.TargetMemberInfo)
+                {
+                    case FieldInfo fieldInfo:
+                    {
+                        if (FieldWithInfo.TargetMemberIndex != -1)
+                        {
+                            if(rawMemberValue != null)
+                            {
+                                Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex, useTarget);
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                fieldInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                            }
+#pragma warning disable CS0168 // Variable is declared but never used
+                            catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                            {
+                                // ignored
+#if SAINTSFIELD_DEBUG
+                                Debug.LogException(e);
+#endif
+                            }
+                        }
+                    }
+                        break;
+                    case PropertyInfo propertyInfo:
+                    {
+                        if (propertyInfo.CanWrite)
+                        {
+                            if (FieldWithInfo.TargetMemberIndex != -1)
+                            {
+                                if(rawMemberValue != null)
+                                {
+                                    Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex,
+                                        useTarget);
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    propertyInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                }
+#pragma warning disable CS0168 // Variable is declared but never used
+                                catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+                                {
+                                    // ignored
+#if SAINTSFIELD_DEBUG
+                                    Debug.LogException(e);
+#endif
+                                }
+                            }
+                        }
+                    }
+                        break;
+                }
+            }
+        }
+
         private static readonly Type[] SkipTypes = { typeof(IntPtr), typeof(UIntPtr), typeof(void) };
 
         public static bool SkipTypeDrawing(Type checkType)

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -22,159 +21,6 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
         {
             _serializedObject = serializedObject;
             _buttonAttribute = buttonAttribute;
-        }
-
-        private void CheckMethodBind(IPlayaMethodBindAttribute playaMethodBindAttribute, SaintsFieldWithInfo fieldWithInfo)
-        {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                return;
-            }
-
-            ParameterInfo[] methodParams = fieldWithInfo.MethodInfo.GetParameters();
-
-            MethodBind methodBind = playaMethodBindAttribute.MethodBind;
-            string eventTarget = playaMethodBindAttribute.EventTarget;
-            object value = playaMethodBindAttribute.Value;
-
-            UnityEventBase unityEventBase = null;
-            UnityEngine.Object unityEventContainerObject;
-            List<Type> invokeRequiredTypes = new List<Type>();
-            string eventDisplayName;
-            if (methodBind == MethodBind.ButtonOnClick)
-            {
-                UnityEngine.UI.Button uiButton = eventTarget is null
-                    ? TryFindButton(fieldWithInfo.Targets[0])
-                    : GetButton(eventTarget, fieldWithInfo.Targets[0]);
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
-                Debug.Log($"find button `{uiButton}`");
-#endif
-
-                if (!uiButton)
-                {
-                    return;
-                }
-
-                unityEventContainerObject = uiButton;
-                unityEventBase = uiButton.onClick;
-                eventDisplayName = $"{eventTarget ?? "Button"}.onClick";
-            }
-            else  // custom event at the moment
-            {
-                eventDisplayName = eventTarget;
-                List<string> attrNames = new List<string>();
-                if (eventTarget.Contains("."))
-                {
-                    attrNames.AddRange(eventTarget.Split(SerializedUtils.DotSplitSeparator));
-                }
-                else
-                {
-                    attrNames.Add(eventTarget);
-                }
-
-                object target = fieldWithInfo.Targets[0];
-
-                unityEventContainerObject = _serializedObject.targetObject;
-
-                while (attrNames.Count > 0)
-                {
-                    string searchAttr = attrNames[0];
-                    attrNames.RemoveAt(0);
-                    if (attrNames.Count == 0)
-                    {
-                        (string error, UnityEventBase foundValue) =
-                            Util.GetOfNoParams<UnityEventBase>(target, searchAttr, null);
-                        // Debug.Log($"{searchAttr}, {foundValue}");
-                        if (error != "")
-                        {
-                            return;
-                        }
-
-                        unityEventBase = foundValue;
-                    }
-                    else
-                    {
-                        (string error, object foundValue) =
-                            Util.GetOfNoParams<object>(target, searchAttr, null);
-                        // Debug.Log($"{searchAttr}, {foundValue}");
-                        if (error != "")
-                        {
-                            return;
-                        }
-
-                        if (foundValue == null)
-                        {
-                            return;
-                        }
-
-                        target = foundValue;
-                        if(foundValue is UnityEngine.Object foundUObject)
-                        {
-                            unityEventContainerObject = foundUObject;
-                        }
-                    }
-                }
-
-                if (unityEventBase == null)
-                {
-                    return;
-                }
-
-                Type unityEventType = unityEventBase.GetType();
-                if (unityEventType.IsGenericType)
-                {
-                    invokeRequiredTypes.AddRange(unityEventType.GetGenericArguments());
-                }
-            }
-
-            for (int eventIndex = 0; eventIndex < unityEventBase.GetPersistentEventCount(); eventIndex++)
-            {
-                UnityEngine.Object persistentTarget = unityEventBase.GetPersistentTarget(eventIndex);
-                string persistentMethodName = unityEventBase.GetPersistentMethodName(eventIndex);
-                if (ReferenceEquals(persistentTarget, fieldWithInfo.Targets[0]) && persistentMethodName == fieldWithInfo.MethodInfo.Name)
-                {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
-                    Debug.Log($"`{persistentMethodName}` already added to `{unityEventBase}`");
-#endif
-                    return;
-                }
-            }
-
-            // UnityAction action = (UnityAction) Delegate.CreateDelegate(typeof(UnityAction), fieldWithInfo.Target, fieldWithInfo.MethodInfo);
-
-            Undo.RecordObject(unityEventContainerObject, "AddEventListener");
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
-            Debug.Log($"add `{fieldWithInfo.MethodInfo.Name}` to `{unityEventBase}` event on target {unityEventContainerObject}");
-#endif
-
-            // Undo.RecordObject(unityEventBase, "AddOnClick");
-            if (methodParams.Length == 0)
-            {
-                UnityEventTools.AddVoidPersistentListener(
-                    unityEventBase,
-                    (UnityAction)Delegate.CreateDelegate(typeof(UnityAction),
-                        fieldWithInfo.Targets[0], fieldWithInfo.MethodInfo));
-                EditorUtility.SetDirty(unityEventContainerObject);
-                SaintsPropertyDrawer.EnqueueSceneViewNotification($"Bind callback `{fieldWithInfo.MethodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`");
-                return;
-            }
-
-            if (playaMethodBindAttribute.IsCallback)
-            {
-                (string error, object foundValue) = Util.GetOfNoParams<object>(fieldWithInfo.Targets[0], (string)value, null);
-
-                if (error != "")
-                {
-                    return;
-                }
-
-                value = foundValue;
-            }
-            Util.BindEventWithValue(unityEventBase, fieldWithInfo.MethodInfo, invokeRequiredTypes.ToArray(), fieldWithInfo.Targets[0], value);
-            SaintsPropertyDrawer.EnqueueSceneViewNotification($"Bind callback `{fieldWithInfo.MethodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`({value})");
-            EditorUtility.SetDirty(unityEventContainerObject);
         }
 
         private static UnityEngine.UI.Button GetButton(string by, object target)
@@ -244,7 +90,5 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
         {
             return $"<{FieldWithInfo.RenderType} {FieldWithInfo.MethodInfo?.Name}/>";
         }
-
-        private IEnumerator _imGuiEnumerator;
     }
 }

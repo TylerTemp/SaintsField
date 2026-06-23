@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Interfaces;
 using UnityEngine;
 
 namespace SaintsField.Editor.Utils
@@ -57,6 +58,7 @@ namespace SaintsField.Editor.Utils
 
             // Debug.Log($"refresh fetch for {key}");
             attributes = memberInfo.GetCustomAttributes().ToArray();
+            attributes = EnsureSaintsAttributeFirst(attributes);
             CustomAttributes[key] = attributes;
             return attributes;
         }
@@ -73,6 +75,7 @@ namespace SaintsField.Editor.Utils
 
             // Debug.Log($"refresh fetch for {key}");
             attributes = memberInfo.GetCustomAttributes().ToArray();
+            attributes = EnsureSaintsAttributeFirst(attributes);
             CustomAttributes[key] = attributes;
             return attributes.OfType<T>().ToArray();
         }
@@ -89,8 +92,28 @@ namespace SaintsField.Editor.Utils
 
             // Debug.Log($"refresh fetch for {key}");
             attributes = attributeType.GetCustomAttributes(inherit: inherit).Cast<Attribute>().ToArray();
+            attributes = EnsureSaintsAttributeFirst(attributes);
             CustomAttributes[key] = attributes;
             return attributes.OfType<T>().ToArray();
+        }
+
+        private static Attribute[] EnsureSaintsAttributeFirst(Attribute[] attributes)
+        {
+            if (attributes.Length == 0 || attributes[0] is ISaintsAttribute)
+            {
+                return attributes;
+            }
+
+            int saintsIndex = Array.FindIndex(attributes, each => each is PropertyAttribute and ISaintsAttribute);
+            if (saintsIndex <= 0)
+            {
+                return attributes;
+            }
+
+            Attribute saintsAttribute = attributes[saintsIndex];
+            Array.Copy(attributes, 0, attributes, 1, saintsIndex);
+            attributes[0] = saintsAttribute;
+            return attributes;
         }
 
         // public static void ReplaceCustomAttributes(MemberInfo memberInfo, Attribute[] attributes, bool inherit = false)

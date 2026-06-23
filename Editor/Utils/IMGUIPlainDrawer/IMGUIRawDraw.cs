@@ -63,9 +63,14 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 0);
             if (!IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer imguiDrawer))
             {
-                PropertyDrawer drawerInstance = useDrawerType == null
-                    ? null
-                    : SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, fieldInfo, useAttribute, label);
+                PropertyDrawer drawerInstance = null;
+                if (useDrawerType != null)
+                {
+                    drawerInstance = typeof(SaintsPropertyDrawer).IsAssignableFrom(useDrawerType)
+                        ? SaintsPropertyDrawer.MakePropertyDrawer(useDrawerType, fieldInfo, useAttribute, label)
+                        : new UnityPropertyFieldProxyDrawer();
+                }
+
                 imguiDrawer =
                     IMGUIDrawerCache.CachedDrawers[drawerKey] =
                         drawerInstance;
@@ -98,11 +103,14 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
             FieldInfo fieldInfo,
             bool inHorizontalLayout)
         {
+            if (imguiDrawer != null)
+            {
+                return imguiDrawer.GetPropertyHeight(property, useGUIContent);
+            }
 
-            return imguiDrawer?.GetPropertyHeight(property, useGUIContent)
-                   ?? GetPropertyHeightRawFallback(
-                       property, allAttributes, rawType, useGUIContent, fieldInfo, inHorizontalLayout
-                   );
+            return GetPropertyHeightRawFallback(
+                property, allAttributes, rawType, useGUIContent, fieldInfo, inHorizontalLayout
+            );
         }
 
         public static float GetPropertyHeightRawFallback(
@@ -703,6 +711,19 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         {
             property.serializedObject.ApplyModifiedProperties();
             SaintsEditorApplicationChanged.OnSaintsFieldChangedEvent.Invoke();
+        }
+    }
+
+    internal sealed class UnityPropertyFieldProxyDrawer : PropertyDrawer
+    {
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            return EditorGUI.GetPropertyHeight(property, label, true);
+        }
+
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            EditorGUI.PropertyField(position, property, label, true);
         }
     }
 }
