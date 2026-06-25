@@ -2,8 +2,8 @@
 
 ## 5.19.0 ##
 
-1.  Remove "Build in Data" from Addressable group as it's a reserved group by Unity. Adding anything inside will not be accessable
-2.  [IMGUI]: IMGUI overhaul so most attributes works in custom drawers
+1.  Remove "Build in Data" from Addressable group as it's a reserved group by Unity. Adding anything inside will not be accessible
+2.  [IMGUI]: IMGUI overhaul so most attributes work in custom drawers
 3.  Add: Sign unity package as Unity 6 required
 
 ## 5.18.9 ##
