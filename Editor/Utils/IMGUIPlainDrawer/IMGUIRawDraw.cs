@@ -16,6 +16,10 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
 {
     public static class IMGUIRawDraw
     {
+        private const int DefaultDrawerCacheIndex = 0;
+        private const int ReferencePickerDrawerCacheIndex = 2;
+        private const int EnumDropdownDrawerCacheIndex = 3;
+
         public static readonly Color LabelGrayColor = EColor.EditorSeparator.GetColor();
         private const float VerticalPadding = 1f;
         private static RichTextDrawer _richTextDrawer;
@@ -134,7 +138,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
                 allAttributes,
                 fieldInfo);
 
-            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 0);
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, DefaultDrawerCacheIndex);
             if (!IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer imguiDrawer))
             {
                 PropertyDrawer drawerInstance = null;
@@ -156,7 +160,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         private static SaintsRowAttributeDrawer GetAndCacheSaintsRowDrawer(SerializedProperty property, FieldInfo fieldInfo, string label,
             bool inHorizontalLayout)
         {
-            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 0);
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, DefaultDrawerCacheIndex);
             if (IMGUIDrawerCache.CachedSaintsRowDrawers.TryGetValue(drawerKey, out SaintsRowAttributeDrawer saintsRowDrawer))
             {
                 return saintsRowDrawer;
@@ -176,10 +180,12 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         private static ReferencePickerAttributeDrawer GetAndCacheReferencePickerDrawer(SerializedProperty property,
             FieldInfo fieldInfo, string label, bool inHorizontalLayout)
         {
-            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 0);
-            if (IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer drawer))
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, ReferencePickerDrawerCacheIndex);
+            if (IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer drawer) &&
+                drawer is ReferencePickerAttributeDrawer cachedDrawer)
             {
-                return (ReferencePickerAttributeDrawer)drawer;
+                cachedDrawer.InHorizontalLayout = inHorizontalLayout;
+                return cachedDrawer;
             }
 
             ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
@@ -194,7 +200,7 @@ namespace SaintsField.Editor.Utils.IMGUIPlainDrawer
         private static SaintsPropertyDrawer GetAndCacheEnumDropdownDrawer(SerializedProperty property, Type rawType,
             FieldInfo fieldInfo, string label, bool inHorizontalLayout)
         {
-            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, 3);
+            IMGUIDrawerCache.DrawerId drawerKey = new IMGUIDrawerCache.DrawerId(property, EnumDropdownDrawerCacheIndex);
             if (IMGUIDrawerCache.CachedDrawers.TryGetValue(drawerKey, out PropertyDrawer drawer))
             {
                 SaintsPropertyDrawer cachedDrawer = (SaintsPropertyDrawer)drawer;
